@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.OrderReviewObligationCheckEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ObligationData;
+import uk.gov.hmcts.reform.civil.model.StoredObligationData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -68,9 +68,9 @@ class OrderReviewObligationCheckHandlerTest {
     void handleTask_shouldPublishEvent_whenObligationDateIsCurrentDateAndWATaskRaisedIsNo() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
-        ObligationData obligationData = mock(ObligationData.class);
-        Element<ObligationData> element = Element.<ObligationData>builder().value(obligationData).build();
-        List<Element<ObligationData>> storedObligationData = Collections.singletonList(element);
+        StoredObligationData obligationData = mock(StoredObligationData.class);
+        Element<StoredObligationData> element = Element.<StoredObligationData>builder().value(obligationData).build();
+        List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
         when(caseSearchService.getCases()).thenReturn(Collections.singletonList(caseDetails));
@@ -91,9 +91,9 @@ class OrderReviewObligationCheckHandlerTest {
     void handleTask_shouldNotPublishEvent_whenObligationDateIsNotCurrentDate() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
-        ObligationData obligationData = mock(ObligationData.class);
-        Element<ObligationData> element = Element.<ObligationData>builder().value(obligationData).build();
-        List<Element<ObligationData>> storedObligationData = Collections.singletonList(element);
+        StoredObligationData obligationData = mock(StoredObligationData.class);
+        Element<StoredObligationData> element = Element.<StoredObligationData>builder().value(obligationData).build();
+        List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
         when(caseSearchService.getCases()).thenReturn(Collections.singletonList(caseDetails));
@@ -113,9 +113,9 @@ class OrderReviewObligationCheckHandlerTest {
     void handleTask_shouldNotPublishEvent_whenWATaskRaisedIsYes() {
         CaseDetails caseDetails = mock(CaseDetails.class);
         CaseData caseData = mock(CaseData.class);
-        ObligationData obligationData = mock(ObligationData.class);
-        Element<ObligationData> element = Element.<ObligationData>builder().value(obligationData).build();
-        List<Element<ObligationData>> storedObligationData = Collections.singletonList(element);
+        StoredObligationData obligationData = mock(StoredObligationData.class);
+        Element<StoredObligationData> element = Element.<StoredObligationData>builder().value(obligationData).build();
+        List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
         when(caseSearchService.getCases()).thenReturn(Collections.singletonList(caseDetails));

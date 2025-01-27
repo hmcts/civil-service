@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,8 +34,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
@@ -43,7 +41,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -57,10 +54,10 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -80,27 +77,19 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.CONFIRM
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.FAST_CLAIM_TRACK;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.GA_DOC_CATEGORY_ID;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INTERMEDIATE_CLAIM_TRACK;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.MULTI_CLAIM_TRACK;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.SMALL_CLAIM_TRACK;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_DATE_RANGE_MISSING;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_CANNOT_BE_IN_PAST;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.FAST_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.GA_DOC_CATEGORY_ID;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INTERMEDIATE_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.MULTI_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @SpringBootTest(classes = {
     InitiateGeneralApplicationService.class,
     JacksonAutoConfiguration.class,
-    InitiateGeneralApplicationServiceHelper.class
+    InitiateGeneralApplicationServiceHelper.class,
+    GeneralAppFeesService.class
 })
 class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder {
 
@@ -151,6 +140,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private UserService userService;
 
     @MockBean
+    private LocationService locationService;
+
+    @MockBean
     private UserRoleCaching userRoleCaching;
 
     @MockBean
@@ -158,9 +150,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @MockBean
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
-
-    @MockBean
-    private LocationReferenceDataService locationRefDataService;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -173,7 +162,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @MockBean
     private Time time;
-    @Mock
+    @MockBean
     private GeneralAppFeesService feesService;
 
     @BeforeEach
@@ -431,27 +420,28 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(featureToggleService.isMintiEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
         result.getGeneralApplications().forEach(generalApplicationElement -> {
             assertCaseManagementCategoryPopulated(generalApplicationElement.getValue().getCaseManagementCategory());
         });
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(MULTI_CLAIM_TRACK);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(MULTI_CLAIM_TRACK.getValue());
+        assertThat(result.getGeneralApplications().get(0).getValue().getEmailPartyReference()).isEqualTo("Claimant reference: AppSol1Ref - Defendant reference: RespSol1ref");
     }
 
     @Test
     void shouldReturnCaseDataWithAdditionToCollection_whenAnotherApplicationIsBeingInitiated() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataCollectionOfApps(CaseData.builder().build());
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(2);
     }
@@ -460,10 +450,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsentInfoNotProvided() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null);
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
@@ -478,12 +469,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null);
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
@@ -502,13 +493,13 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIP() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
@@ -527,14 +518,14 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldNotPopulateGaForLipsFlagIfFeatureFlagIsOff() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null);
 
         when(featureToggleService.isGaForLipsEnabled()).thenReturn(false);
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
@@ -547,12 +538,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateStatementOfTruthAndSetNoticeAndConsentOrderIfConsented() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
@@ -572,12 +563,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldNotPopulateStatementOfTruthAndSetNoticeAndConsentOrderIfConsented() {
         when(featureToggleService.isMintiEnabled()).thenReturn(true);
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
@@ -592,17 +583,17 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
             .isNull();
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(INTERMEDIATE_CLAIM_TRACK);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(INTERMEDIATE_CLAIM_TRACK.getValue());
     }
 
     @Test
     void shoulAddSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataSPEC(SPEC_CLAIM);
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue()
@@ -613,10 +604,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shoulAddUnSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataSPEC(UNSPEC_CLAIM);
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue()
@@ -625,12 +616,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateInformOtherPartyAndStatementOfTruthIfUnconsented() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppInformOtherParty().getIsWithNotice())
@@ -641,294 +632,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .isEqualTo(STRING_CONSTANT);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppStatementOfTruth().getRole())
             .isEqualTo(STRING_CONSTANT);
-    }
-
-    //Urgency Date validation
-    @Test
-    void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(YES)
-            .urgentAppConsiderationDate(null)
-            .build();
-
-        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(URGENCY_DATE_REQUIRED);
-    }
-
-    @Test
-    void shouldReturnErrors_whenApplicationIsNotUrgentButConsiderationDateIsProvided() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(NO)
-            .urgentAppConsiderationDate(LocalDate.now())
-            .build();
-
-        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
-    }
-
-    @Test
-    void shouldReturnErrors_whenUrgencyConsiderationDateIsInPastForUrgentApplication() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(YES)
-            .urgentAppConsiderationDate(LocalDate.now().minusDays(1))
-            .build();
-
-        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(URGENCY_DATE_CANNOT_BE_IN_PAST);
-    }
-
-    @Test
-    void shouldNotCauseAnyErrors_whenUrgencyConsiderationDateIsInFutureForUrgentApplication() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(YES)
-            .urgentAppConsiderationDate(LocalDate.now())
-            .build();
-
-        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
-
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(NO)
-            .urgentAppConsiderationDate(null)
-            .build();
-
-        List<String> errors = service.validateUrgencyDates(urgencyRequirement);
-
-        assertThat(errors).isEmpty();
-    }
-
-    //Trial Dates validations
-    @Test
-    void shouldReturnErrors_whenTrialIsScheduledButTrialDateFromIsNull() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(null)
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(getValidUnavailableDateList())
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(TRIAL_DATE_FROM_REQUIRED);
-    }
-
-    @Test
-    void shouldReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToBeforeIt() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(LocalDate.now().minusDays(1))
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(getValidUnavailableDateList())
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(INVALID_TRIAL_DATE_RANGE);
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithNullTrialDateTo() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(getValidUnavailableDateList())
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedWithTrialDateToAfterIt() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(LocalDate.now().plusDays(1))
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(getValidUnavailableDateList())
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenTrialIsScheduledAndTrialDateFromIsProvidedAndTrialDateToAreSame() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(LocalDate.now())
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(getValidUnavailableDateList())
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenTrialIsNotScheduled() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(NO)
-            .trialDateFrom(null)
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(getValidUnavailableDateList())
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isEmpty();
-    }
-
-    //Unavailability Dates validations
-    @Test
-    void shouldReturnErrors_whenUnavailabilityIsSetButNullDateRangeProvided() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(null)
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(UNAVAILABLE_DATE_RANGE_MISSING);
-    }
-
-    @Test
-    void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasNullDateFrom() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(null)
-            .unavailableTrialDateTo(null)
-            .build();
-
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(wrapElements(range1))
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(UNAVAILABLE_FROM_MUST_BE_PROVIDED);
-    }
-
-    @Test
-    void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasDateFromAfterDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now().plusDays(1))
-            .unavailableTrialDateTo(LocalDate.now())
-            .build();
-
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(YES)
-            .generalAppUnavailableDates(wrapElements(range1))
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isNotEmpty();
-        assertThat(errors).contains(INVALID_UNAVAILABILITY_RANGE);
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenUnavailabilityIsNotSet() {
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(NO)
-            .trialDateFrom(null)
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(NO)
-            .generalAppUnavailableDates(null)
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithNullDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(null)
-            .build();
-
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(NO)
-            .generalAppUnavailableDates(wrapElements(range1))
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithSameDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(LocalDate.now())
-            .build();
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(NO)
-            .generalAppUnavailableDates(wrapElements(range1))
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsBeforeDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(LocalDate.now().plusDays(1))
-            .build();
-        GAHearingDetails hearingDetails = GAHearingDetails.builder()
-            .trialRequiredYesOrNo(YES)
-            .trialDateFrom(LocalDate.now())
-            .trialDateTo(null)
-            .unavailableTrialRequiredYesOrNo(NO)
-            .generalAppUnavailableDates(wrapElements(range1))
-            .build();
-
-        List<String> errors = service.validateHearingScreen(hearingDetails);
-
-        assertThat(errors).isEmpty();
     }
 
     @Test
@@ -946,12 +649,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldPopulatePartyNameDetails() {
         when(featureToggleService.isMintiEnabled()).thenReturn(true);
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");
@@ -959,7 +662,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
         assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseNameGaInternal()).isEqualTo("Internal caseName");
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK.getValue());
     }
 
     @Test
@@ -1000,12 +703,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateApplicantDetails() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppApplnSolicitor().getId())
@@ -1034,50 +737,33 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         ));
     }
 
-    protected List<LocationRefData> getSampleCourtLocationsTransferred() {
-        return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("22222")
-                .siteName("transferred sitename")
-                .courtAddress("Transferred address")
-                .postcode("M5 4RR")
-                .regionId("1")
-                .courtLocationCode("transferred court code").build()
-        ));
+    protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourtLocationsTransferred() {
+        return uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
+            .siteName("transferred sitename")
+            .address("Transferred address")
+            .postcode("M5 4RR")
+            .region("1")
+            .baseLocation("22222").build();
     }
 
-    protected LocationRefData getSampleCourLocationsRefObjectPreSdoCNBC() {
-        return LocationRefData.builder()
-                .epimmsId("420219")
+    protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourLocationsRefObjectPreSdoCNBC() {
+        return uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
                 .siteName("site name of CNBC")
-                .courtAddress("Address of CNBC")
+                .address("Address of CNBC")
                 .postcode("M5 4RR")
-                .regionId("2")
-                .courtLocationCode("CNBC code").build();
+                .region("2")
+                .baseLocation("420219").build();
     }
 
-    protected List<LocationRefData> getSampleCourLocationsRefObjectPostSdo() {
-        return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("22222")
-                .siteName("site name of main case CML")
-                .courtAddress("Address of main case CML")
-                .postcode("M5 4RR")
-                .regionId("2")
-                .courtLocationCode("court1").build()
-        ));
-    }
+    protected uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getSampleCourLocationsRefObjectPostSdo() {
 
-    protected List<LocationRefData> getSampleCourLocationsRefObjectPostSdoNotInRefData() {
-        return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("xxxxx")
-                .siteName("xxxxx")
-                .courtAddress("xxxxx")
-                .postcode("xxxxx")
-                .regionId("xxxxx")
-                .courtLocationCode("xxxxx").build()
-        ));
+        return uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil.builder()
+            .region("2")
+            .baseLocation("22222")
+            .siteName("site name of main case CML")
+            .address("Address of main case CML")
+            .postcode("M5 4RR")
+            .build();
     }
 
     protected List<LocationRefData> getEmptyCourLocationsRefObject() {
@@ -1088,14 +774,14 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateLocationDetailsForBaseLocationWhereListIsEmptyForGaLips() {
-        when(locationRefDataService.getCourtLocationsByEpimmsId(
+        when(locationService.getWorkAllocationLocationDetails(
             any(),
             any()
-        )).thenReturn(getEmptyCourLocationsRefObject());
+        )).thenReturn(getEmptyCourLocationsRefObject().get(0));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("11111");
@@ -1109,14 +795,14 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateLocationDetailsForFAForLipsEnabled() {
-        when(locationRefDataService.getCourtLocationsByEpimmsId(
+        when(locationService.getWorkAllocationLocationDetails(
             any(),
             any()
-        )).thenReturn(getSampleCourLocationsRefObject());
+        )).thenReturn(getSampleCourLocationsRefObject().get(0));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForCaseManagementLocation(SPEC_CLAIM, JUDICIAL_REFERRAL);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("11111");
@@ -1144,11 +830,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateLocationDetailsForFAForLipsFalse() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForCaseManagementLocation(UNSPEC_CLAIM, AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("420219");
@@ -1175,12 +861,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMade() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getCaseDataForWorkAllocation(CASE_ISSUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
                                               respondent2DQ);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("420219");
@@ -1193,14 +879,14 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMadeAndCaseTransferred() {
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourtLocationsTransferred());
+        when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourtLocationsTransferred(), true));
         when(coreCaseEventDataService.getEventsForCase(any())).thenReturn(buildCaseEventDetails());
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(CASE_ISSUED,  SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
                                           respondent2DQ);
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("22222");
@@ -1219,10 +905,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getCaseDataForWorkAllocation(null, SPEC_CLAIM, SOLE_TRADER, applicant1DQ, respondent1DQ,
                                           respondent2DQ
             );
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("22222");
     }
@@ -1233,23 +919,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getCaseDataForWorkAllocation(null, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ,
                                           respondent2DQ
             );
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("22222");
-    }
-
-    @Test
-    void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefData() {
-        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
-                                          respondent2DQ
-            );
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
-
-        assertThrows(IllegalArgumentException.class, () -> service.getWorkAllocationLocation(caseData, authToken));
     }
 
     @Test
@@ -1257,29 +932,29 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(featureToggleService.isMintiEnabled()).thenReturn(true);
         CaseData caseData = new GeneralApplicationDetailsBuilder()
             .getVaryJudgmentWithN245TestData();
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0)
                        .getValue().getGeneralAppEvidenceDocument()).hasSize(2);
         assertThat(result.getGeneralApplications().get(0)
                        .getValue().getGeneralAppEvidenceDocument().get(1).getValue().getCategoryID())
-            .isEqualTo(GA_DOC_CATEGORY_ID);
-        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(SMALL_CLAIM_TRACK);
+            .isEqualTo(GA_DOC_CATEGORY_ID.getValue());
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(SMALL_CLAIM_TRACK.getValue());
 
     }
 
     @Test
     void shouldPopulateGeneralAppSubmittedDateForLipDefendant() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null)
             .toBuilder()
             .applicant1Represented(YES).respondent1Represented(NO).build();
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
@@ -1290,14 +965,14 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateGeneralAppSubmittedDateForLipDefendant2() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null)
             .toBuilder()
             .applicant1Represented(YES).respondent1Represented(YES).respondent2Represented(NO).build();
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
@@ -1308,14 +983,14 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateGeneralAppSubmittedDateForLipClaimant() {
-        when(locationRefDataService.getCnbcLocation(any())).thenReturn(getSampleCourLocationsRefObjectPreSdoCNBC());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null)
             .toBuilder()
             .applicant1Represented(NO).respondent1Represented(YES).build();
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
@@ -1343,10 +1018,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
             .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications()).hasSize(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
@@ -1366,10 +1041,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                 .types(singletonList(CONFIRM_CCJ_DEBT_PAID))
                                 .build()).build();
         data.getGeneralAppHearingDetails().getHearingPreferredLocation().setValue(null);
-        when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdo());
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);
         CaseData result = service.buildCaseData(data.toBuilder(), data, UserDetails.builder()
-            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString(), feesService);
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications()).hasSize(1);
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())

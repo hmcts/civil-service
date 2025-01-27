@@ -691,6 +691,8 @@ public class CaseDataBuilder {
     private JudgmentPaidInFull judgmentPaidInFull;
     private YesOrNo anyRepresented;
 
+    private String partialPaymentAmount;
+
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
         return this;
@@ -773,6 +775,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder totalClaimAmount(BigDecimal totalClaimAmount) {
         this.totalClaimAmount = totalClaimAmount;
+        return this;
+    }
+
+    public CaseDataBuilder partialPaymentAmount(String partialPaymentAmount) {
+        this.partialPaymentAmount = partialPaymentAmount;
         return this;
     }
 
@@ -1477,6 +1484,16 @@ public class CaseDataBuilder {
         this.applicantMPClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
 
         applicant2DQ = applicant2DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder noApplicant2DQSmallClaimExperts() {
+        var applicant2DQBuilder = applicant2DQ != null
+            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
+        applicant2DQ = applicant2DQBuilder
+            .applicant2DQExperts(Experts.builder().expertRequired(NO).build()
+            ).build();
+        this.applicantMPClaimExpertSpecRequired(NO);
         return this;
     }
 
@@ -7050,6 +7067,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specClaim1v1LipvLr() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = YES;
+        this.applicant1Represented = NO;
+        return this;
+    }
+
     public CaseDataBuilder enableRespondent2ResponseFlag() {
         this.claimant2ResponseFlag = YES;
         return this;
@@ -7926,6 +7950,7 @@ public class CaseDataBuilder {
             .repaymentDate(repaymentDate)
             .joJudgmentPaidInFull(judgmentPaidInFull)
             .anyRepresented(anyRepresented)
+            .partialPaymentAmount(partialPaymentAmount)
             .build();
     }
 

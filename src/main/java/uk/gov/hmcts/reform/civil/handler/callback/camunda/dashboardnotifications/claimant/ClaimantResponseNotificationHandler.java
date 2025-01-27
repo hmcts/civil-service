@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
@@ -28,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT;
 
 @Service
 public class ClaimantResponseNotificationHandler extends DashboardCallbackHandler {
@@ -58,7 +61,9 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
 
     @Override
     public String getScenario(CaseData caseData) {
-        if (caseData.getCcdState() == CASE_SETTLED) {
+        if (isMintiApplicable(caseData) && isCaseStateAwaitingApplicantIntention(caseData)) {
+            return SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT.getScenario();
+        } else if (caseData.getCcdState() == CASE_SETTLED) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario();
         } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
@@ -111,6 +116,16 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
                 .map(CaseDataLiP::getApplicant1LiPResponse)
                 .filter(ClaimantLiPResponse::hasClaimantRejectedCourtDecision)
                 .isPresent();
+    }
+
+    private boolean isMintiApplicable(CaseData caseData) {
+        return getFeatureToggleService().isMultiOrIntermediateTrackEnabled(caseData)
+            && (AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
+    }
+
+    private static boolean isCaseStateAwaitingApplicantIntention(CaseData caseData) {
+        return caseData.getCcdState() == AWAITING_APPLICANT_INTENTION;
     }
 
     private boolean isCarmApplicableForMediation(CaseData caseData) {
