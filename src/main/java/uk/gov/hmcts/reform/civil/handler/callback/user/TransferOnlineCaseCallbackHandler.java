@@ -148,7 +148,9 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             } else {
                 boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
                 caseDataBuilder.eaCourtLocation(isHmcNroEnabled || isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
-                caseDataBuilder.hmcLipEnabled(isHmcLipEnabled && isLipCaseEaCourt ? YES : NO);
+                if (isHmcLipEnabled) {
+                    caseDataBuilder.hmcLipEnabled(isLipCaseEaCourt ? YES : NO);
+                }
             }
         }
 
