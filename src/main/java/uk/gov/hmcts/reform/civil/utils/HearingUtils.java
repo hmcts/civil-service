@@ -64,6 +64,9 @@ public class HearingUtils {
     }
 
     public static String formatHearingDuration(HearingDuration hearingDuration) {
+        if (hearingDuration == null) {
+            return null;
+        }
         switch (hearingDuration) {
             case MINUTES_05:
                 return "5 minutes";
