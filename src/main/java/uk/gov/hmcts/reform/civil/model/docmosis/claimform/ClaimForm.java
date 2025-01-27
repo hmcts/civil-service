@@ -46,6 +46,7 @@ public class ClaimForm implements MappableObject {
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate interestEndDate;
     private final String interestEndDateDescription;
+    private final String interestPerDayBreakdown;
     private final String interestAmount;
     private final String claimFee;
     private final String totalAmountOfClaim;
