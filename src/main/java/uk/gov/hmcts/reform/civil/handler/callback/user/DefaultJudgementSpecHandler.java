@@ -411,14 +411,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
-        var subTotal = caseData.getTotalClaimAmount()
-            .add(interest)
-            .add(claimFeePounds);
-        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
-            subTotal = subTotal.add(fixedCost);
-        }
-        BigDecimal theOverallTotal = subTotal.subtract(partialPaymentPounds);
-        return theOverallTotal;
+        var subTotal = getSubTotal(caseData, interest,  claimFeePounds, fixedCost);
+        return subTotal.subtract(partialPaymentPounds);
     }
 
     private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
