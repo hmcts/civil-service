@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +93,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         } else if (isRespondentSolicitorOne(userRoles)) {
             isRespondent1 = YesOrNo.YES;
             updatedData.hearingDurationTextRespondent1(formatHearingDuration(caseData.getHearingDuration()));
-        } else {
+        } else if (isRespondentSolicitorTwo(userRoles)) {
             isRespondent2 = YesOrNo.YES;
             updatedData.hearingDurationTextRespondent2(formatHearingDuration(caseData.getHearingDuration()));
         }
