@@ -2055,7 +2055,7 @@ public class CaseDataBuilder {
                 return atStateNotificationAcknowledgedRespondent1TimeExtension();
             case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
                 return atStateAwaitingResponseFullDefenceReceived();
-            case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+            case AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED:
                 return atStateAwaitingResponseNotFullDefenceReceived();
             case FULL_DEFENCE:
                 return atStateRespondentFullDefenceAfterNotificationAcknowledgement();
