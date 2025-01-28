@@ -85,7 +85,6 @@ class FeesPaymentServiceTest {
     @MockBean
     private UpdatePaymentStatusService updatePaymentStatusService;
 
-
     @BeforeEach
     void before() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
