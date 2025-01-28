@@ -112,8 +112,6 @@ withPipeline(type, product, component) {
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
         ./bin/wait-for.sh definition-store
         ./bin/add-roles.sh
-        ./bin/pull-latest-camunda-files.sh ${camundaBranch}
-        ./bin/pull-latest-dmn-files.sh ${dmnBranch}
         ./bin/pull-latest-ccd-files.sh ${ccdBranch}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
       """
