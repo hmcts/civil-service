@@ -197,7 +197,7 @@ public class FlowPredicate {
             if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
                 respondent1FullAdmit = caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-                    && RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec());
+                    && RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec();
                 respondent2FullAdmit = caseData.getRespondent1ClaimResponseTypeForSpec() == null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent2ClaimResponseTypeForSpec();
