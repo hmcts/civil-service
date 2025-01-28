@@ -97,7 +97,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC);
 
-
         if (featureToggleService.isHmcForLipEnabled() && isWelshHearingTemplate(caseData)) {
             buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId(), HEARING_NOTICE_HMC_WELSH);
         }
@@ -179,7 +178,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         }
         return null;
     }
-
 
     private boolean isWelshHearingTemplate(CaseData caseData) {
         return (YesOrNo.NO.equals(caseData.getApplicant1Represented()) && caseData.isClaimantBilingual())
