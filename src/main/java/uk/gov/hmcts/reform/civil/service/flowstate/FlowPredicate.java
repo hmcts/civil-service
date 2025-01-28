@@ -165,7 +165,8 @@ public class FlowPredicate {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            boolean respondent1FullDefence, respondent2FullDefence;
+            boolean respondent1FullDefence;
+            boolean respondent2FullDefence;
             if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
                 respondent1FullDefence = caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == null
@@ -193,7 +194,8 @@ public class FlowPredicate {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            boolean respondent1FullAdmit, respondent2FullAdmit;
+            boolean respondent1FullAdmit;
+            boolean respondent2FullAdmit;
             if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
                 respondent1FullAdmit = caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == null
@@ -221,7 +223,8 @@ public class FlowPredicate {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            boolean respondent1NonFullDefence, respondent2NonFullDefence;
+            boolean respondent1NonFullDefence;
+            boolean respondent2NonFullDefence;
             if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
                 respondent1NonFullDefence = caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == null
