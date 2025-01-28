@@ -88,8 +88,13 @@ public class FeesPaymentService {
             updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, response.build());
 
         } catch (Exception e) {
-
-            log.error("Update payment status failed for claim [{}]", caseReference);
+            log.error(
+                "Update payment status failed for claim [{}] with fee type [{}]. Error: {}",
+                caseReference,
+                feeType,
+                e.getMessage(),
+                e
+            );
         }
 
         return response.build();
