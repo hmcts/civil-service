@@ -461,7 +461,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullDefenceReceivedSpecRespondent1ShouldReturnTrue() {
+                void awaitingResponsesFullDefenceReceivedRespondent1ShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
@@ -471,7 +471,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullDefenceReceivedSpecRespondent2ShouldReturnTrue() {
+                void awaitingResponsesFullDefenceReceivedRespondent2ShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
@@ -481,29 +481,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullDefenceReceivedUnspecRespondent1ShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                        .build();
-
-                    assertTrue(awaitingResponsesFullDefenceReceived.test(caseData));
-                }
-
-                @Test
-                void awaitingResponsesFullDefenceReceivedUnspecRespondent2ShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
-                        .build();
-
-                    assertTrue(awaitingResponsesFullDefenceReceived.test(caseData));
-                }
-
-                @Test
-                void awaitingResponsesFullAdmitRespondent1ReceivedSpecShouldReturnTrue() {
+                void awaitingResponsesFullAdmitRespondent1ReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondent1FullAdmissionAfterNotifyDetails()
@@ -513,7 +491,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullAdmitRespondent2ReceivedSpecShouldReturnTrue() {
+                void awaitingResponsesFullAdmitRespondent2ReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondent2FullAdmissionAfterNotifyDetails()
@@ -523,29 +501,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullAdmitRespondent1ReceivedUnspecShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                        .atStateRespondent1FullAdmissionAfterNotifyDetails()
-                        .build();
-
-                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
-                }
-
-                @Test
-                void awaitingResponsesFullAdmitRespondent2ReceivedUnspecShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                        .atStateRespondent2FullAdmissionAfterNotifyDetails()
-                        .build();
-
-                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
-                }
-
-                @Test
-                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent1ReceivedSpecShouldReturnTrue() {
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent1ReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondent1CounterClaimAfterNotifyDetails()
@@ -555,31 +511,9 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent2ReceivedSpecShouldReturnTrue() {
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent2ReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .atStateRespondent2CounterClaimAfterNotifyDetails()
-                        .build();
-
-                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
-                }
-
-                @Test
-                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent1ReceivedUnspecShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                        .atStateRespondent1CounterClaimAfterNotifyDetails()
-                        .build();
-
-                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
-                }
-
-                @Test
-                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent2ReceivedUnspecShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                         .atStateRespondent2CounterClaimAfterNotifyDetails()
                         .build();
 

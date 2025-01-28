@@ -19,7 +19,6 @@ import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullAdmitReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
@@ -74,9 +73,9 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
             .onlyWhen(awaitingResponsesFullDefenceReceivedSpec.and(specClaim), transitions)
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)
-            .onlyWhen(awaitingResponsesFullAdmitReceived.and(specClaim), transitions)
+            .onlyWhen(awaitingResponsesFullAdmitReceivedSpec.and(specClaim), transitions)
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
-            .onlyWhen(awaitingResponsesNonFullDefenceReceivedSpec.and(specClaim), transitions)
+            .onlyWhen(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.and(specClaim), transitions)
             .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions)
             .onlyWhen(divergentRespondWithDQAndGoOfflineSpec.and(specClaim), transitions)
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
@@ -122,15 +121,28 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
     };
 
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceivedSpec = caseData -> {
+    public static final Predicate<CaseData> awaitingResponsesFullAdmitReceivedSpec = caseData -> {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         return scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
             && ((caseData.getRespondent1ClaimResponseTypeForSpec() != null
             && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
             || (caseData.getRespondent1ClaimResponseTypeForSpec() == null
             && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
+            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
+    };
+
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec = caseData -> {
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+        return scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
+            && ((caseData.getRespondent1ClaimResponseTypeForSpec() != null
+            && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && !RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            || (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+            && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            && !RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
     };
 
     public static final Predicate<CaseData> contactDetailsChange = caseData ->

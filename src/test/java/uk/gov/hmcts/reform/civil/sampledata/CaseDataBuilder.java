@@ -4126,11 +4126,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefenceAfterNotifyClaimDetails() {
         atStateClaimDetailsNotified();
-        if (caseAccessCategory == SPEC_CLAIM) {
-            respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
-        } else {
-            respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
-        }
+        respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         ccdState = AWAITING_APPLICANT_INTENTION;
         respondent1ClaimResponseDocument = ResponseDocument.builder()
@@ -4155,11 +4151,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse() {
         atStateClaimDetailsNotified();
-        if (caseAccessCategory == SPEC_CLAIM) {
-            respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
-        } else {
-            respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
-        }
+        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
@@ -4476,11 +4468,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondent1CounterClaimAfterNotifyDetails() {
         atStateClaimDetailsNotified();
-        if (caseAccessCategory == SPEC_CLAIM) {
-            respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
-        } else {
-            respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
-        }
+        respondent1ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
         ccdState = AWAITING_APPLICANT_INTENTION;
@@ -4491,11 +4479,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent2CounterClaimAfterNotifyDetails() {
         atStateClaimDetailsNotified();
         respondent2 = Party.builder().partyName("Respondent 2").build();
-        if (caseAccessCategory == SPEC_CLAIM) {
-            respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.COUNTER_CLAIM;
-        } else {
-            respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
-        }
+        respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent2ResponseDate = claimDetailsNotificationDate.plusDays(1);
         ccdState = AWAITING_APPLICANT_INTENTION;
@@ -4517,11 +4501,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondent1FullAdmissionAfterNotifyDetails() {
         atStateClaimDetailsNotified();
-        if (caseAccessCategory == SPEC_CLAIM) {
-            respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
-        } else {
-            respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
-        }
+        respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
         ccdState = AWAITING_APPLICANT_INTENTION;
@@ -4532,11 +4512,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent2FullAdmissionAfterNotifyDetails() {
         atStateClaimDetailsNotified();
         respondent2 = Party.builder().partyName("Respondent 2").build();
-        if (caseAccessCategory == SPEC_CLAIM) {
-            respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
-        } else {
-            respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
-        }
+        respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent2ResponseDate = claimDetailsNotificationDate.plusDays(1);
         ccdState = AWAITING_APPLICANT_INTENTION;
