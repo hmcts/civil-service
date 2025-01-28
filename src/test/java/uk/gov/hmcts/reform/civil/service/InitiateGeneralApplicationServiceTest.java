@@ -431,6 +431,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             assertCaseManagementCategoryPopulated(generalApplicationElement.getValue().getCaseManagementCategory());
         });
         assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(MULTI_CLAIM_TRACK.getValue());
+        assertThat(result.getGeneralApplications().get(0).getValue().getEmailPartyReference()).isEqualTo("Claimant reference: AppSol1Ref - Defendant reference: RespSol1ref");
     }
 
     @Test
