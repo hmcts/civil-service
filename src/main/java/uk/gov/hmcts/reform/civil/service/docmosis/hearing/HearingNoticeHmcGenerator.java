@@ -120,10 +120,6 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     }
 
     private String getExternalShortName(DocmosisTemplates template, LocationRefData caseManagementLocation) {
-        if (caseManagementLocation == null) {
-            return null;
-        }
-
         if (HEARING_NOTICE_HMC_WELSH.equals(template) && caseManagementLocation.getWelshExternalShortName() != null) {
             return caseManagementLocation.getWelshExternalShortName();
         }

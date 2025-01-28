@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -55,6 +56,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM_WELSH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
 
@@ -76,6 +78,9 @@ class HearingNoticeHmcGeneratorTest {
 
     private static final String fileName_application = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
+
+    private static final String fileName_application_welsh = String.format(
+        HEARING_NOTICE_HMC_WELSH.getDocumentTitle(), REFERENCE_NUMBER);
 
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName_application)
@@ -101,6 +106,8 @@ class HearingNoticeHmcGeneratorTest {
     void setupTest() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_NOTICE_HMC)))
             .thenReturn(new DocmosisDocument(HEARING_NOTICE_HMC.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_NOTICE_HMC_WELSH)))
+            .thenReturn(new DocmosisDocument(HEARING_NOTICE_HMC_WELSH.getDocumentTitle(), bytes));
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
@@ -624,6 +631,49 @@ class HearingNoticeHmcGeneratorTest {
             .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM));
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldReturnListOfExpectedCaseDocumentsSpec_WhenIsWelshHearingNotice() {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+
+        var hearing = baseHearing.toBuilder()
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType("AAA7-TRI")
+                                .build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(PaymentStatus.SUCCESS)
+                                          .build())
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(Fee.builder()
+                            .calculatedAmountInPence(new BigDecimal(123))
+                            .build());
+
+        var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC_WELSH);
+        var expected = List.of(CASE_DOCUMENT);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application_welsh, bytes, HEARING_FORM_WELSH));
     }
 
 }
