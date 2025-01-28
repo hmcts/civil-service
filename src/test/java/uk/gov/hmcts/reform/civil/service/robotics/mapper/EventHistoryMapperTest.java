@@ -7902,7 +7902,6 @@ class EventHistoryMapperTest {
                 .extracting("eventDetailsText").asString().isNotEmpty();
         }
 
-
         @Test
         public void shouldgenerateRPAfeedfor_DJ_event_update_sequenceno() {
 
