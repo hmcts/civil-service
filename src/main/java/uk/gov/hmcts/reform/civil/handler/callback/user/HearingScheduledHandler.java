@@ -229,18 +229,14 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private CaseState determinePostState(CaseState caseState, CaseData caseData) {
         if (isClaimMultiOrIntermediate(caseData)) {
-            System.out.println("CASE IS MINTI");
             if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
                 && !caseState.equals(HEARING_READINESS)) {
-                System.out.println("CASE IS NOT  AND NOT PREPARE_FOR_HEARING_CONDUCT_HEARING:HEARING_READINESS");
                 caseState = HEARING_READINESS;
             }
         } else {
-            System.out.println("CASE IS NOT MINTI");
             if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
                 && !caseState.equals(HEARING_READINESS)
                 && !caseState.equals(DECISION_OUTCOME)) {
-                System.out.println("CASE IS NOT MINTI AND NOT PREPARE_FOR_HEARING_CONDUCT_HEARING:HEARING_READINESS:DECISION_OUTCOME");
                 caseState = HEARING_READINESS;
             }
         }
