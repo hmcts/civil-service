@@ -30,6 +30,7 @@ java:
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: false
+    CAMUNDA_WORKER_ID: ${SERVICE_NAME}
   postgresql:
     enabled: true
     image:
@@ -109,6 +110,7 @@ civil-general-applications:
     environment:
       LAUNCH_DARKLY_ENV: service-staging
       PAY_CALLBACK_URL: https://civil-service-ga-staging.aat.platform.hmcts.net/service-request-update
+      CAMUNDA_WORKER_ID: ${SERVICE_NAME}
 
 xui-webapp:
   enabled: true

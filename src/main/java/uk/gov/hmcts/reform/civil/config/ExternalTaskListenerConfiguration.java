@@ -17,18 +17,22 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 public class ExternalTaskListenerConfiguration {
 
     private final String baseUrl;
+    private final String workerId;
     private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
     public ExternalTaskListenerConfiguration(@Value("${feign.client.config.processInstance.url}") String baseUrl,
+                                             @Value("${camunda.workerId}") String workerId,
                                              AuthTokenGenerator authTokenGenerator) {
         this.baseUrl = baseUrl;
+        this.workerId = workerId;
         this.authTokenGenerator = authTokenGenerator;
     }
 
     @Bean
     public ExternalTaskClient client() {
         return ExternalTaskClient.create()
+            .workerId(workerId)
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(29000)
             .maxTasks(1)
