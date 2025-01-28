@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -56,6 +57,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -182,7 +184,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
@@ -247,7 +250,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
@@ -307,7 +311,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC_WELSH);
         var expected = HearingNoticeHmc.builder()
             .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
@@ -368,7 +373,7 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId", HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("disposal hearing")
             .caseNumber(caseData.getCcdCaseReference())
@@ -438,7 +443,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title(expectedTitle)
             .caseNumber(caseData.getCcdCaseReference())
@@ -504,7 +510,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
                 .title("dispute resolution hearing")
             .caseNumber(caseData.getCcdCaseReference())
@@ -564,7 +571,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
-                                        "SiteName - CourtAddress - Postcode", "hearingId");
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC);
         var expected = List.of(CASE_DOCUMENT);
 
         verify(documentManagementService)
@@ -609,7 +617,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
-                                        "SiteName - CourtAddress - Postcode", "hearingId");
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC);
         var expected = List.of(CASE_DOCUMENT);
 
         verify(documentManagementService)

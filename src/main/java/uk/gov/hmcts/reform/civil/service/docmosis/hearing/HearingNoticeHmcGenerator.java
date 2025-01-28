@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingNoticeHmc;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingTypeContentText;
@@ -51,26 +53,26 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
 
-    public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation, String hearingLocation, String hearingId) {
+    public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation, String hearingLocation, String hearingId, DocmosisTemplates template) {
 
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        HearingNoticeHmc templateData = getHearingNoticeTemplateData(caseData, hearing, authorisation, hearingLocation, hearingId);
-        DocmosisTemplates template = getTemplate();
+        HearingNoticeHmc templateData = getHearingNoticeTemplateData(caseData, hearing, authorisation, hearingLocation, hearingId, template);
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
         PDF pdf =  new PDF(
             getFileName(caseData, template),
             document.getBytes(),
-            DocumentType.HEARING_FORM
+            HEARING_NOTICE_HMC.equals(template) ? DocumentType.HEARING_FORM : DocumentType.HEARING_FORM_WELSH
         );
         CaseDocument caseDocument = documentManagementService.uploadDocument(authorisation, pdf);
         assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.HEARING_NOTICES.getValue());
         caseDocuments.add(caseDocument);
-        return caseDocuments;
+
+            return caseDocuments;
     }
 
     public HearingNoticeHmc getHearingNoticeTemplateData(CaseData caseData, HearingGetResponse hearing, String bearerToken,
-                                                         String hearingLocation, String hearingId) {
+                                                         String hearingLocation, String hearingId, DocmosisTemplates template) {
         var paymentFailed = (caseData.getHearingFeePaymentDetails() == null
             || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED))
             && (!featureToggleService.isCaseProgressionEnabled() || !caseData.hearingFeePaymentDoneWithHWF());
@@ -86,7 +88,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
         return HearingNoticeHmc.builder()
             .title(getHearingTypeTitleText(caseData, hearing))
-            .hearingSiteName(nonNull(caseManagementLocation) ? caseManagementLocation.getExternalShortName() : null)
+            .hearingSiteName(getExternalShortName(template, caseManagementLocation))
             .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
@@ -118,8 +120,17 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return String.format(template.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private DocmosisTemplates getTemplate() {
-        return HEARING_NOTICE_HMC;
+    private String getExternalShortName(DocmosisTemplates template, LocationRefData caseManagementLocation) {
+        if (caseManagementLocation == null) {
+            return null;
+        }
+
+        if (HEARING_NOTICE_HMC_WELSH.equals(template) && caseManagementLocation.getWelshExternalShortName() != null) {
+            return caseManagementLocation.getWelshExternalShortName();
+        }
+
+        return caseManagementLocation.getExternalShortName();
     }
+
 }
 

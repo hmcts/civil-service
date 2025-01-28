@@ -64,6 +64,7 @@ public enum DocmosisTemplates {
     DQ_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01283.docx", "%s_directions_questionnaire_form_%s.pdf"),
     TRIAL_READY("CV-UNS-HRN-ENG-01247-10180.docx", "%s_%s_Trial_Arrangements.pdf"),
     HEARING_NOTICE_HMC("CV-UNS-HNO-ENG-01200.docx", "hearing_notice_%s.pdf"),
+    HEARING_NOTICE_HMC_WELSH("cy-CV-UNS-HNO-ENG-01200.docx_en-GB_cy-GB.docx", "hearing_notice_welsh_%s.pdf"),
 
     DRAFT_CLAIM_FORM("CV-SPC-CLM-ENG-00001-DRAFT.docx", "draft_claim_form_%s.pdf"),
     HEARING_SMALL_CLAIMS_AHN("CV-UNS-HNO-ENG-01202.docx", "hearing_small_claim_%s.pdf"),

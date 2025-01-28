@@ -626,6 +626,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
+    @Builder.Default
+    private final List<Element<CaseDocument>> hearingDocumentsWelsh = new ArrayList<>();
+
     // GA for LIP
     private final YesOrNo isGaApplicantLip;
     private final YesOrNo isGaRespondentOneLip;
