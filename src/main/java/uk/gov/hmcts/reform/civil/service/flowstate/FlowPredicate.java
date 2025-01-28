@@ -19,7 +19,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -166,12 +165,22 @@ public class FlowPredicate {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            boolean respondent1FullDefence = caseData.getRespondent1ClaimResponseType() != null
-                && caseData.getRespondent2ClaimResponseType() == null
-                && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType());
-            boolean respondent2FullDefence = caseData.getRespondent1ClaimResponseType() == null
-                && caseData.getRespondent2ClaimResponseType() != null
-                && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType());
+            boolean respondent1FullDefence, respondent2FullDefence;
+            if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
+                respondent1FullDefence = caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                    && RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec();
+                respondent2FullDefence = caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent2ClaimResponseTypeForSpec();
+            } else {
+                respondent1FullDefence = caseData.getRespondent1ClaimResponseType() != null
+                    && caseData.getRespondent2ClaimResponseType() == null
+                    && RespondentResponseType.FULL_DEFENCE == caseData.getRespondent1ClaimResponseType();
+                respondent2FullDefence = caseData.getRespondent1ClaimResponseType() == null
+                    && caseData.getRespondent2ClaimResponseType() != null
+                    && RespondentResponseType.FULL_DEFENCE == caseData.getRespondent2ClaimResponseType();
+            }
             return respondent1FullDefence || respondent2FullDefence;
         }
 
@@ -184,32 +193,54 @@ public class FlowPredicate {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            boolean respondent1FullDefence = caseData.getRespondent1ClaimResponseType() != null
-                && caseData.getRespondent2ClaimResponseType() == null
-                && FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseType());
-            boolean respondent2FullDefence = caseData.getRespondent1ClaimResponseType() == null
-                && caseData.getRespondent2ClaimResponseType() != null
-                && FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseType());
-            return respondent1FullDefence || respondent2FullDefence;
+            boolean respondent1FullAdmit, respondent2FullAdmit;
+            if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
+                respondent1FullAdmit = caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                    && RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec());
+                respondent2FullAdmit = caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && RespondentResponseTypeSpec.FULL_ADMISSION == caseData.getRespondent2ClaimResponseTypeForSpec();
+            } else {
+                respondent1FullAdmit = caseData.getRespondent1ClaimResponseType() != null
+                    && caseData.getRespondent2ClaimResponseType() == null
+                    && RespondentResponseType.FULL_ADMISSION == caseData.getRespondent1ClaimResponseType();
+                respondent2FullAdmit = caseData.getRespondent1ClaimResponseType() == null
+                    && caseData.getRespondent2ClaimResponseType() != null
+                    && RespondentResponseType.FULL_ADMISSION == caseData.getRespondent2ClaimResponseType();
+            }
+            return respondent1FullAdmit || respondent2FullAdmit;
         }
 
         return false;
     }
 
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceived = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceReceived;
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceived = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceOrFullAdmitReceived;
 
-    private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceived(CaseData caseData) {
+    private static boolean getPredicateForAwaitingResponsesNonFullDefenceOrFullAdmitReceived(CaseData caseData) {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
 
         if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            boolean respondent1NonFullDefence = caseData.getRespondent1ClaimResponseType() != null
-                && caseData.getRespondent2ClaimResponseType() == null
-                && !FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                && !FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseType());
-            boolean respondent2NonFullDefence = caseData.getRespondent1ClaimResponseType() == null
-                && caseData.getRespondent2ClaimResponseType() != null
-                && !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())
-                && !FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseType());
+            boolean respondent1NonFullDefence, respondent2NonFullDefence;
+            if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
+                respondent1NonFullDefence = caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                    && RespondentResponseTypeSpec.FULL_DEFENCE != caseData.getRespondent1ClaimResponseTypeForSpec()
+                    && RespondentResponseTypeSpec.FULL_ADMISSION != caseData.getRespondent1ClaimResponseTypeForSpec();
+                respondent2NonFullDefence = caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && RespondentResponseTypeSpec.FULL_DEFENCE != caseData.getRespondent2ClaimResponseTypeForSpec()
+                    && RespondentResponseTypeSpec.FULL_ADMISSION != caseData.getRespondent2ClaimResponseTypeForSpec();
+            } else {
+                respondent1NonFullDefence = caseData.getRespondent1ClaimResponseType() != null
+                    && caseData.getRespondent2ClaimResponseType() == null
+                    && RespondentResponseType.FULL_DEFENCE != caseData.getRespondent1ClaimResponseType()
+                    && RespondentResponseType.FULL_ADMISSION != caseData.getRespondent1ClaimResponseType();
+                respondent2NonFullDefence = caseData.getRespondent1ClaimResponseType() == null
+                    && caseData.getRespondent2ClaimResponseType() != null
+                    && RespondentResponseType.FULL_DEFENCE != caseData.getRespondent2ClaimResponseType()
+                    && RespondentResponseType.FULL_ADMISSION != caseData.getRespondent2ClaimResponseType();
+            }
             return respondent1NonFullDefence || respondent2NonFullDefence;
         }
 
