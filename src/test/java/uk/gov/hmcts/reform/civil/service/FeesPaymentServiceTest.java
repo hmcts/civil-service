@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -38,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -82,6 +84,7 @@ class FeesPaymentServiceTest {
     private PinInPostConfiguration pinInPostConfiguration;
     @MockBean
     private UpdatePaymentStatusService updatePaymentStatusService;
+
 
     @BeforeEach
     void before() {
@@ -279,6 +282,25 @@ class FeesPaymentServiceTest {
 
         verify(paymentsClient, times(3))
             .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
+    }
+
+
+    @Test
+    void shouldReturnResponseWhenExceptionOccurs() {
+        // Arrange
+        PaymentDto response = buildGovPayCardPaymentStatusResponse("Success");
+        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+            .thenReturn(response);
+
+        doThrow(new CaseDataUpdateException()).when(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+
+        // Act & Assert
+        CardPaymentStatusResponse result =
+            feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
+        // Verify logging (optional; you need a library like LogCaptor for assertions)
+        verify(updatePaymentStatusService).updatePaymentStatus(HEARING, "123", result);
+        assertThat(result).isEqualTo(expectedResponse("Success"));
+
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
