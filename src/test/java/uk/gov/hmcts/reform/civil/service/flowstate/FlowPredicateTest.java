@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -29,8 +30,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullAdmitReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
@@ -459,7 +461,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullDefenceReceivedRespondent1ShouldReturnTrue() {
+                void awaitingResponsesFullDefenceReceivedSpecRespondent1ShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
@@ -469,7 +471,7 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullDefenceReceivedRespondent2ShouldReturnTrue() {
+                void awaitingResponsesFullDefenceReceivedSpecRespondent2ShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
@@ -479,23 +481,109 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesNonFullDefenceRespondent1ReceivedShouldReturnTrue() {
+                void awaitingResponsesFullDefenceReceivedUnspecRespondent1ShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullDefenceReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullDefenceReceivedUnspecRespondent2ShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullDefenceReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullAdmitRespondent1ReceivedSpecShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondent1FullAdmissionAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullAdmitRespondent2ReceivedSpecShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondent2FullAdmissionAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullAdmitRespondent1ReceivedUnspecShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .atStateRespondent1FullAdmissionAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullAdmitRespondent2ReceivedUnspecShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .atStateRespondent2FullAdmissionAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent1ReceivedSpecShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondent1CounterClaimAfterNotifyDetails()
                         .build();
 
-                    assertTrue(awaitingResponsesNonFullDefenceReceived.test(caseData));
+                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
                 }
 
                 @Test
-                void awaitingResponsesNonFullDefenceRespondent2ReceivedShouldReturnTrue() {
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent2ReceivedSpecShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondent2CounterClaimAfterNotifyDetails()
                         .build();
 
-                    assertTrue(awaitingResponsesNonFullDefenceReceived.test(caseData));
+                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent1ReceivedUnspecShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .atStateRespondent1CounterClaimAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent2ReceivedUnspecShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                        .atStateRespondent2CounterClaimAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
                 }
 
                 @Test

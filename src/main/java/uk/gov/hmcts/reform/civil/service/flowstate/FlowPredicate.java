@@ -217,7 +217,8 @@ public class FlowPredicate {
         return false;
     }
 
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceived = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceOrFullAdmitReceived;
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceived
+        = FlowPredicate::getPredicateForAwaitingResponsesNonFullDefenceOrFullAdmitReceived;
 
     private static boolean getPredicateForAwaitingResponsesNonFullDefenceOrFullAdmitReceived(CaseData caseData) {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));

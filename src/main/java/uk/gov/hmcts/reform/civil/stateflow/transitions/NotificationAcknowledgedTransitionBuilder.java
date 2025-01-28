@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullAdmitReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
@@ -55,7 +55,7 @@ public class NotificationAcknowledgedTransitionBuilder extends MidTransitionBuil
                           .and(awaitingResponsesFullAdmitReceived), transitions)
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
             .onlyWhen(notificationAcknowledged.and(not(respondentTimeExtension))
-                .and(awaitingResponsesNonFullDefenceReceived), transitions)
+                .and(awaitingResponsesNonFullDefenceOrFullAdmitReceived), transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(takenOfflineByStaffAfterNotificationAcknowledged, transitions)
             .moveTo(PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA, transitions)
