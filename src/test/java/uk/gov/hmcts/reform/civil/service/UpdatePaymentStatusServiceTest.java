@@ -117,7 +117,6 @@ class UpdatePaymentStatusServiceTest {
 
     }
 
-
     @Test
     void shouldThrowCaseDataUpdateExceptionWhenExceptionOccurs() {
         // Arrange

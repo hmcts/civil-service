@@ -284,7 +284,6 @@ class FeesPaymentServiceTest {
             .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
     }
 
-
     @Test
     void shouldReturnResponseWhenExceptionOccurs() {
         // Arrange
