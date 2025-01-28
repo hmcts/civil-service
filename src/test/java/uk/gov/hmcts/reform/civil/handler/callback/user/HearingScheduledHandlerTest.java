@@ -258,16 +258,23 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        // listing/relisting,caseType, currentState, expectState
-        "LISTING,SMALL_CLAIMS,HEARING_READINESS,HEARING_READINESS",
-        "LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
-        "LISTING,SMALL_CLAIMS,DECISION_OUTCOME,DECISION_OUTCOME",
-        "LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
-        "LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
-        "RELISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
-        "RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS"
+        //claimTrack, listingORrelisting, caseType, currentState, expectState
+        "SMALL_CLAIM,LISTING,SMALL_CLAIMS,HEARING_READINESS,HEARING_READINESS",
+        "SMALL_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "SMALL_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,DECISION_OUTCOME",
+        "SMALL_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
+        "SMALL_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "SMALL_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
+        "SMALL_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "FAST_CLAIM,LISTING,SMALL_CLAIMS,HEARING_READINESS,HEARING_READINESS",
+        "FAST_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "FAST_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,DECISION_OUTCOME",
+        "FAST_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
+        "FAST_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "FAST_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
+        "FAST_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS"
     })
-    void shouldSetHearingReadinessStateOnListing_whenAboutToSubmitMinti(String listingType, String hearingNoticeType, String currentState, String expectedStateStr) {
+    void shouldSetExpectedPostState_MintiEnabled_FastOrSmallTrack(String claimTrack, String listingType, String hearingNoticeType, String currentState, String expectedStateStr) {
         given(time.now()).willReturn(LocalDateTime.now());
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
@@ -279,7 +286,52 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
             .hearingDate(time.now().toLocalDate().plusWeeks(2))
-            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .allocatedTrack(AllocatedTrack.valueOf(claimTrack))
+            .hearingNoticeList(hearingNoticeList)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .listingOrRelisting(listingOrRelisting)
+            .ccdState(CaseState.valueOf(currentState))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When: I call the handler
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then: I expect the resulting state to match the expectation for the listing or relisting
+        assertThat(response.getState()).isEqualTo(expectedState.name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        //claimTrack, listingORrelisting, caseType, currentState, expectState
+        "MULTI_CLAIM,LISTING,SMALL_CLAIMS,HEARING_READINESS,HEARING_READINESS",
+        "MULTI_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "MULTI_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,HEARING_READINESS",
+        "MULTI_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
+        "MULTI_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "MULTI_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
+        "MULTI_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "INTERMEDIATE_CLAIM,LISTING,SMALL_CLAIMS,HEARING_READINESS,HEARING_READINESS",
+        "INTERMEDIATE_CLAIM,LISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "INTERMEDIATE_CLAIM,LISTING,FAST_TRACK_TRIAL,DECISION_OUTCOME,HEARING_READINESS",
+        "INTERMEDIATE_CLAIM,LISTING,SMALL_CLAIMS,CASE_PROGRESSION,HEARING_READINESS",
+        "INTERMEDIATE_CLAIM,LISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS",
+        "INTERMEDIATE_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
+        "INTERMEDIATE_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS"
+    })
+    void shouldSetExpectedPostState_MintiEnabled_MultiOrIntermediate(String claimTrack, String listingType, String hearingNoticeType, String currentState, String expectedStateStr) {
+        given(time.now()).willReturn(LocalDateTime.now());
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        // Given: a case either in listing or relisting
+        ListingOrRelisting listingOrRelisting = ListingOrRelisting.valueOf(listingType);
+        HearingNoticeList hearingNoticeList = HearingNoticeList.valueOf(hearingNoticeType);
+        CaseState expectedState = CaseState.valueOf(expectedStateStr);  // converting the string would be redundant but ensures there are no typos
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .addRespondent2(NO)
+            .hearingDate(time.now().toLocalDate().plusWeeks(2))
+            .allocatedTrack(AllocatedTrack.valueOf(claimTrack))
             .hearingNoticeList(hearingNoticeList)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .listingOrRelisting(listingOrRelisting)
