@@ -319,7 +319,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         "INTERMEDIATE_CLAIM,RELISTING,FAST_TRACK_TRIAL,CASE_PROGRESSION,HEARING_READINESS",
         "INTERMEDIATE_CLAIM,RELISTING,OTHER,CASE_PROGRESSION,HEARING_READINESS"
     })
-    void shouldSetExpectedPostState_MintiEnabled_MultiOrIntermediate(String claimTrack, String listingType, String hearingNoticeType, String currentState, String expectedStateStr) {
+    void shouldSetExpectedPostState_MintiEnabled_MultiOrIntermediate(String claimTrack, String listingType, String hearingNoticeType,
+                                                                     String currentState, String expectedStateStr) {
         given(time.now()).willReturn(LocalDateTime.now());
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
 
