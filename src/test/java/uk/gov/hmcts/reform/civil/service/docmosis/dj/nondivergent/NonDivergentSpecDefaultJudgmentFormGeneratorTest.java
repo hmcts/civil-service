@@ -9,6 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAmountsCalculator;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
@@ -35,6 +37,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,7 +53,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_DEFENDANT2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT_BILINGUAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT_WELSH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
 
 @ExtendWith(SpringExtension.class)
@@ -89,6 +94,9 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private CivilStitchService civilStitchService;
 
     @Test
     void shouldGenerateClaimantDocsNonDivergent_whenValidDataIsProvided() {
@@ -244,15 +252,17 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
     @Test
     void shouldGenerateClaimantDocsNonDivergentWelsh_whenValidDataIsProvidedLip() {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT_BILINGUAL)))
-            .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT_BILINGUAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT)))
+            .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N121_SPEC_CLAIMANT_WELSH)))
+            .thenReturn(new DocmosisDocument(N121_SPEC_CLAIMANT_WELSH.getDocumentTitle(), bytes));
 
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT1)))
             .thenReturn(CASE_DOCUMENT);
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DEFAULT_JUDGMENT_CLAIMANT2)))
-            .thenReturn(CASE_DOCUMENT);
+
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), any(), anyLong(), eq(DocumentType.DEFAULT_JUDGMENT_CLAIMANT1),
+                                                             anyString())).thenReturn(CASE_DOCUMENT);
 
         when(interestCalculator.calculateInterest(any(CaseData.class)))
             .thenReturn(new BigDecimal(10));
