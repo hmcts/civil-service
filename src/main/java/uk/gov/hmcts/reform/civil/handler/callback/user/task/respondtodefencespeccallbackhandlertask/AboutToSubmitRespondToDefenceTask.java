@@ -76,11 +76,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     public CallbackResponse execute(CallbackParams callbackParams) {
 
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
         CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
-
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .applicant1ResponseDate(time.now());
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder().applicant1ResponseDate(time.now());
 
         persistFlagsForParties(oldCaseData, caseData, builder);
         setResponseDocumentNull(builder);
@@ -89,14 +86,10 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         assignApplicant1DQExpertsIfPresent(caseData, builder);
         assignApplicant2DQExpertsIfPresent(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
-            builder, featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
 
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToApplicantExperts(builder);
-            addEventAndDateAddedToApplicantWitnesses(builder);
-        }
-
+        addEventAndDateAddedToApplicantExperts(builder);
+        addEventAndDateAddedToApplicantWitnesses(builder);
         populateDQPartyIds(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
@@ -105,6 +98,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         String nextState = putCaseStateInJudicialReferral(caseData);
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
+
+        is1v1RespondImmediately(caseData, builder);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
@@ -322,5 +317,15 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+    }
+
+    private void is1v1RespondImmediately(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        if (featureToggleService.isJudgmentOnlineLive()
+            && isOneVOne(caseData)
+            && caseData.isPayImmediately()
+            && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
+            || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
+            builder.respondForImmediateOption(YesOrNo.YES);
+        }
     }
 }

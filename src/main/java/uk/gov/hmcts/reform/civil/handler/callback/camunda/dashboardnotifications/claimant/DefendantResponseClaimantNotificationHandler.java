@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_FULL_OR_PART_ADMIT_PAY_SET_DATE_ORG_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_PART_ADMIT_PAY_IMMEDIATELY_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM;
@@ -54,7 +55,9 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
 
     @Override
     public String getScenario(CaseData caseData) {
-
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == null) {
+            return null;
+        }
         return switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
             case FULL_DEFENCE -> getFullDefenceScenario(caseData);
             case FULL_ADMISSION -> getFullAdmissionScenario(caseData);
@@ -64,7 +67,9 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
     }
 
     private String getPartAdmissionScenario(CaseData caseData) {
-        if (caseData.isPayByInstallment()) {
+        if (caseData.nocApplyForLiPDefendant()) {
+            return SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario();
+        } else if (caseData.isPayByInstallment()) {
             return getScenarioForPayByInstallmentBasedOnRespondentPartyType(caseData);
         } else if (caseData.isPayBySetDate()) {
             return getScenarioForPayBySetDateBasedOnRespondentPartyType(caseData);
@@ -75,7 +80,9 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
     }
 
     private String getFullAdmissionScenario(CaseData caseData) {
-        if (caseData.isPayByInstallment()) {
+        if (caseData.nocApplyForLiPDefendant()) {
+            return SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario();
+        } else if (caseData.isPayByInstallment()) {
             return getScenarioForPayByInstallmentBasedOnRespondentPartyType(caseData);
         } else if (caseData.isPayBySetDate()) {
             return getScenarioForPayBySetDateBasedOnRespondentPartyType(caseData);
