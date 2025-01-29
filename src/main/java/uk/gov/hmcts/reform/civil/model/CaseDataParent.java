@@ -531,7 +531,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return caseDataLiP1.map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent()
             || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
-                .filter(carm -> carm.getIsMediationEmailCorrect() == YES).isPresent();
+                .filter(carm -> carm.getIsMediationEmailCorrect() == YES).isPresent()
+            || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getIsMediationPhoneCorrect() == YES).isPresent();
     }
 
     @JsonIgnore
