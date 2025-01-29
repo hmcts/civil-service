@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -30,6 +32,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_FORMER_SOLICITOR;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_NEW_DEFENDANT_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITOR_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITOR_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ChangeOfRepresentationNotificationHandler.TASK_ID_NOTIFY_FORMER_SOLICITOR;
@@ -186,8 +189,108 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     REFERENCE
                 );
             }
+
+            @Test
+            void shouldNotifyForOtherPartiesLipForRespondentSolicitorChange() {
+                when(notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate()).thenReturn(
+                    OTHER_SOL_TEMPLATE);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
+                    .applicant1Represented(YesOrNo.NO)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+
+                Map<String, String> expectedProperties = Map.of(
+                    CASE_NAME, CASE_TITLE,
+                    ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
+                    CCD_REF, caseData.getCcdCaseReference().toString(),
+                    FORMER_SOL, PREVIOUS_SOL,
+                    NEW_SOL, NEW_SOLICITOR,
+                    OTHER_SOL_NAME, "LiP",
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
+                );
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    OTHER_SOL_TEMPLATE,
+                    expectedProperties,
+                    REFERENCE
+                );
+            }
+
+            @Test
+            void shouldNotifyForOtherPartiesLipBilingualForRespondentSolicitorChange() {
+                when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC()).thenReturn(
+                    OTHER_SOL_TEMPLATE);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
+                    .applicant1Represented(YesOrNo.NO)
+                    .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+
+                Map<String, String> expectedProperties = Map.of(
+                    CASE_NAME, CASE_TITLE,
+                    ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
+                    CCD_REF, caseData.getCcdCaseReference().toString(),
+                    FORMER_SOL, PREVIOUS_SOL,
+                    NEW_SOL, NEW_SOLICITOR,
+                    OTHER_SOL_NAME, "LiP",
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
+                );
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    OTHER_SOL_TEMPLATE,
+                    expectedProperties,
+                    REFERENCE
+                );
+            }
+
         }
 
+        @Nested
+        class NotifyNewDefendantLrEvent {
+            @Test
+            void newDefendantLrForLipVsLRScenario() {
+                when(notificationsProperties.getNotifyNewDefendantSolicitorNOC()).thenReturn(
+                    OTHER_SOL_TEMPLATE);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
+                    .applicant1Represented(YesOrNo.NO)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_NEW_DEFENDANT_SOLICITOR.name()).build()).build();
+
+                Map<String, String> expectedProperties = Map.of(
+                    CASE_NAME, CASE_TITLE,
+                    ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
+                    CCD_REF, caseData.getCcdCaseReference().toString(),
+                    FORMER_SOL, PREVIOUS_SOL,
+                    NEW_SOL, NEW_SOLICITOR,
+                    OTHER_SOL_NAME, "LiP",
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
+                );
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    OTHER_SOL_TEMPLATE,
+                    expectedProperties,
+                    REFERENCE
+                );
+            }
+        }
         @Nested
         class NotifyOtherSolicitor2Event {
 
