@@ -312,7 +312,6 @@ camunda-bpm:
   java:
     image: hmctsprivatetemp.azurecr.io/camunda/bpm:latest
     disableKeyVaults: true
-    image: hmctsprivatetemp.azurecr.io/camunda/bpm:latest
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}
     devcpuRequests: 500m
