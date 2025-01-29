@@ -119,23 +119,19 @@ class UpdatePaymentStatusServiceTest {
 
     @Test
     void shouldThrowCaseDataUpdateExceptionWhenExceptionOccurs() {
-        // Arrange
         FeeType feeType = FeeType.CLAIMISSUED; // Replace with an actual FeeType
         String caseReference = "123456";
         CardPaymentStatusResponse cardPaymentStatusResponse = mock(CardPaymentStatusResponse.class);
 
         when(coreCaseDataService.getCase(Long.valueOf(caseReference))).thenThrow(new RuntimeException("Database error"));
 
-        // Act & Assert
         CaseDataUpdateException exception = assertThrows(
             CaseDataUpdateException.class,
             () -> updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse)
         );
 
-        // Verify logging (optional; you need a library like LogCaptor for assertions)
         verify(coreCaseDataService).getCase(Long.valueOf(caseReference));
 
-        // Verify no further interactions
         verifyNoInteractions(caseDetailsConverter);
     }
 

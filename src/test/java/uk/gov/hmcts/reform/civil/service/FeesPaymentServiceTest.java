@@ -285,17 +285,15 @@ class FeesPaymentServiceTest {
 
     @Test
     void shouldReturnResponseWhenExceptionOccurs() {
-        // Arrange
         PaymentDto response = buildGovPayCardPaymentStatusResponse("Success");
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
             .thenReturn(response);
 
         doThrow(new CaseDataUpdateException()).when(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
 
-        // Act & Assert
         CardPaymentStatusResponse result =
             feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
-        // Verify logging (optional; you need a library like LogCaptor for assertions)
+
         verify(updatePaymentStatusService).updatePaymentStatus(HEARING, "123", result);
         assertThat(result).isEqualTo(expectedResponse("Success"));
 
