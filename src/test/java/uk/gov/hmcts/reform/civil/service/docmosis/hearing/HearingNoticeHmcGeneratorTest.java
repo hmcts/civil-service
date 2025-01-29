@@ -117,6 +117,7 @@ class HearingNoticeHmcGeneratorTest {
                  .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
                                                                                              .epimmsId(EPIMS)
                                                                                              .externalShortName("VenueName")
+                                                                                             .welshExternalShortName("WelshVenueValue")
                                                                                              .siteName("CML-Site")
                                                                                              .courtAddress(
                                                                                                  "CourtAddress")
