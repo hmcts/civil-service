@@ -530,10 +530,22 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         Optional<CaseDataLiP> caseDataLiP1 = Optional.ofNullable(getCaseDataLiP());
         return caseDataLiP1.map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent()
+            || isCorrectEmailPresent(caseDataLiP1)
+            || isCorrectPhonePresent(caseDataLiP1);
+    }
+
+    private static boolean isCorrectPhonePresent(Optional<CaseDataLiP> caseDataLiP1) {
+        return (caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getIsMediationPhoneCorrect() == YES).isPresent()
             || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
-                .filter(carm -> carm.getIsMediationEmailCorrect() == YES).isPresent()
+            .filter(carm -> carm.getAlternativeMediationTelephone() != null).isPresent());
+    }
+
+    private static boolean isCorrectEmailPresent(Optional<CaseDataLiP> caseDataLiP1) {
+        return (caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getIsMediationEmailCorrect() == YES).isPresent()
             || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
-            .filter(carm -> carm.getIsMediationPhoneCorrect() == YES).isPresent();
+            .filter(carm -> carm.getAlternativeMediationEmail() != null).isPresent());
     }
 
     @JsonIgnore
