@@ -182,6 +182,9 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
                 return caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
             case NOTIFY_NEW_DEFENDANT_SOLICITOR:
                 return !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
+            case NOTIFY_OTHER_SOLICITOR_1:
+                return NocNotificationUtils.isOtherParty1Lip(caseData) &&
+                    !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
             case NOTIFY_OTHER_SOLICITOR_2:
                 return NocNotificationUtils.isOtherParty2Lip(caseData);
             default:
