@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandledOfflineApplicantSolicitorNotifier {
@@ -35,25 +36,31 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     }
 
     public void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData) {
-        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         String templateID;
 
-        if (is1v1Or2v1Case(caseData)) {
-            templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
-        } else {
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                templateID = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
-            } else {
-                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
-            }
-        }
-        if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
-            sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
-        } else if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+        if (caseData.isLipvLROneVOne()) {
+            String recipient = caseData.getApplicant1Email();
             sendNotificationToSolicitorSpec(caseData, recipient);
         } else {
-            sendNotificationToSolicitor(caseData, recipient, templateID);
+            String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+
+            if (is1v1Or2v1Case(caseData)) {
+                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
+            } else {
+                if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                    templateID = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+                } else {
+                    templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
+                }
+            }
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
+                sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
+            } else if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                sendNotificationToSolicitorSpec(caseData, recipient);
+            } else {
+                sendNotificationToSolicitor(caseData, recipient, templateID);
+            }
         }
 
     }
@@ -69,16 +76,32 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     }
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient) {
-        String emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+        String emailTemplate;
+        Map<String, String> properties;
+        if (caseData.isLipvLROneVOne()) {
+            emailTemplate = caseData.isClaimantBilingual()
+                ? notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()
+                : notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+            properties = addPropertiesSpec(caseData);
+        } else {
+            emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+            properties = addPropertiesSpec1v2DiffSol(caseData);
+        }
         notificationService.sendMail(
             recipient,
             emailTemplate,
-            addPropertiesSpec1v2DiffSol(caseData),
+            properties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData) {
+        if (caseData.isLipvLROneVOne()) {
+            return Map.of(
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+            );
+        }
         return Map.of(
             CLAIM_NAME_SPEC, getLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
