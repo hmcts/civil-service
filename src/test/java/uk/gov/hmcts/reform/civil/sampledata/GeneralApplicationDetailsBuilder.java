@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -485,6 +486,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(SPEC_CLAIM)
+            .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("AppSol1Ref").respondentSolicitor1Reference("RespSol1ref").build())
             .responseClaimTrack("MULTI_CLAIM")
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
