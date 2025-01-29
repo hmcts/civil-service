@@ -318,6 +318,7 @@ camunda-bpm:
     devmemoryRequests: 512Mi
     devcpuLimits: 1
     devmemoryLimits: 1Gi
+    image: hmctsprivatetemp.azurecr.io/camunda/bpm:latest
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
       CAMUNDA_DB_HOST: ${SERVICE_NAME}-postgresql

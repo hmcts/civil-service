@@ -249,6 +249,7 @@ camunda-bpm:
   enabled: true
   java:
     disableKeyVaults: true
+    image: hmctsprivatetemp.azurecr.io/camunda/bpm:latest
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: civil-service-camunda-staging-aat.service.core-compute-aat.internal
     devcpuRequests: 500m
