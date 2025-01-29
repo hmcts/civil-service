@@ -332,7 +332,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCUIHMCEnabled(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
         var hmcCui = "hmc-cui-enabled";
         givenToggle(hmcCui, toggleStat);
 
