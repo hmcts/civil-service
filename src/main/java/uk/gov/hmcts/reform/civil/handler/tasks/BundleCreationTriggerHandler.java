@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = bundleCreationTriggerService.getCases();
+        Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
         List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
         log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
 
