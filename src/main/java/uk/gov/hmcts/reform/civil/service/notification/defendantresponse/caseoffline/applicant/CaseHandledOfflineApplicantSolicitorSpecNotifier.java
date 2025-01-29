@@ -36,14 +36,12 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     }
 
     public void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData) {
+        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         String templateID;
 
         if (caseData.isLipvLROneVOne()) {
-            String recipient = caseData.getApplicant1Email();
-            sendNotificationToSolicitorSpec(caseData, recipient);
+            sendNotificationToLiPApplicant(caseData);
         } else {
-            String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
-
             if (is1v1Or2v1Case(caseData)) {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
             } else {
@@ -65,6 +63,18 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
 
     }
 
+    private void sendNotificationToLiPApplicant(CaseData caseData) {
+        String emailTemplate = caseData.isClaimantBilingual()
+            ? notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()
+            : notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        notificationService.sendMail(
+            caseData.getApplicant1Email(),
+            emailTemplate,
+            addPropertiesLipApplicant(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+    }
+
     private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData, String recipient) {
         String emailTemplate = notificationsProperties.getClaimantSolicitorCounterClaimForSpec();
         notificationService.sendMail(
@@ -76,32 +86,16 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     }
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient) {
-        String emailTemplate;
-        Map<String, String> properties;
-        if (caseData.isLipvLROneVOne()) {
-            emailTemplate = caseData.isClaimantBilingual()
-                ? notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()
-                : notificationsProperties.getClaimantLipClaimUpdatedTemplate();
-            properties = addPropertiesSpec(caseData);
-        } else {
-            emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
-            properties = addPropertiesSpec1v2DiffSol(caseData);
-        }
+        String emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
         notificationService.sendMail(
             recipient,
             emailTemplate,
-            properties,
+            addPropertiesSpec1v2DiffSol(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData) {
-        if (caseData.isLipvLROneVOne()) {
-            return Map.of(
-                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-            );
-        }
         return Map.of(
             CLAIM_NAME_SPEC, getLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
@@ -109,6 +103,13 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
+
+    public Map<String, String> addPropertiesLipApplicant(CaseData caseData) {
+        return Map.of(
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+            );
+        }
 
     public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData) {
         return Map.of(
@@ -118,6 +119,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
+
 
     private String getLegalOrganisationName(CaseData caseData) {
         String organisationID;

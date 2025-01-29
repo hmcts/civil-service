@@ -7078,6 +7078,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specClaim1v1LipvLrBilingual() {
+        specClaim1v1LipvLr();
+        this.claimantBilingualLanguagePreference = Language.BOTH.toString();
+        return this;
+    }
+
     public CaseDataBuilder enableRespondent2ResponseFlag() {
         this.claimant2ResponseFlag = YES;
         return this;

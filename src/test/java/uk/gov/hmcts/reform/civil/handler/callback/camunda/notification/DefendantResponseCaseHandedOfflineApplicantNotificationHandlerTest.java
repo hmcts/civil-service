@@ -133,6 +133,32 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
         }
 
         @Test
+        void shouldNotifyApplicantLiPInBilingual() {
+            when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate())
+                .thenReturn("template-id-lip-bilingual");
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .specClaim1v1LipvLrBilingual()
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-lip-bilingual",
+                getNotificationDataMap(caseData),
+                "defendant-response-case-handed-offline-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyApplicantSolicitor_when1v2Case() {
             when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
                 .thenReturn("template-id-multiparty");
