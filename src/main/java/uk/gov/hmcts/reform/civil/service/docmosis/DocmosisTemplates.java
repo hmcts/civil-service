@@ -93,7 +93,6 @@ public enum DocmosisTemplates {
     GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf"),
     RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf"),
-    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG("CV-CMC-LET-ENG-LR-JO0002.docx", "cover_letter.pdf"),
     JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00916.docx", "Judgment_by_admission_claimant.pdf"),
     JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
