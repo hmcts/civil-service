@@ -22,6 +22,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_FORMER_SOLICITOR;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_NEW_DEFENDANT_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITOR_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITOR_2;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -36,13 +37,14 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_FORMER_SOLICITOR,
         NOTIFY_OTHER_SOLICITOR_1,
-        NOTIFY_OTHER_SOLICITOR_2
+        NOTIFY_OTHER_SOLICITOR_2,
+        NOTIFY_NEW_DEFENDANT_SOLICITOR
     );
 
     public static final String TASK_ID_NOTIFY_FORMER_SOLICITOR = "NotifyFormerSolicitor";
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_1 = "NotifyOtherSolicitor1";
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_2 = "NotifyOtherSolicitor2";
-
+    public static final String TASK_ID_NOTIFY_NEW_DEFENDANT_SOLICITOR1 = "NotifyNewDefendantSolicitor1";
     private static final String LITIGANT_IN_PERSON = "LiP";
 
     private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
@@ -72,6 +74,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
                 return TASK_ID_NOTIFY_OTHER_SOLICITOR_1;
             case NOTIFY_OTHER_SOLICITOR_2:
                 return TASK_ID_NOTIFY_OTHER_SOLICITOR_2;
+            case NOTIFY_NEW_DEFENDANT_SOLICITOR:
+                return TASK_ID_NOTIFY_NEW_DEFENDANT_SOLICITOR1;
             default:
                 throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
         }
@@ -94,7 +98,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
         log.info("Sending NoC notification email");
         notificationService.sendMail(
             getRecipientEmail(caseData),
-            getTemplateId(),
+            getTemplateId(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
         log.info("NoC email sent successfully");
@@ -116,17 +120,27 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
                 return NocNotificationUtils.getOtherSolicitor1Email(caseData);
             case NOTIFY_OTHER_SOLICITOR_2:
                 return NocNotificationUtils.getOtherSolicitor2Email(caseData);
+            case NOTIFY_NEW_DEFENDANT_SOLICITOR:
+                return caseData.getRespondentSolicitor1EmailAddress();
             default:
                 throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, event));
         }
     }
 
-    private String getTemplateId() {
+    private String getTemplateId(CaseData caseData) {
         switch (event) {
             case NOTIFY_FORMER_SOLICITOR:
                 return notificationsProperties.getNoticeOfChangeFormerSolicitor();
             case NOTIFY_OTHER_SOLICITOR_1, NOTIFY_OTHER_SOLICITOR_2:
+                if (NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData)) {
+                    if (caseData.isClaimantBilingual()) {
+                        return notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC();
+                    }
+                    return notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
+                }
                 return notificationsProperties.getNoticeOfChangeOtherParties();
+            case NOTIFY_NEW_DEFENDANT_SOLICITOR:
+                return notificationsProperties.getNotifyNewDefendantSolicitorNOC();
             default:
                 throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, event));
         }
@@ -166,8 +180,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
         switch (event) {
             case NOTIFY_FORMER_SOLICITOR:
                 return caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
-            case NOTIFY_OTHER_SOLICITOR_1:
-                return NocNotificationUtils.isOtherParty1Lip(caseData);
+            case NOTIFY_NEW_DEFENDANT_SOLICITOR:
+                return !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
             case NOTIFY_OTHER_SOLICITOR_2:
                 return NocNotificationUtils.isOtherParty2Lip(caseData);
             default:
