@@ -109,7 +109,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
             );
-        }
+    }
 
     public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData) {
         return Map.of(
@@ -119,7 +119,6 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
-
 
     private String getLegalOrganisationName(CaseData caseData) {
         String organisationID;
