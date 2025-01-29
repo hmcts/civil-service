@@ -191,8 +191,9 @@ public class HmcDataUtils {
      */
     public static String getTotalHearingDurationText(HearingGetResponse hearing) {
         Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+        String caseRef = hearing.getCaseDetails() != null ? hearing.getCaseDetails().getCaseRef() : "reference not available";
         if (totalDurationInMinutes == null) {
-            log.info("Total Duration In Minutes from Hmc handler is null for caseId {}", hearing.getCaseDetails().getCaseRef());
+            log.info("Total Duration In Minutes from Hmc handler is null for caseId {}", caseRef);
             return null;
         }
 
@@ -202,7 +203,7 @@ public class HmcDataUtils {
         int hours = (int)(totalDurationInHours - (days * HOURS_PER_DAY));
         int minutes = (int)(totalDurationInMinutes - (totalDurationInHours * MINUTES_PER_HOUR));
         String hearingDurationText = daysHoursMinutesFormat(days, hours, minutes);
-        log.info("Total hearing duration from Hmc handler: {} for caseId {}", hearingDurationText, hearing.getCaseDetails().getCaseRef());
+        log.info("Total hearing duration from Hmc handler: {} for caseId {}", hearingDurationText, caseRef);
         return hearingDurationText;
     }
 
