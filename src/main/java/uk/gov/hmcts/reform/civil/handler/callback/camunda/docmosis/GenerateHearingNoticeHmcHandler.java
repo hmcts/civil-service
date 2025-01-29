@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -44,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -177,10 +177,5 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             return caseData.getResponseClaimTrack();
         }
         return null;
-    }
-
-    private boolean isWelshHearingTemplate(CaseData caseData) {
-        return (YesOrNo.NO.equals(caseData.getApplicant1Represented()) && caseData.isClaimantBilingual())
-            || (YesOrNo.NO.equals(caseData.getRespondent1Represented()) && caseData.isRespondentResponseBilingual());
     }
 }
