@@ -319,7 +319,7 @@ class HearingNoticeHmcGeneratorTest {
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
-                                                            HEARING_NOTICE_HMC_WELSH);
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
