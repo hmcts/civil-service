@@ -73,7 +73,7 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
     private List<CaseDocument> generateDocmosisDocsForNonDivergent(List<DefaultJudgmentForm> defaultJudgmentForms,
                                                                    String authorisation, CaseData caseData, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        log.info("Total DJ forms =" +defaultJudgmentForms.size());
+        log.info("Total DJ forms =" + defaultJudgmentForms.size());
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
             DocumentType documentType = getDocumentTypeBasedOnEvent(i, event);
@@ -95,7 +95,7 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
                 CaseDocument welshCaseDoc = createWelshDocument(defaultJudgmentForm, authorisation, caseData, event, documentType);
                 List<DocumentMetaData> documentMetaDataList = appendWelshDocToDocument(engDocument, welshCaseDoc);
                 Long caseId = caseData.getCcdCaseReference();
-                log.info("Size of document metadata list " +documentMetaDataList.size());
+                log.info("Size of document metadata list " + documentMetaDataList.size());
                 uploadedDocument = civilStitchService.generateStitchedCaseDocument(
                     documentMetaDataList,
                     welshCaseDoc.getDocumentName(),
