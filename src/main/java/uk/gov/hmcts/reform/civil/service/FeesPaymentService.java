@@ -50,7 +50,7 @@ public class FeesPaymentService {
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
             .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
-                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.UNNECESSARY))
             .currency("GBP")
             .language(caseData.isClaimantBilingual() ? "cy" : "En")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
@@ -88,8 +88,13 @@ public class FeesPaymentService {
             updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, response.build());
 
         } catch (Exception e) {
-
-            log.error("Update payment status failed for claim [{}]", caseReference);
+            log.error(
+                "Update payment status failed for claim [{}] with fee type [{}]. Error: {}",
+                caseReference,
+                feeType,
+                e.getMessage(),
+                e
+            );
         }
 
         return response.build();
