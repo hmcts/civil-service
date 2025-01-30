@@ -75,7 +75,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
+        return true;
     }
 
     public boolean isCjesServiceAvailable() {
@@ -96,15 +96,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        long epoch;
-        if (caseData.getSubmittedDate() == null) {
-            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
-        } else {
-            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
-        }
-        return featureToggleApi.isFeatureEnabled("minti")
-            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        return true;
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
