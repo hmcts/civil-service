@@ -86,7 +86,8 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
 
         return HearingNoticeHmc.builder()
-            .title(getHearingTypeTitleText(caseData, hearing))
+            .title(HEARING_NOTICE_HMC_WELSH.equals(template)
+                       ? translateTitle(getHearingTypeTitleText(caseData, hearing)) : getHearingTypeTitleText(caseData, hearing))
             .hearingSiteName(getExternalShortName(template, caseManagementLocation))
             .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
             .hearingLocation(hearingLocation)
@@ -125,6 +126,15 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         }
 
         return caseManagementLocation.getExternalShortName();
+    }
+
+    private String translateTitle(String title) {
+        if ("hearing".equals(title) || "Hearing".equals(title)) {
+            return "Wrandawiad";
+        } else if ("trial".equals(title) || "Trial".equals(title)) {
+            return "Dreial";
+        }
+        return title;
     }
 
 }
