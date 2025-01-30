@@ -623,7 +623,7 @@ public class EventHistoryMapper {
                                    ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
                                    : null)
             .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
-            .dateOfJudgment(setApplicant1ResponseDate(caseData))
+            .dateOfJudgment(caseData.getJoJudgementByAdmissionIssueDate())
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
             .miscText("")
@@ -633,7 +633,7 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
             .litigiousPartyID(APPLICANT_ID)
-            .dateReceived(setApplicant1ResponseDate(caseData))
+            .dateReceived(caseData.getJoJudgementByAdmissionIssueDate())
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));

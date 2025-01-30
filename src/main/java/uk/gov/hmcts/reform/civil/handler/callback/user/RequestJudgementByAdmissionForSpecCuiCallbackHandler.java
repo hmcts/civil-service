@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -122,7 +123,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         if (featureToggleService.isJudgmentOnlineLive()
             && (isOneVOne(data))
             && data.isPayImmediately()) {
-
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
         } else {
@@ -137,13 +137,15 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData updatedCaseData = caseDataBuilder.build();
 
         if (featureToggleService.isJudgmentOnlineLive()) {
-            updatedCaseData.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
-            updatedCaseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            updatedCaseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()));
+            caseDataBuilder
+                .activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData))
+                .joIsLiveJudgmentExists(YesOrNo.YES)
+                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()))
+                .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
     }
