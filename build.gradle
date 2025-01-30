@@ -406,7 +406,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.98'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.34'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.26'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.27'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.5'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
