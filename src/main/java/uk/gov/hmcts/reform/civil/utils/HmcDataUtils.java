@@ -369,4 +369,13 @@ public class HmcDataUtils {
             .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
             .orElse(false);
     }
+
+    public static String translateTitle(String title) {
+        if ("hearing".equals(title) || "Hearing".equals(title)) {
+            return "Wrandawiad";
+        } else if ("trial".equals(title) || "Trial".equals(title)) {
+            return "Dreial";
+        }
+        return title;
+    }
 }

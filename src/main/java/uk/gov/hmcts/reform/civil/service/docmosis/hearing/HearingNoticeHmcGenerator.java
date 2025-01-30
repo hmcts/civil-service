@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPhoneAttendeeNames;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getVideoAttendeesNames;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.translateTitle;
 
 @Service
 @RequiredArgsConstructor
@@ -127,15 +128,5 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
 
         return caseManagementLocation.getExternalShortName();
     }
-
-    private String translateTitle(String title) {
-        if ("hearing".equals(title) || "Hearing".equals(title)) {
-            return "Wrandawiad";
-        } else if ("trial".equals(title) || "Trial".equals(title)) {
-            return "Dreial";
-        }
-        return title;
-    }
-
 }
 
