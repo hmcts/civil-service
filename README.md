@@ -252,6 +252,7 @@ The script should create a /.mirrord/.mirrord.json config file under the project
 Specifically for civil-service you might need to exclude a flyway environment variable to allow the startup process to run without errors.
 For that you should have such file as this:
 
+
 ```json
 {
   "feature": {
