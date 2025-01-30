@@ -23,6 +23,9 @@ public class CaseQueriesUtil {
             return caseData.getQmRespondentSolicitor1Queries();
         } else if (roles.contains("[RESPONDENTSOLICITORTWO]")) {
             return caseData.getQmRespondentSolicitor2Queries();
+        } else if (roles.contains("[CITIZEN-CLAIMANT-PROFILE]")) {
+            System.out.println("Hit citizen condition");
+            return caseData.getQmApplicantCitizenQueries();
         } else {
             throw new IllegalArgumentException("User does have a supported case role for query management.");
         }

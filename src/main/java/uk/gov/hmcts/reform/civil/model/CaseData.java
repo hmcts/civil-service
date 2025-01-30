@@ -781,6 +781,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final CaseQueriesCollection qmRespondentSolicitor2Queries;
     private final CaseMessage caseMessage;
     private final LatestQuery qmLatestQuery;
+    //LIP QM
+    private final CaseQueriesCollection qmApplicantCitizenQueries;
+    private final CaseQueriesCollection qmRespondentCitizen1Queries;
+    private final CaseQueriesCollection qmRespondentCitizen2Queries;
 
 
     /**
