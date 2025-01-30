@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementSer
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -349,5 +350,32 @@ public class HearingFormGeneratorTest {
                 .build();
             assertThat(generator.getHearingDuration(caseData)).isEqualTo("45 minutes");
         }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "custom time duration, FAST_TRACK_TRIAL, INTERMEDIATE_CLAIM",
+        "custom time duration, FAST_TRACK_TRIAL, MULTI_CLAIM",
+    })
+    void shouldGetHearingDuration_spec(String mintiHearingDuration, String hearingNoticeType, String claimType) {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.valueOf(hearingNoticeType))
+            .hearingFeePaymentDetails(null)
+            .responseClaimTrack(claimType)
+            .hearingDurationMinti(mintiHearingDuration)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .build();
+
+        assertThat(generator.getHearingDuration(caseData)).isEqualTo(mintiHearingDuration);
+
     }
 }
