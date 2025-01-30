@@ -96,7 +96,11 @@ public class FeatureToggleService {
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
-        return true;
+        if (caseData != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {

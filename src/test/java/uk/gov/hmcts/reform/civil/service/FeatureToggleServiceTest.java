@@ -192,7 +192,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
-        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(true);
+        assertThat(featureToggleService.isMintiEnabled()).isTrue();
     }
 
     @ParameterizedTest
@@ -226,7 +226,7 @@ class FeatureToggleServiceTest {
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .build();
-        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(true);
+        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isTrue();
     }
 
     private void givenToggle(String feature, boolean state) {
