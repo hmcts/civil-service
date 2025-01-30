@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CCD_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FORMER_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUE_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_REP_NAME_WITH_SPACE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NEW_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OTHER_SOL_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -100,7 +101,8 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             void shouldNotifyFormerSolicitor_whenInvoked() {
                 when(organisationService.findOrganisationById("QWERTY A"))
                     .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
-
+                when(organisationService.findOrganisationById("Previous-sol-id"))
+                    .thenReturn(Optional.of(Organisation.builder().name(PREVIOUS_SOL).build()));
                 when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(PREVIOUS_SOL_TEMPLATE);
 
                 CaseData caseData =
@@ -117,7 +119,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     NEW_SOL, NEW_SOLICITOR,
                     OTHER_SOL_NAME, OTHER_SOLICITOR,
                     PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                    CASEMAN_REF, "000DC001"
+                    CASEMAN_REF, "000DC001",
+                    LEGAL_REP_NAME_WITH_SPACE, "New solicitor",
+                    "reference", "1594901956117591"
                 );
 
                 handler.handle(params);
@@ -177,7 +181,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     NEW_SOL, NEW_SOLICITOR,
                     OTHER_SOL_NAME, OTHER_SOLICITOR,
                     PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                    CASEMAN_REF, "000DC001"
+                    CASEMAN_REF, "000DC001",
+                    LEGAL_REP_NAME_WITH_SPACE, "New solicitor",
+                    "reference", "1594901956117591"
                 );
 
                 handler.handle(params);
@@ -189,72 +195,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     REFERENCE
                 );
             }
-
-            @Test
-            void shouldNotifyForOtherPartiesLipForRespondentSolicitorChange() {
-                when(notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate()).thenReturn(
-                    OTHER_SOL_TEMPLATE);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
-                    .applicant1Represented(YesOrNo.NO)
-                    .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder()
-                                 .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
-
-                Map<String, String> expectedProperties = Map.of(
-                    CASE_NAME, CASE_TITLE,
-                    ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
-                    CCD_REF, caseData.getCcdCaseReference().toString(),
-                    FORMER_SOL, PREVIOUS_SOL,
-                    NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, "LiP",
-                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                    CASEMAN_REF, "000DC001"
-                );
-
-                handler.handle(params);
-
-                verify(notificationService).sendMail(
-                    "rambo@email.com",
-                    OTHER_SOL_TEMPLATE,
-                    expectedProperties,
-                    REFERENCE
-                );
-            }
-
-            @Test
-            void shouldNotifyForOtherPartiesLipBilingualForRespondentSolicitorChange() {
-                when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC()).thenReturn(
-                    OTHER_SOL_TEMPLATE);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
-                    .applicant1Represented(YesOrNo.NO)
-                    .claimantBilingualLanguagePreference(Language.WELSH.toString())
-                    .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder()
-                                 .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
-
-                Map<String, String> expectedProperties = Map.of(
-                    CASE_NAME, CASE_TITLE,
-                    ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
-                    CCD_REF, caseData.getCcdCaseReference().toString(),
-                    FORMER_SOL, PREVIOUS_SOL,
-                    NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, "LiP",
-                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                    CASEMAN_REF, "000DC001"
-                );
-
-                handler.handle(params);
-
-                verify(notificationService).sendMail(
-                    "rambo@email.com",
-                    OTHER_SOL_TEMPLATE,
-                    expectedProperties,
-                    REFERENCE
-                );
-            }
-
         }
 
         @Nested
@@ -278,7 +218,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     NEW_SOL, NEW_SOLICITOR,
                     OTHER_SOL_NAME, "LiP",
                     PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                    CASEMAN_REF, "000DC001"
+                    CASEMAN_REF, "000DC001",
+                    LEGAL_REP_NAME_WITH_SPACE, "New solicitor",
+                    "reference", "1594901956117591"
                 );
 
                 handler.handle(params);
@@ -291,6 +233,7 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 );
             }
         }
+
         @Nested
         class NotifyOtherSolicitor2Event {
 
@@ -315,7 +258,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     NEW_SOL, NEW_SOLICITOR,
                     OTHER_SOL_NAME, OTHER_SOLICITOR_2,
                     PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                    CASEMAN_REF, "000DC001"
+                    CASEMAN_REF, "000DC001",
+                    LEGAL_REP_NAME_WITH_SPACE, "New solicitor",
+                    "reference", "1594901956117591"
                 );
 
                 handler.handle(params);
@@ -329,6 +274,75 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             }
         }
 
+    }
+
+    @Nested
+    class AboutToSubmitCallbackLip {
+
+        @Test
+        void shouldNotifyForOtherPartiesLipBilingualForRespondentSolicitorChange() {
+            when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC()).thenReturn(
+                OTHER_SOL_TEMPLATE);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+
+            Map<String, String> expectedProperties = Map.of(
+                "Defendant Name",
+                "Mr. Sole Trader",
+                "claim16DigitNumber",
+                "1594901956117591",
+                "claimantName",
+                "Mr. John Rambo",
+                "claimnumber",
+                "000DC001"
+            );
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                OTHER_SOL_TEMPLATE,
+                expectedProperties,
+                REFERENCE
+            );
+        }
+
+        @Test
+        void shouldNotifyForOtherPartiesLipForRespondentSolicitorChange() {
+            when(notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate()).thenReturn(
+                OTHER_SOL_TEMPLATE);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+
+            Map<String, String> expectedProperties = Map.of(
+                "Defendant Name",
+                "Mr. Sole Trader",
+                "claim16DigitNumber",
+                "1594901956117591",
+                "claimantName",
+                "Mr. John Rambo",
+                "claimnumber",
+                "000DC001"
+            );
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                OTHER_SOL_TEMPLATE,
+                expectedProperties,
+                REFERENCE
+            );
+        }
     }
 
     @Test

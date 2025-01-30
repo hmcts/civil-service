@@ -99,7 +99,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
         notificationService.sendMail(
             getRecipientEmail(caseData),
             getTemplateId(caseData),
-            addProperties(caseData),
+            getPropertiesForEmail(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
         log.info("NoC email sent successfully");
 
@@ -156,7 +156,31 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, event),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference());
+            CASEMAN_REF,
+            caseData.getLegacyCaseReference(),
+            LEGAL_REP_NAME_WITH_SPACE,
+            getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            REFERENCE,
+            caseData.getCcdCaseReference().toString()
+        );
+
+    }
+
+    public Map<String, String> addPropertiesClaimant(CaseData caseData) {
+        return Map.of(
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference()
+        );
+    }
+
+    public Map<String, String> getPropertiesForEmail(CaseData caseData) {
+        if (NOTIFY_OTHER_SOLICITOR_1.equals(event)
+            && NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData)) {
+            return addPropertiesClaimant(caseData);
+        }
+        return addProperties(caseData);
     }
 
     private String getOrganisationName(String orgToName) {
@@ -183,8 +207,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             case NOTIFY_NEW_DEFENDANT_SOLICITOR:
                 return !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
             case NOTIFY_OTHER_SOLICITOR_1:
-                return NocNotificationUtils.isOtherParty1Lip(caseData) &&
-                    !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
+                return NocNotificationUtils.isOtherParty1Lip(caseData)
+                    && !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
             case NOTIFY_OTHER_SOLICITOR_2:
                 return NocNotificationUtils.isOtherParty2Lip(caseData);
             default:
