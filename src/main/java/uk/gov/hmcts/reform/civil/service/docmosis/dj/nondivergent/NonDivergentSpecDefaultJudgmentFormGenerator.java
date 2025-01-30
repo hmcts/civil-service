@@ -73,12 +73,10 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
     private List<CaseDocument> generateDocmosisDocsForNonDivergent(List<DefaultJudgmentForm> defaultJudgmentForms,
                                                                    String authorisation, CaseData caseData, String event) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        log.info("Total DJ forms =" + defaultJudgmentForms.size());
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
             DocumentType documentType = getDocumentTypeBasedOnEvent(i, event);
             DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event, false);
-            log.info("Docmosis template for English -" + docmosisTemplate.getTemplate());
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
                 docmosisTemplate);
             CaseDocument engDocument = documentManagementService.uploadDocument(
@@ -95,7 +93,6 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
                 CaseDocument welshCaseDoc = createWelshDocument(defaultJudgmentForm, authorisation, caseData, event, documentType);
                 List<DocumentMetaData> documentMetaDataList = appendWelshDocToDocument(engDocument, welshCaseDoc);
                 Long caseId = caseData.getCcdCaseReference();
-                log.info("Size of document metadata list " + documentMetaDataList.size());
                 uploadedDocument = civilStitchService.generateStitchedCaseDocument(
                     documentMetaDataList,
                     welshCaseDoc.getDocumentName(),
@@ -114,7 +111,6 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
                                  String authorisation, CaseData caseData, String event, DocumentType documentType) {
 
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event, true);
-        log.info("Docmosis template for Welsh -" + docmosisTemplate.getTemplate());
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
                                                                                               docmosisTemplate);
         return documentManagementService.uploadDocument(
