@@ -1,4 +1,4 @@
-module "servicebus-subscription" {
+module "servicebus-subscription-ccd-events" {
   source              = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=DTSPO-18682"
   name                = "civil-ccd-case-events-sub-${var.env}"
   namespace_name      = "ccd-servicebus-${var.env}"
