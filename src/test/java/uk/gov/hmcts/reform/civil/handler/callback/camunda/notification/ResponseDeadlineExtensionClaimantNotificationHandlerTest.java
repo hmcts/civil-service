@@ -118,6 +118,9 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         @Test
         void shouldSendEmailToClaimantLip() {
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -127,8 +130,6 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
-            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -142,6 +143,10 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         @Test
         void shouldSendEmailToClaimantLipInWelsh() {
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).willReturn(emailLipWelshTemplate);
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -152,9 +157,6 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            given(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).willReturn(emailLipWelshTemplate);
-            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -168,6 +170,10 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         @Test
         void shouldSendEmailToClaimantLipInEngish_ifPreLiPvLRReleaseDate() {
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -177,10 +183,6 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 .claimantBilingualLanguagePreference("BOTH")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
-            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
-            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -190,7 +192,6 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 "claimant-deadline-extension-notification-" + legacyReference
             );
         }
-
 
         @NotNull
         private Map<String, String> getNotificationDataMapForLip(CaseData caseData) {
