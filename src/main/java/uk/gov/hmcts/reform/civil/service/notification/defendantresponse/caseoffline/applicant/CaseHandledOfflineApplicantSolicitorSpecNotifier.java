@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.applicant;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 @Component
 public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandledOfflineApplicantSolicitorNotifier {
 
@@ -38,7 +40,7 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     public void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData) {
         String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         String templateID;
-
+        log.info("Its Lip V LR claim: {}", caseData.isLipvLROneVOne());
         if (caseData.isLipvLROneVOne()) {
             sendNotificationToLiPApplicant(caseData);
         } else {
