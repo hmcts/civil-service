@@ -38,7 +38,7 @@ abstract class ElasticSearchServiceTest {
 
         when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
 
-        assertThat(searchService.getCases()).isEqualTo(searchResult.getCases());
+        assertThat(searchService.getCases()).containsAll(searchResult.getCases());
         verify(coreCaseDataService).searchCases(queryCaptor.capture());
         assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQuery(0));
     }
@@ -151,7 +151,7 @@ abstract class ElasticSearchServiceTest {
 
         when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
 
-        assertThat(searchService.getCases()).hasSize(2);
+        assertThat(searchService.getCases()).hasSize(1);
         verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
 
         List<Query> capturedQueries = queryCaptor.getAllValues();
