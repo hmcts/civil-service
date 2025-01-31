@@ -29,6 +29,7 @@ java:
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
     CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS: 1
+    CCD_EVENTS_SUBSCRIPTION_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
