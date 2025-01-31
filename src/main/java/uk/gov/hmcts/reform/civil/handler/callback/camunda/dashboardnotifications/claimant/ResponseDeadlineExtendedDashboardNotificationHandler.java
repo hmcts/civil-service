@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class ResponseDeadlineExtendedDashboardNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_DEFENDANT_RESPONSE_DATE);
-    public static final String TASK_ID = "GenerateClaimantDashboardNotificationClaimantNewResponseDeadline";
 
     public ResponseDeadlineExtendedDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
                                                    DashboardNotificationsParamsMapper mapper,
