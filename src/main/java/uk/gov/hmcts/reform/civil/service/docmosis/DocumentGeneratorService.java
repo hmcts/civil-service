@@ -7,7 +7,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-//import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.config.DocmosisConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -23,7 +22,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DocumentGeneratorService {
 
-    // private final DocmosisApiClient docmosisApiClient;
     private final DocmosisConfiguration configuration;
     private final ObjectMapper mapper;
 
@@ -50,7 +48,6 @@ public class DocumentGeneratorService {
         byte[] response = new byte[]{};
 
         try {
-            // response = docmosisApiClient.createDocument(requestBody);
             response = Files.readAllBytes(Paths.get("dummy.pdf"));
         } catch (IOException e) {
             System.out.println("Error reading the PDF file: " + e.getMessage());
