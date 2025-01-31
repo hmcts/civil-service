@@ -28,16 +28,13 @@ public class CaseTaskTrackingServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void trackCaseTask_withNullAdditionalProperties_shouldOnlyAddCaseAndEventProperties() {
-        // Arrange
         String caseId = "111";
         String eventType = "serviceBusMessage";
         String eventName = "NotifyRobotics";
         Map<String, String> additionalProperties = null;
 
-        // Act
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
-        // Assert
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
         verify(telemetryClient).trackEvent(eq(eventName), propertiesCaptor.capture(), isNull());
 
@@ -50,7 +47,6 @@ public class CaseTaskTrackingServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void trackCaseTask_withAdditionalProperties_shouldMergeAllProperties() {
-        // Arrange
         String caseId = "222";
         String eventType = "update";
         String eventName = "CaseUpdated";
@@ -58,10 +54,8 @@ public class CaseTaskTrackingServiceTest {
         additionalProperties.put("someKey", "someValue");
         additionalProperties.put("anotherKey", "anotherValue");
 
-        // Act
         caseTaskTrackingService.trackCaseTask(caseId, eventType, eventName, additionalProperties);
 
-        // Assert
         ArgumentCaptor<Map<String, String>> propertiesCaptor = ArgumentCaptor.forClass(Map.class);
         verify(telemetryClient).trackEvent(eq(eventName), propertiesCaptor.capture(), isNull());
 
