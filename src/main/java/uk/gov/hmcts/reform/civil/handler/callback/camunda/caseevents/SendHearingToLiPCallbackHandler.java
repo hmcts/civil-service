@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
+import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -54,10 +56,36 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse sendHearingLetter(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
-        sendHearingBulkPrintService.sendHearingToLIP(
-            callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, camundaActivityId(callbackParams));
+        String task = camundaActivityId(callbackParams);
+        if (isClaimantLip(task, caseData) || isDefendantLip(task, caseData)) {
+            sendHearingBulkPrintService.sendHearingToLIP(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
+                featureToggleService.isHmcForLipEnabled() && sendWelshHearingToLip(task, caseData));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
+    }
+
+    private boolean sendWelshHearingToLip(String task, CaseData caseData) {
+        return (isClaimant(task) && HmcDataUtils.isWelshHearingTemplateClaimant(caseData))
+            || (isDefendant(task) && HmcDataUtils.isWelshHearingTemplateDefendant(caseData));
+    }
+
+    private boolean isClaimant(String task) {
+        return TASK_ID_CLAIMANT.equals(task);
+    }
+
+    private boolean isDefendant(String task) {
+        return TASK_ID_DEFENDANT.equals(task);
+    }
+
+    private boolean isClaimantLip(String task, CaseData caseData) {
+        return isClaimant(task) && YesOrNo.NO.equals(caseData.getApplicant1Represented());
+    }
+
+    private boolean isDefendantLip(String task, CaseData caseData) {
+        return isDefendant(task) && caseData.isRespondent1NotRepresented();
     }
 }
