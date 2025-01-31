@@ -33,7 +33,7 @@ public class SendHearingBulkPrintService {
             letterContent = generateLetterContent(authorisation, caseData, task, caseDocument);
         } else if (welshDocument && checkWelshHearingDocumentAvailable(caseData)) {
             CaseDocument[] caseDocuments = {caseData.getHearingDocuments().get(0).getValue(),
-                caseData.getHearingDocumentsWelsh().get(0).getValue()} ;
+                caseData.getHearingDocumentsWelsh().get(0).getValue()};
             letterContent = generateLetterContent(authorisation, caseData, task, caseDocuments);
         } else {
             return;
