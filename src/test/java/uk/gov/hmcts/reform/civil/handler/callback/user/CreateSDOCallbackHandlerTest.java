@@ -174,6 +174,7 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack.WRITT
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
@@ -184,6 +185,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
@@ -2501,6 +2503,88 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventSetOrderDetailsFlags {
         private static final String PAGE_ID = "order-details-navigation";
+
+        @Test
+        void showReturnError_whenUnspecIntermediateTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build().toBuilder()
+                .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
+
+        @Test
+        void showReturnError_whenUnspecMultiTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build().toBuilder()
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
+
+        @Test
+        void showReturnError_whenSpecIntermediateTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
+
+        @Test
+        void showReturnError_whenSpecMultiTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .setClaimTypeToSpecClaim()
+                .build().toBuilder()
+                .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
+                .orderType(OrderType.DISPOSAL)
+                .ccdState(JUDICIAL_REFERRAL)
+                .build();
+
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsOnly(ERROR_MINTI_DISPOSAL_NOT_ALLOWED);
+        }
 
         @Test
         void smallClaimsFlagAndFastTrackFlagSetToNo() {
