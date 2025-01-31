@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -337,6 +338,169 @@ class SendAndReplyCallbackHandlerTest {
             verify(messageService, times(1))
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
+
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToJudge_Intermediate_responseClaimTrack() {
+            String messageContent = "Message Content";
+            SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
+
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.JUDICIAL)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
+
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .responseClaimTrack(AllocatedTrack.INTERMEDIATE_CLAIM.name())
+                .sendMessageMetadata(messageMetaData)
+                .sendMessageContent(messageContent)
+                .build();
+
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+                .thenReturn(wrapElements(expectedMessages));
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getSendMessageMetadata()).isNull();
+            assertThat(responseCaseData.getSendMessageContent()).isNull();
+            assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Intermediate track");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
+
+            verify(messageService, times(1))
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToJudge_Multi_responseClaimTrack() {
+            String messageContent = "Message Content";
+            SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
+
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.JUDICIAL)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
+
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .responseClaimTrack(AllocatedTrack.MULTI_CLAIM.name())
+                .sendMessageMetadata(messageMetaData)
+                .sendMessageContent(messageContent)
+                .build();
+
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+                .thenReturn(wrapElements(expectedMessages));
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getSendMessageMetadata()).isNull();
+            assertThat(responseCaseData.getSendMessageContent()).isNull();
+            assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Multi track");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("Judge");
+
+            verify(messageService, times(1))
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Intermediate_TotalClaimAmount() {
+            String messageContent = "Message Content";
+            SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.JUDICIAL_DISTRICT)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
+
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .totalClaimAmount(BigDecimal.valueOf(25001))
+                .sendMessageMetadata(messageMetaData)
+                .sendMessageContent(messageContent)
+                .build();
+
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+                .thenReturn(wrapElements(expectedMessages));
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getSendMessageMetadata()).isNull();
+            assertThat(responseCaseData.getSendMessageContent()).isNull();
+            assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Intermediate track");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
+
+            verify(messageService, times(1))
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Multi_TotalClaimAmount() {
+            String messageContent = "Message Content";
+            SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            Message expectedMessage = Message.builder()
+                .messageContent(messageContent)
+                .recipientRoleType(RolePool.JUDICIAL_DISTRICT)
+                .build();
+            List<Message> expectedMessages = List.of(expectedMessage);
+
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .totalClaimAmount(BigDecimal.valueOf(100001))
+                .sendMessageMetadata(messageMetaData)
+                .sendMessageContent(messageContent)
+                .build();
+
+            when(messageService.addMessage(null, messageMetaData, messageContent, AUTH_TOKEN))
+                .thenReturn(wrapElements(expectedMessages));
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(responseCaseData.getSendMessageMetadata()).isNull();
+            assertThat(responseCaseData.getSendMessageContent()).isNull();
+            assertThat(unwrapElements(responseCaseData.getMessages())).isEqualTo(expectedMessages);
+            assertThat(responseCaseData.getLastMessage()).isEqualTo(expectedMessage);
+            assertThat(responseCaseData.getLastMessageAllocatedTrack()).isEqualTo("Multi track");
+            assertThat(responseCaseData.getLastMessageJudgeLabel()).isEqualTo("DJ");
+
+            verify(messageService, times(1))
+                .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
+        }
+
 
         @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
