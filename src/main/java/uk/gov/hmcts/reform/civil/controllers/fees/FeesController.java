@@ -61,12 +61,12 @@ public class FeesController {
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 
-    @PostMapping("/claim/interest-to-date")
-    @Operation(summary = "Calculates the claim interest to date")
+    @PostMapping("/claim/interest")
+    @Operation(summary = "Calculates the claim interest")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<BigDecimal> calculateClaimInterestToDate(@RequestBody CaseData caseData) {
+    public ResponseEntity<BigDecimal> calculateClaimInterest(@RequestBody CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         return new ResponseEntity<>(interest, HttpStatus.OK);
     }

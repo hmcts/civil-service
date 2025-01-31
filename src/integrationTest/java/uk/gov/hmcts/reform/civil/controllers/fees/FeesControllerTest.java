@@ -26,7 +26,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     private static final String FEES_RANGES_URL = "/fees/ranges/";
     private static final String FEES_CLAIM_URL = "/fees/claim/{claimAmount}";
-    private static final String FEES_CLAIM_INTEREST_TO_DATE_URL = "/fees/claim/interest-to-date";
+    private static final String FEES_CLAIM_INTEREST_URL = "/fees/claim/interest";
     private static final String FEES_HEARING_URL = "/fees/hearing/{claimAmount}";
     private static final String FEES_GA_URL = "/fees/general-application";
 
@@ -55,7 +55,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     public void shouldReturnClaimInterestToDate() {
         CaseData caseData = CaseData.builder().build();
         when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.1"));
-        doGet(BEARER_TOKEN, FEES_CLAIM_INTEREST_TO_DATE_URL, caseData)
+        doGet(BEARER_TOKEN, FEES_CLAIM_INTEREST_URL, caseData)
             .andExpect(content().json(toJson("0.1")))
             .andExpect(status().isOk());
     }
