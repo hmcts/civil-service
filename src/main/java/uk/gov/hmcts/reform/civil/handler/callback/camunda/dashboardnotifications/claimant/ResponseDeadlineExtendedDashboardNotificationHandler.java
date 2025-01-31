@@ -28,11 +28,6 @@ public class ResponseDeadlineExtendedDashboardNotificationHandler extends Dashbo
     }
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
-
-    @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
