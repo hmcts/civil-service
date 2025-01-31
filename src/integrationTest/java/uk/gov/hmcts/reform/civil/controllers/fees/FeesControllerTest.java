@@ -9,13 +9,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
-import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
-import uk.gov.hmcts.reform.civil.model.Fee2Dto;
-import uk.gov.hmcts.reform.civil.model.FeeVersionDto;
-import uk.gov.hmcts.reform.civil.model.FlatAmountDto;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,11 +26,15 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     private static final String FEES_RANGES_URL = "/fees/ranges/";
     private static final String FEES_CLAIM_URL = "/fees/claim/{claimAmount}";
+    private static final String FEES_CLAIM_INTEREST_TO_DATE_URL = "/fees/claim/interest-to-date";
     private static final String FEES_HEARING_URL = "/fees/hearing/{claimAmount}";
     private static final String FEES_GA_URL = "/fees/general-application";
 
     @MockBean
     private FeesService feesService;
+
+    @MockBean
+    private InterestCalculator interestCalculator;
 
     @MockBean
     private GeneralAppFeesService gaFeesService;
@@ -45,6 +47,16 @@ public class FeesControllerTest extends BaseIntegrationTest {
         when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal("7000"))).thenReturn(response);
         doGet(BEARER_TOKEN, FEES_CLAIM_URL, 7000)
             .andExpect(content().json(toJson(response)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    public void shouldReturnClaimInterestToDate() {
+        CaseData caseData = CaseData.builder().build();
+        when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.1"));
+        doGet(BEARER_TOKEN, FEES_CLAIM_INTEREST_TO_DATE_URL, caseData)
+            .andExpect(content().json(toJson("0.1")))
             .andExpect(status().isOk());
     }
 
