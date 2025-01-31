@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
 import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDate;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
@@ -170,13 +172,15 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private YesOrNo finalOrderGiveReasonsYesNo;
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
     private YesOrNo finalOrderAllocateToTrack;
+    private YesOrNo allowOrderTrackAllocation;
     private AllocatedTrack finalOrderTrackAllocation;
-    private FinalOrdersComplexityBand finalOrderFastTrackComplexityBand;
     private FinalOrdersComplexityBand finalOrderIntermediateTrackComplexityBand;
     private DynamicList finalOrderDownloadTemplateOptions;
     private CaseDocument finalOrderDownloadTemplateDocument;
     private Document uploadOrderDocumentFromTemplate;
     private String finalOrderTrackToggle;
+    private OrderAfterHearingDate orderAfterHearingDate;
+    private YesOrNo showOrderAfterHearingDatePage;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;
@@ -232,6 +236,8 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private YesOrNo requestAnotherHearing;
     private final List<ConfirmListingTickBox> confirmListingTickBox;
     private TaskManagementLocationTypes taskManagementLocations;
+    private TaskManagementLocationTab taskManagementLocationsTab;
+    private TaskManagementLocationTab caseManagementLocationTab;
 
     /**
      * Claimant has requested a reconsideration of the SDO.

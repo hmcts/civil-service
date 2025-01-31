@@ -12,14 +12,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
-import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -45,8 +44,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final SealedClaimResponseFormGeneratorForSpec formGenerator;
 
-    private final CivilDocumentStitchingService civilDocumentStitchingService;
-    private final FeatureToggleService toggleService;
+    private final CivilStitchService civilStitchService;
     private final AssignCategoryId assignCategoryId;
 
     @Value("${stitching.enabled:true}")
@@ -67,6 +65,8 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        Long caseId = caseData.getCcdCaseReference();
+        log.info("Preparing response seal form for caseId {}", caseId);
         CaseDocument sealedForm = formGenerator.generate(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -82,13 +82,15 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-                documentMetaDataList,
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                sealedForm.getDocumentName(),
-                sealedForm.getDocumentName(),
-                caseData
-            );
+            log.info("Calling civil stitch service for generate response sealed form for caseId {}", caseId);
+            String auth = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
+            CaseDocument stitchedDocument =
+                civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
+                                                                sealedForm.getDocumentName(),
+                                                                caseId,
+                                                                DocumentType.DEFENDANT_DEFENCE,
+                                                                auth);
+            log.info("Civil stitch service for generate response sealed form {} for caseId {}", stitchedDocument, caseId);
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
             CaseDocument stitchedDocumentCopy = assignCategoryId.copyCaseDocumentWithCategoryId(stitchedDocument, DocCategory.DQ_DEF1.getValue());
             if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
@@ -105,7 +107,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(copy));
             }
         }
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -130,7 +132,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
         ));
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             documents.add(new DocumentMetaData(
-                caseData.getSpecResponseTimelineDocumentFiles().getFile(),
+                caseData.getSpecResponseTimelineDocumentFiles(),
                 "Claim timeline",
                 LocalDate.now().toString()
             ));

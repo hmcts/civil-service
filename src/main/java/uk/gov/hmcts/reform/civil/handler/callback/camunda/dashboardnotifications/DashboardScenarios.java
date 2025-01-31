@@ -121,8 +121,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Required.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Required.Defendant"),
     SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT("Scenario.AAA6.CP.HearingFee.Required.Claimant"),
-    SCENARIO_AAA6_BUNDLE_CREATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Ready.Claimant"),
-    SCENARIO_AAA6_BUNDLE_CREATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Ready.Defendant"),
     SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Claimant"),
     SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_CLAIMANT_WITHOUT_UPLOAD_FILES_CARM("Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Claimant"),
     SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM("Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant"),
@@ -186,8 +184,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_LR_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Lr.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT("Scenario.AAA6.ClaimantIntent.ClaimantEndsClaim.Defendant"),
-    SCENARIO_AAA6_CP_BUNDLE_UPDATED_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.Claimant"),
-    SCENARIO_AAA6_CP_BUNDLE_UPDATED_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.Defendant"),
     SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Bundle.Updated.TrialReady.Claimant"),
     SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Bundle.Updated.TrialReady.Defendant"),
     SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST("Scenario.AAA6.DefendantNoticeOfChange.Claimant.HearingFee.TaskList"),
@@ -217,7 +213,19 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant"),
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Claimant"),
-    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant");
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant"),
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_CLAIMANT("Scenario.AAA6.CP.TrialReady.Check.Claimant"),
+    SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_DEFENDANT("Scenario.AAA6.CP.TrialReady.Check.Defendant"),
+    SCENARIO_AAA6_SETTLE_CLAIM_PAID_IN_FULL_DEFENDANT("Scenario.AAA6.Settle.ClaimPaidInFull.Defendant"),
+    SCENARIO_AAA6_DISCONTINUE_NOTICE_OF_DISCONTINUE_ISSUED_DEFENDANT("Scenario.AAA6.Discontinue.NoticeOfDiscontinuanceIssued.Defendant"),
+    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT("Scenario.AAA6.CP.Court.Officer.Order.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT("Scenario.AAA6.CP.Court.Officer.Order.HearingFee.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant"),
+    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT("Scenario.AAA6.CP.Court.Officer.Order.Defendant"),
+    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant"),
+    SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT("Scenario.AAA6.ClaimantIntent.Multi.Int.Await.Claimant"),
+    SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT("Scenario.AAA6.ClaimantIntent.Multi.Int.Await.Defendant");
 
     private final String scenario;
 

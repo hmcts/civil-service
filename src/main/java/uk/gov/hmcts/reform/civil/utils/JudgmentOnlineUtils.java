@@ -76,7 +76,7 @@ public class JudgmentOnlineUtils {
                            .build());
         if (applicant2 != null) {
             applicants.add(Party.builder()
-                               .name(applicant2.getPartyName())
+                               .name(" and " + applicant2.getPartyName())
                                .primaryAddress(applicant2.getPrimaryAddress())
                                .build());
         }

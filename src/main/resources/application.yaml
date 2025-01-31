@@ -274,6 +274,7 @@ notifications:
   claimantSolicitorCounterClaimForSpec: "082c6017-9bcf-4227-bc0a-bcfec2b8ebf4"
   respondentSolicitorCounterClaimForSpec: "cb31a195-2a9f-4229-9abf-7f4935260ee1"
   respondentSolicitor1DefaultJudgmentReceived: "8cb8ecbc-2fbe-4c8f-9c65-c481b572acca"
+  respondentSolicitor1DefaultJudgmentReceivedForLipVSLR: "79f39a83-667a-4639-8501-1f387b31da22"
   respondentSolicitor1DefaultJudgmentRequested: "24581b50-9818-48cb-9a26-746513fcb44c"
   applicantSolicitor1DefaultJudgmentRequested: "7a990a28-1970-41ab-a366-87ba21d0a651"
   interimJudgmentRequestedClaimant: "0164fc6f-b40e-4afa-a895-90e02c05fd97"
@@ -434,7 +435,7 @@ notifications:
   notifyLrRecordJudgmentDeterminationMeansTemplate: "5f28a959-9827-484c-af43-ea058b08b4b0"
   notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"
   notifyDefendantLipForNoLongerAccessTemplate: "e9c3426a-7888-420f-816e-c74217264111"
-  notifyDefendantLrAfterNoticeOfChangeTemplate: "421711bb-c113-4a2f-8f2a-6d93510c0e8f"
+  notifyDefendantLrAfterNoticeOfChangeTemplate: "632b8aa4-8de2-4abc-b4f5-126f325a31f5"
   notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
   notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
 

@@ -98,6 +98,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
@@ -109,6 +112,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -251,6 +255,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo respondentSolicitor2ServiceAddressRequired;
     private final Address respondentSolicitor2ServiceAddress;
     private final StatementOfTruth applicant1ServiceStatementOfTruthToRespondentSolicitor1;
+    private final RespondentSolicitorDetails respondentSolicitorDetails;
 
     @Builder.Default
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
@@ -333,7 +338,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList;
-    private final ResponseDocument specResponseTimelineDocumentFiles;
+    private final Document specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
     private final List<Evidence> specResponselistYourEvidenceList2;
 
@@ -683,6 +688,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joShowRegisteredWithRTLOption;
     private JudgmentDetails activeJudgment;
     private List<Element<JudgmentDetails>> historicJudgment;
+    private LocalDateTime joSetAsideCreatedDate;
 
     private String joDefendantName1;
     private String joDefendantName2;
@@ -701,6 +707,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String joTotalAmount;
     private YesOrNo joIsDisplayInJudgmentTab;
     private String joRepaymentSummaryObject;
+    private YesOrNo respondForImmediateOption;
 
     private final TransferCaseDetails transferCaseDetails;
 
@@ -754,9 +761,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo obligationDatePresent;
     private CourtStaffNextSteps courtStaffNextSteps;
     private List<Element<ObligationData>> obligationData;
-    private List<Element<ObligationData>> storedObligationData;
+    private List<Element<StoredObligationData>> storedObligationData;
     private YesOrNo isFinalOrder;
-
     private SendAndReplyOption sendAndReplyOption;
     private SendMessageMetadata sendMessageMetadata;
     private String sendMessageContent;
@@ -764,6 +770,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String messageHistory;
     private DynamicList messagesToReplyTo;
     private List<Element<Message>> messages;
+    private ObligationWAFlag obligationWAFlag;
+    private Message lastMessage;
+    private String lastMessageAllocatedTrack;
+    private String lastMessageJudgeLabel;
+
+    //QueryManagement
+    private final CaseQueriesCollection qmApplicantSolicitorQueries;
+    private final CaseQueriesCollection qmRespondentSolicitor1Queries;
+    private final CaseQueriesCollection qmRespondentSolicitor2Queries;
+    private final CaseMessage caseMessage;
+    private final LatestQuery qmLatestQuery;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1050,6 +1068,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return isRespondent1LiP()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isApplicantLipOneVOne() {
+        return isApplicant1NotRepresented() && isOneVOne(this);
     }
 
     @JsonIgnore
@@ -1418,6 +1441,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public BigDecimal getClaimAmountInPounds() {
+        if (nonNull(getClaimValue())) {
+            return getClaimValue().toPounds();
+        } else if (nonNull(getTotalInterest())) {
+            return getTotalClaimAmount()
+                .add(getTotalInterest())
+                .setScale(2, RoundingMode.UNNECESSARY);
+        } else if (nonNull(getTotalClaimAmount())) {
+            return getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
+        }
+        return null;
+    }
+
+    @JsonIgnore
     public BigDecimal getClaimIssueRemissionAmount() {
         return Optional.ofNullable(getClaimIssuedHwfDetails())
             .map(HelpWithFeesDetails::getRemissionAmount)
@@ -1543,7 +1580,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public AllocatedTrack getAssignedTrackType() {
-        return AllocatedTrack.valueOf(getAssignedTrack());
+        return nonNull(getAssignedTrack()) ? AllocatedTrack.valueOf(getAssignedTrack()) : null;
     }
 
     @JsonIgnore

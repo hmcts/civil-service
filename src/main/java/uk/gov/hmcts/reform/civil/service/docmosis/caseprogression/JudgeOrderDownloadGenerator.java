@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -49,10 +50,8 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
     public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
     public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s because %s.";
-    public static final String FAST_NO_BAND_NO_REASON = "This case is allocated to the Fast Track and is not allocated a complexity band.";
-    public static final String FAST_NO_BAND_WITH_REASON = "This case is allocated to the Fast Track and is not allocated a complexity band because %s.";
-    public static final String FAST_WITH_BAND_NO_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s.";
-    public static final String FAST_WITH_BAND_WITH_REASON = "This case is allocated to the Fast Track and is allocated to complexity band %s because %s.";
+    public static final String ORDER_AFTER_HEARING_ON = "This order is made following a hearing on %s.";
+    public static final String ORDER_AFTER_HEARING_BETWEEN = "This order is made following a hearing between %s and %s.";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
@@ -107,7 +106,9 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     }
 
     public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
-        return getBaseTemplateData(caseData, authorisation).build();
+        return getBaseTemplateData(caseData, authorisation)
+            .orderAfterHearingDate(getOrderAfterHearingDateText(caseData))
+            .build();
     }
 
     public JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
@@ -151,8 +152,6 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         if (nonNull(caseData.getFinalOrderAllocateToTrack())
             && caseData.getFinalOrderAllocateToTrack().equals(YES)) {
             return switch (caseData.getFinalOrderTrackAllocation()) {
-                case SMALL_CLAIM -> "This case is allocated to the Small Claims.";
-                case FAST_CLAIM -> getFastClaimTrackAndComplexityText(caseData);
                 case INTERMEDIATE_CLAIM -> getIntermediateClaimTrackAndComplexityText(caseData);
                 case MULTI_CLAIM -> "This case is allocated to the Multi Track.";
                 default -> null;
@@ -174,19 +173,6 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         }
     }
 
-    private String getFastClaimTrackAndComplexityText(CaseData caseData) {
-        String complexityBand = getComplexityBand(caseData);
-        if (caseData.getFinalOrderFastTrackComplexityBand().getAssignComplexityBand().equals(NO)) {
-            return nonNull(caseData.getFinalOrderFastTrackComplexityBand().getReasons())
-                ? format(FAST_NO_BAND_WITH_REASON, caseData.getFinalOrderFastTrackComplexityBand().getReasons())
-                : FAST_NO_BAND_NO_REASON;
-        } else {
-            return  nonNull(caseData.getFinalOrderFastTrackComplexityBand().getReasons())
-                ? format(FAST_WITH_BAND_WITH_REASON, complexityBand, caseData.getFinalOrderFastTrackComplexityBand().getReasons())
-                : format(FAST_WITH_BAND_NO_REASON, complexityBand);
-        }
-    }
-
     public String getComplexityBand(CaseData caseData) {
         if (nonNull(caseData.getFinalOrderIntermediateTrackComplexityBand())
             && caseData.getFinalOrderIntermediateTrackComplexityBand().getAssignComplexityBand().equals(YES)) {
@@ -198,17 +184,16 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
                 default -> null;
             };
         }
-        if (nonNull(caseData.getFinalOrderFastTrackComplexityBand())
-            && caseData.getFinalOrderFastTrackComplexityBand().getAssignComplexityBand().equals(YES)) {
-            return switch (caseData.getFinalOrderFastTrackComplexityBand().getBand()) {
-                case BAND_1 -> "1";
-                case BAND_2 -> "2";
-                case BAND_3 -> "3";
-                case BAND_4 -> "4";
-                default -> null;
-            };
-        }
         return null;
     }
 
+    private String getOrderAfterHearingDateText(CaseData caseData) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+        return switch (caseData.getOrderAfterHearingDate().getDateType()) {
+            case SINGLE_DATE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getDate().format(formatter));
+            case DATE_RANGE -> format(ORDER_AFTER_HEARING_BETWEEN, caseData.getOrderAfterHearingDate().getFromDate().format(formatter),
+                                      caseData.getOrderAfterHearingDate().getToDate().format(formatter));
+            case BESPOKE_RANGE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getBespokeDates());
+        };
+    }
 }
