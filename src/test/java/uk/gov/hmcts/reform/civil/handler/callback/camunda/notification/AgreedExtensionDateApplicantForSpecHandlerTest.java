@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -37,13 +38,17 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
 class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandlerTest {
@@ -60,16 +65,19 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
     @Mock
     private OrganisationService organisationService;
 
+    @Mock
+    private PinInPostConfiguration pinInPostConfiguration;
+
     @Nested
     class AboutToSubmitCallback {
 
         final String templateId = "template-id";
-
         final String templateIdRespondent = "template-id-respondent";
+        final String templateIdWelsh = "template-id-welsh";
         final String reference = "agreed-extension-date-applicant-notification-spec-000DC001";
         Map<String, String> expectedNotificationData;
-
         Map<String, String> expectedNotificationDataRespondent;
+        Map<String, String> expectedNotificationDataClaimantLiP;
         CaseData caseData;
 
         @Nested
@@ -82,13 +90,15 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                     caseData.getRespondentSolicitor1AgreedDeadlineExtension());
                 expectedNotificationDataRespondent = getNotificationDataMapRespondent1v2(
                     caseData.getRespondentSolicitor1AgreedDeadlineExtension());
-
-                when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                expectedNotificationDataClaimantLiP = getNotificationDataMapClaimantLiP(
+                    caseData.getRespondent1ResponseDeadline().toLocalDate()
+                );
             }
 
             @Test
             void shouldNotifyApplicantSolicitor_whenInvoked() {
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 when(notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id");
 
@@ -103,7 +113,42 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
             }
 
             @Test
+            void shouldNotifyApplicantLiP_whenInvoked() {
+                when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");
+                when(notificationsProperties.getClaimantLipDeadlineExtension())
+                    .thenReturn("template-id");
+
+                invokeAboutToSubmitWithEvent("NOTIFY_LIP_APPLICANT_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
+
+                verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    templateId,
+                    expectedNotificationDataClaimantLiP,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantLiPInWelsh_whenInvoked() {
+                caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+                when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");
+                when(notificationsProperties.getClaimantLipDeadlineExtensionWelsh())
+                    .thenReturn("template-id-welsh");
+
+                invokeAboutToSubmitWithEvent("NOTIFY_LIP_APPLICANT_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
+
+                verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    templateIdWelsh,
+                    expectedNotificationDataClaimantLiP,
+                    reference
+                );
+            }
+
+            @Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
 
@@ -120,6 +165,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
 
             @Test
             void shouldNotifyRespondentSolicitor2_whenInvoked() {
+                when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
 
@@ -418,6 +465,17 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMapClaimantLiP(LocalDate extensionDate) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, "000DC001",
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                FRONTEND_URL, "http://localhost:3001/",
+                RESPONSE_DEADLINE, formatLocalDate(extensionDate, DATE)
             );
         }
 

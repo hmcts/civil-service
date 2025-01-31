@@ -57,7 +57,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
-    private final PinInPostConfiguration pipInPostConfiguration;
+    private final PinInPostConfiguration pinInPostConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -133,7 +133,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
+            FRONTEND_URL, pinInPostConfiguration.getCuiFrontEndUrl(),
             RESPONSE_DEADLINE, formatLocalDate(
                 caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE
             )
