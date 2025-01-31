@@ -89,6 +89,7 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
             );
             CaseDocument uploadedDocument = engDocument;
             if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name()) && caseData.isClaimantBilingual()) {
+                uploadedDocument = null;
                 CaseDocument welshCaseDoc = createWelshDocument(defaultJudgmentForm, authorisation, caseData, event, documentType);
                 List<DocumentMetaData> documentMetaDataList = appendWelshDocToDocument(engDocument, welshCaseDoc);
                 Long caseId = caseData.getCcdCaseReference();
