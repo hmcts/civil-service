@@ -633,10 +633,10 @@ rd_commondata:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil.multiparty.robotics@gmail.com
-    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
-    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
-    lipJRecipient: civilmoneyclaimsdemo@gmail.com
+    recipient: sherlyn.khaw1@hmcts.net
+    multipartyrecipient: sherlyn.khaw1@hmcts.net
+    specRecipient: sherlyn.khaw1@hmcts.net
+    lipJRecipient: sherlyn.khaw1@hmcts.net
 
 notification:
   caseworker:
