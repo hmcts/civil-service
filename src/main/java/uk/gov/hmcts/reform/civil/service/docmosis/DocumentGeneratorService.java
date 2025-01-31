@@ -7,12 +7,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
+//import uk.gov.hmcts.reform.civil.client.DocmosisApiClient;
 import uk.gov.hmcts.reform.civil.config.DocmosisConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @Service
@@ -20,7 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DocumentGeneratorService {
 
-    private final DocmosisApiClient docmosisApiClient;
+    // private final DocmosisApiClient docmosisApiClient;
     private final DocmosisConfiguration configuration;
     private final ObjectMapper mapper;
 
@@ -44,10 +47,13 @@ public class DocumentGeneratorService {
             .accessKey(configuration.getAccessKey())
             .build();
 
-        byte[] response;
+        byte[] response = new byte[]{};
 
         try {
-            response = docmosisApiClient.createDocument(requestBody);
+            // response = docmosisApiClient.createDocument(requestBody);
+            response = Files.readAllBytes(Paths.get("dummy.pdf"));
+        } catch (IOException e) {
+            System.out.println("Error reading the PDF file: " + e.getMessage());
         } catch (HttpClientErrorException ex) {
             log.error("Docmosis document generation failed for " + ex.getMessage());
             throw ex;
