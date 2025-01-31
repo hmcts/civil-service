@@ -44,6 +44,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     private final OrganisationService organisationService;
     private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -108,7 +109,9 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
 
     private String getTemplate(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            return notificationsProperties.getClaimantLipDeadlineExtension();
+            return caseData.isClaimantBilingual() && featureToggleService.isDefendantNoCOnlineForCase(caseData)
+                ? notificationsProperties.getClaimantLipDeadlineExtensionWelsh()
+                : notificationsProperties.getClaimantLipDeadlineExtension();
         }
         return notificationsProperties.getClaimantDeadlineExtension();
     }
