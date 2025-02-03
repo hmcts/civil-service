@@ -108,7 +108,7 @@ public class RoboticsDataMapper {
         if (ClaimTypeUnspec.PERSONAL_INJURY.equals(caseData.getClaimTypeUnSpec())) {
             return "PERSONAL INJURY";
         }
-        return "Claim - Unspec only";
+        return "CLAIM - UNSPEC ONLY";
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {

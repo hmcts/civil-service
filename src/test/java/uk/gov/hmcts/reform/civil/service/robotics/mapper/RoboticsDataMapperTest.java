@@ -162,7 +162,7 @@ class RoboticsDataMapperTest {
             .claimType(ClaimType.PERSONAL_INJURY).build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
-        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Claim - Unspec only");
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("CLAIM - UNSPEC ONLY");
     }
 
     @Test
