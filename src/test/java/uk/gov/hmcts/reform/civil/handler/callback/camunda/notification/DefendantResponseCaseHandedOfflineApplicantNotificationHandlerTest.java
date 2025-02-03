@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseCaseHandedOfflineApplicantNotificationHandler.TASK_ID_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -100,6 +101,58 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
+                getNotificationDataMap(caseData),
+                "defendant-response-case-handed-offline-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLiP() {
+            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate())
+                .thenReturn("template-id-lip");
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .specClaim1v1LipvLr()
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-lip",
+                getNotificationDataMap(caseData),
+                "defendant-response-case-handed-offline-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLiPInBilingual() {
+            when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate())
+                .thenReturn("template-id-lip-bilingual");
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .specClaim1v1LipvLrBilingual()
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-lip-bilingual",
                 getNotificationDataMap(caseData),
                 "defendant-response-case-handed-offline-applicant-notification-000DC001"
             );
@@ -245,13 +298,20 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CASEMAN_REF, "000DC001"
-            );
+            if (caseData.isLipvLROneVOne()) {
+                return Map.of(
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+                );
+            } else {
+                return Map.of(
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                    CASEMAN_REF, "000DC001"
+                );
+            }
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
