@@ -623,7 +623,7 @@ public class EventHistoryMapper {
                                    ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
                                    : null)
             .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
-            .dateOfJudgment(caseData.getJoJudgementByAdmissionIssueDate())
+            .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
             .miscText("")
@@ -633,7 +633,7 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
             .litigiousPartyID(APPLICANT_ID)
-            .dateReceived(caseData.getJoJudgementByAdmissionIssueDate())
+            .dateReceived(getJbADate(caseData))
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
@@ -2516,5 +2516,11 @@ public class EventHistoryMapper {
             return caseData.getCertOfSC().getDefendantFinalPaymentDate();
         }
         throw new IllegalArgumentException("Payment date cannot be null");
+    }
+
+    private LocalDateTime getJbADate(CaseData caseData) {
+        return featureToggleService.isJOLiveFeedActive()
+            ? caseData.getJoJudgementByAdmissionIssueDate()
+            : setApplicant1ResponseDate(caseData);
     }
 }

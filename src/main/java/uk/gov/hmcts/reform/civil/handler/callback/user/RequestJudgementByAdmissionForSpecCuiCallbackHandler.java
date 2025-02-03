@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
@@ -134,13 +135,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .businessProcess(businessProcess)
             .ccjPaymentDetails(ccjPaymentDetails);
 
-        CaseData updatedCaseData = caseDataBuilder.build();
-
         if (featureToggleService.isJudgmentOnlineLive()) {
+            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
+
             caseDataBuilder
-                .activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData))
+                .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()))
+                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment))
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 
