@@ -500,8 +500,7 @@ class SendAndReplyCallbackHandlerTest {
             verify(messageService, times(1))
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
-
-
+        
         @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
             Element<Message> message = element(Message.builder().messageContent("Original Message").build());
