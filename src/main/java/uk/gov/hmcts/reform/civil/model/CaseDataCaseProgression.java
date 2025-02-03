@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDate;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
@@ -178,6 +179,8 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private CaseDocument finalOrderDownloadTemplateDocument;
     private Document uploadOrderDocumentFromTemplate;
     private String finalOrderTrackToggle;
+    private OrderAfterHearingDate orderAfterHearingDate;
+    private YesOrNo showOrderAfterHearingDatePage;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;
