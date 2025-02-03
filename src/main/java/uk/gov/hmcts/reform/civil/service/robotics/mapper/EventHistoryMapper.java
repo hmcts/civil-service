@@ -547,7 +547,7 @@ public class EventHistoryMapper {
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(setApplicant1ResponseDate(caseData))
+                .dateReceived(getJbADate(caseData))
                 .eventDetailsText(detailsTextRequested)
                 .eventDetails(EventDetails.builder()
                                   .miscText(miscTextRequested)
