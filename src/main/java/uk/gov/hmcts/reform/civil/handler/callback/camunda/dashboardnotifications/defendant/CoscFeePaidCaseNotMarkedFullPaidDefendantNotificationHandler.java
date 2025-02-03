@@ -57,9 +57,7 @@ public class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler extend
                 .ifPresent(coscApplication -> dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
                                coscApplication.getValue().getCaseLink().getCaseReference(),
                                "APPLICANT",
-                               authToken
-                           )
-                );
+                               authToken));
         }
     }
 }

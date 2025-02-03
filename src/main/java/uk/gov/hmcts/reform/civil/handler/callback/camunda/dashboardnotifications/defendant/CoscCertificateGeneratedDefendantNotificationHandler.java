@@ -55,9 +55,7 @@ public class CoscCertificateGeneratedDefendantNotificationHandler extends Dashbo
                 .ifPresent(coscApplication -> dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
                                coscApplication.getValue().getCaseLink().getCaseReference(),
                                "APPLICANT",
-                               authToken
-                           )
-                );
+                               authToken));
         }
     }
 }
