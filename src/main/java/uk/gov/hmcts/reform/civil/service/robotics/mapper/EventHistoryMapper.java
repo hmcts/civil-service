@@ -2058,7 +2058,7 @@ public class EventHistoryMapper {
                                            .build()
             );
             buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent1ResponseDate());
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
@@ -2094,7 +2094,7 @@ public class EventHistoryMapper {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
                 && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
@@ -2507,6 +2507,22 @@ public class EventHistoryMapper {
             applicant1ResponseDate = LocalDateTime.now();
         }
         return applicant1ResponseDate;
+    }
+
+    private void buildMiscellaneousForRespondentResponseLipVSLr(EventHistory.EventHistoryBuilder builder,
+                                                                CaseData caseData) {
+        if (caseData.isLipvLROneVOne()) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText("RPA Reason: LiP vs LR - full/part admission received.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: LiP vs LR - full/part admission received.")
+                                      .build())
+                    .build());
+        }
     }
 
     private LocalDate getCoscDate(CaseData caseData) {

@@ -8515,6 +8515,92 @@ class EventHistoryMapperTest {
         }
 
         @Test
+        void shouldaddMiscellanousEvents_when1v1ClaimWithRespondentFullAdmissionForLipVSLr() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                .whenWillThisAmountBePaid(whenWillPay)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToClaimAdmitPartLRspec(paymentDetails)
+                .totalInterest(BigDecimal.ZERO)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .respondent1Represented(YesOrNo.YES)
+                .specRespondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            given(featureToggleService.isDefendantNoCOnlineForCase(caseData)).willReturn(true);
+//            if (caseData.getRespondent2OrgRegistered() != null
+//                && caseData.getRespondent2Represented() == null) {
+//                caseData = caseData.toBuilder()
+//                    .respondent2Represented(YES)
+//                    .build();
+//            }
+            //LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+//            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+//                .ccjPaymentPaidSomeOption(NO)
+//                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+//                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+//                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+//                .ccjPaymentPaidSomeAmountInPounds(ZERO)
+//                .ccjJudgmentLipInterest(ZERO)
+//                .build();
+
+
+            Event expectedReceiptOfAdmission = Event.builder()
+                .eventSequence(2)
+                .eventCode("40")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText("Claim issued in CCD.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claim issued in CCD.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(3)
+                    .eventCode("999")
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText("RPA Reason: LiP vs LR - full/part admission received.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: LiP vs LR - full/part admission received..")
+                                      .build())
+                    .build()
+
+            );
+
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).isNotNull();
+            //   assertThat(eventHistory).extracting("receiptOfAdmission").asList()
+            // .containsExactly(expectedReceiptOfAdmission);
+            //  assertThat(eventHistory).extracting("miscellaneous").asList()
+            //  .containsExactly(expectedMiscellaneousEvents.get(0));
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(1));
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "consentExtensionFilingDefence",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+        @Test
         void shouldNotThrowNullPointerException_whenRepaymentPlanIsNull() {
             //Given
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
