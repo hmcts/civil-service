@@ -7069,9 +7069,19 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder specClaim1v1LipvLr() {
+        atStateClaimDraft();
+        legacyCaseReference(LEGACY_CASE_REFERENCE);
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = YES;
         this.applicant1Represented = NO;
+        this.claimantBilingualLanguagePreference = Language.ENGLISH.toString();
+        this.ccdCaseReference = CASE_ID;
+        return this;
+    }
+
+    public CaseDataBuilder specClaim1v1LipvLrBilingual() {
+        specClaim1v1LipvLr();
+        this.claimantBilingualLanguagePreference = Language.BOTH.toString();
         return this;
     }
 
