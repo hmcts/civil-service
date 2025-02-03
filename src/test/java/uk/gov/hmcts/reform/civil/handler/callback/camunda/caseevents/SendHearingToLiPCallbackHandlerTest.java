@@ -33,9 +33,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_CLAIMANT_HMC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_DEFENDANT_HMC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_CLAIMANT_HMC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_DEFENDANT_HMC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -132,7 +136,7 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
             .respondent1Represented(YesOrNo.NO).build();
 ;
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT.name());
+        params.getRequest().setEventId(SEND_HEARING_TO_LIP_DEFENDANT_HMC.name());
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
         // when
@@ -140,7 +144,7 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_DEFENDANT), eq(true));
+        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_DEFENDANT_HMC), eq(true));
     }
 
     @Test
@@ -153,7 +157,7 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
             .claimantBilingualLanguagePreference(Language.BOTH.toString()).build().toBuilder()
             .hearingDocumentsWelsh(wrapElements(caseDocument)).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT.name());
+        params.getRequest().setEventId(SEND_HEARING_TO_LIP_CLAIMANT_HMC.name());
         // when
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isHmcForLipEnabled()).thenReturn(true);
@@ -161,6 +165,6 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_CLAIMANT), eq(true));
+        verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_CLAIMANT_HMC), eq(true));
     }
 }
