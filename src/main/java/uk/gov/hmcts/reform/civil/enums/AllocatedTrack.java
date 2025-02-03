@@ -44,7 +44,7 @@ public enum AllocatedTrack {
         } else { //For Spec Claims
             if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 10_000)) {
                 return SMALL_CLAIM;
-            } else if (isValueWithinRange(statementOfValueInPounds, 10_001, 25_000)) {
+            } else if (isValueWithinRangeLowerExclusive(statementOfValueInPounds, 10_000, 25_000)) {
                 return FAST_CLAIM;
             } else {
                 return MULTI_CLAIM;
@@ -96,8 +96,8 @@ public enum AllocatedTrack {
         return value.compareTo(lower) >= 0 &&  value.compareTo(higher) <= 0;
     }
 
-    private static boolean isValueWithinRange(BigDecimal value, int lower, int higher) {
-        return value.compareTo(BigDecimal.valueOf(lower)) >= 0 &&  value.compareTo(BigDecimal.valueOf(higher)) <= 0;
+    private static boolean isValueWithinRangeLowerExclusive(BigDecimal value, int lower, int higher) {
+        return value.compareTo(BigDecimal.valueOf(lower)) > 0 &&  value.compareTo(BigDecimal.valueOf(higher)) <= 0;
     }
 
     public static String toStringValueForEmail(AllocatedTrack allocatedTrack) {
