@@ -69,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
                                             true, true,
                                             getOriginalStatusOfGeneralApplication()
                 );
+
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -83,6 +84,98 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
             verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
             verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
             verifyNoMoreInteractions(helperService);
+        }
+
+        @Test
+        void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationNotRepresented() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithLocationDetailsLip(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication()
+                );
+
+            when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(TRIGGER_UPDATE_GA_LOCATION.name())
+                             .build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            verify(helperService, times(1)).updateApplicationLocationDetailsInClaim(any(), any());
+            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+            verifyNoMoreInteractions(helperService);
+        }
+
+        @Test
+        void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationNotRepresentedAndNotInEa() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithLocationDetailsLip(CaseData.builder().build(),
+                                                       true,
+                                                       true,
+                                                       true, true,
+                                                       getOriginalStatusOfGeneralApplication()
+                );
+            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(TRIGGER_UPDATE_GA_LOCATION.name())
+                             .build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            verify(helperService, times(1)).updateApplicationLocationDetailsInClaim(any(), any());
+            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+            verifyNoMoreInteractions(helperService);
+        }
+
+        @Test
+        void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplicationRepresentedAndNotInEa() {
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                                       true,
+                                                       true,
+                                                       true, true,
+                                                       getOriginalStatusOfGeneralApplication()
+                );
+            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(TRIGGER_UPDATE_GA_LOCATION.name())
+                             .build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            verify(helperService, times(1)).updateApplicationLocationDetailsInClaim(any(), any());
+            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+            verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
+            verifyNoMoreInteractions(helperService);
+        }
+
+        @Test
+        void shouldNotTriggerGeneralApplicationEvent_whenCaseHasNoGeneralApplicationLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
+                .caseManagementLocation(
+                CaseLocationCivil.builder().baseLocation("00000")
+                    .region("2").build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verifyNoInteractions(helperService);
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test

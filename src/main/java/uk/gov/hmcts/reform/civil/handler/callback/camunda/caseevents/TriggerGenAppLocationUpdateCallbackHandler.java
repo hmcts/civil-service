@@ -56,7 +56,8 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         try {
             if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
-                                                                                   .getCaseManagementLocation().getBaseLocation()))) {
+                                                                                   .getCaseManagementLocation().getBaseLocation()))
+                && caseData.isLipCase()) {
                 caseDataBuilder.gaEaCourtLocation(YesOrNo.YES);
             }
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
