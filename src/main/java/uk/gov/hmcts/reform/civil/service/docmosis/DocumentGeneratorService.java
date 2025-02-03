@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,18 +38,10 @@ public class DocumentGeneratorService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        DocmosisRequest requestBody = DocmosisRequest.builder()
-            .templateName(template.getTemplate())
-            .data(templateData)
-            .outputFormat(outputFormat)
-            .outputName("IGNORED")
-            .accessKey(configuration.getAccessKey())
-            .build();
-
         byte[] response = new byte[]{};
 
         try {
-            response = Files.readAllBytes(Paths.get("dummy.pdf"));
+            response = FileReader.class.getClassLoader().getResourceAsStream("dummy.pdf").readAllBytes();
         } catch (IOException e) {
             System.out.println("Error reading the PDF file: " + e.getMessage());
         } catch (HttpClientErrorException ex) {
