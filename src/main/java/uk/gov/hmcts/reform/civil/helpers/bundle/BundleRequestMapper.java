@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingCaseData;
@@ -104,14 +106,41 @@ public class BundleRequestMapper {
 
     private List<BundlingRequestDocument> mapParticularsOfClaimDocs(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        if (Objects.nonNull(caseData.getServedDocumentFiles())
-            && Objects.nonNull((caseData.getServedDocumentFiles().getParticularsOfClaimDocument()))) {
-            caseData.getServedDocumentFiles()
-                .getParticularsOfClaimDocument()
-                .forEach(poc -> bundlingRequestDocuments.add(
-                    buildBundlingRequestDoc(bundleDocumentsRetrieval.getParticularsOfClaimName(caseData),
-                                            poc.getValue(), ""
-                    )));
+        if (Objects.nonNull(caseData.getServedDocumentFiles())) {
+            List<Element<Document>> particularsOfClaimDocument = caseData.getServedDocumentFiles().getParticularsOfClaimDocument();
+            if (Objects.nonNull((particularsOfClaimDocument))) {
+                particularsOfClaimDocument.forEach(poc -> bundlingRequestDocuments.add(
+                        buildBundlingRequestDoc(
+                            bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.PARTICULARS_OF_CLAIM),
+                            poc.getValue(), ""
+                        )));
+            }
+            List<Element<DocumentWithRegex>> medicalReport = caseData.getServedDocumentFiles().getMedicalReport();
+            if (Objects.nonNull(medicalReport)) {
+                medicalReport.forEach(mr -> bundlingRequestDocuments.add(
+                        buildBundlingRequestDoc(
+                            bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.MEDICAL_REPORT),
+                            mr.getValue().getDocument(), ""
+                        )));
+            }
+
+            List<Element<DocumentWithRegex>> scheduleOfLoss = caseData.getServedDocumentFiles().getScheduleOfLoss();
+            if (Objects.nonNull(scheduleOfLoss)) {
+                scheduleOfLoss.forEach(poc -> bundlingRequestDocuments.add(
+                        buildBundlingRequestDoc(
+                            bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.SCHEDULE_OF_LOSS),
+                            poc.getValue().getDocument(), ""
+                        )));
+            }
+
+            List<Element<DocumentWithRegex>> cos = caseData.getServedDocumentFiles().getCertificateOfSuitability();
+            if (Objects.nonNull(cos)) {
+                cos.forEach(poc -> bundlingRequestDocuments.add(
+                        buildBundlingRequestDoc(
+                            bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.CERTIFICATE_OF_SUITABILITY),
+                            poc.getValue().getDocument(), ""
+                        )));
+            }
         }
         return bundlingRequestDocuments;
     }
