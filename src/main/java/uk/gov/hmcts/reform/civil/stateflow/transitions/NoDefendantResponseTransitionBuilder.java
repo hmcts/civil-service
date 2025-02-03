@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class NoDefendantResponseTransitionBuilder extends MidTransitionBuilder {
+
     public NoDefendantResponseTransitionBuilder(FeatureToggleService featureToggleService) {
         super(FlowState.Main.NO_DEFENDANT_RESPONSE, featureToggleService);
     }
