@@ -25,7 +25,7 @@ import static org.hamcrest.Matchers.is;
 @MockServerConfig(hostInterface = "localhost", port = "6660")
 public class DocmosisApiConsumerTest extends BaseContractTest {
 
-    public static final String ENDPOINT = "/rs/render";
+    public static final String ENDPOINT = "/api/render";
 
     @Autowired
     private DocmosisApiClient docmosisApiClient;

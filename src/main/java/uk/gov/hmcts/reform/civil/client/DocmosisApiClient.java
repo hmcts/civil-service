@@ -10,6 +10,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisRequest;
     FeignClientProperties.FeignClientConfiguration.class)
 public interface DocmosisApiClient {
 
-    @PostMapping(value = "/rs/render", consumes = "application/json")
+    @PostMapping(value = "/api/render", consumes = "application/json")
     byte[] createDocument(@RequestBody DocmosisRequest docmosisRequest);
 }
