@@ -44,7 +44,7 @@ public class BundleDocumentsRetrieval {
     private final ConversionToBundleRequestDocs conversionToBundleRequestDocs;
     private final BundleRequestDocsOrganizer bundleRequestDocsOrganizer;
 
-    public String getParticularsOfClaimName(CaseData caseData) {
+    public String getParticularsOfClaimName(CaseData caseData, BundleFileNameList bundleFileNameList) {
 
         log.info("Getting details of claim for case ID: {}", caseData.getCcdCaseReference());
         LocalDate pocDate;
@@ -55,8 +55,7 @@ public class BundleDocumentsRetrieval {
         } else {
             pocDate = caseData.getSubmittedDate().toLocalDate();
         }
-        return generateDocName(BundleFileNameList.PARTICULARS_OF_CLAIM.getDisplayName(),
-                               null, null, pocDate
+        return generateDocName(bundleFileNameList.getDisplayName(), null, null, pocDate
         );
     }
 

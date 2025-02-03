@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingOnRadioOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
@@ -213,6 +215,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     public static final String ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE = "Date must be in the future";
     public static final String ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO = "The number entered cannot be less than zero";
+    public static final String ERROR_MINTI_DISPOSAL_NOT_ALLOWED = "Disposal Hearing is not available for Multi Track and Intermediate Track Claims. "
+        + "This can be requested by using the Make an Order event.";
 
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
@@ -1280,6 +1284,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
+        if (isMultiOrIntermediateTrackClaim(caseData)
+            && OrderType.DISPOSAL.equals(caseData.getOrderType())
+            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_MINTI_DISPOSAL_NOT_ALLOWED))
+                .build();
+        }
+
         updateDeductionValue(caseData, updatedData);
 
         updatedData.setSmallClaimsFlag(NO).build();
@@ -1852,6 +1864,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
                 && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) >= 0
                 && caseData.getCaseManagementLocation().getBaseLocation().equals(ccmccEpimsId);
+    }
+
+    private boolean isMultiOrIntermediateTrackClaim(CaseData caseData) {
+        return featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && (AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+            || AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
+            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 
 }
