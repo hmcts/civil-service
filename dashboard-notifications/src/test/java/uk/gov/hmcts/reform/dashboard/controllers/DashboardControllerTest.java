@@ -62,7 +62,7 @@ class DashboardControllerTest {
     private DashboardController dashboardController;
 
     @Test
-    public void shouldReturnTaskListForCaseReferenceAndRole() {
+    void shouldReturnTaskListForCaseReferenceAndRole() {
 
         //given
         List<TaskList> taskList = getTaskListList();
@@ -82,7 +82,7 @@ class DashboardControllerTest {
     }
 
     @Test
-    public void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
+    void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
 
         //given
         when(taskListService.getTaskList(any(), any()))
@@ -102,7 +102,7 @@ class DashboardControllerTest {
     }
 
     @Test
-    public void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
+    void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
 
         //given
         when(taskListService.getTaskList(any(), any()))
@@ -117,7 +117,7 @@ class DashboardControllerTest {
     }
 
     @Test
-    public void shouldReturnNotificationsForCaseReferenceAndRole() {
+    void shouldReturnNotificationsForCaseReferenceAndRole() {
 
         List<Notification> notifications = getNotificationList();
         //given
@@ -136,6 +136,30 @@ class DashboardControllerTest {
     }
 
     @Test
+    void shouldReturnNotificationsForListOfCaseReferenceAndRole() {
+
+        Map<String, List<Notification>> notificationslist = new HashMap<>();
+        notificationslist.put("123", getNotificationList());
+        notificationslist.put("1234", getNotificationList());
+
+        String[] gaCaseIds = new String[]{"123", "1234"};
+
+        //given
+        when(dashboardNotificationService.getAllCasesNotifications(any(), any()))
+            .thenReturn(notificationslist);
+
+        //when
+        ResponseEntity<Map<String, List<Notification>>> output = dashboardController.getNotificationsByIdentifiersAndRole(
+            gaCaseIds,
+            "Claimant",
+            AUTHORISATION
+        );
+
+        //then
+        assertThat(output.getBody()).isEqualTo(notificationslist);
+    }
+
+    @Test
     void should_create_scenario() {
         doNothing().when(dashboardScenariosService)
             .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
@@ -143,30 +167,54 @@ class DashboardControllerTest {
         final ResponseEntity responseEntity = dashboardController
             .recordScenario(CASE_ID, NOTIFICATION_DRAFT_CLAIM_START, AUTHORISATION, SCENARIO_REQUEST_PARAMS);
 
-        assertEquals(responseEntity.getStatusCode(), OK);
+        assertEquals(OK, responseEntity.getStatusCode());
 
         verify(dashboardScenariosService)
             .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
     }
 
     @Test
-    public void shouldReturnOkWhenNotificationDeleted() {
+    void shouldReturnOkWhenNotificationDeleted() {
 
         //when
         final ResponseEntity responseEntity = dashboardController.deleteNotification(ID, AUTHORISATION);
 
         //then
-        assertEquals(responseEntity.getStatusCode(), OK);
+        assertEquals(OK, responseEntity.getStatusCode());
         verify(dashboardNotificationService).deleteById(ID);
     }
 
     @Test
-    public void shouldReturn401WhenNotificationDeletedUnauthorised() {
+    void shouldReturn401WhenNotificationDeletedUnauthorised() {
 
         //given
         doThrow(new RuntimeException()).when(dashboardNotificationService).deleteById(ID);
 
         //then
         assertThrows(RuntimeException.class, () -> dashboardController.deleteNotification(ID, AUTHORISATION));
+    }
+
+    @Test
+    void shouldReturnOkWhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleInvoked() {
+
+        //when
+        final ResponseEntity responseEntity = dashboardController
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION);
+
+        //then
+        assertEquals(OK, responseEntity.getStatusCode());
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
+    }
+
+    @Test
+    void shouldReturn401WhenMakeProgressAbleTasksInactiveForCaseIdentifierAndRoleUnauthorised() {
+
+        //given
+        doThrow(new RuntimeException()).when(taskListService)
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
+
+        //then
+        assertThrows(RuntimeException.class, () -> dashboardController
+            .makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", AUTHORISATION));
     }
 }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.data;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +34,10 @@ public class Notification {
 
     private HashMap<String, Object> params;
 
+    private OffsetDateTime createdAt;
+
+    private LocalDateTime deadline;
+
     public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
 
         NotificationBuilder notification = Notification.builder()
@@ -41,7 +47,9 @@ public class Notification {
             .descriptionEn(dashboardNotificationsEntity.getDescriptionEn())
             .descriptionCy(dashboardNotificationsEntity.getDescriptionCy())
             .timeToLive(dashboardNotificationsEntity.getDashboardNotificationsTemplates().getTimeToLive())
-            .params(dashboardNotificationsEntity.getParams());
+            .params(dashboardNotificationsEntity.getParams())
+            .createdAt(dashboardNotificationsEntity.getCreatedAt())
+            .deadline(dashboardNotificationsEntity.getDeadline());
 
         Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction())
             .ifPresent(action -> notification.notificationAction(NotificationAction.from(action)));

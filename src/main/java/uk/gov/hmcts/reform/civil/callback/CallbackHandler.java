@@ -1,21 +1,22 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 
+@Slf4j
 public abstract class CallbackHandler {
 
     private static final String DEFAULT = "default";
-    private static final Logger LOG = LoggerFactory.getLogger(CallbackHandler.class);
 
     protected abstract Map<String, Callback> callbacks();
 
@@ -39,17 +40,21 @@ public abstract class CallbackHandler {
         return String.format("%s%s%s", formattedVersion, type.getValue(), formattedPageId);
     }
 
+    @SuppressWarnings("java:S1172")
     public String camundaActivityId(CallbackParams callbackParams) {
         return DEFAULT;
     }
 
-    public boolean isEventAlreadyProcessed(CallbackParams callbackParams, BusinessProcess businessProcess) {
-        if (camundaActivityId(callbackParams).equals(DEFAULT)) {
+    public List<String> camundaActivityIds(CallbackParams callbackParams) {
+        return Arrays.asList(camundaActivityId(callbackParams));
+    }
 
+    public boolean isEventAlreadyProcessed(CallbackParams callbackParams, BusinessProcess businessProcess) {
+        if (camundaActivityIds(callbackParams).contains(DEFAULT)) {
             return false;
         }
 
-        return businessProcess != null && camundaActivityId(callbackParams).equals(businessProcess.getActivityId());
+        return businessProcess != null && camundaActivityIds(callbackParams).contains(businessProcess.getActivityId());
     }
 
     public void register(Map<String, CallbackHandler> handlers) {
@@ -63,7 +68,9 @@ public abstract class CallbackHandler {
         callbackKey = callbackKey(callbackParams.getVersion(), callbackParams.getType(), callbackParams.getPageId());
 
         if (ofNullable(callbacks().get(callbackKey)).isEmpty()) {
-            LOG.info(String.format("No implementation found for %s, falling back to default", callbackKey));
+            if (log.isDebugEnabled()) {
+                log.debug("No implementation found for {}", callbackKey);
+            }
             callbackKey = callbackKey(callbackParams.getType(), callbackParams.getPageId());
         }
 
@@ -98,5 +105,9 @@ public abstract class CallbackHandler {
      */
     protected CallbackResponse emptySubmittedCallbackResponse(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder().build();
+    }
+
+    public String generateDocumentName(String formName, final String caseReference) {
+        return String.format(formName, caseReference);
     }
 }

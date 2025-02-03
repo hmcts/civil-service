@@ -9,7 +9,7 @@ VALUES ('Scenario.AAA6.CP.OrderMade.Claimant', '{}', '{"Notice.AAA6.CP.OrderMade
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role, time_to_live)
-VALUES ('Notice.AAA6.CP.OrderMade.Claimant', 'An order has been made', 'An order has been made',
-        '<p class="govuk-body">The judge has made an order on your claim. <a href="{VIEW_FINAL_ORDER}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the order</a>.</p>',
-        '<p class="govuk-body">The judge has made an order on your claim. <a href="{VIEW_FINAL_ORDER}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the order</a>.</p>',
+VALUES ('Notice.AAA6.CP.OrderMade.Claimant', 'An order has been made', 'Mae gorchymyn wedi’i wneud',
+        '<p class="govuk-body">The judge has made an order on your claim.</p><p class="govuk-body"><a href="{VIEW_FINAL_ORDER}" rel="noopener noreferrer" target="_blank" class="govuk-link">View the order</a></p>',
+        '<p class="govuk-body">Mae''r Barnwr wedi gwneud gorchymyn ar eich hawliad.</p><p class="govuk-body"><a href="{VIEW_FINAL_ORDER}" rel="noopener noreferrer" target="_blank" class="govuk-link">Gweld y gorchymyn</a></p>',
         'CLAIMANT', 'Session');

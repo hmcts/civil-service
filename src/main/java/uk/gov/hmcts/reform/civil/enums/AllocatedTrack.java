@@ -1,13 +1,30 @@
 package uk.gov.hmcts.reform.civil.enums;
 
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
 import java.math.BigDecimal;
 
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS;
 
+@Slf4j
 public enum AllocatedTrack {
     SMALL_CLAIM,
     FAST_CLAIM,
-    MULTI_CLAIM;
+    MULTI_CLAIM,
+    INTERMEDIATE_CLAIM;
+
+    public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType,
+                                                             FeatureToggleService featureToggleService, CaseData caseData) {
+        Boolean intermediateOrMultiTrackValue = isValueGreaterThan(statementOfValueInPounds, 25000);
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData) && intermediateOrMultiTrackValue.equals(true)) {
+            log.info("isMultiOrIntermediateTrackEnabled toggle is on, for case {}, claim value {}",
+                     caseData != null ? caseData.getCcdCaseReference() : "Unknown Case", statementOfValueInPounds);
+            return isIntermediateOrMultiTrack(statementOfValueInPounds) ? INTERMEDIATE_CLAIM : MULTI_CLAIM;
+        }
+        return getAllocatedTrack(statementOfValueInPounds, claimType, personalInjuryType);
+    }
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType) {
         //The FLIGHT_DELAY ClaimType is only applicable for SPEC cases at the moment.
@@ -59,19 +76,16 @@ public enum AllocatedTrack {
         }
     }
 
-    public static int getDaysToAddToDeadline(AllocatedTrack track) {
-        if (track == SMALL_CLAIM) {
-            return 14;
-        }
-        return 28;
-    }
-
-    public static int getDaysToAddToDeadlineSpec(AllocatedTrack track) {
+    public static int getDaysToAddToDeadlineSpec() {
         return 28;
     }
 
     private static boolean isValueSmallerThan(BigDecimal value, int comparisionValue) {
         return value.compareTo(BigDecimal.valueOf(comparisionValue)) < 0;
+    }
+
+    private static boolean isValueGreaterThan(BigDecimal value, int comparisionValue) {
+        return value.compareTo(BigDecimal.valueOf(comparisionValue)) > 0;
     }
 
     private static boolean isValueSmallerThanOrEqualTo(BigDecimal value, int comparisionValue) {
@@ -94,8 +108,25 @@ public enum AllocatedTrack {
                 return "Multi Track";
             case SMALL_CLAIM:
                 return "Small Claim Track";
+            case INTERMEDIATE_CLAIM:
+                return "Intermediate Track";
             default:
                 throw new IllegalArgumentException("Invalid track type in " + allocatedTrack);
         }
+    }
+
+    public static String toStringValueForMessage(AllocatedTrack allocatedTrack) {
+        switch (allocatedTrack) {
+            case FAST_CLAIM:
+                return "Fast track";
+            case SMALL_CLAIM:
+                return "Small claim";
+            default:
+                throw new IllegalArgumentException("Invalid track type in " + allocatedTrack);
+        }
+    }
+
+    private static boolean isIntermediateOrMultiTrack(BigDecimal statementOfValueInPounds) {
+        return isValueSmallerThanOrEqualTo(statementOfValueInPounds, 100000);
     }
 }

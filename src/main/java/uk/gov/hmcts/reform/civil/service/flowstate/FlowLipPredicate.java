@@ -12,17 +12,9 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
 
-    public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
-
-    public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
-
     public static final Predicate<CaseData> agreedToMediation = CaseData::hasClaimantAgreedToFreeMediation;
 
-    public static final Predicate<CaseData> declinedMediation = CaseData::hasClaimantNotAgreedToFreeMediation;
-
     public static final Predicate<CaseData> isTranslatedDocumentUploaded = CaseData::isTranslatedDocumentUploaded;
-
-    public static final Predicate<CaseData> partAdmitPayImmediately = CaseData::isPartAdmitPayImmediatelyAccepted;
 
     public static final Predicate<CaseData> ccjRequestJudgmentByAdmission =
         CaseData::isCcjRequestJudgmentByAdmission;
@@ -30,13 +22,10 @@ public class FlowLipPredicate {
     public static final Predicate<CaseData> isRespondentSignSettlementAgreement =
         CaseData::isRespondentRespondedToSettlementAgreement;
 
-    public static final Predicate<CaseData> isClaimantNotSettleFullDefenceClaim =
-        CaseData::isClaimantIntentionNotSettlePartAdmit;
+    public static final Predicate<CaseData> nocSubmittedForLiPDefendantBeforeOffline = CaseData::nocApplyForLiPDefendantBeforeOffline;
 
-    public static final Predicate<CaseData> isClaimantSettleTheClaim =
-        CaseData::isClaimantIntentionSettlePartAdmit;
+    public static final Predicate<CaseData> nocSubmittedForLiPDefendant = CaseData::nocApplyForLiPDefendant;
 
-    public static final Predicate<CaseData> isDefendantNotPaidFullDefenceClaim =
-        CaseData::isFullDefenceNotPaid;
+    public  static final Predicate<CaseData> isContainsLip = CaseData::isLipCase;
 
 }

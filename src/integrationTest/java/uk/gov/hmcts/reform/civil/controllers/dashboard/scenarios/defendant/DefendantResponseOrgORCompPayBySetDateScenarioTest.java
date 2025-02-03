@@ -65,9 +65,16 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 by " +
-                        DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details. " +
-                        "The court will contact you when they respond.</p> " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
+                        DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details." +
+                        " The court will contact you when they respond.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 i Claimant John erbyn " +
+                        DateUtils.formatDateInWelsh(whenWillPay) + ". Mae angen i chi anfon eich manylion ariannol at yr" +
+                        " hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
             );
 
@@ -120,10 +127,17 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 by " +
-                        DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details. " +
-                        "The court will contact you when they respond.</p> " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a>"
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1001 by " +
+                        DateUtils.formatDate(whenWillPay) + ". You need to send the claimant your financial details." +
+                        " The court will contact you when they respond.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 i Claimant John erbyn " +
+                        DateUtils.formatDateInWelsh(whenWillPay) + ". Mae angen i chi anfon eich manylion ariannol at yr" +
+                        " hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
             );
 

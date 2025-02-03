@@ -17,7 +17,7 @@ public final class SdoR2UiConstantFastTrack {
         "Defendant requesting it. The Defendant shall serve a copy of the further audiogram on the Claimant and " +
         "upload it to the Digital Portal by 4pm on";
     public static final String DEFENDANT_MAY_ASK = "The Defendant(s) may ask questions of the Claimant's " +
-        "expert which must be sent to the expert directly and uploaded to th Digital Portal by 4pm on";
+        "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on";
     public static final String QUESTIONS_SHALL_BE_ANSWERED = "The questions shall be answered by the expert by";
     public static final String UPLOADED_TO_DIGITAL_PORTAL = "by the party asking within 7 days of receipt.";
     public static final String APPLICATION_TO_RELY_DETAILS = "Any application by the Defendant for permission " +
@@ -76,8 +76,7 @@ public final class SdoR2UiConstantFastTrack {
         " be double spaced using a font size of 12.";
     public static final String PECUNIARY_LOSS = "If there is a claim for future pecuniary loss and the parties have " +
         "not already set out their case on periodical payments, they must do so in the respective schedule and counter-schedule.";
-    public static final String PHYSICAL_TRIAL_BUNDLE = "The Claimant shall deliver to the court a physical copy of" +
-        " the court generated bundle no later than 10 days before the trial.";
+    public static final String PHYSICAL_TRIAL_BUNDLE = "The Claimant's solicitor shall bring to the court, on the day of the hearing, a paper copy of the hearing bundle.";
 
     public static final String WELSH_LANG_DESCRIPTION =
         """

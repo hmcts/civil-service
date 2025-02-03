@@ -31,8 +31,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesForTab;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -59,21 +59,22 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -259,15 +260,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
 
-    /**
-     * This field is not used.
-     *
-     * @deprecated this field is not used and it was in a screen no longer presented to the user.
-     *     It is kept here to devote a single jira to its removal, to ensure said removal won't cause
-     *     any problem when bringing info from db.
-     */
     @Deprecated
     private final YesOrNo respondent2DQCarerAllowanceCreditFullAdmission;
+    @Deprecated
     private final String responseToClaimAdmitPartWhyNotPayLRspec2;
     private final YesOrNo neitherCompanyNorOrganisation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
@@ -299,6 +294,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     private final String respondent1EmailAddress;
     private final YesOrNo applicant1Represented;
+    private final YesOrNo anyRepresented;
 
     /**
      * Adding for LR ITP Update.
@@ -318,6 +314,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
@@ -444,12 +441,6 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final List<Element<Document>> gaRespDocRespondentSol;
     private final List<Element<Document>> gaRespDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> gaDraftDocument;
-    private final List<Element<CaseDocument>> gaDraftDocStaff;
-    private final List<Element<CaseDocument>> gaDraftDocClaimant;
-    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
-    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
-
     private final Address specRespondent2CorrespondenceAddressdetails;
     private final YesOrNo specRespondent2CorrespondenceAddressRequired;
 
@@ -458,6 +449,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
     private String pcqId;
+    private String respondentResponsePcqId;
 
     // Transfer a Case Online
     private String reasonForTransfer;
@@ -490,6 +482,11 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     private SmallClaimsMediation smallClaimsMediationSectionStatement;
 
+    private FixedCosts fixedCosts;
+    private YesOrNo showDJFixedCostsScreen;
+    private YesOrNo showOldDJFixedCostsScreen;
+    private YesOrNo claimFixedCostsOnEntryDJ;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
@@ -501,6 +498,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private final IdamUserDetails defendantUserDetails;
 
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
+    private final ResponseDocument applicant1DefenceResponseDocumentSpec;
 
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
@@ -529,9 +527,11 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
-        return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
-            .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent();
+        Optional<CaseDataLiP> caseDataLiP1 = Optional.ofNullable(getCaseDataLiP());
+        return caseDataLiP1.map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+            .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent()
+            || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+                .filter(carm -> carm.getIsMediationEmailCorrect() == YES).isPresent();
     }
 
     @JsonIgnore
@@ -549,9 +549,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     }
 
     @JsonIgnore
-    public boolean isBilingual() {
+    public boolean isClaimantBilingual() {
         return null != claimantBilingualLanguagePreference
-                && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
+            && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
     }
 
     @JsonIgnore
@@ -560,9 +560,18 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     }
 
     @JsonIgnore
+    public boolean applicant1SuggestedPayImmediately() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.IMMEDIATELY;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayBySetDate() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
+
+    @JsonIgnore
     public boolean hasClaimantAgreedClaimSettled() {
         return Optional.ofNullable(getCaseDataLiP())
             .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
     }
-
 }

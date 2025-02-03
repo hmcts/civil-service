@@ -38,7 +38,7 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder()
-                    .individualFirstName("Claimant")
+                    .individualFirstName("Defendant")
                     .individualLastName("John")
                     .type(Party.Type.INDIVIDUAL).build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
@@ -58,14 +58,14 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Claimant John has offered to pay you £1000 by "
-                      +  DateUtils.formatDate(responseDeadline) + "<br>"
-                      +  "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].titleCy").value("Response to the claim"),
+                    "<p class=\"govuk-body\">Defendant John has offered to pay you £1000 by "
+                      +  DateUtils.formatDate(responseDeadline) + ".</p>"
+                      +  "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Claimant John has offered to pay you £1000 by "
-                     +   DateUtils.formatDateInWelsh(responseDeadline) + "<br>"
-                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                    "<p class=\"govuk-body\">Mae Defendant John wedi cynnig talu £1000 i chi erbyn "
+                     +   DateUtils.formatDateInWelsh(responseDeadline) + ".</p>"
+                     +   "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
 
         //Verify task Item is created
@@ -77,8 +77,8 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                     "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()));
+                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">Gweld yr ymateb i'r hawliad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()));
     }
 
     @Test
@@ -112,14 +112,14 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">Mr. Sole Trader has offered to pay you £1000 by "
-                     +   DateUtils.formatDate(admitPaymentDeadline) + "<br>"
+                    "<p class=\"govuk-body\">Mr. Sole Trader has offered to pay you £1001 by "
+                     +   DateUtils.formatDate(admitPaymentDeadline) + ".</p><p class=\"govuk-body\">"
                      +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-               jsonPath("$[0].titleCy").value("Response to the claim"),
+               jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                jsonPath("$[0].descriptionCy").value(
-                   "<p class=\"govuk-body\">Mr. Sole Trader has offered to pay you £1000 by "
-                    +   DateUtils.formatDateInWelsh(admitPaymentDeadline) + "<br>"
-                    +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                   "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi cynnig talu £1001 i chi erbyn "
+                    +   DateUtils.formatDateInWelsh(admitPaymentDeadline) + ".</p><p class=\"govuk-body\">"
+                    +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
 
         //Verify task Item is created
@@ -131,7 +131,7 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                     "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                 jsonPath("$[0].taskNameCy").value(
-                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()));
+                    "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">Gweld yr ymateb i'r hawliad</a>"),
+                jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()));
     }
 }

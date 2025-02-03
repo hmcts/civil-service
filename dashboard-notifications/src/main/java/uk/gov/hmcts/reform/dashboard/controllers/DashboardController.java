@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dashboard.controllers;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -130,6 +131,25 @@ public class DashboardController {
         return new ResponseEntity<>(notificationsResponse, HttpStatus.OK);
     }
 
+    @GetMapping(path = {
+        "notifications/ids/{ccd-case-identifiers}/role/{role-type}",
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Map<String, List<Notification>>> getNotificationsByIdentifiersAndRole(
+        @PathVariable("ccd-case-identifiers") String[] ccdCaseIdentifiers,
+        @PathVariable("role-type") String roleType,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Get notifications for ccd-case-identifiers: {}, role-type : {}", ccdCaseIdentifiers, roleType);
+
+        var notificationsResponse = dashboardNotificationService.getAllCasesNotifications(List.of(ccdCaseIdentifiers), roleType);
+
+        return new ResponseEntity<>(notificationsResponse, HttpStatus.OK);
+    }
+
     @PutMapping(path = {
         "notifications/{unique-notification-identifier}"
     })
@@ -162,6 +182,23 @@ public class DashboardController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping(path = {
+        "notifications/{ccd-case-identifier}/role/{role-type}"
+    }, consumes = MediaType.ALL_VALUE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Void> deleteNotificationsForCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Received UUID for deleting notification for case: {} and role {}", ccdCaseIdentifier, roleType);
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -177,6 +214,43 @@ public class DashboardController {
         dashboardScenariosService.recordScenarios(authorisation, scenarioReference,
                                                   uniqueCaseIdentifier, scenarioRequestParams
         );
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = {
+        "taskList/{ccd-case-identifier}/role/{role-type}/status/{category}"
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Void> makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @PathVariable("category") String category,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Received UUID for making progress-able tasks inactive for case: {} and role {} and category {}",
+                 ccdCaseIdentifier, roleType, category);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(ccdCaseIdentifier, roleType, category);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = {
+        "taskList/{ccd-case-identifier}/role/{role-type}/status"
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Void> makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info("Received UUID for making progress-able tasks inactive for case: {} and role {}",
+                 ccdCaseIdentifier, roleType);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(ccdCaseIdentifier, roleType, null);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

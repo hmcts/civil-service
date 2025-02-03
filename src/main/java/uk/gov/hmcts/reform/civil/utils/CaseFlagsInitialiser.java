@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -24,19 +23,13 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.createOrUpdateFlags;
 @AllArgsConstructor
 public class CaseFlagsInitialiser {
 
-    private final FeatureToggleService featureToggleService;
     private final OrganisationService organisationService;
 
     public void initialiseCaseFlags(CaseEvent caseEvent, CaseData.CaseDataBuilder dataBuilder) {
-        if (!featureToggleService.isCaseFlagsEnabled()) {
-            return;
-        }
 
         CaseData caseData = dataBuilder.build();
         switch (caseEvent) {
-            case CREATE_CLAIM:
-            case CREATE_CLAIM_SPEC:
-            case CREATE_LIP_CLAIM: {
+            case CREATE_CLAIM, CREATE_CLAIM_SPEC, CREATE_LIP_CLAIM: {
                 initialiseApplicantAndRespondentFlags(dataBuilder, caseData);
                 break;
             }
@@ -48,9 +41,7 @@ public class CaseFlagsInitialiser {
                 addRespondentDQPartiesFlagStructure(dataBuilder, caseData);
                 break;
             }
-            case CLAIMANT_RESPONSE:
-            case CLAIMANT_RESPONSE_SPEC:
-            case CLAIMANT_RESPONSE_CUI: {
+            case CLAIMANT_RESPONSE, CLAIMANT_RESPONSE_SPEC, CLAIMANT_RESPONSE_CUI: {
                 addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
                 break;
             }

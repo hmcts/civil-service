@@ -24,6 +24,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -91,7 +92,8 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             return Map.of(
                 CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                     caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
             );
         }
         if (caseData.isRespondent1NotRepresented()) {
@@ -142,8 +144,8 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     public boolean isRespondentOrSolicitorHasNoEmail(CaseData caseData) {
         return ((isRespondentSolicitorRegistered(caseData)
             && caseData.getRespondentSolicitor1EmailAddress() == null)
-            || ((!isRespondentSolicitorRegistered(caseData)
-            && caseData.getRespondent1().getPartyEmail() == null))
+            || (!isRespondentSolicitorRegistered(caseData)
+            && caseData.getRespondent1().getPartyEmail() == null)
             );
     }
 

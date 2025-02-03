@@ -45,15 +45,15 @@ public class DefendantResponseFullDefenceFullDisputeFastTrackScenarioTest extend
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have rejected the claim.</p>" +
-                        "<p class=\"govuk-body\">The court will contact you when they respond.</p>" +
+                    "<p class=\"govuk-body\">You have rejected the claim." +
+                        " The court will contact you when they respond.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 ),
-                jsonPath("$[0].titleCy").value("Response to the claim"),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You have rejected the claim.</p>" +
-                        "<p class=\"govuk-body\">The court will contact you when they respond.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                    "<p class=\"govuk-body\">Rydych wedi gwrthod yr hawliad." +
+                        " Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
             );
 

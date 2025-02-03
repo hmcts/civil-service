@@ -8,11 +8,9 @@ public final class DocumentTypeMapper {
     }
 
     public static ManageDocumentType mapDocumentTypeToManageDocumentType(DocumentType documentType) {
-        switch (documentType) {
-            case MEDIATION_AGREEMENT:
-                return ManageDocumentType.MEDIATION_AGREEMENT;
-            default:
-                return null;
+        if (documentType == DocumentType.MEDIATION_AGREEMENT) {
+            return ManageDocumentType.MEDIATION_AGREEMENT;
         }
+        return null;
     }
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -56,7 +55,7 @@ class CallbackHandlerFactoryTest {
             return new CallbackHandler() {
                 @Override
                 protected Map<String, Callback> callbacks() {
-                    return ImmutableMap.of(
+                    return Map.of(
                         callbackKey(ABOUT_TO_START), this::createCitizenClaim,
                         callbackKey(V_1, ABOUT_TO_SUBMIT), this::createCitizenClaim,
                         callbackKey(ABOUT_TO_SUBMIT, "start-claim"), this::createCitizenClaim,
@@ -81,7 +80,7 @@ class CallbackHandlerFactoryTest {
             return new CallbackHandler() {
                 @Override
                 protected Map<String, Callback> callbacks() {
-                    return ImmutableMap.of(
+                    return Map.of(
                         callbackKey(V_1, ABOUT_TO_SUBMIT), this::sendSealedClaim
                     );
                 }
@@ -108,7 +107,7 @@ class CallbackHandlerFactoryTest {
             return new CallbackHandler() {
                 @Override
                 protected Map<String, Callback> callbacks() {
-                    return ImmutableMap.of(
+                    return Map.of(
                         callbackKey(ABOUT_TO_SUBMIT), this::doMethod
                     );
                 }
@@ -137,7 +136,7 @@ class CallbackHandlerFactoryTest {
         CallbackParams params = CallbackParams.builder()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .version(V_1)
             .build();
 
@@ -155,7 +154,7 @@ class CallbackHandlerFactoryTest {
         CallbackParams params = CallbackParams.builder()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .version(V_2)
             .build();
 
@@ -177,7 +176,7 @@ class CallbackHandlerFactoryTest {
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
@@ -200,7 +199,7 @@ class CallbackHandlerFactoryTest {
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
@@ -223,7 +222,7 @@ class CallbackHandlerFactoryTest {
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
@@ -246,7 +245,7 @@ class CallbackHandlerFactoryTest {
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
@@ -265,7 +264,7 @@ class CallbackHandlerFactoryTest {
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
@@ -283,7 +282,7 @@ class CallbackHandlerFactoryTest {
         CallbackParams params = CallbackParams.builder()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
@@ -302,7 +301,7 @@ class CallbackHandlerFactoryTest {
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(ImmutableMap.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);

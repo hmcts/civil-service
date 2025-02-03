@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -29,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantCCJResponseNotificationHandler.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -50,14 +51,16 @@ public class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHand
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimantRepaymentPlanDecision", "accepted");
+            scenarioParams.put("claimantRepaymentPlanDecisionCy", "derbyn");
             scenarioParams.put("respondent1PartyName", "Mr Defendant Guy");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
                 .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()

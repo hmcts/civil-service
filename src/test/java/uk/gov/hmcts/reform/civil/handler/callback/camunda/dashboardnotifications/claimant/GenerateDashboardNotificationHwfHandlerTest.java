@@ -19,15 +19,18 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
 public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTest {
@@ -41,34 +44,97 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
     @Mock
     private FeatureToggleService toggleService;
 
+    HashMap<String, Object> params = new HashMap<>();
+
     @Nested
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
-            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
-        void shouldRecordScenario_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+        void shouldRecordScenario_whenInvoked_smallClaims() {
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTrialReadyCheck()
+                .applicant1Represented(NO)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1.name()).build()
             ).build();
 
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("typeOfFee", "claimFee");
+            when(mapper.mapCaseDataToParams(any())).thenReturn(params);
 
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
-            handler.handle(params);
+            handler.handle(callbackParams);
 
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.ClaimIssue.HWF.Requested",
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvoked_FastTrack() {
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTrialReadyCheck()
+                .applicant1Represented(NO)
+                .totalClaimAmount(new BigDecimal(10001))
+                .build();
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1.name()).build()
+            ).build();
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+
+            handler.handle(callbackParams);
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.ClaimIssue.HWF.Requested",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.ClaimIssue.Claimant.FastTrack",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+        }
+
+        @Test
+        void shouldNotRecordScenario_whenInvoked_legalRep() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTrialReadyCheck()
+                .totalClaimAmount(new BigDecimal(10001))
+                .build();
+            CallbackParams callbackParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1.name()).build()
+            ).build();
+
+            handler.handle(callbackParams);
+
+            verify(dashboardApiClient, never()).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.ClaimIssue.HWF.Requested",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
+            );
+
+            verify(dashboardApiClient, never()).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA6.ClaimIssue.Claimant.FastTrack",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
             );
         }
     }

@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +55,10 @@ public class CaseTakenOfflineForSpecApplicantNotificationHandler extends Callbac
     private CallbackResponse notifyApplicantSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        if (caseData.isApplicantLiP()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getSolicitorCaseTakenOfflineForSpec(),
@@ -66,7 +71,8 @@ public class CaseTakenOfflineForSpecApplicantNotificationHandler extends Callbac
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                 .getOrganisation().getOrganisationID(), caseData)
         );

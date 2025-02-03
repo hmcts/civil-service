@@ -1,42 +1,73 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import com.google.common.base.Strings;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.util.HashMap;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 
-public abstract class OrderCallbackHandler extends DashboardCallbackHandler {
+@Slf4j
+public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHandler {
 
-    protected OrderCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
+    protected final WorkingDayIndicator workingDayIndicator;
+
+    protected OrderCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper,
+                                   FeatureToggleService featureToggleService, WorkingDayIndicator workingDayIndicator) {
         super(dashboardApiClient, mapper, featureToggleService);
+        this.workingDayIndicator = workingDayIndicator;
     }
 
-    @Override
-    public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.getMapWithDocumentInfo(caseData, caseEvent);
+    protected boolean isEligibleForReconsideration(CaseData caseData) {
+        return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+            && caseData.isSmallClaim()
+            && caseData.getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) <= 0
+            && (isNull(caseData.getDecisionOnRequestReconsiderationOptions())
+            || !DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions()));
+    }
 
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String scenario = getScenario(caseData);
-        if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
-                authToken,
-                ScenarioRequestParams.builder().params(paramsMap).build()
-            );
+    protected boolean hasTrackChanged(CaseData caseData) {
+        return SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData))
+            && !caseData.isSmallClaim();
+    }
+
+    protected AllocatedTrack getPreviousAllocatedTrack(CaseData caseData) {
+        return AllocatedTrack.getAllocatedTrack(
+            caseData.getTotalClaimAmount(),
+            null,
+            null
+        );
+    }
+
+    protected boolean isCarmApplicableCase(CaseData caseData) {
+        return getFeatureToggleService().isCarmEnabledForCase(caseData)
+            && SMALL_CLAIM.equals(getPreviousAllocatedTrack(caseData));
+    }
+
+    protected LocalDateTime getDateWithoutBankHolidays() {
+        LocalDate date = LocalDate.now();
+        try {
+            for (int i = 0; i < 7; i++) {
+                if (workingDayIndicator.isPublicHoliday(date)) {
+                    date = date.plusDays(2);
+                } else {
+                    date = date.plusDays(1);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error when retrieving public days");
+            date = LocalDate.now().plusDays(7);
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+        return date.atTime(16, 0, 0);
     }
-
 }

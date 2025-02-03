@@ -1,24 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_ADMISSION;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_DETERMINATION;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_OR_DETERMINATION;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -27,9 +16,28 @@ import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmis
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_ADMISSION;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_ADMISSION_OR_DETERMINATION;
 
 @ExtendWith(MockitoExtension.class)
-public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
+class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final String REFERENCE_NUMBER = "000DC001";
@@ -39,10 +47,13 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
     private JudgmentByAdmissionOrDeterminationMapper judgmentByAdmissionOrDeterminationMapper;
 
     @Mock
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @Mock
     private DocumentGeneratorService documentGeneratorService;
+
+    @Mock
+    private AssignCategoryId assignCategoryId;
 
     @InjectMocks
     private RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator generator;
@@ -126,5 +137,64 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, CCJ_REQUEST_ADMISSION));
         assertThat(actual).isEqualTo(caseDocument);
+    }
+
+    @Test
+    void shouldGenerateClaimantJudgementByAdmissionDocument() {
+        // Given
+        String fileName = String.format(JUDGMENT_BY_ADMISSION_CLAIMANT.getDocumentTitle(), REFERENCE_NUMBER, "admission");
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT)
+            .build();
+        when(documentGeneratorService.generateDocmosisDocument(any(JudgmentByAdmissionOrDetermination.class),
+                                                               eq(JUDGMENT_BY_ADMISSION_CLAIMANT)))
+            .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_CLAIMANT.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT))
+        ).thenReturn(caseDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .build();
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+
+        // When
+        List<CaseDocument> actual = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                       GEN_JUDGMENT_BY_ADMISSION_DOC_CLAIMANT);
+
+        // Then
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_CLAIMANT));
+        verify(assignCategoryId)
+            .assignCategoryIdToCaseDocument(caseDocument, "judgments");
+        assertThat(actual).contains(caseDocument);
+    }
+
+    @Test
+    void shouldGenerateDefendantJudgementByAdmissionDocument() {
+        // Given
+        String fileName = String.format(JUDGMENT_BY_ADMISSION_DEFENDANT.getDocumentTitle(), REFERENCE_NUMBER, "admission");
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT)
+            .build();
+        when(documentGeneratorService.generateDocmosisDocument(any(JudgmentByAdmissionOrDetermination.class), eq(JUDGMENT_BY_ADMISSION_DEFENDANT)))
+            .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_DEFENDANT.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT))
+        ).thenReturn(caseDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .build();
+        when(judgmentByAdmissionOrDeterminationMapper.toNonDivergentDocs(caseData))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+
+        // When
+        List<CaseDocument> actual = generator.generateNonDivergentDocs(caseData, BEARER_TOKEN,
+                                                                  GEN_JUDGMENT_BY_ADMISSION_DOC_DEFENDANT);
+
+        // Then
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT));
+        assertThat(actual).contains(caseDocument);
     }
 }

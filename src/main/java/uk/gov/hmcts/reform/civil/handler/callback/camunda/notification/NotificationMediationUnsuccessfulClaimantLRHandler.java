@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR;
@@ -34,7 +35,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR);
     private static final String LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR = "notification-mediation-unsuccessful-claimant-LR-%s";
     private static final String LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP = "notification-mediation-unsuccessful-claimant-LIP-%s";
-    private static final String TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR = "SendMediationUnsuccessfulClaimantLR";
+    public static final String TASK_ID_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR = "SendMediationUnsuccessfulClaimantLR";
     private static final String CLAIMANT_TEXT = "your claim against ";
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantLRForMediationUnsuccessful
@@ -113,10 +114,12 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
                 sendMailAccordingToReason(caseData);
             }
         } else {
-            if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+            if (Objects.nonNull(caseData.getApplicant1Represented())
+                && caseData.isApplicant1NotRepresented()
+                && featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate(),
+                    addTemplate(caseData),
                     addPropertiesLip(caseData),
                     String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference())
                 );
@@ -129,6 +132,12 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
                 );
             }
         }
+    }
+
+    private String addTemplate(CaseData caseData) {
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate() :
+            notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate();
     }
 
     private void sendMailAccordingToReason(CaseData caseData) {
@@ -158,7 +167,9 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     private void sendMailUnrepresentedClaimant(CaseData caseData) {
         notificationService.sendMail(
             caseData.getApplicant1().getPartyEmail(),
-            notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
+            caseData.isClaimantBilingual()
+                ? notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()
+                : notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
             addPropertiesCARMforLIP(caseData),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LIP, caseData.getLegacyCaseReference()));
     }

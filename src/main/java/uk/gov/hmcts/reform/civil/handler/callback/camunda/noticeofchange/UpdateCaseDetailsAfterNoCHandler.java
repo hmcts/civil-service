@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.noticeofchange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,20 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.RespondentSolicitorDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
@@ -29,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -45,6 +54,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final CoreCaseUserService coreCaseUserService;
+    private final FeatureToggleService featureToggleService;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -128,6 +139,16 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .build();
     }
 
+    private Consumer<Organisation> setRespondentSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        return organisation -> {
+            List<ContactInformation> contactInformation = organisation.getContactInformation();
+            caseDataBuilder.respondentSolicitorDetails(RespondentSolicitorDetails.builder()
+                                                           .orgName(organisation.getName())
+                                                           .address(Address.fromContactInformation(
+                                                               contactInformation.get(0))).build());
+        };
+    }
+
     private void unassignCaseFromDefendantLip(CaseData caseData) {
         if (caseData.isRespondent1LiP() && caseData.getDefendantUserDetails() != null) {
             coreCaseUserService.unassignCase(caseData.getCcdCaseReference().toString(), caseData.getDefendantUserDetails().getId(), null, CaseRole.DEFENDANT);
@@ -207,6 +228,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent2Represented(YES)
             .defendant2LIPAtClaimIssued(NO);
 
+        if (featureToggleService.isCaseEventsEnabled()) {
+            caseDataBuilder.anyRepresented(YES);
+        }
+
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
                 .respondentSolicitor2ServiceAddressRequired(NO)
@@ -235,6 +260,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent1Represented(YES)
             .defendant1LIPAtClaimIssued(NO);
 
+        if (featureToggleService.isCaseEventsEnabled()) {
+            caseDataBuilder.anyRepresented(YES);
+        }
+
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)
                 .respondentSolicitor1ServiceAddressRequired(NO)
@@ -251,6 +280,19 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         } else {
             caseDataBuilder.respondentSolicitor1EmailAddress(null);
         }
+
+        String organisationId = OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData);
+        if (organisationId != null
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData)
+            && isOneVOne(caseData)) {
+            try {
+                organisationService.findOrganisationById(organisationId)
+                    .ifPresent(setRespondentSolicitorDetails(caseDataBuilder));
+            } catch (FeignException e) {
+                log.error("Error recovering org id " + organisationId
+                              + " for case id " + caseData.getLegacyCaseReference(), e);
+            }
+        }
     }
 
     private void updateApplicantSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
@@ -259,6 +301,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         caseDataBuilder.applicantSolicitor1PbaAccounts(null)
             .applicantSolicitor1PbaAccountsIsEmpty(YES);
+
+        if (featureToggleService.isCaseEventsEnabled()) {
+            caseDataBuilder.anyRepresented(YES);
+        }
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder

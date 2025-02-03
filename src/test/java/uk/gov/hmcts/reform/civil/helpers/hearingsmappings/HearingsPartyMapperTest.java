@@ -92,14 +92,14 @@ public class HearingsPartyMapperTest {
 
     private CaseData rollUpUnavailableDateRespondent(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
         caseData = builder.build();
         return caseData;
     }
 
     private CaseData rollUpUnavailableDateApplicant(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder, true);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
         caseData = builder.build();
         return caseData;
     }
@@ -973,6 +973,122 @@ public class HearingsPartyMapperTest {
         expected.add(respondent2Expert);
         expected.add(respondent2Witness);
         expected.add(respondent2LitFriend);
+
+        List<PartyDetailsModel> actualPartyDetailsModel = buildPartyObjectForHearingPayload(
+            caseData,
+            organisationService
+        );
+        assertThat(actualPartyDetailsModel).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldBuildPartyDetails_whenClaimantResponds1v1_nullOrg() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .addApplicant1LitigationFriend()
+            .addRespondent1LitigationFriend()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .addApplicant1ExpertsAndWitnesses()
+            .addRespondent1ExpertsAndWitnesses()
+            .build().toBuilder()
+            .applicant1OrganisationPolicy(uk.gov.hmcts.reform.ccd.model.OrganisationPolicy.builder()
+                                              .orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build()).build();
+
+        PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
+            "John",
+            "Rambo",
+            "Mr. John Rambo",
+            CLAIMANT_ROLE,
+            "rambo@email.com",
+            "0123456789"
+        );
+
+        PartyDetailsModel applicantExpert = buildExpectedIndividualPartyDetails(
+            "app-1-expert-party-id",
+            "Applicant",
+            "Expert",
+            "Applicant Expert",
+            EXPERT_ROLE,
+            null,
+            null
+        );
+
+        PartyDetailsModel applicantWitness = buildExpectedIndividualPartyDetails(
+            "app-1-witness-party-id",
+            "Applicant",
+            "Witness",
+            "Applicant Witness",
+            WITNESS_ROLE,
+            null,
+            null
+        );
+
+        PartyDetailsModel applicantLitFriend = buildExpectedIndividualPartyDetails(
+            "app-1-litfriend-party-id",
+            "Applicant",
+            "Litigation Friend",
+            "Applicant Litigation Friend",
+            LITIGATION_FRIEND_ROLE,
+            null,
+            null
+        );
+
+        PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
+            "Sole",
+            "Trader",
+            "Mr. Sole Trader",
+            DEFENDANT_ROLE,
+            "sole.trader@email.com",
+            "0123456789"
+        );
+
+        PartyDetailsModel respondentSolicitorParty = buildExpectedOrganisationPartyObject(
+            RESPONDENT_ONE_LR_ORG_NAME,
+            LEGAL_REP_ROLE,
+            RESPONDENT_ONE_ORG_ID
+        );
+
+        PartyDetailsModel respondent1Expert = buildExpectedIndividualPartyDetails(
+            "res-1-expert-party-id",
+            "Respondent",
+            "Expert",
+            "Respondent Expert",
+            EXPERT_ROLE,
+            null,
+            null
+        );
+
+        PartyDetailsModel respondent1Witness = buildExpectedIndividualPartyDetails(
+            "res-1-witness-party-id",
+            "Respondent",
+            "Witness",
+            "Respondent Witness",
+            WITNESS_ROLE,
+            null,
+            null
+        );
+
+        PartyDetailsModel respondent1LitFriend = buildExpectedIndividualPartyDetails(
+            "res-1-litfriend-party-id",
+            "Litigation",
+            "Friend",
+            "Litigation Friend",
+            LITIGATION_FRIEND_ROLE,
+            null,
+            null
+        );
+
+        List<PartyDetailsModel> expected = new ArrayList<>();
+        expected.add(applicantPartyDetails);
+        expected.add(applicantExpert);
+        expected.add(applicantWitness);
+        expected.add(applicantLitFriend);
+        expected.add(respondentPartyDetails);
+        expected.add(respondentSolicitorParty);
+        expected.add(respondent1Expert);
+        expected.add(respondent1Witness);
+        expected.add(respondent1LitFriend);
 
         List<PartyDetailsModel> actualPartyDetailsModel = buildPartyObjectForHearingPayload(
             caseData,

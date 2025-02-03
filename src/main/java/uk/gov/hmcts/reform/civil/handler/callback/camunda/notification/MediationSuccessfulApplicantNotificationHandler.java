@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -36,6 +37,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL);
     private static final String REFERENCE_TEMPLATE = "mediation-successful-applicant-notification-%s";
     private static final String REFERENCE_TEMPLATE_LIP = "mediation-successful-applicant-notification-LIP-%s";
+    private static final String REFERENCE_TEMPLATE_LIP_WELSH = "mediation-successful-applicant-notification-LIP-%s";
     public static final String TASK_ID = "MediationSuccessfulNotifyApplicant";
     private final Map<String, Callback> callbacksMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicant
@@ -58,10 +60,12 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             String claimId = caseData.getLegacyCaseReference();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-            if (caseData.isLipvLipOneVOne()) {
+            if (Objects.nonNull(caseData.getApplicant1Represented())
+                && caseData.isApplicant1NotRepresented()
+                && featureToggleService.isLipVLipEnabled()) {
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getNotifyLipSuccessfulMediation(),
+                    caseData.isClaimantBilingual() ? notificationsProperties.getNotifyLipSuccessfulMediationWelsh() : notificationsProperties.getNotifyLipSuccessfulMediation(),
                     lipProperties(caseData),
                     referenceTemplate
                 );
@@ -82,10 +86,12 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 );
             }
         } else {
-            if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+            if (Objects.nonNull(caseData.getApplicant1Represented())
+                && caseData.isApplicant1NotRepresented()
+                && featureToggleService.isLipVLipEnabled()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate(),
+                    addTemplate(caseData),
                     addPropertiesLip(caseData),
                     String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference()));
             } else {
@@ -98,6 +104,12 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
 
+    }
+
+    private String addTemplate(CaseData caseData) {
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate() :
+            notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate();
     }
 
     private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {

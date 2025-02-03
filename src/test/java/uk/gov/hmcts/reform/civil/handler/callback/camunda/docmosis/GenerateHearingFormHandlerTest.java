@@ -3,16 +3,13 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -20,6 +17,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingFormGenerator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,24 +35,25 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateHearingFormHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
-public class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    @Mock
+    private ObjectMapper mapper;
+    @InjectMocks
     private GenerateHearingFormHandler handler;
-    @MockBean
+    @Mock
     private HearingFormGenerator hearingFormGenerator;
 
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateHearingFormHandler(hearingFormGenerator, mapper);
+        mapper.registerModule(new JavaTimeModule());
+    }
+
     @Test
-    public void shouldGenerateForm_when1v1() {
+    void shouldGenerateForm_when1v1() {
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
             .documentName("document name")
@@ -85,11 +84,11 @@ public class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
         verify(hearingFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(updatedData.getHearingDocuments()).hasSize(1);
     }
 
     @Test
-    public void shouldGenerate2Forms_whenListHave1PreviousForm() {
+    void shouldGenerate2Forms_whenListHave1PreviousForm() {
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
             .documentName("document name")
@@ -123,6 +122,6 @@ public class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
         verify(hearingFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(2);
+        assertThat(updatedData.getHearingDocuments()).hasSize(2);
     }
 }

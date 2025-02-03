@@ -1,23 +1,21 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -32,24 +30,23 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    BreathingSpaceLiftedNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
-    private FeatureToggleService featureToggleService;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private BreathingSpaceLiftedNotificationHandler handler;
 
     public static final String REFERENCE = "breathing-space-lifted-notification-000DC001";
@@ -61,14 +58,9 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
     @Nested
     class AboutToSubmitCallbackTest {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getBreathingSpaceLiftedApplicantEmailTemplate()).thenReturn(APPLICANT_ID);
-            when(notificationsProperties.getBreathingSpaceLiftedRespondentEmailTemplate()).thenReturn(RESPONDENT_ID);
-        }
-
         @Test
         void shouldNotifyApplicantSolicitorForBreathingSpaceLifted() {
+            when(notificationsProperties.getBreathingSpaceLiftedApplicantEmailTemplate()).thenReturn(APPLICANT_ID);
             when(organisationService.findOrganisationById(
                 anyString())).thenReturn(Optional.of(Organisation.builder().name("applicant solicitor org").build()));
 
@@ -94,7 +86,8 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
         }
 
         @Test
-        public void shouldNotifyRespondentSolicitorForBreathingSpaceLifted() {
+        void shouldNotifyRespondentSolicitorForBreathingSpaceLifted() {
+            when(notificationsProperties.getBreathingSpaceLiftedRespondentEmailTemplate()).thenReturn(RESPONDENT_ID);
             when(organisationService.findOrganisationById(
                 anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
 
@@ -120,7 +113,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
         }
 
         @Test
-        public void assertThatCorrectActivityIdIsHandledByCallback() {
+        void assertThatCorrectActivityIdIsHandledByCallback() {
 
             assertThat(handler.camundaActivityId(
                 CallbackParamsBuilder.builder()
@@ -142,9 +135,10 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
 
     private Map<String, String> addPropertiesForApplicant(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
     }
 
@@ -158,9 +152,10 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
 
     private Map<String, String> addPropertiesForRespondent(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+            CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
         );
     }
 

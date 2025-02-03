@@ -116,6 +116,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean fastTrackWelshLanguageToggle;
     private final String fastTrackAllocation;
     private final String welshLanguageDescription;
+    private boolean showBundleInfo;
 
     @SuppressWarnings("unused")
     public boolean getFastTrackMethodToggle() {

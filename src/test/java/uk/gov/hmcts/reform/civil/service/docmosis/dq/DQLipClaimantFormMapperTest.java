@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -13,7 +14,14 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
+import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.DocumentsToBeConsideredSection;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
+import uk.gov.hmcts.reform.civil.model.dq.DocumentsToBeConsidered;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 
 import java.util.Optional;
 
@@ -84,6 +92,56 @@ class DQLipClaimantFormMapperTest {
         DirectionsQuestionnaireForm resultForm = dqLipClaimantFormMapper.addLipDQs(form, caseDataLiPOptional);
         //Then
         assertThat(resultForm.getLipExtraDQ()).isNotNull();
+    }
+
+    @Test
+    void shouldPopulateLipDQ_whenDQIsNotNullMinti() {
+        //Given
+        given(caseData.getApplicant1DQ()).willReturn(Applicant1DQ.builder()
+                                                         .applicant1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
+                                                                                                            .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
+                                                                                                            .complexityBandingAgreed(YesOrNo.YES)
+                                                                                                            .band(ComplexityBand.BAND_1)
+                                                                                                            .reasons("reasons")
+                                                                                                            .build())
+                                                         .specApplicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                                                                               .reachedAgreement(YesOrNo.YES)
+                                                                                                               .build())
+                                                         .specApplicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                                                                 .bespokeDirections("directions")
+                                                                                                                 .build())
+                                                         .applicant1DQDefendantDocumentsToBeConsidered(DocumentsToBeConsidered.builder()
+                                                                                                           .hasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                                                           .details("details")
+                                                                                                           .build())
+                                                         .build());
+        //When
+        FixedRecoverableCostsSection expectedFrc = dqLipClaimantFormMapper.getFixedRecoverableCostsIntermediate(caseData);
+        DisclosureOfElectronicDocuments expectedEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfElectronicDocuments(caseData);
+        DisclosureOfNonElectronicDocuments expectedNonEletronicDisclosure = dqLipClaimantFormMapper.getDisclosureOfNonElectronicDocuments(caseData);
+        DocumentsToBeConsideredSection expectedDocsToBeConsidered = dqLipClaimantFormMapper.getDocumentsToBeConsidered(caseData);
+        //Then
+        assertThat(expectedFrc).isEqualTo(FixedRecoverableCostsSection.builder()
+                                              .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
+                                              .complexityBandingAgreed(YesOrNo.YES)
+                                              .reasons("reasons")
+                                              .band(ComplexityBand.BAND_1)
+                                              .bandText("Band 1")
+                                              .build());
+
+        assertThat(expectedEletronicDisclosure).isEqualTo(DisclosureOfElectronicDocuments.builder()
+                                                                          .reachedAgreement(YesOrNo.YES).build());
+
+        assertThat(expectedNonEletronicDisclosure).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .bespokeDirections("directions")
+                                                                 .build());
+
+        assertThat(expectedDocsToBeConsidered).isEqualTo(DocumentsToBeConsideredSection.builder()
+                                                             .hasDocumentsToBeConsidered(YesOrNo.YES)
+                                                             .details("details")
+                                                             .sectionHeading("Defendants documents to be considered")
+                                                             .question("Are there any documents the defendants have that you want the court to consider?")
+                                                             .build());
     }
 
     @Test

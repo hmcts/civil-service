@@ -38,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NotSuitable_SDO);
-    public static final String NotSuitableSDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
+    public static final String NOT_SUITABLE_SDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
         + "a notification will be sent to the listing officer to look at this case offline."
         + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
@@ -92,7 +92,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateNotSuitableReason(CallbackParams callbackParams) {
-        final int lengthAllowed = 150;
+        final int lengthAllowed = 4000;
         List<String> errors = new ArrayList<>();
         String reason;
 
@@ -161,15 +161,12 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        return format(NotSuitableSDO_CONFIRMATION_BODY);
+        return format(NOT_SUITABLE_SDO_CONFIRMATION_BODY);
     }
 
     private boolean isTransferOnlineCase(CaseData caseData) {
-        if (toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
-            return true;
-        } else {
-            return false;
-        }
+        return toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions()
+            == NotSuitableSdoOptions.CHANGE_LOCATION;
     }
 
     private String getHeaderTOC(CaseData caseData) {

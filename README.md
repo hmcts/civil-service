@@ -102,6 +102,21 @@ To access Camunda visit url (login and password are both `admin`):
 
 - `https://camunda-civil-service-pr-PR_NUMBER.service.core-compute-preview.internal`
 
+
+### Functional test labels for targeted testing
+There are a variety of labels that can be added to PRs for the purpose of running sub-groups of functional tests, relevant to specific journeys. All functional test labels begin with the pr_ft_ prefix.
+
+Adding a functional test label allows the user to run a greater amount of tests relevant to the journey where changes are being made, and reduces the amount of time taken to run a build.
+
+For example, if the label pr_ft_spec-part-admit is added to a PR, the PR will run only the API tests relevant to the Spec Part Admit journey.
+
+It is also possible to add two labels to a PR to target multiple journeys. For example, if the labels pr_ft_spec-part-admit, and pr_ft_spec-part-admit are added to a PR, the PR will run only the API tests relevant to the Spec Part Admit, and Spec Full Admit journeys.
+
+If no functional test label has been added to a PR, the full set of regression tests (api-nonprod) will be run.
+
+For more details about the functional test labels available, the tests that run under each label, and the guidelines for using them, please refer to this confluence page: https://tools.hmcts.net/confluence/display/ROC/GitHub+Labels+for+Testing
+
+
 ## Contract testing
 
 ### Generate contracts
@@ -186,6 +201,83 @@ Example
 ./gradlew -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Dnvd.api.key=<YOUR_API_KEY_HERE> dependencyCheckAggregate
 ```
 
+## CFTLib- Running Locally
+```
+./gradlew bootWithCCD
+```
+If you're seeing errors when pulling images, run the following command:
+
+```shell
+az acr login --name hmctspublic --subscription 8999dec3-0104-4a27-94ee-6588559729d1
+```
+If you're seeing errors after importing bpmn files then run it again.
+XUI will be running on http://localhost:3000/
+
+After creating a case in XUI, complete the payment using service request.
+To update the payment success callback on a created case, please use [[civil-operation]](https://github.com/hmcts/civil-operations/)
+http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease to generate token
+then use http://localhost:4000/service-request-update-claim-issued endpoint with above token and then
+update body with case id and payment reference no
+
+## Development / Debugging Environment - Preview with Mirrord
+
+  As an alternative for a development environment there is a procedure in place where after running the command
+below the required services for Civil are created in Preview under the developer's name, so these will be exclusively
+for the named developer use.
+
+While connected to the VPN simply run one of the below commands from your project's (civil-service) folder:
+Note: be sure to have Docker running
+```shell
+npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh
+```
+You can optionally specify a branch for CCD definitions and Camunda definitions like below or leave it blank to use master.
+
+```shell
+npx @hmcts/dev-env@latest && ./bin/setup-devuser-preview-env.sh ccdBranchName camundaBranchName
+```
+If you want to clean up the environment just run:
+
+```shell
+npx @hmcts/dev-env@latest --delete
+```
+
+Once the pods are up and running you can connect to them using a plugin called Mirrord on Intellij.
+https://mirrord.dev
+
+Most times, by just enabling the Mirrord plugin and running the application in debug mode a popup will come for you to select the target pod running civil-service.
+In some setups you will need a mirrord config file specifying the pod as below.
+
+The script should create a /.mirrord/.mirrord.json config file under the project's root directory.
+
+Specifically for civil-service you might need to exclude a flyway environment variable to allow the startup process to run without errors.
+For that you should have such file as this:
+
+```json
+{
+  "feature": {
+    "network": {
+      "incoming": "steal",
+      "outgoing": true
+    },
+    "fs": "read",
+    "env": {
+      "override": {
+        "REFERENCE_DATABASE_MIGRATION": "false"
+      }
+    }
+  },
+  "target": {
+    "path": {
+      "pod": "Your civil-service pod ID"
+    },
+    "namespace": "civil"
+  },
+  "operator": false,
+  "agent": {
+    "flush_connections": false
+  }
+}
+```
 
 ## License
 

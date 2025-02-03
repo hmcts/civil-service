@@ -31,6 +31,7 @@ class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
     @AfterAll
     static void tearDown() {
         currentDateMock.reset();
+        currentDateMock.close();
     }
 
     @BeforeEach
@@ -49,7 +50,9 @@ class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
     }
 
     @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
         return null;
     }
 

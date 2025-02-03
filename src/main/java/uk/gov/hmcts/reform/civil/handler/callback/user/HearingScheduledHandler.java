@@ -1,15 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +18,20 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -43,6 +43,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -57,12 +59,12 @@ public class HearingScheduledHandler extends CallbackHandler {
         + ", for example, book an interpreter.";
     public static final String HEARING_CREATED_HEADER = "# Hearing notice created\n"
         + "# Your reference number\n" + "# %s";
-
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final HearingFeesService hearingFeesService;
+    private final FeatureToggleService  featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -133,7 +135,7 @@ public class HearingScheduledHandler extends CallbackHandler {
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
                             .sorted()
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     private CallbackResponse checkPastDate(CallbackParams callbackParams) {
@@ -184,7 +186,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             locationList.setListItems(null);
             caseDataBuilder.hearingLocation(locationList);
         }
-        CaseState caseState = HEARING_READINESS;
 
         // Hearing fee will be different based on claim track.
         // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
@@ -196,26 +197,51 @@ public class HearingScheduledHandler extends CallbackHandler {
             claimTrack = caseData.getResponseClaimTrack();
         }
 
-        // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
-        // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
-        if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
-            if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
-                caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
-                caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
-            } else {
-                caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        CaseState caseState = caseDataBuilder.build().getCcdState();
+
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
+            if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                && !caseState.equals(HEARING_READINESS)
+                && !caseState.equals(DECISION_OUTCOME)) {
+                caseState = HEARING_READINESS;
             }
-            // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
-            // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+            calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
         } else {
-            caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+            // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
+            // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+            if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+                if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
+                    calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
+                    caseState = caseState.equals(CASE_PROGRESSION) ? HEARING_READINESS : caseState;
+                } else {
+                    caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
+                }
+                // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
+                // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+            } else if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+                caseState = caseState.equals(CASE_PROGRESSION) ? PREPARE_FOR_HEARING_CONDUCT_HEARING : caseState;
+            }
         }
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
+        caseDataBuilder.trialReadyNotified(null);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(caseState.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void calculateHearingFeeAndDueDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData, String claimTrack) {
+        if (caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+            return;
+        }
+        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+            && ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
+            caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
+            return;
+        }
+        caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
+        caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
     }
 
     private List<String> checkTrueOrElseAddError(boolean condition, String error) {

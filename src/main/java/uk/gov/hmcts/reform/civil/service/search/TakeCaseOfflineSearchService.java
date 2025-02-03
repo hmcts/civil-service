@@ -27,21 +27,22 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-                            .must(beState(AWAITING_APPLICANT_INTENTION)))
+                    .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                    .must(beState(AWAITING_APPLICANT_INTENTION)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
-                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
+                    .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                    .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
-                            .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
+                    .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                    .must(beState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT))),
             List.of("reference"),
             startIndex
         );
     }
 
     @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
+                                String searchAfterValue) {
         return null;
     }
 

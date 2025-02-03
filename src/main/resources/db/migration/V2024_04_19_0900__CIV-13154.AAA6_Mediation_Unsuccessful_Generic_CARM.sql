@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Claimant", "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant"}',
         '{"Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant": []}');
 
 /**
@@ -13,9 +13,9 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claimant',
         'Mediation appointment unsuccessful',
-        'Mediation appointment unsuccessful',
+        'Roedd eich apwyntiad cyfryngu yn aflwyddiannus',
         '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
-        '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
+        '<p class="govuk-body">Nid oeddech yn gallu datrys yr hawliad hwn drwy ddefnyddio cyfryngu.</p> <p class="govuk-body">Bydd yr achos hwn nawr yn cael ei adolygu gan y llys.</p>',
         'CLAIMANT');
 
 /**
@@ -23,7 +23,7 @@ VALUES ('Notice.AAA6.MediationUnsuccessful.NOTClaimant1NonContactable.CARM.Claim
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant',
-        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant"}',
+        '{"Notice.AAA6.ClaimantIntent.Mediation.CARM.Defendant", "Notice.AAA6.ClaimantIntent.MediationUnsuccessful.Defendant"}',
         '{"Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant": []}');
 
 /**
@@ -33,7 +33,7 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA6.MediationUnsuccessful.NOTDefendant1NonContactable.CARM.Defendant',
         'Mediation appointment unsuccessful',
-        'Mediation appointment unsuccessful',
+        'Roedd eich apwyntiad cyfryngu yn aflwyddiannus',
         '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
-        '<p class="govuk-body">You were not able to resolve this claim using mediation.</p> <p class="govuk-body">This case will now be reviewed by the court.</p>',
+        '<p class="govuk-body">Nid oeddech yn gallu datrys yr hawliad hwn drwy ddefnyddio cyfryngu.</p> <p class="govuk-body">Bydd yr achos hwn nawr yn cael ei adolygu gan y llys.</p>',
         'DEFENDANT');

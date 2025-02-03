@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -41,6 +42,7 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final List<ClaimAmountBreakupDetails> claimAmount;
     private final String sameInterestRate;
     private final String breakdownInterestRate;
+    private final String interestPerDayBreakdown;
     private final String totalInterestAmount;
     private final String howTheInterestWasCalculated;
     private final String interestRate;
@@ -61,4 +63,6 @@ public class SealedClaimFormForSpec implements MappableObject {
     private final StatementOfTruth statementOfTruth;
     private final String applicantRepresentativeOrganisationName;
     private final String defendantResponseDeadlineDate;
+    private final YesOrNo claimFixedCosts;
+    private final String fixedCostAmount;
 }

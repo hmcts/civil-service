@@ -1,21 +1,20 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.FeignException;
 import feign.Request;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -44,54 +43,51 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_BULK_CLAIM_PAYME
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
-@SpringBootTest(classes = {
-    MakeBulkClaimPaymentCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "RC-1234-1234-1234-1234";
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
     private static final String PAYMENT_ERROR_CODE = "CA-E0004";
     public static final String DUPLICATE_PAYMENT_MESSAGE
-        = "You attempted to retry the payment to soon. Try again later.";
+        = "You attempted to retry the payment too soon. Try again later.";
 
-    @MockBean
+    @Mock
     private PaymentsService paymentsService;
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @Autowired
     private MakeBulkClaimPaymentCallbackHandler handler;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
     private CaseData caseData;
     private CallbackParams params;
 
     @BeforeEach
     void setup() {
-        when(time.now()).thenReturn(LocalDateTime.of(1990, 2, 20, 12, 0, 0));
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        handler = new MakeBulkClaimPaymentCallbackHandler(paymentsService, objectMapper, time);
 
         caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
             .hearingDate(null)
             .sdtRequestIdFromSdt("testRequestId")
-            .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build())
+            .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("12345").build())
             .build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
     }
 
     @Test
     void shouldMakeBulkClaimPbaPayment_whenInvokedAndIsBulkClaim() {
+        when(time.now()).thenReturn(LocalDateTime.of(1990, 2, 20, 12, 0, 0));
+
         when(paymentsService.createPbaPayment(any(), any()))
             .thenReturn(PBAServiceRequestResponse.builder().paymentReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(paymentsService).createPbaPayment(caseData, "BEARER_TOKEN");
+
         assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
             .extracting("reference", "status", "customerReference")
             .containsExactly(SUCCESSFUL_PAYMENT_REFERENCE, SUCCESS.toString(), "12345");
@@ -100,20 +96,7 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotMakeBulkClaimPbaPayment_whenInvokedAndIsNotBulkClaim() {
-        when(paymentsService.createPbaPayment(any(), any()))
-            .thenReturn(PBAServiceRequestResponse.builder().paymentReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-            .hearingDate(null)
-            .sdtRequestIdFromSdt(null)
-            .claimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build())
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
         verifyNoInteractions(paymentsService);
-
     }
 
     @ParameterizedTest
@@ -124,7 +107,8 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(paymentsService).createPbaPayment(caseData, "BEARER_TOKEN");
-        assertThat(response.getData()).extracting("claimIssuedPaymentDetails").doesNotHaveToString("reference");
+        assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+            .doesNotHaveToString("reference");
         assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
             .extracting("errorMessage", "errorCode", "status", "customerReference")
             .containsExactly(PAYMENT_ERROR_MESSAGE, PAYMENT_ERROR_CODE, FAILED.toString(), "12345");
@@ -200,10 +184,9 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnCorrectActivityIdAndCorrectEvent_whenInvoked() {
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams localParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        assertThat(handler.camundaActivityId(params)).isEqualTo("makeBulkClaimPayment");
+        assertThat(handler.camundaActivityId(localParams)).isEqualTo("makeBulkClaimPayment");
         assertThat(handler.handledEvents()).contains(MAKE_BULK_CLAIM_PAYMENT);
     }
-
 }

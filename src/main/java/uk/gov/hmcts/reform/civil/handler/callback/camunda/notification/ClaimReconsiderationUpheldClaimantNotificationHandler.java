@@ -52,9 +52,10 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
 
     private CallbackResponse notifyClaimReconsiderationUpheldToClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
+        String email = caseData.isApplicantLiP() ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
+        if (email != null) {
             notificationService.sendMail(
-                caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                email,
                 getTemplate(),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
@@ -67,18 +68,17 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
                 PARTY_NAME, caseData.getApplicant1().getPartyName()
             );
     }
 
     private String getTemplate() {
-        return notificationsProperties.getNotifyUpdateTemplate();
+        return notificationsProperties.getNotifyClaimReconsiderationLRTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
-        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+        return String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference().toString());
     }
-
 }

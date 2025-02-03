@@ -5,6 +5,8 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
@@ -13,15 +15,17 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
+import uk.gov.hmcts.reform.civil.event.NoHearingFeeDueEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -54,6 +58,9 @@ class HearingFeeDueHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private HearingFeeDueHandler handler;
 
@@ -65,15 +72,37 @@ class HearingFeeDueHandlerTest {
     }
 
     @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
+    void shouldEmitNoHearingFeeDueEvent_whenCasesFoundNoFeeDue() {
+        long caseId = 1L;
+        CaseData caseData = CaseDataBuilder.builder().atStateNoHearingFeeDue().build();
+        Map<String, Object> data = Map.of("data", caseData);
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+
+        when(featureToggleService.isMintiEnabled()).thenReturn(true);
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(searchService.getCases()).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(applicationEventPublisher).publishEvent(new NoHearingFeeDueEvent(caseId));
+        verify(externalTaskService).complete(mockTask, null);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid(boolean toggle) {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
         Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMintiEnabled()).thenReturn(toggle);
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
@@ -81,8 +110,9 @@ class HearingFeeDueHandlerTest {
         verify(externalTaskService).complete(mockTask, null);
     }
 
-    @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF(boolean toggle) {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder()
             .atStateHearingFeeDuePaidWithHwf()
@@ -93,11 +123,13 @@ class HearingFeeDueHandlerTest {
             .build();
         caseData = caseData.toBuilder().hearingHelpFeesReferenceNumber("HWF-111-111").build();
         Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMintiEnabled()).thenReturn(toggle);
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
@@ -105,16 +137,19 @@ class HearingFeeDueHandlerTest {
         verify(externalTaskService).complete(mockTask, null);
     }
 
-    @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundUnpaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldEmitHearingFeeUnpaidEvent_whenCasesFoundUnpaid(boolean toggle) {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
         Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
+        when(featureToggleService.isMintiEnabled()).thenReturn(toggle);
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(toggle);
         when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
@@ -124,7 +159,7 @@ class HearingFeeDueHandlerTest {
 
     @Test
     void shouldNotEmitTakeCaseOfflineEvent_WhenNoCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -142,7 +177,7 @@ class HearingFeeDueHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask, null);
+        verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
@@ -170,7 +205,7 @@ class HearingFeeDueHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 

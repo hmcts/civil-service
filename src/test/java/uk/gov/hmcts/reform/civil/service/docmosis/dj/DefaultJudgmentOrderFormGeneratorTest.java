@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
@@ -23,10 +23,10 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -52,7 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SD
     DefaultJudgmentOrderFormGenerator.class,
     JacksonAutoConfiguration.class
 })
-public class DefaultJudgmentOrderFormGeneratorTest {
+class DefaultJudgmentOrderFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -68,7 +68,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         .documentType(DEFAULT_JUDGMENT_SDO_ORDER)
         .build();
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
@@ -80,7 +80,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     private DocumentHearingLocationHelper documentHearingLocationHelper;
 
     @MockBean
-    private IdamClient idamClient;
+    private UserService userService;
 
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
@@ -91,7 +91,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         fileNameTrial = LocalDate.now() + "_Judge Dredd" + ".pdf";
         FILE_NAME_DISPOSAL_HNL = LocalDate.now() + "_Judge Dredd" + ".pdf";
 
-        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+        when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                     .forename("Judge")
                                                                     .surname("Dredd")
                                                                     .roles(Collections.emptyList()).build());

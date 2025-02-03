@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 public interface Claim {
 
     boolean hasResponsePending();
@@ -60,13 +64,7 @@ public interface Claim {
 
     boolean defendantRespondedWithPartAdmit();
 
-    boolean isHearingFormGenerated();
-
     boolean hasSdoBeenDrawn();
-
-    boolean isBeforeHearing();
-
-    boolean isMoreDetailsRequired();
 
     boolean isMediationSuccessful();
 
@@ -86,7 +84,17 @@ public interface Claim {
 
     boolean isPartialAdmissionRejected();
 
-    boolean isSDOOrderCreated();
+    boolean isSDOOrderCreatedCP();
+
+    boolean isSDOOrderCreatedPreCP();
+
+    boolean isSDOOrderLegalAdviserCreated();
+
+    boolean isSDOOrderInReview();
+
+    boolean isSDOOrderInReviewOtherParty();
+
+    boolean isDecisionForReconsiderationMade();
 
     boolean isClaimantDefaultJudgement();
 
@@ -117,4 +125,61 @@ public interface Claim {
     boolean isClaimSubmittedNotPaidOrFailedNotHwF();
 
     boolean isClaimSubmittedWaitingTranslatedDocuments();
+
+    boolean isNocForDefendant();
+
+    boolean isCaseStruckOut();
+
+    boolean isDefaultJudgementIssued();
+
+    default boolean isCaseDismissed() {
+        return false;
+    }
+
+    boolean isCaseStayed();
+
+    /**
+     * Hearing scheduled implies at least that hearing date is defined.
+     *
+     * @return true if hearing is scheduled
+     */
+    boolean isHearingScheduled();
+
+    /**
+     * Some statuses consider how far is the hearing date.
+     *
+     * @param i days
+     * @return true if hearing date is defined and it is less or equal than i days away
+     */
+    boolean isHearingLessThanDaysAway(int days);
+
+    boolean isAwaitingJudgment();
+
+    boolean trialArrangementsSubmitted();
+
+    default boolean isHwFHearingSubmit() {
+        return false;
+    }
+
+    boolean isOrderMade();
+
+    Optional<LocalDate> getHearingDate();
+
+    Optional<LocalDateTime> getTimeOfLastNonSDOOrder();
+
+    Optional<LocalDateTime> getBundleCreationDate();
+
+    Optional<LocalDateTime> getWhenWasHearingScheduled();
+
+    boolean isBundleCreatedStatusActive();
+
+    boolean isTrialArrangementStatusActive();
+
+    boolean isTrialScheduledNoPaymentStatusActive();
+
+    boolean isTrialScheduledPaymentPaidStatusActive();
+
+    default boolean isHwfFullRemission() {
+        return false;
+    }
 }

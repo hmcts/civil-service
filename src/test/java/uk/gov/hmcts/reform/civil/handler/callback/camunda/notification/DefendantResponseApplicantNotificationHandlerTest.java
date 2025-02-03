@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -24,8 +23,16 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneCCSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneCCUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceApplicantSolicitorOneUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorOneCCSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorOneCCUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorTwoCCSpecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceRespondentSolicitorTwoCCUnspecNotifier;
+import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.fulldefence.FullDefenceSolicitorNotifierFactory;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -51,15 +58,21 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
     DefendantResponseApplicantNotificationHandler.class,
+    FullDefenceSolicitorNotifierFactory.class,
+    FullDefenceApplicantSolicitorOneSpecNotifier.class,
+    FullDefenceApplicantSolicitorOneUnspecNotifier.class,
+    FullDefenceApplicantSolicitorOneCCSpecNotifier.class,
+    FullDefenceApplicantSolicitorOneCCUnspecNotifier.class,
+    FullDefenceRespondentSolicitorOneCCSpecNotifier.class,
+    FullDefenceRespondentSolicitorOneCCUnspecNotifier.class,
+    FullDefenceRespondentSolicitorTwoCCSpecNotifier.class,
+    FullDefenceRespondentSolicitorTwoCCUnspecNotifier.class,
     JacksonAutoConfiguration.class
+
 })
 class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
@@ -71,8 +84,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     private DefendantResponseApplicantNotificationHandler handler;
     @MockBean
     private OrganisationService organisationService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setup() {
@@ -104,8 +115,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -113,7 +124,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, false),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -127,8 +138,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -136,7 +147,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, false),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -150,8 +161,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -159,7 +170,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor2@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, false),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -186,12 +197,11 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     .build();
 
                 handler.handle(params);
-                final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
                     ArgumentMatchers.eq("spec-claimant-template-id"),
                     ArgumentMatchers.argThat(map -> {
-                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        Map<String, String> expected = getNotificationDataMapSpec();
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
                             && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
                     }),
@@ -221,12 +231,11 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     .build();
 
                 handler.handle(params);
-                final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("rambo@email.com"),
                     ArgumentMatchers.eq("spec-claimant-template-id"),
                     ArgumentMatchers.argThat(map -> {
-                        Map<String, String> expected = getNotificationDataMapSpecCui(finalCaseData);
+                        Map<String, String> expected = getNotificationDataMapSpecCui();
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
                             && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
                     }),
@@ -256,12 +265,11 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     .build();
 
                 handler.handle(params);
-                final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
                     ArgumentMatchers.eq("templateImm-id"),
                     ArgumentMatchers.argThat(map -> {
-                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        Map<String, String> expected = getNotificationDataMapSpec();
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
                             && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
                     }),
@@ -291,12 +299,11 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     .build();
 
                 handler.handle(params);
-                final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
                     ArgumentMatchers.eq("templateImm-id"),
                     ArgumentMatchers.argThat(map -> {
-                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        Map<String, String> expected = getNotificationDataMapSpec();
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
                             && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
                     }),
@@ -326,12 +333,11 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     .build();
 
                 handler.handle(params);
-                final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
                     ArgumentMatchers.eq("templateImm-id"),
                     ArgumentMatchers.argThat(map -> {
-                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        Map<String, String> expected = getNotificationDataMapSpec();
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
                             && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
                     }),
@@ -357,7 +363,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "spec-respondent-template-id",
-                    getNotificationDataMapSpec(caseData),
+                    getNotificationDataMapSpec(),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -380,7 +386,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "spec-respondent-template-id",
-                    getNotificationDataMapPartAdmissionSpec(caseData),
+                    getNotificationDataMapPartAdmissionSpec(),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -403,7 +409,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "spec-respondent-template-id",
-                    getNotificationDataMapSpec(caseData),
+                    getNotificationDataMapSpec(),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -427,7 +433,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "spec-respondent-template-id-action",
-                    getNotificationDataMapSpec(caseData),
+                    getNotificationDataMapSpec(),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -448,12 +454,11 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 handler.handle(params);
 
-                final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("respondentsolicitor2@example.com"),
                     ArgumentMatchers.eq("spec-respondent-template-id"),
                     ArgumentMatchers.argThat(map -> {
-                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        Map<String, String> expected = getNotificationDataMapSpec();
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
                             && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
                     }),
@@ -475,8 +480,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -484,7 +489,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, true),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -499,8 +504,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -508,7 +513,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, true),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -523,8 +528,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -532,7 +537,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor2@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, true),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -550,8 +555,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -559,7 +564,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, false),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -574,8 +579,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
-                                 .build())
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                        .build())
                     .build();
 
                 handler.handle(params);
@@ -583,66 +588,59 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
                     "template-id",
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(caseData, false),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap(CaseData caseData, boolean is1v2DS) {
             if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
                 || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                     RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                    PARTY_REFERENCES, buildPartiesReferences(caseData),
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                     ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
                 );
             } else {
                 //if there are 2 respondents on the case, concatenate the names together for the template subject line
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                     RESPONDENT_NAME,
                     getPartyNameBasedOnType(caseData.getRespondent1())
                         .concat(" and ")
                         .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                    PARTY_REFERENCES, buildPartiesReferences(caseData),
+                    PARTY_REFERENCES, is1v2DS ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234"
+                    : "Claimant reference: 12345 - Defendant reference: 6789",
                     ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
                 );
             }
         }
 
-        private Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapSpec() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 "defendantName", "Mr. Sole Trader",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
 
-        private Map<String, String> getNotificationDataMapSpecCui(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapSpecCui() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. John Rambo"
             );
         }
 
-        private Map<String, String> getNotificationDataMapImmediatelySpec(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                "defendantName", "Mr. Sole Trader",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                "payImmediately", "12 FEBRUARY 2023;"
-
-            );
-        }
-
-        private Map<String, String> getNotificationDataMapPartAdmissionSpec(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapPartAdmissionSpec() {
             return Map.of(
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
             );
         }
 
@@ -661,230 +659,5 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC").build()).build())).isEqualTo(TASK_ID_CC_RESP1);
-    }
-
-    @Test
-    void shoulldReturnPartyInformation_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationSecondScenerio_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationThirdScenerio_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerio1_whenCaseEventIsInvoked() {
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        String formattedDate = formatLocalDate(whenWillPay, DATE);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", formattedDate.toUpperCase());
-
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioOne_whenCaseEventIsInvoked() {
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        String formattedDate = formatLocalDate(whenWillPay, DATE);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", formattedDate.toUpperCase());
-
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioTwo_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder().build()
-            )
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioThird_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioFourth_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioFifth_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerioSix_whenCaseEventIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "my company");
-    }
-
-    @Test
-    void shoulldReturnPartyInformationScenerio2_whenCaseEventIsInvoked() {
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
-        String formattedDate = formatLocalDate(whenWillPay, DATE);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateNotificationAcknowledged().build();
-        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
-            )
-            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Mr. John Rambo").build())
-            .build();
-
-        assertThat(handler.addPropertiesSpec(caseData,
-                                             CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-            .containsEntry("legalOrgName", "Signer Name")
-            .containsEntry("claimReferenceNumber",  "000DC001")
-            .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", formattedDate.toUpperCase());;
-
     }
 }

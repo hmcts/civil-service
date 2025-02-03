@@ -1,37 +1,41 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingNoticeHmc;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -78,17 +82,19 @@ class HearingNoticeHmcGeneratorTest {
         .build();
 
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private HearingNoticeHmcGenerator generator;
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
     @MockBean
     private HearingFeesService hearingFeesService;
     @MockBean
     private AssignCategoryId assignCategoryId;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setupTest() {
@@ -102,11 +108,19 @@ class HearingNoticeHmcGeneratorTest {
         when(locationRefDataService
                  .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
                                                                                              .epimmsId(EPIMS)
-                                                                                             .venueName("VenueName")
+                                                                                             .externalShortName("VenueName")
+                                                                                             .siteName("CML-Site")
                                                                                              .courtAddress(
                                                                                                  "CourtAddress")
                                                                                              .postcode("Postcode")
                                                                                              .build()));
+
+        List<HearingIndividual> hearingIndividuals = List.of(
+                HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
+                HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
+                HearingIndividual.nonAttending("James", "Allen")
+        );
 
         HearingDay hearingDay = HearingDay.builder()
             .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
@@ -114,28 +128,34 @@ class HearingNoticeHmcGeneratorTest {
             .build();
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 02, 02, 0, 0, 0);
         baseHearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
-                    List.of(
-                        HearingDaySchedule.builder()
-                            .hearingVenueId(EPIMS)
-                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                            .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .build();
+                .partyDetails(hearingIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+                .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+                                List.of(
+                                        HearingDaySchedule.builder()
+                                                .attendees(hearingIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                                                .hearingVenueId(EPIMS)
+                                                .hearingStartDateTime(hearingDay.getHearingStartDateTime())
+                                                .hearingEndDateTime(hearingDay.getHearingEndDateTime())
+                                                .build()))
+                        .receivedDateTime(hearingResponseDate)
+                        .build())
+                .requestDetails(HearingRequestDetails.builder()
+                        .versionNumber(VERSION_NUMBER)
+                        .build())
+                .build();
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled) {
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
                     .hearingDetails(HearingDetails.builder()
                                         .hearingType("AAA7-TRI")
-                                        .build())
+                                        .build()
+                    )
             .build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -164,6 +184,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -172,19 +193,89 @@ class HearingNoticeHmcGeneratorTest {
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount(null)
             .hearingSiteName("VenueName")
+            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
             .hearingType("trial")
             .hearingDueDate(null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
             .build();
 
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
+
+        var hearing = baseHearing.toBuilder()
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType("AAA7-TRI")
+                                .build()
+            )
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingHelpFeesReferenceNumber("123")
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                          .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES)
+                                          .build())
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(Fee.builder()
+                            .calculatedAmountInPence(new BigDecimal(123))
+                            .build());
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+        var expected = HearingNoticeHmc.builder()
+            .title("trial")
+            .caseNumber(caseData.getCcdCaseReference())
+            .creationDate(LocalDate.now())
+            .claimant(caseData.getApplicant1().getPartyName())
+            .defendant(caseData.getRespondent1().getPartyName())
+            .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
+            .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+            .feeAmount(isCaseProgressionEnabled ? null : "£1")
+            .hearingSiteName("VenueName")
+            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
+            .hearingLocation("SiteName - CourtAddress - Postcode")
+            .hearingDays("01 January 2023 at 00:00 for 12 hours")
+            .totalHearingDuration("2 days")
+            .hearingType("trial")
+            .hearingDueDate(isCaseProgressionEnabled ? null : LocalDate.of(2023, 1, 1))
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
+            .build();
+
+        assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -218,6 +309,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -226,19 +318,25 @@ class HearingNoticeHmcGeneratorTest {
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount("£1")
             .hearingSiteName("VenueName")
+            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
             .hearingType("trial")
             .hearingDueDate(LocalDate.of(2023, 1, 1))
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
             .build();
 
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -272,6 +370,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title("disposal hearing")
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -282,23 +381,30 @@ class HearingNoticeHmcGeneratorTest {
             .defendant2Reference(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
             .feeAmount(null)
             .hearingSiteName("VenueName")
+            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
             .hearingType("hearing")
             .hearingDueDate(null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
-            .build();
+                .partiesAttendingInPerson("Chloe Landale")
+                .partiesAttendingByVideo("Michael Carver")
+                .partiesAttendingByTelephone("Jenny Harper")
+                .build();
 
         assertEquals(expected, actual);
     }
 
     @ParameterizedTest
     @CsvSource({
-        "AAA7-DIS",
-        "AAA7-DRH"
+        "AAA7-DIS, disposal hearing, true",
+        "AAA7-DIS, disposal hearing, false",
+        "AAA7-DRH, dispute resolution hearing, true",
+        "AAA7-DRH, dispute resolution hearing, false"
     })
-    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType) {
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle, boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -334,6 +440,7 @@ class HearingNoticeHmcGeneratorTest {
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
+            .title(expectedTitle)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
@@ -344,19 +451,88 @@ class HearingNoticeHmcGeneratorTest {
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount(null)
             .hearingSiteName("VenueName")
+            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
             .hearingLocation("SiteName - CourtAddress - Postcode")
             .hearingDays("01 January 2023 at 00:00 for 12 hours")
             .totalHearingDuration("2 days")
             .hearingType("hearing")
             .hearingDueDate(null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
             .build();
 
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldReturnListOfExpectedCaseDocuments() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
+
+        var hearing = baseHearing.toBuilder()
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType("AAA7-DRH")
+                                .build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoApplicants()
+            .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(PaymentStatus.SUCCESS)
+                                          .build())
+            .solicitorReferences(null)
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(Fee.builder()
+                            .calculatedAmountInPence(new BigDecimal(123))
+                            .build());
+
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+        var expected = HearingNoticeHmc.builder()
+                .title("dispute resolution hearing")
+            .caseNumber(caseData.getCcdCaseReference())
+            .creationDate(LocalDate.now())
+            .claimant(caseData.getApplicant1().getPartyName())
+            .claimant2(caseData.getApplicant2().getPartyName())
+            .defendant(caseData.getRespondent1().getPartyName())
+            .feeAmount(null)
+            .hearingSiteName("VenueName")
+            .caseManagementLocation("CML-Site - CourtAddress - Postcode")
+            .hearingLocation("SiteName - CourtAddress - Postcode")
+            .hearingDays("01 January 2023 at 00:00 for 12 hours")
+            .totalHearingDuration("2 days")
+            .hearingType("hearing")
+            .hearingDueDate(null)
+            .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
+            .partiesAttendingInPerson("Chloe Landale")
+            .partiesAttendingByVideo("Michael Carver")
+            .partiesAttendingByTelephone("Jenny Harper")
+            .build();
+
+        assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnListOfExpectedCaseDocuments(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -397,8 +573,10 @@ class HearingNoticeHmcGeneratorTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void shouldReturnListOfExpectedCaseDocumentsSpec() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnListOfExpectedCaseDocumentsSpec(boolean isCaseProgressionEnabled) {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -439,6 +617,7 @@ class HearingNoticeHmcGeneratorTest {
 
         assertEquals(expected, actual);
     }
+
 }
 
 

@@ -21,11 +21,10 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DefendantSignSettlementAgreementNotificationHandlerTest {
+class DefendantSignSettlementAgreementNotificationHandlerTest {
 
     private DefendantSignSettlementAgreementNotificationHandler handler;
 
@@ -49,7 +48,7 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
     }
 
     @Test
-    public void notifyApplicantForSignedSettlement() {
+    void notifyApplicantForSignedSettlement() {
 
         Mockito.when(notificationsProperties.getNotifyApplicantForSignedSettlementAgreement())
             .thenReturn(templateId);
@@ -66,15 +65,15 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-            eq("applicant1@gmail.com"),
-            eq(templateId),
-            eq(createExpectedTemplateProperties()),
-            eq("notify-signed-settlement-legacy ref")
+            "applicant1@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-signed-settlement-legacy ref"
         );
     }
 
     @Test
-    public void notifyDefendantForSignedSettlement() {
+    void notifyDefendantForSignedSettlement() {
 
         Mockito.when(notificationsProperties.getNotifyRespondentForSignedSettlementAgreement())
             .thenReturn(templateId);
@@ -91,15 +90,15 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-            eq("respondent@gmail.com"),
-            eq(templateId),
-            eq(createExpectedTemplateProperties()),
-            eq("notify-signed-settlement-legacy ref")
+            "respondent@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-signed-settlement-legacy ref"
         );
     }
 
     @Test
-    public void notifyApplicantForRejectedSignedSettlement() {
+    void notifyApplicantForRejectedSignedSettlement() {
 
         Mockito.when(notificationsProperties.getNotifyApplicantForNotAgreedSignSettlement())
             .thenReturn(templateId);
@@ -116,15 +115,15 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-            eq("applicant1@gmail.com"),
-            eq(templateId),
-            eq(createExpectedTemplateProperties()),
-            eq("notify-signed-settlement-legacy ref")
+            "applicant1@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-signed-settlement-legacy ref"
         );
     }
 
     @Test
-    public void notifyDefendantForRejectedSignedSettlement() {
+    void notifyDefendantForRejectedSignedSettlement() {
 
         Mockito.when(notificationsProperties.getNotifyRespondentForNotAgreedSignSettlement())
             .thenReturn(templateId);
@@ -141,15 +140,15 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-            eq("respondent@gmail.com"),
-            eq(templateId),
-            eq(createExpectedTemplateProperties()),
-            eq("notify-signed-settlement-legacy ref")
+            "respondent@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-signed-settlement-legacy ref"
         );
     }
 
     @Test
-    public void notifyApplicantForSignedSettlement_InBilingual() {
+    void notifyApplicantForSignedSettlement_InBilingual() {
         Mockito.when(notificationsProperties.getNotifyApplicantLipForSignedSettlementAgreementInBilingual())
                 .thenReturn(templateId);
         CaseData.CaseDataBuilder caseData = createCaseData();
@@ -166,15 +165,15 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-                eq("applicant1@gmail.com"),
-                eq(templateId),
-                eq(createExpectedTemplateProperties()),
-                eq("notify-signed-settlement-legacy ref")
+            "applicant1@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-signed-settlement-legacy ref"
         );
     }
 
     @Test
-    public void notifyApplicantForRejectedSignedSettlement_InBilingual() {
+    void notifyApplicantForRejectedSignedSettlement_InBilingual() {
         Mockito.when(notificationsProperties.getNotifyApplicantLipForNotAgreedSignSettlementInBilingual())
                 .thenReturn(templateId);
         CaseData.CaseDataBuilder caseData = createCaseData();
@@ -191,10 +190,10 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
         handler.handle(params);
 
         Mockito.verify(notificationService).sendMail(
-                eq("applicant1@gmail.com"),
-                eq(templateId),
-                eq(createExpectedTemplateProperties()),
-                eq("notify-signed-settlement-legacy ref")
+            "applicant1@gmail.com",
+            templateId,
+            createExpectedTemplateProperties(),
+            "notify-signed-settlement-legacy ref"
         );
     }
 

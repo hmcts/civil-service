@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.CascadeType;
@@ -79,4 +80,7 @@ public class DashboardNotificationsEntity implements Serializable {
 
     @Schema(name = "updated_on")
     private OffsetDateTime updatedOn;
+
+    @Schema(name = "deadline")
+    private LocalDateTime deadline;
 }

@@ -30,8 +30,15 @@ public class ApplicationClosedUpdateClaimCallbackHandler extends CallbackHandler
 
     private static final String APPLICATION_CLOSED_DESCRIPTION = "Application Closed";
 
+    public static final String TASK_ID = "UpdateClaimWithApplicationStatus";
+
     private final GenAppStateHelperService helper;
     private final ObjectMapper objectMapper;
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {

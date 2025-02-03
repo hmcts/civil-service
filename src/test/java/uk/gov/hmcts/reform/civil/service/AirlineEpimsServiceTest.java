@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest(classes = {AirlineEpimsService.class})
+@ExtendWith(MockitoExtension.class)
 class AirlineEpimsServiceTest {
 
-    @MockBean
+    @Mock
     private AirlineEpimsDataLoader airlineEpimsDataLoader;
 
     private AirlineEpimsService airlineEpimsService;
@@ -28,37 +30,48 @@ class AirlineEpimsServiceTest {
 
         given(airlineEpimsDataLoader.getAirlineEpimsIDList())
             .willReturn(airlineEpimsIDList);
+
+        airlineEpimsService = new AirlineEpimsService(airlineEpimsDataLoader);
+
     }
 
     @Test
     void getEpimsIdForAirline_shouldReturnCorrespondingEpimsIdForAirline() {
-        // Given
-        airlineEpimsService = new AirlineEpimsService(airlineEpimsDataLoader);
-
-        // When
         String result = airlineEpimsService.getEpimsIdForAirline("Gulf Air");
 
-        // Then
         assertThat(result).isEqualTo("36791");
     }
 
     @Test
     void getEpimsIdForAirline_givenInvalidAirline_shouldThrowException() {
-        // Given
-        airlineEpimsService = new AirlineEpimsService(airlineEpimsDataLoader);
-
-        // Then
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(() -> airlineEpimsService.getEpimsIdForAirline("INVALID_AIRLINE"));
     }
 
     @Test
     void getEpimsIdForAirline_givenNoLocationAirline_shouldThrowException() {
-        // Given
-        airlineEpimsService = new AirlineEpimsService(airlineEpimsDataLoader);
-
-        // Then
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(() -> airlineEpimsService.getEpimsIdForAirline("NoLocationAirline"));
+    }
+
+    @Test
+    void getEpimsIdForAirlineIgnoreCase_shouldReturnCorrespondingEpimsIdForAirline() {
+        String result = airlineEpimsService.getEpimsIdForAirlineIgnoreCase("gulf air");
+
+        assertThat(result).isEqualTo("36791");
+    }
+
+    @Test
+    void getEpimsIdForAirlineIgnoreCase_givenInvalidAirline_shouldThrowException() {
+        String result = airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void getEpimsIdForAirlineIgnoreCase_givenNoLocationAirline_shouldThrowException() {
+        String result = airlineEpimsService.getEpimsIdForAirlineIgnoreCase("NoLocationAirline");
+
+        assertThat(result).isNull();
     }
 }

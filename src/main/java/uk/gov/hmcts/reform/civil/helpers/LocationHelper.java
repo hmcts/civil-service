@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -28,6 +26,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Slf4j
 @Component
@@ -48,16 +47,15 @@ public class LocationHelper {
         this.ccmccEpimsId = ccmccEpimsId;
     }
 
-    /**
-     * If the defendant is individual or sole trader, their preferred court is the case's court.
-     * Otherwise, the case's court is the claimant's preferred court.
-     * In multiparty cases we consider the lead claimant and the lead defendant. Lead claimant is claimant 1,
-     * lead defendant is the defendant who responded first to the claim.
-     *
-     * @param caseData case data
-     * @return requested court to be used as case court
-     */
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
+        return getCaseManagementLocationDefault(caseData, false);
+    }
+
+    public Optional<RequestedCourt> getCaseManagementLocationWhenLegalAdvisorSdo(CaseData caseData, boolean legalAdvisorSdo) {
+        return getCaseManagementLocationDefault(caseData, legalAdvisorSdo);
+    }
+
+    private Optional<RequestedCourt> getCaseManagementLocationDefault(CaseData caseData, boolean isLegalAdvisorSdo) {
         List<RequestedCourt> prioritized = new ArrayList<>();
         boolean leadDefendantIs1 = leadDefendantIs1(caseData);
         Supplier<Party.Type> getDefendantType;
@@ -74,50 +72,48 @@ public class LocationHelper {
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
-        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
-            log.debug(
-                "Case {}, defendant is a person, so their court request has priority",
-                caseData.getLegacyCaseReference()
-            );
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+            if (!isLegalAdvisorSdo) {
+                log.debug("Case {}, specified claim under 1000, CML set to CCMCC", caseData.getLegacyCaseReference());
+                return Optional.of(RequestedCourt.builder().caseLocation(getCcmccCaseLocation()).build());
+            } else {
+                log.debug("Case {}, specified claim under 1000, Legal advisor,  CML set to preferred location", caseData.getLegacyCaseReference());
+                assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
+                return prioritized.stream().findFirst();
+            }
+        }
+
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) <= 0) {
+            assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
+            return prioritized.stream().findFirst();
+        }
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
+                log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+                prioritized.add(requestedCourt);
+            });
+            return prioritized.stream().findFirst();
+        }
+
+        return Optional.empty();
+    }
+
+    private void assignSpecPreferredCourt(CaseData caseData, Supplier<Party.Type> getDefendantType,
+                                      Supplier<Optional<RequestedCourt>> getDefendantCourt, List<RequestedCourt> prioritized) {
+        if (PEOPLE.contains(getDefendantType.get())) {
             getDefendantCourt.get()
                 .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
                     log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
                 });
-            getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
-                log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
-                prioritized.add(requestedCourt);
-            });
-
-            Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
-            if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
-                return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
-                        .caseLocation(getCcmccCaseLocation()).build())
-                                       .orElseGet(() -> RequestedCourt.builder()
-                                           .caseLocation(getCcmccCaseLocation())
-                                           .build()));
-            } else {
-                return byParties;
-            }
-        } else {
-            log.debug(
-                "Case {}, defendant is a group, so claimant's court request has priority",
-                caseData.getLegacyCaseReference()
-            );
-            getClaimantRequestedCourt(caseData)
-                .filter(this::hasInfo)
-                .ifPresent(requestedCourt -> {
-                    log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
-                    prioritized.add(requestedCourt);
-                });
-            getDefendantCourt.get().ifPresent(requestedCourt -> {
-                log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
-                prioritized.add(requestedCourt);
-            });
-            return prioritized.stream().findFirst();
         }
+        getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
+            log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+            prioritized.add(requestedCourt);
+        });
     }
 
     private boolean hasInfo(RequestedCourt requestedCourt) {
@@ -183,7 +179,6 @@ public class LocationHelper {
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
         return Optional.ofNullable(caseData.getCourtLocation())
             .map(courtLocation -> RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YesOrNo.YES)
                 .responseCourtCode(courtLocation.getApplicantPreferredCourt())
                 .caseLocation(courtLocation.getCaseLocation())
                 .build());
@@ -258,10 +253,10 @@ public class LocationHelper {
                                                                   RequestedCourt requestedCourt,
                                                                   Supplier<List<LocationRefData>> getLocations) {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
-        if (log.isDebugEnabled()) {
-            String reference = updatedData.build().getLegacyCaseReference();
-            log.debug("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
-            log.debug(
+        Long reference = updatedData.build().getCcdCaseReference();
+        if (log.isInfoEnabled()) {
+            log.info("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
+            log.info(
                 "Case {}, there {} a location matching to requested court",
                 reference,
                 matchingLocation.isPresent() ? "is" : "is not"

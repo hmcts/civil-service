@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
@@ -27,13 +28,14 @@ import java.util.UUID;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentsService {
 
     private static final String PAYMENT_ACTION = "Case Submit";
+    protected static final String CLAIM_ISSUE_PAYMENT = "Claim issue payment";
     private final PaymentsClient paymentsClient;
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
@@ -49,7 +51,7 @@ public class PaymentsService {
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
     }
 
-    private CreditAccountPaymentRequest buildRequest(CaseData caseData) {
+    public CreditAccountPaymentRequest buildRequest(CaseData caseData) {
         FeeDto claimFee = caseData.getClaimFee().toFeeDto();
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
@@ -59,35 +61,26 @@ public class PaymentsService {
         String customerReference = ofNullable(caseData.getClaimIssuedPaymentDetails())
             .map(PaymentDetails::getCustomerReference)
             .orElse(caseData.getPaymentReference());
-        CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
-                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
-                .amount(claimFee.getCalculatedAmount())
-                .caseReference(caseData.getLegacyCaseReference())
-                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-                .customerReference(customerReference)
-                .description("Claim issue payment")
-                .organisationName(organisationName)
-                .service(paymentsConfiguration.getService())
-                .siteId(paymentsConfiguration.getSiteId())
-                .fees(new FeeDto[]{claimFee})
-                .build();
-        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
-                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
-                .amount(claimFee.getCalculatedAmount())
-                .caseReference(caseData.getLegacyCaseReference())
-                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-                .customerReference(customerReference)
-                .description("Claim issue payment")
-                .organisationName(organisationName)
-                .service(paymentsConfiguration.getSpecService())
-                .siteId(paymentsConfiguration.getSpecSiteId())
-                .fees(new FeeDto[]{claimFee})
-                .build();
-        }
+        return getCreditAccountPaymentRequest(caseData, claimFee, customerReference, organisationName);
+    }
+
+    private CreditAccountPaymentRequest getCreditAccountPaymentRequest(CaseData caseData, FeeDto claimFee, String customerReference,
+                                                                       String organisationName) {
+        CreditAccountPaymentRequest creditAccountPaymentRequest;
+        creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
+            .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
+            .amount(claimFee.getCalculatedAmount())
+            .caseReference(caseData.getLegacyCaseReference())
+            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+            .customerReference(customerReference)
+            .description(CLAIM_ISSUE_PAYMENT)
+            .organisationName(organisationName)
+            .service(
+                SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ? paymentsConfiguration.getSpecService() : paymentsConfiguration.getService())
+            .siteId(SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId())
+            .fees(new FeeDto[] {claimFee})
+            .build();
         return creditAccountPaymentRequest;
     }
 
@@ -128,7 +121,7 @@ public class PaymentsService {
         if (serviceRequestPBADetails != null) {
             pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
                 .accountNumber(serviceRequestPBADetails.getApplicantsPbaAccounts()
-                                   .getValue().getLabel())
+                    .getValue().getLabel())
                 .amount(srFee.getCalculatedAmount())
                 .customerReference("bulk claim issuer")
                 .organisationName(organisationName)
@@ -158,7 +151,9 @@ public class PaymentsService {
     }
 
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
-        return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
+        CreateServiceRequestDTO paymentRequest = buildServiceRequest(caseData);
+        log.info("Calling payment service request for case {} and callbackUrl {} ", caseData.getCcdCaseReference(), paymentRequest.getCallBackUrl());
+        return paymentsClient.createServiceRequest(authToken, paymentRequest);
     }
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
@@ -169,7 +164,6 @@ public class PaymentsService {
         } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             siteId = paymentsConfiguration.getSpecSiteId();
         }
-
         String callbackURLUsed = null;
         FeeDto feeResponse = null;
 
@@ -185,6 +179,7 @@ public class PaymentsService {
                     hearingFeesService, caseData, caseData.getAssignedTrack()).toFeeDto();
             }
         }
+        log.info("Payment callbackURLUsed: {}, siteId{} and  for caseId {} ", callbackURLUsed, siteId, caseData.getCcdCaseReference());
 
         if (callbackURLUsed != null) {
             return CreateServiceRequestDTO.builder()
@@ -192,14 +187,14 @@ public class PaymentsService {
                 .ccdCaseNumber(caseData.getCcdCaseReference().toString())
                 .hmctsOrgId(siteId)
                 .callBackUrl(callbackURLUsed)
-                .fees(new FeeDto[]{(FeeDto.builder()
+                .fees(new FeeDto[] {(FeeDto.builder()
                     .calculatedAmount(feeResponse.getCalculatedAmount())
                     .code(feeResponse.getCode())
                     .version(feeResponse.getVersion())
                     .volume(1).build())})
                 .casePaymentRequest(CasePaymentRequestDto.builder()
-                                        .action(PAYMENT_ACTION)
-                                        .responsibleParty(caseData.getApplicant1().getPartyName()).build())
+                    .action(PAYMENT_ACTION)
+                    .responsibleParty(caseData.getApplicant1().getPartyName()).build())
                 .build();
 
         } else {

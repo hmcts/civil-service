@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -36,8 +35,6 @@ import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class PartyUtils {
 
@@ -74,8 +71,7 @@ public class PartyUtils {
                 return ofNullable(party.getIndividualDateOfBirth());
             case SOLE_TRADER:
                 return ofNullable(party.getSoleTraderDateOfBirth());
-            case COMPANY:
-            case ORGANISATION:
+            case COMPANY, ORGANISATION:
             default:
                 return Optional.empty();
         }
@@ -179,9 +175,7 @@ public class PartyUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
-            .ifPresent(ref -> {
-                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
-            });
+            .ifPresent(ref -> stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference()));
 
         return stringBuilder.toString();
     }
@@ -192,16 +186,12 @@ public class PartyUtils {
 
         if (!isRespondentSolicitorNumber2) {
             Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
-                .ifPresent(ref -> {
-                    stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
-                });
+                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference()));
         }
 
         if (isRespondentSolicitorNumber2) {
             Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
-                .ifPresent(ref -> {
-                    stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference());
-                });
+                .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference()));
         }
         return stringBuilder.toString();
     }
@@ -298,6 +288,8 @@ public class PartyUtils {
         return responseIntentions.toString();
     }
 
+    static final String DEFENDANT_STRING = "\nDefendant : ";
+
     public static String fetchDefendantName(CaseData caseData) {
         StringBuilder defendantNames = new StringBuilder();
         switch (getMultiPartyScenario(caseData)) {
@@ -305,23 +297,23 @@ public class PartyUtils {
                 if ((caseData.getRespondent1TimeExtensionDate() == null)
                     && (caseData.getRespondent2TimeExtensionDate() != null)) {
                     //case where respondent 2 extends first
-                    defendantNames.append("\nDefendant : ")
+                    defendantNames.append(DEFENDANT_STRING)
                         .append(caseData.getRespondent2().getPartyName());
                 } else if ((caseData.getRespondent1TimeExtensionDate() != null)
                     && (caseData.getRespondent2TimeExtensionDate() != null)) {
                     if (caseData.getRespondent2TimeExtensionDate()
                         .isAfter(caseData.getRespondent1TimeExtensionDate())) {
                         //case where respondent 2 extends 2nd
-                        defendantNames.append("\nDefendant : ")
+                        defendantNames.append(DEFENDANT_STRING)
                             .append(caseData.getRespondent2().getPartyName());
                     } else {
                         //case where respondent 1 extends 2nd
-                        defendantNames.append("\nDefendant : ")
+                        defendantNames.append(DEFENDANT_STRING)
                             .append(caseData.getRespondent1().getPartyName());
                     }
                 } else {
                     //case where respondent 1 extends first
-                    defendantNames.append("\nDefendant : ")
+                    defendantNames.append(DEFENDANT_STRING)
                         .append(caseData.getRespondent1().getPartyName());
                 }
                 break;
@@ -333,7 +325,7 @@ public class PartyUtils {
                     .append(caseData.getRespondent2().getPartyName());
                 break;
             default:
-                defendantNames.append("\nDefendant : ")
+                defendantNames.append(DEFENDANT_STRING)
                     .append(caseData.getRespondent1().getPartyName());
                 break;
         }
@@ -374,7 +366,7 @@ public class PartyUtils {
         return partyFlagStructures != null ? partyFlagStructures.stream().map(
             party -> Element.<PartyFlagStructure>builder()
                 .id(party.getId()).value(appendWithNewPartyId(party.getValue())).build()
-        ).collect(Collectors.toList()) : null;
+        ).toList() : null;
     }
 
     public static ExpertDetails appendWithNewPartyIds(ExpertDetails expert) {
@@ -391,9 +383,11 @@ public class PartyUtils {
         }
 
         return experts.toBuilder().details(
-            wrapElements(unwrapElements(
-                experts.getDetails()).stream().map(
-                    expert ->  appendWithNewPartyIds(expert)).collect(Collectors.toList()))).build();
+            experts.getDetails().stream()
+                .map(listElement -> Element.<Expert>builder()
+                    .id(listElement.getId())
+                    .value(appendWithNewPartyIds(listElement.getValue()))
+                    .build()).toList()).build();
     }
 
     public static Witness appendWithNewPartyIds(Witness witness) {
@@ -406,9 +400,11 @@ public class PartyUtils {
         }
 
         return witnesses.toBuilder().details(
-            wrapElements(unwrapElements(
-                witnesses.getDetails()).stream().map(
-                    witness ->  appendWithNewPartyIds(witness)).collect(Collectors.toList()))).build();
+            witnesses.getDetails().stream()
+                .map(listElement -> Element.<Witness>builder()
+                    .id(listElement.getId())
+                    .value(appendWithNewPartyIds(listElement.getValue()))
+                    .build()).toList()).build();
     }
 
     public static Applicant1DQ appendWithNewPartyIds(Applicant1DQ applicant1DQ) {
@@ -464,6 +460,18 @@ public class PartyUtils {
             .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
             .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
             .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void populateWitnessAndExpertsPartyIds(CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        builder
+            .applicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()))
+            .respondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()))
+            .respondent2Experts(appendWithNewPartyIds(caseData.getRespondent2Experts()))
+            .applicantWitnesses(appendWithNewPartyIds(caseData.getApplicantWitnesses()))
+            .respondent1Witnesses(appendWithNewPartyIds(caseData.getRespondent1Witnesses()))
+            .respondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
     }
 
     @SuppressWarnings("unchecked")

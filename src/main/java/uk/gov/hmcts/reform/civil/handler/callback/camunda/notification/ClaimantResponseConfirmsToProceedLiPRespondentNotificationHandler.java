@@ -53,7 +53,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             notificationService.sendMail(
                 shouldSendEmailToDefendantLR ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
                 shouldSendEmailToDefendantLR ? notificationsProperties.getNotifyDefendantLRForMediation()
-                    : notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
+                    : getRespondent1LipEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -63,8 +63,13 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private boolean shouldSendNotification(CaseData caseData, String eventId) {
         return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
-            && (!caseData.isBilingual()
+            && (!caseData.isClaimantBilingual()
             || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId));
+    }
+
+    private String getRespondent1LipEmailTemplate(CaseData caseData) {
+        return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
+            : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
     }
 
     @Override
@@ -84,10 +89,15 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (shouldSendMediationNotificationDefendant1LRCarm(caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
+        if (shouldSendMediationNotificationDefendant1LRCarm(
+            caseData,
+            featureToggleService.isCarmEnabledForCase(caseData)
+        )) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+                CLAIM_REFERENCE_NUMBER,
+                caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
             );
         }
         return Map.of(

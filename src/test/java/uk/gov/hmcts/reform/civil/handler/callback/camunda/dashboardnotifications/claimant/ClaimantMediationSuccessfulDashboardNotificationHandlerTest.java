@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -66,10 +67,10 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
     }
 
     @Test
-    public void createDashboardNotificationsWhenCarmIsEnabled() {
+    void createDashboardNotificationsWhenCarmIsEnabled() {
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         params.put("ccdCaseReference", "123");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
@@ -79,6 +80,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(dateTime)
             .build();
 
@@ -96,13 +98,14 @@ public class ClaimantMediationSuccessfulDashboardNotificationHandlerTest extends
     }
 
     @Test
-    public void createDashboardNotificationsWhenCarmIsDisabled() {
+    void createDashboardNotificationsWhenCarmIsDisabled() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
             .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()

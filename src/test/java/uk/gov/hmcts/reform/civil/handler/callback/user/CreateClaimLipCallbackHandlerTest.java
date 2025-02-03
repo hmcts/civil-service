@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -14,24 +16,33 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,10 +59,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class,
-    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
     InterestCalculator.class,
-    StateFlowEngine.class,
-    },
+    LocationReferenceDataService.class
+},
     properties = {"reference.database.enabled=false"})
 class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -76,8 +89,14 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private HelpWithFeesForTabService hwfForTabService;
 
+    @MockBean
+    CoreCaseEventDataService coreCaseEventDataService;
+
     @Autowired
     private CreateClaimLipCallBackHandler handler;
+
+    @MockBean
+    private LocationReferenceDataService locationReferenceDataService;
 
     public static final String REFERENCE_NUMBER = "000MC001";
 
@@ -117,27 +136,25 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
             given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
             given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
-            when(toggleService.isHmcEnabled()).thenReturn(false);
         }
 
         @Test
         void shouldInitializePartyID_whenInvoked() {
-            when(toggleService.isHmcEnabled()).thenReturn(true);
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName(DEFENDANT_PARTY_NAME)
-                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                    .type(Party.Type.INDIVIDUAL)
+                    .partyName(DEFENDANT_PARTY_NAME)
+                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder()
-                                 .type(Party.Type.ORGANISATION)
-                                 .partyName("Test Inc")
-                                 .partyEmail("claimant@email.com").build())
+                    .type(Party.Type.ORGANISATION)
+                    .partyName("Test Inc")
+                    .partyEmail("claimant@email.com").build())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getRespondent1().getPartyID()).isNotNull();
@@ -148,15 +165,15 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName(DEFENDANT_PARTY_NAME)
-                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                    .type(Party.Type.INDIVIDUAL)
+                    .partyName(DEFENDANT_PARTY_NAME)
+                    .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
@@ -169,10 +186,10 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetOrganisationPolicies_whenInvoked() {
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("respondent1OrganisationPolicy.OrgPolicyCaseAssignedRole")
@@ -184,10 +201,13 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetCaseManagementLocation() {
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219").siteName("Civil National Business Centre").build());
+            when(locationReferenceDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
             assertThat(response.getData())
                 .extracting("caseManagementLocation.region")
@@ -195,6 +215,34 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("caseManagementLocation.baseLocation")
                 .isEqualTo("420219");
+            assertThat(response.getData())
+                .extracting("locationName")
+                .isEqualTo("Civil National Business Centre");
+        }
+
+        @Test
+        void shouldSetFlightDelayType() {
+            caseData.setIsFlightDelayClaim(YesOrNo.YES);
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData())
+                .extracting("claimType")
+                .isEqualTo(ClaimType.FLIGHT_DELAY.name());
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldSetAnyRepresented(boolean caseEventsEnabled) {
+            when(toggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData().get("anyRepresented")).isEqualTo(caseEventsEnabled ? "No" : null);
         }
     }
 }

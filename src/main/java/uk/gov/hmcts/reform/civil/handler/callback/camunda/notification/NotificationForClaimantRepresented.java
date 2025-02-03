@@ -72,7 +72,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
         String recipientEmail = getRecipientEmail(caseEvent, caseData);
         boolean isRespondentNotification = isRespondentNotification(caseEvent);
         boolean isApplicantSolicitorNotify = isApplicantSolicitorNotification(caseEvent);
-        String templateId = getTemplateID(isRespondentNotification, isApplicantSolicitorNotify, caseData.isBilingual());
+        String templateId = getTemplateID(isRespondentNotification, isApplicantSolicitorNotify, caseData.isClaimantBilingual());
         if (isNotEmpty(recipientEmail) && templateId != null) {
             notificationService.sendMail(
                 recipientEmail,

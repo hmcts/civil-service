@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
@@ -36,9 +35,7 @@ public class LocationRefSampleDataBuilder {
     protected static final String STRING_CONSTANT = "this is a string";
     protected static final String CASE_MANAGEMENT_CATEGORY = "Civil";
     protected static final String STRING_NUM_CONSTANT = "123456789";
-    protected static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     protected static final LocalDate APP_DATE_EPOCH = EPOCH;
-    protected static final DynamicList PBALIST = DynamicList.builder().build();
 
     protected CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
@@ -290,7 +287,7 @@ public class LocationRefSampleDataBuilder {
     protected List<String> locationsFromDynamicList(DynamicList dynamicList) {
         return dynamicList.getListItems().stream()
             .map(DynamicListElement::getLabel)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     protected List<LocationRefData> getSampleCourLocationsRefObject() {

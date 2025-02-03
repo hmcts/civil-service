@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -23,7 +22,7 @@ public class JudicialReferralUtils {
      *                 vs all the defendants
      * @return true if and only if the case should move to judicial referral
      */
-    public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
+    public static boolean shouldMoveToJudicialReferral(CaseData caseData, boolean mintiApplicableCase) {
         CaseCategory caseCategory = caseData.getCaseAccessCategory();
 
         if (CaseCategory.SPEC_CLAIM.equals(caseCategory)) {
@@ -34,15 +33,8 @@ public class JudicialReferralUtils {
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
             };
         } else {
-            AllocatedTrack allocatedTrack =
-                getAllocatedTrack(
-                    CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
-                        ? caseData.getClaimValue().toPounds()
-                        : caseData.getTotalClaimAmount(),
-                    caseData.getClaimType(),
-                    caseData.getPersonalInjuryType()
-                );
-            if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+            AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+            if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack) && !mintiApplicableCase) {
                 return false;
             }
             MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);

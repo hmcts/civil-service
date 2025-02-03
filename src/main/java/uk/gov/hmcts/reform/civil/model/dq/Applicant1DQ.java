@@ -18,8 +18,11 @@ public class Applicant1DQ implements DQ {
 
     private FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
     private FixedRecoverableCosts applicant1DQFixedRecoverableCosts;
+    private FixedRecoverableCosts applicant1DQFixedRecoverableCostsIntermediate;
     private DisclosureOfElectronicDocuments applicant1DQDisclosureOfElectronicDocuments;
+    private DisclosureOfElectronicDocuments specApplicant1DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
+    private DisclosureOfNonElectronicDocuments specApplicant1DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport applicant1DQDisclosureReport;
     private Experts applicant1DQExperts;
     private ExpertDetails applicant1RespondToClaimExperts;
@@ -37,6 +40,7 @@ public class Applicant1DQ implements DQ {
     private VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
     private FutureApplications applicant1DQFutureApplications;
     private WelshLanguageRequirements applicant1DQLanguageLRspec;
+    private DocumentsToBeConsidered applicant1DQDefendantDocumentsToBeConsidered;
 
     private RemoteHearing remoteHearing;
 
@@ -58,15 +62,33 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("applicant1DQFixedRecoverableCostsIntermediate")
+    public FixedRecoverableCosts getFixedRecoverableCostsIntermediate() {
+        return applicant1DQFixedRecoverableCostsIntermediate;
+    }
+
+    @Override
     @JsonProperty("applicant1DQDisclosureOfElectronicDocuments")
     public DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments() {
         return applicant1DQDisclosureOfElectronicDocuments;
     }
 
     @Override
+    @JsonProperty("specApplicant1DQDisclosureOfElectronicDocuments")
+    public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
+        return specApplicant1DQDisclosureOfElectronicDocuments;
+    }
+
+    @Override
     @JsonProperty("applicant1DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return applicant1DQDisclosureOfNonElectronicDocuments;
+    }
+
+    @Override
+    @JsonProperty("specApplicant1DQDisclosureOfNonElectronicDocuments")
+    public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
+        return specApplicant1DQDisclosureOfNonElectronicDocuments;
     }
 
     @Override
@@ -178,5 +200,11 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQLanguageLRspec")
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return applicant1DQLanguageLRspec;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQDefendantDocumentsToBeConsidered")
+    public DocumentsToBeConsidered getDocumentsToBeConsidered() {
+        return applicant1DQDefendantDocumentsToBeConsidered;
     }
 }

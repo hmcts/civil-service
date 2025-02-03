@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantMediationSuccessfulDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -33,6 +34,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
             .build();
         final List<TaskList> taskListExpected = MockTaskList.getMediationTaskListMock(CLAIMANT, caseId);
 
@@ -52,13 +54,13 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
                             + "<p class=\"govuk-body\">This case is now settled and no further action is needed.</p> "
                             + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
                             + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>"),
-                jsonPath("$[0].titleCy").value("Mediation appointment successful"),
+                jsonPath("$[0].titleCy").value("Roedd eich apwyntiad cyfryngu yn llwyddiannus"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">Both parties attended mediation and an agreement was reached.</p> "
-                            + "<p class=\"govuk-body\">This case is now settled and no further action is needed.</p> "
-                            + "<p class=\"govuk-body\">You can view your mediation agreement <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
-                            + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">here</a>.</p>")
+                        "<p class=\"govuk-body\">Bu i’r ddau barti fynychu cyfryngu a daethpwyd i gytundeb.</p> "
+                            + "<p class=\"govuk-body\">Mae’r achos hwn bellach wedi setlo ac nid oes angen unrhyw gamau pellach.</p> "
+                            + "<p class=\"govuk-body\">Gallwch weld eich cytundeb cyfryngu <a href=\"{MEDIATION_SUCCESSFUL_URL}\" "
+                            + "rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">yma</a>.</p>")
             );
 
         //Verify dashboard information
@@ -77,6 +79,7 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
             .legacyCaseReference("reference")
+            .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
 
@@ -92,11 +95,14 @@ public class ClaimantMediationSuccessfulDashboardNotificationScenarioTest extend
                 jsonPath("$[0].titleEn").value("You settled the claim through mediation"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement</a></p>"),
-                jsonPath("$[0].titleCy").value("You settled the claim through mediation"),
+                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement (opens in a new tab)</a></p>"),
+                jsonPath("$[0].titleCy").value("Rydych wedi setlo’r hawliad drwy gyfryngu"),
                 jsonPath("$[0].descriptionCy")
                     .value(
-                        "<p class=\"govuk-body\">You made an agreement which means the claim is now ended and sets out the terms of how Mr. Sole Trader must repay you.</p><p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Download the agreement</a></p>")
+                        "<p class=\"govuk-body\">Mi wnaethoch gytundeb sy’n golygu bod yr hawliad nawr ar ben. " +
+                            "Mae’r cytundeb yn nodi’r telerau ar gyfer sut mae'n rhaid i Mr. Sole Trader eich ad-dalu.</p>" +
+                            "<p class=\"govuk-body\"><a href=\"{MEDIATION_SUCCESSFUL_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\" target=\"_blank\">Lawrlwytho’r cytundeb (yn agor mewn tab newydd)</a></p>"
+                    )
             );
     }
 }

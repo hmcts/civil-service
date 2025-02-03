@@ -9,12 +9,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.lang.Boolean.TRUE;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
 
 @Component
@@ -30,14 +29,15 @@ public class JwtGrantedAuthoritiesConverter implements Converter<Jwt, Collection
         this.userService = userService;
     }
 
-    @Override
     public Collection<GrantedAuthority> convert(Jwt jwt) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        if (TRUE.equals(jwt.containsClaim(TOKEN_NAME)) && jwt.getClaim(TOKEN_NAME).equals(ACCESS_TOKEN)) {
+        String tokenNameClaim = jwt.getClaimAsString(TOKEN_NAME);
+
+        if (ACCESS_TOKEN.equals(tokenNameClaim)) {
             UserInfo userInfo = userService.getUserInfo(BEARER + jwt.getTokenValue());
-            authorities = extractAuthorityFromClaims(userInfo.getRoles());
+            return extractAuthorityFromClaims(userInfo.getRoles());
         }
-        return authorities;
+
+        return Collections.emptyList();
     }
 
     private List<GrantedAuthority> extractAuthorityFromClaims(List<String> roles) {

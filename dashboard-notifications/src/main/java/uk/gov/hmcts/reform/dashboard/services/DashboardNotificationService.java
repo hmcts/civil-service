@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,10 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -53,11 +55,24 @@ public class DashboardNotificationService {
             .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
 
         return dashboardNotificationsEntityList.stream()
+            .sorted(Comparator.comparing(t -> t.getCreatedAt(), Comparator.reverseOrder()))
             .map(Notification::from)
-            .collect(Collectors.toList());
+            .toList();
+    }
+
+    public Map<String, List<Notification>> getAllCasesNotifications(List<String> ccdCaseIdentifiers, String roleType) {
+        Map<String, List<Notification>> gaNotifications = new HashMap<>();
+        ccdCaseIdentifiers.stream().forEach(gaCaseId -> gaNotifications.put(gaCaseId, getNotifications(gaCaseId, roleType)));
+        return gaNotifications;
     }
 
     public DashboardNotificationsEntity saveOrUpdate(DashboardNotificationsEntity notification) {
+        log.info(
+            "saveOrUpdate dashboard notification reference= {}, citizenRole = {}, templateId = {}",
+            notification.getReference(),
+            notification.getCitizenRole(),
+            notification.getDashboardNotificationsTemplates() != null ? notification.getDashboardNotificationsTemplates().getId() : null
+        );
         Optional<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
             .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
                 notification.getReference(), notification.getCitizenRole(),
@@ -103,5 +118,10 @@ public class DashboardNotificationService {
 
     public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {
         return dashboardNotificationsRepository.deleteByNameAndReferenceAndCitizenRole(name, reference, citizenRole);
+    }
+
+    public void deleteByReferenceAndCitizenRole(String reference, String citizenRole) {
+        int deleted = dashboardNotificationsRepository.deleteByReferenceAndCitizenRole(reference, citizenRole);
+        log.info("{} notifications removed for claim = {}", deleted, reference);
     }
 }

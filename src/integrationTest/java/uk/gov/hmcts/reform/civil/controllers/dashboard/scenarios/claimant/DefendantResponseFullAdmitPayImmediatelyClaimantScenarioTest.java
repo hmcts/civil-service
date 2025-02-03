@@ -34,6 +34,7 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
+            .responseClaimTrack("SMALL_CLAIM")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
@@ -57,10 +58,17 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">James John has offered to pay £1000 by " +
+                    "<p class=\"govuk-body\">James John has offered to pay £1001 by " +
                         DateUtils.formatDate(admitPaymentDeadline) + ".</p>" +
                         "<p class=\"govuk-body\">The payment must be received in your account by then, if not you can request a county court judgment.</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>"
+                        "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us you've settled the claim</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Mae James John wedi cynnig talu £1001 erbyn " +
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline) + ".</p>" +
+                        "<p class=\"govuk-body\">Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais am ddyfarniad llys sirol.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us you've settled the claim</a></p>"
                 )
             );
 
@@ -71,6 +79,8 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
                     "<a href={VIEW_RESPONSE_TO_CLAIM} rel=\"noopener noreferrer\" class=\"govuk-link\">View the response to the claim</a>"),
+                jsonPath("$[0].taskNameCy").value(
+                    "<a href={VIEW_RESPONSE_TO_CLAIM} rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld yr ymateb i'r hawliad</a>"),
                 jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
             );
     }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.businessprocess;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.DISPATCHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DispatchBusinessProcessCallbackHandler extends CallbackHandler {
 
@@ -62,6 +64,8 @@ public class DispatchBusinessProcessCallbackHandler extends CallbackHandler {
         BusinessProcess businessProcess = caseData.getBusinessProcess();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (businessProcess.getStatus() == READY) {
+            log.info("Setting BusinessProcess.status to DISPATCHED to avoid another " +
+                         "Poller execution pickup and Camunda execution");
             caseDataBuilder
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent(businessProcess.getCamundaEvent())

@@ -12,14 +12,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.EditJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,24 +38,40 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EDIT_JUDGMENT);
     protected final ObjectMapper objectMapper;
+    private final EditJudgmentOnlineMapper editJudgmentOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setRTLFieldShowCondition)
+            .put(callbackKey(ABOUT_TO_START), this::populateFromActiveJudgment)
             .put(callbackKey(MID, "validateDates"), this::validateDates)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveJudgmentDetails)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
-    private CallbackResponse setRTLFieldShowCondition(CallbackParams callbackParams) {
+    private CallbackResponse populateFromActiveJudgment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.NO) {
-            caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
-        } else {
+        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (JudgmentType.DEFAULT_JUDGMENT.equals(caseData.getActiveJudgment().getType())
+            || JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())) {
+            // populate data from Default Judgment Or JBA
+            caseData.setJoOrderMadeDate(activeJudgment.getIssueDate());
+            caseData.setJoPaymentPlan(activeJudgment.getPaymentPlan());
+            caseData.setJoInstalmentDetails(activeJudgment.getInstalmentDetails());
+            caseData.setJoJudgmentRecordReason(null);
+            caseData.setJoAmountOrdered(activeJudgment.getOrderedAmount());
+            caseData.setJoAmountCostOrdered(activeJudgment.getCosts());
+            caseData.setJoIssuedDate(activeJudgment.getIssueDate());
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
+        } else {
+            if (activeJudgment.getIsRegisterWithRTL() == YesOrNo.NO) {
+                caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
+            } else {
+                caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
+            }
         }
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -80,19 +97,19 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        JudgmentStatusDetails judgmentStatusDetails = caseData.getJoJudgmentStatusDetails();
-        judgmentStatusDetails.setJudgmentStatusTypes(JudgmentStatusType.MODIFIED);
-        judgmentStatusDetails.setLastUpdatedDate(LocalDateTime.now());
-        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            if (caseData.getJoShowRegisteredWithRTLOption() == YesOrNo.NO) {
-                judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.MODIFIED));
-            } else {
-                judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
-            }
-            caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
-        }
-        caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
+
+        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
+            caseDataBuilder.joIssuedDate(caseData.getJoOrderMadeDate());
+        }
+        if (caseData.getActiveJudgment() != null) {
+            JudgmentDetails activeJudgment = editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseDataBuilder.activeJudgment(activeJudgment);
+            caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+        } else {
+            errors.add("There is no active judgment to edit");
+        }
 
         if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS) {
             caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_JUDGMENT_VARIED_DETERMINATION_OF_MEANS));
@@ -100,6 +117,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 

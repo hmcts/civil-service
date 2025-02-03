@@ -3,20 +3,18 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -39,21 +37,22 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.TRIAL_READY_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateTrialReadyFormHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    @Mock
+    private ObjectMapper mapper;
+    @InjectMocks
     private GenerateTrialReadyFormHandler handler;
-    @MockBean
+    @Mock
     private TrialReadyFormGenerator trialReadyFormGenerator;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateTrialReadyFormHandler(trialReadyFormGenerator, mapper);
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @Test
     void shouldGenerateForm_when1v1() {

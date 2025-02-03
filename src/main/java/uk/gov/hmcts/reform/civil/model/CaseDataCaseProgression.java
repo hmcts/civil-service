@@ -6,7 +6,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.ConfirmListingTickBox;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
@@ -32,12 +35,16 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTab;
+import uk.gov.hmcts.reform.civil.model.dmnacourttasklocation.TaskManagementLocationTypes;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDate;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
@@ -138,6 +145,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final HearingNotes hearingNotes;
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+    private final List<Element<UploadEvidenceDocumentType>> bundleEvidence;
 
     /* Final Orders */
     private YesOrNo finalOrderMadeSelection;
@@ -163,6 +171,16 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice;
     private YesOrNo finalOrderGiveReasonsYesNo;
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
+    private YesOrNo finalOrderAllocateToTrack;
+    private YesOrNo allowOrderTrackAllocation;
+    private AllocatedTrack finalOrderTrackAllocation;
+    private FinalOrdersComplexityBand finalOrderIntermediateTrackComplexityBand;
+    private DynamicList finalOrderDownloadTemplateOptions;
+    private CaseDocument finalOrderDownloadTemplateDocument;
+    private Document uploadOrderDocumentFromTemplate;
+    private String finalOrderTrackToggle;
+    private OrderAfterHearingDate orderAfterHearingDate;
+    private YesOrNo showOrderAfterHearingDatePage;
 
     // judge final freeform orders
     private final FinalOrderSelection finalOrderSelection;
@@ -178,7 +196,9 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
 
     // Court officer order
     private FinalOrderFurtherHearing courtOfficerFurtherHearingComplex;
+    private String courtOfficerOrdered;
     private YesOrNo courtOfficerGiveReasonsYesNo;
+    private CaseDocument previewCourtOfficerOrder;
 
     //Hearing Scheduled
     private DynamicList hearingLocation;
@@ -210,6 +230,23 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private HearingOtherComments respondent2HearingOtherComments;
     @Builder.Default
     private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
+
+    // // MINTI case prog
+    private DynamicList requestHearingNoticeDynamic;
+    private YesOrNo requestAnotherHearing;
+    private final List<ConfirmListingTickBox> confirmListingTickBox;
+    private TaskManagementLocationTypes taskManagementLocations;
+    private TaskManagementLocationTab taskManagementLocationsTab;
+    private TaskManagementLocationTab caseManagementLocationTab;
+
+    /**
+     * Claimant has requested a reconsideration of the SDO.
+     */
+    private YesOrNo orderRequestedForReviewClaimant;
+    /**
+     * Defendant has requested a reconsideration of the SDO.
+     */
+    private YesOrNo orderRequestedForReviewDefendant;
 
     @JsonIgnore
     public String getHearingLocationText() {

@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -38,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -67,7 +69,7 @@ class FeesPaymentServiceTest {
         = CardPaymentServiceRequestDTO.builder()
         .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
         .language("En")
-        .amount(new BigDecimal("232.00")).currency("GBP").build();
+        .amount(new BigDecimal("232.12")).currency("GBP").build();
 
     @Autowired
     private FeesPaymentService feesPaymentService;
@@ -89,10 +91,10 @@ class FeesPaymentServiceTest {
             .data(Map.of(
                 "hearingFeePBADetails",
                 SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
+                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build())
                     .build(),
                 "hearingFee",
-                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23212")).build()
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -279,6 +281,22 @@ class FeesPaymentServiceTest {
 
         verify(paymentsClient, times(3))
             .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
+    }
+
+    @Test
+    void shouldReturnResponseWhenExceptionOccurs() {
+        PaymentDto response = buildGovPayCardPaymentStatusResponse("Success");
+        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+            .thenReturn(response);
+
+        doThrow(new CaseDataUpdateException()).when(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
+
+        CardPaymentStatusResponse result =
+            feesPaymentService.getGovPaymentRequestStatus(HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
+
+        verify(updatePaymentStatusService).updatePaymentStatus(HEARING, "123", result);
+        assertThat(result).isEqualTo(expectedResponse("Success"));
+
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {

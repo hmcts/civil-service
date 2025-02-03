@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -15,8 +16,8 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
+@Slf4j
 public class DocmosisTemplateDataUtils {
 
     public static final int CASE_NAME_LENGTH_TO_FIT_IN_DOCS = 37;
@@ -72,8 +73,8 @@ public class DocmosisTemplateDataUtils {
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
         } else {
-            String errorMsg = String.format("Applicant1 not found for claim number: "
-                                                + caseData.getCcdCaseReference());
+            String errorMsg = String.format("Applicant1 not found for claim number: %s",
+                                            caseData.getCcdCaseReference());
             log.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }

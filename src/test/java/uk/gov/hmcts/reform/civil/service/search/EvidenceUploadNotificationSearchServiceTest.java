@@ -25,6 +25,8 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
                       .minimumShouldMatch(1)
                       .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
                       .should(boolQuery().must(matchQuery("state", "HEARING_READINESS")))
+                      .should(boolQuery().must(matchQuery("state", "DECISION_OUTCOME")))
+                      .should(boolQuery().must(matchQuery("state", "All_FINAL_ORDERS_ISSUED")))
                       .should(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))))
             .must(boolQuery()
                       .minimumShouldMatch(1)
@@ -37,7 +39,9 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
     }
 
     @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
         return null;
     }
 }

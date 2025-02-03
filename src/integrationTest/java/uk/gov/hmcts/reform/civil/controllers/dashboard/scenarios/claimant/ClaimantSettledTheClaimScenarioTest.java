@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimSettledDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -25,6 +26,7 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
         String caseId = "55551111";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
             .toBuilder()
+            .applicant1Represented(YesOrNo.NO)
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .caseDataLiP(CaseDataLiP.builder()
@@ -41,10 +43,12 @@ public class ClaimantSettledTheClaimScenarioTest extends DashboardBaseIntegratio
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have confirmed that Mr. Sole Trader paid  on 19 March 2024.</p>"),
-                jsonPath("$[0].titleCy").value("The claim is settled"),
+                    "<p class=\"govuk-body\">You have confirmed that the claim against Mr. Sole Trader was settled on 19 March 2024.</p>"
+                        + "<p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>"),
+                jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">You have confirmed that Mr. Sole Trader paid  on 19 Mawrth 2024.</p>")
+                    "<p class=\"govuk-body\">You have confirmed that the claim against Mr. Sole Trader was settled on 19 March 2024.</p>"
+                        + "<p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>")
             );
     }
 }

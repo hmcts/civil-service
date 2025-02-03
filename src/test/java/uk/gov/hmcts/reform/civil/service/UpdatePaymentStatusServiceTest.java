@@ -3,11 +3,10 @@ package uk.gov.hmcts.reform.civil.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -23,31 +23,31 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 
-@SpringBootTest(classes = {
-    UpdatePaymentStatusService.class,
-    JacksonAutoConfiguration.class
-
-})
+@ExtendWith(MockitoExtension.class)
 class UpdatePaymentStatusServiceTest {
 
-    @MockBean
-    FeatureToggleService featureToggleService;
-    @MockBean
+    @InjectMocks
+    UpdatePaymentStatusService updatePaymentStatusService;
+
+    @Mock
     CaseDetailsConverter caseDetailsConverter;
+
     @Mock
     ObjectMapper objectMapper;
-    @MockBean
+
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @Autowired
-    UpdatePaymentStatusService updatePaymentStatusService;
 
     public static final String BUSINESS_PROCESS = "JUDICIAL_REFERRAL";
     private static final Long CASE_ID = 1594901956117591L;
@@ -115,6 +115,24 @@ class UpdatePaymentStatusServiceTest {
         verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_CLAIM_ISSUE_PAYMENT);
         verify(coreCaseDataService).submitUpdate(any(), any());
 
+    }
+
+    @Test
+    void shouldThrowCaseDataUpdateExceptionWhenExceptionOccurs() {
+        FeeType feeType = FeeType.CLAIMISSUED; // Replace with an actual FeeType
+        String caseReference = "123456";
+        CardPaymentStatusResponse cardPaymentStatusResponse = mock(CardPaymentStatusResponse.class);
+
+        when(coreCaseDataService.getCase(Long.valueOf(caseReference))).thenThrow(new RuntimeException("Database error"));
+
+        CaseDataUpdateException exception = assertThrows(
+            CaseDataUpdateException.class,
+            () -> updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse)
+        );
+
+        verify(coreCaseDataService).getCase(Long.valueOf(caseReference));
+
+        verifyNoInteractions(caseDetailsConverter);
     }
 
     private CaseDetails buildCaseDetails(CaseData caseData) {

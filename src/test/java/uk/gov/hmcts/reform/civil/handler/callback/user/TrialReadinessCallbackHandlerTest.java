@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -21,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
@@ -33,34 +32,44 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    TrialReadinessCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
+class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
-
-    @Autowired
     private TrialReadinessCallbackHandler handler;
 
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
+    @Mock
+    private UserService userService;
+
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        handler = new TrialReadinessCallbackHandler(objectMapper, userService, coreCaseUserService);
+    }
+
     public static final String READY_HEADER = "## You have said this case is ready for trial or hearing";
-    public static final String READY_BODY = "### What happens next \n\n"
-        + "You can view your and other party's trial arrangements in documents in the case details.\n\n "
-        + "If there are any additional changes between now and the hearing date, "
-        + "you will need to make an application as soon as possible and pay the appropriate fee.";
+    public static final String READY_BODY = """
+        ### What happens next\s
+
+        You can view your and other party's trial arrangements in documents in the case details.
+
+         \
+        If there are any additional changes between now and the hearing date, \
+        you will need to make an application as soon as possible and pay the appropriate fee.""";
     public static final String NOT_READY_HEADER = "## You have said this case is not ready for trial or hearing";
-    public static final String NOT_READY_BODY = "### What happens next \n\n"
-        + "You can view your and other party's trial arrangements in documents in the case details. "
-        + "If there are any additional changes between now and the hearing date, "
-        + "you will need to make an application as soon as possible and pay the appropriate fee.\n\n"
-        + "The trial will go ahead on the specified date "
-        + "unless a judge makes an order changing the date of the hearing. "
-        + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
-        + "you will need to make an application to the court and pay the appropriate fee.";
+    public static final String NOT_READY_BODY = """
+        ### What happens next\s
+
+        You can view your and other party's trial arrangements in documents in the case details. \
+        If there are any additional changes between now and the hearing date, \
+        you will need to make an application as soon as possible and pay the appropriate fee.
+
+        The trial will go ahead on the specified date \
+        unless a judge makes an order changing the date of the hearing. \
+        If you want the date of the hearing to be changed (or any other order to make the case ready for trial)\
+        you will need to make an application to the court and pay the appropriate fee.""";
 
     @Nested
     class AboutToStartCallback {

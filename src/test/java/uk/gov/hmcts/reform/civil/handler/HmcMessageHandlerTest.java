@@ -3,10 +3,9 @@ package uk.gov.hmcts.reform.civil.handler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HearingUpdate;
@@ -25,27 +24,25 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.EXCEPTION;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.HEARING_REQUESTED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    HmcMessageHandler.class
-})
+@ExtendWith(MockitoExtension.class)
 class HmcMessageHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private HmcMessageHandler handler;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private PaymentsConfiguration paymentsConfiguration;
 
     @BeforeEach
     void setUp() {
         when(paymentsConfiguration.getSpecSiteId()).thenReturn("AAA6");
-        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
     }
 
     @Test
     void shouldNotTriggerEvent_whenMessageRelevantForServiceAndHearingException() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -62,6 +59,8 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldNotTriggerEvent_whenMessageRelevantForServiceNoHearingException() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -94,6 +93,8 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsListed() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -126,6 +127,8 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsAwaitingActuals() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -158,6 +161,8 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsCompleted() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -190,6 +195,8 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsCanceled() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -222,6 +229,8 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsAdjourned() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -238,6 +247,8 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldNotTriggerEvent_whenMessageServiceIdNotRelevant() {
+        when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")

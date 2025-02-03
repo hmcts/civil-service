@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -27,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEARING_HMC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING_HMC;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
@@ -36,6 +39,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final HearingNoticeCamundaService camundaService;
+    private final OrganisationService organisationService;
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_DEFENDANT1_HEARING,
         NOTIFY_DEFENDANT2_HEARING,
@@ -85,15 +89,16 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     private void sendEmail(CaseData caseData, String recipient, boolean isDefendant1, boolean isRespondent1Lip, boolean isHmc) {
         Map<String, String> properties;
-        if (isHmc) {
-            properties = addPropertiesHmc(caseData);
+        if (isHmc && !(isRespondent1Lip && isDefendant1)) {
+            properties = addPropertiesHmc(caseData, isDefendant1);
         } else {
-            properties = addProperties(caseData);
+            properties = addPropertiesHearing(caseData, isHmc, isRespondent1Lip, isDefendant1);
         }
-        if (!isRespondent1Lip || isHmc) {
+        if (!isRespondent1Lip) {
             properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData, isDefendant1));
         }
-        notificationService.sendMail(recipient, getEmailTemplate(isRespondent1Lip, isHmc), properties, getReferenceTemplate(caseData, isRespondent1Lip, isHmc));
+        notificationService.sendMail(recipient, getEmailTemplate(caseData, isRespondent1Lip, isDefendant1, isHmc), properties,
+                                     getReferenceTemplate(caseData, isRespondent1Lip, isDefendant1, isHmc));
     }
 
     @Override
@@ -103,22 +108,43 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        String legacyCaseRef = caseData.getLegacyCaseReference();
-        String hearingDate = NotificationUtils.getFormattedHearingDate(caseData.getHearingDate());
-        String hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
-        return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime));
+        return null;
     }
 
-    public Map<String, String> addPropertiesHmc(final CaseData caseData) {
+    public Map<String, String> addPropertiesHearing(final CaseData caseData, boolean isHmc, boolean isRespondent1Lip, boolean isDefendant1) {
+        String legacyCaseRef = isRespondent1Lip ? caseData.getLegacyCaseReference() : caseData.getCcdCaseReference().toString();
+        String hearingDate = NotificationUtils.getFormattedHearingDate(caseData.getHearingDate());
+        String orgName = isRespondent1Lip ? caseData.getRespondent1().getPartyName() : isDefendant1
+            ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            : getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
+        String hearingTime;
+        if (!isHmc) {
+            hearingTime = NotificationUtils.getFormattedHearingTime(caseData.getHearingTimeHourMinute());
+        } else {
+            LocalDateTime hearingStartDateTime = camundaService
+                .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
+            hearingTime = NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString());
+        }
+        return new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime,
+                                    CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                                    CASEMAN_REF, caseData.getLegacyCaseReference()));
+    }
+
+    public Map<String, String> addPropertiesHmc(final CaseData caseData, boolean isDefendant1) {
         LocalDateTime hearingStartDateTime = camundaService
             .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
+        String orgName = isDefendant1
+            ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            : getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
+            caseData.getCcdCaseReference().toString(),
             HEARING_DATE,
             NotificationUtils.getFormattedHearingDate(hearingStartDateTime.toLocalDate()),
             HEARING_TIME,
-            NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString())
+            NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString()),
+            CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 
@@ -160,22 +186,27 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         return "";
     }
 
-    private String getEmailTemplate(boolean isRespondent1Lip, boolean isHmc) {
-        if (isHmc) {
+    private String getEmailTemplate(CaseData caseData, boolean isRespondent1Lip, boolean isDefendant1, boolean isHmc) {
+        if (isHmc && !(isRespondent1Lip && isDefendant1)) {
             return notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC();
+        } else if (isRespondent1Lip && caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh();
+        } else if (isRespondent1Lip) {
+            return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         } else {
-            return isRespondent1Lip ? notificationsProperties.getHearingNotificationLipDefendantTemplate()
-                : notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
+            return notificationsProperties.getHearingListedNoFeeDefendantLrTemplate();
         }
     }
 
-    private String getReferenceTemplate(CaseData caseData, boolean isRespondent1Lip, boolean isHmc) {
-        if (isHmc) {
-            return String.format(REFERENCE_TEMPLATE_HEARING, camundaService
-            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId());
+    private String getReferenceTemplate(CaseData caseData, boolean isRespondent1Lip, boolean isDefendant1, boolean isHmc) {
+        String hearingId = isHmc ? camundaService
+            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId() : caseData.getHearingReferenceNumber();
+
+        if (isHmc && !(isRespondent1Lip && isDefendant1)) {
+            return String.format(REFERENCE_TEMPLATE_HEARING, hearingId);
         } else {
-            return isRespondent1Lip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, caseData.getHearingReferenceNumber())
-                : String.format(REFERENCE_TEMPLATE_HEARING, caseData.getHearingReferenceNumber());
+            return isRespondent1Lip ? String.format(REFERENCE_TEMPLATE_HEARING_LIP, hearingId)
+                : String.format(REFERENCE_TEMPLATE_HEARING, hearingId);
         }
     }
 

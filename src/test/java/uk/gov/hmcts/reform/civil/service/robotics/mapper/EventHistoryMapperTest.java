@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
@@ -32,7 +34,9 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.DebtPaymentEvidence;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -40,6 +44,10 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -50,7 +58,9 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
@@ -68,9 +78,11 @@ import static java.math.BigDecimal.ZERO;
 import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
@@ -83,6 +95,8 @@ import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDIC
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
+import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
@@ -93,12 +107,17 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_REASON;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
     EventHistorySequencer.class,
     EventHistorySequencer.class,
     EventHistoryMapper.class
@@ -106,6 +125,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapp
 class EventHistoryMapperTest {
 
     private static final Event EMPTY_EVENT = Event.builder().build();
+    private static final String BEARER_TOKEN = "Bearer Token";
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -156,7 +176,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -203,7 +223,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -265,7 +285,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -323,7 +343,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -367,7 +387,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -421,7 +441,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -484,7 +504,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -546,7 +566,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -589,7 +609,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -639,7 +659,7 @@ class EventHistoryMapperTest {
                     ))
                     .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -691,7 +711,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -748,7 +768,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -788,7 +808,7 @@ class EventHistoryMapperTest {
                         .eventDetailsText(expectedMiscText1)
                         .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -825,7 +845,7 @@ class EventHistoryMapperTest {
                         .eventDetailsText(expectedMiscText1)
                         .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory)
@@ -862,7 +882,7 @@ class EventHistoryMapperTest {
                     ))
                     .build();
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("acknowledgementOfServiceReceived").asList()
@@ -897,7 +917,7 @@ class EventHistoryMapperTest {
                         .format(DateTimeFormatter.ofPattern("dd MM yyyy")))
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -927,7 +947,7 @@ class EventHistoryMapperTest {
                     )
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -953,7 +973,7 @@ class EventHistoryMapperTest {
                     )
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -979,7 +999,7 @@ class EventHistoryMapperTest {
                     )
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -1090,7 +1110,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1172,7 +1192,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1273,7 +1293,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1374,7 +1394,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build()
             );
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission.get(0), expectedReceiptOfAdmission.get(1));
@@ -1463,7 +1483,7 @@ class EventHistoryMapperTest {
                 );
             List<Event> expectedMiscellaneousEvents = List.of();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
                 .containsExactly(expectedDefenceFiled);
@@ -1539,7 +1559,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -1591,7 +1611,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1642,7 +1662,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1691,7 +1711,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -1765,7 +1785,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -1824,7 +1844,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -1943,7 +1963,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2048,7 +2068,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2191,7 +2211,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2327,7 +2347,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -2419,7 +2439,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2491,7 +2511,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2590,7 +2610,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2691,7 +2711,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -2780,7 +2800,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -2872,7 +2892,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -2990,7 +3010,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3109,7 +3129,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
@@ -3197,7 +3217,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3268,7 +3288,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3366,7 +3386,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3477,7 +3497,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3580,7 +3600,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3692,7 +3712,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3787,7 +3807,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
@@ -3853,7 +3873,7 @@ class EventHistoryMapperTest {
                                                       mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
                                                   .preferredCourtName("").build()).build());
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -3932,7 +3952,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("receiptOfAdmission").asList().containsExactly(
@@ -4010,7 +4030,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
@@ -4043,7 +4063,7 @@ class EventHistoryMapperTest {
                         .build();
                 }
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
 
                 assertEmptyEvents(
@@ -4136,7 +4156,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -4231,7 +4251,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -4327,7 +4347,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -4400,14 +4420,14 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                                           caseData,
-                                                          CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                                          BEARER_TOKEN, true))
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
                                         locationRefDataUtil.getPreferredCourtData(
                                                 caseData,
-                                                CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                                                BEARER_TOKEN, true)
                         ))
                         .build();
                 List<Event> expectedMiscellaneousEvents = List.of(Event.builder().eventSequence(1).eventCode("999")
@@ -4455,7 +4475,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                     .asList().containsExactlyInAnyOrder(expectedDirectionsQuestionnaireRespondent,
@@ -4502,14 +4522,14 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                          BEARER_TOKEN, true))
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant1DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                            BEARER_TOKEN, true)
                         ))
                     .build();
                 List<Event> expectedMiscellaneousEvents = List.of(
@@ -4559,7 +4579,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build()
                     );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                     .asList().containsExactlyInAnyOrder(
@@ -4635,7 +4655,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                          .asList().containsExactlyInAnyOrder(
@@ -4726,7 +4746,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true
+                                          BEARER_TOKEN, true
                                       ))
                                       .preferredCourtName("")
                                       .build())
@@ -4734,7 +4754,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant1DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true
+                            BEARER_TOKEN, true
                         )
                     ))
                     .build();
@@ -4785,7 +4805,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build()
                 );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
                     .containsExactly(expectedDefence1, expectedDefence2);
@@ -4922,7 +4942,7 @@ class EventHistoryMapperTest {
                             .build()
 
                     );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
                         .containsExactly(expectedDefence1, expectedDefence2);
@@ -5045,7 +5065,7 @@ class EventHistoryMapperTest {
                             .build()
 
                     );
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
                         .containsExactly(expectedDefence1, expectedDefence2);
@@ -5131,7 +5151,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).extracting("miscellaneous").asList()
                     .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
@@ -5187,7 +5207,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
                     .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
                                      expectedMiscEvents.get(2)
@@ -5235,14 +5255,14 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                                   caseData,
-                                                  CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                                  BEARER_TOKEN, true))
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
                                 locationRefDataUtil.getPreferredCourtData(
                                         caseData,
-                                        CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                                        BEARER_TOKEN, true)
                         ))
                         .build();
                 Event expectedApplicant2DQ = Event.builder()
@@ -5254,14 +5274,14 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                           .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                                   caseData,
-                                                  CallbackParams.Params.BEARER_TOKEN.toString(), true))
+                                                  BEARER_TOKEN, true))
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant2DQ(),
                                 locationRefDataUtil.getPreferredCourtData(
                                         caseData,
-                                        CallbackParams.Params.BEARER_TOKEN.toString(), true)
+                                        BEARER_TOKEN, true)
                         ))
                         .build();
                 List<Event> expectedMiscEvents = List.of(
@@ -5312,7 +5332,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
@@ -5422,7 +5442,7 @@ class EventHistoryMapperTest {
                             .build()
                     );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
@@ -5483,7 +5503,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true
+                                          BEARER_TOKEN, true
                                       ))
                                       .preferredCourtName("")
                                       .build())
@@ -5491,7 +5511,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant1DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true
+                            BEARER_TOKEN, true
                         )
                     ))
                     .build();
@@ -5545,7 +5565,7 @@ class EventHistoryMapperTest {
                         .build()
                 );
 
-                var eventHistory = mapper.buildEvents(caseData);
+                var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -5609,7 +5629,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                       .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(
                                           caseData,
-                                          CallbackParams.Params.BEARER_TOKEN.toString(), true
+                                          BEARER_TOKEN, true
                                       ))
                                       .preferredCourtName("")
                                       .build())
@@ -5617,7 +5637,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant2DQ(),
                         locationRefDataUtil.getPreferredCourtData(
                             caseData,
-                            CallbackParams.Params.BEARER_TOKEN.toString(), true
+                            BEARER_TOKEN, true
                         )
                     ))
                     .build();
@@ -5684,7 +5704,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5732,7 +5752,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5787,7 +5807,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5866,7 +5886,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -5946,7 +5966,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6040,7 +6060,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6142,7 +6162,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("defenceFiled").asList()
@@ -6209,7 +6229,7 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("001")
                     .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
                     .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6266,7 +6286,7 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("004")
                     .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
                     .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6311,7 +6331,7 @@ class EventHistoryMapperTest {
 
             Event defenceStruckOutJudgment = Event.builder().build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6356,7 +6376,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6413,7 +6433,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6499,7 +6519,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6583,7 +6603,7 @@ class EventHistoryMapperTest {
                 ))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6680,7 +6700,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -6790,7 +6810,7 @@ class EventHistoryMapperTest {
                     .format(DateTimeFormatter.ofPattern("dd MM yyyy"))))
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             // TODO Tobe done as part of RPA release
             /*
@@ -6847,7 +6867,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6912,7 +6932,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -6973,7 +6993,7 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -7042,7 +7062,71 @@ class EventHistoryMapperTest {
                                   .build())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimIssuedEvent, claimNotifiedEvent, caseNoteEvent);
+            assertEmptyEvents(
+                eventHistory,
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence",
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "receiptOfAdmission",
+                "replyToDefence",
+                "directionsQuestionnaireFiled"
+            );
+        }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenCaseNoteAddedButCaseNoteSavedBecauseOfSystemGlitch() {
+            var noteCreatedAt = LocalDateTime.now().plusDays(3);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v1()
+                .caseNotes(CaseNote.builder()
+                               .createdOn(noteCreatedAt)
+                               .createdBy("createdBy")
+                               .build())
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            Event claimIssuedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getIssueDate().atStartOfDay())
+                .eventDetailsText("Claim issued in CCD.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claim issued in CCD.")
+                                  .build())
+                .build();
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getClaimNotificationDate())
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+            Event caseNoteEvent = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(noteCreatedAt)
+                .eventDetailsText("case note added: ")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("case note added: ")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory)
@@ -7125,7 +7209,7 @@ class EventHistoryMapperTest {
 
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscEvents.get(0),
@@ -7196,7 +7280,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
@@ -7260,7 +7344,7 @@ class EventHistoryMapperTest {
                     .build()
             );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1),
@@ -7321,7 +7405,7 @@ class EventHistoryMapperTest {
                               .build())
             .build();
 
-        var eventHistory = mapper.buildEvents(caseData);
+        var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
         assertThat(eventHistory).isNotNull();
         assertThat(eventHistory)
@@ -7397,7 +7481,7 @@ class EventHistoryMapperTest {
                               .build())
             .build();
 
-        var eventHistory = mapper.buildEvents(caseData);
+        var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
         assertThat(eventHistory).isNotNull();
         assertThat(eventHistory)
@@ -7432,7 +7516,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
@@ -7452,7 +7536,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
@@ -7471,7 +7555,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
@@ -7490,7 +7574,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
@@ -7509,7 +7593,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
@@ -7529,7 +7613,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
@@ -7548,7 +7632,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
@@ -7567,7 +7651,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
@@ -7586,7 +7670,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
@@ -7613,7 +7697,7 @@ class EventHistoryMapperTest {
 
             LocalDateTime currentTime = LocalDateTime.now();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
@@ -7640,7 +7724,7 @@ class EventHistoryMapperTest {
                                                  .build())
                                       .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("interlocutoryJudgment").asList()
                 .extracting("eventCode").asString().contains("[252, 252]");
         }
@@ -7661,7 +7745,7 @@ class EventHistoryMapperTest {
                                                  .build())
                                       .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
         }
@@ -7699,7 +7783,7 @@ class EventHistoryMapperTest {
                                                      .build())
                                           .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("defaultJudgment").asList()
                 .extracting("eventCode").asString().contains("[230, 230]");
         }
@@ -7732,12 +7816,190 @@ class EventHistoryMapperTest {
                                                      .build())
                                           .build())
                 .build();
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
 
         }
 
+        @Test
+        public void shouldgenerateRPAfeedfor_DJNoDivergent_case_online_999_event() {
+
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventCode").asString().contains("[230, 230]");
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains("Judgment recorded");
+        }
+
+        @Test
+        public void shouldgenerateRPAfeedfor_DJNoDivergent_case_offline_999_event() {
+
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventCode").asString().contains("[230, 230]");
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().isNotEmpty();
+        }
+
+    }
+
+    @Nested
+    class SetAsideJudgment {
+
+        @Test
+        public void shouldGenerateRPAFeedfor_SetAside() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170]");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicant").contains("PARTY AGAINST");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("result").contains("GRANTED");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("resultDate").asString().contains("2022-12-12");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicationDate").asString().contains("2022-11-11");
+        }
+
+        @Test
+        public void shouldGenerateRPAFeedfor_SetAsideDefence() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 11, 11));
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170]");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicant").contains("PARTY AGAINST");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("result").contains("GRANTED");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("resultDate").asString().contains("2022-12-12");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicationDate").asString().contains("2022-11-11");
+        }
+
+        @Test
+        public void shouldGenerateRPAFeedfor_SetAside_Error() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170]");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicant").contains("PROPER OFFICER");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("result").contains("GRANTED");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("resultDate").asString().contains("null");
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventDetails").asList()
+                .extracting("applicationDate").asString().contains("null");
+        }
+
+        @Test
+        public void shouldGenerateRPAfeedfor_SetAside_1v2() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
+            caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
+            caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
+            caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
+            caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
+            caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
+            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("setAsideJudgment").asList()
+                .extracting("eventCode").asString().contains("[170, 170]");
+
+        }
     }
 
     @Nested
@@ -7793,7 +8055,7 @@ class EventHistoryMapperTest {
                                               .build())
                             .build());
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -7814,7 +8076,7 @@ class EventHistoryMapperTest {
                 .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -7885,7 +8147,7 @@ class EventHistoryMapperTest {
                                               .preferredCourtName("")
                                               .build())
                             .build());
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -7964,7 +8226,7 @@ class EventHistoryMapperTest {
                             .build()
                 );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -8054,7 +8316,7 @@ class EventHistoryMapperTest {
                             .build()
                 );
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
                 .contains(expectedDirectionsQuestionnaireFiled.get(0));
             assertThat(eventHistory).extracting("statesPaid").asList()
@@ -8095,7 +8357,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8143,7 +8405,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8193,7 +8455,7 @@ class EventHistoryMapperTest {
                 .applicant1ResponseDate(LocalDateTime.now())
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8238,7 +8500,7 @@ class EventHistoryMapperTest {
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
@@ -8272,7 +8534,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .build();
             //When
-            var eventHistory = mapper.buildEvents(caseData);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             //Then
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventDetails").asList()
@@ -8284,6 +8546,337 @@ class EventHistoryMapperTest {
                 .extracting("eventDetails").asList()
                 .extracting("installmentAmount").isNotNull();
 
+        }
+
+        @Test
+        void validateRespondent2IntentionType() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2Represented(NO)
+                .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+                .build();
+
+            assertEquals("Defend all of the claim", mapper.evaluateRespondent2IntentionType(caseData));
+
+            CaseData caseData1 = CaseDataBuilder.builder()
+                .respondent2Represented(NO)
+                .respondent1Represented(YES)
+                .respondent1ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+                .build();
+            assertEquals("Defend all of the claim", mapper.evaluateRespondent2IntentionType(caseData1));
+
+            CaseData caseData2 = CaseDataBuilder.builder()
+                .respondent2Represented(YES)
+                .respondent1Represented(YES)
+                .respondent1ClaimResponseIntentionType(PART_DEFENCE)
+                .build();
+            assertEquals("Defend part of the claim", mapper.evaluateRespondent2IntentionType(caseData2));
+        }
+
+        @Test
+        void shouldGenerateRPA_WhenClaimPayImmediately() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
+            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                .whenWillThisAmountBePaid(whenWillPay)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToClaimAdmitPartLRspec(paymentDetails)
+                .totalInterest(BigDecimal.ZERO)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .build();
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("isJudgmentForthwith").contains(true);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
+        }
+
+        @Test
+        void shouldGenerateRPA_WhenLrvLrClaimPayImmediately() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
+            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                .whenWillThisAmountBePaid(whenWillPay)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToClaimAdmitPartLRspec(paymentDetails)
+                .totalInterest(BigDecimal.ZERO)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .respondent1Represented(YesOrNo.YES)
+                .specRespondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.YES)
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .build();
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetails").extracting("miscText").asString().contains(RECORD_JUDGMENT);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
+        }
+
+        @Test
+        public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_BySetDate_JoLiveFeed() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
+            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                .whenWillThisAmountBePaid(whenWillPay)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToClaimAdmitPartLRspec(paymentDetails)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .totalInterest(BigDecimal.ZERO)
+                .build();
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetails").extracting("miscText").asString().contains(RECORD_JUDGMENT);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
+        }
+
+        @Test
+        public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_JoLiveFeed() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
+            RepaymentPlanLRspec respondent1RepaymentPlan = RepaymentPlanLRspec.builder()
+                .firstRepaymentDate(whenWillPay)
+                .paymentAmount(BigDecimal.valueOf(10000))
+                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .respondent1RepaymentPlan(respondent1RepaymentPlan)
+                .totalInterest(BigDecimal.ZERO)
+                .build();
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetails").extracting("miscText").asString().contains(RECORD_JUDGMENT);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
+        }
+
+        private CCJPaymentDetails buildCcjPaymentDetails() {
+            return CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(NO)
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                .build();
+        }
+    }
+
+    @Nested
+    class Cosc {
+        LocalDate markPaidInFullDate = LocalDate.of(2024, 1, 1);
+        LocalDate defendantFinalPaymentDate = LocalDate.of(2024, 1, 4);
+        LocalDateTime markPaidInFullIssueDate = LocalDateTime.of(2024, 1, 2,  9, 0, 0);
+        LocalDateTime schedulerDeadline = LocalDateTime.of(2024, 2, 2,  16, 0, 0);
+        LocalDateTime joDefendantMarkedPaidInFullIssueDate = LocalDateTime.of(2024, 1, 3, 16, 0, 0);
+        CaseDocument caseDocument = CaseDocument.builder()
+            .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
+            .build();
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
+        }
+
+        @Nested
+        class CancelledStatus {
+            @Test
+            public void shouldGenerateRPA_Cancelled_MarkPaidInFull_CoscApplied() {
+                CertOfSC certOfSC = CertOfSC.builder()
+                    .defendantFinalPaymentDate(LocalDate.now())
+                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .certOfSC(certOfSC)
+                    .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                    .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
+                    .joCoscRpaStatus(CANCELLED)
+                    .joFullyPaymentMadeDate(markPaidInFullDate)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .dateReceived(markPaidInFullIssueDate)
+                    .litigiousPartyID("001")
+                    .eventDetailsText("")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(CANCELLED))
+                                      .datePaidInFull(markPaidInFullDate)
+                                      .notificationReceiptDate(markPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
+
+            @Test
+            public void shouldGenerateRPA_Cancelled_MarkPaidInFull_NoCoscApplied() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
+                    .joCoscRpaStatus(CANCELLED)
+                    .joFullyPaymentMadeDate(markPaidInFullDate)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .dateReceived(markPaidInFullIssueDate)
+                    .eventDetailsText("")
+                    .litigiousPartyID("001")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(CANCELLED))
+                                      .datePaidInFull(markPaidInFullDate)
+                                      .notificationReceiptDate(markPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
+
+            @Test
+            public void shouldGenerateRPA_Cancelled_NotMarkPaidInFull_CoscApplied() {
+                CertOfSC certOfSC = CertOfSC.builder()
+                    .defendantFinalPaymentDate(defendantFinalPaymentDate)
+                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .certOfSC(certOfSC)
+                    .joDefendantMarkedPaidInFullIssueDate(joDefendantMarkedPaidInFullIssueDate)
+                    .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                    .joMarkedPaidInFullIssueDate(null)
+                    .joCoscRpaStatus(CANCELLED)
+                    .joFullyPaymentMadeDate(null)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .litigiousPartyID("002")
+                    .dateReceived(joDefendantMarkedPaidInFullIssueDate)
+                    .eventDetailsText("")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(CANCELLED))
+                                      .datePaidInFull(defendantFinalPaymentDate)
+                                      .notificationReceiptDate(joDefendantMarkedPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
+        }
+
+        @Nested
+        class SatisfiedStatus {
+            @Test
+            public void shouldGenerateRPA_MarkedPaidInFull_CoscApplied() {
+                CertOfSC certOfSC = CertOfSC.builder()
+                    .defendantFinalPaymentDate(LocalDate.now())
+                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
+                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
+                    .certOfSC(certOfSC)
+                    .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                    .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
+                    .joCoscRpaStatus(SATISFIED)
+                    .joFullyPaymentMadeDate(markPaidInFullDate)
+                    .build();
+
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("600")
+                    .dateReceived(markPaidInFullIssueDate)
+                    .eventDetailsText("")
+                    .litigiousPartyID("001")
+                    .eventDetails(EventDetails.builder()
+                                      .status(String.valueOf(SATISFIED))
+                                      .datePaidInFull(markPaidInFullDate)
+                                      .notificationReceiptDate(markPaidInFullIssueDate.toLocalDate())
+                                      .build())
+                    .build();
+
+                EventHistory eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation").asList()
+                    .extracting("eventCode").asString().contains("600");
+                assertThat(eventHistory).extracting("certificateOfSatisfactionOrCancellation")
+                    .asList().containsExactly(expectedEvent);
+            }
         }
     }
 }

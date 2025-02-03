@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -18,23 +18,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {
-    ServiceOfDateValidationMessageUtils.class,
-
-})
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class ServiceOfDateValidationMessageUtilsTest {
 
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @Mock
     private WorkingDayIndicator workingDayIndicator;
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @Autowired
+    @InjectMocks
     private ServiceOfDateValidationMessageUtils serviceUtils;
 
     @Test
@@ -49,7 +45,6 @@ class ServiceOfDateValidationMessageUtilsTest {
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
         when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(currentDate);
-        when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
         List<String> errorMessages = serviceUtils.getServiceOfDateValidationMessages(certificateOfService);
 
@@ -101,10 +96,9 @@ class ServiceOfDateValidationMessageUtilsTest {
     @Test
     void shouldThrowError_whenDeemedServedDateIsNotWorkingDay() {
         LocalDate currentDate = LocalDate.now();
-        LocalDate deemedServedDate = currentDate;
         CertificateOfService certificateOfService = CertificateOfService.builder()
             .cosDateOfServiceForDefendant(currentDate)
-            .cosDateDeemedServedForDefendant(deemedServedDate)
+            .cosDateDeemedServedForDefendant(currentDate)
             .build();
 
         LocalDateTime currentDateTime = LocalDateTime.now();

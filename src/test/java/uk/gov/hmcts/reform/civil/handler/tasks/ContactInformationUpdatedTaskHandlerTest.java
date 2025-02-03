@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -9,21 +10,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -40,12 +36,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONTACT_INFORMATION_UPDATED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@SpringBootTest(classes = {
-    ContactInformationUpdatedTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class ContactInformationUpdatedTaskHandlerTest {
 
     private static final String CASE_ID = "1";
@@ -56,17 +47,21 @@ class ContactInformationUpdatedTaskHandlerTest {
     @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
 
-    @Autowired
     private ContactInformationUpdatedTaskHandler caseEventTaskHandler;
+
+    @BeforeEach
+    void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+        caseEventTaskHandler = new ContactInformationUpdatedTaskHandler(coreCaseDataService, caseDetailsConverter,
+                                                                        objectMapper);
+    }
 
     @BeforeEach
     void init() {
@@ -77,8 +72,6 @@ class ContactInformationUpdatedTaskHandlerTest {
 
         when(mockTask.getAllVariables()).thenReturn(variables);
         when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-        when(mockTask.getActivityId()).thenReturn("activityId");
     }
 
     @Test
@@ -103,6 +96,8 @@ class ContactInformationUpdatedTaskHandlerTest {
             .thenReturn(caseData);
 
         caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+        verify(coreCaseDataService, times(1)).submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture());
 
         CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
         Event actual = caseDataContent.getEvent();

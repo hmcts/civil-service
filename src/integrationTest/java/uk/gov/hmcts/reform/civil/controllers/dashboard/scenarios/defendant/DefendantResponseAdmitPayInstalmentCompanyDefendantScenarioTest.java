@@ -33,6 +33,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
 
         String caseId = "12345671";
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
+        PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_ONE_WEEK;
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
@@ -47,9 +48,10 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
                                           .firstRepaymentDate(firstRepaymentDate)
                                           .paymentAmount(new BigDecimal(1000))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                          .repaymentFrequency(frequency)
                                           .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .claimInterest(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
 
@@ -62,11 +64,19 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 in instalments of £10 every week. " +
-                        "You have offered to do this starting from " +
-                        DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
-                        "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 in instalments of £10 " +
+                        frequency.getDashboardLabel() + "." +
+                        " You have offered to do this starting from " + DateUtils.formatDate(firstRepaymentDate) + "." +
+                        " You need to send the claimant your financial details. The court will contact you when they respond.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 mewn rhandaliadau o £10 i Claimant John " +
+                        frequency.getDashboardLabelWelsh() + "." +
+                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate) + " ymlaen." +
+                        " Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
             );
 
@@ -86,7 +96,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
 
         String caseId = "12345672";
         LocalDate firstRepaymentDate = OffsetDateTime.now().toLocalDate();
-
+        PaymentFrequencyLRspec frequency = PaymentFrequencyLRspec.ONCE_ONE_WEEK;
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
@@ -100,7 +110,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
                                           .firstRepaymentDate(firstRepaymentDate)
                                           .paymentAmount(new BigDecimal(1000))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                          .repaymentFrequency(frequency)
                                           .build())
             .totalClaimAmount(new BigDecimal(1000))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
@@ -115,11 +125,19 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1000 in instalments of £10 every week. " +
-                        "You have offered to do this starting from " +
-                        DateUtils.formatDate(firstRepaymentDate) + ".</p>" +
-                        "<p class=\"govuk-body\">You need to send the claimant your financial details. The court will contact you when they respond. " +
-                        "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                    "<p class=\"govuk-body\">You have offered to pay Claimant John £1001 in instalments of £10 " +
+                        frequency.getDashboardLabel() + "." +
+                        " You have offered to do this starting from " + DateUtils.formatDate(firstRepaymentDate) + "." +
+                        " You need to send the claimant your financial details. The court will contact you when they respond.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
+                ),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 mewn rhandaliadau o £10 i Claimant John " +
+                        frequency.getDashboardLabelWelsh() + "." +
+                        " Rydych wedi cynnig gwneud hyn o " + DateUtils.formatDateInWelsh(firstRepaymentDate) + " ymlaen." +
+                        " Mae angen i chi anfon eich manylion ariannol at yr hawlydd. Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
             );
 

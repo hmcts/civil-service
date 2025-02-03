@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -54,6 +55,8 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
     private DocumentManagementService documentManagementService;
     @Autowired
     private ClaimantLipManualDeterminationFormGenerator generator;
+    @MockBean
+    private ClaimantResponseUtils claimantResponseUtils;
 
     @BeforeEach
     void setup() {

@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -46,12 +45,16 @@ public class ReferToJudgeDefenceReceivedCallbackHandler extends CallbackHandler 
             .build();
     }
 
+    private static final String CASE_REFERRED_TO_JUDGE = "# The case has been referred to a judge for a decision";
+
     private String getHeader() {
-        return format("# The case has been referred to a judge for a decision");
+        return CASE_REFERRED_TO_JUDGE;
     }
 
+    private static final String GET_BODY_STRING = "<br />";
+
     private String getBody() {
-        return format("<br />");
+        return GET_BODY_STRING;
     }
 
     private CallbackResponse saveReferToJudgeDefenceReceivedInTimeDetails(CallbackParams callbackParams) {

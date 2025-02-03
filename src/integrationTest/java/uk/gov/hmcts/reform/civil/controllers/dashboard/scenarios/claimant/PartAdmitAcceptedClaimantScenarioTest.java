@@ -1,43 +1,50 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
+public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrationTest {
 
-    public static final String SCENARIO_PART_ADMIT_ACCEPTED_CLAIMANT = "Scenario.AAA6.ClaimantIntent.PartAdmit.Claimant";
-    private static final String DASHBOARD_CREATE_SCENARIO_URL
-        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL
         = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
+
+    @Autowired
+    private ClaimantResponseNotificationHandler handler;
 
     @Test
     void should_create_scenario_for_part_admit_accepted_claimant() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>(Map.of("respondent1PartyName", "John Doe",
-                                                "defendantAdmittedAmount", "£500",
-                                                "respondent1AdmittedAmountPaymentDeadlineEn", "19th March 2024",
-                                                "respondent1AdmittedAmountPaymentDeadlineCy", "19th March 2024"
-                   ))).build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_PART_ADMIT_ACCEPTED_CLAIMANT, caseId
-        )
-            .andExpect(status().isOk());
+        String caseId = "712345678";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+            .applicant1Represented(YesOrNo.NO)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
+            .build().toBuilder()
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.of(2024, 3, 19))
+                                               .build())
+            .ccdCaseReference(Long.valueOf(caseId)).ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
+
+        // When
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
@@ -46,7 +53,18 @@ public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">John Doe has said that they will pay you £500 immediately in full and final settlement of your claim and you have accepted this offer. Funds must be received in your account by 19th March 2024.</p> <p class=\"govuk-body\">If you don´t receive the money by then, you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment(CCJ)</a>.</p>")
+                    "<p class=\"govuk-body\">Mr. Sole Trader has said that they will pay you £500 immediately " +
+                        "in full and final settlement of your claim and you have accepted this offer. " +
+                        "Funds must be received in your account by 19 March 2024.</p> " +
+                        "<p class=\"govuk-body\">If you don't receive the money by then, " +
+                        "you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment(CCJ)</a>.</p>"),
+                jsonPath("$[0].titleCy").value("Talu ar unwaith"),
+                jsonPath("$[0].descriptionCy").value(
+                    "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi dweud y byddant yn talu £500 i chi ar " +
+                        "unwaith fel setliad llawn a therfynol o’ch hawliad ac rydych wedi derbyn y cynnig hwn. " +
+                        "Rhaid i’r arian gyrraedd eich cyfrif erbyn 19 Mawrth 2024.</p> " +
+                        "<p class=\"govuk-body\">Os nad ydych wedi cael yr arian erbyn hynny, gallwch " +
+                        "<a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">wneud cais am Ddyfarniad Llys Sifil (CCJ)</a>.</p>")
             );
     }
 }

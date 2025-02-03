@@ -6,12 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
+
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
 
     private static final List<CaseEvent> EVENTS = List.of(CUI_UPLOAD_MEDIATION_DOCUMENTS);
     private final ObjectMapper objectMapper;
+    private final UploadMediationService uploadMediationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -38,6 +40,7 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
     private CallbackResponse submitData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        uploadMediationService.uploadMediationDocumentsTaskList(callbackParams);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
@@ -47,4 +50,5 @@ public class CuiUploadMediationDocumentsCallbackHandler extends CallbackHandler 
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
 }

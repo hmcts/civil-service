@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,14 +14,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
+import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,6 +61,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
     private final DeadlinesCalculator deadlinesCalculator;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -74,6 +82,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         updatedCaseData.showResponseOneVOneFlag(responseOneVOneService.setUpOneVOneFlow(caseData));
 
+        Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+            .map(RespondToClaim::getHowMuchWasPaid);
+
+        howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
+            MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -86,7 +100,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .applicant1ResponseDate(applicant1ResponseDate)
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .respondent1RespondToSettlementAgreementDeadline(caseData.isBilingual() ? null : getRespondToSettlementAgreementDeadline(
+            .respondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual() ? null : getRespondToSettlementAgreementDeadline(
                 caseData,
                 applicant1ResponseDate
             ));
@@ -101,16 +115,19 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
-        if (featureToggleService.isHmcEnabled()) {
-            populateDQPartyIds(builder);
-        }
-
-        if (featureToggleService.isUpdateContactDetailsEnabled()) {
-            addEventAndDateAddedToApplicantExperts(builder);
-            addEventAndDateAddedToApplicantWitnesses(builder);
-        }
+        populateDQPartyIds(builder);
+        addEventAndDateAddedToApplicantExperts(builder);
+        addEventAndDateAddedToApplicantWitnesses(builder);
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
+
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
+            CaseData updatedCaseData = builder.build();
+            builder.activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
+            builder.joIsLiveJudgmentExists(YES);
+        }
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
@@ -121,8 +138,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
-        return caseData.hasApplicant1SignedSettlementAgreement()
-            ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
+        if (caseData.hasApplicant1SignedSettlementAgreement()) {
+            return caseData.isCourtDecisionInClaimantFavourImmediateRePayment()
+                    ? deadlinesCalculator.getRespondentToImmediateSettlementAgreement(responseDate)
+                    : deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate);
+        }
+        return null;
     }
 
     private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {

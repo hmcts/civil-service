@@ -73,7 +73,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
@@ -131,6 +131,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
+            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
 

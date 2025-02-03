@@ -35,15 +35,17 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,8 +89,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
     CaseEventTaskHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class
-})
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class})
 @ExtendWith(SpringExtension.class)
 class CaseEventTaskHandlerTest {
 
@@ -131,13 +134,15 @@ class CaseEventTaskHandlerTest {
 
             when(mockTask.getAllVariables()).thenReturn(variables);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(PENDING_CLAIM_ISSUED.fullName());
-            when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
         }
 
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(BusinessProcess.builder()
+                                     .status(BusinessProcessStatus.READY)
+                                     .processInstanceId("processInstanceId")
+                                     .build())
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
@@ -194,7 +199,7 @@ class CaseEventTaskHandlerTest {
                             Request.create(
                                 requestType,
                                 exampleUrl,
-                                new HashMap<>(), //this field is required for construtor//
+                                new HashMap<>(),
                                 null,
                                 null,
                                 null
@@ -219,7 +224,10 @@ class CaseEventTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(BusinessProcess.builder()
+                                     .status(BusinessProcessStatus.READY)
+                                     .processInstanceId("processInstanceId")
+                                     .build())
                 .build();
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
             when(coreCaseDataService.startUpdate(any(), any()))
@@ -268,7 +276,8 @@ class CaseEventTaskHandlerTest {
             variables.putValue(FLOW_STATE, state.fullName());
             Map<String, Boolean> flags = new HashMap<>(getFlowFlags(state));
             if (state == FULL_DEFENCE_PROCEED) {
-                flags.put(FlowFlag.SDO_ENABLED.name(), false);
+                // case is fast claim
+                flags.put(FlowFlag.SDO_ENABLED.name(), true);
             }
             variables.putValue(
                 FLOW_FLAGS,
@@ -278,7 +287,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
-
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -327,6 +336,7 @@ class CaseEventTaskHandlerTest {
 
             CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
             caseData.getClaimProceedsInCaseman().setReason(reason);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -354,6 +364,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -383,6 +394,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -412,6 +424,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
+            caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -434,7 +447,10 @@ class CaseEventTaskHandlerTest {
         @Nested
         class FullDefenceProceed {
             FlowState.Main state = FULL_DEFENCE_PROCEED;
-            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            BusinessProcess businessProcess = BusinessProcess.builder()
+                .status(BusinessProcessStatus.READY)
+                .processInstanceId("processInstanceId")
+                .build();
 
             @BeforeEach
             void initForFullDefence() {
@@ -450,6 +466,7 @@ class CaseEventTaskHandlerTest {
                 @Test
                 void shouldHaveExpectedDescription() {
                     CaseData caseData = getCaseData(state);
+                    caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
                     CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
                     when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -642,26 +659,72 @@ class CaseEventTaskHandlerTest {
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
-                              FlowFlag.BULK_CLAIM_ENABLED.name(), false
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), false
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
-                || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
-                || state.equals(FULL_ADMISSION)
+                || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)) {
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), false
+                );
+            } else if (state.equals(FULL_ADMISSION)
                 || state.equals(PART_ADMISSION)
                 || state.equals(COUNTER_CLAIM)
-                || state.equals(FULL_DEFENCE_PROCEED)
-                || state.equals(FULL_DEFENCE_NOT_PROCEED)
-                || state.equals(CLAIM_DETAILS_NOTIFIED)
+                || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), true
+                );
+            } else if (state.equals(CLAIM_DETAILS_NOTIFIED)
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                               FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                               FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
-                              FlowFlag.BULK_CLAIM_ENABLED.name(), false
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), false
+                );
+
+            } else if (state.equals(FULL_DEFENCE_PROCEED)) {
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
+                              FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                              FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                              FlowFlag.MINTI_ENABLED.name(), false,
+                              FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                              FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                              FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
+                              FlowFlag.CLAIM_STATE_DURING_NOC.name(), true
                 );
             }
             return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
-                          FlowFlag.BULK_CLAIM_ENABLED.name(), false
+                          FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
+                          FlowFlag.BULK_CLAIM_ENABLED.name(), false,
+                          FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
+                          FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
+                          FlowFlag.DEFENDANT_NOC_ONLINE.name(), false
                     );
         }
 

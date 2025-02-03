@@ -41,10 +41,14 @@ public class TellUsSettledDefendantScenarioTest extends DashboardBaseIntegration
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The claimant has confirmed that you settled on 19 March 2024.</p>"),
-                jsonPath("$[0].titleCy").value("The claim is settled"),
+                    "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on 19 March 2024.</p>"
+                        + "<p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections in"
+                        + " writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at {cmcCourtEmailId}</p>"),
+                jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">The claimant has confirmed that you settled on 19 Mawrth 2024.</p>")
+                    "<p class=\"govuk-body\">The claimant has confirmed that this case was settled on 19 March 2024.</p>"
+                        + "<p class=\"govuk-body\">If you do not agree that the case is settled, please outline your objections in"
+                        + " writing within 19 days of the settlement date, to the Civil National Business Centre using the email address at {cmcCourtEmailId}</p>")
             );
     }
 }

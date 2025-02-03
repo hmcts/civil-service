@@ -4,10 +4,10 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.properties.mediation.MediationCSVEmailConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -35,37 +35,40 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 
-@SpringBootTest(classes = {
-    GenerateMediationJsonAndTransferTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateMediationJsonAndTransferHandlerTest {
 
-    @MockBean
-    private ExternalTask externalTask;
-    @MockBean
-    private ExternalTaskService externalTaskService;
-    @MockBean
-    private MediationCasesSearchService searchService;
-    @MockBean
-    private CaseDetailsConverter caseDetailsConverter;
-    @Autowired
+    @InjectMocks
     private GenerateMediationJsonAndTransferTaskHandler mediationJsonHandler;
-    @MockBean
+
+    @Mock
+    private ExternalTask externalTask;
+
+    @Mock
+    private ExternalTaskService externalTaskService;
+
+    @Mock
+    private MediationCasesSearchService searchService;
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @Mock
     private  SendGridClient sendGridClient;
-    @MockBean
-    private  MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
-    @MockBean
+
+    @Mock
     private MediationJsonService mediationJsonService;
-    @MockBean
+
+    @Mock
+    private  MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+
+    @Mock
     private FeatureToggleService featureToggleService;
 
     private CaseDetails caseDetailsWithInMediationState;
     private CaseDetails caseDetailsWithInMediationStateNotToProcess;
     private CaseData caseDataInMediation;
     private CaseData caseDataInMediationNotToProcess;
-    private static final String SENDER = "sender@gmail.com";
     private static final String RECIPIENT = "recipient@gmail.com";
     private final LocalDate claimToBeProcessed = LocalDate.now().minusDays(1);
     private final LocalDate claimNotToBeProcessed = LocalDate.now();
@@ -76,16 +79,13 @@ class GenerateMediationJsonAndTransferHandlerTest {
         caseDetailsWithInMediationStateNotToProcess = getCaseDetails(2L, claimNotToBeProcessed);
         caseDataInMediation = getCaseData(1L, claimToBeProcessed);
         caseDataInMediationNotToProcess = getCaseData(2L, claimNotToBeProcessed);
-        when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(SENDER);
-        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(true);
     }
 
     @Test
     void shouldGenerateJsonAndSendEmailSuccessfully() {
         when(searchService.getInMediationCases(claimToBeProcessed, true)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
+        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimToBeProcessed, true);
@@ -97,10 +97,9 @@ class GenerateMediationJsonAndTransferHandlerTest {
     @Test
     void shouldNotGenerateJsonAndSendEmail() {
         List<CaseDetails> cases = new ArrayList<>();
-        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
-        when(externalTask.getVariable(any())).thenReturn(date);
+        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
+        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
         when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(cases);
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
@@ -109,27 +108,13 @@ class GenerateMediationJsonAndTransferHandlerTest {
     }
 
     @Test
-    void shouldNotGenerateJsonAndSendEmailCarmToggleOff() {
-        List<CaseDetails> cases = new ArrayList<>();
-        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
-        when(externalTask.getVariable(any())).thenReturn(date);
-        when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(cases);
-        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(false);
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
-
-        mediationJsonHandler.execute(externalTask, externalTaskService);
-        verify(searchService, times(0)).getInMediationCases(eq(claimNotToBeProcessed), anyBoolean());
-        verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
     void should_handle_task_from_external_variable() {
-        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
-        when(externalTask.getVariable(any())).thenReturn(date);
+        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
+        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
         when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
+        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
@@ -142,7 +127,7 @@ class GenerateMediationJsonAndTransferHandlerTest {
     void shouldGenerateCsvAndSendEmailSuccessfully_R2LipVLipFlagEnabled() {
         when(searchService.getInMediationCases(claimToBeProcessed, true)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
+        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
 
         mediationJsonHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimToBeProcessed, true);

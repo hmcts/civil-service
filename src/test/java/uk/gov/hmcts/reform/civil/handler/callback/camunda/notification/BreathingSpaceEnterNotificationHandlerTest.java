@@ -25,9 +25,10 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 
 @ExtendWith(SpringExtension.class)
-public class BreathingSpaceEnterNotificationHandlerTest {
+class BreathingSpaceEnterNotificationHandlerTest {
 
     @InjectMocks
     private BreathingSpaceEnterNotificationHandler handler;
@@ -40,7 +41,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     private OrganisationService organisationService;
 
     @Test
-    public void notifyRespondent1_enter() {
+    void notifyRespondent1_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -55,6 +56,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent1(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -80,7 +82,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -88,7 +90,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyRespondent2_enter() {
+    void notifyRespondent2_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -103,6 +105,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -128,7 +131,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -136,7 +139,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyRespondent2SameSolicitor_enter() {
+    void notifyRespondent2SameSolicitor_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -151,6 +154,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -178,7 +182,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -186,7 +190,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyRespondent2DiffSolicitor_enter() {
+    void notifyRespondent2DiffSolicitor_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterDefendantEmailTemplate())
@@ -201,6 +205,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("company name")
@@ -228,7 +233,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             eq(null),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
@@ -236,7 +241,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
     }
 
     @Test
-    public void notifyApplicant1_enter() {
+    void notifyApplicant1_enter() {
         String recipient = "recipient";
         String templateId = "templateId";
         Mockito.when(notificationsProperties.getBreathingSpaceEnterApplicantEmailTemplate())
@@ -247,6 +252,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
         String solicitorName = "solicitor name";
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .ccdCaseReference(CASE_ID)
             .applicant1(Party.builder()
                             .type(Party.Type.COMPANY)
                             .companyName("company name")
@@ -277,7 +283,7 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             eq(recipient),
             eq(templateId),
             argThat(
-                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
+                map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC).equals(solicitorName)),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );

@@ -8,11 +8,15 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Notificat
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +24,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
 
     private static final String REFERENCE_TEMPLATE = "evidence-upload-notification-%s";
     private final NotificationService notificationService;
+    private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
 
     public void notifyRespondentEvidenceUpload(CaseData caseData, boolean isForRespondentSolicitor1) throws NotificationException {
@@ -43,10 +48,13 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
 
         if (null != email && nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
+            Map<String, String> properties = addProperties(caseData);
+            properties.put(CLAIM_REFERENCE_NUMBER, getCaseRef(caseData, isRespondentLip));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getOrgName(caseData, isForRespondentSolicitor1, isRespondentLip));
             notificationService.sendMail(
                 email,
-                getTemplate(isRespondentLip),
-                addProperties(caseData),
+                getTemplate(caseData, isRespondentLip),
+                properties,
                 String.format(
                     REFERENCE_TEMPLATE,
                     caseData.getLegacyCaseReference()
@@ -55,16 +63,32 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
     }
 
-    public String getTemplate(boolean isRespondentLip) {
-        return isRespondentLip ? notificationsProperties.getEvidenceUploadLipTemplate()
-                                    : notificationsProperties.getEvidenceUploadTemplate();
+    public String getTemplate(CaseData caseData, boolean isRespondentLip) {
+        if (isRespondentLip && caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getEvidenceUploadLipTemplateWelsh();
+        } else if (isRespondentLip) {
+            return notificationsProperties.getEvidenceUploadLipTemplate();
+        } else {
+            return notificationsProperties.getEvidenceUploadTemplate();
+        }
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            UPLOADED_DOCUMENTS, caseData.getNotificationText()
-        );
+        return new HashMap<>(Map.of(
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            UPLOADED_DOCUMENTS, caseData.getNotificationText(),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+    }
+
+    private String getCaseRef(CaseData caseData, boolean isLip) {
+        return isLip ? caseData.getLegacyCaseReference() : caseData.getCcdCaseReference().toString();
+    }
+
+    private String getOrgName(CaseData caseData, boolean isForRespondentSolicitor1, boolean isLip) {
+        return isLip && isForRespondentSolicitor1 ? caseData.getRespondent1().getPartyName() : isForRespondentSolicitor1
+            ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            : getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
     }
 }

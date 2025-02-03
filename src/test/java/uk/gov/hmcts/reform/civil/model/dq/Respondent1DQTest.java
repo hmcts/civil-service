@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -188,7 +187,7 @@ class Respondent1DQTest extends DQTest {
                     .toDate(LocalDate.of(2020, 6, 2))
                     .who("who 2")
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             Hearing hearing = buildRespondent1Dq().toBuilder()
                 .respondent1DQHearing(null)
@@ -228,7 +227,7 @@ class Respondent1DQTest extends DQTest {
                     .toDate(LocalDate.of(2020, 6, 2))
                     .who("who 2")
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             Hearing hearing = buildRespondent1Dq().toBuilder()
                 .respondent1DQHearing(null)

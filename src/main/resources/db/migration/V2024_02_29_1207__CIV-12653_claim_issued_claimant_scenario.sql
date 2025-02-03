@@ -21,11 +21,18 @@ VALUES ('Notice.AAA6.ClaimIssue.Response.Await', 'Wait for defendant to respond'
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">View the claim</a>', 'The claim','<a href={VIEW_CLAIM_URL}>View the claim</a>',
-        'The claim', 'Claim.View', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 1),
-       ('<a href={VIEW_INFO_ABOUT_CLAIMANT} rel="noopener noreferrer" class="govuk-link">View information about the claimant</a>', 'The claim','<a href={VIEW_INFO_ABOUT_CLAIMANT}>View information about the claimant</a>',
-        'The claim', 'Claim.Claimant.Info', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 2),
-       ('<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">View information about the defendant</a>', 'The response','<a href={VIEW_INFO_ABOUT_DEFENDANT}>View information about the defendant</a>',
-        'The response', 'Response.Defendant.Info', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 4),
-       ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES}>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 13);
+values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">View the claim</a>', 'The claim',
+        '<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">Gweld yr hawliad</a>',
+        'Yr hawliad', 'Claim.View', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 1),
+       ('<a href={VIEW_INFO_ABOUT_CLAIMANT} rel="noopener noreferrer" class="govuk-link">View information about the claimant</a>', 'The claim',
+        '<a href={VIEW_INFO_ABOUT_CLAIMANT} rel="noopener noreferrer" class="govuk-link">Gweld gwybodaeth am yr hawliad</a>',
+        'Yr hawliad', 'Claim.Claimant.Info', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 2),
+       ('<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">View information about the defendant</a>', 'The response',
+        '<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">Gweld gwybodaeth am y diffynnydd</a>',
+        'Yr ymateb', 'Response.Defendant.Info', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 4),
+       ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,
+        '<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">Gweld gorchmynion a rhybuddion</a>',
+        'Gorchmynion a rhybuddion gan y llys', 'Order.View', 'Scenario.AAA6.ClaimIssue.Response.Await', '{3, 3}', 'CLAIMANT', 14),
+       ('<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
+        'Applications', '<a href={GENERAL_APPLICATIONS_INITIATION_PAGE_URL} rel="noopener noreferrer" class="govuk-link">Contact the court to request a change to my case</a>',
+         'Ceisiadau', 'Application.Create', 'Scenario.AAA6.ClaimIssue.Response.Await', '{4, 4}', 'CLAIMANT', 16);

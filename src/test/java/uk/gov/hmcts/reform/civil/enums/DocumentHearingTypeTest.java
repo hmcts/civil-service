@@ -2,12 +2,16 @@ package uk.gov.hmcts.reform.civil.enums;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DIS;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.DRH;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.TRI;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getContentText;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getTitleText;
 
 public class DocumentHearingTypeTest {
 
@@ -53,6 +57,32 @@ public class DocumentHearingTypeTest {
         void shouldThrowIllegalArgumentException_withInvalidInput() {
             assertThrows(IllegalArgumentException.class, () -> DocumentHearingType.getType("BAD"));
         }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "TRI, SMALL_CLAIM, hearing",
+        "TRI, FAST_CLAIM, trial",
+        "DRH, SMALL_CLAIM, dispute resolution hearing",
+        "DRH, FAST_CLAIM, dispute resolution hearing",
+        "DIS, SMALL_CLAIM, disposal hearing",
+        "DIS, FAST_CLAIM, disposal hearing"
+    })
+    void shouldReturnExpectedTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
+        assertEquals(expected, getTitleText(hearingType, allocatedTrack));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "TRI, SMALL_CLAIM, hearing",
+        "TRI, FAST_CLAIM, trial",
+        "DRH, SMALL_CLAIM, hearing",
+        "DRH, FAST_CLAIM, hearing",
+        "DIS, SMALL_CLAIM, hearing",
+        "DIS, FAST_CLAIM, hearing"
+    })
+    void shouldReturnExpectedContentText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
+        assertEquals(expected, getContentText(hearingType, allocatedTrack));
     }
 
 }

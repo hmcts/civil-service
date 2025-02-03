@@ -303,7 +303,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
-            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
+            || (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }
 
     private LocalDateTime getServiceDate(CaseData caseData) {

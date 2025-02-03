@@ -8,6 +8,8 @@
 ./bin/utils/ccd-add-role.sh "judge-profile"
 ./bin/utils/ccd-add-role.sh "APP-SOL-UNSPEC-PROFILE"
 ./bin/utils/ccd-add-role.sh "APP-SOL-SPEC-PROFILE"
+./bin/utils/ccd-add-role.sh "APPLICANT-PROFILE-SPEC"
+./bin/utils/ccd-add-role.sh "RESPONDENT-ONE-PROFILE-SPEC"
 ./bin/utils/ccd-add-role.sh "RES-SOL-ONE-UNSPEC-PROFILE"
 ./bin/utils/ccd-add-role.sh "RES-SOL-ONE-SPEC-PROFILE"
 ./bin/utils/ccd-add-role.sh "RES-SOL-TWO-UNSPEC-PROFILE"
@@ -38,6 +40,9 @@
 ./bin/utils/ccd-add-role.sh "hearing-centre-team-leader"
 ./bin/utils/ccd-add-role.sh "next-hearing-date-admin"
 ./bin/utils/ccd-add-role.sh "court-officer-order"
+./bin/utils/ccd-add-role.sh "nbc-team-leader"
+./bin/utils/ccd-add-role.sh "ctsc"
+./bin/utils/ccd-add-role.sh "ctsc-team-leader"
 
 roles=("solicitor" "systemupdate" "admin" "staff")
 for role in "${roles[@]}"

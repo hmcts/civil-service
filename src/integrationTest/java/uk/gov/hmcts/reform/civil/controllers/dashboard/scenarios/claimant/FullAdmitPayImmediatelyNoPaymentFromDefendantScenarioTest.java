@@ -1,43 +1,57 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
+import uk.gov.hmcts.reform.civil.handler.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends BaseIntegrationTest {
+public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandler handler;
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     @Test
     void should_create_full_admit_pay_immediately_no_payment_scenario() throws Exception {
+        String caseId = "1234678912136";
+        LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build().toBuilder()
+            .ccdCaseReference(Long.valueOf(caseId))
+            .totalClaimAmount(BigDecimal.valueOf(124.67))
+            .applicant1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
+                                               .build())
+            .build();
 
-        UUID caseId = UUID.randomUUID();
-        LocalDate respondent1AdmittedAmountPaymentDeadline = OffsetDateTime.now().toLocalDate();
-        String defendantName = "Dave Indent";
-        doPost(
-            BEARER_TOKEN,
-            ScenarioRequestParams.builder().params(new HashMap<>(Map.of(
-                "respondent1PartyName", defendantName,
-                "respondent1AdmittedAmountPaymentDeadlineEn", respondent1AdmittedAmountPaymentDeadline,
-                "respondent1AdmittedAmountPaymentDeadlineCy", respondent1AdmittedAmountPaymentDeadline
-                ))).build(),
-            DASHBOARD_CREATE_SCENARIO_URL,
-            SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
-            caseId
-        ).andExpect(status().isOk());
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).id(Long.valueOf(caseId)).build();
+
+        when(coreCaseDataService.getCase(Long.valueOf(caseId))).thenReturn(caseDetails);
+        when(userService.getAccessToken(any(), any())).thenReturn(BEARER_TOKEN);
+
+        handler.createClaimantDashboardScenario(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(Long.valueOf(
+            caseId)));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
@@ -45,16 +59,15 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends B
             jsonPath("$[0].titleEn").value("Immediate payment"),
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You have accepted Dave Indent's offer to pay £{fullAdmitPayImmediatelyPaymentAmount} immediately." +
-                    " Funds must be received in your account by " + respondent1AdmittedAmountPaymentDeadline + ".</p>" +
+                    " Funds must be received in your account by " + DateUtils.formatDate(whenWillThisAmountBePaid) + ".</p>" +
                     "<p class=\"govuk-body\">If you don't receive the money by then, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  " +
                     "rel=\"noopener noreferrer\" class=\"govuk-link\">you can request a County Court Judgment(CCJ)</a>.</p>"),
-            jsonPath("$[0].titleCy").value("Immediate payment"),
+            jsonPath("$[0].titleCy").value("Talu ar unwaith"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You have accepted Dave Indent's offer " +
-                    "to pay £{fullAdmitPayImmediatelyPaymentAmount} immediately. Funds must be received in your account by " +
-                    respondent1AdmittedAmountPaymentDeadline + ".</p>" +
-                    "<p class=\"govuk-body\">If you don't receive the money by then, " +
-                    "<a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">you can request a County Court Judgment(CCJ)</a>.</p>")
+                "<p class=\"govuk-body\">Rydych wedi derbyn cynnig Dave Indent i dalu £{fullAdmitPayImmediatelyPaymentAmount} " +
+                    "ar unwaith. Rhaid i’r arian gyrraedd eich cyfrif erbyn " + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid) + ".</p>" +
+                    "<p class=\"govuk-body\">Os na fyddwch wedi cael yr arian erbyn hynny, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"" +
+                    "  rel=\"noopener noreferrer\" class=\"govuk-link\">gallwch wneud cais am Ddyfarniad Llys Sifil (CCJ)</a>.</p>")
 
         );
     }

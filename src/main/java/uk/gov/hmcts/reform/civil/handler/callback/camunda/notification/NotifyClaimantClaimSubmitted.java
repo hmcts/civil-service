@@ -73,10 +73,10 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
 
     private String addTemplate(CaseData caseData) {
         boolean isWithHearingFee = caseData.getHelpWithFeesReferenceNumber() != null;
-        if (caseData.isBilingual() && isWithHearingFee) {
+        if (caseData.isClaimantBilingual() && isWithHearingFee) {
             return notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate();
         }
-        if (caseData.isBilingual()) {
+        if (caseData.isClaimantBilingual()) {
             return notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate();
         }
         if (isWithHearingFee) {

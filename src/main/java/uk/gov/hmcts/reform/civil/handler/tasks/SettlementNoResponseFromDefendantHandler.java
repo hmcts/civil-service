@@ -7,21 +7,22 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.SettlementNoResponseFromDefendantEvent;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.search.SettlementNoResponseFromDefendantSearchService;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class SettlementNoResponseFromDefendantHandler implements BaseExternalTaskHandler {
+public class SettlementNoResponseFromDefendantHandler extends BaseExternalTaskHandler {
 
     private final SettlementNoResponseFromDefendantSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = caseSearchService.getCases();
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
+        Set<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> {
@@ -31,5 +32,6 @@ public class SettlementNoResponseFromDefendantHandler implements BaseExternalTas
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
+        return ExternalTaskData.builder().build();
     }
 }

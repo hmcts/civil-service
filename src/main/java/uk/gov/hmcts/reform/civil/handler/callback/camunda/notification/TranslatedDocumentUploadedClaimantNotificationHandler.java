@@ -82,7 +82,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
 
     private String addTemplate(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            if (caseData.isBilingual()) {
+            if (caseData.isClaimantBilingual()) {
                 return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
             }
             return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish();

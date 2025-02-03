@@ -25,8 +25,11 @@ public class Respondent1DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
     private FixedRecoverableCosts respondent1DQFixedRecoverableCosts;
+    private FixedRecoverableCosts respondent1DQFixedRecoverableCostsIntermediate;
     private DisclosureOfElectronicDocuments respondent1DQDisclosureOfElectronicDocuments;
+    private DisclosureOfElectronicDocuments specRespondent1DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
+    private DisclosureOfNonElectronicDocuments specRespondent1DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent1DQDisclosureReport;
     private Experts respondent1DQExperts;
     private ExpertDetails respondToClaimExperts;
@@ -55,6 +58,7 @@ public class Respondent1DQ implements DQ {
     private YesOrNo responseClaimCourtLocationRequired;
     private RequestedCourt respondToCourtLocation;
     private VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
+    private DocumentsToBeConsidered respondent1DQClaimantDocumentsToBeConsidered;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
@@ -69,15 +73,33 @@ public class Respondent1DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("respondent1DQFixedRecoverableCostsIntermediate")
+    public FixedRecoverableCosts getFixedRecoverableCostsIntermediate() {
+        return respondent1DQFixedRecoverableCostsIntermediate;
+    }
+
+    @Override
     @JsonProperty("respondent1DQDisclosureOfElectronicDocuments")
     public DisclosureOfElectronicDocuments getDisclosureOfElectronicDocuments() {
         return respondent1DQDisclosureOfElectronicDocuments;
     }
 
     @Override
+    @JsonProperty("specRespondent1DQDisclosureOfElectronicDocuments")
+    public DisclosureOfElectronicDocuments getSpecDisclosureOfElectronicDocuments() {
+        return specRespondent1DQDisclosureOfElectronicDocuments;
+    }
+
+    @Override
     @JsonProperty("respondent1DQDisclosureOfNonElectronicDocuments")
     public DisclosureOfNonElectronicDocuments getDisclosureOfNonElectronicDocuments() {
         return respondent1DQDisclosureOfNonElectronicDocuments;
+    }
+
+    @Override
+    @JsonProperty("specRespondent1DQDisclosureOfNonElectronicDocuments")
+    public DisclosureOfNonElectronicDocuments getSpecDisclosureOfNonElectronicDocuments() {
+        return specRespondent1DQDisclosureOfNonElectronicDocuments;
     }
 
     @Override
@@ -217,5 +239,11 @@ public class Respondent1DQ implements DQ {
     @JsonProperty("respondent1DQRemoteHearing")
     public RemoteHearing getRemoteHearing() {
         return respondent1DQRemoteHearing;
+    }
+
+    @Override
+    @JsonProperty("respondent1DQClaimantDocumentsToBeConsidered")
+    public DocumentsToBeConsidered getDocumentsToBeConsidered() {
+        return respondent1DQClaimantDocumentsToBeConsidered;
     }
 }

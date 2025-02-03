@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_SDO_ORDER_TO_LIP_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_SDO_ORDER_TO_LIP_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -37,7 +38,8 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
     @MockBean
     private DocumentDownloadService documentDownloadService;
 
-    public static final String TASK_ID = "SendSDOToDefendantLIP";
+    public static final String TASK_ID_DEFENDANT = "SendSDOToDefendantLIP";
+    public static final String TASK_ID_CLAIMANT = "SendSDOToClaimantLIP";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -48,21 +50,41 @@ public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandle
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
                 SEND_SDO_ORDER_TO_LIP_DEFENDANT.name()).build())
-                                                 .build())).isEqualTo(TASK_ID);
+                                                 .build())).isEqualTo(TASK_ID_DEFENDANT);
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+                SEND_SDO_ORDER_TO_LIP_CLAIMANT.name()).build())
+                                                 .build())).isEqualTo(TASK_ID_CLAIMANT);
     }
 
     @Test
-    void shouldDownloadDocumentAndPrintLetterSuccessfully() {
+    void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLiP() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_SDO_ORDER_TO_LIP_DEFENDANT.name());
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
 
         // then
         assertThat(response.getErrors()).isNull();
-        verify(sendSDOBulkPrintService).sendSDOToDefendantLIP(any(), any());
+        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), any());
+    }
+
+    @Test
+    void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLiP() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(SEND_SDO_ORDER_TO_LIP_CLAIMANT.name());
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        verify(sendSDOBulkPrintService).sendSDOOrderToLIP(any(), any(), any());
     }
 }

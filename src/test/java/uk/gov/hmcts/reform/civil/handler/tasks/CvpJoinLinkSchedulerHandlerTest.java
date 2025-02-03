@@ -14,11 +14,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.CvpJoinLinkEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingDateSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,34 +47,20 @@ class CvpJoinLinkSchedulerHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private CvpJoinLinkSchedulerHandler handler;
 
     @BeforeEach
     void init() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
-    }
-
-    @Test
-    void shouldDoNothing_whenAHNFeatureToggleIsTurnedOff() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verifyNoInteractions(searchService);
-        verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldEmitCvpJoinLinkEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
@@ -87,7 +72,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
     @Test
     void shouldNotEmitCvpJoinLinkEvent_WhenNoCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -105,7 +90,7 @@ class CvpJoinLinkSchedulerHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask, null);
+        verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
@@ -140,7 +125,7 @@ class CvpJoinLinkSchedulerHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 

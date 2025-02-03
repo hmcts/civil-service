@@ -20,29 +20,31 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
-import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.time.LocalDateTime;
@@ -67,7 +69,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
         RoboticsNotificationService.class,
         JacksonAutoConfiguration.class,
         CaseDetailsConverter.class,
-        StateFlowEngine.class,
+        SimpleStateFlowEngine.class,
+        SimpleStateFlowBuilder.class,
+        TransitionsTestConfiguration.class,
         EventHistorySequencer.class,
         EventHistoryMapper.class,
         RoboticsDataMapper.class,
@@ -113,7 +117,7 @@ class RoboticsNotificationServiceTest {
     @MockBean
     private Time time;
     @MockBean
-    LocationRefDataService locationRefDataService;
+    LocationReferenceDataService locationRefDataService;
     @MockBean
     LocationRefDataUtil locationRefDataUtil;
 
@@ -174,12 +178,12 @@ class RoboticsNotificationServiceTest {
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
                 .miscellaneous(Event.builder()
-                   .eventDetailsText(lastEventText)
-                   .dateReceived(LocalDateTime.now())
-                   .build())
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
                 .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
         service.notifyRobotics(caseData, false, BEARER_TOKEN);
@@ -237,7 +241,7 @@ class RoboticsNotificationServiceTest {
             "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
         );
         String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
-                                "Claim details notified.");
+            "Claim details notified.");
 
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
@@ -268,21 +272,21 @@ class RoboticsNotificationServiceTest {
                     .build()
             ).build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(roboticsCaseData);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
 
         // When
         service.notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
 
-        verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData);
+        verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData, BEARER_TOKEN);
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
         String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
         String subject = format("Multiparty LR v LR Case Data for %s - %s - %s", reference, caseData.getCcdState(),
-                                lastEventText);
+            lastEventText);
 
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
@@ -321,8 +325,8 @@ class RoboticsNotificationServiceTest {
             "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
         );
         String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
-                                "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
-                                    + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false");
+            "[1 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
+                + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false");
 
         // Then
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
@@ -343,13 +347,13 @@ class RoboticsNotificationServiceTest {
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
-                                           .eventDetailsText(lastEventText)
-                                           .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
+                .miscellaneous(Event.builder()
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
+                .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
         service.notifyRobotics(caseData, false, BEARER_TOKEN);
@@ -381,16 +385,16 @@ class RoboticsNotificationServiceTest {
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
-                                           .eventDetailsText(lastEventText)
-                                           .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
+                .miscellaneous(Event.builder()
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
+                .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
-        service.notifyJudgementLip(caseData);
+        service.notifyJudgementLip(caseData, BEARER_TOKEN);
 
         //Then
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -415,16 +419,16 @@ class RoboticsNotificationServiceTest {
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
-                                           .eventDetailsText(lastEventText)
-                                           .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
+                .miscellaneous(Event.builder()
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
+                .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
-        service.notifyJudgementLip(caseData);
+        service.notifyJudgementLip(caseData, BEARER_TOKEN);
 
         //Then
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -449,16 +453,16 @@ class RoboticsNotificationServiceTest {
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
-                                           .eventDetailsText(lastEventText)
-                                           .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
+                .miscellaneous(Event.builder()
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
+                .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
-        service.notifyJudgementLip(caseData);
+        service.notifyJudgementLip(caseData, BEARER_TOKEN);
 
         //Then
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -483,16 +487,16 @@ class RoboticsNotificationServiceTest {
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
-                                           .eventDetailsText(lastEventText)
-                                           .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
+                .miscellaneous(Event.builder()
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
+                .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
-        service.notifyJudgementLip(caseData);
+        service.notifyJudgementLip(caseData, BEARER_TOKEN);
 
         //Then
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -517,24 +521,24 @@ class RoboticsNotificationServiceTest {
             .caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
                 DJPaymentTypeSelection.SET_DATE)
             .businessProcess(BusinessProcess.builder()
-                                 .camundaEvent(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
-                                 .build())
+                .camundaEvent(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())
+                .build())
             .build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
-                                           .eventDetailsText(lastEventText)
-                                           .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
+                .miscellaneous(Event.builder()
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
+                .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
-        service.notifyJudgementLip(caseData);
+        service.notifyJudgementLip(caseData, BEARER_TOKEN);
 
         //Then
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -560,16 +564,16 @@ class RoboticsNotificationServiceTest {
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
-                                           .eventDetailsText(lastEventText)
-                                           .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
+                .miscellaneous(Event.builder()
+                    .eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build())
+                .build())
             .build();
-        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
-        service.notifyJudgementLip(caseData);
+        service.notifyJudgementLip(caseData, BEARER_TOKEN);
 
         //Then
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -582,5 +586,48 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSendNotificationEmailWithLipVLrSubjectLine() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+
+        caseData = caseData.toBuilder()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder()
+                        .miscellaneous(Event.builder()
+                                           .eventDetailsText(lastEventText)
+                                           .dateReceived(LocalDateTime.now())
+                                           .build())
+                        .build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
+
+        // When
+        service.notifyRobotics(caseData, false, BEARER_TOKEN);
+
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String fileName = format("CaseData_%s.json", reference);
+        String message = format("Robotics case data JSON is attached for %s", reference);
+        String subject = format("LIP v LR Case Data for %s", reference);
+
+        // Then
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
+        assertThat(capturedEmailData.getAttachments()).hasSize(1);
+        assertThat(capturedEmailData.getAttachments())
+            .extracting("filename", "contentType")
+            .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
     }
 }

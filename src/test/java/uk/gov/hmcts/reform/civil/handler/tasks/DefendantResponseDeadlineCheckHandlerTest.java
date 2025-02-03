@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.event.DefendantResponseDeadlineCheckEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.service.search.DefendantResponseDeadlineCheckSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.any;
@@ -60,7 +60,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
     void shouldEmitRespondentResponseDeadlineCheckEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
@@ -72,7 +72,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
 
     @Test
     void shouldNotEmitRespondentResponseDeadlineCheckEvent_WhenNoCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -90,7 +90,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(mockTask, null);
+        verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
             eq(errorMessage),
@@ -125,7 +125,7 @@ class DefendantResponseDeadlineCheckHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 

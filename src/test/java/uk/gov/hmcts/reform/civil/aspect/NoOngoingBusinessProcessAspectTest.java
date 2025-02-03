@@ -8,26 +8,26 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,36 +38,49 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    NoOngoingBusinessProcessAspect.class,
-    FlowStateAllowedEventService.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    StateFlowEngine.class})
+@ExtendWith(MockitoExtension.class)
 class NoOngoingBusinessProcessAspectTest {
 
-    @Autowired
-    NoOngoingBusinessProcessAspect aspect;
-    @MockBean
-    FeatureToggleService featureToggleService;
+    @InjectMocks
+    private NoOngoingBusinessProcessAspect aspect;
+
+    @Mock
+    private FlowStateAllowedEventService flowStateAllowedEventService;
+
+    @Mock
+    private SimpleStateFlowEngine stateFlowEngine;
+
+    @Mock
+    private StateFlow stateFlow;
+
+    @Mock
+    private ProceedingJoinPoint proceedingJoinPoint;
+
+    @SneakyThrows
+    private void mockProceedingJoinPoint(AboutToStartOrSubmitCallbackResponse response) {
+        when(proceedingJoinPoint.proceed()).thenReturn(response);
+    }
+
+    private CallbackParams createCallbackParams(String eventId, CaseData caseData) {
+        return CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_START, caseData)
+            .request(CallbackRequest.builder().eventId(eventId).build())
+            .build();
+    }
 
     @Nested
-    class UserEvent {
-
-        @MockBean
-        ProceedingJoinPoint proceedingJoinPoint;
+    class UserEventTests {
 
         @Test
         @SneakyThrows
-        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess() {
+        void shouldProceedWhenNoOngoingBusinessProcess() {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
-            when(proceedingJoinPoint.proceed()).thenReturn(response);
+            mockProceedingJoinPoint(response);
 
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimDetailsNotified().build())
-                .request(CallbackRequest.builder().eventId(ACKNOWLEDGE_CLAIM.name()).build())
-                .build();
+            CallbackParams callbackParams = createCallbackParams(
+                ACKNOWLEDGE_CLAIM.name(),
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+            );
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
@@ -75,42 +88,46 @@ class NoOngoingBusinessProcessAspectTest {
             verify(proceedingJoinPoint).proceed();
         }
 
-        @SneakyThrows
         @ParameterizedTest
+        @SneakyThrows
         @NullSource
         @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.INCLUDE)
-        void shouldProceedToMethodInvocation_whenBusinessProcessStatusIsNullOrFinished(BusinessProcessStatus status) {
+        void shouldProceedWhenBusinessProcessStatusIsNullOrFinished(BusinessProcessStatus status) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
-            when(proceedingJoinPoint.proceed()).thenReturn(response);
+            mockProceedingJoinPoint(response);
 
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder()
+            CallbackParams callbackParams = createCallbackParams(
+                CREATE_CLAIM.name(),
+                CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .businessProcess(BusinessProcess.builder().status(status).build())
-                    .build())
-                .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
-                .build();
+                    .build()
+            );
+
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
             assertThat(result).isEqualTo(response);
             verify(proceedingJoinPoint).proceed();
         }
 
-        @SneakyThrows
         @ParameterizedTest
+        @SneakyThrows
         @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
-        void shouldNotProceedToMethodInvocation_whenOngoingBusinessProcess(BusinessProcessStatus status) {
+        void shouldNotProceedWhenOngoingBusinessProcess(BusinessProcessStatus status) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_MESSAGE))
                 .build();
 
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder()
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+            when(stateFlow.getStateHistory()).thenReturn(List.of(State.from("state1")));
+
+            CallbackParams callbackParams = createCallbackParams(
+                CREATE_CLAIM.name(),
+                CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .businessProcess(BusinessProcess.builder().status(status).build())
-                    .build())
-                .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
-                .build();
+                    .build()
+            );
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
@@ -118,13 +135,12 @@ class NoOngoingBusinessProcessAspectTest {
             verify(proceedingJoinPoint, never()).proceed();
         }
 
-        @SneakyThrows
         @ParameterizedTest
+        @SneakyThrows
         @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
-        void shouldProceedToMethodInvocation_whenOngoingBusinessProcessOnSubmittedCallback(BusinessProcessStatus status
-        ) {
+        void shouldProceedWhenOngoingBusinessProcessOnSubmittedCallback(BusinessProcessStatus status) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
-            when(proceedingJoinPoint.proceed()).thenReturn(response);
+            mockProceedingJoinPoint(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(SUBMITTED, CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -141,21 +157,18 @@ class NoOngoingBusinessProcessAspectTest {
     }
 
     @Nested
-    class CamundaEvent {
-
-        @MockBean
-        ProceedingJoinPoint proceedingJoinPoint;
+    class CamundaEventTests {
 
         @Test
         @SneakyThrows
-        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess() {
+        void shouldProceedWhenNoOngoingBusinessProcess() {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
-            when(proceedingJoinPoint.proceed()).thenReturn(response);
+            mockProceedingJoinPoint(response);
 
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder().atStateClaimDetailsNotified().build())
-                .request(CallbackRequest.builder().eventId(START_BUSINESS_PROCESS.name()).build())
-                .build();
+            CallbackParams callbackParams = createCallbackParams(
+                START_BUSINESS_PROCESS.name(),
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+            );
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 
@@ -163,21 +176,21 @@ class NoOngoingBusinessProcessAspectTest {
             verify(proceedingJoinPoint).proceed();
         }
 
-        @SneakyThrows
         @ParameterizedTest
+        @SneakyThrows
         @NullSource
         @EnumSource(value = BusinessProcessStatus.class)
-        void shouldProceedToMethodInvocation_whenBusinessProcessStatusIsNullOrFinished(BusinessProcessStatus status) {
+        void shouldProceedWhenBusinessProcessStatusIsNullOrFinished(BusinessProcessStatus status) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
-            when(proceedingJoinPoint.proceed()).thenReturn(response);
+            mockProceedingJoinPoint(response);
 
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_START, CaseDataBuilder.builder()
+            CallbackParams callbackParams = createCallbackParams(
+                START_BUSINESS_PROCESS.name(),
+                CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .businessProcess(BusinessProcess.builder().status(status).build())
-                    .build())
-                .request(CallbackRequest.builder().eventId(START_BUSINESS_PROCESS.name()).build())
-                .build();
+                    .build()
+            );
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 

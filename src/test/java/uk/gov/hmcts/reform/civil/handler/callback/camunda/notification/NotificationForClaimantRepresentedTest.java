@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -42,21 +41,18 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationForClaimantRepresented.TASK_ID_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationForClaimantRepresented.TASK_ID_APPLICANT_SOLICITOR;
 
-@SpringBootTest(classes = {
-    NotificationForClaimantRepresented.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private NotificationForClaimantRepresented notificationHandler;
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     NotificationsProperties notificationsProperties;
     @Captor
     private ArgumentCaptor<String> targetEmail;
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
     @Captor
     private ArgumentCaptor<String> emailTemplate;
@@ -77,14 +73,6 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         private static final String CLAIMANT_ORG_NAME = "Org Name";
         private static final String APPLICANT_SOLICITOR_TEMPLATE = "applicant1-solicitor-id";
 
-        @BeforeEach
-        void setUp() {
-            given(notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate()).willReturn(EMAIL_TEMPLATE);
-            given(notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate()).willReturn(EMAIL_TEMPLATE);
-            given(notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate()).willReturn(EMAIL_WELSH_TEMPLATE);
-            given(notificationsProperties.getNoticeOfChangeApplicantLipSolicitorTemplate()).willReturn(APPLICANT_SOLICITOR_TEMPLATE);
-        }
-
         @Test
         void shouldSendNotificationToDefendantLip_whenEventIsCalledAndDefendantHasEmail() {
             //Given
@@ -99,6 +87,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED.name()).build()).build();
             //When
+            given(notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate()).willReturn(EMAIL_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -110,7 +99,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void notifyApplicantAfterNocApproval() {
+        void notifyApplicantAfterNocApproval() {
 
             //Given
             CaseData caseData = CaseData.builder()
@@ -127,6 +116,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
                 .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL.name()).build())
                 .build();
             //When
+            given(notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate()).willReturn(EMAIL_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -138,7 +128,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void notifyApplicantAfterNocApprovalBilingual() {
+        void notifyApplicantAfterNocApprovalBilingual() {
 
             //Given
             CaseData caseData = CaseData.builder()
@@ -155,6 +145,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
                 .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL.name()).build())
                 .build();
             //When
+            given(notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate()).willReturn(EMAIL_WELSH_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -189,6 +180,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
                     .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("test solicitor").build()));
 
             //When
+            given(notificationsProperties.getNoticeOfChangeApplicantLipSolicitorTemplate()).willReturn(APPLICANT_SOLICITOR_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),

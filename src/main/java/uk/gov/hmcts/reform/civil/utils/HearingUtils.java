@@ -53,11 +53,11 @@ public class HearingUtils {
     public static String getHearingType(CaseData caseData) {
         switch (caseData.getChannel()) {
             case IN_PERSON:
-                return caseData.getHearingLocation().getValue().getLabel();
+                return "in person";
             case VIDEO:
-                return "video conference";
+                return "by video conference";
             case TELEPHONE:
-                return "telephone";
+                return "by telephone";
             default:
                 return "not defined";
         }
@@ -65,8 +65,28 @@ public class HearingUtils {
 
     public static String formatHearingDuration(HearingDuration hearingDuration) {
         switch (hearingDuration) {
+            case MINUTES_05:
+                return "5 minutes";
+            case MINUTES_10:
+                return "10 minutes";
+            case MINUTES_15:
+                return "15 minutes";
+            case MINUTES_20:
+                return "20 minutes";
+            case MINUTES_25:
+                return "25 minutes";
             case MINUTES_30:
                 return "30 minutes";
+            case MINUTES_35:
+                return "35 minutes";
+            case MINUTES_40:
+                return "40 minutes";
+            case MINUTES_45:
+                return "45 minutes";
+            case MINUTES_50:
+                return "50 minutes";
+            case MINUTES_55:
+                return "55 minutes";
             case MINUTES_60:
                 return "1 hour";
             case MINUTES_90:

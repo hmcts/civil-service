@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -40,37 +39,31 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    ClaimantDefendantAgreedMediationRespondentNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
+
+    @InjectMocks
     private ClaimantDefendantAgreedMediationRespondentNotificationHandler  handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplateWelsh()).thenReturn("template-id-welsh");
-            when(notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
-            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        }
-
         @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
+            when(notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate()).thenReturn("template-id");
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -98,6 +91,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentLiPBilingual_whenInvoked() {
+            when(notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplateWelsh()).thenReturn("template-id-welsh");
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -126,8 +121,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentLR_whenInvoked() {
-            when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
+            when(notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate()).thenReturn("template-id");
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
 
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
@@ -154,9 +149,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondent1LR_whenInvokedCarm() {
-            when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
-
+            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             Party respondent1 = PartyBuilder.builder().soleTrader()
@@ -185,9 +179,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondent2LR_whenInvokedCarm() {
-            when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor 2 org").build()));
-
+            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor 2 org").build()));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             Party respondent1 = PartyBuilder.builder().soleTrader()
@@ -261,4 +254,3 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         }
     }
 }
-

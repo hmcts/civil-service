@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.List;
 
@@ -16,10 +16,10 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 @Component
 public class LocationRefDataUtil {
 
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
 
     @Autowired
-    public LocationRefDataUtil(LocationRefDataService locationRefDataService) {
+    public LocationRefDataUtil(LocationReferenceDataService locationRefDataService) {
 
         this.locationRefDataService = locationRefDataService;
     }

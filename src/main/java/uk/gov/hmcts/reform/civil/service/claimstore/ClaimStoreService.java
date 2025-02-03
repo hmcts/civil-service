@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
+import uk.gov.hmcts.reform.cmc.model.DefendantLinkStatus;
 import uk.gov.hmcts.reform.cmc.model.Response;
 
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,7 +28,7 @@ public class ClaimStoreService {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForClaimant(authorisation, claimantId));
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return Collections.emptyList();
         }
     }
@@ -37,8 +37,17 @@ public class ClaimStoreService {
         try {
             return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForDefendant(authorisation, defendantId));
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return Collections.emptyList();
+        }
+    }
+
+    public DefendantLinkStatus isOcmcDefendantLinked(String caseReference) {
+        try {
+            return claimStoreApi.isDefendantLinked(caseReference);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return DefendantLinkStatus.builder().linked(false).build();
         }
     }
 
@@ -64,7 +73,7 @@ public class ClaimStoreService {
                                                                                            .orElse(null))
                                               .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
                                               .build()
-        ).collect(Collectors.toList());
+        ).toList();
     }
 
     private LocalDateTime createAtToCreateDate(CmcClaim claim) {

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
@@ -40,6 +41,7 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
                     .build())
             .respondent1ResponseDeadline(responseDeadline.atStartOfDay())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .applicant1ResponseDeadline(LocalDateTime.of(2024, 3, 21, 16, 0))
             .responseClaimMediationSpecRequired(NO)
             .applicant1Represented(NO)
@@ -53,8 +55,9 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
-                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has rejected the claim and refused mediation.<br>You need to respond by 21 March 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
-                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">James John has rejected the claim and refused mediation.<br>You need to respond by 21 Mawrth 2024.<br><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>")
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">James John has rejected the claim and refused mediation. You need to respond by 21 March 2024.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
+                jsonPath("$[0].descriptionCy").value("<p class=\"govuk-body\">Mae James John wedi gwrthod yr hawliad ac wedi gwrthod cyfryngu. Mae angen i chi ymateb erbyn 21 Mawrth 2024.</p><p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );
     }
 }

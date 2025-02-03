@@ -53,7 +53,7 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
 
         notificationService.sendMail(
             getRecipientEmail(caseData),
-            getNotificationTemplate(),
+            getNotificationTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -69,8 +69,10 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
         );
     }
 
-    private String getNotificationTemplate() {
-        return notificationsProperties.getNotifyClaimantLipHelpWithFees();
+    private String getNotificationTemplate(CaseData caseData) {
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getNotifyClaimantLipHelpWithFeesWelsh()
+            : notificationsProperties.getNotifyClaimantLipHelpWithFees();
     }
 
     private String getRecipientEmail(CaseData caseData) {

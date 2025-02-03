@@ -54,12 +54,10 @@ public class TrialReadyFormGenerator {
         );
 
         switch (userRole) {
-            case APPLICANTSOLICITORONE:
-            case CLAIMANT:
+            case APPLICANTSOLICITORONE, CLAIMANT:
                 assignCategoryId.assignCategoryIdToCaseDocument(trialReadyDocument, DocCategory.DQ_APP1.getValue());
                 break;
-            case RESPONDENTSOLICITORONE:
-            case DEFENDANT:
+            case RESPONDENTSOLICITORONE, DEFENDANT:
                 assignCategoryId.assignCategoryIdToCaseDocument(trialReadyDocument, DocCategory.DQ_DEF1.getValue());
                 break;
             case RESPONDENTSOLICITORTWO:

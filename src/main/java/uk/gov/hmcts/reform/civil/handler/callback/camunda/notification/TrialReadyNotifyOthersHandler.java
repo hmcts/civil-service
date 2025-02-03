@@ -8,14 +8,17 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY;
@@ -23,6 +26,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
@@ -42,6 +48,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -70,38 +77,66 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     private CallbackResponse notifySolicitorForOtherTrialReady(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String eventId = callbackParams.getRequest().getEventId();
-        String emailAddress;
+        String emailAddress = null;
         boolean isLiP;
         boolean isApplicant = false;
         switch (CaseEvent.valueOf(eventId)) {
             case NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY -> {
                 isApplicant = true;
                 isLiP = isLiP(isApplicant, false, caseData);
-                emailAddress = getEmail(isApplicant, false, isLiP, caseData);
-            }
-            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY -> {
-                isLiP = isLiP(isApplicant, false, caseData);
-                emailAddress = getEmail(isApplicant, false, isLiP, caseData);
-            }
-            default -> {
-                isLiP = isLiP(isApplicant, true, caseData);
-                emailAddress = getEmail(isApplicant, true, isLiP, caseData);
-                if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                if (isNull(caseData.getTrialReadyApplicant())) {
                     emailAddress = getEmail(isApplicant, false, isLiP, caseData);
                 }
             }
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY -> {
+                isLiP = isLiP(isApplicant, false, caseData);
+                if (isNull(caseData.getTrialReadyRespondent1())) {
+                    emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                }
+            }
+            default -> {
+                isLiP = isLiP(isApplicant, true, caseData);
+                if (isNull(caseData.getTrialReadyRespondent2())) {
+                    emailAddress = getEmail(isApplicant, true, isLiP, caseData);
+
+                    if (null == emailAddress && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+                        emailAddress = getEmail(isApplicant, false, isLiP, caseData);
+                    }
+                }
+            }
+        }
+
+        Map<String, String> properties = new HashMap<>();
+        if (!isLiP) {
+            properties = addProperties(caseData);
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getOrgName(CaseEvent.valueOf(eventId), caseData));
         }
 
         if (emailAddress != null && !emailAddress.isEmpty()) {
             notificationService.sendMail(
                 emailAddress,
-                isLiP ? notificationsProperties.getNotifyLipUpdateTemplate() : notificationsProperties.getOtherPartyTrialReady(),
-                isLiP ? addPropertiesLiP(isApplicant, caseData) : addProperties(caseData),
+                getTemplate(caseData, isLiP, isApplicant),
+                isLiP ? addPropertiesLiP(isApplicant, caseData) : properties,
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getTemplate(CaseData caseData, boolean isLiP, boolean isApplicant) {
+        String emailTemplate;
+        if (isLiP) {
+            if ((isApplicant && caseData.isClaimantBilingual())
+                || caseData.isRespondentResponseBilingual()) {
+                emailTemplate = notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                emailTemplate = notificationsProperties.getNotifyLipUpdateTemplate();
+            }
+        } else {
+            emailTemplate = notificationsProperties.getOtherPartyTrialReady();
+        }
+        return emailTemplate;
     }
 
     private String getEmail(boolean isApplicant, boolean isRespondent2, boolean isLiP, CaseData caseData) {
@@ -130,16 +165,42 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
 
     private Map<String, String> addPropertiesLiP(boolean isApplicant, CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_NAME, isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
-            CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getCcdCaseReference().toString(),
+            PARTY_NAME,
+            isApplicant ? caseData.getApplicant1().getPartyName() : caseData.getRespondent1().getPartyName(),
+            CLAIMANT_V_DEFENDANT,
+            getAllPartyNames(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        return new HashMap<>(Map.of(
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
+    }
+
+    private String getOrgName(CaseEvent eventId, CaseData caseData) {
+        switch (eventId) {
+            case NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY -> {
+                return isLiP(true, false, caseData)
+                    ? caseData.getApplicant1().getPartyName() : getApplicantLegalOrganizationName(caseData, organisationService);
+            }
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_OTHER_TRIAL_READY -> {
+                return isLiP(false, false, caseData)
+                    ? caseData.getRespondent1().getPartyName()
+                    : getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService);
+            }
+            default -> {
+                return isLiP(false, true, caseData)
+                    ? caseData.getRespondent2().getPartyName()
+                    : getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
+            }
+        }
     }
 }

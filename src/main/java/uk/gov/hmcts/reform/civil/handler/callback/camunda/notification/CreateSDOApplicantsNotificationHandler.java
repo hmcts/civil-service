@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANTS_SOLICITOR_SDO_TRIGGERED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +72,8 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantsLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                  .getOrganisation().getOrganisationID(), caseData)
         );
@@ -78,8 +81,9 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
 
     public Map<String, String> addPropertiesLip(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
     }
 
@@ -90,20 +94,17 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-
-        String unspecTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
-
-        String specTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
-
         if (caseData.isApplicantLiP()) {
-            return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+            if (caseData.isClaimantBilingual()) {
+                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
+            } else {
+                return notificationsProperties.getNotifyLipUpdateTemplate();
+            }
         } else {
             if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
-                return specTemplate;
+                return notificationsProperties.getSdoOrderedSpec();
             } else {
-                return unspecTemplate;
+                return notificationsProperties.getSdoOrdered();
             }
         }
     }

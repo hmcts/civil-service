@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class StateMachineUtils {
 
@@ -40,6 +39,6 @@ public class StateMachineUtils {
         return stateMachine.getTransitions().stream()
             .filter(isTransitionSourceEqualTo(state.getId()))
             .filter(isTransitionPermitted(stateContext))
-            .collect(Collectors.toList());
+            .toList();
     }
 }

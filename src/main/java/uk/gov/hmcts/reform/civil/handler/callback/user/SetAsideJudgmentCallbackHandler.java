@@ -13,12 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.SetAsideJudgmentOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,15 +29,20 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_SET_ASIDE_JUDGMENT;
 
 @Service
 @RequiredArgsConstructor
 public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(SET_ASIDE_JUDGMENT);
+
     protected final ObjectMapper objectMapper;
+    private final SetAsideJudgmentOnlineMapper setAsideJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
+    private static final String ERROR_MESSAGE_APPLICATION_DATE =
+        "Application date to set aside judgment must be on or before the date of the order setting aside judgment";
+    private static final String ERROR_MESSAGE_DEFENCE_DATE =
+        "Date the defence was received must be on or before the date of the order setting aside judgment";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -51,14 +54,27 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
+    }
+
     private CallbackResponse validateDates(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderType().equals(
-            JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION) ? caseData.getJoSetAsideOrderDate() : caseData.getJoSetAsideDefenceReceivedDate())) {
+        if (JudgmentsOnlineHelper.validateIfFutureDate(caseData.getJoSetAsideOrderDate())) {
             errors.add(ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST);
         }
+        if (JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION.equals(caseData.getJoSetAsideOrderType())
+            && caseData.getJoSetAsideApplicationDate().isAfter(caseData.getJoSetAsideOrderDate())) {
+            errors.add(ERROR_MESSAGE_APPLICATION_DATE);
+        }
+        if (JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE.equals(caseData.getJoSetAsideOrderType())
+            && caseData.getJoSetAsideDefenceReceivedDate().isAfter(caseData.getJoSetAsideOrderDate())) {
+            errors.add(ERROR_MESSAGE_DEFENCE_DATE);
+        }
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -75,27 +91,16 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
-            .judgmentStatusTypes(JudgmentStatusType.SET_ASIDE)
-            .lastUpdatedDate(LocalDateTime.now()).build();
-        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
-            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SET_ASIDE));
-        }
-        caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseData.setJoIsDisplayInJudgmentTab(YesOrNo.NO);
+        setAsideJudgmentOnlineMapper.moveToHistoricJudgment(caseData);
 
-        if (caseData.getJoSetAsideReason() == JudgmentSetAsideReason.JUDGMENT_ERROR) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_SET_ASIDE_JUDGMENT));
-        }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(SET_ASIDE_JUDGMENT))
+            .joSetAsideCreatedDate(LocalDateTime.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
     }
 }

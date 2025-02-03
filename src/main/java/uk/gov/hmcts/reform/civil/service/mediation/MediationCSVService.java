@@ -14,12 +14,12 @@ public abstract class MediationCSVService {
     private static final String CLAIMANT = "1";
     private static final String RESPONDENT = "2";
 
-    public String generateCSVContent(CaseData caseData, boolean isR2FlagEnabled) {
+    public String generateCSVContent(CaseData caseData) {
         MediationParams mediationParams = getMediationParams(caseData);
-        return getCSVContent(mediationParams, isR2FlagEnabled);
+        return getCSVContent(mediationParams);
     }
 
-    private String getCSVContent(MediationParams params, boolean isR2FlagEnabled) {
+    private String getCSVContent(MediationParams params) {
         CaseData data = params.getCaseData();
         ApplicantContactDetails applicantContactDetails = getApplicantContactDetails();
         DefendantContactDetails defendantContactDetails = getDefendantContactDetails();
@@ -29,7 +29,8 @@ public abstract class MediationCSVService {
             getCsvCompanyName(data.getApplicant1()), applicantContactDetails.getApplicantContactName(params),
             applicantContactDetails.getApplicantContactNumber(params),
             applicantContactDetails.getApplicantContactEmail(params),
-            isPilot(data.getTotalClaimAmount())
+            isPilot(data.getTotalClaimAmount()),
+            data.getCaseNamePublic()
         };
 
         String[] respondentData = {
@@ -37,16 +38,11 @@ public abstract class MediationCSVService {
             getCsvCompanyName(data.getRespondent1()), defendantContactDetails.getDefendantContactName(params),
             defendantContactDetails.getDefendantContactNumber(params),
             defendantContactDetails.getDefendantContactEmail(params),
-            isPilot(data.getTotalClaimAmount())
+            isPilot(data.getTotalClaimAmount()),
+            data.getCaseNamePublic()
         };
-
-        if (isR2FlagEnabled) {
-            return generateCSVRow(claimantData, getWelshFlag(data.isBilingual()), isR2FlagEnabled)
-                    + generateCSVRow(respondentData, null, isR2FlagEnabled);
-        }
-
-        return generateCSVRow(claimantData, null, false)
-                + generateCSVRow(respondentData, null, false);
+        return generateCSVRow(claimantData)
+            + generateCSVRow(respondentData);
     }
 
     protected abstract ApplicantContactDetails getApplicantContactDetails();
@@ -59,25 +55,19 @@ public abstract class MediationCSVService {
         return amount.compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No";
     }
 
-    private String generateCSVRow(String[] row, String bilingualFlag, boolean isR2FlagEnabled) {
+    private String generateCSVRow(String[] row) {
         StringBuilder builder = new StringBuilder();
 
         for (String rowValue : row) {
             builder.append(rowValue).append(",");
         }
-        if (isR2FlagEnabled) {
-            builder.append(bilingualFlag).append(",");
-        }
-        builder.append("\n");
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("\r\n");
 
         return builder.toString();
     }
 
     protected String getCsvCompanyName(Party party) {
         return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
-    }
-
-    private String getWelshFlag(boolean isBilingualFlag) {
-        return isBilingualFlag ? "Yes" : "No";
     }
 }

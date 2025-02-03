@@ -66,6 +66,7 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
+                .applicant1Represented(YesOrNo.NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                  .applicant1ClaimSettledDate(
                                      LocalDate.now()).build()).build();
@@ -75,13 +76,22 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
             scenarioParams.put("applicant1ClaimSettledDateCy", caseData.getApplicant1ClaimSettleDate());
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isDashboardServiceEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()
             ).build();
 
             handler.handle(params);
+            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "BEARER_TOKEN");
+            verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "BEARER_TOKEN");
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",

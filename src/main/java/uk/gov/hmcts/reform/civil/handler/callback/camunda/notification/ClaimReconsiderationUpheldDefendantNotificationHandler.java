@@ -53,10 +53,9 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
 
     private CallbackResponse notifyClaimReconsiderationUpheldToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
             notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
+                caseData.isRespondent1LiP() ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress(),
                 getTemplate(),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
@@ -78,25 +77,26 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
     }
 
     private String getTemplate() {
-        return notificationsProperties.getNotifyUpdateTemplate();
+        return notificationsProperties.getNotifyClaimReconsiderationLRTemplate();
     }
 
     private String getReferenceTemplate(CaseData caseData) {
-        return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+        return String.format(REFERENCE_TEMPLATE, caseData.getCcdCaseReference().toString());
     }
 
     public Map<String, String> addPropertiesDef2(final CaseData caseData) {
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent2().getPartyName()
         ));
     }
+
 }

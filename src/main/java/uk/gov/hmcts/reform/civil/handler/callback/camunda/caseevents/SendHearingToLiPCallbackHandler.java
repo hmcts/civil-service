@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 
 import java.util.List;
@@ -28,12 +29,13 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendHearingToClaimantLIP";
     private final SendHearingBulkPrintService sendHearingBulkPrintService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::sendHearingLetter
-        );
+        return featureToggleService.isCaseProgressionEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::sendHearingLetter)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
 
     @Override

@@ -1,29 +1,28 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -36,51 +35,44 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJApplicantReceivedNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_SPECIFIED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    DJApplicantReceivedNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
-public class DJApplicantReceivedNotificationHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class DJApplicantReceivedNotificationHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
-    NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private DJApplicantReceivedNotificationHandler handler;
-    @MockBean
+
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
-                .thenReturn("test-template-received-id");
-            when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
-                .thenReturn("test-template-requested-id");
-            when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
-                .thenReturn("test-template-requested-lip-id");
-            when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
-                .thenReturn("test-template-requested-lip-id-bilingual");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-            when(featureToggleService.isLipVLipEnabled())
-                .thenReturn(false);
-        }
-
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
+                .thenReturn("test-template-received-id");
+
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(YesOrNo.NO)
@@ -99,6 +91,11 @@ public class DJApplicantReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1AndBothSelected() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
+                .thenReturn("test-template-received-id");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YesOrNo.YES)
@@ -123,6 +120,11 @@ public class DJApplicantReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1AndBothNotSelected() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
+                .thenReturn("test-template-requested-id");
+
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -141,13 +143,15 @@ public class DJApplicantReceivedNotificationHandlerTest {
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "test-template-requested-id",
-                getNotificationDataMapForRequested(caseData),
+                getNotificationDataMapForRequested(),
                 "default-judgment-applicant-requested-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
+            when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
+                .thenReturn("test-template-requested-lip-id");
             when(featureToggleService.isLipVLipEnabled())
                 .thenReturn(true);
             //send Received email
@@ -174,8 +178,11 @@ public class DJApplicantReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantLip_whenInvokedAndLiPvsLiPEnabledAndBilingual() {
+            when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
+                .thenReturn("test-template-requested-lip-id-bilingual");
             when(featureToggleService.isLipVLipEnabled())
                     .thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                     .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .build())
@@ -203,17 +210,21 @@ public class DJApplicantReceivedNotificationHandlerTest {
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 LEGAL_ORG_SPECIFIED, "Test Org Name",
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                CLAIM_NUMBER, CASE_ID.toString(),
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapForRequested(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapForRequested() {
             return Map.of(
                 LEGAL_ORG_APPLICANT1, "Test Org Name",
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, "David"
+                CLAIM_NUMBER, CASE_ID.toString(),
+                DEFENDANT_NAME, "David",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 

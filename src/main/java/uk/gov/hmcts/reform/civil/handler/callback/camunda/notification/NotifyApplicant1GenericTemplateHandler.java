@@ -62,14 +62,16 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
 
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
         );
     }
 
     private String getNotificationTemplate(CaseData caseData) {
-        return caseData.isBilingual() ? notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual() : notificationsProperties.getNotifyLipUpdateTemplate();
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
+            : notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
     private String getRecipientEmail(CaseData caseData) {

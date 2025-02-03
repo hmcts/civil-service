@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -37,7 +38,10 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends 
                             .must(matchQuery(
                                 "data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid",
                                 targetDateString
-                            ))
+                            )).must(matchQuery(
+                        "data.respondent1ClaimResponseTypeForSpec",
+                        RespondentResponseType.FULL_ADMISSION
+                    ))
                             .must(beState(AWAITING_APPLICANT_INTENTION))
                 ),
             List.of("reference"),
@@ -46,7 +50,8 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends 
     }
 
     @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled) {
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
+                                String searchAfterValue) {
         return null;
     }
 

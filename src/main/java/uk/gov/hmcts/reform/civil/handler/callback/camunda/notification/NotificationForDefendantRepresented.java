@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_SOLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_DEFENDANT_REPRESENTED;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +72,8 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         var caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
         Map<String, Object> notificationTemplateMapping = setNotificationMapping(caseData, caseEvent);
-        if (!notificationTemplateMapping.isEmpty() && isNotEmpty(notificationTemplateMapping.get(EMAIL_MAP_ID).toString())) {
+        if (!notificationTemplateMapping.isEmpty() && notificationTemplateMapping.get(EMAIL_MAP_ID) != null
+            && isNotEmpty(notificationTemplateMapping.get(EMAIL_MAP_ID).toString())) {
             notificationService.sendMail(
                 notificationTemplateMapping.get(EMAIL_MAP_ID).toString(),
                 notificationTemplateMapping.get(TEMPLATE_MAP_ID).toString(),
@@ -104,7 +106,9 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
         return Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
-            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID())
+            LEGAL_REP_NAME, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
             );
     }
 
@@ -123,7 +127,9 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
             NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-            OTHER_SOL_NAME, getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData))
+            OTHER_SOL_NAME, getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -184,7 +190,7 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     }
 
     private String templateIDForClaimant(CaseData caseData) {
-        if (caseData.isBilingual()) {
+        if (caseData.isClaimantBilingual()) {
             return notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC();
         }
         return notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();

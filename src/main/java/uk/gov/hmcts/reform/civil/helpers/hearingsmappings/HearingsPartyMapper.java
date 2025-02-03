@@ -21,9 +21,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.util.Lists.emptyList;
+import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -103,10 +102,8 @@ public class HearingsPartyMapper {
             parties.add(getDetailsForPartyObject(caseData.getRespondent2(), DEFENDANT_ROLE.getPartyRoleValue()));
 
             // respondent 2 org individuals for COMPANY/ORG PartyType
-            if (caseData.getRespondent2().isCompanyOROrganisation()) {
-                if (caseData.getRespondent2OrgIndividuals() != null) {
-                    parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2OrgIndividuals()));
-                }
+            if (caseData.getRespondent2().isCompanyOROrganisation() && caseData.getRespondent2OrgIndividuals() != null) {
+                parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2OrgIndividuals()));
             }
 
             // respondent 2 solicitor
@@ -153,10 +150,8 @@ public class HearingsPartyMapper {
         parties.add(getDetailsForPartyObject(caseData.getRespondent1(), DEFENDANT_ROLE.getPartyRoleValue()));
 
         // respondent 1 org individuals for COMPANY/ORG PartyType
-        if (caseData.getRespondent1().isCompanyOROrganisation()) {
-            if (caseData.getRespondent1OrgIndividuals() != null) {
-                parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1OrgIndividuals()));
-            }
+        if (caseData.getRespondent1().isCompanyOROrganisation() && caseData.getRespondent1OrgIndividuals() != null) {
+            parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1OrgIndividuals()));
         }
 
         // respondent 1 solicitor
@@ -192,26 +187,22 @@ public class HearingsPartyMapper {
             parties.add(getDetailsForPartyObject(caseData.getApplicant2(), CLAIMANT_ROLE.getPartyRoleValue()));
 
             // applicant 2 org individuals for COMPANY/ORG PartyType
-            if (caseData.getApplicant2().isCompanyOROrganisation()) {
-                if (caseData.getApplicant2OrgIndividuals() != null) {
-                    parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant2OrgIndividuals()));
-                }
+            if (caseData.getApplicant2().isCompanyOROrganisation() && caseData.getApplicant2OrgIndividuals() != null) {
+                parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant2OrgIndividuals()));
             }
 
             // 2v1 claimant response - if different response and app 2 proceeds
             if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
-                && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())) {
-                if (caseData.getApplicant2DQ() != null) {
-                    // applicant 2 expert
-                    if (caseData.getApplicantExperts() != null
-                        && !caseData.getApplicantExperts().isEmpty()) {
-                        parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getApplicantExperts()));
-                    }
-                    // applicant 2 witness
-                    if (caseData.getApplicantWitnesses() != null
-                        && !caseData.getApplicantWitnesses().isEmpty()) {
-                        parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getApplicantWitnesses()));
-                    }
+                && NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) && caseData.getApplicant2DQ() != null) {
+                // applicant 2 expert
+                if (caseData.getApplicantExperts() != null
+                    && !caseData.getApplicantExperts().isEmpty()) {
+                    parties.addAll(getDetailsFor(EXPERT_ROLE, caseData.getApplicantExperts()));
+                }
+                // applicant 2 witness
+                if (caseData.getApplicantWitnesses() != null
+                    && !caseData.getApplicantWitnesses().isEmpty()) {
+                    parties.addAll(getDetailsFor(WITNESS_ROLE, caseData.getApplicantWitnesses()));
                 }
             }
 
@@ -227,17 +218,17 @@ public class HearingsPartyMapper {
         parties.add(getDetailsForPartyObject(caseData.getApplicant1(), CLAIMANT_ROLE.getPartyRoleValue()));
 
         // applicant 1 org individuals for COMPANY/ORG PartyType
-        if (caseData.getApplicant1().isCompanyOROrganisation()) {
-            if (caseData.getApplicant1OrgIndividuals() != null) {
-                parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1OrgIndividuals()));
-            }
+        if (caseData.getApplicant1().isCompanyOROrganisation() && caseData.getApplicant1OrgIndividuals() != null) {
+            parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1OrgIndividuals()));
         }
 
         // applicant 1 solicitor
-        parties.add(getDetailsForSolicitorOrganisation(
-            caseData.getApplicant1OrganisationPolicy(),
-            organisationService
-        ));
+        if (caseData.getApplicant1OrganisationPolicy().getOrganisation() != null) {
+            parties.add(getDetailsForSolicitorOrganisation(
+                caseData.getApplicant1OrganisationPolicy(),
+                organisationService
+            ));
+        }
 
         if (caseData.getApplicant1DQ() != null) {
             // applicant 1 expert
@@ -339,7 +330,7 @@ public class HearingsPartyMapper {
                                                                Flags flags, List<Element<UnavailableDate>> unavailableDates) {
 
         List<FlagDetail> flagDetails = flags != null &&  flags.getDetails() != null
-            ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : List.of();
+            ? flags.getDetails().stream().map(Element::getValue).toList() : List.of();
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
@@ -363,8 +354,7 @@ public class HearingsPartyMapper {
             .partyRole(partyRole)
             .individualDetails(individualDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
-                Collectors.toList()) : null)
+            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).toList() : null)
             .hearingSubChannel(null)
             .build();
     }
@@ -386,21 +376,23 @@ public class HearingsPartyMapper {
             .partyRole(partyRole)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
-                Collectors.toList()) : null)
+            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date))
+                    .toList() : null)
             .hearingSubChannel(null)
             .build();
     }
+
+    static final String DATE_STRING = "yyyy-MM-dd";
 
     private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date) {
         return UnavailabilityRangeModel.builder()
             .unavailabilityType(ALL_DAY)
             .unavailableFromDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : date.getFromDate()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getFromDate()
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)))
             .unavailableToDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : date.getToDate()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getToDate()
+                .format(DateTimeFormatter.ofPattern(DATE_STRING)))
             .build();
     }
 }

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +25,15 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_
 public class ProceedOfflineCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(PROCEEDS_IN_HERITAGE_SYSTEM);
-    private static final String TASK_ID = "ProceedOffline";
+    private static final List<String> TASK_IDS =
+        Arrays.asList("ProceedOffline", "ProceedOfflineForResponseToDefence", "ProceedOfflineForUnregisteredFirm",
+                      "ProceedOfflineForUnRepresentedSolicitor", "ProceedOfflineForNonDefenceResponse");
 
     private final ObjectMapper objectMapper;
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+    public List<String> camundaActivityIds(CallbackParams callbackParams) {
+        return TASK_IDS;
     }
 
     @Override

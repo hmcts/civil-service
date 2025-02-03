@@ -6,53 +6,53 @@ INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, cat
 
 values ('<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View mediation settlement agreement</a>',
         'Mediation',
-        '<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">View mediation settlement agreement</a>',
-        'Mediation', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{3, 3}', 'CLAIMANT', 5),
+        '<a href={VIEW_MEDIATION_SETTLEMENT_AGREEMENT} class="govuk-link">Gweld cytundeb setlo o ran cyfryngu</a>',
+        'Cyfryngu', 'View.Mediation.Settlement.Agreement', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{3, 3}', 'CLAIMANT', 5),
 
 ('<a>Upload mediation documents</a>',
   'Mediation',
-  '<a>Upload mediation documents</a>',
-  'Mediation', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 6),
+  '<a>Uwchlwytho dogfennau cyfryngu</a>',
+  'Cyfryngu', 'Upload.Mediation.Documents', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 6),
 
 ('<a>View mediation documents</a>',
   'Mediation',
-  '<a>View mediation documents</a>',
-  'Mediation', 'View.Mediation.Documents', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 7),
+  '<a>Gweld dogfennau cyfryngu</a>',
+  'Cyfryngu', 'View.Mediation.Documents', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 7),
 
 ('<a>View hearings</a>',
-  'Hearings',
-  '<a>View hearings</a>',
-  'Hearings', 'Hearing.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 8),
+  'Hearing',
+  '<a>Gweld y gwrandawiad</a>',
+  'Gwrandawiad', 'Hearing.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 8),
 
 
 ('<a>Upload hearing documents</a>',
-  'Hearings',
-  '<a>Upload hearing documents</a>',
-  'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 9),
+  'Hearing',
+  '<a>Llwytho dogfennau''r gwrandawiad</a>',
+  'Gwrandawiad', 'Hearing.Document.Upload', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 9),
 
 ('<a>Add the trial arrangements</a>',
-  'Hearings',
-  '<a>Add the trial arrangements</a>',
-  'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 10),
+  'Hearing',
+  '<a>Ychwanegu trefniadau''r treial</a>',
+  'Gwrandawiad', 'Hearing.Arrangements.Add', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 10),
 
 ('<a>Pay the hearing fee</a>',
-  'Hearings',
-  '<a>Pay the hearing fee</a>',
-  'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 11),
+  'Hearing',
+  '<a>Talu ffi''r gwrandawiad</a>',
+  'Gwrandawiad', 'Hearing.Fee.Pay', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 11),
 
 
 ('<a>View the bundle</a>',
-  'Hearings',
-  '<a>View the bundle</a>',
-  'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 12),
+  'Hearing',
+  '<a>Gweld y bwndel</a>',
+  'Gwrandawiad', 'Hearing.Bundle.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 12),
 
 ('<a>View the judgment</a>',
-  'Judgments from the court',
-  '<a>View the judgment</a>',
-  'Judgments from the court', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 13),
+  'Judgment from the court',
+  '<a>Gweld y Dyfarniad</a>',
+  'Dyfarniadau gan y llys', 'Judgment.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 13),
 
 ('<a>View applications</a>',
   'Applications',
-  '<a>View applications</a>',
-  'Applications', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 14);
+  '<a>Gweld y cais i gyd</a>',
+  'Ceisiadau', 'Application.View', 'Scenario.AAA6.MediationSuccessful.CARM.Claimant', '{2, 2}', 'CLAIMANT', 14);
 

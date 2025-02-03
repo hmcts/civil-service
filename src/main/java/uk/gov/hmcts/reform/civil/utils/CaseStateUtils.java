@@ -13,13 +13,11 @@ public class CaseStateUtils {
     }
 
     public static boolean shouldMoveToInMediationState(CaseData caseData, boolean carmEnabled) {
-        if (carmEnabled) {
-            if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
-                return YES.equals(caseData.getApplicant1ProceedWithClaim())
-                    || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())
-                    || (caseData.getCaseDataLiP() != null
-                    && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()));
-            }
+        if (carmEnabled && SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            return YES.equals(caseData.getApplicant1ProceedWithClaim())
+                || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())
+                || (caseData.getCaseDataLiP() != null
+                && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()));
         }
         return false;
     }

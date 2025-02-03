@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
@@ -62,9 +61,6 @@ class AutomatedHearingNoticeHandlerTest {
     private SystemUpdateUserConfiguration userConfig;
 
     @Mock
-    private FeatureToggleService featureToggleService;
-
-    @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
@@ -79,7 +75,6 @@ class AutomatedHearingNoticeHandlerTest {
 
     @BeforeEach
     void init() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
         when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.setVariables(any())).thenReturn(messageCorrelationBuilder);
         when(mockTask.getTopicName()).thenReturn("test");
@@ -91,16 +86,6 @@ class AutomatedHearingNoticeHandlerTest {
         when(userConfig.getUserName()).thenReturn("");
         when(userConfig.getPassword()).thenReturn("");
         when(runtimeService.getVariable(PROCESS_INSTANCE_ID, SERVICE_ID_KEY)).thenReturn(new ArrayList<>());
-    }
-
-    @Test
-    void shouldNotCallUnnotifiedHearings_whenAHNFeatureToggleIsOff() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verifyNoInteractions(hearingsService);
-        verify(externalTaskService).complete(mockTask);
     }
 
     @Test
@@ -132,7 +117,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .dispatchedHearingIds(List.of())
                 .build().toMap(mapper)
         );
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -166,7 +151,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .build().toMap(mapper)
         );
 
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -207,7 +192,7 @@ class AutomatedHearingNoticeHandlerTest {
                 .build().toMap(mapper)
         );
 
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
@@ -231,7 +216,7 @@ class AutomatedHearingNoticeHandlerTest {
             .dispatchedHearingIds(List.of(HEARING_ID))
             .build().toMap(mapper));
         verifyNoInteractions(messageCorrelationBuilder);
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     private UnNotifiedHearingResponse createUnnotifiedHearings(List<String> hearingIds) {

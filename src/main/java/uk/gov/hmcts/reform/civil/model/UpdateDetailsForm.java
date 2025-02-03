@@ -22,6 +22,8 @@ public class UpdateDetailsForm {
     private List<Element<UnavailableDate>> additionalUnavailableDates;
     private List<Element<UpdatePartyDetailsForm>> updateExpertsDetailsForm;
     private List<Element<UpdatePartyDetailsForm>> updateWitnessesDetailsForm;
+    private List<Element<UpdatePartyDetailsForm>> updateLRIndividualsForm;
+    private List<Element<UpdatePartyDetailsForm>> updateOrgIndividualsForm;
     private YesOrNo manageContactDetailsEventUsed;
 }
 

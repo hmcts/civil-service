@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -30,10 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
@@ -75,6 +79,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final AssignCategoryId assignCategoryId;
+    private final UploadMediationService uploadMediationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -82,7 +87,8 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(MID, "populate-party-options"), this::populatePartyOptions,
             callbackKey(MID, "validate-dates"), this::validateDocumentDate,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitData
+            callbackKey(ABOUT_TO_SUBMIT), this::submitData,
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -140,6 +146,8 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         // clear form
         builder.uploadMediationDocumentsForm(null);
 
+        //create dashboard scenarios
+        uploadMediationService.uploadMediationDocumentsTaskList(callbackParams);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
@@ -350,6 +358,15 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
                 .errors(errors)
                 .build();
         }
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        String body = "<br /> %n%n You can continue uploading documents or return later. To upload more documents, go to Next steps and select 'Document upload'.";
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader("# Documents uploaded")
+            .confirmationBody(format(body))
+            .build();
     }
 
     private void isDocumentDateInFuture(List<String> errors, LocalDate date) {

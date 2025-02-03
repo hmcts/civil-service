@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.civil.validation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.DayOfWeek;
@@ -19,18 +19,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {
-    DeadlineExtensionValidator.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class DeadlineExtensionValidatorTest {
 
     private static final LocalDate NOW = now();
 
-    @MockBean
+    @Mock
     private WorkingDayIndicator workingDayIndicator;
 
-    @Autowired
+    @InjectMocks
     private DeadlineExtensionValidator validator;
 
     @Nested
@@ -105,7 +102,6 @@ class DeadlineExtensionValidatorTest {
 
         @Test
         void shouldReturnErrors_whenExtensionDateisPastDateForSpec() {
-            when(workingDayIndicator.isWorkingDay(any())).thenReturn(true);
             LocalDate agreedExtension = NOW.minusDays(10);
             LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
 
@@ -120,7 +116,6 @@ class DeadlineExtensionValidatorTest {
 
         @Test
         void shouldReturnErrors_whenExtensionDateisAfterResponseDeadlineDateForSpec() {
-            when(workingDayIndicator.isWorkingDay(any())).thenReturn(true);
             LocalDate agreedExtension = NOW.plusDays(5);
             LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
 
@@ -133,22 +128,6 @@ class DeadlineExtensionValidatorTest {
             assertThat(errors).contains("The agreed extension date must be after the current deadline");
         }
 
-        /*@Test
-        void shouldReturnErrors_whenAgreedExtensionDateIsBeyond29And56DaysForSpec() {
-            when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
-
-            LocalDate agreedExtension = NOW.with(DayOfWeek.SUNDAY).plusDays(7);
-            LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
-            when(workingDayIndicator.getNextWorkingDay(any())).thenReturn(currentResponseDeadline.toLocalDate());
-
-            List<String> errors = validator.specValidateProposedDeadline(
-                agreedExtension,
-                currentResponseDeadline,
-                true
-            );
-            assertThat(errors).contains("Date must be from claim issue date plus a maximum of between 29 and 56 days.");
-        }
-*/
         @Test
         void shouldReturnErrors_whenAgreedExtensionDateIsWeekendForSpec() {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);

@@ -58,6 +58,9 @@ public class DashboardClaimInfo {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate defaultJudgementIssuedDate;
     private DashboardClaimStatus status;
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
 

@@ -37,6 +37,7 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .defenceRouteRequired(DISPUTES_THE_CLAIM)
                 .responseClaimMediationSpecRequired(YesOrNo.YES)
+                .responseClaimTrack("SMALL_CLAIM")
                 .build();
 
         handler.handle(callbackParams(caseData));
@@ -48,14 +49,14 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">You have rejected the claim and suggested mediation. Claimant John can reject or agree to mediation.<br>" +
-                              "The court will contact you when they respond.<br>"
-                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"),
-                jsonPath("$[0].titleCy").value("Response to the claim"),
+                    .value("<p class=\"govuk-body\">You have rejected the claim and suggested mediation. Claimant John can reject or agree to mediation." +
+                              " The court will contact you when they respond.</p>"
+                               + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">You have rejected the claim and suggested mediation. Claimant John can reject or agree to mediation.<br>" +
-                        "The court will contact you when they respond.<br>"
-                         + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>")
+                    .value("<p class=\"govuk-body\">Rydych wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gall Claimant John wrthod neu gytuno i gyfryngu." +
+                        " Bydd y llys yn cysylltu â chi pan fyddant yn ymateb.</p>"
+                         + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>")
 
             );
 
@@ -68,7 +69,7 @@ public class DefendantFullDefenceFullDisputeWithMediationScenarioTest extends  D
                                 "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
                         jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
                         jsonPath("$[0].taskNameCy").value(
-                                "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View the response to the claim</a>"),
-                        jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getName()));
+                                "<a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">Gweld yr ymateb i'r hawliad</a>"),
+                        jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName()));
     }
 }

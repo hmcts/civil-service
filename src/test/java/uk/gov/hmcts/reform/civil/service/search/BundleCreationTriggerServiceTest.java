@@ -23,16 +23,22 @@ class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusWeeks(3)))
+                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusDays(10)))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusWeeks(3)))
-                        .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
+                        .must(rangeQuery("data.hearingDate").lte(LocalDate.now().plusDays(10)))
+                        .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))))
+            .mustNot(matchQuery("data.allocatedTrack", "MULTI_CLAIM"))
+            .mustNot(matchQuery("data.allocatedTrack", "INTERMEDIATE_CLAIM"))
+            .mustNot(matchQuery("data.responseClaimTrack", "MULTI_CLAIM"))
+            .mustNot(matchQuery("data.responseClaimTrack", "INTERMEDIATE_CLAIM"));
         return new Query(query, List.of("reference"), fromValue);
     }
 
     @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
         return null;
     }
 }

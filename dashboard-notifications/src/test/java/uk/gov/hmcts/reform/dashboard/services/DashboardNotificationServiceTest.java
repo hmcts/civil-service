@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,6 +80,21 @@ public class DashboardNotificationServiceTest {
         }
 
         @Test
+        void should_return_all_ga_notifications() {
+            List<DashboardNotificationsEntity> expectedList = getNotificationEntityList();
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole(any(), any())).thenReturn(expectedList);
+            List<String> gaCaseIds = new ArrayList<>();
+            gaCaseIds.add("123");
+            gaCaseIds.add("234");
+            Map<String, List<Notification>> notificationslist = dashboardNotificationService
+                .getAllCasesNotifications(gaCaseIds, "Claimant");
+
+            assertThat(notificationslist.get("123")).isEqualTo(getNotificationList());
+            assertThat(notificationslist.get("234")).isEqualTo(getNotificationList());
+            assertThat(notificationslist.size()).isEqualTo(2);
+        }
+
+        @Test
         void should_return_all_notification() {
             List<DashboardNotificationsEntity> expectedList = getNotificationEntityList();
             when(dashboardNotificationsRepository.findAll()).thenReturn(expectedList);
@@ -97,6 +115,22 @@ public class DashboardNotificationServiceTest {
 
             //then
             verify(dashboardNotificationsRepository).deleteById(id);
+        }
+
+        @Test
+        void deleteAllNotificationsToClaimant() {
+            String reference = "reference";
+            String claimant = "CLAIMANT";
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, claimant);
+            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, claimant);
+        }
+
+        @Test
+        void deleteAllNotificationsToDefendant() {
+            String reference = "reference";
+            String defendant = "DEFENDANT";
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(reference, defendant);
+            Mockito.verify(dashboardNotificationsRepository).deleteByReferenceAndCitizenRole(reference, defendant);
         }
     }
 

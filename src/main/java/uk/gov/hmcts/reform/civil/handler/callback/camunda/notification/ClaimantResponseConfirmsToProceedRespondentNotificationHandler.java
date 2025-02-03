@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -8,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,16 +26,16 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -94,21 +95,14 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        var recipient = isCcNotification(callbackParams)
-            ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-            : caseData.getRespondentSolicitor1EmailAddress();
 
-        if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            recipient = isCcNotificationMultiTrack(callbackParams)
-                ? caseData.getApplicantSolicitor1UserDetails().getEmail()
-                : caseData.getRespondentSolicitor1EmailAddress();
-        }
+        String recipient = caseData.getRespondentSolicitor1EmailAddress();
 
-        if (isRespondentSolicitor2Notification(callbackParams)) {
-            recipient = caseData.getRespondentSolicitor2EmailAddress();
-        }
-
-        if (isRespondentSolicitor2NotificationMultiTrack(callbackParams)) {
+        if (isCcNotification(callbackParams)) {
+            recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack()) && isCcNotificationMultiTrack(callbackParams)) {
+            recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else if (isRespondentSolicitor2Notification(callbackParams) || isRespondentSolicitor2NotificationMultiTrack(callbackParams)) {
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
@@ -123,6 +117,18 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             }
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
+
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        Map<String, String> notificationProperties = addProperties(caseData);
+
+        String legalOrganisationName = getLegalOrganisationName(caseData, caseEvent);
+
+        if (legalOrganisationName.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
+        notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrganisationName);
+
         if ((isRespondentSolicitor2Notification(callbackParams)
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
             || (!isRespondentSolicitor2Notification(callbackParams)
@@ -130,7 +136,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             notificationService.sendMail(
                 recipient,
                 notificationsProperties.getClaimantSolicitorConfirmsNotToProceed(),
-                addProperties(caseData),
+                notificationProperties,
                 String.format(NP_PROCEED_REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -145,14 +151,12 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
         }
 
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-
         notificationService.sendMail(
             recipient,
             template,
             SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                ? addPropertiesSpec(caseData, caseEvent)
-                : addProperties(caseData),
+                ? addPropertiesSpec(caseData, legalOrganisationName)
+                : notificationProperties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -204,25 +208,28 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
-        );
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+        ));
     }
 
-    public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
+    public Map<String, String> addPropertiesSpec(CaseData caseData,
+                                                 String legalOrganisationName) {
         return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, legalOrganisationName,
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
     public Map<String, String> addPropertiesLRvLip(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
         );
     }
 
@@ -246,19 +253,38 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             .equals(NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK.name());
     }
 
-    //finding legal org name
     private String getLegalOrganisationName(CaseData caseData, CaseEvent caseEvent) {
-        String organisationID;
-        if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)) {
-            organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        } else {
-            organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED)
-                ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-                : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<String> organisationIdOption = switch (caseEvent) {
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC -> caseData.isApplicantLiP()
+                ? Optional.empty()
+                : Optional.ofNullable(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
+            case NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK -> caseData.isRespondent1LiP()
+                ? Optional.empty()
+                : Optional.ofNullable(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+            case NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK -> caseData.isRespondent2LiP()
+                ? Optional.empty()
+                : Optional.ofNullable(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
+            default -> getRespondentSolicitorOrganisationName(caseData, caseEvent);
+        };
+
+        return organisationIdOption
+            .map(organisationId -> {
+                Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
+                return organisation.isPresent()
+                    ? organisation.get().getName()
+                    : caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+            }).orElse(StringUtils.EMPTY);
+    }
+
+    private static Optional<String> getRespondentSolicitorOrganisationName(CaseData caseData, CaseEvent caseEvent) {
+        if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED)) {
+            return caseData.getRespondent1OrganisationPolicy().getOrganisation() == null
+                ? Optional.empty()
+                : Optional.of(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
         }
-        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        return caseData.getRespondent2OrganisationPolicy().getOrganisation() == null
+            ? Optional.empty()
+            : Optional.of(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
     }
 
     private boolean isLRvLipToDefendant(CallbackParams callbackParams) {

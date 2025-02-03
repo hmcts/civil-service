@@ -1,20 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -26,6 +23,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,26 +42,26 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateDJFormHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
-public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    @Mock
+    private ObjectMapper mapper;
+    @InjectMocks
     private GenerateDJFormHandler handler;
-    @Autowired
+    @InjectMocks
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @Mock
     private DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        handler = new GenerateDJFormHandler(assignCategoryId, defaultJudgmentFormGenerator, mapper);
+        mapper.registerModule(new JavaTimeModule());
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -82,7 +80,7 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         @Test
-        public void shouldGenerateTwoForm_when1v2() {
+        void shouldGenerateTwoForm_when1v2() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             documents.add(document);
@@ -107,11 +105,11 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(2);
         }
 
         @Test
-        public void shouldNotGenerateTwoForm_when1v2And1DefSelectedSpecified() {
+        void shouldNotGenerateTwoForm_when1v2And1DefSelectedSpecified() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -128,12 +126,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
 
         }
 
         @Test
-        public void shouldNotGenerateOneForm_when1v1Specified() {
+        void shouldNotGenerateOneForm_when1v1Specified() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
@@ -155,12 +153,11 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(1);
         }
 
         @Test
-        public void shouldNotGenerateOneForm_whenLRvLiPSpecified() {
-            List<CaseDocument> documents = new ArrayList<>();
+        void shouldNotGenerateOneForm_whenLRvLiPSpecified() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .specClaim1v1LrVsLip().build().toBuilder()
                 .addRespondent2(NO)
@@ -176,11 +173,31 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
         }
 
         @Test
-        public void shouldGenerateTwoForm_when1v2Specified() {
+        void shouldNotGenerateOneForm_whenLipvLRSpecified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .specClaim1v1LipvLr().build().toBuilder()
+                .addRespondent2(NO)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("One")
+                                                     .build()).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(GENERATE_DJ_FORM_SPEC.name());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
+        }
+
+        @Test
+        void shouldGenerateTwoForm_when1v2Specified() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             documents.add(document);
@@ -205,11 +222,11 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(2);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(2);
         }
 
         @Test
-        public void shouldNotGenerateTwoForm_when1v2And1DefSelected() {
+        void shouldNotGenerateTwoForm_when1v2And1DefSelected() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -226,12 +243,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
+            assertThat(updatedData.getDefaultJudgmentDocuments()).isEmpty();
 
         }
 
         @Test
-        public void shouldNotGenerateOneForm_when1v1() {
+        void shouldNotGenerateOneForm_when1v1() {
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
@@ -253,12 +270,12 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
                                                           eq(GENERATE_DJ_FORM.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getDefaultJudgmentDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getDefaultJudgmentDocuments()).hasSize(1);
 
         }
 
         @Test
-        public void shouldAssignCategoryId_whenInvoked() {
+        void shouldAssignCategoryId_whenInvoked() {
             //Given
             List<CaseDocument> documents = new ArrayList<>();
             documents.add(document);

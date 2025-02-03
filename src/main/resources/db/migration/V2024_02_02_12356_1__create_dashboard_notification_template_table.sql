@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications_templates (
  template_name VARCHAR(256),
  title_en VARCHAR(256),
  title_cy VARCHAR(256),
- description_en VARCHAR(1024),
- description_cy VARCHAR(1024),
+ description_en VARCHAR(2048),
+ description_cy VARCHAR(2048),
  notification_role VARCHAR(256),
  time_to_live VARCHAR(256),
  created_at TIMESTAMP default CURRENT_TIMESTAMP

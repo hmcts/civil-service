@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(classes = {AirlineEpimsDataLoader.class})
+@ExtendWith(MockitoExtension.class)
 class AirlineEpimsDataLoaderTest {
 
     private AirlineEpimsDataLoader airlineEpimsDataLoader;

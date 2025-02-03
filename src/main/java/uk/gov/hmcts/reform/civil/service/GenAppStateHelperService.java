@@ -34,6 +34,7 @@ public class GenAppStateHelperService {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final InitiateGeneralApplicationService genAppService;
+    private final LocationService locationService;
 
     private final ObjectMapper objectMapper;
 
@@ -42,10 +43,10 @@ public class GenAppStateHelperService {
     public enum RequiredState {
         APPLICATION_CLOSED("APPLICATION_CLOSED"),
         APPLICATION_PROCEEDS_OFFLINE("PROCEEDS_IN_HERITAGE");
-        private final String requiredState;
+        private final String state;
 
         public String getRequiredState() {
-            return this.requiredState;
+            return this.state;
         }
     }
 
@@ -80,7 +81,7 @@ public class GenAppStateHelperService {
         if (!Collections.isEmpty(caseData.getGeneralApplications())) {
             List<GeneralApplication> genApps = new ArrayList<>();
             CaseData finalCaseData = caseData;
-            LocationRefData locationDetails = genAppService.getWorkAllocationLocationDetails(finalCaseData.getCaseManagementLocation().getBaseLocation(), authToken);
+            LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(finalCaseData.getCaseManagementLocation().getBaseLocation(), authToken);
             caseData.getGeneralApplications().forEach(generalApplicationElement -> {
                 GeneralApplication generalApplication = generalApplicationElement.getValue();
                 generalApplication.getCaseManagementLocation().setBaseLocation(finalCaseData.getCaseManagementLocation().getBaseLocation());

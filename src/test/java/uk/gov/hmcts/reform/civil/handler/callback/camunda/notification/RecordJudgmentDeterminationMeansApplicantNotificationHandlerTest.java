@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -41,32 +40,22 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
-@SpringBootTest(classes = {
-    RecordJudgmentDeterminationMeansApplicantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @Autowired
+    @InjectMocks
     private RecordJudgmentDeterminationMeansApplicantNotificationHandler handler;
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
     private static final String ORG_NAME = "Org1";
     public static final String TASK_ID = "RecordJudgmentApplicantSolicitor1";
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
-        }
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
@@ -86,6 +75,8 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                                                                                             .organisationID(ORG_NAME).build()).build()).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -112,6 +103,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
             handler.handle(params);
 
             verify(notificationService).sendMail(

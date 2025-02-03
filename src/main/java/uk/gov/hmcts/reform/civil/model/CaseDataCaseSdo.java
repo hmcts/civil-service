@@ -248,6 +248,7 @@ public class CaseDataCaseSdo implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
     private CaseDocument sdoOrderDocument;
     private final YesOrNo eaCourtLocation;
+    private final YesOrNo hmcEaCourtLocation;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;

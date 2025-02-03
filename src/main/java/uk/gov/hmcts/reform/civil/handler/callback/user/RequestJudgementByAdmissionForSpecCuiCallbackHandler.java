@@ -12,16 +12,22 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Map;
 
 import static java.lang.String.format;
@@ -29,7 +35,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +49,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
+    private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -65,6 +74,16 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isJudgementDateNotPermitted()) {
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
+        } else {
+            LocalDate whenWillThisAmountBePaid =
+                Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                    null);
+            if (featureToggleService.isJudgmentOnlineLive()
+                && whenWillThisAmountBePaid != null
+                && caseData.isDateAfterToday(whenWillThisAmountBePaid)
+                && caseData.isPartAdmitPayImmediatelyClaimSpec()) {
+                errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid)));
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -93,18 +112,39 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     }
 
     private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
+        String nextState;
+        BusinessProcess businessProcess;
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-        CCJPaymentDetails
-            ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+        CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
+
+        if (featureToggleService.isJudgmentOnlineLive()
+            && (isOneVOne(data))
+            && data.isPayImmediately()) {
+
+            nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+            businessProcess = BusinessProcess.ready(JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC);
+        } else {
+            nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+            businessProcess = BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC);
+        }
+
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
-            .businessProcess(BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC))
+            .businessProcess(businessProcess)
             .ccjPaymentDetails(ccjPaymentDetails);
 
+        CaseData updatedCaseData = caseDataBuilder.build();
+
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            updatedCaseData.setActiveJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
+            updatedCaseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            updatedCaseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(updatedCaseData.getActiveJudgment()));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+            .data(updatedCaseData.toMap(objectMapper))
+            .state(nextState)
             .build();
     }
 
@@ -112,19 +152,26 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(setUpHeader(caseData))
-            .confirmationBody(setUpBody())
+            .confirmationBody(setUpBody(caseData))
             .build();
     }
 
     private String setUpHeader(CaseData caseData) {
         String claimNumber = caseData.getLegacyCaseReference();
         return format(
-            "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+            "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
             claimNumber
         );
     }
 
-    private String setUpBody() {
+    private String setUpBody(CaseData caseData) {
+        if (CaseState.All_FINAL_ORDERS_ISSUED == caseData.getCcdState()) {
+            return format(
+                "<br />%n%n<a href=\"%s\" target=\"_blank\">Download county court judgment</a>"
+                    + "<br><br>The defendant will be served the county court judgment<br><br>",
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
+        }
         return format(
             "<br /><h2 class=\"govuk-heading-m\"><u>What happens next</u></h2>"
                 + "<br>This case will now proceed offline. Any updates will be sent by post.<br><br>"

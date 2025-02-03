@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Timeline;
@@ -45,6 +46,7 @@ public class ClaimForm implements MappableObject {
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate interestEndDate;
     private final String interestEndDateDescription;
+    private final String interestPerDayBreakdown;
     private final String interestAmount;
     private final String claimFee;
     private final String totalAmountOfClaim;
@@ -52,4 +54,5 @@ public class ClaimForm implements MappableObject {
     private final LocalDateTime generationDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMM yyyy")
     private final LocalDate claimIssuedDate;
+    private final FlightDelayDetails flightDelayDetails;
 }

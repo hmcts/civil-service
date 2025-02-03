@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,6 +73,7 @@ class DashboardScenariosServiceTest {
                                         .descriptionEn("The ${animal} jumped over the ${target}.")
                                         .titleCy("The ${animal} jumped over the ${target}.")
                                         .descriptionCy("The ${animal} jumped over the ${target}.")
+                                        .deadlineParam("deadlineParam")
                                         .id(2L)
                                         .build()));
 
@@ -120,7 +122,45 @@ class DashboardScenariosServiceTest {
                 "animal",
                 "Tiger",
                 "target",
-                "Safari"
+                "Safari",
+                "deadlineParam",
+                LocalDateTime.now()
+
+            )))
+        );
+
+        verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
+        verify(notificationTemplateRepository).findByName(NOTIFICATION_ISSUE_CLAIM_START);
+        verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
+        verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
+        verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
+        verify(taskListService).saveOrUpdate(any(TaskListEntity.class));
+        verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
+            NOTIFICATION_DRAFT_CLAIM_START,
+            "ccd-case-id",
+            "claimant"
+        );
+    }
+
+    @Test
+    void shouldContinueIfCannotParseDeadline() {
+        dashboardScenariosService.recordScenarios(
+            "Auth-token",
+            SCENARIO_ISSUE_CLAIM_START,
+            "ccd-case-id",
+            new ScenarioRequestParams(new HashMap<>(Map.of(
+                "url",
+                "http://testUrl",
+                "status",
+                "InProgress",
+                "helpText",
+                "Should be helpful!",
+                "animal",
+                "Tiger",
+                "target",
+                "Safari",
+                "deadlineParam",
+                "NotALocalDateTime"
             )))
         );
 

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseClaimantNotificationHandler;
@@ -38,9 +39,11 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
                     .individualFirstName("James")
                     .individualLastName("John")
                     .build())
+            .responseClaimTrack("SMALL_CLAIM")
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .responseClaimMediationSpecRequired(YesOrNo.YES)
+            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -52,17 +55,15 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">James John has rejected the claim and suggested mediation. You can reject or agree to mediation.</p>" +
-                        "<p class=\"govuk-body\">You need to respond by " +
-                        DateUtils.formatDate(paymentDate) + ".</p>" +
+                    "<p class=\"govuk-body\">James John has rejected the claim and suggested mediation. You can reject or agree to mediation." +
+                        " You need to respond by " + DateUtils.formatDate(paymentDate) + ".</p>" +
                         "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and respond</a></p>"
                 ),
-                jsonPath("$[0].titleCy").value("Response to the claim"),
+                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">James John has rejected the claim and suggested mediation. You can reject or agree to mediation.</p>" +
-                        "<p class=\"govuk-body\">You need to respond by " +
-                        DateUtils.formatDateInWelsh(paymentDate) + ".</p>" +
-                        "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View and respond</a></p>"
+                    "<p class=\"govuk-body\">Mae James John wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gallwch wrthod neu gytuno i gyfryngu." +
+                        " Mae angen i chi ymateb erbyn " + DateUtils.formatDateInWelsh(paymentDate) + ".</p>" +
+                        "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )
             );
 

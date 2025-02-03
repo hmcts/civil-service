@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.defaultjudgments.DefaultJudgmentSpecEmailConfiguration;
@@ -22,11 +22,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.fees.client.FeesApi;
-import uk.gov.hmcts.reform.fees.client.FeesClient;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -42,50 +39,45 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT_OF_COSTS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT_PAID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PAYMENT_TYPE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT;
 
-@SpringBootTest(classes = {
-    DJCaseworkerReceivedNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-    InterestCalculator.class,
-    FeesService.class,
-    FeesClient.class
-})
-public class DJCaseworkerReceivedNotificationHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class DJCaseworkerReceivedNotificationHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
-    private FeatureToggleService featureToggleService;
-    @MockBean
-    NotificationsProperties notificationsProperties;
-    @Autowired
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @InjectMocks
     private DJCaseworkerReceivedNotificationHandler handler;
-    @MockBean
+
+    @Mock
     private InterestCalculator interestCalculator;
-    @MockBean
+
+    @Mock
     private FeesService feesService;
-    @MockBean
+
+    @Mock
     private DefaultJudgmentSpecEmailConfiguration defaultJudgmentSpecEmailConfiguration;
-    @MockBean
-    private FeesApi feesApi;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
             when(notificationsProperties.getCaseworkerDefaultJudgmentRequested())
                 .thenReturn("test-template-received-id");
             when(defaultJudgmentSpecEmailConfiguration.getReceiver())
                 .thenReturn("caseworker@hmcts.net");
-
-        }
-
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
@@ -95,6 +87,7 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
                                 .version("1")
                                 .code("CODE")
                                 .build());
+
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build().toBuilder()
@@ -121,6 +114,10 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedPartialPaymentAnd1v1() {
+            when(notificationsProperties.getCaseworkerDefaultJudgmentRequested())
+                .thenReturn("test-template-received-id");
+            when(defaultJudgmentSpecEmailConfiguration.getReceiver())
+                .thenReturn("caseworker@hmcts.net");
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(100)
                 );
@@ -170,26 +167,30 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-                PAYMENT_TYPE, "Immediately £1203.00",
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+                PAYMENT_TYPE, "Immediately £1193.00",
                 AMOUNT_CLAIMED, "1100",
                 RESPONDENT, "John Doe",
-                AMOUNT_OF_COSTS, "103.00",
+                AMOUNT_OF_COSTS, "93.00",
                 AMOUNT_PAID, "0",
-                AMOUNT_OF_JUDGMENT, "1203.00"
+                AMOUNT_OF_JUDGMENT, "1193.00",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
+                CASEMAN_REF, "000DC001"
             );
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapPartialPayment(CaseData caseData) {
             return Map.of(
-                CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
                 PAYMENT_TYPE, "By installments of £100.00 per two weeks",
                 AMOUNT_CLAIMED, "1100",
                 RESPONDENT, "John Doe",
-                AMOUNT_OF_COSTS, "103.00",
+                AMOUNT_OF_COSTS, "93.00",
                 AMOUNT_PAID, "0",
-                AMOUNT_OF_JUDGMENT, "1203.00"
+                AMOUNT_OF_JUDGMENT, "1193.00",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

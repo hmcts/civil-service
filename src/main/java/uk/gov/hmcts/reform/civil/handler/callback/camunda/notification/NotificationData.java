@@ -77,6 +77,7 @@ public interface NotificationData {
     String LEGAL_ORG_NAME = "LegalOrgName";
     String LEGAL_ORG = "legal Org";
     String PARTY_NAME = "name";
+    String BUNDLE_RESTITCH_DATE = "bundleRestitchDate";
 
     //NoC
     String CASE_NAME = "case name";
@@ -109,6 +110,8 @@ public interface NotificationData {
     String LEGAL_REP_NAME = "legalrepname";
     String CLAIM_NUMBER_CASE = "ClaimNumber";
     String CLAIM_NAME = "ClaimName";
+
+    String CASEMAN_REF = "casemanRef";
 
     Map<String, String> addProperties(CaseData caseData);
 

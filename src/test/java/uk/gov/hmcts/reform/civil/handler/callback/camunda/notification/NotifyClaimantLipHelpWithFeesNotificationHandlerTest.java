@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -26,39 +26,55 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
-@SpringBootTest(classes = {
-    NotifyClaimantLipHelpWithFeesNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     NotificationsProperties notificationsProperties;
-    @Autowired
+    @InjectMocks
     NotifyClaimantLipHelpWithFeesNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getNotifyClaimantLipHelpWithFees())
-                .thenReturn("test-template-received-id");
-        }
 
         @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
+        void shouldNotifyClaimant_whenInvokedAnd1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build()).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            when(notificationsProperties.getNotifyClaimantLipHelpWithFees())
+                .thenReturn("test-template-received-id");
             handler.handle(params);
 
             verify(notificationService).sendMail(
                 "claimant@hmcts.net",
                 "test-template-received-id",
+                getNotificationDataMap(caseData),
+                "notify-claimant-lip-help-with-fees-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyClaimantInWelsh_whenInvokedAnd1v1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+                .claimantBilingualLanguagePreference(Language.BOTH.toString())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            when(notificationsProperties.getNotifyClaimantLipHelpWithFeesWelsh())
+                .thenReturn("test-template-received-id-welsh");
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "claimant@hmcts.net",
+                "test-template-received-id-welsh",
                 getNotificationDataMap(caseData),
                 "notify-claimant-lip-help-with-fees-notification-000DC001"
             );

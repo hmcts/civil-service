@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -62,12 +62,12 @@ class PollingEventEmitterHandlerTest {
             Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT2"))).build();
         caseDetails3 = CaseDetails.builder().id(3L).data(
             Map.of("businessProcess", businessProcessWithCamundaEvent("TEST_EVENT3"))).build();
-        when(searchService.getCases()).thenReturn(List.of(caseDetails1, caseDetails2, caseDetails3));
+        when(searchService.getCases()).thenReturn(Set.of(caseDetails1, caseDetails2, caseDetails3));
     }
 
     @Test
     void shouldNotSendMessageAndTriggerEvent_whenZeroCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
@@ -110,7 +110,7 @@ class PollingEventEmitterHandlerTest {
 
         pollingEventEmitterHandler.execute(externalTask, externalTaskService);
 
-        verify(externalTaskService, never()).complete(externalTask, null);
+        verify(externalTaskService, never()).complete(externalTask);
         verify(externalTaskService).handleFailure(
             eq(externalTask),
             eq(errorMessage),

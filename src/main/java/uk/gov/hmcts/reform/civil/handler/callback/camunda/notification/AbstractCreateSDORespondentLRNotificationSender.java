@@ -15,7 +15,7 @@ public abstract class AbstractCreateSDORespondentLRNotificationSender extends Ab
 
     private final OrganisationService organisationService;
 
-    public AbstractCreateSDORespondentLRNotificationSender(
+    protected AbstractCreateSDORespondentLRNotificationSender(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
         OrganisationService organisationService,

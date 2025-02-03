@@ -2,24 +2,24 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -35,20 +35,32 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITO
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ChangeOfRepresentationNotificationHandler.TASK_ID_NOTIFY_FORMER_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ChangeOfRepresentationNotificationHandler.TASK_ID_NOTIFY_OTHER_SOLICITOR_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ChangeOfRepresentationNotificationHandler.TASK_ID_NOTIFY_OTHER_SOLICITOR_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CCD_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FORMER_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUE_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NEW_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OTHER_SOL_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
-@SpringBootTest(classes = {
-    ChangeOfRepresentationNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationService organisationService;
+
+    private ChangeOfRepresentationNotificationHandler handler;
+
+    private ObjectMapper objectMapper;
 
     public static final String REFERENCE = "notice-of-change-000DC001";
     private static final String PREVIOUS_SOL = "Previous solicitor";
@@ -59,20 +71,13 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
     private static final String OTHER_SOLICITOR_2 = "Other solicitor2";
     private static final String OTHER_SOL_TEMPLATE = "other-sol-template-id";
 
-    @MockBean
-    private NotificationService notificationService;
-
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-
-    @MockBean
-    private OrganisationService organisationService;
-
-    @Autowired
-    private ChangeOfRepresentationNotificationHandler handler;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new ChangeOfRepresentationNotificationHandler(notificationService, notificationsProperties,
+                                                               organisationService, objectMapper);
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -83,14 +88,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 .thenReturn(Optional.of(Organisation.builder().name(PREVIOUS_SOL).build()));
             when(organisationService.findOrganisationById("New-sol-id"))
                 .thenReturn(Optional.of(Organisation.builder().name(NEW_SOLICITOR).build()));
-            when(organisationService.findOrganisationById("QWERTY R"))
-                .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
-            when(organisationService.findOrganisationById("QWERTY A"))
-                .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
-            when(organisationService.findOrganisationById("QWERTY R2"))
-                .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR_2).build()));
-            when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(PREVIOUS_SOL_TEMPLATE);
-            when(notificationsProperties.getNoticeOfChangeOtherParties()).thenReturn(OTHER_SOL_TEMPLATE);
         }
 
         @Nested
@@ -98,6 +95,11 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
 
             @Test
             void shouldNotifyFormerSolicitor_whenInvoked() {
+                when(organisationService.findOrganisationById("QWERTY A"))
+                    .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
+
+                when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(PREVIOUS_SOL_TEMPLATE);
+
                 CaseData caseData =
                     CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1().build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -110,7 +112,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     CCD_REF, caseData.getCcdCaseReference().toString(),
                     FORMER_SOL, PREVIOUS_SOL,
                     NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, OTHER_SOLICITOR
+                    OTHER_SOL_NAME, OTHER_SOLICITOR,
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
                 );
 
                 handler.handle(params);
@@ -125,6 +129,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
 
             @Test
             void shouldRemoveFormerSolicitorEmail_whenInvoked() {
+                when(organisationService.findOrganisationById("QWERTY A"))
+                    .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
+
                 CaseData caseData =
                     CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1().build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -148,6 +155,11 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
 
             @Test
             void shouldNotifyOtherPartiesWhenInvoked_whenInvoked() {
+                when(organisationService.findOrganisationById("QWERTY A"))
+                    .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
+
+                when(notificationsProperties.getNoticeOfChangeOtherParties()).thenReturn(OTHER_SOL_TEMPLATE);
+
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -160,7 +172,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     CCD_REF, caseData.getCcdCaseReference().toString(),
                     FORMER_SOL, PREVIOUS_SOL,
                     NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, OTHER_SOLICITOR
+                    OTHER_SOL_NAME, OTHER_SOLICITOR,
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
                 );
 
                 handler.handle(params);
@@ -179,6 +193,11 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
 
             @Test
             void shouldNotifyOtherPartiesWhenInvoked_whenInvoked() {
+                when(organisationService.findOrganisationById("QWERTY R2"))
+                    .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR_2).build()));
+
+                when(notificationsProperties.getNoticeOfChangeOtherParties()).thenReturn(OTHER_SOL_TEMPLATE);
+
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -191,7 +210,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     CCD_REF, caseData.getCcdCaseReference().toString(),
                     FORMER_SOL, PREVIOUS_SOL,
                     NEW_SOL, NEW_SOLICITOR,
-                    OTHER_SOL_NAME, OTHER_SOLICITOR_2
+                    OTHER_SOL_NAME, OTHER_SOLICITOR_2,
+                    PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                    CASEMAN_REF, "000DC001"
                 );
 
                 handler.handle(params);

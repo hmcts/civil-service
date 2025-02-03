@@ -1,27 +1,24 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,31 +35,29 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    ClaimContinuingOnlineApplicantForSpecNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private ClaimContinuingOnlineApplicantForSpecNotificationHandler handler;
 
     public static final String ORG_NAME = "Signer Name";
@@ -76,18 +71,12 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
-            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec())
-                .thenReturn(TEMPLATE_1v2);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
-        }
-
         @Test
         void shouldNotifyClaimantSolicitor_in1v1_whenInvoked() {
-            // Given
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -96,14 +85,12 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            // When
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
-            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
@@ -114,7 +101,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_when1v2_SameLegalRep() {
-            // Given
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
@@ -127,21 +117,22 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            // When
             handler.handle(params);
 
-            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_1v2,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, false),
                 REFERENCE
             );
         }
 
         @Test
         void shouldNotifyClaimantSolicitor_when1v2_TwoLegalReps() {
-            // Given
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -154,21 +145,22 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            // When
             handler.handle(params);
 
-            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_1v2,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(caseData, true),
                 REFERENCE
             );
         }
 
         @Test
         void shouldNotifyClaimantSolicitor_in2v1() {
-            // Given
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoApplicants()
@@ -180,14 +172,12 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            // When
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
-            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
@@ -196,14 +186,16 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap(CaseData caseData, boolean is1v2DS) {
 
             Map<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
                 CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-                formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+                formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
+                PARTY_REFERENCES, is1v2DS ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234" :
+                "Claimant reference: 12345 - Defendant reference: 6789"
             ));
 
             if (caseData.getRespondent2() != null) {
@@ -219,6 +211,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldGetApplicantSolicitor1ClaimStatementOfTruth_whenNoOrgFound() {
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.empty());
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -227,16 +223,12 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.empty());
-            // When
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
-            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
@@ -247,6 +239,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_whenRespondent1NotRepresented() {
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+
             CaseData caseData =
                 CaseDataBuilder.builder()
                     .respondent1(Party.builder().partyName(PARTY_NAME).build())
@@ -258,12 +254,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            // When
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
 
-            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
@@ -274,6 +268,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_whenRespondent1IsRepresented() {
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+
             CaseData caseData =
                 CaseDataBuilder.builder()
                     .respondent1(Party.builder().partyName(PARTY_NAME).build())
@@ -285,12 +283,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            // When
             handler.handle(params);
 
-            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData, false);
 
-            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
@@ -310,10 +306,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
-            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            // Then
             assertThat(response.getData()).isNull();
         }
     }

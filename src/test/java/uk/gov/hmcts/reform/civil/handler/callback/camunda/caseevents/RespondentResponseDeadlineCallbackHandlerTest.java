@@ -3,17 +3,17 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.LocalDateTime;
 
@@ -22,22 +22,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    RespondentResponseDeadlineCallbackHandler.class,
-    DeadlinesCalculator.class,
-    JacksonAutoConfiguration.class
-})
-public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private RespondentResponseDeadlineCallbackHandler handler;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
+
+    private static ObjectMapper mapper;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        handler = new RespondentResponseDeadlineCallbackHandler(mapper, deadlinesCalculator);
+    }
 
     @Test
     void shouldUpdateRespondent1ResponseDeadlineTo28days_whenClaimIssud() {

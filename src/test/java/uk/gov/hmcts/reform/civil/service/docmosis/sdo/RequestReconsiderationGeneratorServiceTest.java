@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF;
 
 @ExtendWith(SpringExtension.class)
@@ -42,28 +42,28 @@ class RequestReconsiderationGeneratorServiceTest {
 
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(fileName)
-        .documentType(SDO_ORDER)
+        .documentType(DECISION_MADE_ON_APPLICATIONS)
         .build();
 
     @Autowired
     private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
 
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
     @MockBean
-    protected IdamClient idamClient;
+    protected UserService userService;
 
     @Test
     void shouldGenerateReconsiderationUpheldDocument() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF)))
             .thenReturn(new DocmosisDocument(RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF.getDocumentTitle(), bytes));
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SDO_ORDER)))
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DECISION_MADE_ON_APPLICATIONS)))
             .thenReturn(CASE_DOCUMENT);
-        when(idamClient.getUserDetails(any()))
+        when(userService.getUserDetails(any()))
             .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -80,7 +80,7 @@ class RequestReconsiderationGeneratorServiceTest {
 
         assertThat(caseDocument).isNotNull();
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SDO_ORDER));
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, DECISION_MADE_ON_APPLICATIONS));
     }
 
 }

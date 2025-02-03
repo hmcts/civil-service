@@ -4,23 +4,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,92 +26,66 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    StateFlowEngine.class,
-    RepresentativeService.class})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class RepresentativeServiceTest {
 
-    private final ContactInformation applicantContactInformation = ContactInformation.builder()
-        .addressLine1("A address line 1")
-        .addressLine2("A address line 2")
-        .addressLine3("A address line 3")
-        .postCode("SW1 1AA A")
-        .county("London A")
-        .country("UK A")
-        .dxAddress(List.of(DxAddress.builder().dxNumber("DX12345A").build()))
-        .build();
-    private final ContactInformation respondentContactInformation = ContactInformation.builder()
-        .addressLine1("R address line 1")
-        .addressLine2("R address line 2")
-        .addressLine3("R address line 3")
-        .postCode("SW1 1AA R")
-        .county("London R")
-        .country("UK R")
-        .dxAddress(List.of(DxAddress.builder().dxNumber("DX12345R").build()))
-        .build();
-    private final ContactInformation respondent2ContactInformation = ContactInformation.builder()
-        .addressLine1("R2 address line 1")
-        .addressLine2("R2 address line 2")
-        .addressLine3("R2 address line 3")
-        .postCode("SW1 1AA R2")
-        .county("London R2")
-        .country("UK R2")
-        .dxAddress(List.of(DxAddress.builder().dxNumber("DX12345R").build()))
-        .build();
-    private final Address respondentSolicitorServiceAddress = Address.builder()
-        .addressLine1("RS service address 1")
-        .addressLine2("RS service address 2")
-        .addressLine3("RS service address 3")
-        .postCode("SW1 1AA RS")
-        .county("London RS")
-        .country("UK RS")
-        .build();
-    private final Address respondentSolicitor2ServiceAddress = Address.builder()
-        .addressLine1("RS2 service address 1")
-        .addressLine2("RS2 service address 2")
-        .addressLine3("RS2 service address 3")
-        .postCode("SW1 1AA RS2")
-        .county("London RS2")
-        .country("UK RS2")
-        .build();
-    private final Address applicantSolicitorServiceAddress = Address.builder()
-        .addressLine1("AS service address 1")
-        .addressLine2("AS service address 2")
-        .addressLine3("AS service address 3")
-        .postCode("SW1 1AA AS")
-        .county("London AS")
-        .country("UK AS")
-        .build();
-    private final Organisation applicantOrganisation = Organisation.builder()
-        .name("test applicant org")
-        .contactInformation(List.of(applicantContactInformation))
-        .build();
-    private final Organisation respondentOrganisation = Organisation.builder()
-        .name("test respondent org")
-        .contactInformation(List.of(respondentContactInformation))
-        .build();
-    private final Organisation respondent2Organisation = Organisation.builder()
-        .name("test respondent org")
-        .contactInformation(List.of(respondent2ContactInformation))
-        .build();
-
-    @MockBean
-    private OrganisationService organisationService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @Autowired
+    @InjectMocks
     private RepresentativeService representativeService;
 
+    @Mock
+    private OrganisationService organisationService;
+
+    private ContactInformation applicantContactInformation;
+    private ContactInformation respondentContactInformation;
+    private ContactInformation respondent2ContactInformation;
+    private Address respondentSolicitorServiceAddress;
+    private Address respondentSolicitor2ServiceAddress;
+    private Address applicantSolicitorServiceAddress;
+    private Organisation applicantOrganisation;
+    private Organisation respondentOrganisation;
+    private Organisation respondent2Organisation;
+
     @BeforeEach
-    void setup() {
-        given(organisationService.findOrganisationById("QWERTY A")).willReturn(Optional.of(applicantOrganisation));
-        given(organisationService.findOrganisationById("QWERTY R")).willReturn(Optional.of(respondentOrganisation));
-        given(organisationService.findOrganisationById("QWERTY R2")).willReturn(Optional.of(respondent2Organisation));
+    void setUp() {
+        applicantContactInformation = createContactInformation("A");
+        respondentContactInformation = createContactInformation("R");
+        respondent2ContactInformation = createContactInformation("R2");
+        respondentSolicitorServiceAddress = createAddress("RS");
+        respondentSolicitor2ServiceAddress = createAddress("RS2");
+        applicantSolicitorServiceAddress = createAddress("AS");
+        applicantOrganisation = createOrganisation("test applicant org", applicantContactInformation);
+        respondentOrganisation = createOrganisation("test respondent org", respondentContactInformation);
+        respondent2Organisation = createOrganisation("test respondent org", respondent2ContactInformation);
+    }
+
+    private ContactInformation createContactInformation(String prefix) {
+        return ContactInformation.builder()
+            .addressLine1(prefix + " address line 1")
+            .addressLine2(prefix + " address line 2")
+            .addressLine3(prefix + " address line 3")
+            .postCode("SW1 1AA " + prefix)
+            .county("London " + prefix)
+            .country("UK " + prefix)
+            .dxAddress(List.of(DxAddress.builder().dxNumber("DX12345" + prefix).build()))
+            .build();
+    }
+
+    private Address createAddress(String prefix) {
+        return Address.builder()
+            .addressLine1(prefix + " service address 1")
+            .addressLine2(prefix + " service address 2")
+            .addressLine3(prefix + " service address 3")
+            .postCode("SW1 1AA " + prefix)
+            .county("London " + prefix)
+            .country("UK " + prefix)
+            .build();
+    }
+
+    private Organisation createOrganisation(String name, ContactInformation contactInformation) {
+        return Organisation.builder()
+            .name(name)
+            .contactInformation(List.of(contactInformation))
+            .build();
     }
 
     @Nested
@@ -124,6 +93,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresented() {
+            given(organisationService.findOrganisationById("QWERTY R")).willReturn(Optional.of(respondentOrganisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
 
             Representative representative = representativeService.getRespondent1Representative(caseData);
@@ -154,6 +125,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasProvidedServiceAddress() {
+            given(organisationService.findOrganisationById("QWERTY R")).willReturn(Optional.of(respondentOrganisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
                 .respondentSolicitor1ServiceAddress(respondentSolicitorServiceAddress)
@@ -187,6 +160,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasProvidedServiceAddressSpec() {
+            given(organisationService.findOrganisationById("QWERTY R")).willReturn(Optional.of(respondentOrganisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
                 .build().toBuilder()
@@ -223,6 +198,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasNotProvidedServiceAddress() {
+            given(organisationService.findOrganisationById("QWERTY R")).willReturn(Optional.of(respondentOrganisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
                 .build();
@@ -329,6 +306,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresented() {
+            given(organisationService.findOrganisationById("QWERTY R2")).willReturn(Optional.of(respondent2Organisation));
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors().build();
@@ -361,6 +340,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasProvidedServiceAddress() {
+            given(organisationService.findOrganisationById("QWERTY R2")).willReturn(Optional.of(respondent2Organisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
@@ -396,6 +377,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresentedAndHasNotProvidedServiceAddress() {
+            given(organisationService.findOrganisationById("QWERTY R2")).willReturn(Optional.of(respondent2Organisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
@@ -429,6 +412,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenOrganisationIDIsEmpty() {
+            given(organisationService.findOrganisationById("QWERTY R2")).willReturn(Optional.of(respondent2Organisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
@@ -466,6 +451,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenApplicantHasProvidedServiceAddress() {
+            given(organisationService.findOrganisationById("QWERTY A")).willReturn(Optional.of(applicantOrganisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
                 .respondentSolicitor1ServiceAddress(respondentSolicitorServiceAddress)
@@ -499,6 +486,8 @@ class RepresentativeServiceTest {
 
         @Test
         void shouldReturnValidOrganisationDetails_whenApplicantHasNotProvidedServiceAddress() {
+            given(organisationService.findOrganisationById("QWERTY A")).willReturn(Optional.of(applicantOrganisation));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .respondentSolicitor1ServiceAddress(respondentSolicitorServiceAddress)
                 .build();

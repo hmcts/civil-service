@@ -5,11 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -24,8 +21,9 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement
 import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.mediation.UploadMediationService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -34,7 +32,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -51,31 +52,32 @@ import static uk.gov.hmcts.reform.civil.utils.UploadMediationDocumentsUtils.DEFE
 import static uk.gov.hmcts.reform.civil.utils.UploadMediationDocumentsUtils.DEFENDANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.UploadMediationDocumentsUtils.DEFENDANT_TWO_ID;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    UploadMediationDocumentsCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private UploadMediationDocumentsCallbackHandler handler;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AssignCategoryId assignCategoryId;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @Mock
+    private UploadMediationService uploadMediationService;
+
+    @Mock
+    private UserService userService;
+
+    @Mock
     private Time time;
+
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        AssignCategoryId assignCategoryId = new AssignCategoryId();
+        handler = new UploadMediationDocumentsCallbackHandler(coreCaseUserService, userService, objectMapper, time,
+                                                              assignCategoryId, uploadMediationService);
+    }
 
     private static final String PARTY_OPTIONS_PAGE = "populate-party-options";
     private static final String VALIDATE_DATES = "validate-dates";
@@ -640,6 +642,42 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(secondEventData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
                 assertThat(actual).hasSize(2);
                 assertThat(actual).containsExactly(getExpectedReferredDocsOne(APP1_CATEGORY_ID), getExpectedReferredDocsTwo(APP1_CATEGORY_ID));
+
+            }
+
+            @Test
+            void shouldUploadApplicant1Documents_whenInvokedForDocumentsReferredWhenCarmIsEnable() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                    .uploadMediationDocumentsChooseOptions(CLAIMANT_ONE_ID, DOCUMENTS_REFERRED_OPTION)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                List<MediationDocumentsReferredInStatement> actual = unwrapElements(updatedData.getApp1MediationDocumentsReferred());
+
+                assertThat(updatedData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
+                assertThat(actual).hasSize(1);
+                assertThat(actual).containsExactly(getExpectedReferredDocsOne(APP1_CATEGORY_ID));
+
+                // Run event again adding second document
+                UploadMediationDocumentsForm uploadMediationDocumentsForm = buildSecondMediationNonattendanceDoc(
+                    CLAIMANT_ONE_ID,
+                    DOCUMENTS_REFERRED_OPTION
+                );
+                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+
+                params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
+
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                secondEventData = objectMapper.convertValue(response.getData(), CaseData.class);
+                actual = unwrapElements(updatedData.getApp1MediationDocumentsReferred());
+
+                assertThat(secondEventData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
+                assertThat(actual).hasSize(2);
+                assertThat(actual).containsExactly(getExpectedReferredDocsOne(APP1_CATEGORY_ID), getExpectedReferredDocsTwo(APP1_CATEGORY_ID));
+                verify(uploadMediationService, times(2)).uploadMediationDocumentsTaskList(any());
             }
 
             @Test
@@ -749,6 +787,41 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(secondEventData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
                 assertThat(actual).hasSize(2);
                 assertThat(actual).containsExactly(getExpectedReferredDocsOne(RES1_CATEGORY_ID), getExpectedReferredDocsTwo(RES1_CATEGORY_ID));
+            }
+
+            @Test
+            void shouldUploadRespondent1Documents_whenInvokedForDocumentsReferred_WhenCarmIsEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                    .uploadMediationDocumentsChooseOptions(DEFENDANT_ONE_ID, DOCUMENTS_REFERRED_OPTION)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                List<MediationDocumentsReferredInStatement> actual = unwrapElements(updatedData.getRes1MediationDocumentsReferred());
+
+                assertThat(updatedData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
+                assertThat(actual).hasSize(1);
+                assertThat(actual).containsExactly(getExpectedReferredDocsOne(RES1_CATEGORY_ID));
+
+                // Run event again adding second document
+                UploadMediationDocumentsForm uploadMediationDocumentsForm = buildSecondMediationNonattendanceDoc(
+                    DEFENDANT_ONE_ID,
+                    DOCUMENTS_REFERRED_OPTION
+                );
+                CaseData secondEventData = updatedData.toBuilder().uploadMediationDocumentsForm(uploadMediationDocumentsForm).build();
+
+                params = callbackParamsOf(secondEventData, ABOUT_TO_SUBMIT);
+
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                secondEventData = objectMapper.convertValue(response.getData(), CaseData.class);
+                actual = unwrapElements(updatedData.getRes1MediationDocumentsReferred());
+
+                assertThat(secondEventData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
+                assertThat(actual).hasSize(2);
+                assertThat(actual).containsExactly(getExpectedReferredDocsOne(RES1_CATEGORY_ID), getExpectedReferredDocsTwo(RES1_CATEGORY_ID));
+                verify(uploadMediationService, times(2)).uploadMediationDocumentsTaskList(any());
             }
 
             @Test

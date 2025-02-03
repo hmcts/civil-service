@@ -9,11 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -21,7 +25,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -46,6 +52,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -64,10 +71,10 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -77,12 +84,16 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
@@ -97,7 +108,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -109,6 +120,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -120,8 +132,11 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF2;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -129,59 +144,70 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {
+    RespondToClaimSpecCallbackHandler.class,
+    ExitSurveyConfiguration.class,
+    ExitSurveyContentService.class,
+    JacksonAutoConfiguration.class,
+    ValidationAutoConfiguration.class,
+    DateOfBirthValidator.class,
+    UnavailableDateValidator.class,
+    CaseDetailsConverter.class,
+    LocationReferenceDataService.class,
+    CourtLocationUtils.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
+})
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
+    @Autowired
     private RespondToClaimSpecCallbackHandler handler;
-
-    @Mock
+    @Autowired
+    private ObjectMapper objectMapper;
+    @MockBean
     private Time time;
-    @Mock
+    @MockBean
     private PaymentDateValidator validator;
-    @Mock
+    @MockBean
     private UnavailableDateValidator dateValidator;
-    @Mock
+    @Autowired
     private ExitSurveyContentService exitSurveyContentService;
-    @Mock
+    @MockBean
     private FeatureToggleService toggleService;
-    @Mock
+    @MockBean
     private PostcodeValidator postcodeValidator;
-    @Mock
+    @MockBean
     private DeadlinesCalculator deadlinesCalculator;
-    @Mock
+    @Autowired
     private UserService userService;
-    @Mock
+    @MockBean
     private CoreCaseUserService coreCaseUserService;
     @Mock
     private StateFlow mockedStateFlow;
-    @Mock
-    private StateFlowEngine stateFlowEngine;
+    @MockBean
+    private SimpleStateFlowEngine stateFlowEngine;
+    @MockBean
+    private SimpleStateFlowBuilder simpleStateFlowBuilder;
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
-    @Mock
-    private LocationRefDataService locationRefDataService;
-    @Mock
+    @MockBean
+    private LocationReferenceDataService locationRefDataService;
+    @Autowired
     private AssignCategoryId assignCategoryId;
-    @Mock
+    @MockBean
     private CourtLocationUtils courtLocationUtils;
-    @Mock
+    @MockBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @Mock
+    @MockBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+    @MockBean
+    private DQResponseDocumentUtils dqResponseDocumentUtils;
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
 
-    public static final String UNAVAILABLE_DATE_RANGE_MISSING = "Please provide at least one valid Date from if you "
-        + "cannot attend hearing within next 3 months.";
-    public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
-        + "Unavailability Date to. Please enter valid range.";
-    public static final String INVALID_UNAVAILABLE_DATE_BEFORE_TODAY = "Unavailability date must not"
-        + " be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY = "Unavailability date from must not"
-        + " be before today.";
-    public static final String INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR = "Unavailability date to must not"
-        + " be more than one year in the future.";
-    public static final String INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR = "Unavailability date must not"
-        + " be more than one year in the future.";
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
         new FullAdmitAlreadyPaidConfirmationText(),
@@ -203,14 +229,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     public void setup() {
-        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
+        ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper()
+            .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
-        ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators",
-                                     confirmationTextGenerators
-        );
-        ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators",
-                                     confirmationHeaderSpecGenerators
-        );
+        ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators", confirmationTextGenerators);
+        ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators", confirmationHeaderSpecGenerators);
+
+        when(dqResponseDocumentUtils.buildClaimantResponseDocuments(any(CaseData.class))).thenReturn(new ArrayList<>());
     }
 
     @Test
@@ -644,6 +669,38 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        public void shouldSetIntermediateAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // total claim amount is 100000, so track is intermediate, as this is the upper limit
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
+                .totalClaimAmount(BigDecimal.valueOf(100000))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.INTERMEDIATE_CLAIM.name());
+        }
+
+        @Test
+        public void shouldSetMultiAllocatedTrack_whenInvoked() {
+            // New multi and intermediate track change track logic
+            // total claim amount is 100001, so track is multi
+            when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceFastTrack()
+                .totalClaimAmount(BigDecimal.valueOf(100001))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "track", "DEFENDANT_RESPONSE_SPEC");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.MULTI_CLAIM.name());
+        }
+
+        @Test
         public void testValidateLengthOfUnemploymentWithError() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().generateYearsAndMonthsIncorrectInput().build();
@@ -743,7 +800,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
 
             // When
@@ -770,6 +827,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+                when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
 
                 ExpertDetails experts = ExpertDetails.builder()
                     .expertName("Mr Expert Defendant")
@@ -790,7 +848,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -819,7 +877,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -838,6 +896,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
                 when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
                 when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+                when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+                when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
                 ExpertDetails experts = ExpertDetails.builder()
                     .expertName("Mr Expert Defendant")
@@ -851,6 +911,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .respondent2(PartyBuilder.builder().individual().build())
+                    .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .respondent2DQSmallClaimExperts(experts, YES)
                     .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
@@ -858,7 +919,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -886,7 +947,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                     .thenReturn(LocalDateTime.now());
 
                 // When
@@ -919,7 +980,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(LocalDateTime.now());
 
             // When
@@ -1032,7 +1093,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-        when(toggleService.isHmcEnabled()).thenReturn(true);
 
         Witnesses res1witnesses = Witnesses.builder().details(
             wrapElements(
@@ -1077,7 +1137,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1ResponseDate(dateTime).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+        when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
             .thenReturn(LocalDateTime.now());
 
         // When
@@ -1191,6 +1251,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(completePreferredLocation.getCourtLocationCode());
             sent1.extracting("reasonForHearingAtSpecificCourt")
                 .isEqualTo("Reason");
+
+            verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
         }
 
         @Test
@@ -1278,6 +1340,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(completePreferredLocation.getCourtLocationCode());
             sent2.extracting("reasonForHearingAtSpecificCourt")
                 .isEqualTo("Reason123");
+
+            verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
         }
 
         @Test
@@ -1360,7 +1424,223 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(completePreferredLocation.getCourtLocationCode());
             sent2.extracting("reasonForHearingAtSpecificCourt")
                 .isEqualTo("Reason123");
+
+            verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
         }
+    }
+
+    @Test
+    void shouldAssignCategoryId_frc_whenInvoked() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent2DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //Then
+        assertThat(response.getData())
+            .extracting("respondent1DQFixedRecoverableCostsIntermediate")
+            .extracting("frcSupportingDocument")
+            .extracting("categoryID")
+            .isEqualTo(DQ_DEF1.getValue());
+
+        assertThat(response.getData())
+            .extracting("respondent2DQFixedRecoverableCostsIntermediate")
+            .extracting("frcSupportingDocument")
+            .extracting("categoryID")
+            .isEqualTo(DQ_DEF2.getValue());
+    }
+
+    @Test
+    void shouldAssignCategoryId_frc_whenInvokedFor1v2DiffFirstResponse() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //Then
+        assertThat(response.getData())
+            .extracting("respondent1DQFixedRecoverableCostsIntermediate")
+            .extracting("frcSupportingDocument")
+            .extracting("categoryID")
+            .isEqualTo(DQ_DEF1.getValue());
+    }
+
+    @Test
+    void shouldPopulateDefendantResponseDocuments_whenInvokedFor1v2DiffBothResponded() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        Document document = DocumentBuilder.builder().build();
+        List<Element<CaseDocument>> existingResponseDocuments = new ArrayList<>();
+        existingResponseDocuments.add(
+            Element.<CaseDocument>builder()
+                .id(UUID.randomUUID())
+                .value(CaseDocument.builder()
+                           .documentLink(document)
+                           .documentName("doc-1")
+                           .createdBy("Defendant 1")
+                           .createdDatetime(LocalDateTime.now())
+                           .build())
+                .build());
+
+        var newResponseDocuments = List.of(
+            Element.<CaseDocument>builder()
+                .id(UUID.randomUUID())
+                .value(CaseDocument.builder()
+                           .documentLink(document)
+                           .documentName("doc-2")
+                           .createdBy("Defendant 2")
+                           .createdDatetime(LocalDateTime.now())
+                           .build())
+                .build());
+
+        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(newResponseDocuments);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent2DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .build().toBuilder()
+            .defendantResponseDocuments(existingResponseDocuments)
+            .build();
+        caseData = caseData.toBuilder()
+            .respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+                               .respondent2DQDraftDirections(document).build()
+            ).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        //Then
+        var actualCaseData = getCaseData(response);
+
+        assertThat(actualCaseData.getDefendantResponseDocuments().size()).isEqualTo(2);
+        assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo("doc-1");
+        assertThat(actualCaseData.getDefendantResponseDocuments().get(1).getValue().getDocumentName()).isEqualTo("doc-2");
+        assertThat(actualCaseData.getRespondent2DQ().getRespondent2DQDraftDirections()).isEqualTo(null);
+
+        verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
+    }
+
+    @Test
+    void shouldAppendDefendantResponseDocuments_whenInvokedFor1v2DiffFirstResponse() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = LocalDateTime.now().plusDays(4);
+        //Given
+        when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(
+            any(LocalDateTime.class)
+        )).thenReturn(deadline);
+
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        Document document = DocumentBuilder.builder().build();
+        var expectedResponseDocuments = List.of(
+            Element.<CaseDocument>builder()
+                .id(UUID.randomUUID())
+                .value(CaseDocument.builder()
+                           .documentLink(document)
+                           .documentName("doc-name")
+                           .createdBy("Defendant")
+                           .createdDatetime(LocalDateTime.now())
+                           .build())
+                .build());
+        when(dqResponseDocumentUtils.buildDefendantResponseDocuments(any(CaseData.class))).thenReturn(expectedResponseDocuments);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .setIntermediateTrackClaim()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .atStateRespondentFullDefence()
+            .respondent1DQWithFixedRecoverableCostsIntermediate()
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .build();
+        caseData = caseData.toBuilder()
+            .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                               .respondent1DQDraftDirections(document).build()
+            ).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        //Then
+        var actualCaseData = getCaseData(response);
+
+        assertThat(actualCaseData.getDefendantResponseDocuments().size()).isEqualTo(1);
+        assertThat(actualCaseData.getDefendantResponseDocuments().get(0).getValue().getDocumentName()).isEqualTo("doc-name");
+        assertThat(actualCaseData.getRespondent1DQ().getRespondent1DQDraftDirections()).isEqualTo(null);
+
+        verify(dqResponseDocumentUtils, times(1)).buildDefendantResponseDocuments(any(CaseData.class));
     }
 
     @Test
@@ -1966,7 +2246,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atState1v2SameSolicitorDivergentResponseSpec(
-                    RespondentResponseTypeSpec.FULL_DEFENCE,
+                    FULL_DEFENCE,
                     FULL_ADMISSION
                 )
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -2442,7 +2722,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2497,7 +2777,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2531,7 +2811,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2549,7 +2829,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be before today.");
         }
 
         @Test
@@ -2558,14 +2838,14 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             List<Element<UnavailableDate>> unAvailableDates = Stream.of(
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                    .date(LocalDate.now().plusYears(4))
+                    .date(LocalDate.now().plusMonths(4))
                     .build(),
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
                     .fromDate(LocalDate.now().plusDays(4))
                     .toDate(LocalDate.now().plusDays(6))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2583,7 +2863,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date must not be more than three months in the future.");
         }
 
         @Test
@@ -2599,7 +2879,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().plusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2617,7 +2897,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -2633,7 +2913,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().minusDays(6))
                     .toDate(LocalDate.now().plusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2651,7 +2931,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+            assertThat(response.getErrors()).contains("Unavailability Date From must not be before today.");
         }
 
         @Test
@@ -2667,7 +2947,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .fromDate(LocalDate.now().plusDays(6))
                     .toDate(LocalDate.now().minusDays(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2685,7 +2965,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
         }
 
         @Test
@@ -2699,9 +2979,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UnavailableDate.builder()
                     .unavailableDateType(UnavailableDateType.DATE_RANGE)
                     .fromDate(LocalDate.now().plusDays(6))
-                    .toDate(LocalDate.now().plusYears(4))
+                    .toDate(LocalDate.now().plusMonths(4))
                     .build()
-            ).map(ElementUtils::element).collect(Collectors.toList());
+            ).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .addRespondent2(YES)
@@ -2719,7 +2999,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+            assertThat(response.getErrors()).contains("Unavailability Date To must not be more than three months in the future.");
         }
 
     }
@@ -2790,7 +3070,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 UnavailableDate.builder()
                     .date(LocalDate.of(2024, 5, 2))
                     .who("who 1")
-                    .build()).map(ElementUtils::element).collect(Collectors.toList());
+                    .build()).map(ElementUtils::element).toList();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
@@ -2832,5 +3112,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(DEFENDANT_RESPONSE_SPEC);
+    }
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
     }
 }

@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
-import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
 
 import java.util.List;
 import java.util.Map;
@@ -20,27 +19,18 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_DJ_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_DJ_UNSPEC;
 
 @Service
-public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
+public class NotifyDefaultJudgmentHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RPA_DJ_UNSPEC,
         NOTIFY_RPA_DJ_SPEC
     );
+    private final DefaultJudgmentRoboticsNotifier defaultJudgmentRoboticsNotifier;
 
     public NotifyDefaultJudgmentHandler(
-        RoboticsNotificationService roboticsNotificationService,
-        JsonSchemaValidationService jsonSchemaValidationService,
-        RoboticsDataMapper roboticsDataMapper,
-        RoboticsDataMapperForSpec roboticsDataMapperForSpec,
-        FeatureToggleService toggleService
+        DefaultJudgmentRoboticsNotifier defaultJudgmentRoboticsNotifier
     ) {
-        super(
-            roboticsNotificationService,
-            jsonSchemaValidationService,
-            roboticsDataMapper,
-            roboticsDataMapperForSpec,
-            toggleService
-        );
+        this.defaultJudgmentRoboticsNotifier = defaultJudgmentRoboticsNotifier;
     }
 
     public static final String TASK_ID = "NotifyRPADJ";
@@ -53,6 +43,15 @@ public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
         );
     }
 
+    private CallbackResponse notifyRobotics(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        String authToken = (String) callbackParams.getParams().get(BEARER_TOKEN);
+
+        defaultJudgmentRoboticsNotifier.notifyRobotics(caseData, authToken);
+
+        return SubmittedCallbackResponse.builder().build();
+    }
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return isSpecHandler(callbackParams) ? TASK_ID_SPEC : TASK_ID;
@@ -62,17 +61,6 @@ public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    @Override
-    protected void sendNotifications(CallbackParams callbackParams, CaseData caseData, boolean multiPartyScenario) {
-        if (toggleService.isPinInPostEnabled() && caseData.isRespondent1NotRepresented()) {
-            roboticsNotificationService.notifyJudgementLip(caseData);
-        } else {
-            roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
-                                                       callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-        }
     }
 
     private boolean isSpecHandler(CallbackParams callbackParams) {

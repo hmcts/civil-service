@@ -109,7 +109,7 @@ public class CaseFlagsToHearingValueMapper {
 
     public static List<String> getReasonableAdjustments(List<FlagDetail> flagDetails) {
         return getReasonableAdjustmentFlags(flagDetails).stream().map(FlagDetail::getFlagCode)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private static boolean isLanguageInterpreterFlag(String flag) {
@@ -118,7 +118,7 @@ public class CaseFlagsToHearingValueMapper {
 
     public static String getOtherReasonableAdjustmentDetails(List<FlagDetail> flagDetails) {
         String details = null;
-        List<FlagDetail> flags = new ArrayList<FlagDetail>();
+        List<FlagDetail> flags = new ArrayList<>();
         List<FlagDetail> reasonableAdjustmentFlags = getReasonableAdjustmentFlags(flagDetails);
         List<FlagDetail> languageInterpreterFlags = getSpokenLanguageInterpreterFlags(flagDetails);
 

@@ -19,9 +19,10 @@ import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -42,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -58,7 +58,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
 
     @Override
@@ -234,12 +234,13 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
@@ -249,11 +250,21 @@ public class DefaultJudgementHandler extends CallbackHandler {
                 .toBuilder().hearingTemporaryLocation(list).build();
             caseDataBuilder
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
+            String code = list.getValue().getCode();
+            final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
+            List<LocationRefData> locations = (locationRefDataService
+                .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimId));
+
+            if (!locations.isEmpty()) {
+                LocationRefData locationRefData = locations.get(0);
+                caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder()
+                                                           .region(locationRefData.getRegionId())
+                                                           .baseLocation(locationRefData.getEpimmsId())
+                                                           .build());
+            }
         }
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder,
-                                                                         featureToggleService.isUpdateContactDetailsEnabled());
-
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder);
         caseDataBuilder.setRequestDJDamagesFlagForWA(YesOrNo.YES).build();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
@@ -263,12 +274,17 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        return fromList(locations.stream()
-                            .map(location -> location.getSiteName()
-                                + " - " + location.getCourtAddress()
-                                + " - " + location.getPostcode())
-                            .sorted()
-                            .collect(Collectors.toList()));
+        List<DynamicListElement> list = locations.stream()
+            .map(location ->
+                     DynamicListElement.dynamicElementFromCode(
+                         UUID.randomUUID() + "-" + location.getEpimmsId(),
+                         location.getSiteName()
+                             + " - " + location.getCourtAddress()
+                             + " - " + location.getPostcode()
+                     )
+            ).sorted((object1, object2) -> object1.getLabel().compareTo(object2.getLabel()))
+            .toList();
+        return DynamicList.fromDynamicListElementList(list);
     }
 
     private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
@@ -297,8 +313,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private DynamicList formatLocationList(DynamicList locationList) {
         List<DynamicListElement> list = locationList.getListItems()
             .stream()
-            .filter(element -> checkLocationItemValue(element, locationList.getValue())).collect(
-                Collectors.toList());
+            .filter(element -> checkLocationItemValue(element, locationList.getValue())).toList();
         return DynamicList.builder().value(locationList.getValue()).listItems(list).build();
     }
 

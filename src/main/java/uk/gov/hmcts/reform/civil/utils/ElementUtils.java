@@ -15,7 +15,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toUnmodifiableList;
 
 public class ElementUtils {
 
@@ -42,8 +41,7 @@ public class ElementUtils {
         return nullSafeCollection(elements)
             .stream()
             .map(Element::getValue)
-            .filter(Objects::nonNull)
-            .collect(toUnmodifiableList());
+            .filter(Objects::nonNull).toList();
     }
 
     public static <T> List<T> unwrapElementsNullSafe(List<Element<T>> elements) {

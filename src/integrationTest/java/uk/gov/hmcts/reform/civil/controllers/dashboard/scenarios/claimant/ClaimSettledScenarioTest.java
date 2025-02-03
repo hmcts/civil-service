@@ -1,35 +1,57 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class ClaimSettledScenarioTest extends BaseIntegrationTest {
+public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private ClaimantResponseNotificationHandler handler;
 
     @Test
     void should_create_scenario_for_claim_settled() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
+        String caseId = "1234678912";
+        LocalDateTime respondent1SettlementDeadline = LocalDateTime.now().plusDays(7);
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+            .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                       .applicant1SignedSettlementAgreement(YesOrNo.YES).build()).build();
 
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>(Map.of("claimSettledAmount", "£3000",
-                                                "claimSettledDateEn", "16th March 2024",
-                                                "claimSettledDateCy", "16th March 2024",
-                                                "respondent1PartyName", "mr defendant"
-                   )))
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.ClaimSettled.Claimant", caseId
-        )
-            .andExpect(status().isOk());
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
+            .toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .applicant1Represented(YesOrNo.NO)
+            .caseDataLiP(caseDataLiP)
+            .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+            .ccdState(CaseState.CASE_SETTLED)
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(BigDecimal.valueOf(300000))
+                                .whenWasThisAmountPaid(LocalDate.of(2024, 3, 16))
+                                .build())
+            .respondent1RespondToSettlementAgreementDeadline(respondent1SettlementDeadline)
+            .build();
+
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
@@ -39,7 +61,13 @@ public class ClaimSettledScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn")
                     .value(
-                        "<p class=\"govuk-body\">You have confirmed that mr defendant paid £3000 on 16th March 2024.</p>")
+                        "<p class=\"govuk-body\">You have confirmed that the claim against Mr. Sole Trader was settled on 16 March 2024.</p>"
+                            + "<p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>"),
+                jsonPath("$[0].titleCy").value("Mae’r hawliad wedi’i setlo"),
+                jsonPath("$[0].descriptionCy")
+                    .value(
+                        "<p class=\"govuk-body\">You have confirmed that the claim against Mr. Sole Trader was settled on 16 March 2024.</p>"
+                            + "<p class=\"govuk-body\">The defendant has 19 days from the date of settlement to notify the court of any objection.</p>")
             );
     }
 }

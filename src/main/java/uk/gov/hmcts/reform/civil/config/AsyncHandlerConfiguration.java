@@ -23,5 +23,4 @@ public class AsyncHandlerConfiguration implements AsyncConfigurer {
         executor.initialize();
         return executor;
     }
-
 }

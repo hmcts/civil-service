@@ -13,6 +13,6 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
 VALUES ('Notice.AAA6.ClaimIssue.HWF.InfoRequired',
         'Your help with fees application needs more information',
         'Mae angen i chi ddarparu mwy o wybodaeth am eich cais am help i dalu ffioedd',
-        '<p class="govuk-body">We need more information on your application for help with the claim fee.<br>You''ve been sent an email with further details. If you''ve already read the email and taken action, you can disregard this message.<br>You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
-        '<p class="govuk-body">Mae arnom angen mwy o wybodaeth am eich cais am help i dalu ffi’r hawliad.<br>Anfonwyd e-bost atoch gyda mwy o fanylion. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu, gallwch anwybyddu''r neges hon.<br>Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>',
+        '<p class="govuk-body">We need more information on your application for help with the claim fee. You''ve been sent an email with further details. If you''ve already read the email and taken action, you can disregard this message. You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>',
+        '<p class="govuk-body">Mae arnom angen mwy o wybodaeth am eich cais am help i dalu ffi’r hawliad. Anfonwyd e-bost atoch gyda mwy o fanylion. Os ydych eisoes wedi darllen yr e-bost ac wedi gweithredu, gallwch anwybyddu''r neges hon. Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephoneWelshSpeaker}.</p>',
         'CLAIMANT');

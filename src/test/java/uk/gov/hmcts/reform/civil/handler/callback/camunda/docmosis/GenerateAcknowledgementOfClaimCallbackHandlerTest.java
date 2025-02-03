@@ -95,7 +95,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     @Test
     void shouldAssignCategoryId_whenInvokedAnd1v2DifferentSol() {
         //Given
-        //AcknowledgeClaimCallbackHandler.defendantFlag = "userRespondent2";
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .respondent2DocumentGeneration("userRespondent2")

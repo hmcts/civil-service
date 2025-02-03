@@ -151,9 +151,9 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 assertThat(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-                    .isEqualTo(null);
+                    .isNull();
                 assertThat(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
-                    .isEqualTo(null);
+                    .isNull();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

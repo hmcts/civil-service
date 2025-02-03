@@ -19,11 +19,11 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper locationHelper;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
@@ -62,7 +62,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserDetails userDetails = userService.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
 
         return documentManagementService.uploadDocument(
@@ -93,7 +93,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserDetails userDetails = userService.getUserDetails(authorisation);
 
         boolean isJudge = false;
 
@@ -163,7 +163,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData, String authorisation) {
         String trialHearingLocation = getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ());
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserDetails userDetails = userService.getUserDetails(authorisation);
 
         boolean isJudge = false;
 
@@ -295,11 +295,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return "";
     }
 
-    private String fillTypeBundleInfoTrial() {
-        return "An indexed electronic bundle of documents for trial, with each page "
-            + "clearly numbered including a case summary limited to 500 words";
-    }
-
     private String fillDisposalHearingTime(DisposalHearingFinalDisposalHearingTimeEstimate type) {
         switch (type) {
             case FIFTEEN_MINUTES:
@@ -316,11 +311,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private boolean addAdditionalDirection(CaseData caseData) {
-        if (caseData.getDisposalHearingAddNewDirectionsDJ() != null
-            || caseData.getTrialHearingAddNewDirectionsDJ() != null) {
-            return true;
-        }
-        return false;
+        return caseData.getDisposalHearingAddNewDirectionsDJ() != null
+            || caseData.getTrialHearingAddNewDirectionsDJ() != null;
     }
 
     private String getCourt(CaseData caseData) {

@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
@@ -123,10 +125,8 @@ public class ManageContactInformationUtils {
             case(DEFENDANT_TWO_ID): {
                 return formatId(partyChosen, user, caseData.getRespondent2());
             }
-            case(CLAIMANT_ONE_LITIGATION_FRIEND_ID):
-            case(CLAIMANT_TWO_LITIGATION_FRIEND_ID):
-            case(DEFENDANT_ONE_LITIGATION_FRIEND_ID):
-            case(DEFENDANT_TWO_LITIGATION_FRIEND_ID): {
+            case(CLAIMANT_ONE_LITIGATION_FRIEND_ID), (CLAIMANT_TWO_LITIGATION_FRIEND_ID),
+                (DEFENDANT_ONE_LITIGATION_FRIEND_ID), (DEFENDANT_TWO_LITIGATION_FRIEND_ID): {
                 return formatId(partyChosen, user);
             }
             default: {
@@ -314,10 +314,12 @@ public class ManageContactInformationUtils {
         return String.format("%s_%s", partyChosen, isAdmin);
     }
 
+    static final String SPACE_FORMAT = "%s %s";
+
     private static void addApplicant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // applicant 1 party name
         list.add(dynamicElementFromCode(CLAIMANT_ONE_ID,
-                                        String.format("%s %s", CLAIMANT_ONE, caseData.getApplicant1().getPartyName())));
+                                        String.format(SPACE_FORMAT, CLAIMANT_ONE, caseData.getApplicant1().getPartyName())));
         // applicant 1 litigation friend
         if (shouldAddLitigationFriend(caseData.getApplicant1().getType())) {
             if (caseData.getApplicant1LitigationFriend() != null) {
@@ -333,7 +335,7 @@ public class ManageContactInformationUtils {
 
     private static void addApplicant2PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // applicant 2 party name
-        list.add(dynamicElementFromCode(CLAIMANT_TWO_ID, String.format("%s %s", CLAIMANT_TWO, caseData.getApplicant2().getPartyName())));
+        list.add(dynamicElementFromCode(CLAIMANT_TWO_ID, String.format(SPACE_FORMAT, CLAIMANT_TWO, caseData.getApplicant2().getPartyName())));
         // applicant 2 litigation friend
         if (shouldAddLitigationFriend(caseData.getApplicant2().getType())) {
             if (caseData.getApplicant2LitigationFriend() != null) {
@@ -349,7 +351,7 @@ public class ManageContactInformationUtils {
 
     private static void addDefendant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // defendant 1 party name
-        list.add(dynamicElementFromCode(DEFENDANT_ONE_ID, String.format("%s %s", DEFENDANT_ONE, caseData.getRespondent1().getPartyName())));
+        list.add(dynamicElementFromCode(DEFENDANT_ONE_ID, String.format(SPACE_FORMAT, DEFENDANT_ONE, caseData.getRespondent1().getPartyName())));
         // defendant 1 litigation friend
         if (shouldAddLitigationFriend(caseData.getRespondent1().getType())) {
             if (caseData.getRespondent1LitigationFriend() != null) {
@@ -365,7 +367,7 @@ public class ManageContactInformationUtils {
 
     private static void addDefendant2PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // defendant 2 party name
-        list.add(dynamicElementFromCode(DEFENDANT_TWO_ID, String.format("%s %s", DEFENDANT_TWO, caseData.getRespondent2().getPartyName())));
+        list.add(dynamicElementFromCode(DEFENDANT_TWO_ID, String.format(SPACE_FORMAT, DEFENDANT_TWO, caseData.getRespondent2().getPartyName())));
         // defendant 2 litigation friend
         if (shouldAddLitigationFriend(caseData.getRespondent2().getType())) {
             if (caseData.getRespondent2LitigationFriend() != null) {
@@ -480,18 +482,82 @@ public class ManageContactInformationUtils {
     }
 
     private static void addOrganisationIndividuals(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, ORG_INDIVIDUALS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, ORG_INDIVIDUALS)));
     }
 
     private static void addLegalRepIndividuals(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, LEGAL_REP_INDIVIDUALS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, LEGAL_REP_INDIVIDUALS)));
     }
 
     private static void addWitnesses(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, WITNESSES)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, WITNESSES)));
     }
 
     private static void addExperts(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, EXPERTS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, EXPERTS)));
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> mapPartyFieldsToPartyFormData(List<Element<PartyFlagStructure>> partyFields) {
+        return ofNullable(partyFields).orElse(new ArrayList<>()).stream().map(partyElement ->
+                        Element.<UpdatePartyDetailsForm>builder()
+                                .id(partyElement.getId())
+                                .value(UpdatePartyDetailsForm.builder()
+                                        .firstName(partyElement.getValue().getFirstName())
+                                        .lastName(partyElement.getValue().getLastName())
+                                        .emailAddress(partyElement.getValue().getEmail())
+                                        .phoneNumber(partyElement.getValue().getPhone())
+                                        .build())
+                                .build())
+                .toList();
+    }
+
+    public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
+                                                                           List<Element<UpdatePartyDetailsForm>> updatedData) {
+        return updatedData.stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
+                        .id(updatedParty.getId())
+                        .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
+                                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
+                                .map(Element::getValue)
+                                .findFirst().orElse(PartyFlagStructure.builder().build()), updatedParty.getValue()))
+                        .build())
+                .toList();
+    }
+
+    private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {
+        return  individual.toBuilder()
+                .firstName(form.getFirstName())
+                .lastName(form.getLastName())
+                .email(form.getEmailAddress())
+                .phone(form.getPhoneNumber())
+                .build();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareOrgIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1OrgIndividuals());
+        }
+        if (CLAIMANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant2OrgIndividuals());
+        }
+        if (DEFENDANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1OrgIndividuals());
+        }
+        if (DEFENDANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2OrgIndividuals());
+        }
+        return new ArrayList<>();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareLRIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1LRIndividuals());
+        }
+        if (DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1LRIndividuals());
+        }
+        if (DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2LRIndividuals());
+        }
+        return new ArrayList<>();
     }
 }

@@ -1,37 +1,40 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimantResponseDefendantNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Testcontainers
-public class GoToHearingDefendantPartAdmitScenarioTest extends BaseIntegrationTest {
+public class GoToHearingDefendantPartAdmitScenarioTest extends DashboardBaseIntegrationTest {
+
+    @Autowired
+    private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
     void should_create_go_to_hearing_scenario_defendant_part_admit() throws Exception {
 
-        UUID caseId = UUID.randomUUID();
+        String caseId = "90123456783";
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build().toBuilder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(Long.valueOf(caseId))
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(700))
+            .build();
 
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(new HashMap<>(Map.of("applicant1PartyName", "Mr.Claimant",
-                                                "defendantAdmittedAmount", "£700"
-                   )))
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA6.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant", caseId
-        )
-            .andExpect(status().isOk());
+        handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
@@ -40,20 +43,20 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends BaseIntegrationTe
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">Mr.Claimant wants to proceed to court.</p>" +
-                               "<p class=\"govuk-body\">They rejected your admission of £700.</p>" +
-                               "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>" +
-                               "<p class=\"govuk-body\"><a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View your response</a>" +
-                               "<br><a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">" +
-                               "View the claimant's hearing requirements</a></p>"),
-                jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
+                    .value("<p class=\"govuk-body\">Mr. John Rambo wants to proceed with the claim." +
+                               " They rejected your admission of £700." +
+                               " The case will be referred to a judge who will decide what should happen next.</p>" +
+                               "<p class=\"govuk-body\">You can <a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">view your response</a>" +
+                               " or <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">" +
+                               "view the claimant's hearing requirements (opens in a new tab)</a>.</p>"),
+                jsonPath("$[0].titleCy").value("Aros i’r llys adolygu’r achos"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">Mr.Claimant wants to proceed to court.</p>" +
-                               "<p class=\"govuk-body\">They rejected your admission of £700.</p>" +
-                               "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>" +
-                               "<p class=\"govuk-body\"><a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View your response</a>" +
-                               "<br><a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">" +
-                               "View the claimant's hearing requirements</a></p>")
+                    .value("<p class=\"govuk-body\">Mae Mr. John Rambo eisiau parhau â’r hawliad." +
+                               " Maent wedi gwrthod eich addefiad o £700." +
+                               " Bydd yr achos yn cael ei gyfeirio at farnwr a fydd yn penderfynu beth ddylai ddigwydd nesaf.</p>" +
+                               "<p class=\"govuk-body\">Gallwch <a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">weld eich ymateb</a>" +
+                               " neu <a href={VIEW_CLAIMANT_HEARING_REQS} target=\"_blank\" class=\"govuk-link\">" +
+                               "weld y gofynion ar gyfer gwrandawiad yr hawlydd (yn agor mewn tab newydd)</a>.</p>")
             );
     }
 }

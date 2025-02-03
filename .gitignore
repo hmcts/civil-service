@@ -19,6 +19,7 @@ bin/main/application.yaml
 *.iws
 *.iml
 *.ipr
+.mirrord
 
 .DS_Store
 

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import static java.util.Optional.ofNullable;
@@ -27,14 +28,14 @@ import static java.util.Optional.ofNullable;
  */
 @RequiredArgsConstructor
 @Component
-public class ContactInformationUpdatedTaskHandler implements BaseExternalTaskHandler {
+public class ContactInformationUpdatedTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
@@ -45,7 +46,7 @@ public class ContactInformationUpdatedTaskHandler implements BaseExternalTaskHan
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
 
             coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, externalTask));
-
+            return ExternalTaskData.builder().build();
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }

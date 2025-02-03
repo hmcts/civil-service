@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -373,7 +374,7 @@ public class CaseFlagUtils {
         flagCollection.addAll(getFlagDetails(caseData.getRespondent1Witnesses()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Experts()));
         flagCollection.addAll(getFlagDetails(caseData.getRespondent2Witnesses()));
-        return flagCollection.stream().filter(flags -> flags != null).collect(Collectors.toList());
+        return flagCollection.stream().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public static List<FlagDetail> getFlagDetails(Flags flags) {

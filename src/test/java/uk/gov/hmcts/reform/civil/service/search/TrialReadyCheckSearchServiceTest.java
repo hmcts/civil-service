@@ -32,13 +32,19 @@ class TrialReadyCheckSearchServiceTest extends ElasticSearchServiceTest {
                           .should(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
                 .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
                 .mustNot(matchQuery("data.responseClaimTrack", "SMALL_CLAIM"))
+                .mustNot(matchQuery("data.allocatedTrack", "MULTI_CLAIM"))
+                .mustNot(matchQuery("data.responseClaimTrack", "MULTI_CLAIM"))
+                .mustNot(matchQuery("data.allocatedTrack", "INTERMEDIATE_CLAIM"))
+                .mustNot(matchQuery("data.responseClaimTrack", "INTERMEDIATE_CLAIM"))
                 .mustNot(matchQuery("data.trialReadyChecked", "Yes")));
 
         return new Query(query, List.of("reference"), fromValue);
     }
 
     @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled) {
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
         return null;
     }
 }

@@ -49,22 +49,26 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[5].currentStatusEn").value("Not available yet"),
                 jsonPath("$[6].taskNameEn").value("<a>View mediation documents</a>"),
                 jsonPath("$[6].currentStatusEn").value("Not available yet"),
-                jsonPath("$[7].taskNameEn").value("<a>View hearings</a>"),
+                jsonPath("$[7].taskNameEn").value("<a>View the hearing</a>"),
                 jsonPath("$[7].currentStatusEn").value("Not available yet"),
-                jsonPath("$[8].taskNameEn").value("<a>Upload hearing documents</a>"),
+                jsonPath("$[8].taskNameEn").value("<a>Pay the hearing fee</a>"),
                 jsonPath("$[8].currentStatusEn").value("Not available yet"),
-                jsonPath("$[9].taskNameEn").value("<a>Add the trial arrangements</a>"),
+                jsonPath("$[9].taskNameEn").value("<a>Upload hearing documents</a>"),
                 jsonPath("$[9].currentStatusEn").value("Not available yet"),
-                jsonPath("$[10].taskNameEn").value("<a>Pay the hearing fee</a>"),
+                jsonPath("$[10].taskNameEn").value("<a>View documents</a>"),
                 jsonPath("$[10].currentStatusEn").value("Not available yet"),
-                jsonPath("$[11].taskNameEn").value("<a>View the bundle</a>"),
+                jsonPath("$[11].taskNameEn").value("<a>Add the trial arrangements</a>"),
                 jsonPath("$[11].currentStatusEn").value("Not available yet"),
-                jsonPath("$[12].taskNameEn").value("<a>View orders and notices</a>"),
+                jsonPath("$[12].taskNameEn").value("<a>View the bundle</a>"),
                 jsonPath("$[12].currentStatusEn").value("Not available yet"),
-                jsonPath("$[13].taskNameEn").value("<a>View the judgment</a>"),
+                jsonPath("$[13].taskNameEn").value("<a>View orders and notices</a>"),
                 jsonPath("$[13].currentStatusEn").value("Not available yet"),
-                jsonPath("$[14].taskNameEn").value("<a>View applications</a>"),
-                jsonPath("$[14].currentStatusEn").value("Not available yet")
+                jsonPath("$[14].taskNameEn").value("<a>View the judgment</a>"),
+                jsonPath("$[14].currentStatusEn").value("Not available yet"),
+                jsonPath("$[15].taskNameEn").value("<a>Contact the court to request a change to my case</a>"),
+                jsonPath("$[15].currentStatusEn").value("Not available yet"),
+                jsonPath("$[16].taskNameEn").value("<a>View applications</a>"),
+                jsonPath("$[16].currentStatusEn").value("Not available yet")
 
             );
 
@@ -76,7 +80,7 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("This claim has not been submitted"),
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">Your claim is saved as a draft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" "
-                               + "rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a>.</p>")
+                               + "rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a></p>")
             );
     }
 

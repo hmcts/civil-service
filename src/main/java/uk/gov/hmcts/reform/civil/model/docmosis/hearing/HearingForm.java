@@ -38,7 +38,7 @@ public class HearingForm implements MappableObject {
     private final String defendant2Reference;
     private final boolean claimant2exists;
     private final boolean defendant2exists;
-    private final String listingOrRelisting;
+    private final String listingOrRelistingWithFeeDue;
 
     private final String claimReferenceNumber;
     private final CorrectEmail emailAddress;

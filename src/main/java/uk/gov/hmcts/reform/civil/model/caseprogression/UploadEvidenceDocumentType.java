@@ -18,6 +18,7 @@ public class UploadEvidenceDocumentType {
 
     private String witnessOptionName;
     private String typeOfDocument;
+    private String bundleName;
     private LocalDate documentIssuedDate;
     private Document documentUpload;
     @Builder.Default

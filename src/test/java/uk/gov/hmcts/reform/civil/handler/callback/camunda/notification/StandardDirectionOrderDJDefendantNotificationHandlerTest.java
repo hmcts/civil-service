@@ -1,21 +1,32 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2;
 
 import java.util.Map;
 import java.util.Optional;
@@ -23,44 +34,50 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
-@SpringBootTest(classes = {
-    StandardDirectionOrderDJDefendantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private NotificationService notificationService;
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-    @MockBean
-    private OrganisationService organisationService;
-    @Autowired
+    @InjectMocks
     private StandardDirectionOrderDJDefendantNotificationHandler handler;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationService organisationService;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Nested
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
             when(notificationsProperties.getStandardDirectionOrderDJTemplate()).thenReturn("template-id-sdo");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
 
         @Test
-        void shouldNotifyClaimantSolicitor_whenInvoked() {
+        void shouldNotifyDefendantSolicitor_whenInvoked() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
                 .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                             .build())
+                .build();
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -72,24 +89,115 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         }
 
         @Test
-        void shouldNotifyClaimantSolicitor2Defendants_whenInvoked() {
+        void shouldNotifyDefendantSolicitor2Defendants_whenInvoked() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                             .build())
+                .build();
             handler.handle(params);
 
-            verify(notificationService, times(2)).sendMail(
+            verify(notificationService, times(1)).sendMail(
                 anyString(),
                 eq("template-id-sdo"), anyMap(),
                 eq("sdo-dj-order-notification-defendant-000DC001"));
         }
 
+        @Test
+        void shouldNotNotifyDefendantSolicitor2Defendants_whenInvokedAndNo2Defendant() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .addRespondent2(NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                             .build())
+                .build();
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldReturnRespondent1name_whenInvokedAndNoOrgPolicy() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                             .build())
+                .build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-id-sdo",
+                getNotificationDataMapRes1(),
+                "sdo-dj-order-notification-defendant-000DC001"
+            );
+        }
+
+        @Test
+        void shouldReturnRespondent2name_whenInvokedAndNoOrgPolicy() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                             .build())
+                .build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "template-id-sdo",
+                getNotificationDataMapRes2(),
+                "sdo-dj-order-notification-defendant-000DC001"
+            );
+        }
+
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "legalOrgName", "Test Org Name",
-                "claimReferenceNumber", "000DC001"
+                "claimReferenceNumber", "1594901956117591",
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMapRes1() {
+            return Map.of(
+                "legalOrgName", "Mr. Sole Trader",
+                "claimReferenceNumber", "1594901956117591",
+                "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMapRes2() {
+            return Map.of(
+                "legalOrgName", "Mr. John Rambo",
+                "claimReferenceNumber", "1594901956117591",
+                "partyReferences", "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

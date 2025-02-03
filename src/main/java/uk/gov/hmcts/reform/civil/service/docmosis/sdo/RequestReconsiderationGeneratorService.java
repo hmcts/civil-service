@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.DesicionOnReconsiderationDocumentForm;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -24,13 +24,13 @@ public class RequestReconsiderationGeneratorService {
 
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
-    private final IdamClient idamClient;
+    private final UserService userService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
         DocmosisTemplates docmosisTemplate;
 
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserDetails userDetails = userService.getUserDetails(authorisation);
         String judgeName = userDetails.getFullName();
 
         boolean isJudge = false;
@@ -53,7 +53,7 @@ public class RequestReconsiderationGeneratorService {
             new PDF(
                 getFileName(docmosisTemplate, caseData),
                 docmosisDocument.getBytes(),
-                DocumentType.SDO_ORDER
+                DocumentType.DECISION_MADE_ON_APPLICATIONS
             )
         );
     }

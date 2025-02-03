@@ -77,4 +77,9 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final String qcosProtection;
     private final String costsProtection;
     private final Boolean finalOrderJudgeHeardFrom;
+    // Download order
+    private final YesOrNo claimTrack;
+    private final String trackAndComplexityBandText;
+    private final String dateNowPlus7;
+    private final String orderAfterHearingDate;
 }

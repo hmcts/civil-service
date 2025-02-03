@@ -18,10 +18,10 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +42,8 @@ import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.Require
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    GenAppStateHelperService.class, JacksonAutoConfiguration.class,
+    GenAppStateHelperService.class,
+    JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
 class GenAppStateHelperServiceTest {
@@ -58,11 +59,14 @@ class GenAppStateHelperServiceTest {
     @MockBean
     private InitiateGeneralApplicationService genAppService;
 
+    @MockBean
+    private LocationService locationService;
+
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
 
     private static final String APPLICATION_CLOSED_TEXT = "Application Closed";
     private static final String APPLICATION_OFFLINE_TEXT = "Proceeds In Heritage";
@@ -406,7 +410,7 @@ class GenAppStateHelperServiceTest {
          void updateApplicationLocationDetailsLists() {
             when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject());
-            when(genAppService.getWorkAllocationLocationDetails(any(), any()))
+            when(locationService.getWorkAllocationLocationDetails(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject1());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),

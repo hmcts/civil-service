@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
@@ -19,7 +20,11 @@ import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.PartyDetailsPopulator;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.RepresentedLitigantPopulator;
+import uk.gov.hmcts.reform.civil.service.mediation.helpers.UnrepresentedLitigantPopulator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,11 +36,15 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.ENGLISH;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 
 @SpringBootTest(classes = {
-    MediationJsonService.class
+    MediationJsonService.class,
+    RepresentedLitigantPopulator.class,
+    UnrepresentedLitigantPopulator.class,
+    PartyDetailsPopulator.class
 })
 public class MediationJsonServiceTest {
 
@@ -567,6 +576,30 @@ public class MediationJsonServiceTest {
         }
 
         @Test
+        void shouldBuildUnrepresentedLitigants_when1v1BothUnrepresentedNoAltMediationCompany() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedCompanyClaimant()
+                .withApplicant1Flags()
+                .withRespondent1Flags()
+                .applicant1Represented(NO)
+                .respondent1Represented(NO)
+                .addLiPRespondent1MediationInfo(false)
+                .addLiPApplicant1MediationInfo(false)
+                .build();
+
+            List<MediationLitigant> expected = new ArrayList<>();
+            expected.add(addMediationInfoLip(buildUnrepresentedClaimant1Company(),
+                                             caseData.getApplicant1().getPartyPhone(), caseData.getApplicant1().getPartyEmail()));
+            expected.add(addMediationInfoLip(buildRespondent1(NO),
+                                             caseData.getRespondent1().getPartyPhone(), caseData.getRespondent1().getPartyEmail()));
+
+            MediationCase actual = service.generateJsonContent(caseData);
+
+            assertThat(actual.getLitigants().size()).isEqualTo(expected.size());
+            assertThat(actual.getLitigants()).isEqualTo(expected);
+        }
+
+        @Test
         void shouldBuildUnrepresentedLitigants_when1v1BothUnrepresentedAltMediation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
@@ -761,7 +794,7 @@ public class MediationJsonServiceTest {
 
         MediationCase mediationCase = service.generateJsonContent(caseData);
 
-        assertThat(mediationCase.getClaimValue()).isEqualTo("800");
+        assertThat(mediationCase.getClaimValue()).isEqualTo(BigDecimal.valueOf(800));
     }
 
     private HearingSupport supportRequired(YesOrNo option) {
@@ -818,6 +851,24 @@ public class MediationJsonServiceTest {
                 .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
                 .build();
         }
+    }
+
+    private MediationLitigant buildUnrepresentedClaimant1Company() {
+        return MediationLitigant.builder()
+            .partyID("app-1-party-id")
+            .partyRole("Claimant 1")
+            .partyName("Company ltd")
+            .partyType(COMPANY)
+            .paperResponse(PAPER_RESPONSE)
+            .represented(false)
+            .solicitorOrgName(null)
+            .litigantTelephone("0123456789")
+            .litigantEmail("company@email.com")
+            .mediationContactName(null)
+            .mediationContactNumber(null)
+            .mediationContactEmail(null)
+            .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
+            .build();
     }
 
     private MediationLitigant buildClaimant2() {
@@ -916,67 +967,75 @@ public class MediationJsonServiceTest {
             .mediationContactNumber(MEDIATION_CONTACT_NUMBER)
             .mediationContactEmail(MEDIATION_CONTACT_EMAIL)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .fromDate("2024-06-01")
-                                          .toDate("2024-06-01")
+                                          .dateFrom("2024-06-01")
+                                          .dateTo("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-07")
-                                          .toDate("2024-06-07")
+                                          .dateFrom("2024-06-07")
+                                          .dateTo("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-10")
-                                          .toDate("2024-06-15")
+                                          .dateFrom("2024-06-10")
+                                          .dateTo("2024-06-15")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-20")
-                                          .toDate("2024-06-25")
+                                          .dateFrom("2024-06-20")
+                                          .dateTo("2024-06-25")
                                           .build())).build();
     }
 
     private MediationLitigant addAltMediationInfoLip(MediationLitigant litigant) {
+        String mediationContactName =
+            Party.Type.INDIVIDUAL.equals(litigant.getPartyType())
+                || SOLE_TRADER.equals(litigant.getPartyType())
+                ? litigant.getPartyName() : MEDIATION_ALT_CONTACT_NAME;
         return litigant.toBuilder()
-            .mediationContactName(MEDIATION_ALT_CONTACT_NAME)
+            .mediationContactName(mediationContactName)
             .mediationContactNumber(MEDIATION_ALT_CONTACT_NUMBER)
             .mediationContactEmail(MEDIATION_ALT_CONTACT_EMAIL)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .fromDate("2024-06-01")
-                                          .toDate("2024-06-01")
+                                          .dateFrom("2024-06-01")
+                                          .dateTo("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-07")
-                                          .toDate("2024-06-07")
+                                          .dateFrom("2024-06-07")
+                                          .dateTo("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-10")
-                                          .toDate("2024-06-15")
+                                          .dateFrom("2024-06-10")
+                                          .dateTo("2024-06-15")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-20")
-                                          .toDate("2024-06-25")
+                                          .dateFrom("2024-06-20")
+                                          .dateTo("2024-06-25")
                                           .build())).build();
     }
 
     private MediationLitigant addMediationInfoLip(MediationLitigant litigant,
                                                   String number, String email) {
+        String mediationContactName =
+            Party.Type.INDIVIDUAL.equals(litigant.getPartyType())
+                || SOLE_TRADER.equals(litigant.getPartyType())
+                ? litigant.getPartyName() : LIP_MEDIATION_CONTACT_NAME;
         return litigant.toBuilder()
-            .mediationContactName(LIP_MEDIATION_CONTACT_NAME)
+            .mediationContactName(mediationContactName)
             .mediationContactNumber(number)
             .mediationContactEmail(email)
             .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .fromDate("2024-06-01")
-                                          .toDate("2024-06-01")
+                                          .dateFrom("2024-06-01")
+                                          .dateTo("2024-06-01")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-07")
-                                          .toDate("2024-06-07")
+                                          .dateFrom("2024-06-07")
+                                          .dateTo("2024-06-07")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-10")
-                                          .toDate("2024-06-15")
+                                          .dateFrom("2024-06-10")
+                                          .dateTo("2024-06-15")
                                           .build(),
                                       MediationUnavailability.builder()
-                                          .fromDate("2024-06-20")
-                                          .toDate("2024-06-25")
+                                          .dateFrom("2024-06-20")
+                                          .dateTo("2024-06-25")
                                           .build())).build();
     }
 }

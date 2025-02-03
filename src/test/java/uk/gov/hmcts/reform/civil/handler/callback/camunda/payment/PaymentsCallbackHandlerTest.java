@@ -1,22 +1,21 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.FeignException;
 import feign.Request;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -41,39 +40,32 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
-@SpringBootTest(classes = {
-    PaymentsCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "RC-1234-1234-1234-1234";
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
     private static final String PAYMENT_ERROR_CODE = "CA-E0004";
     public static final String DUPLICATE_PAYMENT_MESSAGE
-        = "You attempted to retry the payment to soon. Try again later.";
+        = "You attempted to retry the payment too soon. Try again later.";
 
-    @MockBean
+    @Mock
     private PaymentsService paymentsService;
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @Autowired
     private PaymentsCallbackHandler handler;
-
-    @Autowired
     private ObjectMapper objectMapper;
-
     private CaseData caseData;
     private CallbackParams params;
 
     @BeforeEach
     public void setup() {
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        handler = new PaymentsCallbackHandler(paymentsService, objectMapper, time);
         caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-
-        when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
 
     @Nested
@@ -86,6 +78,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakePbaPayment_whenInvoked() {
+            when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
+
             when(paymentsService.createCreditAccountPayment(any(), any()))
                 .thenReturn(PaymentDto.builder().reference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
@@ -154,9 +148,9 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CallbackParams localParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            assertThat(handler.camundaActivityId(params)).isEqualTo("CreateClaimMakePayment");
+            assertThat(handler.camundaActivityId(localParams)).isEqualTo("CreateClaimMakePayment");
         }
     }
 

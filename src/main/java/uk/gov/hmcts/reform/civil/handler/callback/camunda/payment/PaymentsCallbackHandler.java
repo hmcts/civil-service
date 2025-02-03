@@ -41,7 +41,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
     private static final String ERROR_MESSAGE = "Technical error occurred";
     private static final String TASK_ID = "CreateClaimMakePayment";
     public static final String DUPLICATE_PAYMENT_MESSAGE
-        = "You attempted to retry the payment to soon. Try again later.";
+        = "You attempted to retry the payment too soon. Try again later.";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
