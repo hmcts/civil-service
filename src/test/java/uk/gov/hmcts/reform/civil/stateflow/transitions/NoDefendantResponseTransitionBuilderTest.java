@@ -39,8 +39,8 @@ public class NoDefendantResponseTransitionBuilderTest {
         assertThat(result).hasSize(3);
 
         assertTransition(result.get(0), "MAIN.NO_DEFENDANT_RESPONSE", "MAIN.IN_HEARING_READINESS");
-        assertTransition(result.get(0), "MAIN.NO_DEFENDANT_RESPONSE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(0), "MAIN.NO_DEFENDANT_RESPONSE", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(1), "MAIN.NO_DEFENDANT_RESPONSE", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(2), "MAIN.NO_DEFENDANT_RESPONSE", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
     }
 
     @Test

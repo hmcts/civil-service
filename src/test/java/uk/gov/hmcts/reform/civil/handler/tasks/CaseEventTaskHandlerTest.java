@@ -799,12 +799,12 @@ class CaseEventTaskHandlerTest {
                     break;
                 case CLAIM_DETAILS_NOTIFIED:
                     caseDataBuilder.atStateClaimDetailsNotified1v1()
-                        .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
+                        .respondent1ResponseDeadline(LocalDateTime.now().plusDays(1));
                     break;
                 case NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION:
                     caseDataBuilder.atStateNotificationAcknowledgedRespondent1TimeExtension()
                         .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
-                        .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1));
+                        .respondent1ResponseDeadline(LocalDateTime.now().plusDays(1));
                     break;
                 default:
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
