@@ -445,6 +445,24 @@ public class FlowPredicate {
         }
     }
 
+    public static final Predicate<CaseData> responseDeadlinePassed = FlowPredicate::getResponseDeadlinePassed;
+
+    private static boolean getResponseDeadlinePassed(CaseData caseData) {
+        final MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
+        final LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
+        final boolean respondent1ResponseDeadlinePassed = caseData.getRespondent1ResponseDate() == null
+            && respondent1ResponseDeadline.isBefore(LocalDateTime.now());
+
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            final LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
+            final boolean respondent2ResponseDeadlinePassed = caseData.getRespondent2ResponseDate() == null
+                && respondent2ResponseDeadline.isBefore(LocalDateTime.now());
+            return respondent1ResponseDeadlinePassed && respondent2ResponseDeadlinePassed;
+        }
+
+        return respondent1ResponseDeadlinePassed;
+    }
+
     public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
         caseData.isLipvLipOneVOne()
                 ? caseData.hasApplicantAcceptedRepaymentPlan() && caseData.getTakenOfflineByStaffDate() == null

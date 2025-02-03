@@ -38,17 +38,18 @@ public class ClaimDetailsNotifiedTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(9);
+        assertThat(result).hasSize(10);
 
         assertTransition(result.get(0), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION");
         assertTransition(result.get(1), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.NOTIFICATION_ACKNOWLEDGED");
         assertTransition(result.get(2), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.ALL_RESPONSES_RECEIVED");
         assertTransition(result.get(3), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED");
         assertTransition(result.get(4), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED");
-        assertTransition(result.get(5), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(6), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
-        assertTransition(result.get(7), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.IN_HEARING_READINESS");
-        assertTransition(result.get(8), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
+        assertTransition(result.get(5), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.NO_DEFENDANT_RESPONSE");
+        assertTransition(result.get(6), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(7), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(8), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.IN_HEARING_READINESS");
+        assertTransition(result.get(9), "MAIN.CLAIM_DETAILS_NOTIFIED", "MAIN.TAKEN_OFFLINE_SDO_NOT_DRAWN");
     }
 
     @Test

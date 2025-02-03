@@ -141,6 +141,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NO_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
@@ -2242,6 +2243,56 @@ public class FlowStateAllowedEventService {
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
                 CASE_PROCEEDS_IN_CASEMAN,
+                ADD_CASE_NOTE
+            )
+        ),
+        entry(
+            NO_DEFENDANT_RESPONSE.fullName(),
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ENTER_BREATHING_SPACE_SPEC,
+                LIFT_BREATHING_SPACE_SPEC,
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                CASE_PROCEEDS_IN_CASEMAN,
+                AMEND_PARTY_DETAILS,
+                DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT_SPEC,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                REQUEST_FOR_RECONSIDERATION,
+                migrateCase,
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE,
+                GENERATE_DIRECTIONS_ORDER,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
+                HEARING_SCHEDULED,
+                HEARING_SCHEDULED_RETRIGGER,
+                CONFIRM_LISTING_COMPLETED,
+                TRIAL_READY_CHECK,
+                TRIAL_READY_NOTIFICATION,
+                MOVE_TO_DECISION_OUTCOME,
+                HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                BUNDLE_CREATION_NOTIFICATION,
+                COURT_OFFICER_ORDER,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE,
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                TAKE_CASE_OFFLINE,
                 ADD_CASE_NOTE
             )
         )

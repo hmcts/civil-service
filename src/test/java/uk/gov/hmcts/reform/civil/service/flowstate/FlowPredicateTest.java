@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClai
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responseDeadlinePassed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
@@ -725,6 +726,53 @@ class FlowPredicateTest {
                     .applicant1ProceedWithClaimSpec2v1(NO)
                     .build();
                 assertTrue(fullDefenceNotProceed.test(caseData));
+            }
+        }
+
+        @Nested
+        class NoDefendantResponse {
+            @Test
+            void shouldReturnFalse_whenResponseDeadlineHasNotPassedAndNoDefendantResponse() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ClaimResponseIntentionType(null)
+                    .respondent1ResponseDeadline(LocalDateTime.now().plusDays(1))
+                    .build();
+
+                assertFalse(responseDeadlinePassed.test(caseData));
+            }
+
+            @Test
+            void shouldReturnTrue_whenResponseDeadlineHasPassedAndNoDefendantResponse() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ClaimResponseIntentionType(null)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+                    .build();
+
+                assertTrue(responseDeadlinePassed.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenResponseDeadlineHasNotPassedAndDefendantResponse() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ResponseDate(LocalDateTime.now().minusDays(2))
+                    .respondent1ResponseDeadline(LocalDateTime.now().plusDays(1))
+                    .build();
+
+                assertFalse(responseDeadlinePassed.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenResponseDeadlineHasPassedAndDefendantResponse() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .respondent1ResponseDate(LocalDateTime.now().minusDays(2))
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+                    .build();
+
+                assertFalse(responseDeadlinePassed.test(caseData));
             }
         }
 
