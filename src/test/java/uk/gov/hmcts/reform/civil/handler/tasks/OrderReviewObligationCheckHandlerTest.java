@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.search.OrderReviewObligationSearchServi
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
 import static org.mockito.Mockito.mock;
@@ -73,7 +74,7 @@ class OrderReviewObligationCheckHandlerTest {
         List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
-        when(caseSearchService.getCases()).thenReturn(Collections.singletonList(caseDetails));
+        when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
         when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
@@ -96,7 +97,7 @@ class OrderReviewObligationCheckHandlerTest {
         List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
-        when(caseSearchService.getCases()).thenReturn(Collections.singletonList(caseDetails));
+        when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
         when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
@@ -118,7 +119,7 @@ class OrderReviewObligationCheckHandlerTest {
         List<Element<StoredObligationData>> storedObligationData = Collections.singletonList(element);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
-        when(caseSearchService.getCases()).thenReturn(Collections.singletonList(caseDetails));
+        when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
         when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
@@ -137,7 +138,7 @@ class OrderReviewObligationCheckHandlerTest {
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
         when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-        when(caseSearchService.getCases()).thenReturn(Collections.singletonList(caseDetails));
+        when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenThrow(new RuntimeException("Test exception"));
 
         handler.handleTask(mock(ExternalTask.class));

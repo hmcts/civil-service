@@ -691,6 +691,8 @@ public class CaseDataBuilder {
     private JudgmentPaidInFull judgmentPaidInFull;
     private YesOrNo anyRepresented;
 
+    private String partialPaymentAmount;
+
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
         return this;
@@ -773,6 +775,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder totalClaimAmount(BigDecimal totalClaimAmount) {
         this.totalClaimAmount = totalClaimAmount;
+        return this;
+    }
+
+    public CaseDataBuilder partialPaymentAmount(String partialPaymentAmount) {
+        this.partialPaymentAmount = partialPaymentAmount;
         return this;
     }
 
@@ -7061,9 +7068,19 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder specClaim1v1LipvLr() {
+        atStateClaimDraft();
+        legacyCaseReference(LEGACY_CASE_REFERENCE);
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = YES;
         this.applicant1Represented = NO;
+        this.claimantBilingualLanguagePreference = Language.ENGLISH.toString();
+        this.ccdCaseReference = CASE_ID;
+        return this;
+    }
+
+    public CaseDataBuilder specClaim1v1LipvLrBilingual() {
+        specClaim1v1LipvLr();
+        this.claimantBilingualLanguagePreference = Language.BOTH.toString();
         return this;
     }
 
@@ -7943,6 +7960,7 @@ public class CaseDataBuilder {
             .repaymentDate(repaymentDate)
             .joJudgmentPaidInFull(judgmentPaidInFull)
             .anyRepresented(anyRepresented)
+            .partialPaymentAmount(partialPaymentAmount)
             .build();
     }
 

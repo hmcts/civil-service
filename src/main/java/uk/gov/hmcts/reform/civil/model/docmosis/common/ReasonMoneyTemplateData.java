@@ -78,6 +78,8 @@ public class ReasonMoneyTemplateData {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal amountPounds;
 
+    private String frequency;
+
     @JsonIgnore
     public static ReasonMoneyTemplateData toReasonMoneyTemplateData(RecurringIncomeLRspec item) {
         return ReasonMoneyTemplateData.builder()
@@ -85,6 +87,7 @@ public class ReasonMoneyTemplateData {
                       ? "Other: " + item.getTypeOtherDetails()
                       : INCOME_TYPE_LIP_RESPONSE.get(item.getType()))
             .amountPounds(getAmountPounds(item.getAmount()))
+            .frequency(item.getFrequency().getDashboardLabel())
             .build();
     }
 
@@ -95,6 +98,7 @@ public class ReasonMoneyTemplateData {
                       ? "Other: " + item.getTypeOtherDetails()
                       : EXPENSE_TYPE_LIP_RESPONSE.get(item.getType()))
             .amountPounds(getAmountPounds(item.getAmount()))
+            .frequency(item.getFrequency().getDashboardLabel())
             .build();
     }
 
