@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_TASK_LIST_CONF
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ConfirmOrderReviewClaimantNotificationHandler.GA;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -94,7 +93,7 @@ public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallb
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
-            GA,
+            "Applications",
             "BEARER_TOKEN"
         );
 
@@ -185,7 +184,7 @@ public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallb
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
-            GA,
+            "Applications",
             "BEARER_TOKEN"
         );
 

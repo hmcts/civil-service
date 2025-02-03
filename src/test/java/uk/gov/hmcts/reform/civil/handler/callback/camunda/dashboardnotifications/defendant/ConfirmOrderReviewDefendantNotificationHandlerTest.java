@@ -93,7 +93,7 @@ public class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCall
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
-            ConfirmOrderReviewDefendantNotificationHandler.GA,
+            "Applications",
             "BEARER_TOKEN"
         );
 
@@ -184,7 +184,7 @@ public class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCall
         verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
-            ConfirmOrderReviewDefendantNotificationHandler.GA,
+            "Applications",
             "BEARER_TOKEN"
         );
 
