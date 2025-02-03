@@ -5,15 +5,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT;
 
@@ -22,8 +20,6 @@ public class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler extend
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_DEFENDANT);
     private static final String TASK_ID = "GenerateDashboardNotificationCoSCProcessedDefendant";
-    private static final String CONFIRM_CCJ_PAID = "Confirm you've paid a judgment debt";
-    private static final String AWAITING_APPLICATION_PAYMENT = "Awaiting Application Payment";
 
     public CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                                         DashboardNotificationsParamsMapper mapper,
@@ -53,16 +49,17 @@ public class CoscFeePaidCaseNotMarkedFullPaidDefendantNotificationHandler extend
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        if (caseData.getRespondentSolGaAppDetails() != null && !caseData.getRespondentSolGaAppDetails().isEmpty()) {
-            List<Element<GADetailsRespondentSol>> app = caseData.getRespondentSolGaAppDetails().stream()
-                .filter(gaApp -> gaApp.getValue().getGeneralApplicationType().equals(CONFIRM_CCJ_PAID)
-                    && !Objects.equals(gaApp.getValue().getCaseState(), AWAITING_APPLICATION_PAYMENT)).toList();
-
-            app.stream().forEach(gaApp -> dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-                gaApp.getValue().getCaseLink().getCaseReference(),
-                "APPLICANT",
-                authToken
-            ));
+        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
+            caseData.getGeneralApplications().stream()
+                .filter(application ->
+                            application.getValue().getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID))
+                .findFirst()
+                .ifPresent(coscApplication -> dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+                               coscApplication.getValue().getCaseLink().getCaseReference(),
+                               "APPLICANT",
+                               authToken
+                           )
+                );
         }
     }
 }
