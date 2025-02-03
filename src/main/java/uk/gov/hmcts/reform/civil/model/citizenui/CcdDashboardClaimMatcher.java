@@ -239,6 +239,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && !isTrialArrangementStatusActive()
+            && !isBundleCreatedStatusActive()
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
     }
@@ -260,10 +261,11 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         Optional<LocalDateTime> bundleDate = getBundleCreationDate();
         Optional<LocalDateTime> lastOrderDate = getTimeOfLastNonSDOOrder();
         return isHearingScheduled()
-            && caseData.getCcdState() == CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState())
+                || caseData.getCcdState() == CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
             && isHearingLessThanDaysAway(3 * 7)
             && bundleDate.isPresent()
             && (lastOrderDate.isEmpty()
-            || lastOrderDate.get().isBefore(bundleDate.get()));
+                || lastOrderDate.get().isBefore(bundleDate.get()));
     }
 }
