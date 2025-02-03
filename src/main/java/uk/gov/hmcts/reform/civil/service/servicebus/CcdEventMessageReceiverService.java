@@ -22,6 +22,7 @@ public class CcdEventMessageReceiverService {
                                              String sessionId,
                                              String message) throws JsonProcessingException {
         log.info("Received CCD Case Events ASB message with id '{}' and session {}", messageId, sessionId);
+        log.info("message shape: {}", message);
         CcdEventMessage caseEventMessage = objectMapper.readValue(message, CcdEventMessage.class);
         handleMessage(caseEventMessage);
     }

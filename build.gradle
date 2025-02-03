@@ -428,7 +428,9 @@ dependencies {
   implementation group: 'com.azure', name: 'azure-core', version: '1.54.1'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.8'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
-  implementation group: 'com.azure', name: 'azure-monitor-query', version: '1.0.11'
+  implementation group: 'com.azure', name: 'azure-monitor-query', version: '1.5.4'
+  implementation group: 'com.azure', name: 'azure-identity', version: '1.14.2'
+
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox

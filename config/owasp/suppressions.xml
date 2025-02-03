@@ -9,5 +9,9 @@
     <cve>CVE-2023-45648</cve>
     <cve>CVE-2023-20883</cve>
     <cve>CVE-2023-34055</cve>
+    <!--False positive for Azure Identity SDK-->
+    <cve>CVE-2023-36415</cve>
+    <!--False positive for Azure Identity SDK-->
+    <cve>CVE-2024-35255</cve>
   </suppress>
 </suppressions>
