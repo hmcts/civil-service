@@ -122,6 +122,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         return SealedClaimFormForSpec.builder()
+            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .applicantExternalReference(solicitorReferences
@@ -216,6 +217,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             interest = interestCalculator.calculateBulkInterest(caseData);
         }
         return SealedClaimFormForSpec.builder()
+            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .applicantExternalReference(solicitorReferences.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse(""))

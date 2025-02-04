@@ -84,6 +84,7 @@ public class ClaimFormMapper {
             ))
             .generationDate(LocalDateTime.now())
             .claimIssuedDate(caseData.getIssueDate())
+            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
             .claimNumber(caseData.getLegacyCaseReference())
             .flightDelayDetails(getFlightDelayDetails(caseData))
             .evidenceList(Optional.ofNullable(caseData.getSpeclistYourEvidenceList())
