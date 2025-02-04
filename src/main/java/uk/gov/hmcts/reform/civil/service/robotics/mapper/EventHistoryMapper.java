@@ -194,7 +194,7 @@ public class EventHistoryMapper {
                     // It can share the same RPA builder as DIVERGENT_RESPOND state because it builds events according
                     // to defendant response
                     // DIVERGENT_RESPOND states would only happen in 1v2 diff sol after both defendant responds.
-                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+                    case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED:
                         buildRespondentDivergentResponse(builder, caseData, false);
                         break;
                     case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE:
