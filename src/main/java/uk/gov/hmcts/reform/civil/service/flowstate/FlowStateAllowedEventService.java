@@ -118,8 +118,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_LISTING_COMPLETED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
@@ -582,7 +583,41 @@ public class FlowStateAllowedEventService {
         ),
 
         entry(
-            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                DEFENDANT_RESPONSE,
+                ACKNOWLEDGE_CLAIM,
+                INFORM_AGREED_EXTENSION_DATE,
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                AMEND_PARTY_DETAILS,
+                CASE_PROCEEDS_IN_CASEMAN,
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                REQUEST_FOR_RECONSIDERATION,
+                migrateCase,
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE,
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
+            )
+        ),
+
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
             List.of(
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
@@ -1818,7 +1853,27 @@ public class FlowStateAllowedEventService {
             )
         ),
         entry(
-            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI,
+                RESET_PIN,
+                migrateCase,
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
+            )
+        ),
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
