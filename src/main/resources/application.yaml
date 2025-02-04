@@ -335,25 +335,25 @@ notifications:
   applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
   applicantLiPDefaultJudgmentRequestedBilingualTemplate: "cad66be4-ee96-4114-b2a7-489690cd6ebf"
 
-  hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
+  hearingFeeUnpaidNoc: "e2b0118b-15cc-41c0-918c-fbbd042f8019"
 
-  mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
+  mediationUnsuccessfulClaimantLRTemplate: "698c3d4c-bd58-4725-aaba-4146730bbe10"
   mediationUnsuccessfulClaimantLIPTemplate: "159112bd-0026-4ac4-901b-e7fc1614069f"
   mediationUnsuccessfulClaimantLIPWelshTemplate: "338f07e4-f06d-40ad-9d68-65d8d25ae3ea"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
-  mediationUnsuccessfulLRTemplate: "0b0f7846-6238-4ece-87b1-597e22ed518b"
-  mediationUnsuccessfulLRTemplateForLipVLr: "13c72c37-4657-4998-ae4c-ebdf31978ef5"
+  mediationUnsuccessfulLRTemplate: "023204af-032f-42b9-82a3-d107254c4a7f"
+  mediationUnsuccessfulLRTemplateForLipVLr: "df9f1bb5-d3bc-4fa1-a5a8-60980df99394"
   mediationUnsuccessfulLIPTemplate: "a986a00b-83f6-459e-a2cb-5bc76ba39164"
   mediationUnsuccessfulLIPTemplateWelsh: "b3200be6-1b21-48b8-938d-5428a6fa6f8f"
-  mediationUnsuccessfulNoAttendanceLRTemplate: "a26641f7-b1d5-4d85-a130-6719b8cc173e"
+  mediationUnsuccessfulNoAttendanceLRTemplate: "01d057e5-a28b-465f-a6a0-ef43aa97a20c"
 
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
-  notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
+  notifyClaimantTranslatedDocumentUploaded: "f76562b8-26b4-486d-a98d-b48bc04508a3"
   notifyDefendantTranslatedDocumentUploaded: "279b6997-2a04-4428-921b-c699c190f558"
 
-  notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
+  notifyApplicantLRMediationSuccessfulTemplate: "c5651496-8de5-4e16-9bd7-1c10d53a2ded"
   notifyApplicantLiPMediationSuccessfulTemplate: "17495b1f-7afa-4b43-a5ca-0a60ae950423"
   notifyApplicantLiPMediationSuccessfulWelshTemplate: "abb3d4d1-5ced-4af6-b577-a692a5e289b7"
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
@@ -363,8 +363,8 @@ notifications:
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
-  notifyClaimReconsiderationLRTemplate: "107ea708-bb51-4caa-9f56-e6fe0d9a6b9a"
-  notifySetAsideJudgmentTemplate: "5edb8dd4-94a3-4d3c-a4fc-d4f76d2b2ccb"
+  notifyClaimReconsiderationLRTemplate: "2eb06df8-8dd9-401d-8116-9e76550050ef"
+  notifySetAsideJudgmentTemplate: "f4f7f07a-05bc-4ecf-866b-d349a747c788"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
@@ -395,7 +395,7 @@ notifications:
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
-  noticeOfChangeApplicantLipSolicitorTemplate: "a03fa4a8-373e-4892-89bc-45506331eb17"
+  noticeOfChangeApplicantLipSolicitorTemplate: "1acd4a91-15dd-4a69-a869-acbc5a623cf7"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
   notifyClaimantLipForNoLongerAccessWelshTemplate: "4186a193-3135-41dc-b4d3-a0f31911e46f"
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
@@ -418,10 +418,10 @@ notifications:
   notifyApplicantForHwfFeePaymentOutcome: "0abdcb29-edd3-418a-aeab-a102da4ad441"
   notifyApplicantForHwfFeePaymentOutcomeInBilingual: "ca84e76e-f178-4c63-9eca-96b491cc538c"
 
-  notifyDefendantLRForMediation: "feec8506-6d60-4715-8f48-43ded5d24d97"
-  notifyApplicantLRMediationTemplate: "55fd5423-e044-42d0-8296-e9755a002480"
+  notifyDefendantLRForMediation: "e231e271-93b9-49e8-99d3-5b3ceac4b3af"
+  notifyApplicantLRMediationTemplate: "774f34ff-eb67-4e6c-a9fe-19719890894c"
 
-  notifyClaimantJudgmentVariedDeterminationOfMeansTemplate: "16711810-3629-4f8f-a55d-3a7dbab47ed9"
+  notifyClaimantJudgmentVariedDeterminationOfMeansTemplate: "d3779d98-d08f-434d-8670-b814b0b18f6c"
   notifyDefendantJudgmentVariedDeterminationOfMeansTemplate: "6e13b9af-2dbe-49dd-be89-71464ed551d2"
 
   notifyLipSuccessfulMediation: "ed3810ae-3c12-4cc1-bc3f-8aff560fa6b2"
