@@ -602,6 +602,7 @@ class SealedClaimLipResponseFormGeneratorTest {
     private CaseData.CaseDataBuilder<?, ?> commonData() {
         return CaseData.builder()
             .legacyCaseReference("reference")
+            .ccdCaseReference(1234567890123456L)
             .solicitorReferences(SolicitorReferences.builder()
                                      .applicantSolicitor1Reference("claimant reference")
                                      .respondentSolicitor1Reference("defendant reference")

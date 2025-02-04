@@ -46,6 +46,7 @@ public class ReferenceNumberAndCourtDetailsPopulator {
             .orElse(null);
 
         builder.referenceNumber(caseData.getLegacyCaseReference())
+            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .whyDisputeTheClaim(isRespondent2(caseData) ? caseData.getDetailsOfWhyDoesYouDisputeTheClaim2() : caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .hearingCourtLocation(hearingCourtLocation);
