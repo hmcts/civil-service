@@ -17,8 +17,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.RequestForReconsiderationNotificationDeadlineSearchService;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,11 +59,11 @@ class RequestForReconsiderationNotificationDeadlineHandlerTest {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
         Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 

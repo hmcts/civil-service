@@ -53,9 +53,14 @@ class BundleDocumentsRetrievalTest {
             .issueDate(LocalDate.of(2023, 12, 4))
             .build();
 
-        String result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData);
-
+        String result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.PARTICULARS_OF_CLAIM);
         assertEquals("Particulars Of Claim 04/12/2023", result);
+        result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.MEDICAL_REPORT);
+        assertEquals("Medical Report 04/12/2023", result);
+        result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.SCHEDULE_OF_LOSS);
+        assertEquals("Schedule Of Loss 04/12/2023", result);
+        result = bundleDocumentsRetrieval.getParticularsOfClaimName(caseData, BundleFileNameList.CERTIFICATE_OF_SUITABILITY);
+        assertEquals("Certificate Of Suitability 04/12/2023", result);
     }
 
     @Test
