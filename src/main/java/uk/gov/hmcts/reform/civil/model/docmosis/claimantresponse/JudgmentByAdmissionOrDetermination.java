@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData
 import java.time.LocalDate;
 import java.util.List;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @EqualsAndHashCode
 public class JudgmentByAdmissionOrDetermination implements MappableObject {
@@ -61,4 +61,9 @@ public class JudgmentByAdmissionOrDetermination implements MappableObject {
     private final String installmentAmount;
     private final String payByDate;
     private final String applicantReference;
+    private final String welshDate;
+    private final String welshPayByDate;
+    private final String welshRepaymentDate;
+    private final String welshRepaymentFrequency;
+    private final String welshPaymentStr;
 }
