@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAmountsCalculator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
@@ -54,7 +55,7 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
             .applicantDetails(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
             .paymentPlan(caseData.getPaymentTypeSelection().name())
             .payByDate(Objects.isNull(caseData.getPaymentSetDate()) ? null :
-                DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
+                           DateFormatHelper.formatLocalDate(caseData.getPaymentSetDate(), DateFormatHelper.DATE))
             .repaymentFrequency(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentFrequency(
                 caseData.getRepaymentFrequency(), false))
             .paymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(
@@ -63,6 +64,10 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
                 caseData.getRepaymentFrequency(), true))
             .welshPaymentStr(Objects.isNull(caseData.getRepaymentFrequency()) ? null : getRepaymentString(
                 caseData.getRepaymentFrequency(), true))
+            .currentDateInWelsh(getDateInWelsh(LocalDate.now()))
+            .welshPayByDate(Objects.isNull(caseData.getPaymentSetDate()) ?  null : getDateInWelsh(caseData.getPaymentSetDate()))
+            .welshRepaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
+                                    getDateInWelsh(caseData.getRepaymentDate()))
             .installmentAmount(Objects.isNull(caseData.getRepaymentSuggestion()) ? null : getInstallmentAmount(caseData.getRepaymentSuggestion()))
             .repaymentDate(Objects.isNull(caseData.getRepaymentDate()) ? null :
                 DateFormatHelper.formatLocalDate(caseData.getRepaymentDate(), DateFormatHelper.DATE));
@@ -104,5 +109,4 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
             }
         }
     }
-
 }

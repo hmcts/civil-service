@@ -13,7 +13,10 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @RequiredArgsConstructor
 public abstract class DefaultJudgmentFormBuilderBase {
@@ -69,6 +72,10 @@ public abstract class DefaultJudgmentFormBuilderBase {
             default:
                 return null;
         }
+    }
+
+    protected String getDateInWelsh(LocalDate dateToConvert) {
+        return formatDateInWelsh(dateToConvert);
     }
 
     protected String getInstallmentAmount(String amount) {
