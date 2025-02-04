@@ -76,6 +76,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
             .claimDetails(caseData.getDetailsOfClaim())
             .hearingCourtLocation(hearingCourtLocation)
             .referenceNumber(caseData.getLegacyCaseReference())
+            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
             .applicantExternalReference(solicitorReferences
