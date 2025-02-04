@@ -15,18 +15,20 @@ import java.util.Map;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.REFERENCE_TEMPLATE_APPLICANT_FOR_LITIGATION_FRIEND_ADDED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.REFERENCE_TEMPLATE_RESPONDENT_FOR_LITIGATION_FRIEND_ADDED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 @Slf4j
-public class AddDefendantLitigationFriendNotificationHandler extends NotificationHandler implements NotificationData {
+public class AddDefendantLitigationFriendNotifier extends Notifier implements NotificationData {
 
-    public AddDefendantLitigationFriendNotificationHandler(NotificationService notificationService,
-                                                           NotificationsProperties notificationsProperties,
-                                                           OrganisationService organisationService,
-                                                           SimpleStateFlowEngine stateFlowEngine) {
+    public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
+                                                NotificationsProperties notificationsProperties,
+                                                OrganisationService organisationService,
+                                                SimpleStateFlowEngine stateFlowEngine) {
         super(notificationService, notificationsProperties, organisationService, stateFlowEngine);
     }
 
@@ -40,6 +42,8 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
 
     @Override
     public void notifyParties(CaseData caseData) {
+        log.info("Building list of recipients for Litigation Friend Added event. Case id - {}",
+                caseData.getCcdCaseReference());
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         partiesToEmail.addAll(getApplicants(caseData));
         partiesToEmail.addAll(getRespondents(caseData));
@@ -58,7 +62,8 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
                 .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                 .parameters(properties)
-                .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
+                .reference(String.format(REFERENCE_TEMPLATE_APPLICANT_FOR_LITIGATION_FRIEND_ADDED,
+                        caseData.getLegacyCaseReference()))
                 .build();
     }
 
@@ -81,7 +86,9 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
                         .targetEmail(caseData.getRespondentSolicitor1EmailAddress())
                         .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                         .parameters(properties)
-                        .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference()))
+                        .reference(String.format(
+                                REFERENCE_TEMPLATE_RESPONDENT_FOR_LITIGATION_FRIEND_ADDED,
+                                caseData.getLegacyCaseReference()))
                         .build();
     }
 }

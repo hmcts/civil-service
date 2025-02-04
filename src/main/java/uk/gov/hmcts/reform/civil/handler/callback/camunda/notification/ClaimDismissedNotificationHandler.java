@@ -9,29 +9,32 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notification.handlers.AddDefendantLitigationFriendNotifier;
+import uk.gov.hmcts.reform.civil.notification.handlers.ClaimDismissedNotifier;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_PARTIES_FOR_CLAIM_DISMISSED;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LitigationFriendAddedNotificationHandler extends CallbackHandler {
+public class ClaimDismissedNotificationHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
+    public static final String TASK_ID = "ClaimDismissedNotifier";
 
-    public static final String TASK_ID = "LitigationFriendAddedNotifier";
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_PARTIES_FOR_CLAIM_DISMISSED
+    );
 
-    private final AddDefendantLitigationFriendNotifier addDefendantLitigationFriendNotificationHandler;
+    private final ClaimDismissedNotifier claimDismissedNotifier;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyForLitigationFriendAdded
+            callbackKey(ABOUT_TO_SUBMIT),
+            this::notifyPartiesForClaimDismissed
         );
     }
 
@@ -45,9 +48,9 @@ public class LitigationFriendAddedNotificationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse notifyForLitigationFriendAdded(CallbackParams callbackParams) {
+    private CallbackResponse notifyPartiesForClaimDismissed(CallbackParams callbackParams) {
         log.info("Handling {} case event for case id {}", EVENTS.get(0), callbackParams.getCaseData().getCcdCaseReference());
-        addDefendantLitigationFriendNotificationHandler.notifyParties(callbackParams.getCaseData());
+        claimDismissedNotifier.notifyParties(callbackParams.getCaseData());
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

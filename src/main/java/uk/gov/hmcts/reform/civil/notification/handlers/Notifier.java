@@ -8,20 +8,19 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @Component
-public abstract class NotificationHandler {
+public abstract class Notifier {
 
-    protected static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
-    protected static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
     protected final NotificationService notificationService;
     protected final NotificationsProperties notificationsProperties;
     protected final OrganisationService organisationService;
     protected final SimpleStateFlowEngine stateFlowEngine;
 
-    protected NotificationHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
-                               OrganisationService organisationService, SimpleStateFlowEngine stateFlowEngine) {
+    protected Notifier(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                       OrganisationService organisationService, SimpleStateFlowEngine stateFlowEngine) {
         this.notificationService = notificationService;
         this.notificationsProperties = notificationsProperties;
         this.organisationService = organisationService;
@@ -30,8 +29,10 @@ public abstract class NotificationHandler {
 
     protected void sendNotification(Set<EmailDTO> recipients) {
         for (EmailDTO recipient : recipients) {
-            notificationService.sendMail(recipient.getTargetEmail(), recipient.getEmailTemplate(), recipient.getParameters(),
-                    recipient.getReference());
+            if (Objects.nonNull(recipient.getTargetEmail()) && !recipient.getTargetEmail().isEmpty()) {
+                notificationService.sendMail(recipient.getTargetEmail(), recipient.getEmailTemplate(), recipient.getParameters(),
+                        recipient.getReference());
+            }
         }
     }
 

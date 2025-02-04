@@ -12,22 +12,25 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import static org.mockito.ArgumentMatchers.any;
+import java.util.List;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 
 @ExtendWith(MockitoExtension.class)
-class AddDefendantLitigationFriendNotificationHandlerTest {
+class ClaimDismissedNotifierTest {
 
     public static final Long CASE_ID = 1594901956117591L;
     @Mock
     NotificationService notificationService;
     @InjectMocks
-    AddDefendantLitigationFriendNotifier addDefendantLitigationFriendNotifier;
+    ClaimDismissedNotifier claimDismissedNotifier;
     @Mock
     private NotificationsProperties notificationsProperties;
     @Mock
@@ -37,14 +40,17 @@ class AddDefendantLitigationFriendNotificationHandlerTest {
 
     @Test
     void shouldNotifyApplicantSolicitor_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastClaimDetailsNotificationDeadline().build();
 
         StateFlow stateFlow = mock(StateFlow.class);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+
+        List<State> stateHistoryList = List.of(State.from(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName()));
+        when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
+        when(stateFlow.getStateHistory()).thenReturn(stateHistoryList);
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
 
-        addDefendantLitigationFriendNotifier.notifyParties(caseData);
+        claimDismissedNotifier.notifyParties(caseData);
 
-        verify(stateFlowEngine, times(1)).evaluate(caseData);
+        verify(stateFlowEngine, times(2)).evaluate(caseData);
     }
 }

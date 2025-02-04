@@ -39,6 +39,11 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 public class NotificationUtils {
 
+    public static final String REFERENCE_TEMPLATE_APPLICANT_FOR_LITIGATION_FRIEND_ADDED = "litigation-friend-added-applicant-notification-%s";
+    public static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_LITIGATION_FRIEND_ADDED = "litigation-friend-added-respondent-notification-%s";
+    public static final String REFERENCE_TEMPLATE_APPLICANT_FOR_CLAIM_DISMISSED = "claim-dismissed-applicant-notification-%s";
+    public static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED = "claim-dismissed-respondent-notification-%s";
+
     private NotificationUtils() {
         //NO-OP
     }
