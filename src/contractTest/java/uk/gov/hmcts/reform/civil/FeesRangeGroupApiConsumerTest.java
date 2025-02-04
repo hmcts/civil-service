@@ -152,8 +152,8 @@ public class FeesRangeGroupApiConsumerTest extends BaseContractTest {
             .stringType("si_ref_id", "1.1h")
             .stringType("status", "approved")
             .stringType("statutory_instrument", "2014 No 874")
-                .stringType("validFrom", "2015-03-09")
-                .stringType("validTo", "2022-03-09")
+                .date("valid_from", "2015-03-09")
+                .date("valid_to", "2022-03-09")
             .numberType("version", 2);
     }
 }
