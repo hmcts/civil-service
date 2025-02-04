@@ -1614,7 +1614,8 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 ADD_CASE_NOTE,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
