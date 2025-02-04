@@ -47,6 +47,7 @@ import java.util.stream.Stream;
 public class SealedClaimLipResponseForm implements MappableObject {
 
     private final String claimReferenceNumber;
+    private final String ccdCaseReference;
     private final String claimantReferenceNumber;
     private final String defendantReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -89,6 +90,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     public static SealedClaimLipResponseForm toTemplate(final CaseData caseData) {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
+            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .claimant1(LipFormPartyDefence.toLipDefenceParty(caseData.getApplicant1()))
             .defendant1(LipFormPartyDefence.toLipDefenceParty(
