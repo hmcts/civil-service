@@ -776,17 +776,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
+        boolean isHmcLipEnabled = featureToggleService.isHmcForLipEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
+        boolean isHmcNroEnabled = featureToggleService.isHmcNroEnabled();
 
         if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             caseDataBuilder.eaCourtLocation(YES);
-            caseDataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
-        } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
-            caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+            caseDataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
         } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-            caseDataBuilder.eaCourtLocation(NO);
+            boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+            caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            if (isHmcLipEnabled) {
+                caseDataBuilder.hmcLipEnabled(isLipCaseEaCourt ? YES : NO);
+            }
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {

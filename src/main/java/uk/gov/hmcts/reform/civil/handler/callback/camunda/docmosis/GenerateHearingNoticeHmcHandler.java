@@ -44,6 +44,8 @@ import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyF
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
+
 
 @Service
 @RequiredArgsConstructor
@@ -115,7 +117,11 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         );
 
         String claimTrack = determineClaimTrack(caseData);
-
+        Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+        if (featureToggleService.isHmcForLipEnabled()) {
+            caseDataBuilder.hearingDurationInMinutesAHN(totalDurationInMinutes.toString())
+                .trialReadyNotified(null);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
                       .hearingDate(hearingStartDate.toLocalDate())
