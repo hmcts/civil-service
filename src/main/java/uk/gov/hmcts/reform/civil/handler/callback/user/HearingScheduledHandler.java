@@ -101,7 +101,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             .hearingDate(null)
             .hearingTimeHourMinute(null)
             .hearingDuration(null)
-            .hearingDurationMinti(null)
             .information(null)
             .hearingNoticeListOther(null);
 

@@ -28,11 +28,7 @@ import java.util.List;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
-import static uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList.FAST_TRACK_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_TRIAL_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
@@ -94,7 +90,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .hearingTime(getHearingTimeFormatted(caseData.getHearingTimeHourMinute()))
             .hearingType(getHearingType(caseData))
             .applicationDate(getDateFormatted(caseData.getDateOfApplication()))
-            .hearingDuration(getHearingDuration(caseData))
+            .hearingDuration(formatHearingDuration(caseData.getHearingDuration()))
             .additionalInfo(caseData.getInformation())
             .feeAmount(HearingUtils.formatHearingFee(caseData.getHearingFee()))
             .hearingDueDate(getDateFormatted(caseData.getHearingDueDate()))
@@ -108,16 +104,6 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .defendant2Reference(checkReference(caseData)
                                      ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference() : null)
             .build();
-    }
-
-    public String getHearingDuration(CaseData caseData) {
-        if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
-            && isClaimMultiOrIntermediate(caseData)
-            && caseData.getHearingNoticeList().equals(FAST_TRACK_TRIAL)) {
-            return caseData.getHearingDurationMinti();
-        } else {
-            return formatHearingDuration(caseData.getHearingDuration());
-        }
     }
 
     public String listingOrRelistingWithFeeDue(CaseData caseData) {
@@ -174,14 +160,6 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 return HEARING_APPLICATION_AHN;
             default:
                 return HEARING_OTHER_AHN;
-        }
-    }
-
-    private Boolean isClaimMultiOrIntermediate(CaseData caseData) {
-        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
-            return caseData.getAllocatedTrack().equals(INTERMEDIATE_CLAIM) || caseData.getAllocatedTrack().equals(MULTI_CLAIM);
-        } else {
-            return caseData.getResponseClaimTrack().equals("INTERMEDIATE_CLAIM") || caseData.getResponseClaimTrack().equals("MULTI_CLAIM");
         }
     }
 }
