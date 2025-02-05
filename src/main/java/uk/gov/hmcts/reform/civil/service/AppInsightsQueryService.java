@@ -43,7 +43,6 @@ public class AppInsightsQueryService {
     public List<Map<String, Object>> queryCustomEvents(String eventType, String caseId) {
         QueryTimeInterval timeRange = new QueryTimeInterval(Duration.ofDays(30));
 
-
         LogsQueryResult queryResult = logsQueryClient.queryWorkspace(
             workspaceId,
             QUERY.formatted(eventType, caseId),
