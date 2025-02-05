@@ -51,7 +51,7 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(FULL_ADMIT_REJECT_REPAYMENT, transitions).onlyWhen(rejectRepaymentPlan, transitions)
             .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions).onlyWhen(ccjRequestJudgmentByAdmission.and(isPayImmediately), transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaff, transitions)
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaff.and(not(ccjRequestJudgmentByAdmission)), transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
     }
