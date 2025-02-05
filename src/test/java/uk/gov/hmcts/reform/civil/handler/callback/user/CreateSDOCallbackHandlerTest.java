@@ -1069,30 +1069,30 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         //LR scenarios trigger hmcEaCourt and ignore hmcLipEnabled
         "true, true, true, YES, YES, YES, YES, ",
         "false, true, true, YES, YES, YES, YES, ",
-        "false, false, true, YES, YES, YES, YES, ",
+        "false, false, true, YES, YES, YES, NO, ",
         "false, false, false, YES, YES, YES, NO, ",
         "true, false, false, YES, YES, YES, NO, ",
         "false, true, false, YES, YES, YES, YES, ",
         "true, true, false, YES, YES, YES, YES, ",
         //LiP cases trigger hmcLipEnabled and ignore hmcEaCourt
-        "true, true, true, NO, YES, YES, , NO",
+        "true, true, true, NO, YES, NO, , NO",
         "true, true, true, YES, NO, YES, , YES",
         "true, true, true, NO, NO, YES, , YES",
         // LiP vs LR - should work with NRO
-        "false, true, true, NO, YES, YES, ,",
-        "true, false, true, NO, YES, YES, , NO",
+        "false, true, true, NO, YES, NO, ,",
+        "true, false, true, NO, YES, NO, , NO",
         "true, true, false, NO, YES, NO, , NO",
         "true, false, false, NO, YES, NO, , NO",
         "false, false, false, NO, YES, NO, ,",
         //LR vs LiP
         "false, true, true, YES, NO, YES, ,",
-        "true, false, true, YES, NO, YES, , NO",
+        "true, false, true, YES, NO, NO, , NO",
         "true, true, false, YES, NO, YES, , YES",
         "true, false, false, YES, NO, NO, , NO",
         "false, false, false, YES, NO, NO, ,",
         //LiP vs LiP
         "false, true, true, NO, NO, YES, ,",
-        "true, false, true, NO, NO, YES, , NO",
+        "true, false, true, NO, NO, NO, , NO",
         "true, true, false, NO, NO, YES, , YES",
         "true, false, false, NO, NO, NO, , NO",
         "false, false, false, NO, NO, NO, ,"
@@ -1103,10 +1103,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                              YesOrNo eaCourtLocation, YesOrNo hmcEaCourtLocation,
                                                              YesOrNo hmcLipEnabled) {
 
-        when(featureToggleService.isHmcNroEnabled()).thenReturn(isHmcNro);
         when(featureToggleService.isHmcForLipEnabled()).thenReturn(isHmcForLipEnabled);
 
-        if (NO.equals(respondent1Represented)) {
+        if (NO.equals(respondent1Represented) || NO.equals(applicantRepresented)) {
             when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
         } else {
             when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);

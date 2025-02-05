@@ -1604,15 +1604,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
         boolean isHmcLipEnabled = featureToggleService.isHmcForLipEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
-        boolean isHmcNroEnabled = featureToggleService.isHmcNroEnabled();
 
         if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
-            dataBuilder.hmcEaCourtLocation(isHmcNroEnabled || isLocationWhiteListed ? YES : NO);
+            dataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
         } else {
             boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-            dataBuilder.eaCourtLocation(isHmcNroEnabled || isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
+            dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
             if (isHmcLipEnabled) {
                 dataBuilder.hmcLipEnabled(isLipCaseEaCourt ? YES : NO);
             }
