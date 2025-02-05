@@ -366,7 +366,7 @@ public class EventHistoryMapper {
         return Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
-            .dateReceived(LocalDateTime.now())
+            .dateReceived(getDateOfDjCreated(caseData))
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder()
@@ -383,11 +383,17 @@ public class EventHistoryMapper {
                                                      : ZERO)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
-                              .dateOfJudgment(LocalDateTime.now())
+                              .dateOfJudgment(getDateOfDjCreated(caseData))
                               .jointJudgment(caseData.getRespondent2() != null)
                               .judgmentToBeRegistered(false)
                               .build())
             .build();
+    }
+
+    private LocalDateTime getDateOfDjCreated(CaseData caseData) {
+        return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
+            ? caseData.getJoDJCreatedDate()
+            : LocalDateTime.now();
     }
 
     private BigDecimal getInstallmentAmount(String amount) {
