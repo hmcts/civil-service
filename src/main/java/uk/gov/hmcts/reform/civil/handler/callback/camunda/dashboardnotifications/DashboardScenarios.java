@@ -223,7 +223,11 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT("Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_DEFENDANT("Scenario.AAA6.CP.Court.Officer.Order.Defendant"),
     SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_DEFENDANT("Scenario.AAA6.CP.Court.Officer.Order.TrialReady.Defendant"),
-    SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant");
+    SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant"),
+    SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT("Scenario.AAA6.ClaimantIntent.Multi.Int.Await.Claimant"),
+    SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT("Scenario.AAA6.ClaimantIntent.Multi.Int.Await.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT(
+        "Scenario.AAA6.DefendantNoticeOfChange.ClaimRemainsOnline.Claimant");
 
     private final String scenario;
 

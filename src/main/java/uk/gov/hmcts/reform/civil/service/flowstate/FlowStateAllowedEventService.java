@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
@@ -117,8 +118,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_LISTING_COMPLETED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
@@ -164,6 +166,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PREPARE_FOR_HEARING_CONDUCT_HEARING;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
@@ -192,7 +196,9 @@ public class FlowStateAllowedEventService {
         UpdateNextHearingInfo,
         UPDATE_NEXT_HEARING_DETAILS,
         DISPATCH_BUSINESS_PROCESS,
-        SEND_AND_REPLY
+        SEND_AND_REPLY,
+        queryManagementRaiseQuery,
+        queryManagementRespondQuery
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
@@ -577,7 +583,41 @@ public class FlowStateAllowedEventService {
         ),
 
         entry(
-            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                DEFENDANT_RESPONSE,
+                ACKNOWLEDGE_CLAIM,
+                INFORM_AGREED_EXTENSION_DATE,
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                AMEND_PARTY_DETAILS,
+                CASE_PROCEEDS_IN_CASEMAN,
+                DISMISS_CLAIM,
+                ADD_CASE_NOTE,
+                CHANGE_SOLICITOR_EMAIL,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                REQUEST_FOR_RECONSIDERATION,
+                migrateCase,
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE,
+                MANAGE_STAY,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
+            )
+        ),
+
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
             List.of(
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
@@ -1567,7 +1607,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
         entry(
@@ -1582,7 +1623,8 @@ public class FlowStateAllowedEventService {
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                     ADD_CASE_NOTE,
                     NOC_REQUEST,
-                    APPLY_NOC_DECISION)
+                    APPLY_NOC_DECISION,
+                    REQUEST_JUDGEMENT_ADMISSION_SPEC)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),
@@ -1810,7 +1852,27 @@ public class FlowStateAllowedEventService {
             )
         ),
         entry(
-            AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+            AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+            List.of(
+                DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI,
+                RESET_PIN,
+                migrateCase,
+                TRANSFER_ONLINE_CASE,
+                SETTLE_CLAIM,
+                SETTLE_CLAIM_MARK_PAID_FULL,
+                DISCONTINUE_CLAIM_CLAIMANT,
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                STAY_CASE,
+                DISMISS_CASE,
+                MANAGE_STAY,
+                ADD_CASE_NOTE,
+                CONFIRM_ORDER_REVIEW,
+                ORDER_REVIEW_OBLIGATION_CHECK
+            )
+        ),
+        entry(
+            AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
@@ -2207,7 +2269,8 @@ public class FlowStateAllowedEventService {
                 INVALID_HWF_REFERENCE,
                 NO_REMISSION_HWF,
                 LIP_CLAIM_SETTLED,
-                ADD_CASE_NOTE
+                ADD_CASE_NOTE,
+                CITIZEN_CLAIM_ISSUE_PAYMENT
             )
         ),
         entry(

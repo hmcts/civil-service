@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
-import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -29,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
@@ -44,6 +44,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final JudgementService judgementService;
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -188,17 +189,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
     }
 
-    private Address getAddress(ContactInformation address) {
-        return uk.gov.hmcts.reform.civil.model.Address.builder().addressLine1(address.getAddressLine1())
-            .addressLine2(address.getAddressLine1())
-            .addressLine3(address.getAddressLine1())
-            .country(address.getCountry())
-            .county(address.getCounty())
-            .postCode(address.getPostCode())
-            .postTown(address.getTownCity())
-            .build();
-    }
-
     private Party getRespondentLROrLipDetails(CaseData caseData) {
         if (caseData.isRespondent1LiP()) {
             return getPartyDetails(caseData.getRespondent1());
@@ -248,6 +238,34 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .build();
     }
 
+    public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination builder) {
+        return builder.toBuilder()
+            .welshDate(formatDateInWelsh(LocalDate.now()))
+            .welshPayByDate(getWelshPayByDate(caseData))
+            .welshRepaymentDate(getWelshRepaymentDate(caseData))
+            .welshRepaymentFrequency(caseData.isPayByInstallment()
+                                         ? getRepaymentFrequencyInWelsh(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .welshPaymentStr(caseData.isPayByInstallment() ? getRepaymentWelshString(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
+            .build();
+    }
+
+    private String getWelshPayByDate(CaseData caseData) {
+        return caseData.getRespondToClaimAdmitPartLRspec() != null
+            ? formatDateInWelsh(LocalDate.parse(
+            DateFormatHelper.formatLocalDate(
+                caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
+                DateFormatHelper.DATE
+            ), dateTimeFormatter)) : null;
+    }
+
+    private String getWelshRepaymentDate(CaseData caseData) {
+        return caseData.isPayByInstallment()
+            ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
+            caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(),
+            DateFormatHelper.DATE
+        ), dateTimeFormatter)) : null;
+    }
+
     private String getRepaymentString(PaymentFrequencyLRspec repaymentFrequency) {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "each week";
@@ -257,11 +275,29 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
     }
 
+    private String getRepaymentWelshString(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "pob mis";
+            case ONCE_ONE_MONTH: return "pob mis";
+            case ONCE_TWO_WEEKS: return "pob 2 wythnos";
+            default: return null;
+        }
+    }
+
     private String getRepaymentFrequency(PaymentFrequencyLRspec repaymentFrequency) {
         switch (repaymentFrequency) {
             case ONCE_ONE_WEEK : return "per week";
             case ONCE_ONE_MONTH: return "per month";
             case ONCE_TWO_WEEKS: return "every 2 weeks";
+            default: return null;
+        }
+    }
+
+    private String getRepaymentFrequencyInWelsh(PaymentFrequencyLRspec repaymentFrequency) {
+        switch (repaymentFrequency) {
+            case ONCE_ONE_WEEK : return "yr wythnos";
+            case ONCE_ONE_MONTH: return "y mis";
+            case ONCE_TWO_WEEKS: return "bob pythefnos";
             default: return null;
         }
     }

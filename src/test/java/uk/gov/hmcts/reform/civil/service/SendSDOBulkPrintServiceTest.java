@@ -8,12 +8,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
+import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoCoverLetterAppendService;
 
 import java.util.Collections;
 
@@ -32,10 +32,10 @@ class SendSDOBulkPrintServiceTest {
     private SendSDOBulkPrintService sendSDOBulkPrintService;
 
     @Mock
-    private DocumentDownloadService documentDownloadService;
+    private BulkPrintService bulkPrintService;
 
     @Mock
-    private BulkPrintService bulkPrintService;
+    private SdoCoverLetterAppendService sdoCoverLetterAppendService;
 
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
     private static final String TEST = "test";
@@ -50,8 +50,8 @@ class SendSDOBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForDefendantLIP() {
         Party respondent1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(respondent1);
-
-        givenDocumentDownloadWillReturn();
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
@@ -62,8 +62,8 @@ class SendSDOBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfullyForClaimantLIP() {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
-
-        givenDocumentDownloadWillReturn();
+        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
 
@@ -87,11 +87,6 @@ class SendSDOBulkPrintServiceTest {
         sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         verifyNoInteractions(bulkPrintService);
-    }
-
-    private void givenDocumentDownloadWillReturn() {
-        given(documentDownloadService.downloadDocument(any(), any()))
-            .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), TEST, TEST));
     }
 
     private void verifyPrintLetter(CaseData caseData, Party party) {

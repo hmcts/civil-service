@@ -51,6 +51,8 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrdersComplexityBand;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDate;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -100,7 +102,11 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRe
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1_V_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_2_V_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.DATE_FROM_AFTER_DATE_TO_ERROR;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FURTHER_HEARING_OTHER_ALT_LOCATION;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FUTURE_DATE_FROM_ERROR;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FUTURE_DATE_TO_ERROR;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FUTURE_SINGLE_DATE_ERROR;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.HEADER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -1021,7 +1027,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         private static final String PAGE_ID = "create-download-template-document";
 
         @Test
-        void shouldGenerateFreeFormOrder_onMidEventCallback() {
+        void shouldNotGenerateAfterHearingTemplateBeforeHearingDate_onMidEventCallback() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderDownloadTemplateOptions(DynamicList.builder()
@@ -1032,12 +1038,161 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNull();
+            assertThat(response.getData()).extracting("showOrderAfterHearingDatePage").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldGenerateTemplateBeforeHearing_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Blank template to be used before a hearing/box work")
+                                                                  .build())
+                                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
             when(judgeOrderDownloadGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNotNull();
+            assertThat(response.getData()).extracting("showOrderAfterHearingDatePage").isEqualTo("No");
         }
 
+        @Test
+        void shouldGenerateTemplateFixDateForCCMC_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Fix a date for CCMC")
+                                                                  .build())
+                                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeOrderDownloadGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNotNull();
+            assertThat(response.getData()).extracting("showOrderAfterHearingDatePage").isEqualTo("No");
+        }
+
+        @Test
+        void shouldGenerateTemplateFixDateForCMC_onMidEventCallback() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Fix a date for CMC")
+                                                                  .build())
+                                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeOrderDownloadGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNotNull();
+            assertThat(response.getData()).extracting("showOrderAfterHearingDatePage").isEqualTo("No");
+        }
+    }
+
+    @Nested
+    class MidEventGenerateTemplatesAfterHearingMinti {
+        private static final String PAGE_ID = "hearing-date-order";
+
+        @Test
+        void shouldGenerateAfterHearingTemplateBeforeHearingDate_onMidEventCallback_noDateValidationErrors() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Blank template to be used after a hearing")
+                                                                  .build())
+                                                       .build())
+                .orderAfterHearingDate(OrderAfterHearingDate.builder()
+                                           .dateType(OrderAfterHearingDateType.SINGLE_DATE)
+                                           .date(LocalDate.now().minusDays(2))
+                                           .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            when(judgeOrderDownloadGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("finalOrderDownloadTemplateDocument").isNotNull();
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldReturnError_whenSingleDateIsInFuture() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Blank template to be used after a hearing")
+                                                                  .build())
+                                                       .build())
+                .orderAfterHearingDate(OrderAfterHearingDate.builder()
+                                           .dateType(OrderAfterHearingDateType.SINGLE_DATE)
+                                           .date(LocalDate.now().plusDays(2))
+                                           .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors()).hasSize(1).containsExactlyInAnyOrder(FUTURE_SINGLE_DATE_ERROR);
+        }
+
+        @Test
+        void shouldReturnError_whenDateRangeDatesAreInFuture() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Blank template to be used after a hearing")
+                                                                  .build())
+                                                       .build())
+                .orderAfterHearingDate(OrderAfterHearingDate.builder()
+                                           .dateType(OrderAfterHearingDateType.DATE_RANGE)
+                                           .fromDate(LocalDate.now().plusDays(2))
+                                           .toDate(LocalDate.now().plusDays(3))
+                                           .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors()).hasSize(2).containsExactlyInAnyOrder(FUTURE_DATE_FROM_ERROR, FUTURE_DATE_TO_ERROR);
+        }
+
+        @Test
+        void shouldReturnError_whenFromDateIsAfterToDate() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label("Blank template to be used after a hearing")
+                                                                  .build())
+                                                       .build())
+                .orderAfterHearingDate(OrderAfterHearingDate.builder()
+                                           .dateType(OrderAfterHearingDateType.DATE_RANGE)
+                                           .fromDate(LocalDate.now().minusDays(2))
+                                           .toDate(LocalDate.now().minusDays(3))
+                                           .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getErrors()).hasSize(1).containsExactlyInAnyOrder(DATE_FROM_AFTER_DATE_TO_ERROR);
+        }
     }
 
     @Nested
@@ -1518,7 +1673,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             // Then
             String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
-            assertThat(updatedData).extracting("finalOrderFurtherHearingToggle").isNull();
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
@@ -1762,6 +1916,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderTrackAllocation(AllocatedTrack.MULTI_CLAIM)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, JUDICIAL_REFERRAL);
+
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then

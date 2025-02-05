@@ -41,6 +41,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
@@ -190,7 +192,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         // Hearing fee will be different based on claim track.
         // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
         String claimTrack = null;
-
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
             claimTrack = caseData.getAllocatedTrack().name();
         } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
@@ -198,13 +199,8 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
 
         CaseState caseState = caseDataBuilder.build().getCcdState();
-
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
-            if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
-                && !caseState.equals(HEARING_READINESS)
-                && !caseState.equals(DECISION_OUTCOME)) {
-                caseState = HEARING_READINESS;
-            }
+            caseState = determinePostState(caseState, caseData);
             calculateHearingFeeAndDueDate(caseDataBuilder, caseData, claimTrack);
         } else {
             // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
@@ -229,6 +225,30 @@ public class HearingScheduledHandler extends CallbackHandler {
             .state(caseState.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseState determinePostState(CaseState caseState, CaseData caseData) {
+        if (isClaimMultiOrIntermediate(caseData)) {
+            if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                && !caseState.equals(HEARING_READINESS)) {
+                caseState = HEARING_READINESS;
+            }
+        } else {
+            if (!caseState.equals(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                && !caseState.equals(HEARING_READINESS)
+                && !caseState.equals(DECISION_OUTCOME)) {
+                caseState = HEARING_READINESS;
+            }
+        }
+        return caseState;
+    }
+
+    private Boolean isClaimMultiOrIntermediate(CaseData caseData) {
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            return caseData.getAllocatedTrack().equals(INTERMEDIATE_CLAIM) || caseData.getAllocatedTrack().equals(MULTI_CLAIM);
+        } else {
+            return caseData.getResponseClaimTrack().equals("INTERMEDIATE_CLAIM") || caseData.getResponseClaimTrack().equals("MULTI_CLAIM");
+        }
     }
 
     private void calculateHearingFeeAndDueDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData, String claimTrack) {

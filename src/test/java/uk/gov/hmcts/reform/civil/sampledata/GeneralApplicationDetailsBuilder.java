@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -340,7 +341,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder.build();
     }
 
-    public CaseData getTestCaseDataWithLocationDetails(CaseData caseData,
+    public CaseData getTestCaseDataWithLocationDetailsLip(CaseData caseData,
                                                boolean withGADetails,
                                                boolean withGADetailsResp,
                                                boolean withGADetailsResp2, boolean withGADetailsMaster,
@@ -349,6 +350,7 @@ public class GeneralApplicationDetailsBuilder {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
                                                    .region("2").build());
+        caseDataBuilder.respondent1Represented(NO);
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();
@@ -485,6 +487,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(SPEC_CLAIM)
+            .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("AppSol1Ref").respondentSolicitor1Reference("RespSol1ref").build())
             .responseClaimTrack("MULTI_CLAIM")
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
