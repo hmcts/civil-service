@@ -2092,9 +2092,9 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             final Party respondent1 = caseData.getRespondent1();
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
             buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
                 && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
