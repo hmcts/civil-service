@@ -95,6 +95,8 @@ public enum DocmosisTemplates {
     RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf"),
     JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00916.docx", "Judgment_by_admission_claimant.pdf"),
     JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
+    JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL("CV-SPC-DEC-WEL-00916.docx", "Judgment_by_admission_claimant.pdf"),
+    JUDGMENT_BY_ADMISSION_DEFENDANT_BILINGUAL("CV-SPC-DEC-WEL-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_DETERMINATION_CLAIMANT("CV-SPC-DEC-ENG-00982.docx", "Judgment_by_determination_claimant.pdf"),
     JUDGMENT_BY_DETERMINATION_DEFENDANT("CV-SPC-DEC-ENG-00981.docx", "Judgment_by_determination_defendant.pdf"),
     NOTICE_OF_DISCONTINUANCE_PDF("CV-SPC-GNO-ENG-SD0002.docx", "notice_of_discontinuance_%s.pdf"),
