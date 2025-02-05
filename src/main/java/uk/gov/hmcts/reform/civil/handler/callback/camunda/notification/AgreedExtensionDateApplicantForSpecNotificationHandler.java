@@ -130,7 +130,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
 
     public Map<String, String> addPropertiesForClaimantLiP(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             FRONTEND_URL, pinInPostConfiguration.getCuiFrontEndUrl(),

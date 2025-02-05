@@ -471,7 +471,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
         @NotNull
         private Map<String, String> getNotificationDataMapClaimantLiP(LocalDate extensionDate) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, "000DC001",
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, "http://localhost:3001/",

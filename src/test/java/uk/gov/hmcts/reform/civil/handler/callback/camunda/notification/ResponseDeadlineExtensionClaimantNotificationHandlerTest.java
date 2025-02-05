@@ -196,7 +196,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         @NotNull
         private Map<String, String> getNotificationDataMapForLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, "Mr. John Rambo",
                 DEFENDANT_NAME, "Mr. Sole Trader",
                 FRONTEND_URL, "url",
