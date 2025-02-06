@@ -242,43 +242,22 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @CsvSource({
             //LR scenarios trigger hmcEaCourt and ignore hmcLipEnabled
-            "true, true, true, YES, YES, YES, YES, ",
-            "false, true, true, YES, YES, YES, YES, ",
-            "false, false, true, YES, YES, YES, NO, ",
-            "false, false, false, YES, YES, YES, NO, ",
-            "true, false, false, YES, YES, YES, NO, ",
-            "false, true, false, YES, YES, YES, YES, ",
-            "true, true, false, YES, YES, YES, YES, ",
-            //LiP cases trigger hmcLipEnabled and ignore hmcEaCourt
-            "true, true, true, NO, YES, NO, , NO",
-            "true, true, true, YES, NO, YES, , YES",
-            "true, true, true, NO, NO, YES, , YES",
-            // LiP vs LR - should work with NRO
-            "false, true, true, NO, YES, NO, ,",
-            "true, false, true, NO, YES, NO, , NO",
-            "true, true, false, NO, YES, NO, , NO",
-            "true, false, false, NO, YES, NO, , NO",
-            "false, false, false, NO, YES, NO, ,",
-            //LR vs LiP
-            "false, true, true, YES, NO, YES, ,",
-            "true, false, true, YES, NO, NO, , NO",
-            "true, true, false, YES, NO, YES, , YES",
-            "true, false, false, YES, NO, NO, , NO",
-            "false, false, false, YES, NO, NO, ,",
-            //LiP vs LiP
-            "false, true, true, NO, NO, YES, ,",
-            "true, false, true, NO, NO, NO, , NO",
-            "true, true, false, NO, NO, YES, , YES",
-            "true, false, false, NO, NO, NO, , NO",
-            "false, false, false, NO, NO, NO, ,"
+            "true, YES, YES, YES, YES",
+            "false, YES, YES, YES, NO",
+            // LiP vs LR - ignore HMC court
+            "true,  NO, YES, NO,",
+            "false,  NO, YES, NO,",
+            //LR vs LiP - ignore HMC court
+            "true, YES, NO, YES,",
+            "false, YES, NO, NO,",
+            //LiP vs LiP - ignore HMC court
+            "true, NO, NO, YES,",
+            "false, NO, NO, NO,"
         })
-        void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isHmcForLipEnabled, boolean isCPAndWhitelisted,
-                                                                 boolean isHmcNro, YesOrNo applicantRepresented,
+        void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted,
+                                                                 YesOrNo applicantRepresented,
                                                                  YesOrNo respondent1Represented,
-                                                                 YesOrNo eaCourtLocation, YesOrNo hmcEaCourtLocation,
-                                                                 YesOrNo hmcLipEnabled) {
-
-            when(featureToggleService.isHmcForLipEnabled()).thenReturn(isHmcForLipEnabled);
+                                                                 YesOrNo eaCourtLocation, YesOrNo hmcEaCourtLocation) {
 
             if (NO.equals(respondent1Represented)) {
                 when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
@@ -305,8 +284,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                          .build(), ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            assertEquals(hmcLipEnabled, responseCaseData.getHmcLipEnabled());
+            
             assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
             assertEquals(hmcEaCourtLocation, responseCaseData.getHmcEaCourtLocation());
         }
