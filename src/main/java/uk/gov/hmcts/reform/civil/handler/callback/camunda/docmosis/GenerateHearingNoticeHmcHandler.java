@@ -46,7 +46,6 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
 
-
 @Service
 @RequiredArgsConstructor
 public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
