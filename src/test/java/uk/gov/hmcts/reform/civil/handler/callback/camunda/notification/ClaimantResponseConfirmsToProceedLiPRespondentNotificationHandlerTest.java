@@ -164,7 +164,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             );
         }
 
-
         @ParameterizedTest()
         @ValueSource(strings = {"INTERMEDIATE_CLAIM", "MULTI_CLAIM"})
         void shouldNotNotifyLRRespondent_whenApplicantProceedsForLipVSLR(String claimType) {
