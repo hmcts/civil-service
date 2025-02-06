@@ -82,7 +82,10 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         boolean isRespondent1Lip = isRespondent1Lip(caseData);
         boolean isDefendant1 = isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING) || isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING_HMC);
         boolean isHmc = isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING_HMC) || isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING_HMC);
-        sendEmail(caseData, getRespondentRecipient(caseData, isDefendant1, isRespondent1Lip), isDefendant1, isRespondent1Lip, isHmc);
+        final String respondentRecipient = getRespondentRecipient(caseData, isDefendant1, isRespondent1Lip);
+        if (null != respondentRecipient) {
+            sendEmail(caseData, respondentRecipient, isDefendant1, isRespondent1Lip, isHmc);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
