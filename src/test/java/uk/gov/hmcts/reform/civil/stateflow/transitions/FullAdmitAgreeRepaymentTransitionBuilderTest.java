@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import java.util.List;
