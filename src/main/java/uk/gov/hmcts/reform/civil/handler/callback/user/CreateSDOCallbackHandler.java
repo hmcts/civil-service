@@ -1602,7 +1602,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
         boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-        boolean isHmcLipEnabled = featureToggleService.isHmcForLipEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
 
         if (!isLipCase) {

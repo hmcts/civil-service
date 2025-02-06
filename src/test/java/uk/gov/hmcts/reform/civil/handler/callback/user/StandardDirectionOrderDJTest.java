@@ -1008,7 +1008,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                                      .build(), ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-        
+
         assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
         assertEquals(hmcEaCourtLocation, responseCaseData.getHmcEaCourtLocation());
     }

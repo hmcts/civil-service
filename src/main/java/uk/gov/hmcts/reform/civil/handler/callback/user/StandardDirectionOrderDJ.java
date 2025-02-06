@@ -776,9 +776,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         boolean isLipCase = caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
-        boolean isHmcLipEnabled = featureToggleService.isHmcForLipEnabled();
         boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
-        boolean isHmcNroEnabled = featureToggleService.isHmcNroEnabled();
 
         if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
