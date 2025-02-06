@@ -438,6 +438,7 @@ notifications:
   notifyDefendantLrAfterNoticeOfChangeTemplate: "632b8aa4-8de2-4abc-b4f5-126f325a31f5"
   notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
   notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
+  notifyNewDefendantSolicitorNOC: "b6eebb9d-ee0c-4ae4-88bf-49bd98be3f5f"
 
   notifyDJNonDivergentSpecClaimantTemplate: "7c4be349-fe65-4e65-abed-802a81ba60d1"
   notifyDJNonDivergentSpecDefendantTemplate: "0acc8e5f-3572-410b-9bbf-ad973c1609f4"
