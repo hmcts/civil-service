@@ -53,33 +53,78 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     private CallbackResponse notifyAllPartiesInterimJudgmentApprovedDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        var state = "JUDICIAL_REFERRAL";
+
+        if (caseData.isRespondent1LiP() && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(state)
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
+
+        if (caseData.isRespondent1LiP() && YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            if (caseData.isRespondent2LiP()) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .state(state)
+                    .data(caseData.toMap(objectMapper))
+                    .build();
+            }
+
+            notificationService.sendMail(
+                caseData.getRespondentSolicitor2EmailAddress() != null
+                    ? caseData.getRespondentSolicitor2EmailAddress() :
+                    caseData.getRespondentSolicitor1EmailAddress(),
+                checkIfBothDefendants(caseData)
+                    ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                    : notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                addPropertiesDefendant2(caseData),
+                String.format(
+                    checkIfBothDefendants(caseData)
+                        ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                        : REFERENCE_TEMPLATE_REQUEST_DEF,
+                    caseData.getLegacyCaseReference()
+                )
+            );
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(state)
+                .data(caseData.toMap(objectMapper))
+                .build();
+        }
 
         if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
             if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
                 || checkIfBothDefendants(caseData)) {
-                notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
-                                             checkIfBothDefendants(caseData)
-                                                 ? notificationsProperties.getInterimJudgmentApprovalDefendant()
-                                                 : notificationsProperties.getInterimJudgmentRequestedDefendant(),
-                                             addProperties(caseData),
-                                             String.format(checkIfBothDefendants(caseData)
-                                                               ? REFERENCE_TEMPLATE_APPROVAL_DEF
-                                                               : REFERENCE_TEMPLATE_REQUEST_DEF,
-                                                           caseData.getLegacyCaseReference()));
+                notificationService.sendMail(
+                    caseData.getRespondentSolicitor1EmailAddress(),
+                    checkIfBothDefendants(caseData)
+                        ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                        : notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                    addProperties(caseData),
+                    String.format(
+                        checkIfBothDefendants(caseData)
+                            ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                            : REFERENCE_TEMPLATE_REQUEST_DEF,
+                        caseData.getLegacyCaseReference()
+                    )
+                );
             }
             if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
                 || checkIfBothDefendants(caseData)) {
-                notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
-                                                 ? caseData.getRespondentSolicitor2EmailAddress() :
-                                                 caseData.getRespondentSolicitor1EmailAddress(),
-                                             checkIfBothDefendants(caseData)
-                                                 ? notificationsProperties.getInterimJudgmentApprovalDefendant()
-                                                 : notificationsProperties.getInterimJudgmentRequestedDefendant(),
-                                             addPropertiesDefendant2(caseData),
-                                             String.format(checkIfBothDefendants(caseData)
-                                                               ? REFERENCE_TEMPLATE_APPROVAL_DEF
-                                                               : REFERENCE_TEMPLATE_REQUEST_DEF,
-                                                           caseData.getLegacyCaseReference())
+                notificationService.sendMail(
+                    caseData.getRespondentSolicitor2EmailAddress() != null
+                        ? caseData.getRespondentSolicitor2EmailAddress() :
+                        caseData.getRespondentSolicitor1EmailAddress(),
+                    checkIfBothDefendants(caseData)
+                        ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                        : notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                    addPropertiesDefendant2(caseData),
+                    String.format(
+                        checkIfBothDefendants(caseData)
+                            ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                            : REFERENCE_TEMPLATE_REQUEST_DEF,
+                        caseData.getLegacyCaseReference()
+                    )
                 );
             }
         } else {
@@ -90,7 +135,6 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                                                        caseData.getLegacyCaseReference()));
         }
 
-        var state = "JUDICIAL_REFERRAL";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)
             .data(caseData.toMap(objectMapper))

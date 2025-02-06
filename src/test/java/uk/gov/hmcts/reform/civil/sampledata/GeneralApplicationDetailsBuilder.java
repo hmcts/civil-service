@@ -341,7 +341,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseDataBuilder.build();
     }
 
-    public CaseData getTestCaseDataWithLocationDetails(CaseData caseData,
+    public CaseData getTestCaseDataWithLocationDetailsLip(CaseData caseData,
                                                boolean withGADetails,
                                                boolean withGADetailsResp,
                                                boolean withGADetailsResp2, boolean withGADetailsMaster,
@@ -350,6 +350,7 @@ public class GeneralApplicationDetailsBuilder {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().baseLocation("000000")
                                                    .region("2").build());
+        caseDataBuilder.respondent1Represented(NO);
         caseDataBuilder.ccdCaseReference(1L);
         if (!Collections.isEmpty(applicationIdStatus)) {
             List<GeneralApplication> genApps = new ArrayList<>();

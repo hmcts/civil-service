@@ -457,7 +457,8 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseEvent)) {
             switch (caseEvent) {
-                case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
+                case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
+                    UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT, UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT -> {
                     return caseData.getFinalOrderDocumentCollection()
                         .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
                 }

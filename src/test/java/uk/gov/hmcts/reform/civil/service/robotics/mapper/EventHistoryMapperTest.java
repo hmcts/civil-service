@@ -3898,7 +3898,7 @@ class EventHistoryMapperTest {
             void shouldPrepareExpectedEvents_whenDefendantResponseFullAdmits() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
+                    .atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED)
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
@@ -7902,6 +7902,50 @@ class EventHistoryMapperTest {
                 .extracting("eventDetailsText").asString().isNotEmpty();
         }
 
+        @Test
+        public void shouldgenerateRPAfeedfor_DJ_event_update_sequenceno() {
+
+            given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .joDJCreatedDate(LocalDateTime.now())
+                .repaymentSummaryObject(
+                    "The judgment will order dsfsdf ffdg to pay £1072.00, "
+                        + "including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ## "
+                        + "Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                .respondent2SameLegalRepresentative(YES)
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventCode").asString().contains("[230, 230]");
+            assertThat(eventHistory).extracting("defaultJudgment").asList()
+                .extracting("eventSequence").asString().contains("1");
+
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventSequence").asString().contains("5");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().isNotEmpty();
+        }
     }
 
     @Nested

@@ -508,5 +508,6 @@ class GenAppStateHelperServiceTest {
             latestStatus.put("2345", "Order Made");
             return latestStatus;
         }
+
     }
 }

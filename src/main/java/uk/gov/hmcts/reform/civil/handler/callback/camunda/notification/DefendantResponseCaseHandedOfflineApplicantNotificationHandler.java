@@ -46,10 +46,8 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
 
     private CallbackResponse notifyApplicantSolicitorForCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.isLipvLROneVOne()) {
-            caseHandledOffLineApplicantSolicitorNotifierFactory.getCaseHandledOfflineSolicitorNotifier(caseData)
+        caseHandledOffLineApplicantSolicitorNotifierFactory.getCaseHandledOfflineSolicitorNotifier(caseData)
                 .notifyApplicantSolicitorForCaseHandedOffline(caseData);
-        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
