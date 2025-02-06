@@ -14,27 +14,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class AwaitingResponsesNotFullDefenceReceivedTransitionBuilderTest {
+public class AwaitingResponsesFullAdmitReceivedTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
-    private AwaitingResponsesNotFullDefenceReceivedTransitionBuilder awaitingResponsesNotFullDefenceReceivedTransitionBuilder;
+    private AwaitingResponsesFullAdmitReceivedTransitionBuilder awaitingResponsesFullAdmitReceivedTransitionBuilder;
 
     @BeforeEach
     void setUp() {
-        awaitingResponsesNotFullDefenceReceivedTransitionBuilder = new AwaitingResponsesNotFullDefenceReceivedTransitionBuilder(mockFeatureToggleService);
+        awaitingResponsesFullAdmitReceivedTransitionBuilder = new AwaitingResponsesFullAdmitReceivedTransitionBuilder(mockFeatureToggleService);
     }
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        List<Transition> result = awaitingResponsesNotFullDefenceReceivedTransitionBuilder.buildTransitions();
+        List<Transition> result = awaitingResponsesFullAdmitReceivedTransitionBuilder.buildTransitions();
         assertNotNull(result);
         assertThat(result).hasSize(4);
 
-        assertTransition(result.get(0), "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED", "MAIN.ALL_RESPONSES_RECEIVED");
-        assertTransition(result.get(1), "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED", "MAIN.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED");
-        assertTransition(result.get(2), "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(3), "MAIN.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED", "MAIN.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(0), "MAIN.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED", "MAIN.ALL_RESPONSES_RECEIVED");
+        assertTransition(result.get(1), "MAIN.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED", "MAIN.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED");
+        assertTransition(result.get(2), "MAIN.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(3), "MAIN.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED", "MAIN.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

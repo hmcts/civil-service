@@ -547,19 +547,21 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("hearingFeeOutStandingAmount").isEqualTo("£100");
     }
 
-    @Test
-    void shouldMapOrderParameters_whenEventIsFinalOrder() {
+    @ParameterizedTest
+    @EnumSource(value = CaseEvent.class, names = {
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT",
+        "CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT",
+        "UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT"
+    })
+    void shouldMapOrderParameters(CaseEvent caseEvent) {
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(generateOrder(JUDGE_FINAL_ORDER)));
         caseData = caseData.toBuilder().finalOrderDocumentCollection(finalCaseDocuments).build();
 
-        Map<String, Object> resultClaimant =
-            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT);
-        Map<String, Object> resultDefendant =
-            mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT);
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData, caseEvent);
 
-        assertThat(resultClaimant).extracting("orderDocument").isEqualTo("binary-url");
-        assertThat(resultDefendant).extracting("orderDocument").isEqualTo("binary-url");
+        assertThat(result).extracting("orderDocument").isEqualTo("binary-url");
     }
 
     @Test

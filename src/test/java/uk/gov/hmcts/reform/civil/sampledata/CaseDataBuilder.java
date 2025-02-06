@@ -2055,7 +2055,7 @@ public class CaseDataBuilder {
                 return atStateNotificationAcknowledgedRespondent1TimeExtension();
             case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
                 return atStateAwaitingResponseFullDefenceReceived();
-            case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+            case AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED:
                 return atStateAwaitingResponseNotFullDefenceReceived();
             case FULL_DEFENCE:
                 return atStateRespondentFullDefenceAfterNotificationAcknowledgement();
@@ -3287,6 +3287,7 @@ public class CaseDataBuilder {
         respondent1OrgRegistered = NO;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
+
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
@@ -4496,6 +4497,27 @@ public class CaseDataBuilder {
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent1FullAdmissionAfterNotifyDetails() {
+        atStateClaimDetailsNotified();
+        respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        takenOfflineDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2FullAdmissionAfterNotifyDetails() {
+        atStateClaimDetailsNotified();
+        respondent2 = Party.builder().partyName("Respondent 2").build();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        respondent2ResponseDate = claimDetailsNotificationDate.plusDays(1);
+        ccdState = AWAITING_APPLICANT_INTENTION;
+        takenOfflineDate = LocalDateTime.now();
         return this;
     }
 
@@ -7068,9 +7090,19 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder specClaim1v1LipvLr() {
+        atStateClaimDraft();
+        legacyCaseReference(LEGACY_CASE_REFERENCE);
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = YES;
         this.applicant1Represented = NO;
+        this.claimantBilingualLanguagePreference = Language.ENGLISH.toString();
+        this.ccdCaseReference = CASE_ID;
+        return this;
+    }
+
+    public CaseDataBuilder specClaim1v1LipvLrBilingual() {
+        specClaim1v1LipvLr();
+        this.claimantBilingualLanguagePreference = Language.BOTH.toString();
         return this;
     }
 

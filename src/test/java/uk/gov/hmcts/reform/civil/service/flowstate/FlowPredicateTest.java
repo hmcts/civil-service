@@ -29,8 +29,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullAdmitReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceived;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
@@ -479,23 +480,43 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesNonFullDefenceRespondent1ReceivedShouldReturnTrue() {
+                void awaitingResponsesFullAdmitRespondent1ReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondent1FullAdmissionAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesFullAdmitRespondent2ReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .atStateRespondent2FullAdmissionAfterNotifyDetails()
+                        .build();
+
+                    assertTrue(awaitingResponsesFullAdmitReceived.test(caseData));
+                }
+
+                @Test
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent1ReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondent1CounterClaimAfterNotifyDetails()
                         .build();
 
-                    assertTrue(awaitingResponsesNonFullDefenceReceived.test(caseData));
+                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
                 }
 
                 @Test
-                void awaitingResponsesNonFullDefenceRespondent2ReceivedShouldReturnTrue() {
+                void awaitingResponsesNonFullDefenceOrFullAdmitRespondent2ReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondent2CounterClaimAfterNotifyDetails()
                         .build();
 
-                    assertTrue(awaitingResponsesNonFullDefenceReceived.test(caseData));
+                    assertTrue(awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
                 }
 
                 @Test

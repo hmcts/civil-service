@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergen
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
@@ -1713,7 +1713,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName());
+                    .isEqualTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
                     .hasSize(9)
                     .extracting(State::getName)
@@ -1721,7 +1721,7 @@ class SimpleStateFlowEngineTest {
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
                     );
 
                 assertThat(stateFlow.getFlags()).hasSize(10).contains(
@@ -3616,7 +3616,7 @@ class SimpleStateFlowEngineTest {
                 assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName());
+                    .isEqualTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName());
                 assertThat(stateFlow.getStateHistory())
                     .hasSize(9)
                     .extracting(State::getName)
@@ -3624,7 +3624,7 @@ class SimpleStateFlowEngineTest {
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
                         CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
                     );
 
                 assertThat(stateFlow.getFlags()).hasSize(10).contains(

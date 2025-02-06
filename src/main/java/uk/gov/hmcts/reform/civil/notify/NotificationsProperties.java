@@ -266,6 +266,9 @@ public class NotificationsProperties {
     private String noticeOfChangeOtherParties;
 
     @NotEmpty
+    private String notifyNewDefendantSolicitorNOC;
+
+    @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
 
     @NotEmpty
