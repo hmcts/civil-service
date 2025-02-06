@@ -457,11 +457,11 @@ notifications:
   notifyLRBundleRestitched: "b7eb7e1a-a66c-44b4-8cee-b4ab94ca0830"
   notifyLRCaseStayed: "660fc639-774c-4211-acdf-f2cb87fad8c2"
   notifyLRCaseDismissed: "68694cf5-efa3-4335-8a3a-6d88a74f2d2c"
-  notifyLRStayLifted: "a9cdde1e-6e11-44b2-bf8e-83e1f64a5735"
-  notifyLRStayUpdateRequested: "2bf8e191-d0aa-4cc3-9c54-42245c1d56a2"
+  notifyLRStayLifted: "1714328f-4add-4e3c-ab97-b505bbf3ddf6"
+  notifyLRStayUpdateRequested: "c2ed99e9-5f11-490e-bfe7-e3115bfe9250"
   notifyLipStayUpdateRequested: "a08532c7-67f5-4c4f-a30d-81c4c0508ffc"
   notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
-  notifyClaimantLRCoscApplied: "a2f38927-7e54-4066-bbce-ff6ffda821ac"
+  notifyClaimantLRCoscApplied: "392cc0d5-51b3-4a82-8576-922424775617"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
