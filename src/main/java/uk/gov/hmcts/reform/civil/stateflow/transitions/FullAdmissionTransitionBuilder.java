@@ -44,7 +44,7 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(FULL_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(fullAdmitPayImmediately.and(not(ccjRequestJudgmentByAdmission)), transitions)
+        this.moveTo(FULL_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(fullAdmitPayImmediately, transitions)
             .moveTo(FULL_ADMIT_PROCEED, transitions).onlyWhen(fullDefenceProceed, transitions)
             .moveTo(FULL_ADMIT_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
             .moveTo(FULL_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
