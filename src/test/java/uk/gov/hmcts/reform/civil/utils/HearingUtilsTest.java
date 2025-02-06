@@ -22,9 +22,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class HearingUtilsTest {
+class HearingUtilsTest {
 
     @Test
     void shouldThrowNullException_whenGivenNullDate() {
@@ -60,6 +61,12 @@ public class HearingUtilsTest {
     @EnumSource(HearingDuration.class)
     void shouldReturnHearingDuration_whenGivenAnyHearingDuration(HearingDuration hearingDuration) {
         assertThat(HearingUtils.formatHearingDuration(hearingDuration)).isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnHearingDuration_whenGivenAnyHearingDuration_extended() {
+        HearingDuration hearingDuration = null;
+        assertNull(HearingUtils.formatHearingDuration(hearingDuration));
     }
 
     @ParameterizedTest
