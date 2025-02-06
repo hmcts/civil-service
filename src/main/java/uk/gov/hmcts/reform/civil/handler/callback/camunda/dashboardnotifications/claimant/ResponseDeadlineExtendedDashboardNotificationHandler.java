@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
@@ -19,17 +18,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class ResponseDeadlineExtendedDashboardNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_DEFENDANT_RESPONSE_DATE);
-    public static final String TASK_ID = "GenerateClaimantDashboardNotificationClaimantNewResponseDeadline";
 
     public ResponseDeadlineExtendedDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
                                                    DashboardNotificationsParamsMapper mapper,
                                                    FeatureToggleService featureToggleService) {
         super(dashboardApiClient, mapper, featureToggleService);
-    }
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
     }
 
     @Override
