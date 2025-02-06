@@ -88,7 +88,7 @@ public class DashboardNotificationService {
             );
             log.info("Existing notification deleted reference = {}, id = {}", notification.getReference(), existingNotification.get().getId());
         } else {
-            log.info("Existing notification not present reference = {}, id = {}", notification.getReference(), existingNotification.get().getId());
+            log.info("Existing notification not present reference = {}", notification.getReference());
         }
 
         return dashboardNotificationsRepository.save(updated);
