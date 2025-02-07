@@ -783,9 +783,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LatestQuery qmLatestQuery;
     //LIP QM
     private final CaseQueriesCollection qmApplicantCitizenQueries;
-    private final CaseQueriesCollection qmRespondentCitizen1Queries;
-    private final CaseQueriesCollection qmRespondentCitizen2Queries;
-
+    private final CaseQueriesCollection qmRespondentCitizenQueries;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
