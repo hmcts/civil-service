@@ -133,8 +133,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
@@ -626,7 +627,40 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
-                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED,
+                    AWAITING_RESPONSES_FULL_ADMIT_RECEIVED,
+                    new CaseEvent[] {
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
+                        DEFENDANT_RESPONSE,
+                        ACKNOWLEDGE_CLAIM,
+                        INFORM_AGREED_EXTENSION_DATE,
+                        ADD_DEFENDANT_LITIGATION_FRIEND,
+                        WITHDRAW_CLAIM,
+                        DISCONTINUE_CLAIM,
+                        AMEND_PARTY_DETAILS,
+                        CASE_PROCEEDS_IN_CASEMAN,
+                        DISMISS_CLAIM,
+                        ADD_CASE_NOTE,
+                        CHANGE_SOLICITOR_EMAIL,
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
+                        NotSuitable_SDO,
+                        REQUEST_FOR_RECONSIDERATION,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
+                    }
+                ),
+                of(
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED,
                     new CaseEvent[] {
                         NOC_REQUEST,
                         APPLY_NOC_DECISION,
@@ -1838,7 +1872,26 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
-                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED,
+                    AWAITING_RESPONSES_FULL_ADMIT_RECEIVED,
+                    new CaseEvent[] {
+                        DEFENDANT_RESPONSE_SPEC,
+                        DEFENDANT_RESPONSE_CUI,
+                        RESET_PIN,
+                        migrateCase,
+                        TRANSFER_ONLINE_CASE,
+                        SETTLE_CLAIM,
+                        SETTLE_CLAIM_MARK_PAID_FULL,
+                        DISCONTINUE_CLAIM_CLAIMANT,
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        STAY_CASE,
+                        DISMISS_CASE,
+                        MANAGE_STAY,
+                        CONFIRM_ORDER_REVIEW,
+                        ORDER_REVIEW_OBLIGATION_CHECK
+                    }
+                ),
+                of(
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED,
                     new CaseEvent[] {
                         DEFENDANT_RESPONSE_SPEC,
                         DEFENDANT_RESPONSE_CUI,
@@ -2281,7 +2334,8 @@ class FlowStateAllowedEventServiceTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
+                    AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()}),
                 of(NOTIFY_DEFENDANT_OF_CLAIM, new String[] {CLAIM_ISSUED.fullName(),
                     PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()}),
                 of(CLAIMANT_RESPONSE, new String[] {FULL_DEFENCE.fullName()}),
@@ -2292,7 +2346,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
                     }
                 ),
                 of(
@@ -2305,7 +2360,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         IN_HEARING_READINESS.fullName()
                     }
                 ),
@@ -2319,7 +2375,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         IN_HEARING_READINESS.fullName()
                     }
                 ),
@@ -2336,7 +2393,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
                         CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         IN_HEARING_READINESS.fullName()
                     }
                 ),
@@ -2350,7 +2408,8 @@ class FlowStateAllowedEventServiceTest {
                         CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         IN_HEARING_READINESS.fullName()
                     }
                 ),
@@ -2364,7 +2423,8 @@ class FlowStateAllowedEventServiceTest {
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                    AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                    AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                     IN_HEARING_READINESS.fullName()}),
                 of(
                     AMEND_PARTY_DETAILS,
@@ -2376,7 +2436,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_PROCEED.fullName(), FULL_DEFENCE_NOT_PROCEED.fullName(),
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         TAKEN_OFFLINE_AFTER_SDO.fullName(),
                         IN_HEARING_READINESS.fullName()
                     }
@@ -2398,7 +2459,8 @@ class FlowStateAllowedEventServiceTest {
                         IN_MEDIATION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         PART_ADMISSION.fullName(),
                         FULL_DEFENCE_NOT_PROCEED.fullName(),
                         FULL_DEFENCE.fullName(),
@@ -2416,7 +2478,8 @@ class FlowStateAllowedEventServiceTest {
                         IN_MEDIATION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         PART_ADMISSION.fullName(),
                         FULL_DEFENCE_NOT_PROCEED.fullName(),
                         FULL_DEFENCE.fullName(),
@@ -2434,7 +2497,8 @@ class FlowStateAllowedEventServiceTest {
                         IN_MEDIATION.fullName(),
                         NOTIFICATION_ACKNOWLEDGED.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
-                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
+                        AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         PART_ADMISSION.fullName(),
                         FULL_DEFENCE_NOT_PROCEED.fullName(),
                         FULL_DEFENCE.fullName(),
