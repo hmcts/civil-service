@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -33,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -85,6 +87,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String EMAIL_TEMPLATE_FEE_PAYMENT_OUTCOME = "test-hwf-feePayment-outcome-id";
         private static final String EMAIL_TEMPLATE_BILINGUAL_FEE_PAYMENT_OUTCOME = "test-hwf-feePayment-outcome-bilingual-id";
         private static final String EMAIL = "test@email.com";
+        private static final String EMAIL_SOLICITOR = "solicitor_test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
         private static final String HWF_REFERENCE = "000HWF001";
@@ -166,6 +169,33 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             // Then
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
+                EMAIL_TEMPLATE_NO_REMISSION,
+                getNotificationDataMapNoRemissionClaimIssued(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_HwfOutcome_NoRemission_ClaimIssued() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(NO_REMISSION_HWF)
+                .noRemissionDetails("no remission")
+                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
+            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .claimIssuedHwfDetails(hwfeeDetails)
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(EMAIL_SOLICITOR).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL_SOLICITOR,
                 EMAIL_TEMPLATE_NO_REMISSION,
                 getNotificationDataMapNoRemissionClaimIssued(),
                 REFERENCE_NUMBER
@@ -368,6 +398,35 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         }
 
         @Test
+        void shouldNotifyApplicantSolicitor_HwfOutcome_PartialRemission_Hearing() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
+                .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
+                .outstandingFeeInPounds(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+                .build();
+
+            CaseData caseData = HEARING_CASE_DATA.toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .hearingHwfDetails(hwfeeDetails)
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(EMAIL_SOLICITOR).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL_SOLICITOR,
+                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
+                getNotificationDataMapPartialRemissionHearing(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
         void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_ClaimIssued() {
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
@@ -485,6 +544,35 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL,
                 getNotificationDataMapPartialRemissionClaimIssued(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotNotify_HwfOutcome_PartialRemission_Hearing_WhenEmailMissing() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
+                .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
+                .outstandingFeeInPounds(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+                .build();
+
+            CaseData caseData = HEARING_CASE_DATA.toBuilder()
+                .applicant1Represented(YesOrNo.YES)
+                .hearingHwfDetails(hwfeeDetails)
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, never()).sendMail(
+                null,
+                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
+                getNotificationDataMapPartialRemissionHearing(),
                 REFERENCE_NUMBER
             );
         }
