@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.AddDefendantLitigationFriendNotificationHandler;
+import uk.gov.hmcts.reform.civil.notification.handlers.AddDefendantLitigationFriendNotifier;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 class LitigationFriendAddedNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
-    AddDefendantLitigationFriendNotificationHandler addDefendantLitigationFriendNotificationHandler;
+    AddDefendantLitigationFriendNotifier addDefendantLitigationFriendNotificationHandler;
 
     @InjectMocks
     private LitigationFriendAddedNotificationHandler handler;
