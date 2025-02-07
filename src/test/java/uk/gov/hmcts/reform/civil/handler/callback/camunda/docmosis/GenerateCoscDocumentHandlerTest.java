@@ -49,7 +49,6 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private CivilStitchService civilStitchService;
 
-
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
@@ -126,9 +125,9 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(certificateOfDebtGenerator, times(1))
-            .generateDoc(any(CaseData.class), eq("BEARER_TOKEN"),eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT));
+            .generateDoc(any(CaseData.class), eq("BEARER_TOKEN"), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT));
         verify(certificateOfDebtGenerator, times(1))
-            .generateDoc(any(CaseData.class), eq("BEARER_TOKEN"),eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT_WELSH));
+            .generateDoc(any(CaseData.class), eq("BEARER_TOKEN"), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT_WELSH));
 
         assertThat(response.getData())
             .extracting("coSCApplicationStatus")
