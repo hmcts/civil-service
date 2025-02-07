@@ -44,6 +44,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     private final OrganisationService organisationService;
     private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -79,7 +80,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
@@ -108,7 +109,9 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
 
     private String getTemplate(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            return notificationsProperties.getClaimantLipDeadlineExtension();
+            return caseData.isClaimantBilingual() && featureToggleService.isDefendantNoCOnlineForCase(caseData)
+                ? notificationsProperties.getClaimantLipDeadlineExtensionWelsh()
+                : notificationsProperties.getClaimantLipDeadlineExtension();
         }
         return notificationsProperties.getClaimantDeadlineExtension();
     }
