@@ -155,20 +155,20 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         );
     }
 
-    private List<DocumentMetaData> appendWelshDocToDocument(CaseDocument englishDoc, CaseDocument... welshDocuments) {
+    private List<DocumentMetaData> appendWelshDocToDocument(CaseDocument englishDoc, CaseDocument welshDocument) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
 
         documentMetaDataList.add(new DocumentMetaData(
             englishDoc.getDocumentLink(),
-            "Welsh Document",
+            "English Document",
             LocalDate.now().toString()
         ));
 
-        Arrays.stream(welshDocuments).forEach(caseDocument -> documentMetaDataList.add(new DocumentMetaData(
-            caseDocument.getDocumentLink(),
+        documentMetaDataList.add(new DocumentMetaData(
+            welshDocument.getDocumentLink(),
             "Welsh Doc to attach",
             LocalDate.now().toString()
-        )));
+        ));
 
         return documentMetaDataList;
     }
