@@ -27,8 +27,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT_WELSH;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
@@ -95,15 +93,14 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
     private String getJudgmentText(JudgmentDetails activeJudgment, boolean isBilingual) {
 
         if (JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
-            return isBilingual? MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED_WELSH
+            return isBilingual ? MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED_WELSH
                 : MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED;
         } else if (JudgmentState.CANCELLED.equals(activeJudgment.getState())) {
-            return isBilingual? REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT_WELSH
+            return isBilingual ? REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT_WELSH
                 : REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT;
         }
         return null;
     }
-
 
     private String getCourtName(CaseData caseData, String authorisation) {
 
