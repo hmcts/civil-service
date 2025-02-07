@@ -21,7 +21,7 @@ public class CcdEventServiceBusConfiguration {
     private String connectionString;
     @Value("${azure.servicebus.ccd-events-topic.topic-name}")
     private String topicName;
-    @Value("${azure.servicebus.ccd-events-topic.civil-ccd-case-events-subscription-name}")
+    @Value("${azure.servicebus.ccd-events-topic.civil-ccd-events-subscription-name}")
     private String ccdCaseEventsSubscriptionName;
     @Value("${azure.servicebus.ccd-events-topic.retry-duration}")
     private int retryTime;
