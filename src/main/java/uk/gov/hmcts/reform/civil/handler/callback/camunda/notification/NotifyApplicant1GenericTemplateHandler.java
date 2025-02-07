@@ -75,7 +75,9 @@ public class NotifyApplicant1GenericTemplateHandler extends CallbackHandler impl
     }
 
     private String getRecipientEmail(CaseData caseData) {
-        return caseData.getClaimantUserDetails().getEmail();
+        return  caseData.isApplicantNotRepresented()
+            ? caseData.getClaimantUserDetails().getEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
 }
