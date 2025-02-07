@@ -212,6 +212,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private Fee hearingFee;
     private HearingChannel channel;
     private HearingDuration hearingDuration;
+    private String hearingDurationMinti;
     private String information;
     private String hearingNoticeListOther;
     private LocalDateTime caseDismissedHearingFeeDueDate;
