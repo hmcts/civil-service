@@ -21,12 +21,12 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 
 @Component
 @Slf4j
-public class AddDefendantLitigationFriendNotificationHandler extends NotificationHandler implements NotificationData {
+public class AddDefendantLitigationFriendNotifier extends Notifier implements NotificationData {
 
-    public AddDefendantLitigationFriendNotificationHandler(NotificationService notificationService,
-                                                           NotificationsProperties notificationsProperties,
-                                                           OrganisationService organisationService,
-                                                           SimpleStateFlowEngine stateFlowEngine) {
+    public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
+                                                NotificationsProperties notificationsProperties,
+                                                OrganisationService organisationService,
+                                                SimpleStateFlowEngine stateFlowEngine) {
         super(notificationService, notificationsProperties, organisationService, stateFlowEngine);
     }
 
@@ -39,19 +39,7 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
     }
 
     @Override
-    public void notifyParties(CaseData caseData) {
-        Set<EmailDTO> partiesToEmail = new HashSet<>();
-        partiesToEmail.addAll(getApplicants(caseData));
-        partiesToEmail.addAll(getRespondents(caseData));
-
-        sendNotification(partiesToEmail);
-    }
-
-    private Set<EmailDTO> getApplicants(CaseData caseData) {
-        return new HashSet<>(Set.of(getApplicant1(caseData)));
-    }
-
-    private EmailDTO getApplicant1(CaseData caseData) {
+    protected EmailDTO getApplicant(CaseData caseData) {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
@@ -78,7 +66,7 @@ public class AddDefendantLitigationFriendNotificationHandler extends Notificatio
                 isRespondent1, organisationService));
 
         return EmailDTO.builder()
-                        .targetEmail(caseData.getRespondentSolicitor1EmailAddress())
+                        .targetEmail(isRespondent1 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress())
                         .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                         .parameters(properties)
                         .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference()))

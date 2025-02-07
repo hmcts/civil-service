@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.AddDefendantLitigationFriendNotificationHandler;
+import uk.gov.hmcts.reform.civil.notification.handlers.AddDefendantLitigationFriendNotifier;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,10 +28,8 @@ public class LitigationFriendAddedNotificationHandler extends CallbackHandler im
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
 
     public static final String TASK_ID = "LitigationFriendAddedNotifier";
-    protected static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
-    protected static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
 
-    private final AddDefendantLitigationFriendNotificationHandler addDefendantLitigationFriendNotificationHandler;
+    private final AddDefendantLitigationFriendNotifier addDefendantLitigationFriendNotifier;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -51,7 +49,7 @@ public class LitigationFriendAddedNotificationHandler extends CallbackHandler im
     }
 
     private CallbackResponse notifyForLitigationFriendAdded(CallbackParams callbackParams) {
-        addDefendantLitigationFriendNotificationHandler.notifyParties(callbackParams.getCaseData());
+        addDefendantLitigationFriendNotifier.notifyParties(callbackParams.getCaseData());
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
