@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -15,6 +16,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -307,5 +310,72 @@ public class HearingFormGeneratorTest {
             .build();
 
         assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "custom time duration,,FAST_TRACK_TRIAL, INTERMEDIATE_CLAIM",
+        "custom time duration,,FAST_TRACK_TRIAL, MULTI_CLAIM",
+        ", MINUTES_45 ,SMALL_CLAIMS, MULTI_CLAIM",
+        ", MINUTES_45 ,OTHER, INTERMEDIATE_CLAIM",
+        ", MINUTES_45 ,FAST_TRACK_TRIAL, FAST_CLAIM",
+        ", MINUTES_45 ,SMALL_CLAIMS, FAST_CLAIM",
+        ", MINUTES_45 ,OTHER, SMALL_CLAIM"
+    })
+    void shouldGetHearingDuration(String mintiHearingDuration, String hearingDuration, String hearingNoticeType, String claimType) {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.valueOf(hearingNoticeType))
+            .hearingFeePaymentDetails(null)
+            .allocatedTrack(AllocatedTrack.valueOf(claimType))
+            .build();
+
+        if (mintiHearingDuration != null) {
+            caseData = caseData.toBuilder().build().toBuilder()
+                .hearingDurationMinti(mintiHearingDuration)
+                .build();
+            assertThat(generator.getHearingDuration(caseData)).isEqualTo(mintiHearingDuration);
+        }
+        if (hearingDuration != null) {
+            caseData = caseData.toBuilder().build().toBuilder()
+                .hearingDuration(HearingDuration.valueOf(hearingDuration))
+                .build();
+            assertThat(generator.getHearingDuration(caseData)).isEqualTo("45 minutes");
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "custom time duration, FAST_TRACK_TRIAL, INTERMEDIATE_CLAIM",
+        "custom time duration, FAST_TRACK_TRIAL, MULTI_CLAIM",
+    })
+    void shouldGetHearingDuration_spec(String mintiHearingDuration, String hearingNoticeType, String claimType) {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .caseManagementLocation(caseManagementLocation)
+            .hearingNoticeList(HearingNoticeList.valueOf(hearingNoticeType))
+            .hearingFeePaymentDetails(null)
+            .responseClaimTrack(claimType)
+            .hearingDurationMinti(mintiHearingDuration)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .build();
+
+        assertThat(generator.getHearingDuration(caseData)).isEqualTo(mintiHearingDuration);
+
     }
 }
