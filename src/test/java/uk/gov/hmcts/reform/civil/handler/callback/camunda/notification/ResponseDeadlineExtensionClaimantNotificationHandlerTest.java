@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -70,6 +71,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         private final String claimantEmail = "applicantsolicitor@example.com";
         private final String claimantLipEmail = "rambo@email.com";
         private final String emailLipTemplate = "emailTemplateLip";
+        private final String emailLipWelshTemplate = "emailTemplateWelshLip";
         private final String legacyReference = "000DC001";
 
         @Test
@@ -116,6 +118,9 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         @Test
         void shouldSendEmailToClaimantLip() {
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -125,8 +130,59 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                claimantLipEmail,
+                emailLipTemplate,
+                getNotificationDataMapForLip(caseData),
+                "claimant-deadline-extension-notification-" + legacyReference
+            );
+        }
+
+        @Test
+        void shouldSendEmailToClaimantLipInWelsh() {
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).willReturn(emailLipWelshTemplate);
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                claimantLipEmail,
+                emailLipWelshTemplate,
+                getNotificationDataMapForLip(caseData),
+                "claimant-deadline-extension-notification-" + legacyReference
+            );
+        }
+
+        @Test
+        void shouldSendEmailToClaimantLipInEngish_ifPreLiPvLRReleaseDate() {
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -140,7 +196,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         @NotNull
         private Map<String, String> getNotificationDataMapForLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, "Mr. John Rambo",
                 DEFENDANT_NAME, "Mr. Sole Trader",
                 FRONTEND_URL, "url",
