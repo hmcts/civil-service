@@ -690,6 +690,7 @@ public class CaseDataBuilder {
     private String claimantBilingualLanguagePreference;
     private JudgmentPaidInFull judgmentPaidInFull;
     private YesOrNo anyRepresented;
+    protected YesOrNo setRequestDJDamagesFlagForWA;
 
     private String partialPaymentAmount;
 
@@ -1950,6 +1951,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder takenOfflineByStaffDate(LocalDateTime takenOfflineByStaffDate) {
         this.takenOfflineByStaffDate = takenOfflineByStaffDate;
+        return this;
+    }
+
+    public CaseDataBuilder setRequestDJDamagesFlagForWA(YesOrNo setRequestDJDamagesFlagForWA) {
+        this.setRequestDJDamagesFlagForWA = setRequestDJDamagesFlagForWA;
         return this;
     }
 
@@ -5492,6 +5498,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder generalApplications() {
+        this.generalApplications = new ArrayList<>();
+        return this;
+    }
+
     public CaseDataBuilder getGeneralApplicationWithStrikeOut(final String litigiousPartyID) {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
@@ -7977,6 +7988,7 @@ public class CaseDataBuilder {
             .joJudgmentPaidInFull(judgmentPaidInFull)
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
+            .setRequestDJDamagesFlagForWA(setRequestDJDamagesFlagForWA)
             .build();
     }
 
