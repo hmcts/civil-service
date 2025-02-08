@@ -278,7 +278,9 @@ public class FlowPredicate {
             && caseData.getRespondent1TimeExtensionDate() == null
             && caseData.getRespondent1ClaimResponseIntentionType() == null
             && caseData.getRespondent1ResponseDate() == null
-            && caseData.getTakenOfflineByStaffDate() == null;
+            && caseData.getTakenOfflineByStaffDate() == null
+            && (caseData.getGeneralApplications() == null || caseData.getGeneralApplications().isEmpty())
+            && caseData.getSetRequestDJDamagesFlagForWA() == null;
 
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
 

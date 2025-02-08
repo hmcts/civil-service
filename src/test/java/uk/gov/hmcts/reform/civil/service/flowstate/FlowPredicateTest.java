@@ -818,6 +818,42 @@ class FlowPredicateTest {
             }
 
             @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt2() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .setRequestDJDamagesFlagForWA(YES)
+                    .build();
+                assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGa() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .getGeneralApplicationWithStrikeOut("001")
+                    .build();
+                assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithNoGa() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .generalApplications()
+                    .build();
+                assertTrue(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
             void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDismissed()
