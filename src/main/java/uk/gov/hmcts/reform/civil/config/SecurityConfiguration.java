@@ -53,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/service-request-update",
         "/service-request-update-claim-issued",
         "/case/document/downloadDocument/**",
-        "/fees/claim/interest",
+        "/fees/claim/calculate-interest",
         "/testing-support/flowstate"
     };
 

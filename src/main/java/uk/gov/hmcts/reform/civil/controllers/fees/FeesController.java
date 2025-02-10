@@ -61,7 +61,7 @@ public class FeesController {
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 
-    @PostMapping("/claim/interest")
+    @PostMapping("/claim/calculate-interest")
     @Operation(summary = "Calculates the claim interest")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
