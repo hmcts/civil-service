@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -31,7 +32,9 @@ class LocationHelperTest {
     private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
     private static final String CCMCC_REGION_ID = "ccmccRegionId";
     private static final String CCMCC_EPIMS = "ccmccEpims";
-    private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
+    private static final String CNBC_EPIMS = "cnbcEpims";
+    private static final String CNBC_REGION_ID = "cnbcRegionId";
+    private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID, CNBC_EPIMS, CNBC_REGION_ID);
     private final CaseLocationCivil claimantPreferredCourt = CaseLocationCivil.builder()
         .baseLocation("123456").region("region 1").build();
     private final CaseLocationCivil defendant1PreferredCourt = CaseLocationCivil.builder()
@@ -219,6 +222,41 @@ class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
         Assertions.assertThat(court.orElseThrow().getCaseLocation()).isEqualTo(claimantPreferredCourt);
+    }
+
+    @Test
+    void whenSpecMultiOrIntermediateAndLip_courtIsCnbc() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(1000000))
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .caseLocation(claimantPreferredCourt)
+                                      .build()
+                              )
+                              .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.ORGANISATION)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
+                                       .build()
+                               )
+                               .build())
+            .respondent1Represented(YesOrNo.NO)
+            .responseClaimTrack("INTERMEDIATE_CLAIM")
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Assertions.assertThat(court.orElseThrow().getCaseLocation())
+            .isEqualTo(CaseLocationCivil.builder().baseLocation(CNBC_EPIMS).region(CNBC_REGION_ID).build());
     }
 
     @Test
