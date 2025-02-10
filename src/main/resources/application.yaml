@@ -26,11 +26,25 @@ spring:
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
+    jcache:
+      config: classpath:ehcache.xml
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
+  jpa:
+    properties:
+      hibernate:
+        javax:
+          cache:
+            uri: ehcache.xml
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
 
   servlet:
     multipart:
@@ -557,9 +571,6 @@ feign:
 ---
 
 spring:
-  cache:
-    jcache:
-      config: classpath:ehcache.xml
   config:
     activate:
       on-profile: local
@@ -661,6 +672,8 @@ spring:
   config:
     activate:
       on-profile: integration-test
+  jcache:
+    config: classpath:ehcache.xml
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:15://localhost/cmc
@@ -680,15 +693,6 @@ spring:
         show_sql: false
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        javax:
-          cache:
-            uri: ehcache.xml
-            provider: org.ehcache.jsr107.EhcacheCachingProvider
-        cache:
-          use_second_level_cache: true
-          use_query_cache: true
-          region:
-            factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
   flyway:
     enabled: true
     baselineOnMigrate: true
