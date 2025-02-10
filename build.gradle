@@ -431,6 +431,8 @@ dependencies {
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   implementation group: 'org.ehcache', name: 'ehcache', version: '3.10.8'
+  implementation group: 'org.hibernate', name: 'hibernate-jcache', version: '6.6.6.Final', ext: 'pom'
+
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4
