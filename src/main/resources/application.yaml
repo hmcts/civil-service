@@ -557,6 +557,9 @@ feign:
 ---
 
 spring:
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
   config:
     activate:
       on-profile: local
