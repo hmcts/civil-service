@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -37,8 +37,8 @@ public class FeeVersionDto {
     private String siRefId;
     private String status;
     private String statutoryInstrument;
-    private OffsetDateTime validFrom;
-    private OffsetDateTime validTo;
+    private LocalDate validFrom;
+    private LocalDate validTo;
     private Integer version;
     private VolumeAmountDto volumeAmount;
 }
