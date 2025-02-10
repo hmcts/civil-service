@@ -2344,11 +2344,11 @@ public class EventHistoryMapper {
             .getLabel().startsWith("Both");
         String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
-        LocalDateTime eventDJCreated = LocalDateTime.now();
+        LocalDateTime eventDJCreatedDate = LocalDateTime.now();
         if (featureToggleService.isJOLiveFeedActive()
             && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
             miscTextGranted = RECORD_JUDGMENT;
-            eventDJCreated = caseData.getJoDJCreatedDate();
+            eventDJCreatedDate = caseData.getJoDJCreatedDate();
         }
 
         if (caseData.getDefendantDetailsSpec() != null) {
@@ -2356,7 +2356,7 @@ public class EventHistoryMapper {
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(eventDJCreated)
+                    .dateReceived(eventDJCreatedDate)
                     .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                     .eventDetails(EventDetails.builder()
                                       .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
