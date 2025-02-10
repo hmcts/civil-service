@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -25,19 +24,19 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings("unchecked")
 public class GenerateDJFormHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
-            CaseEvent.GENERATE_DJ_FORM,
-            CaseEvent.GENERATE_DJ_FORM_SPEC
+        CaseEvent.GENERATE_DJ_FORM,
+        CaseEvent.GENERATE_DJ_FORM_SPEC
     );
     private static final String TASK_ID = "GenerateDJForm";
     private static final String TASK_ID_SPEC = "GenerateDJFormSpec";
     private final AssignCategoryId assignCategoryId;
+
     private final DefaultJudgmentFormGenerator defaultJudgmentFormGenerator;
     private final ObjectMapper objectMapper;
 
@@ -58,22 +57,17 @@ public class GenerateDJFormHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        if (caseData.isLipvLipOneVOne()) {
-            log.info("Suppressing default judgment document generation for LIP v LIP case: {}",
-                    caseData.getCcdCaseReference());
-        } else {
-            if (!((caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
-                    && isSpecHandler(callbackParams))
-                    && (ofNullable(caseData.getRespondent2()).isPresent()
-                    && ((ofNullable(caseData.getDefendantDetails()).isPresent()
-                    && caseData.getDefendantDetails().getValue().getLabel().startsWith("Both"))
-                    || (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-                    && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")))
-                    || ofNullable(caseData.getRespondent2()).isEmpty())) {
-                buildDocument(callbackParams, caseDataBuilder);
-            }
+        if (!((caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
+            && isSpecHandler(callbackParams))
+            && (ofNullable(caseData.getRespondent2()).isPresent()
+            && ((ofNullable(caseData.getDefendantDetails()).isPresent()
+            && caseData.getDefendantDetails().getValue().getLabel().startsWith("Both"))
+            || (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")))
+            || ofNullable(caseData.getRespondent2()).isEmpty())) {
+            buildDocument(callbackParams, caseDataBuilder);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
