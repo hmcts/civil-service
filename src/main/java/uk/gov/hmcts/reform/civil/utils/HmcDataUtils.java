@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -34,13 +35,13 @@ import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.TELCVP;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
+@Slf4j
 public class HmcDataUtils {
 
     private HmcDataUtils() {
         // NO OP
     }
 
-    private static final String HEARING = "hearing";
     private static final int HOURS_PER_DAY = 6;
     private static final int MINUTES_PER_HOUR = 60;
 
@@ -190,7 +191,9 @@ public class HmcDataUtils {
      */
     public static String getTotalHearingDurationText(HearingGetResponse hearing) {
         Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+        String caseRef = hearing.getCaseDetails() != null ? hearing.getCaseDetails().getCaseRef() : "reference not available";
         if (totalDurationInMinutes == null) {
+            log.info("Total Duration In Minutes from Hmc handler is null for caseId {}", caseRef);
             return null;
         }
 
@@ -199,8 +202,9 @@ public class HmcDataUtils {
         int days = (int)Math.floor(totalDurationInHours / HOURS_PER_DAY);
         int hours = (int)(totalDurationInHours - (days * HOURS_PER_DAY));
         int minutes = (int)(totalDurationInMinutes - (totalDurationInHours * MINUTES_PER_HOUR));
-
-        return daysHoursMinutesFormat(days, hours, minutes);
+        String hearingDurationText = daysHoursMinutesFormat(days, hours, minutes);
+        log.info("Total hearing duration from Hmc handler: {} for caseId {}", hearingDurationText, caseRef);
+        return hearingDurationText;
     }
 
     /**

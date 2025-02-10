@@ -366,7 +366,7 @@ public class EventHistoryMapper {
         return Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
-            .dateReceived(LocalDateTime.now())
+            .dateReceived(getDateOfDjCreated(caseData))
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder()
@@ -383,11 +383,17 @@ public class EventHistoryMapper {
                                                      : ZERO)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
-                              .dateOfJudgment(LocalDateTime.now())
+                              .dateOfJudgment(getDateOfDjCreated(caseData))
                               .jointJudgment(caseData.getRespondent2() != null)
                               .judgmentToBeRegistered(false)
                               .build())
             .build();
+    }
+
+    private LocalDateTime getDateOfDjCreated(CaseData caseData) {
+        return featureToggleService.isJOLiveFeedActive() && Objects.nonNull(caseData.getJoDJCreatedDate())
+            ? caseData.getJoDJCreatedDate()
+            : LocalDateTime.now();
     }
 
     private BigDecimal getInstallmentAmount(String amount) {
@@ -2058,7 +2064,7 @@ public class EventHistoryMapper {
                                            .build()
             );
             buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent1ResponseDate());
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
@@ -2092,9 +2098,9 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             final Party respondent1 = caseData.getRespondent1();
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
                 && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
@@ -2507,6 +2513,22 @@ public class EventHistoryMapper {
             applicant1ResponseDate = LocalDateTime.now();
         }
         return applicant1ResponseDate;
+    }
+
+    private void buildMiscellaneousForRespondentResponseLipVSLr(EventHistory.EventHistoryBuilder builder,
+                                                                CaseData caseData) {
+        if (caseData.isLipvLROneVOne()) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText("RPA Reason: LiP vs LR - full/part admission received.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: LiP vs LR - full/part admission received.")
+                                      .build())
+                    .build());
+        }
     }
 
     private LocalDate getCoscDate(CaseData caseData) {
