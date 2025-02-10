@@ -24,6 +24,7 @@ import static java.util.Objects.nonNull;
 @Service
 @Slf4j
 @Transactional
+@SuppressWarnings("deprecation")
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
@@ -81,14 +82,17 @@ public class DashboardNotificationService {
 
         DashboardNotificationsEntity updated = notification;
         if (existingNotification.isPresent()) {
+            log.info("Existing notification present reference = {}, id = {}", notification.getReference(), existingNotification.get().getId());
             updated = notification.toBuilder().id(existingNotification.get().getId()).build();
             notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(),
                                                                                          clickAction
             );
+            log.info("Existing notification deleted reference = {}, id = {}", notification.getReference(), existingNotification.get().getId());
+        } else {
+            log.info("Existing notification not present reference = {}", notification.getReference());
         }
 
         return dashboardNotificationsRepository.save(updated);
-
     }
 
     public void deleteById(UUID id) {

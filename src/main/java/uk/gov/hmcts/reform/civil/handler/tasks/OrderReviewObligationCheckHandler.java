@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.search.OrderReviewObligationSearchService;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         if (featureToggleService.isCaseEventsEnabled()) {
-            List<CaseDetails> cases = caseSearchService.getCases();
+            Set<CaseDetails> cases = caseSearchService.getCases();
             log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
             cases.forEach(caseDetails -> {
