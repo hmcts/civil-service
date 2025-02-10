@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.NoDefendantResponseTransitionBuilder.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.NoDefendantResponseTransitionBuilder.takenOfflineByStaffAfterNoResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,6 +64,28 @@ public class NoDefendantResponseTransitionBuilderTest {
             .build();
 
         assertTrue(takenOfflineByStaffAfterNoResponse.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenNotCaseDismissedAfterDetailNotifiedExtension() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(null)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .claimDismissedDeadline(LocalDateTime.now().plusDays(1))
+            .build();
+
+        assertFalse(caseDismissedAfterDetailNotifiedExtension.test(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseDismissedAfterDetailNotifiedExtension() {
+        CaseData caseData = CaseData.builder()
+            .respondent1ResponseDate(null)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .claimDismissedDeadline(LocalDateTime.now())
+            .build();
+
+        assertTrue(caseDismissedAfterDetailNotifiedExtension.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
