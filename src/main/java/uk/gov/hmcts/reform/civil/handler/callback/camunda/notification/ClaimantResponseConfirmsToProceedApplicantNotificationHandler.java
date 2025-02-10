@@ -70,14 +70,14 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     }
 
     private String getEmailTemplate(CaseData caseData) {
-        if (isBilingualForLipvsLip(caseData)) {
+        if (isBilingualForLipApplicant(caseData)) {
             return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
         }
         return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
     }
 
-    private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+    private boolean isBilingualForLipApplicant(CaseData caseData) {
+        return caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()
             && caseData.isClaimantBilingual();
     }
 
