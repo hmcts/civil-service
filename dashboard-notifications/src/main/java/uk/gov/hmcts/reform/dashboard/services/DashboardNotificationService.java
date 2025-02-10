@@ -24,6 +24,7 @@ import static java.util.Objects.nonNull;
 @Service
 @Slf4j
 @Transactional
+@SuppressWarnings("deprecation")
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;

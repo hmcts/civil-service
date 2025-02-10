@@ -134,7 +134,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
                 AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)

@@ -287,6 +287,7 @@ notifications:
   respondentDeadlineExtensionWelsh: "5fb6d574-e1b8-42bc-9d97-fcd8042f36d3"
   claimantDeadlineExtension: "f4313f23-e3a5-4a27-ad3b-bbef691489d8"
   claimantLipDeadlineExtension: "77cc47b1-4a9a-4baf-9313-98542698d32a"
+  claimantLipDeadlineExtensionWelsh: "4ad7ff45-d139-4e30-8251-729a7320ebb8"
   respondentChangeOfAddressNotificationTemplate: "c78090fa-f86c-4231-b808-470dab9abf31"
   respondentLipFullAdmitOrPartAdmitTemplate: "81caadd5-40ef-4c4c-8fb4-0d2af0e2a8e1"
   respondentLipFullDefenceWithMediationTemplate: "31ac1f84-8c40-4636-862b-47cc8ef64716"

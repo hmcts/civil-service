@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -41,6 +42,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .applicant1Represented(YesOrNo.NO)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
@@ -63,10 +65,39 @@ class NotifyApplicant1GenericTemplateHandlerTest {
     }
 
     @Test
+    void shouldSendGenericEmailWhenAllDataIsCorrectAndNotBilingual_SolicitorAfterNoC() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@claimant.net").build())
+            .applicant1Represented(YesOrNo.YES)
+            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                            .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
+                             .type(Party.Type.INDIVIDUAL).build()).build();
+
+        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
+            TEMPLATE_ID);
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+        handler.handle(params);
+
+        verify(notificationService).sendMail(
+            "solicitor@claimant.net",
+            TEMPLATE_ID,
+            getNotificationDataMap(caseData),
+            "generic-notification-lip-000DC001"
+        );
+
+    }
+
+    @Test
     void shouldSendGenericEmailWhenAllDataIsCorrectAndBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .applicant1Represented(YesOrNo.NO)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")

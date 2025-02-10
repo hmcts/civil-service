@@ -434,6 +434,9 @@ public class NotificationsProperties {
     private String claimantLipDeadlineExtension;
 
     @NotEmpty
+    private String claimantLipDeadlineExtensionWelsh;
+
+    @NotEmpty
     private String notifyClaimantLipTemplateManualDetermination;
 
     @NotEmpty
