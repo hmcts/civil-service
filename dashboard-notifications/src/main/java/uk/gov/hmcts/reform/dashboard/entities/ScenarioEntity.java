@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -19,6 +23,9 @@ import java.util.Map;
 @lombok.AllArgsConstructor
 @Entity
 @Table(name = "scenario", schema = "dbs")
+@Immutable
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class ScenarioEntity implements Serializable {
 
     private static final long serialVersionUID = -3567298611275939014L;

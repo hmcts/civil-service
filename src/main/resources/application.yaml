@@ -677,6 +677,15 @@ spring:
         show_sql: false
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        javax:
+          cache:
+            uri: ehcache.xml
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
   flyway:
     enabled: true
     baselineOnMigrate: true
