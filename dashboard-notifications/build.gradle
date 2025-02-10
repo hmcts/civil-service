@@ -19,6 +19,8 @@ ext.libraries = [
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.6.15.Final'
+  implementation group: 'org.ehcache', name: 'ehcache', version: '3.10.8'
+  implementation 'org.hibernate:hibernate-jcache:5.6.15.Final'
   implementation group: 'org.hibernate', name: 'hibernate-validator', version: '7.0.5.Final'
   implementation group: 'javax.persistence', name: 'javax.persistence-api', version: 2.2
   implementation 'jakarta.inject:jakarta.inject-api:2.0.1'

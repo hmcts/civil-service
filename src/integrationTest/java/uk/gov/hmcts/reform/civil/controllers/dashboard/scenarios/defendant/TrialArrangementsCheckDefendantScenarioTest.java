@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.TrialReadyCheckDefendantNotificationHandler;
@@ -19,6 +20,7 @@ public class TrialArrangementsCheckDefendantScenarioTest extends CaseProgression
     private TrialReadyCheckDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_close_defendant_trial_arrangements_when_trial_arrangements_not_finalised() throws Exception {
 
         String caseId = "10002348";
@@ -53,6 +55,7 @@ public class TrialArrangementsCheckDefendantScenarioTest extends CaseProgression
     }
 
     @Test
+    @DirtiesContext
     void should_not_do_anything_for_defendant_when_trial_arrangements_finalised() throws Exception {
 
         String caseId = "10002348";
@@ -82,6 +85,7 @@ public class TrialArrangementsCheckDefendantScenarioTest extends CaseProgression
     }
 
     @Test
+    @DirtiesContext
     void should_not_do_anything_for_defendant_when_small_claims() throws Exception {
 
         String caseId = "10002348";

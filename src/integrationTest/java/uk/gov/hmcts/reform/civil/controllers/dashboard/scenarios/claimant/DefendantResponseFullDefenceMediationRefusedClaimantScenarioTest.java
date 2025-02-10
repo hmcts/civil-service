@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -26,6 +27,7 @@ public class DefendantResponseFullDefenceMediationRefusedClaimantScenarioTest ex
     private DefendantResponseClaimantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_full_defence_mediation_refused_response_scenario() throws Exception {
 
         String caseId = "11234949493";

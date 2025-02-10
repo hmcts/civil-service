@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.RecordJudgementDefendantNotificationHandler;
@@ -19,6 +20,7 @@ public class DefendantRecordJudgementScenarioTest extends  DashboardBaseIntegrat
     private RecordJudgementDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_record_judgement() throws Exception {
 
         CaseData caseData = CaseDataBuilder.builder()

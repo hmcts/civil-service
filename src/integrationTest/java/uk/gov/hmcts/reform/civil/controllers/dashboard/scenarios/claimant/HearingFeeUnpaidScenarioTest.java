@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -32,6 +33,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void should_create_hearing_fee_unpaid_scenario() throws Exception {
 
         String caseId = "14323241";
@@ -81,6 +83,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void should_create_hearing_fee_unpaid_scenario_without_trial_arrangements_when_small_claims() throws Exception {
 
         String caseId = "14323240";
@@ -124,6 +127,7 @@ public class HearingFeeUnpaidScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void should_create_hearing_fee_unpaid_trial_ready_scenario() throws Exception {
 
         String caseId = "14323242";

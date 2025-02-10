@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.GenerateDashboardNotificationClaimFeeRequiredHandler;
@@ -24,6 +25,7 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
     private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_claim_fee_required_small_claims() throws Exception {
 
         String caseId = "12301";
@@ -95,6 +97,7 @@ public class ClaimFeeRequiredScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_claim_fee_required_fast_track() throws Exception {
 
         String caseId = "12303";

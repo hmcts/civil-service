@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
@@ -25,6 +26,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnHttp200() {
         ServiceHearingValuesModel expectedHearingValues =
             ServiceHearingValuesModel.builder().publicCaseName("mock case name").build();
@@ -41,6 +43,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnHttp400_whenCaseNotFoundExceptionThrown() {
         when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenThrow(CaseNotFoundException.class);
@@ -53,6 +56,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnHttp404_whenPartyIdsUpdatedExceptionThrown() {
         when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenThrow(MissingFieldsUpdatedException.class);

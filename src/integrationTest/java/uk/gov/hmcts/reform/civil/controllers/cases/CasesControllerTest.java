@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -128,6 +129,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnHttp200() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
 
@@ -140,6 +142,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnRASAssignment() {
         var rasResponse = RoleAssignmentServiceResponse
             .builder()
@@ -162,6 +165,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnListOfCasesHttp200() {
         SearchResult expectedCaseDetails = SearchResult.builder()
             .total(1)
@@ -187,6 +191,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnClaimsForClaimantSuccessfully() {
         var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
         when(dashboardClaimInfoService.getDashboardClaimantResponse(any(), any(), eq(1))).thenReturn(dashBoardResponse);
@@ -197,6 +202,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnClaimsForDefendantSuccessfully() {
         var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
         when(dashboardClaimInfoService.getDashboardDefendantResponse(
@@ -211,6 +217,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldSubmitEventSuccessfully() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
         when(caseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
@@ -226,6 +233,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldCalculateDeadlineSuccessfully() {
         LocalDate extensionDate = LocalDate.of(2022, 6, 6);
         when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).thenReturn(extensionDate);
@@ -240,6 +248,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnDeadlineExtensionAgreedDate() {
         LocalDate agreedDate = LocalDate.of(2023, 4, 22);
         when(coreCaseDataService.getAgreedDeadlineResponseDate(any(), any())).thenReturn(agreedDate);
@@ -250,6 +259,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldSubmitEventSuccessfullyForCaseWorker() {
         CaseDetails caseDetails = CaseDetails.builder().build();
         CaseData caseData = CaseData.builder().ccdCaseReference(1990L).build();
@@ -270,6 +280,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldNotSubmitEventSuccessfullyForisUnauthorizedCaseWorker() {
         doPost(
             "invalid token",
@@ -284,6 +295,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldThrowUnprocessableEntityExceptionCaseWorkerSubmit() {
         when(caseworkerCaseEventService.submitEventForNewClaimCaseWorker(any()))
             .thenThrow(CaseDataInvalidException.class);
@@ -304,6 +316,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseExists() {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Arrays.asList(caseDetails));
@@ -322,6 +335,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseNotExists() {
 
         when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Lists.newArrayList());
@@ -340,6 +354,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldValidatePostCodeSuccessfullyWhenInEnglandOrWales() {
 
         when(postcodeValidator.validate(any())).thenReturn(Lists.newArrayList());
@@ -354,6 +369,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldValidatePostCodeAndSendErrorsWhenNotInEnglandOrWales() {
 
         when(postcodeValidator.validate(any())).thenReturn(
@@ -370,6 +386,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldGetUserInfoSuccessfully() {
         List<String> expectedRoles = List.of("role1", "role2");
         when(userInformationService.getUserCaseRoles(anyString(), anyString()))
@@ -387,6 +404,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldThrowNotFoundExceptionWhenGetUserInfo() {
         when(userInformationService.getUserCaseRoles(anyString(), anyString()))
             .thenThrow(CaseNotFoundException.class);
@@ -404,6 +422,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldThrowUserNotFoundOnCaseExceptionWhenRolesIsEmpty() {
         when(userInformationService.getUserCaseRoles(anyString(), anyString()))
             .thenThrow(new UserNotFoundOnCaseException("111"));
@@ -421,6 +440,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnDecisionMadeForTheClaimantRepaymentPlan() {
         //Given
         given(repaymentPlanDecisionService.getCalculatedDecision(any(), any())).willReturn(IN_FAVOUR_OF_CLAIMANT);

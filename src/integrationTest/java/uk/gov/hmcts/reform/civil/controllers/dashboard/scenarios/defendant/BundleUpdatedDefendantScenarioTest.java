@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -27,6 +28,7 @@ public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboard
     private BundleUpdatedDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_bundle_update_scenario() throws Exception {
         CaseData caseData = createCaseData(YesOrNo.NO, false);
         handler.handle(callbackParams(caseData));
@@ -35,6 +37,7 @@ public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboard
     }
 
     @Test
+    @DirtiesContext
     void should_create_trial_ready_bundle_update_scenario() throws Exception {
         CaseData caseData = createCaseData(YesOrNo.NO, true);
         handler.handle(callbackParams(caseData));
@@ -43,6 +46,7 @@ public class BundleUpdatedDefendantScenarioTest extends CaseProgressionDashboard
     }
 
     @Test
+    @DirtiesContext
     void should_not_create_bundle_updated_scenario() throws Exception {
         CaseData caseData = createCaseData(YesOrNo.YES, false);
         handler.handle(callbackParams(caseData));

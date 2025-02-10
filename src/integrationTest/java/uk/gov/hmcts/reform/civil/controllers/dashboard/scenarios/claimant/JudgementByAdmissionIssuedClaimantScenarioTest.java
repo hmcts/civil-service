@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.JudgementByAdmissionIssuedClaimantDashboardNotificationHandler;
@@ -30,6 +31,7 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
     private JudgementByAdmissionIssuedClaimantDashboardNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_scenario_jo_notification_for_claimant() throws Exception {
 
         String caseId = "6532987";
@@ -61,6 +63,7 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
     }
 
     @Test
+    @DirtiesContext
     void shouldUpdateJudgmentByAdmissionTaskList() throws Exception {
 
         String caseId = "720165773";

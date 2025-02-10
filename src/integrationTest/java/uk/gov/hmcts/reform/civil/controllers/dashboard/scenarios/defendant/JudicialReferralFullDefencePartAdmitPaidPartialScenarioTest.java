@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -23,6 +24,7 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
     private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_judicial_referral_full_defence_or_part_admit_paid_partial_amount() throws Exception {
 
         String caseId = "90123456782";

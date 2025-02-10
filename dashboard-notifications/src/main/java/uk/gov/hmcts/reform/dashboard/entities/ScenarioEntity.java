@@ -5,8 +5,8 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
+import org.springframework.cache.annotation.Cacheable;
 
-import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,7 +24,6 @@ import java.util.Map;
 @Entity
 @Table(name = "scenario", schema = "dbs")
 @Immutable
-@Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 public class ScenarioEntity implements Serializable {
 

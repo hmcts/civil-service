@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -40,6 +41,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnClaimFee() {
         Fee response = buildFeeResponse();
         when(feesService.getFeeDataByTotalClaimAmount(new BigDecimal("7000"))).thenReturn(response);
@@ -50,6 +52,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnHearingFee() {
         Fee response = buildFeeResponse();
         when(feesService.getHearingFeeDataByTotalClaimAmount(new BigDecimal("7000"))).thenReturn(response);
@@ -60,6 +63,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnGeneralApplicationFee() {
         Fee response = buildFeeResponse();
         when(gaFeesService.getFeeForGALiP(List.of(GeneralApplicationTypes.EXTEND_TIME), true, false, null)).thenReturn(
@@ -78,6 +82,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void shouldReturnFeeRanges() {
         Fee2Dto[] response = buildFeeRangeResponse();
         when(feesService.getFeeRange()).thenReturn(List.of(response));

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -36,6 +37,7 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
     private OrderMadeClaimantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_order_made_claimant_scenario() throws Exception {
 
         String caseId = "72014112265";

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -26,6 +27,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
     private CCJRequestedDashboardNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_ccj_requested_scenario() throws Exception {
 
         String caseId = "12345678";
@@ -97,6 +99,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void should_create_ccj_requested_scenario_duringClaimant_intention() throws Exception {
 
         String caseId = "1234445678";

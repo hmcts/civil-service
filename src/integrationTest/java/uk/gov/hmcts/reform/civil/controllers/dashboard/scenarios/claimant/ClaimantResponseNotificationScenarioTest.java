@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -21,6 +22,7 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
     private ClaimantResponseNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void shouldCreateNotification_forClaimantWhenClaimantProceedsCarm() throws Exception {
         String caseId = "901234567891";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
@@ -55,6 +57,7 @@ public class ClaimantResponseNotificationScenarioTest extends DashboardBaseInteg
     }
 
     @Test
+    @DirtiesContext
     void shouldCreateNotification_forClaimantWhenClaimantProceeds() throws Exception {
         String caseId = "901234567892";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()

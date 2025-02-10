@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
@@ -31,6 +32,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
     private MediationUnsuccessfulDashboardNotificationDefendantHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_mediation_unsuccessful_scenario() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
@@ -61,6 +63,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
     }
 
     @Test
+    @DirtiesContext
     void should_create_mediation_unsuccessful_scenario_for_carm_mediator_select_other_options() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
@@ -97,6 +100,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
     }
 
     @Test
+    @DirtiesContext
     void should_create_mediation_unsuccessful_scenario_for_carm_defendant_not_contactable() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
@@ -133,6 +137,7 @@ public class ClaimantIntentMediationUnsuccesfulDefendantScenarioTest extends Das
     }
 
     @Test
+    @DirtiesContext
     void should_create_mediation_unsuccessful_scenario_for_carm_claimant_not_contactable() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 

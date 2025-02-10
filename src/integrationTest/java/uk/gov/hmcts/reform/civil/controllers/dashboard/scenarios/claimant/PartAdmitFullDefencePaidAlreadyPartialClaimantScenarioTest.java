@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -30,6 +31,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
     private DefendantResponseClaimantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_full_defence_pay_already_partial_claimant_scenario() throws Exception {
 
         String caseId = "12345673";
@@ -81,6 +83,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
     }
 
     @Test
+    @DirtiesContext
     void should_create_part_admit_pay_already_partial_claimant_scenario() throws Exception {
 
         String caseId = "12345674";

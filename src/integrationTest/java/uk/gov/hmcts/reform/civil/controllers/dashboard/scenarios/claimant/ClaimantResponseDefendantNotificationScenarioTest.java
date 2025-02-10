@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -30,6 +31,7 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
     private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void shouldCreateNotification_forDefendantWhenClaimantProceedsCarm() throws Exception {
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
@@ -64,6 +66,7 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
     }
 
     @Test
+    @DirtiesContext
     void shouldCreateNotification_forDefendantWhenClaimantProceeds() throws Exception {
         String caseId = String.valueOf(System.currentTimeMillis());
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
@@ -104,6 +107,7 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
     }
 
     @Test
+    @DirtiesContext
     void shouldCreateNotification_forDefendantWhenLRvLipFullAdmitPayImmediately() throws Exception {
         String caseId = String.valueOf(System.currentTimeMillis());
         LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);

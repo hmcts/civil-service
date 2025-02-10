@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
@@ -32,6 +33,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
     private CoreCaseDataService coreCaseDataService;
 
     @Test
+    @DirtiesContext
     void should_create_full_admit_pay_immediately_no_payment_scenario() throws Exception {
         String caseId = "1234678912136";
         LocalDate whenWillThisAmountBePaid = LocalDate.now().plusDays(5);

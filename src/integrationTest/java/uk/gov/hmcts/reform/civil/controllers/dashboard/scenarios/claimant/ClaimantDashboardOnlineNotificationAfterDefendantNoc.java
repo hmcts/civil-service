@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
@@ -25,6 +26,7 @@ public class ClaimantDashboardOnlineNotificationAfterDefendantNoc extends Dashbo
     private ClaimantNocOnlineDashboardNotificationHandler claimantNocOnlineDashboardNotificationHandler;
 
     @Test
+    @DirtiesContext
     void should_create_online_notification_after_defendant_noc() throws Exception {
         String caseId = "15673456";
         //Given

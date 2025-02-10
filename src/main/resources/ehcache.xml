@@ -1,6 +1,0 @@
-<ehcache>
-  <cache name="scenario"
-         maxEntriesLocalHeap="1000"
-         timeToLiveSeconds="3600"
-         memoryStoreEvictionPolicy="LRU"/>
-</ehcache>

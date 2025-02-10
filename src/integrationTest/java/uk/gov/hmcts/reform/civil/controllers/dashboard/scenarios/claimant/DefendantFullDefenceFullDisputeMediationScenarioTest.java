@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -26,6 +27,7 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
     private DefendantResponseClaimantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_full_defence_pay_already_partial_claimant_scenario() throws Exception {
 
         String caseId = "13165";

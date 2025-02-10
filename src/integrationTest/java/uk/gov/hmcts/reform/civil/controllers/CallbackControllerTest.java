@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 
@@ -36,6 +37,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnNotFoundWhenCallbackHandlerIsNotImplemented() {
         doPost(BEARER_TOKEN, callbackRequest, CALLBACK_URL, "invalid-callback-type")
             .andExpect(status().isNotFound());
@@ -43,6 +45,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnOkWithValidCallbackType() {
         doPost(BEARER_TOKEN, callbackRequest, CALLBACK_URL, VALID_CALLBACK_TYPE2)
             .andExpect(status().isOk());
@@ -50,6 +53,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnOkWithValidCallbackTypeAndPageId() {
         doPost(BEARER_TOKEN, callbackRequest, CALLBACK_PAGE_ID_URL, VALID_CALLBACK_TYPE, VALID_PAGE_ID)
             .andExpect(status().isOk());
@@ -57,6 +61,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnNotFoundWithInvalidCallbackTypeButValidPage() {
         doPost(BEARER_TOKEN, callbackRequest, CALLBACK_PAGE_ID_URL, INVALID_CALLBACK_TYPE, VALID_PAGE_ID)
             .andExpect(status().isNotFound());

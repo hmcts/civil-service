@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimantResponseDefendantNotificationHandler;
@@ -21,6 +22,7 @@ public class ClaimantRejectsRepaymentCourtPlanDefendantScenarioTest extends Dash
     private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_reject_repayment_court_plan_for_defendant() throws Exception {
 
         String caseId = "1674364636586679";

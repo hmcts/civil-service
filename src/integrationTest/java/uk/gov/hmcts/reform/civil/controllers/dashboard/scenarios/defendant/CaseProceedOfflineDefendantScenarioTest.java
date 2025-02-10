@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -22,6 +23,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
     private CaseProceedOfflineDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_case_proceed_offline_defendant_scenario() throws Exception {
 
         String caseId = "72016577145";
@@ -63,6 +65,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
     }
 
     @Test
+    @DirtiesContext
     void should_create_case_proceed_offline__claimant_scenario_without_tasks() throws Exception {
 
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
@@ -101,6 +104,7 @@ public class CaseProceedOfflineDefendantScenarioTest extends DashboardBaseIntegr
     }
 
     @Test
+    @DirtiesContext
     void shouldUpdateCaseProceedOffLineTaskList() throws Exception {
 
         when(featureToggleService.isCoSCEnabled()).thenReturn(true);

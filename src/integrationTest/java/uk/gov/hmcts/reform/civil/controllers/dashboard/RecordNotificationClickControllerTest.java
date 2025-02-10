@@ -51,6 +51,7 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
 
         doDelete("", null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
@@ -59,6 +60,7 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
 
         doDelete(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, "126")

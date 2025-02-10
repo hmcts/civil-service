@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -26,6 +27,7 @@ public class UploadHearingDocumentsClaimantScenarioTest extends DashboardBaseInt
     private UploadHearingDocumentsClaimantHandler handler;
 
     @Test
+    @DirtiesContext
     void shouldCreateUploadDocumentCaseProgresionScenario() throws Exception {
 
         String caseId = "12345188432991";

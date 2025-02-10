@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -32,6 +33,7 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
     }
 
     @Test
+    @DirtiesContext
     void shouldCreateAddTrialArrangementsForClaimant() throws Exception {
 
         String caseId = "1234987";

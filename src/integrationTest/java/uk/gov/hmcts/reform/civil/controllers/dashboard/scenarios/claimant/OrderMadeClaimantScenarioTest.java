@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -45,6 +46,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
         .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
     @Test
+    @DirtiesContext
     void should_create_order_made_claimant_scenario() throws Exception {
 
         String caseId = "72014545415";
@@ -81,6 +83,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
     }
 
     @Test
+    @DirtiesContext
     void should_create_order_made_claimant_scenario_mediation_unsuccessful_sdo_carm() throws Exception {
 
         String caseId = "72014545415";
@@ -120,6 +123,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
     }
 
     @Test
+    @DirtiesContext
     void should_create_order_made_claimant_scenario_pre_cp_release() throws Exception {
 
         String caseId = "72014545415";
@@ -156,6 +160,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
     }
 
     @Test
+    @DirtiesContext
     void should_create_order_made_claimant_all_orders_issued_scenario() throws Exception {
 
         String caseId = "72014545415332";
@@ -200,6 +205,7 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
     }
 
     @Test
+    @DirtiesContext
     void should_create_order_made_claimant_all_orders_issued_fast_track_not_ready_trial_scenario() throws Exception {
 
         String caseId = "7201458805332";

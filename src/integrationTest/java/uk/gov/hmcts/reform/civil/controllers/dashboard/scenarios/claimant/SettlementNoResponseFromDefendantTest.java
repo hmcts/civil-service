@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
@@ -34,6 +35,7 @@ public class SettlementNoResponseFromDefendantTest extends DashboardBaseIntegrat
     private CoreCaseDataService coreCaseDataService;
 
     @Test
+    @DirtiesContext
     void should_create_settlement_no_response_from_defendant() throws Exception {
 
         String caseId = "10002349";

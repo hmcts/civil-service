@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -24,6 +25,7 @@ public class HearingFeeUnpaidScenarioTest extends CaseProgressionDashboardBaseIn
     private HearingFeeUnpaidDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_hearing_fee_unpaid_scenario_fast_track() throws Exception {
 
         String caseId = "14323241";
@@ -72,6 +74,7 @@ public class HearingFeeUnpaidScenarioTest extends CaseProgressionDashboardBaseIn
     }
 
     @Test
+    @DirtiesContext
     void should_create_hearing_fee_unpaid_small_claims_scenario() throws Exception {
 
         String caseId = "14323238";
@@ -113,6 +116,7 @@ public class HearingFeeUnpaidScenarioTest extends CaseProgressionDashboardBaseIn
     }
 
     @Test
+    @DirtiesContext
     void should_create_hearing_fee_unpaid_trial_ready_fast_track_scenario() throws Exception {
 
         String caseId = "15323241";

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,6 +15,7 @@ public class GetWelcomeTest extends BaseIntegrationTest {
     @DisplayName("Should welcome upon root request with 200 response code")
     @Test
     @SneakyThrows
+    @DirtiesContext
     public void welcomeRootEndpoint() {
         MvcResult response = mockMvc.perform(get("/")).andExpect(status().isOk()).andReturn();
 

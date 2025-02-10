@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
@@ -30,6 +31,7 @@ public class HearingScheduledDefendantScenarioTest extends CaseProgressionDashbo
     private HearingScheduledDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_hearing_scheduled_scenario() throws Exception {
 
         List<LocationRefData> locations = new ArrayList<>();

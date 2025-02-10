@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.ClaimIssueNotificationsHandler;
@@ -31,6 +32,7 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
     private OffsetDateTime time;
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_claim_issue_small_claims() throws Exception {
 
         String caseId = "12303";
@@ -109,6 +111,7 @@ public class ClaimIssuedScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_claim_issue_fast_track() throws Exception {
 
         String caseId = "12303";

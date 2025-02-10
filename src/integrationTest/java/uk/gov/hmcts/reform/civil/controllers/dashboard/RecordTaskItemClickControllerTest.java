@@ -31,6 +31,7 @@ public class RecordTaskItemClickControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnOkWithTaskItemStatusChangedWhenTaskItemClickRecorded() {
 
         TaskListEntity taskListEntity = taskListRepository.findById(TASK_ITEM_IDENTIFIER).get();

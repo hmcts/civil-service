@@ -1,3 +1,15 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        javax:
+          cache:
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+        cache:
+          use_second_level_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
+
 idam:
   test:
     username: ${TEST_WA_LAW_FIRM_USERNAME:some_user@hmcts.net}

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.applicant;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -23,6 +24,8 @@ public class GeneralAppSubmittedScenarioTest extends BaseIntegrationTest {
     private static final String UPDATE_DASHBOARD_NOTIFICATION = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
 
     @Test
+    @DirtiesContext
+
     void should_create_scenario_for_general_application_submitted() throws Exception {
 
         UUID caseId = UUID.randomUUID();

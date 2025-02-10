@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -30,6 +31,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
     @Test
     @Sql("/scripts/dashboardNotifications/create_dashboard_scenarios.sql")
+    @DirtiesContext
     void should_create_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
@@ -70,6 +72,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_claim_fee_required() throws Exception {
 
         UUID caseId = UUID.randomUUID();

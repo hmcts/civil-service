@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -24,6 +25,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
     private DefendantNocDashboardNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void shouldCreateNotificationForDefendantNoc() throws Exception {
         String caseId = "323491";
         CaseData caseData = buildCaseData(caseId);
@@ -35,6 +37,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void shouldUpdateTrialArrangementsTaskList() throws Exception {
         String caseId = "323491";
         CaseData caseData = buildCaseDataWithTrialArrangements(caseId);
@@ -45,6 +48,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void shouldUpdateHearingFeeTaskList() throws Exception {
         String caseId = "323491";
         CaseData caseData = buildCaseDataWithHearingFee(caseId);

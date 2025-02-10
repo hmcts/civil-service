@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.CCJRequestedDashboardNotificationDefendantHandler;
@@ -24,6 +25,7 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
     private CCJRequestedDashboardNotificationDefendantHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_upon_ccj_request_for_broken_settlement_for_accepted_repayment() throws Exception {
 
         String caseId = "1674364636586678";
@@ -67,6 +69,7 @@ public class CCJRequestForBrokenSettlementAgreementScenarioTest extends Dashboar
     }
 
     @Test
+    @DirtiesContext
     void should_create_upon_ccj_request_for_broken_settlement_for_rejected_repayment() throws Exception {
 
         String caseId = "1674364636586678";

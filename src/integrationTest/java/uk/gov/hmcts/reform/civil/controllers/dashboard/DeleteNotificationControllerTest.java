@@ -42,6 +42,7 @@ public class DeleteNotificationControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
 
         doDelete("", null, END_POINT_URL, NOTIFICATION_IDENTIFIER.toString())
@@ -50,6 +51,7 @@ public class DeleteNotificationControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
 
         doDelete(BEARER_TOKEN, null, END_POINT_URL, "126")

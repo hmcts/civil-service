@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantCCJResponseNotificationHandler;
@@ -18,6 +19,7 @@ public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseInteg
     private ClaimantCCJResponseNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_claimant_requested_judgment_by_admission() throws Exception {
         String caseId = "4567";
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -24,6 +25,7 @@ public class EvidenceUploadedDefendantScenarioTest extends DashboardBaseIntegrat
     private EvidenceUploadedDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_enable_view_documents_task_list_when_defendant_uploads_document_scenario() throws Exception {
 
         String caseId = "14323241";
@@ -60,6 +62,7 @@ public class EvidenceUploadedDefendantScenarioTest extends DashboardBaseIntegrat
     }
 
     @Test
+    @DirtiesContext
     void should_enable_view_documents_task_list_when_claimant_uploads_document_scenario() throws Exception {
 
         String caseId = "14323241";

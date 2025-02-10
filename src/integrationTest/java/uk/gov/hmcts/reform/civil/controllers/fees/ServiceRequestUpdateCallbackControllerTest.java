@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -56,12 +57,14 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void whenValidPaymentCallbackIsReceivedReturnSuccess() throws Exception {
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isOk());
     }
 
     @Test
+    @DirtiesContext
     public void whenPaymentCallbackIsReceivedWithoutServiceAuthorisationReturn400() throws Exception {
         mockMvc.perform(
             MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
@@ -70,6 +73,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
         when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
         mockMvc.perform(
@@ -80,6 +84,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void whenInvalidTypeOfRequestMade_ReturnMethodNotAllowed() throws Exception {
 
         doPost(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
@@ -87,6 +92,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     public void whenServiceRequestUpdateRequestAndEverythingIsOk_thenHttp2xx() throws Exception {
         // Given: an existing case in CCD
 

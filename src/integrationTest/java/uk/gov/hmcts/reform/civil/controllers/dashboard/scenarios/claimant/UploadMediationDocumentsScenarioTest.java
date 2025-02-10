@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
@@ -25,6 +26,7 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
     private CuiUploadMediationDocumentsCallbackHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_upload_mediation_scenario_for_carm_claimant_as_applicant_solicitor_one() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(coreCaseUserService.getUserCaseRoles(any(), any()))
@@ -61,6 +63,7 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
     }
 
     @Test
+    @DirtiesContext
     void should_create_upload_mediation_scenario_for_carm_claimant_as_claimant() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         when(coreCaseUserService.getUserCaseRoles(any(), any()))

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -29,6 +30,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
     private DefendantResponseDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_part_admit_pay_instalment_company_organisation_scenario() throws Exception {
 
         String caseId = "12345671";
@@ -92,6 +94,7 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
     }
 
     @Test
+    @DirtiesContext
     void should_create_full_admit_pay_instalment_company_organisation_scenario() throws Exception {
 
         String caseId = "12345672";

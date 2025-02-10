@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -21,6 +22,7 @@ public class HelpWithFeeDashboardNoticeHandlerIntegrationTest  extends CaseProgr
     private HelpWithFeeDashboardNoticeHandler handler;
 
     @Test
+    @DirtiesContext
     void shouldCreateNotificationScenario() throws Exception {
 
         String caseId = "12345188432991";

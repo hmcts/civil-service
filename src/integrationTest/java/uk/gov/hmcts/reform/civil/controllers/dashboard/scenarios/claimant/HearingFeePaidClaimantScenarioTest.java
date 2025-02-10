@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -23,6 +24,7 @@ public class HearingFeePaidClaimantScenarioTest extends CaseProgressionDashboard
     private HearingFeePaidClaimantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_fee_payment_outcome_scenario_when_payment_via_phone() throws Exception {
         String caseId = "7834212";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().applicant1Represented((YesOrNo.NO)).build()
@@ -60,6 +62,7 @@ public class HearingFeePaidClaimantScenarioTest extends CaseProgressionDashboard
     }
 
     @Test
+    @DirtiesContext
     void should_create_fee_payment_outcome_scenario_when_payment_via_gov_pay() throws Exception {
         String caseId = "7834212";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().applicant1Represented((YesOrNo.NO)).build()

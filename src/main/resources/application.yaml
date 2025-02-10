@@ -26,8 +26,6 @@ spring:
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
-    jcache:
-      config: classpath:ehcache.xml
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
@@ -38,11 +36,9 @@ spring:
       hibernate:
         javax:
           cache:
-            uri: ehcache.xml
             provider: org.ehcache.jsr107.EhcacheCachingProvider
         cache:
           use_second_level_cache: true
-          use_query_cache: true
           region:
             factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
 
@@ -672,8 +668,6 @@ spring:
   config:
     activate:
       on-profile: integration-test
-  jcache:
-    config: classpath:ehcache.xml
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:15://localhost/cmc

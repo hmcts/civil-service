@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.generalapplica
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -22,6 +23,7 @@ public class OtherPartyUploadedDocumentTest extends BaseIntegrationTest {
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_applicant_when_other_party_uploaded_document() throws Exception {
 
         UUID caseId = UUID.randomUUID();

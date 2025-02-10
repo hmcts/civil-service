@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -21,6 +22,7 @@ public class BundleCreationClaimantScenarioTest extends CaseProgressionDashboard
     private BundleCreationClaimantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_bundle_created_scenario() throws Exception {
         String caseId = "12325480";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()

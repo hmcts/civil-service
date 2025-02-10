@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -55,6 +56,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
+    @DirtiesContext
     public void whenInvalidTypeOfRequestMade_ReturnMethodNotAllowed() throws Exception {
 
         doPost(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
@@ -62,6 +64,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
+    @DirtiesContext
     public void whenServiceRequestUpdateRequestAndEverythingIsOk_thenHttp2xx() throws Exception {
 
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
@@ -69,6 +72,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
+    @DirtiesContext
     public void whenServiceRequestUpdateRequestButUnexpectedErrorOccurs_thenHttp5xx() throws Exception {
         // Given: a CCD call will throw an exception
         given(coreCaseDataApi.startEventForCaseWorker(any(), any(), any(), any(), any(), any(), any())).willThrow(RuntimeException.class);
@@ -80,12 +84,14 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
+    @DirtiesContext
     public void whenValidPaymentCallbackIsReceivedReturnSuccess() throws Exception {
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().isOk());
     }
 
     @Test
+    @DirtiesContext
     public void whenPaymentCallbackIsReceivedWithoutServiceAuthorisationReturn400() throws Exception {
         mockMvc.perform(
             MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
@@ -94,6 +100,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     @Test
+    @DirtiesContext
     public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
         when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
 

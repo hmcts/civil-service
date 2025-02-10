@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CreateClaimIssueNotificationsHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,6 +22,7 @@ public class IssueClaimScenarioTest extends DashboardBaseIntegrationTest {
     private CreateClaimIssueNotificationsHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_claimIssue_response_await_scenario() throws Exception {
 
         String caseId = "4123456789111";

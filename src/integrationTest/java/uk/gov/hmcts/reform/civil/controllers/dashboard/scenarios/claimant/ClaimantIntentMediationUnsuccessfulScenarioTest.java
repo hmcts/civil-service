@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.springframework.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.mock.MockTaskList;
 import uk.gov.hmcts.reform.civil.controllers.dashboard.util.Evaluations;
@@ -30,6 +31,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
     private ClaimantIntentMediationUnsuccessfulHandler handler;
 
     @Test
+    @DirtiesContext
     void shouldCreateMediationUnsuccessful() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
@@ -63,6 +65,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
     }
 
     @Test
+    @DirtiesContext
     void shouldCreateMediationUnsuccessfulForCarmWhenMediatorSelectOtherOptions() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
@@ -134,6 +137,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
     }
 
     @Test
+    @DirtiesContext
     void shouldCreateMediationUnsuccessfulForCarmDefendantNotContactable() throws Exception {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.TrialArrangementsNotifyOtherPartyNotificationHandler;
@@ -20,6 +21,7 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends CaseProgressi
     private TrialArrangementsNotifyOtherPartyNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_notification_for_claimant_when_defendant_finalises_trial_arrangements() throws Exception {
         String caseId = "10002348";
         CaseData caseData = createCaseData(caseId, YesOrNo.NO);

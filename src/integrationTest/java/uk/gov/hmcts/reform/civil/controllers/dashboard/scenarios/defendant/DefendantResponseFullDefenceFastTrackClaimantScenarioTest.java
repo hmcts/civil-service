@@ -4,6 +4,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -25,6 +26,7 @@ public class DefendantResponseFullDefenceFastTrackClaimantScenarioTest extends D
 
     @ParameterizedTest
     @EnumSource(value = AllocatedTrack.class, mode = EnumSource.Mode.EXCLUDE, names = {"SMALL_CLAIM"})
+    @DirtiesContext
     void shouldCreateFullDefenceFastTrackResponseScenario(AllocatedTrack track) throws Exception {
 
         String caseId = "1234987";

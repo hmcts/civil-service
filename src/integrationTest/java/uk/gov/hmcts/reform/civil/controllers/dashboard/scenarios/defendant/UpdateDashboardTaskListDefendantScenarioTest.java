@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.DefendantDecisionOutcomeDashboardHandler;
@@ -21,6 +22,7 @@ public class UpdateDashboardTaskListDefendantScenarioTest
     private DefendantDecisionOutcomeDashboardHandler handler;
 
     @Test
+    @DirtiesContext
     void should_update_taskList_for_defendant_when_decision_outcome_small_claims() throws Exception {
 
         String caseId = "10002348";
@@ -52,6 +54,7 @@ public class UpdateDashboardTaskListDefendantScenarioTest
     }
 
     @Test
+    @DirtiesContext
     void should_update_taskList_for_defendant_when_decision_outcome_fast_track() throws Exception {
 
         String caseId = "10002348";
@@ -89,6 +92,7 @@ public class UpdateDashboardTaskListDefendantScenarioTest
     }
 
     @Test
+    @DirtiesContext
     void should_update_taskList_for_defendant_when_decision_outcome_fast_track_trial_ready() throws Exception {
 
         String caseId = "10002348";

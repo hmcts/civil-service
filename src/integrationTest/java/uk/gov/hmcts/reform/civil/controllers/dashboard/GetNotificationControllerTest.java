@@ -27,6 +27,7 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnNotificationListWhenRequestingWithReferenceAndRole() {
         String getNotificationsEndpoint = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
         doGet(BEARER_TOKEN, getNotificationsEndpoint, "127", "defendant")

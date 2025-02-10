@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant.MoreTimeRequestedDashboardNotificationDefendantHandler;
@@ -21,6 +22,7 @@ public class MoreTimeRequestedScenarioTest extends DashboardBaseIntegrationTest 
     private MoreTimeRequestedDashboardNotificationDefendantHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_ccj_requested_scenario() throws Exception {
 
         String caseId = "1234914567";

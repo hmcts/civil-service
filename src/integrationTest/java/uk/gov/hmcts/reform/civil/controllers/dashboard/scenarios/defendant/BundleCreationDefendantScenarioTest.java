@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.CaseProgressionDashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
@@ -21,6 +22,7 @@ public class BundleCreationDefendantScenarioTest extends CaseProgressionDashboar
     private BundleCreationDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_bundle_created_scenario_when_trial_ready() throws Exception {
         String caseId = "12349854";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().build()
@@ -59,6 +61,7 @@ public class BundleCreationDefendantScenarioTest extends CaseProgressionDashboar
     }
 
     @Test
+    @DirtiesContext
     void should_create_bundle_created_scenario_when_small_claims() throws Exception {
         String caseId = "17849854";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()
@@ -93,6 +96,7 @@ public class BundleCreationDefendantScenarioTest extends CaseProgressionDashboar
     }
 
     @Test
+    @DirtiesContext
     void should_create_bundle_created_scenario_when_fast_track() throws Exception {
         String caseId = "12310493";
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build()

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseWelshClaimantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,6 +18,7 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
     private DefendantResponseWelshClaimantDashboardNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_defendant_response_claimant_dashboard_welsh_scenario() throws Exception {
 
         String caseId = "123451";

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -44,6 +45,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectPinAndReference_whenValidateCaseAndPin_shouldReturnCaseData() {
         CaseDetails caseDetails = givenCaseIsFound();
 
@@ -54,6 +56,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenIncorrectReference_whenValidateCaseAndPin_shouldReturnUnauthorized() {
         when(caseByLegacyReferenceSearchService
                  .getCaseDataByLegacyReference(any())).thenThrow(new SearchServiceCaseNotFoundException());
@@ -64,6 +67,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenIncorrectPin_whenValidateCaseAndPin_shouldReturnBadRequest() {
         givenCaseIsFound();
         doThrow(new PinNotMatchException()).when(defendantPinToPostLRspecService).validatePin(
@@ -77,6 +81,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenIncorrectPin_whenValidateOcmcPin_shouldReturnBadRequest() {
         givenCaseIsFound();
         doThrow(new PinNotMatchException()).when(defendantPinToPostLRspecService).validateOcmcPin(
@@ -90,6 +95,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectParams_whenAssignClaim_shouldReturnStatusOk() {
         doPost("authorization", "", ASSIGN_CASE, "123", "RESPONDENTSOLICITORONE")
             .andExpect(status().isOk());
@@ -97,6 +103,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectParams_whenAssignClaim_forDefendant_shouldReturnStatusOk() {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
@@ -106,6 +113,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectOcmcClaim_whenDefendantLinkedStatusFalse_shouldReturnStatusOk() {
         CaseDetails caseDetails = givenOcmcOrCivilCaseIsFound();
         caseDetails.setCaseTypeId(CaseDefinitionConstants.CMC_CASE_TYPE);
@@ -119,6 +127,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectOcmcClaim_whenDefendantLinkedStatusTrue_shouldReturnStatusOk() {
         CaseDetails caseDetails = givenOcmcOrCivilCaseIsFound();
         caseDetails.setCaseTypeId(CaseDefinitionConstants.CMC_CASE_TYPE);
@@ -132,6 +141,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectClaim_whenDefendantLinkedStatusFalse_shouldReturnStatusOk() {
         CaseDetails caseDetails = givenOcmcOrCivilCaseIsFound();
         caseDetails.setCaseTypeId(CaseDefinitionConstants.CASE_TYPE);
@@ -145,6 +155,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectClaim_whenDefendantLinkedStatusTrue_shouldReturnStatusOk() {
         CaseDetails caseDetails = givenOcmcOrCivilCaseIsFound();
         caseDetails.setCaseTypeId(CaseDefinitionConstants.CASE_TYPE);
@@ -158,6 +169,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenNoClaim_whenDefendantLinkedStatus_shouldReturnStatusOk() {
         when(caseByLegacyReferenceSearchService.getCivilOrOcmcCaseDataByCaseReference(any())).thenReturn(null);
         boolean linkedStatus = false;
@@ -170,6 +182,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     @Deprecated
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectClaim_whenDefendantLinkedStatusFalse_shouldReturnStatusOk_DeprecatedEndpoint() {
         when(defendantPinToPostLRspecService.isOcmcDefendantLinked(anyString())).thenReturn(false);
 
@@ -180,6 +193,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     @Deprecated
     @Test
     @SneakyThrows
+    @DirtiesContext
     void givenCorrectClaim_whenDefendantLinkedStatusTrue_shouldReturnStatusOk_DeprecatedEndpoint() {
         when(defendantPinToPostLRspecService.isOcmcDefendantLinked(anyString())).thenReturn(true);
 

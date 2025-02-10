@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.locations;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -22,6 +23,7 @@ public class LocationControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldReturnCourtLocationsMVC() {
         DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();
         DynamicList dynamicList = DynamicList.builder().listItems(Collections.singletonList(dynamicListElement))

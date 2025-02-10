@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -22,6 +23,7 @@ public class ClaimantIntendsToProceedMultIntClaimantScenarioTest extends Dashboa
     private ClaimantResponseNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_claimant_intent_multi_int_claimant_int_track() throws Exception {
 
         String caseId = "1674364636586679";
@@ -55,6 +57,7 @@ public class ClaimantIntendsToProceedMultIntClaimantScenarioTest extends Dashboa
     }
 
     @Test
+    @DirtiesContext
     void should_create_claimant_intent_multi_int_claimant_multi_track() throws Exception {
 
         String caseId = "1674364636586679";

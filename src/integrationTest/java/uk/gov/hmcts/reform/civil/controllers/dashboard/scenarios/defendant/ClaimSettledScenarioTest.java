@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -27,6 +28,7 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
     private ClaimantResponseDefendantNotificationHandler handler;
 
     @Test
+    @DirtiesContext
     void should_create_scenario_for_claim_settled() throws Exception {
 
         String caseId = "1234678914";

@@ -16,6 +16,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
@@ -134,6 +135,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void shouldDownloadDocumentById() throws Exception {
         Document document = mapper.readValue(
             ResourceReader.readString("document-management/download.success.json"),
@@ -166,6 +168,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void shouldReturnExpectedGeneratedSealedDocument() throws Exception {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .legacyCaseReference(REFERENCE_NUMBER)
@@ -188,6 +191,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldThrowExceptionSealedDocument() throws Exception {
 
         //given
@@ -215,6 +219,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void shouldReturnExpectedGeneratedAnyDocument() throws Exception {
 
         //given
@@ -242,6 +247,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DirtiesContext
     void shouldReturnForbiddenIfUserRoleIsNotCivil() throws Exception {
 
         //given
@@ -267,6 +273,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
+    @DirtiesContext
     void shouldThrowExceptionAnyDocument() throws Exception {
 
         //given
