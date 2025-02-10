@@ -36,4 +36,9 @@ public class DefaultJudgmentForm implements MappableObject {
     private final String repaymentDate;
     private final String paymentStr;
     private final String installmentAmount;
+    private final String welshRepaymentFrequency;
+    private final String welshPaymentStr;
+    private final String currentDateInWelsh;
+    private final String welshPayByDate;
+    private final String welshRepaymentDate;
 }
