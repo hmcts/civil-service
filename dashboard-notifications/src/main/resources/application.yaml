@@ -1,17 +1,3 @@
-spring:
-  jpa:
-    properties:
-      hibernate:
-        cache:
-          use_second_level_cache: true
-          region:
-            factory_class: jcache
-        javax:
-          cache:
-            provider: com.github.benmanes.caffeine.jcache.CaffeineCachingProvider
-  cache:
-    type: jcache  # Explicitly set the cache type to JCache
-
 idam:
   test:
     username: ${TEST_WA_LAW_FIRM_USERNAME:some_user@hmcts.net}
