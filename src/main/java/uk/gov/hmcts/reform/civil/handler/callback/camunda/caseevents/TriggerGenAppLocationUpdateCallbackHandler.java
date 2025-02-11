@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -57,7 +58,8 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
         try {
             if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                                                    .getCaseManagementLocation().getBaseLocation()))
-                && caseData.isLipCase()) {
+                && caseData.isLipCase()
+                && Objects.nonNull(caseData.getGeneralApplications())) {
                 caseDataBuilder.gaEaCourtLocation(YesOrNo.YES);
             }
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
