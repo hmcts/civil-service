@@ -9,10 +9,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
@@ -35,6 +39,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     protected final UserService userService;
     protected final CoreCaseUserService coreCaseUserService;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -60,10 +65,22 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
 
+        assignCategoryIdToAttachments(latestCaseMessage);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().qmLatestQuery(
                 buildLatestQuery(latestCaseMessage)).build().toMap(objectMapper))
             .build();
+    }
+
+    private void assignCategoryIdToAttachments(CaseMessage latestCaseMessage) {
+        List<Element<Document>> attachments = latestCaseMessage.getAttachments();
+        if (attachments != null && !attachments.isEmpty()) {
+            for (Element<Document> attachment : attachments) {
+                assignCategoryId.assignCategoryIdToDocument(attachment.getValue(),
+                                                            DocCategory.QUERY_DOCUMENTS.getValue());
+            }
+        }
     }
 
     private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {
