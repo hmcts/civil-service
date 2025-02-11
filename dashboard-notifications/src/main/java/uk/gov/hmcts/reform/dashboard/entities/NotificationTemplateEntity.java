@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import java.util.Date;
 @lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications_templates", schema = "dbs")
+@Immutable
 public class NotificationTemplateEntity implements Serializable {
 
     private static final long serialVersionUID = -7113029898212912034L;

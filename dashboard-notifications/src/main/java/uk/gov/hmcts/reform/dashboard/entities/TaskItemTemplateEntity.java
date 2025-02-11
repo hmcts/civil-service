@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Entity;
@@ -17,6 +18,7 @@ import java.time.OffsetDateTime;
 @lombok.AllArgsConstructor
 @Entity
 @Table(name = "task_item_template", schema = "dbs")
+@Immutable
 public class TaskItemTemplateEntity implements Serializable {
 
     private static final long serialVersionUID = -2461367611245226407L;
