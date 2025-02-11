@@ -132,9 +132,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
-        return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", location, true)
-            && isCaseProgressionEnabled();
+        return true;
     }
 
     public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
