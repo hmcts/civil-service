@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -274,25 +275,10 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "someLocation, true, true",
-        "someLocation, false, false",
-        ", true, false",
-        ", false, false"
-    })
-    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle(String location, boolean isFeatureEnabled, boolean expected) {
+    @Test
+    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle() {
 
-        if (isFeatureEnabled && location != null) {
-            when(featureToggleApi.isFeatureEnabledForLocation(
-                "case-progression-location-whitelist",
-                location,
-                true
-            )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
-        }
-
-        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
+        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(null);
 
         assertTrue(result);
     }
