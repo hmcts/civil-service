@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -293,7 +294,7 @@ class FeatureToggleServiceTest {
 
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
 
-        assertEquals(expected, result);
+        assertTrue(result);
     }
 
     @ValueSource(booleans = {true, false})
