@@ -2314,6 +2314,7 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 DISMISS_CLAIM,
+                DEFAULT_JUDGEMENT,
                 DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
