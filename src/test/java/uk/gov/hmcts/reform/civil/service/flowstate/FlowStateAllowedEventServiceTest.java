@@ -1321,7 +1321,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
