@@ -223,6 +223,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        when((featureToggleService.isHmcForLipEnabled())).thenReturn(true);
         Fee expectedFee = Fee.builder()
             .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
         given(hearingFeesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
