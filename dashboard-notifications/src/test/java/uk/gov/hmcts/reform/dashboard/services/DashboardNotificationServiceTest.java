@@ -39,7 +39,6 @@ public class DashboardNotificationServiceTest {
     private DashboardNotificationsRepository dashboardNotificationsRepository;
     @Mock
     private NotificationActionRepository notificationActionRepository;
-    public static final String NOTIFICATION_DRAFT_CLAIM_START = "notification.draft.claim.start";
 
     @Mock
     private IdamApi idamApi;
@@ -148,12 +147,6 @@ public class DashboardNotificationServiceTest {
                 .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
                     any(), any(), any())).thenReturn(List.of(notification1, notification2));
         NotificationTemplateEntity template = NotificationTemplateEntity.builder()
-            .name(NOTIFICATION_DRAFT_CLAIM_START)
-            .role("claimant")
-            .titleEn("The ${animal} jumped over the ${target}.")
-            .descriptionEn("The ${animal} jumped over the ${target}.")
-            .titleCy("The ${animal} jumped over the ${target}.")
-            .descriptionCy("The ${animal} jumped over the ${target}.")
             .id(1L)
             .build();
         DashboardNotificationsEntity notification = DashboardNotificationsEntity.builder()
