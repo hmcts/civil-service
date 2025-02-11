@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 import uk.gov.hmcts.reform.civil.model.FeeVersionDto;
 import uk.gov.hmcts.reform.civil.model.FlatAmountDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -60,7 +59,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     public void shouldReturnClaimInterestToDate() {
         CaseData caseData = CaseData.builder().build();
         when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.1"));
-        doPost(BEARER_TOKEN, CaseDataBuilder.builder().build(), FEES_CLAIM_CALCULATE_INTEREST_URL, caseData)
+        doPost(BEARER_TOKEN, caseData, FEES_CLAIM_CALCULATE_INTEREST_URL, caseData)
             .andExpect(content().json(toJson("0.1")))
             .andExpect(status().isOk());
     }
