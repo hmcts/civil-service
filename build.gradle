@@ -93,11 +93,11 @@ allprojects {
       }
 
       nvd {
-        apiKey  = 'YOUR-API-KEY'
+//        apiKey  = 'YOUR-NVD-API-KEY'
         delay   = 10000
         maxRetryCount = 10
-//        autoUpdate = false
-//        waitTime = 3000
+//        autoUpdate = false // default is true
+//        waitTime = 3000 // does not work in v10.0 of dependency-check library
       }
 
     }
