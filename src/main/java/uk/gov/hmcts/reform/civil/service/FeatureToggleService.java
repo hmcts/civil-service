@@ -163,4 +163,8 @@ public class FeatureToggleService {
         }
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
+
+    public boolean isHmcForLipEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
+    }
 }
