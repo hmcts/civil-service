@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotification;
@@ -160,6 +161,7 @@ public class DashboardNotificationServiceTest {
             .dashboardNotificationsTemplates(template)
             .build();
         dashboardNotificationService.saveOrUpdate(notification);
+        verify(notificationActionRepository, times(2)).deleteByDashboardNotificationAndActionPerformed(any(DashboardNotificationsEntity.class), any());
         final ArgumentCaptor<DashboardNotificationsEntity> captor = ArgumentCaptor.forClass(DashboardNotificationsEntity.class);
         verify(dashboardNotificationsRepository).save(captor.capture());
         assertThat(captor.getValue()).isNotNull();
