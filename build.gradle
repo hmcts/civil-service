@@ -93,7 +93,7 @@ allprojects {
       }
 
       nvd {
-//        apiKey  = 'YOUR-NVD-API-KEY'
+        apiKey  = '5c4e3e8c-4943-4131-b1a8-d224190d1c1f'
         delay   = 10000
         maxRetryCount = 10
 //        autoUpdate = false // default is true
