@@ -82,7 +82,9 @@ public class DashboardNotificationService {
                     notification.getDashboardNotificationsTemplates().getId()
                 );
 
-            log.info("Found {} dashboard notifications in database for reference {}", nonNull(existingNotification) ? existingNotification.size() : null, notification.getReference());
+            log.info("Found {} dashboard notifications in database for reference {}",
+                     nonNull(existingNotification) ? existingNotification.size() : null,
+                     notification.getReference());
             if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
                 DashboardNotificationsEntity dashboardNotification = existingNotification.get(0);
                 updated = notification.toBuilder().id(dashboardNotification.getId()).build();
