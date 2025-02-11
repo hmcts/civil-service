@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import java.util.List;
 import java.util.function.Predicate;
+import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_JUDGMENT_ADMISSION;
@@ -24,7 +25,7 @@ public class FullAdmissionPayImmediatelyTransitionBuilder extends MidTransitionB
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaff, transitions)
+        this.moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaff.and(not(ccjRequestJudgmentByAdmission)), transitions)
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions).onlyWhen(ccjRequestJudgmentByAdmission.and(isPayImmediately), transitions);
 
     }
