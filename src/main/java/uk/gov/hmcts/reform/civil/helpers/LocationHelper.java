@@ -99,7 +99,6 @@ public class LocationHelper {
             if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
                 && isMultiOrIntTrack(caseData)
                 && caseData.isLipCase()) {
-                log.info("MINTI CLAIM ENABLED, IS MINTI LIP CLAIM");
                 return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());
             } else {
                 assignSpecPreferredCourt(caseData, getDefendantType, getDefendantCourt, prioritized);
@@ -111,7 +110,6 @@ public class LocationHelper {
             if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
                 && isMultiOrIntTrack(caseData)
                 && caseData.isLipCase()) {
-                log.info("MINTI CLAIM ENABLED, IS MINTI LIP CLAIM");
                 return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());
             } else {
                 getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
