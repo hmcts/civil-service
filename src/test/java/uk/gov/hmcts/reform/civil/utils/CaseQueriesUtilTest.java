@@ -93,7 +93,7 @@ class CaseQueriesUtilTest {
             CaseQueriesUtil.getUserQueriesByRole(caseData, List.of("unsupported-role"))
         );
 
-        assertEquals("User does have a supported case role for query management.", exception.getMessage());
+        assertEquals("Unsupported case role for query management.", exception.getMessage());
     }
 
     private CaseMessage buildCaseMessage(String id, String subject) {

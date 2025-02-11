@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 
 public class CaseQueriesUtil {
 
-    private static final String UNSUPPORTED_ROLE_ERROR = "User does have a supported case role for query management.";
+    private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
 
     private CaseQueriesUtil() {
         //NO-OP
