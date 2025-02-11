@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -39,19 +40,22 @@ public class LocationHelper {
     private final String ccmccEpimsId;
     private final String cnbcRegionId;
     private final String cnbcEpimsId;
+    private final FeatureToggleService featureToggleService;
 
     public LocationHelper(
         @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
         @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
         @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId,
         @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId,
-        @Value("${court-location.specified-claim.region-id}") String cnbcRegionId) {
+        @Value("${court-location.specified-claim.region-id}") String cnbcRegionId,
+        FeatureToggleService featureToggleService) {
 
         this.ccmccAmount = ccmccAmount;
         this.ccmccRegionId = ccmccRegionId;
         this.ccmccEpimsId = ccmccEpimsId;
         this.cnbcEpimsId = cnbcEpimsId;
         this.cnbcRegionId = cnbcRegionId;
+        this.featureToggleService = featureToggleService;
     }
 
     public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
@@ -92,7 +96,9 @@ public class LocationHelper {
         }
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && ccmccAmount.compareTo(getClaimValue(caseData)) <= 0) {
-            if (isMultiOrIntTrack(caseData) && caseData.isLipCase()) {
+            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+                && isMultiOrIntTrack(caseData)
+                && caseData.isLipCase()) {
                 log.info("MINTI CLAIM ENABLED, IS MINTI LIP CLAIM");
                 return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());
             } else {
@@ -102,13 +108,19 @@ public class LocationHelper {
         }
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
-                log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
-                prioritized.add(requestedCourt);
-            });
-            return prioritized.stream().findFirst();
+            if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
+                && isMultiOrIntTrack(caseData)
+                && caseData.isLipCase()) {
+                log.info("MINTI CLAIM ENABLED, IS MINTI LIP CLAIM");
+                return Optional.of(RequestedCourt.builder().caseLocation(getCnbcCaseLocation()).build());
+            } else {
+                getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
+                    log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+                    prioritized.add(requestedCourt);
+                });
+                return prioritized.stream().findFirst();
+            }
         }
-
         return Optional.empty();
     }
 
