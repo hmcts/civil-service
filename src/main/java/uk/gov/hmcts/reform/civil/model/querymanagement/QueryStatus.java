@@ -6,10 +6,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
 @Builder(toBuilder = true)
-public class LatestQuery {
+public class QueryStatus {
 
     private final String queryId;
-    private final YesOrNo isHearingRelated;
     private final StatusType status;
 
 }

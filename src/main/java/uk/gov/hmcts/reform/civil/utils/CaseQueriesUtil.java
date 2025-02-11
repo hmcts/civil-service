@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
+import uk.gov.hmcts.reform.civil.model.querymanagement.StatusType;
 
 import java.util.Comparator;
 import java.util.List;
@@ -38,6 +39,7 @@ public class CaseQueriesUtil {
             .map(latestMessage -> LatestQuery.builder()
                 .queryId(latestMessage.getId())
                 .isHearingRelated(latestMessage.getIsHearingRelated())
+                .status(StatusType.QUESTION_SENT)
                 .build())
             .orElse(null);
     }

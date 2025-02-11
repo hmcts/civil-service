@@ -101,6 +101,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
+import uk.gov.hmcts.reform.civil.model.querymanagement.QueryStatus;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
@@ -784,6 +785,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     //LIP QM
     private final CaseQueriesCollection qmApplicantCitizenQueries;
     private final CaseQueriesCollection qmRespondentCitizenQueries;
+
+    private List<Element<QueryStatus>> queriesStatus;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

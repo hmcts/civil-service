@@ -10,11 +10,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.model.querymanagement.QueryStatus;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -59,10 +63,21 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         );
 
         CaseQueriesCollection usersQueries = getUserQueriesByRole(caseData, roles);
+        // add data
+        List<Element<QueryStatus>> combinedData = new ArrayList<>();
+        combinedData.add(element(QueryStatus.builder()
+                                     .queryId(caseData.getCcdCaseReference().toString())
+                                     .build()));
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().qmLatestQuery(getLatestQuery(usersQueries)).build().toMap(objectMapper))
+        var aboutSubmit = AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toBuilder()
+                      .queriesStatus(combinedData)
+                      .qmLatestQuery(getLatestQuery(usersQueries)).build().toMap(objectMapper)
+
+            )
+
             .build();
+        return aboutSubmit;
     }
 
     private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {
