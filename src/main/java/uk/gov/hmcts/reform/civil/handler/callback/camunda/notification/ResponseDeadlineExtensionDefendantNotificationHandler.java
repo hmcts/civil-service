@@ -75,7 +75,7 @@ public class ResponseDeadlineExtensionDefendantNotificationHandler
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             AGREED_EXTENSION_DATE, formatLocalDate(
