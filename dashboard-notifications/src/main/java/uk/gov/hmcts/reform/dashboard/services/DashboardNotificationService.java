@@ -32,7 +32,7 @@ public class DashboardNotificationService {
 
     private final IdamApi idamApi;
 
-    private String clickAction = "Click";
+    private final String clickAction = "Click";
 
     @Autowired
     public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
@@ -56,14 +56,14 @@ public class DashboardNotificationService {
             .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
 
         return dashboardNotificationsEntityList.stream()
-            .sorted(Comparator.comparing(t -> t.getCreatedAt(), Comparator.reverseOrder()))
+            .sorted(Comparator.comparing(DashboardNotificationsEntity::getCreatedAt, Comparator.reverseOrder()))
             .map(Notification::from)
             .toList();
     }
 
     public Map<String, List<Notification>> getAllCasesNotifications(List<String> ccdCaseIdentifiers, String roleType) {
         Map<String, List<Notification>> gaNotifications = new HashMap<>();
-        ccdCaseIdentifiers.stream().forEach(gaCaseId -> gaNotifications.put(gaCaseId, getNotifications(gaCaseId, roleType)));
+        ccdCaseIdentifiers.forEach(gaCaseId -> gaNotifications.put(gaCaseId, getNotifications(gaCaseId, roleType)));
         return gaNotifications;
     }
 
@@ -72,9 +72,9 @@ public class DashboardNotificationService {
         DashboardNotificationsEntity updated = notification;
         if (nonNull(notification.getDashboardNotificationsTemplates())) {
             log.info("Query for dashboard notifications using notification reference= {}, citizenRole = {}, templateId = {}",
-                      notification.getReference(),
-                      notification.getCitizenRole(),
-                      notification.getDashboardNotificationsTemplates().getId()
+                     notification.getReference(),
+                     notification.getCitizenRole(),
+                     notification.getDashboardNotificationsTemplates().getId()
             );
             List<DashboardNotificationsEntity> existingNotification = dashboardNotificationsRepository
                 .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
@@ -82,16 +82,22 @@ public class DashboardNotificationService {
                     notification.getDashboardNotificationsTemplates().getId()
                 );
 
-
-        if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
-            updated = notification.toBuilder().id(existingNotification.get(0).getId()).build();
-            notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(existingNotification.get(0),
-                                                                                         clickAction
-            );
-            log.info("Existing notification deleted reference = {}, id = {}", notification.getReference(), existingNotification.get().getId());
+            log.info("Found {} dashboard notifications in database for reference {}", nonNull(existingNotification) ? existingNotification.size() : null, notification.getReference());
+            if (nonNull(existingNotification) && !existingNotification.isEmpty()) {
+                DashboardNotificationsEntity dashboardNotification = existingNotification.get(0);
+                updated = notification.toBuilder().id(dashboardNotification.getId()).build();
+                for (DashboardNotificationsEntity dashNotification : existingNotification) {
+                    notificationActionRepository.deleteByDashboardNotificationAndActionPerformed(
+                        dashNotification,
+                        clickAction
+                    );
+                    log.info("Existing notification deleted reference = {}, id = {}", notification.getReference(), dashNotification.getId());
+                }
+            }
         } else {
             log.info("Existing notification not present reference = {}", notification.getReference());
         }
+
         return dashboardNotificationsRepository.save(updated);
     }
 
