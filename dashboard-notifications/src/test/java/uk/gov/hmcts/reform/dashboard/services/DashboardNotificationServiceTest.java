@@ -25,7 +25,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotification;
@@ -143,7 +142,10 @@ public class DashboardNotificationServiceTest {
 
         DashboardNotificationsEntity notification1 = createDashboardNotificationsEntity();
         DashboardNotificationsEntity notification2 = createDashboardNotificationsEntity();
-        when(dashboardNotificationsRepository.findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(any(), any(), any())).thenReturn(List.of(notification1, notification2));
+        when(
+            dashboardNotificationsRepository
+                .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
+                    any(), any(), any())).thenReturn(List.of(notification1, notification2));
         NotificationTemplateEntity template = NotificationTemplateEntity.builder()
             .name(NOTIFICATION_DRAFT_CLAIM_START)
             .role("claimant")
