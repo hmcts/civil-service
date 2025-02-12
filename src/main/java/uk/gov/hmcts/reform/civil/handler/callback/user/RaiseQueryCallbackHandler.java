@@ -9,10 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -27,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 
@@ -65,22 +63,12 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
 
-        assignCategoryIdToAttachments(latestCaseMessage);
+        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().qmLatestQuery(
                 buildLatestQuery(latestCaseMessage)).build().toMap(objectMapper))
             .build();
-    }
-
-    private void assignCategoryIdToAttachments(CaseMessage latestCaseMessage) {
-        List<Element<Document>> attachments = latestCaseMessage.getAttachments();
-        if (attachments != null && !attachments.isEmpty()) {
-            for (Element<Document> attachment : attachments) {
-                assignCategoryId.assignCategoryIdToDocument(attachment.getValue(),
-                                                            DocCategory.QUERY_DOCUMENTS.getValue());
-            }
-        }
     }
 
     private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {
