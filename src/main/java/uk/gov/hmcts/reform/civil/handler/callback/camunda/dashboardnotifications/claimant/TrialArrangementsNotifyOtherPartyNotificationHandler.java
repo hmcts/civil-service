@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
@@ -22,10 +22,10 @@ public class TrialArrangementsNotifyOtherPartyNotificationHandler extends CasePr
         List.of(CREATE_DASHBOARD_NOTIFICATION_TRIAL_ARRANGEMENTS_NOTIFY_CLAIMANT);
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationTrialArrangementsNotifyParty";
 
-    public TrialArrangementsNotifyOtherPartyNotificationHandler(DashboardApiClient dashboardApiClient,
-                                                    DashboardNotificationsParamsMapper mapper,
-                                                    FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+    public TrialArrangementsNotifyOtherPartyNotificationHandler(DashboardScenariosService dashboardScenariosService,
+                                                                DashboardNotificationsParamsMapper mapper,
+                                                                FeatureToggleService featureToggleService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

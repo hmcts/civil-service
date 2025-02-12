@@ -9,12 +9,14 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.OrderCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +33,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MEDIATION_UNSUCCESSFUL_TRACK_CHANGE_DEFENDANT_WITHOUT_UPLOAD_FILES_CARM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_DEFENDANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
 @Service
@@ -45,14 +47,20 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_DEFENDANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderDefendant";
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public OrderMadeDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public OrderMadeDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                  DashboardNotificationsParamsMapper mapper,
                                                  FeatureToggleService featureToggleService, ObjectMapper objectMapper,
-                                                 WorkingDayIndicator workingDayIndicator) {
-        super(dashboardApiClient, mapper, featureToggleService, workingDayIndicator);
+                                                 WorkingDayIndicator workingDayIndicator,
+                                                 DashboardNotificationService dashboardNotificationService,
+                                                 TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService, workingDayIndicator);
         this.objectMapper = objectMapper;
         this.workingDayIndicator = workingDayIndicator;
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -81,10 +89,10 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData, callbackParams);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                scenario,
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(paramsMap).build()
             );
         }
@@ -161,16 +169,15 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
     private void deleteNotificationAndInactiveTasks(CaseData caseData, String authToken) {
 
-        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            authToken
+            "DEFENDANT"
         );
 
-        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
-            authToken
+            null
         );
     }
 }

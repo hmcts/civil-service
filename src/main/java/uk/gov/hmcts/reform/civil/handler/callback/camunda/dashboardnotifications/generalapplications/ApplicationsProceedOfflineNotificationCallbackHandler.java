@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
                 CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT);
     public static final String TASK_ID_CLAIMANT = "claimantLipApplicationOfflineDashboardNotification";
     public static final String TASK_ID_DEFENDANT = "defendantLipApplicationOfflineDashboardNotification";
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
     private static final String CLAIMANT = "Claimant";
@@ -83,12 +83,12 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         if (isApplicationsExistLive(caseData, notificationType)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
+            dashboardScenariosService.recordScenarios(
+                authToken,
                 notificationType.equals(CLAIMANT)
                     ? SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT.getScenario()
                     : SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario(),
-                authToken,
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build());
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
