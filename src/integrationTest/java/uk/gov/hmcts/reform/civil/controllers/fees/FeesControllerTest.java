@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,9 +59,9 @@ public class FeesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnClaimInterestToDate() {
         CaseData caseData = CaseData.builder().build();
-        when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.1"));
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("0.1"));
         doPost(BEARER_TOKEN, caseData, FEES_CLAIM_CALCULATE_INTEREST_URL, caseData)
-            .andExpect(content().json(toJson("0.1")))
+            .andExpect(content().json("0.1"))
             .andExpect(status().isOk());
     }
 
