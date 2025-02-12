@@ -14,15 +14,16 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        return Caching.getCachingProvider("com.github.benmanes.caffeine.jcache.CaffeineCachingProvider")
+        CacheManager cacheManager = Caching.getCachingProvider("com.github.benmanes.caffeine.jcache.CaffeineCachingProvider")
             .getCacheManager();
+        configureCache(cacheManager);
+        return cacheManager;
     }
 
-    @Bean
-    public void configureCache(CacheManager cacheManager) {
+    private void configureCache(CacheManager cacheManager) {
         MutableConfiguration<Object, Object> cacheConfig = new MutableConfiguration<>()
-            .setStoreByValue(false)  // No deep copies, better performance
-            .setExpiryPolicyFactory(AccessedExpiryPolicy.factoryOf(Duration.ONE_DAY)); // 24-hour cache
+            .setStoreByValue(false)
+            .setExpiryPolicyFactory(AccessedExpiryPolicy.factoryOf(Duration.ONE_DAY));
 
         cacheManager.createCache("ReadOnlyEntity", cacheConfig);
     }
