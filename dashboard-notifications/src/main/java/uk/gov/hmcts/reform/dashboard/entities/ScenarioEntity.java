@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Cacheable;
@@ -20,6 +21,7 @@ import java.util.Map;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
+@Immutable
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
 @Table(name = "scenario", schema = "dbs")
