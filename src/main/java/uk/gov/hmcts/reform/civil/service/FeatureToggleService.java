@@ -132,7 +132,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
-        System.out.println(location);
+        log.info("Location {}", location);
         return true;
     }
 
