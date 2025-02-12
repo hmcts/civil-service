@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CacheConfig {
 
+    public static final String READ_ONLY_ENTITY = "ReadOnlyEntity";
+
     @Bean
     public CacheManager cacheManager() {
         CacheManager cacheManager = Caching.getCachingProvider("com.github.benmanes.caffeine.jcache.CaffeineCachingProvider")
@@ -25,7 +27,7 @@ public class CacheConfig {
             .setStoreByValue(false)
             .setExpiryPolicyFactory(AccessedExpiryPolicy.factoryOf(Duration.ONE_DAY));
 
-        cacheManager.createCache("ReadOnlyEntity", cacheConfig);
+        cacheManager.createCache(READ_ONLY_ENTITY, cacheConfig);
     }
 }
 

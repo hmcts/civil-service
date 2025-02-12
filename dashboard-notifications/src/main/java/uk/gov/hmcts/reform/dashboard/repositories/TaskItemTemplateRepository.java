@@ -13,7 +13,5 @@ public interface TaskItemTemplateRepository extends CrudRepository<TaskItemTempl
 
     List<TaskItemTemplateEntity> findByScenarioName(String name);
 
-    List<TaskItemTemplateEntity> findByScenarioNameAndRole(String name, String role);
-
     List<TaskItemTemplateEntity> findByCategoryEnAndRole(String category, String role);
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Transactional(readOnly = true)
+@Transactional
 @Repository
 public interface TaskListRepository extends CrudRepository<TaskListEntity, UUID> {
 
