@@ -84,7 +84,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         );
     }
