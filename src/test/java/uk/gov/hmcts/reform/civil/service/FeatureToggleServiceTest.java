@@ -278,7 +278,7 @@ class FeatureToggleServiceTest {
     @Test
     void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle() {
 
-        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed();
+        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(null);
 
         assertTrue(result);
     }
