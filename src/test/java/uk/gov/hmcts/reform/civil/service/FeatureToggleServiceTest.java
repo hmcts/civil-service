@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -180,13 +181,9 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
-        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
-        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
-
-        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
+    @Test
+    public void shouldReturnCorrectValue_whenIsJudgmentOnlineLive() {
+           assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(false);
     }
 
     @ParameterizedTest
@@ -305,14 +302,9 @@ class FeatureToggleServiceTest {
 
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
-        when(featureToggleService.isJudgmentOnlineLive())
-            .thenReturn(toggleStat);
-        when(featureToggleService.isJOLiveFeedActive())
-            .thenReturn(toggleStat);
-        assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
+    @Test
+    public void shouldReturnCorrectValue_whenisJOLiveFeedActive() {
+        assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(false);
     }
 
     @ParameterizedTest
