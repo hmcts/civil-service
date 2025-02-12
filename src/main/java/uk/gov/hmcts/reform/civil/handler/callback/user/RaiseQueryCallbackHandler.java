@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.QueryStatus;
+import uk.gov.hmcts.reform.civil.model.querymanagement.StatusType;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -63,10 +64,11 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         );
 
         CaseQueriesCollection usersQueries = getUserQueriesByRole(caseData, roles);
-        // add data
+        // add data into QueryStatus table
         List<Element<QueryStatus>> combinedData = new ArrayList<>();
         combinedData.add(element(QueryStatus.builder()
                                      .queryId(caseData.getCcdCaseReference().toString())
+                                     .status(StatusType.RESPONSE_VIEWED)
                                      .build()));
 
         var aboutSubmit = AboutToStartOrSubmitCallbackResponse.builder()
