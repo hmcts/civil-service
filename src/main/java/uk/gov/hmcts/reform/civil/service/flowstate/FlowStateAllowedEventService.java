@@ -1611,7 +1611,8 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
         entry(
@@ -1652,7 +1653,8 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 ADD_CASE_NOTE,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
         entry(
