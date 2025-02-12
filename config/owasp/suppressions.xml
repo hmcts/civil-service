@@ -9,7 +9,7 @@
     <cve>CVE-2023-45648</cve>  <!-- Continue SUSPENSION-->
 <!--    <cve>CVE-2023-20883</cve>-->
 
-    <cve>CVE-2023-34055</cve> <!-- Continue SUSPENSION-->
-    <cve>CVE-2024-43591</cve> <!-- Continue SUSPENSION-->
+    <!-- <cve>CVE-2023-34055</cve>  Continue SUSPENSION-->
+    <!-- <cve>CVE-2024-43591</cve>  Continue SUSPENSION-->
   </suppress>
 </suppressions>
