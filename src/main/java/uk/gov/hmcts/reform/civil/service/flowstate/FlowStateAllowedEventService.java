@@ -1485,7 +1485,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
         entry(
@@ -1531,7 +1532,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
 
@@ -2220,7 +2222,8 @@ public class FlowStateAllowedEventService {
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 ADD_CASE_NOTE,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
         entry(
@@ -2255,7 +2258,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
         entry(

@@ -1525,7 +1525,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
@@ -1570,7 +1571,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
@@ -2228,7 +2230,8 @@ class FlowStateAllowedEventServiceTest {
                         LIP_CLAIM_SETTLED,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
@@ -2259,7 +2262,8 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
