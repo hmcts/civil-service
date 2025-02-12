@@ -1,10 +1,16 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
@@ -15,8 +21,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+@ExtendWith(MockitoExtension.class)
 class CaseQueriesUtilTest {
+
+    @InjectMocks
+    private AssignCategoryId assignCategoryId;
 
     @Test
     void shouldReturnApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
@@ -94,6 +106,111 @@ class CaseQueriesUtilTest {
         );
 
         assertEquals("Unsupported case role for query management.", exception.getMessage());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(LocalDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId);
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldReturnNullWhenNoQueries() {
+        CaseData caseData = CaseData.builder().build();
+        CaseMessage latestQuery = CaseQueriesUtil.getLatestQuery(caseData);
+
+        assertThat(latestQuery).isNull();
+    }
+
+    @Test
+    void shouldReturnLatestQuery_whenApplicantRaisedLastQuery() {
+        LocalDateTime now = LocalDateTime.now();
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                             .caseMessages(wrapElements(
+                                                 buildCaseMessageAt("1", "a", now),
+                                                 buildCaseMessageAt("2", "b", now.minusDays(1))))
+                                             .build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder()
+                                             .caseMessages(wrapElements(
+                                                 buildCaseMessageAt("3", "c", now.minusDays(2)),
+                                                 buildCaseMessageAt("4", "d", now.minusDays(1))))
+                                             .build())
+            .build();
+        CaseMessage latestQuery = CaseQueriesUtil.getLatestQuery(caseData);
+
+        assertThat(latestQuery).isEqualTo(buildCaseMessageAt("1", "a", now));
+    }
+
+    @Test
+    void shouldReturnLatestQuery_whenRespondent1RaisedLastQuery() {
+        LocalDateTime now = LocalDateTime.now();
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                             .caseMessages(wrapElements(
+                                                 buildCaseMessageAt("1", "a", now.minusDays(2)),
+                                                 buildCaseMessageAt("2", "b", now.minusDays(1))))
+                                             .build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(wrapElements(
+                                                   buildCaseMessageAt("3", "c", now),
+                                                   buildCaseMessageAt("4", "d", now.minusDays(1))))
+                                               .build())
+            .build();
+        CaseMessage latestQuery = CaseQueriesUtil.getLatestQuery(caseData);
+
+        assertThat(latestQuery).isEqualTo(buildCaseMessageAt("3", "c", now));
+    }
+
+    @Test
+    void shouldReturnLatestQuery_whenRespondent2RaisedLastQuery() {
+        LocalDateTime now = LocalDateTime.now();
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                             .caseMessages(wrapElements(
+                                                 buildCaseMessageAt("1", "a", now.minusDays(2)),
+                                                 buildCaseMessageAt("2", "b", now.minusDays(1))))
+                                             .build())
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(wrapElements(
+                                                   buildCaseMessageAt("3", "c", now.minusDays(1)),
+                                                   buildCaseMessageAt("4", "d", now.minusDays(1))))
+                                               .build())
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(wrapElements(
+                                                   buildCaseMessageAt("5", "e", now.minusDays(1)),
+                                                   buildCaseMessageAt("6", "f", now)))
+                                               .build())
+            .build();
+        CaseMessage latestQuery = CaseQueriesUtil.getLatestQuery(caseData);
+
+        assertThat(latestQuery).isEqualTo(buildCaseMessageAt("6", "f", now));
+    }
+
+    private CaseMessage buildCaseMessageAt(String id, String subject, LocalDateTime createdDate) {
+        return CaseMessage.builder()
+            .id(id)
+            .subject(subject)
+            .name("John Doe")
+            .body("Sample body text")
+            .attachments(List.of())
+            .isHearingRelated(NO)
+            .hearingDate(LocalDate.now())
+            .createdOn(createdDate)
+            .createdBy("System")
+            .build();
     }
 
     private CaseMessage buildCaseMessage(String id, String subject) {

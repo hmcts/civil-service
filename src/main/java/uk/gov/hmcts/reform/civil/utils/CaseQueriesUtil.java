@@ -39,9 +39,15 @@ public class CaseQueriesUtil {
 
     public static CaseMessage getLatestQuery(CaseData caseData) {
         List<CaseMessage> latestQueries = new ArrayList<>();
-        latestQueries.add(caseData.getQmApplicantSolicitorQueries().latest());
-        latestQueries.add(caseData.getQmRespondentSolicitor1Queries().latest());
-        latestQueries.add(caseData.getQmRespondentSolicitor2Queries().latest());
+        if (caseData.getQmApplicantSolicitorQueries() != null) {
+            latestQueries.add(caseData.getQmApplicantSolicitorQueries().latest());
+        }
+        if (caseData.getQmRespondentSolicitor1Queries() != null) {
+            latestQueries.add(caseData.getQmRespondentSolicitor1Queries().latest());
+        }
+        if (caseData.getQmRespondentSolicitor2Queries() != null) {
+            latestQueries.add(caseData.getQmRespondentSolicitor2Queries().latest());
+        }
         return latestQueries.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
             .orElse(null);
     }

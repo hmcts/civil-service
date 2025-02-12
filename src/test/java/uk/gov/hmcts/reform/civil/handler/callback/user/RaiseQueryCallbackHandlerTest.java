@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -35,6 +37,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -56,7 +60,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
     @InjectMocks
     private AssignCategoryId assignCategoryId;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @InjectMocks
+    private ObjectMapper objectMapper;
 
     @Test
     public void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -97,6 +102,30 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("qmLatestQuery")
                 .extracting("isHearingRelated")
                 .isEqualTo(YES.getLabel());
+        }
+
+        @Test
+        public void shouldAssignCategoryIdToLatestQuery() {
+            when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                APPLICANTSOLICITORONE.name()));
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .qmApplicantSolicitorQueries(mockQueriesCollectionWithAttachments(QUERY_ID, NOW))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            List<Document> documents = unwrapElements(updatedData.getQmApplicantSolicitorQueries()
+                                                          .getCaseMessages().get(0).getValue()
+                                                          .getAttachments());
+
+            assertThat(response.getErrors()).isNull();
+            for (Document document : documents) {
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.QUERY_DOCUMENTS.getValue());
+            }
         }
 
         @Test
@@ -174,6 +203,31 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .createdOn(latestDate.minusMinutes(10))
                                     .build()).build()
                     ))
+                .build();
+        }
+
+        private CaseQueriesCollection mockQueriesCollectionWithAttachments(String queryId, LocalDateTime latestDate) {
+            return CaseQueriesCollection.builder()
+                .partyName("partyName")
+                .roleOnCase("roleOnCase")
+                .caseMessages(
+                    List.of(
+                        Element.<CaseMessage>builder()
+                            .id(UUID.randomUUID())
+                            .value(
+                                CaseMessage.builder()
+                                    .id(queryId)
+                                    .isHearingRelated(YES)
+                                    .createdOn(latestDate)
+                                    .attachments(wrapElements(
+                                        Document.builder()
+                                            .documentFileName("file1")
+                                            .build(),
+                                        Document.builder()
+                                            .documentFileName("file2")
+                                            .build()
+                                    ))
+                                    .build()).build()))
                 .build();
         }
     }
