@@ -41,7 +41,7 @@ public class PartAdmissionTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(10);
+        assertThat(result).hasSize(9);
 
         assertTransition(result.get(0), "MAIN.PART_ADMISSION", "MAIN.IN_MEDIATION");
         assertTransition(result.get(1), "MAIN.PART_ADMISSION", "MAIN.PART_ADMIT_NOT_SETTLED_NO_MEDIATION");
@@ -50,9 +50,8 @@ public class PartAdmissionTransitionBuilderTest {
         assertTransition(result.get(4), "MAIN.PART_ADMISSION", "MAIN.PART_ADMIT_PAY_IMMEDIATELY");
         assertTransition(result.get(5), "MAIN.PART_ADMISSION", "MAIN.PART_ADMIT_AGREE_SETTLE");
         assertTransition(result.get(6), "MAIN.PART_ADMISSION", "MAIN.PART_ADMIT_AGREE_REPAYMENT");
-        assertTransition(result.get(7), "MAIN.PART_ADMISSION", "MAIN.PART_ADMIT_REJECT_REPAYMENT");
-        assertTransition(result.get(8), "MAIN.PART_ADMISSION", "MAIN.TAKEN_OFFLINE_BY_STAFF");
-        assertTransition(result.get(9), "MAIN.PART_ADMISSION", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(7), "MAIN.PART_ADMISSION", "MAIN.TAKEN_OFFLINE_BY_STAFF");
+        assertTransition(result.get(8), "MAIN.PART_ADMISSION", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
     }
 
     @Test
