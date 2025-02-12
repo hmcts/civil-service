@@ -39,7 +39,6 @@ public class CaseQueriesUtil {
             .map(latestMessage -> LatestQuery.builder()
                 .queryId(latestMessage.getId())
                 .isHearingRelated(latestMessage.getIsHearingRelated())
-                .status(StatusType.QUESTION_SENT)
                 .build())
             .orElse(null);
     }
