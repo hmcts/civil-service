@@ -183,7 +183,7 @@ class FeatureToggleServiceTest {
 
     @Test
     public void shouldReturnCorrectValue_whenIsJudgmentOnlineLive() {
-           assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(false);
+        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(false);
     }
 
     @ParameterizedTest
