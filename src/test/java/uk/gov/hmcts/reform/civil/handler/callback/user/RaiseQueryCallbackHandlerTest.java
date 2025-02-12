@@ -125,10 +125,10 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldReturnError_whenAllFinalOrdersIssuedState() {
+        public void shouldReturnError_whenCaseClosed() {
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
-                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .ccdState(CaseState.CLOSED)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);

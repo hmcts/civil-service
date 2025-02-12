@@ -25,8 +25,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -60,7 +60,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse checkCaseState(CallbackParams callbackParams) {
         List<CaseState> invalidStates = Arrays.asList(PENDING_CASE_ISSUED, CASE_DISMISSED,
-                                                      PROCEEDS_IN_HERITAGE_SYSTEM, All_FINAL_ORDERS_ISSUED);
+                                                      PROCEEDS_IN_HERITAGE_SYSTEM, CLOSED);
         if (invalidStates.contains(callbackParams.getCaseData().getCcdState())) {
             List<String> errors = List.of(INVALID_CASE_STATE_ERROR);
 
