@@ -679,50 +679,6 @@ class HearingNoticeHmcGeneratorTest {
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
                                         "SiteName - CourtAddress - Postcode", "hearingId",
-                                        HEARING_NOTICE_HMC);
-
-        var expected = List.of(CASE_DOCUMENT);
-
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application_welsh, bytes, HEARING_FORM_WELSH));
-    }
-
-    @Test
-    void shouldReturnListOfExpectedCaseDocumentsSpec_WhenIsWelshHearingNotice() {
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .build();
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC()
-            .totalClaimAmount(new BigDecimal(2000))
-            .build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(EPIMS)
-                                        .build())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
-                                 .build())
-            .hearingTimeHourMinute("0800")
-            .channel(HearingChannel.IN_PERSON)
-            .hearingDuration(HearingDuration.DAY_1)
-            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
-            .build();
-
-        when(hearingFeesService
-                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
-
-        var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
-                                        "SiteName - CourtAddress - Postcode", "hearingId",
                                         HEARING_NOTICE_HMC_WELSH);
         var expected = List.of(CASE_DOCUMENT);
 
