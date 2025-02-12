@@ -33,12 +33,6 @@ public class DefaultJudgmentFormGenerator {
     private final NonImmediatePaymentTypeDefaultJudgmentFormBuilder nonImmediatePaymentTypeDefaultJudgmentFormBuilder;
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) {
-        if (caseData.isLipvLipOneVOne()) {
-            log.info("Skipping generation of Default Judgment Form for CUI case (LIP v LIP): {}",
-                    caseData.getCcdCaseReference());
-            return new ArrayList<>();
-        }
-
         List<CaseDocument> caseDocuments = new ArrayList<>();
         DocmosisDocument docmosisDocument2;
         List<DefaultJudgmentForm> templateData = getDefaultJudgmentForms(caseData, event, getDefaultJudgmentBuilder(event, caseData));
