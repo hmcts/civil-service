@@ -67,7 +67,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         // add data into QueryStatus table
         List<Element<QueryStatus>> combinedData = new ArrayList<>();
         combinedData.add(element(QueryStatus.builder()
-                                     .queryId(caseData.getCcdCaseReference().toString())
+                                     .queryId(caseData.getCcdCaseReference().toString()) // get lastQueryID
                                      .status(StatusType.RESPONSE_VIEWED)
                                      .build()));
 

@@ -4,7 +4,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
-import uk.gov.hmcts.reform.civil.model.querymanagement.StatusType;
 
 import java.util.Comparator;
 import java.util.List;
