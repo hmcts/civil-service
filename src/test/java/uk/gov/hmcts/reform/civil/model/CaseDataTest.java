@@ -36,9 +36,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Optional;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.math.BigDecimal.ZERO;
@@ -48,13 +47,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -62,14 +61,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-public class CaseDataTest {
+class CaseDataTest {
 
     private static final BigDecimal CLAIM_FEE = new BigDecimal(2000);
 
-    private static final String FILE_NAME_1 = "Some file 1";
-
     @Test
-    public void applicant1Proceed_when1v1() {
+    void applicant1Proceed_when1v1() {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
@@ -77,7 +74,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void applicant1Proceed_when2v1() {
+    void applicant1Proceed_when2v1() {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
             .build();
@@ -257,7 +254,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRespondentUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenTrue() {
+    void givenRespondentUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
@@ -270,7 +267,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRespondentRepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
+    void givenRespondentRepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.YES)
@@ -283,7 +280,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenApplicantUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
+    void givenApplicantUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
@@ -296,7 +293,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRespondentUnrepresentedAndApplicantUnrepresentedAndOnevOne_whenIsLipvLipOneVOne_thenTrue() {
+    void givenRespondentUnrepresentedAndApplicantUnrepresentedAndOnevOne_whenIsLipvLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
@@ -309,7 +306,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenApplicantUnrepresented_whenIsApplicant1NotRepresented_thenTrue() {
+    void givenApplicantUnrepresented_whenIsApplicant1NotRepresented_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.NO)
@@ -320,7 +317,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenApplicantRepresented_whenIsApplicant1NotRepresented_thenFalse() {
+    void givenApplicantRepresented_whenIsApplicant1NotRepresented_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.YES)
@@ -938,7 +935,7 @@ public class CaseDataTest {
     class GetHearingLocationText {
 
         @Test
-        public void shouldReturnNull_whenHearingLocationIsNull() {
+        void shouldReturnNull_whenHearingLocationIsNull() {
             CaseData caseData = CaseData.builder().build();
             String actual = caseData.getHearingLocationText();
 
@@ -946,7 +943,7 @@ public class CaseDataTest {
         }
 
         @Test
-        public void shouldReturnNull_whenHearingLocationValueIsNull() {
+        void shouldReturnNull_whenHearingLocationValueIsNull() {
             CaseData caseData = CaseData.builder()
                 .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
             String actual = caseData.getHearingLocationText();
@@ -955,7 +952,7 @@ public class CaseDataTest {
         }
 
         @Test
-        public void shouldExpectedString_whenHearingLocationValueLabelIsNotNull() {
+        void shouldExpectedString_whenHearingLocationValueLabelIsNotNull() {
             CaseData caseData = CaseData.builder()
                 .hearingLocation(DynamicList.builder().value(
                     DynamicListElement.dynamicElement("label")).build()).build();
