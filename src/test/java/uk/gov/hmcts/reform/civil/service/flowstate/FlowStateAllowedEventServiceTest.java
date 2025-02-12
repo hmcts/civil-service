@@ -165,6 +165,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.MEDIATION_UNSUCCESSFUL_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NO_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
@@ -2362,7 +2363,8 @@ class FlowStateAllowedEventServiceTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                         AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 ),
                 of(
@@ -2377,7 +2379,8 @@ class FlowStateAllowedEventServiceTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                         AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 ),
                 of(
@@ -2395,7 +2398,8 @@ class FlowStateAllowedEventServiceTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                         AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 ),
                 of(
@@ -2410,7 +2414,8 @@ class FlowStateAllowedEventServiceTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                         AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 ),
                 of(
@@ -2425,7 +2430,9 @@ class FlowStateAllowedEventServiceTest {
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                     AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
-                    IN_HEARING_READINESS.fullName()}),
+                    IN_HEARING_READINESS.fullName(),
+                    NO_DEFENDANT_RESPONSE.fullName()
+                }),
                 of(
                     AMEND_PARTY_DETAILS,
                     new String[] {CLAIM_ISSUED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
@@ -2439,7 +2446,8 @@ class FlowStateAllowedEventServiceTest {
                         AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName(),
                         TAKEN_OFFLINE_AFTER_SDO.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 ),
                 of(
@@ -2465,7 +2473,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_NOT_PROCEED.fullName(),
                         FULL_DEFENCE.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 ),
                 of(
@@ -2484,7 +2493,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_NOT_PROCEED.fullName(),
                         FULL_DEFENCE.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 ),
                 of(
@@ -2503,7 +2513,8 @@ class FlowStateAllowedEventServiceTest {
                         FULL_DEFENCE_NOT_PROCEED.fullName(),
                         FULL_DEFENCE.fullName(),
                         FULL_DEFENCE_PROCEED.fullName(),
-                        IN_HEARING_READINESS.fullName()
+                        IN_HEARING_READINESS.fullName(),
+                        NO_DEFENDANT_RESPONSE.fullName()
                     }
                 )
 

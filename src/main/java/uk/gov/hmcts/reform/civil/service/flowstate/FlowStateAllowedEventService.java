@@ -1153,8 +1153,6 @@ public class FlowStateAllowedEventService {
             List.of(
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ACKNOWLEDGE_CLAIM,
-                DEFENDANT_RESPONSE,
                 INFORM_AGREED_EXTENSION_DATE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
