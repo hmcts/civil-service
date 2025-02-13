@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.RestException;
@@ -62,7 +62,7 @@ class EvidenceUploadCheckHandlerTest {
         // Given: one case found from search service
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         given(searchService.getCases()).willReturn(caseDetails);
 
@@ -77,7 +77,7 @@ class EvidenceUploadCheckHandlerTest {
     @Test
     void shouldNotEmitEvidenceUploadCheckEvent_WhenNoCasesFound() {
         // Given: no case found from search service
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         // When: handler is called
         handler.execute(mockTask, externalTaskService);
@@ -139,7 +139,7 @@ class EvidenceUploadCheckHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 

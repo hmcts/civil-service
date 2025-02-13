@@ -20,10 +20,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class AwaitingResponsesNotFullDefenceReceivedTransitionBuilder extends MidTransitionBuilder {
+public class AwaitingResponsesFullAdmitReceivedTransitionBuilder extends MidTransitionBuilder {
 
-    public AwaitingResponsesNotFullDefenceReceivedTransitionBuilder(FeatureToggleService featureToggleService) {
-        super(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED, featureToggleService);
+    public AwaitingResponsesFullAdmitReceivedTransitionBuilder(FeatureToggleService featureToggleService) {
+        super(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, featureToggleService);
     }
 
     @Override
