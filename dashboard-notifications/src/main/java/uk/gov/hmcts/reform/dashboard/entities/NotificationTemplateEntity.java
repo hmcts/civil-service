@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dashboard.entities;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Immutable;
 import uk.gov.hmcts.reform.dashboard.cache.CacheConfig;
 
 import javax.persistence.Cacheable;
@@ -18,6 +19,7 @@ import java.util.Date;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
+@Immutable
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = CacheConfig.READ_ONLY_ENTITY)
 @Table(name = "dashboard_notifications_templates", schema = "dbs")
