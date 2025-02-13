@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
@@ -34,13 +40,13 @@ import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.TELCVP;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
+@Slf4j
 public class HmcDataUtils {
 
     private HmcDataUtils() {
         // NO OP
     }
 
-    private static final String HEARING = "hearing";
     private static final int HOURS_PER_DAY = 6;
     private static final int MINUTES_PER_HOUR = 60;
 
@@ -190,7 +196,9 @@ public class HmcDataUtils {
      */
     public static String getTotalHearingDurationText(HearingGetResponse hearing) {
         Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+        String caseRef = hearing.getCaseDetails() != null ? hearing.getCaseDetails().getCaseRef() : "reference not available";
         if (totalDurationInMinutes == null) {
+            log.info("Total Duration In Minutes from Hmc handler is null for caseId {}", caseRef);
             return null;
         }
 
@@ -199,8 +207,9 @@ public class HmcDataUtils {
         int days = (int)Math.floor(totalDurationInHours / HOURS_PER_DAY);
         int hours = (int)(totalDurationInHours - (days * HOURS_PER_DAY));
         int minutes = (int)(totalDurationInMinutes - (totalDurationInHours * MINUTES_PER_HOUR));
-
-        return daysHoursMinutesFormat(days, hours, minutes);
+        String hearingDurationText = daysHoursMinutesFormat(days, hours, minutes);
+        log.info("Total hearing duration from Hmc handler: {} for caseId {}", hearingDurationText, caseRef);
+        return hearingDurationText;
     }
 
     /**
@@ -342,5 +351,35 @@ public class HmcDataUtils {
             .min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
             .orElse(HearingDaySchedule.builder().build())
             .getHearingStartDateTime();
+    }
+
+    public static boolean isWelshHearingTemplate(CaseData caseData) {
+        return (YesOrNo.NO.equals(caseData.getApplicant1Represented()) && (caseData.isClaimantBilingual() || isClaimantDQDocumentsWelsh(caseData)))
+            || (YesOrNo.NO.equals(caseData.getRespondent1Represented()) && (caseData.isRespondentResponseBilingual() || isDefendantDQDocumentsWelsh(caseData)));
+    }
+
+    public static boolean isClaimantDQDocumentsWelsh(CaseData caseData) {
+        return Optional.ofNullable(caseData.getApplicant1DQ())
+            .map(Applicant1DQ::getApplicant1DQLanguage)
+            .map(WelshLanguageRequirements::getDocuments)
+            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
+            .orElse(false);
+    }
+
+    public static boolean isDefendantDQDocumentsWelsh(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQLanguage)
+            .map(WelshLanguageRequirements::getDocuments)
+            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
+            .orElse(false);
+    }
+
+    public static String translateTitle(String title) {
+        if ("hearing".equals(title) || "Hearing".equals(title)) {
+            return "Wrandawiad";
+        } else if ("trial".equals(title) || "Trial".equals(title)) {
+            return "Dreial";
+        }
+        return title;
     }
 }

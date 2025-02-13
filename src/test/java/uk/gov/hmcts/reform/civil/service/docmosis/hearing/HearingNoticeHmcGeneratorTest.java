@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -55,7 +57,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM_WELSH;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -73,11 +77,14 @@ class HearingNoticeHmcGeneratorTest {
 
     private HearingGetResponse baseHearing;
 
-    private static final String fileName_application = String.format(
+    private static final String FILE_NAME_APPLICATION = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
 
+    private static final String fileName_application_welsh = String.format(
+        HEARING_NOTICE_HMC_WELSH.getDocumentTitle(), REFERENCE_NUMBER);
+
     private static final CaseDocument CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentName(fileName_application)
+        .documentName(FILE_NAME_APPLICATION)
         .documentType(HEARING_FORM)
         .build();
 
@@ -100,15 +107,18 @@ class HearingNoticeHmcGeneratorTest {
     void setupTest() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_NOTICE_HMC)))
             .thenReturn(new DocmosisDocument(HEARING_NOTICE_HMC.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_NOTICE_HMC_WELSH)))
+            .thenReturn(new DocmosisDocument(HEARING_NOTICE_HMC_WELSH.getDocumentTitle(), bytes));
 
         when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
+                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
                  .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
                                                                                              .epimmsId(EPIMS)
                                                                                              .externalShortName("VenueName")
+                                                                                             .welshExternalShortName("WelshVenueValue")
                                                                                              .siteName("CML-Site")
                                                                                              .courtAddress(
                                                                                                  "CourtAddress")
@@ -156,6 +166,7 @@ class HearingNoticeHmcGeneratorTest {
                                         .hearingType("AAA7-TRI")
                                         .build()
                     )
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
             .build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -182,7 +193,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
@@ -218,6 +230,7 @@ class HearingNoticeHmcGeneratorTest {
                                 .hearingType("AAA7-TRI")
                                 .build()
             )
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
             .build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -247,7 +260,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
@@ -281,6 +295,7 @@ class HearingNoticeHmcGeneratorTest {
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
                                 .build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
             .build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -307,7 +322,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("trial")
             .caseNumber(caseData.getCcdCaseReference())
@@ -342,6 +358,7 @@ class HearingNoticeHmcGeneratorTest {
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DIS")
                                 .build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
             .build();
 
         CaseData caseData = CaseDataBuilder.builder().atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension()
@@ -368,7 +385,7 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId", HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title("disposal hearing")
             .caseNumber(caseData.getCcdCaseReference())
@@ -410,6 +427,7 @@ class HearingNoticeHmcGeneratorTest {
             .hearingDetails(HearingDetails.builder()
                                 .hearingType(hearingType)
                                 .build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
             .build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -438,7 +456,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
             .title(expectedTitle)
             .caseNumber(caseData.getCcdCaseReference())
@@ -475,6 +494,7 @@ class HearingNoticeHmcGeneratorTest {
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-DRH")
                                 .build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
             .build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -504,7 +524,8 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
-                                                            "SiteName - CourtAddress - Postcode", "hearingId");
+                                                            "SiteName - CourtAddress - Postcode", "hearingId",
+                                                            HEARING_NOTICE_HMC);
         var expected = HearingNoticeHmc.builder()
                 .title("dispute resolution hearing")
             .caseNumber(caseData.getCcdCaseReference())
@@ -538,6 +559,7 @@ class HearingNoticeHmcGeneratorTest {
             .hearingDetails(HearingDetails.builder()
                                 .hearingType("AAA7-TRI")
                                 .build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
             .build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -564,11 +586,12 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
-                                        "SiteName - CourtAddress - Postcode", "hearingId");
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC);
         var expected = List.of(CASE_DOCUMENT);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM));
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM));
 
         assertEquals(expected, actual);
     }
@@ -577,6 +600,52 @@ class HearingNoticeHmcGeneratorTest {
     @ValueSource(booleans = {true, false})
     void shouldReturnListOfExpectedCaseDocumentsSpec(boolean isCaseProgressionEnabled) {
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
+
+        var hearing = baseHearing.toBuilder()
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType("AAA7-TRI")
+                                .build())
+            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC()
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(PaymentStatus.SUCCESS)
+                                          .build())
+            .build();
+
+        when(hearingFeesService
+                 .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
+            .thenReturn(Fee.builder()
+                            .calculatedAmountInPence(new BigDecimal(123))
+                            .build());
+
+        var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC);
+        var expected = List.of(CASE_DOCUMENT);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_APPLICATION, bytes, HEARING_FORM));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldReturnListOfExpectedCaseDocumentsSpec_WhenIsWelshHearingNotice() {
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
 
         var hearing = baseHearing.toBuilder()
             .hearingDetails(HearingDetails.builder()
@@ -609,13 +678,12 @@ class HearingNoticeHmcGeneratorTest {
                             .build());
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
-                                        "SiteName - CourtAddress - Postcode", "hearingId");
+                                        "SiteName - CourtAddress - Postcode", "hearingId",
+                                        HEARING_NOTICE_HMC_WELSH);
         var expected = List.of(CASE_DOCUMENT);
 
         verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM));
-
-        assertEquals(expected, actual);
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application_welsh, bytes, HEARING_FORM_WELSH));
     }
 
 }
