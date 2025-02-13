@@ -28,7 +28,6 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -84,7 +83,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
 
         handler.createClaimantDashboardScenario(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(CASE_ID));
 
-        verify(dashboardScenariosService, times(1)).recordScenarios(
+        verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
             CASE_ID.toString(),

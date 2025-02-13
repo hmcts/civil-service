@@ -158,7 +158,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
                 .build();
 
             when(toggleService.isCaseEventsEnabled()).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()

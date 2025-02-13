@@ -24,7 +24,6 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -69,7 +68,7 @@ class SettlementNoResponseFromDefendantEventHandlerTest {
 
         handler.createClaimantDashboardScenario(new SettlementNoResponseFromDefendantEvent(CASE_ID));
 
-        verify(dashboardScenariosService, times(1)).recordScenarios(
+        verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT.getScenario(),
             CASE_ID.toString(),
