@@ -585,6 +585,10 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
+    hikari:
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      idle-timeout: 600000 # 10 minutes
 
 fees:
   api:
@@ -696,8 +700,11 @@ spring:
     hibernate:
       naming:
         physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
+
     properties:
       hibernate:
+        jdbc:
+          timeout: 300
         show_sql: false
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
@@ -710,6 +717,10 @@ spring:
         javax:
           cache:
             provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+          persistence:
+            query:
+              timeout: 300000  # 5 minutes (in milliseconds)
+
   flyway:
     enabled: true
     baselineOnMigrate: true
