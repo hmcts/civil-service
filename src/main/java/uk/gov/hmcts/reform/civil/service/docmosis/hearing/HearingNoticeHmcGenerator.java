@@ -41,8 +41,6 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPhoneAttendeeNames;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getVideoAttendeesNames;
-import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.translateContent;
-import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.translateTitle;
 
 @Service
 @RequiredArgsConstructor
@@ -91,18 +89,14 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
 
         return HearingNoticeHmc.builder()
-            .title(isWelsh
-                       ? translateTitle(getHearingTypeTitleText(caseData, hearing))
-                       : getHearingTypeTitleText(caseData, hearing))
+            .title(getHearingTypeTitleText(caseData, hearing, isWelsh ? true : false))
             .hearingSiteName(getExternalShortName(template, caseManagementLocation))
             .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(creationDate)
             .creationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
-            .hearingType(isWelsh
-                             ? translateContent(getHearingTypeContentText(caseData, hearing))
-                             : getHearingTypeContentText(caseData, hearing))
+            .hearingType(getHearingTypeContentText(caseData, hearing, isWelsh ? true : false))
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)

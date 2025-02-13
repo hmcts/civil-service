@@ -1392,7 +1392,7 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
 
-            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
 
             assertEquals(expected, actual);
         }
@@ -1408,7 +1408,7 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
 
-            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, false);
 
             assertEquals(expected, actual);
         }
@@ -1428,7 +1428,7 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().allocatedTrack(allocatedTrack).build();
 
-            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
 
             assertEquals(expected, actual);
         }
@@ -1444,7 +1444,7 @@ class HmcDataUtilsTest {
             HearingGetResponse hearing = buildHearing(hearingType);
             CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
 
-            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing);
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
 
             assertEquals(expected, actual);
         }
@@ -1970,56 +1970,6 @@ class HmcDataUtilsTest {
 
             // Then
             assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnWrandawiad_whenTitleIsHearingLowercase() {
-            // Given
-            String input = "hearing";
-            // When
-            String result = HmcDataUtils.translateTitle(input);
-            // Then
-            assertEquals("Wrandawiad", result);
-        }
-
-        @Test
-        void shouldReturnWrandawiad_whenTitleIsHearingUppercase() {
-            // Given
-            String input = "Hearing";
-            // When
-            String result = HmcDataUtils.translateTitle(input);
-            // Then
-            assertEquals("Wrandawiad", result);
-        }
-
-        @Test
-        void shouldReturnDreial_whenTitleIsTrialLowercase() {
-            // Given
-            String input = "trial";
-            // When
-            String result = HmcDataUtils.translateTitle(input);
-            // Then
-            assertEquals("Dreial", result);
-        }
-
-        @Test
-        void shouldReturnDreial_whenTitleIsTrialUppercase() {
-            // Given
-            String input = "Trial";
-            // When
-            String result = HmcDataUtils.translateTitle(input);
-            // Then
-            assertEquals("Dreial", result);
-        }
-
-        @Test
-        void shouldReturnSameTitle_whenTitleIsNotHearingOrTrial() {
-            // Given
-            String input = "anythingElse";
-            // When
-            String result = HmcDataUtils.translateTitle(input);
-            // Then
-            assertEquals("anythingElse", result);
         }
     }
 }

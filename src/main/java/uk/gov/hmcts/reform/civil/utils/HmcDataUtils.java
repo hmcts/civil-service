@@ -395,12 +395,12 @@ public class HmcDataUtils {
         return concatenateNames(getHearingAttendeeNames(hearing, VIDCVP));
     }
 
-    public static String getHearingTypeTitleText(CaseData caseData, HearingGetResponse hearing) {
-        return getTitleText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
+    public static String getHearingTypeTitleText(CaseData caseData, HearingGetResponse hearing, boolean isWelsh) {
+        return getTitleText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType(), isWelsh);
     }
 
-    public static String getHearingTypeContentText(CaseData caseData, HearingGetResponse hearing) {
-        return getContentText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
+    public static String getHearingTypeContentText(CaseData caseData, HearingGetResponse hearing, boolean isWelsh) {
+        return getContentText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType(), isWelsh);
     }
 
     @Nullable
@@ -447,21 +447,5 @@ public class HmcDataUtils {
             .map(WelshLanguageRequirements::getDocuments)
             .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
             .orElse(false);
-    }
-
-    public static String translateTitle(String title) {
-        if ("hearing".equals(title) || "Hearing".equals(title)) {
-            return "Wrandawiad";
-        } else if ("trial".equals(title) || "Trial".equals(title)) {
-            return "Dreial";
-        }
-        return title;
-    }
-
-    public static String translateContent(String hearingType) {
-        if (nonNull(hearingType)) {
-            return translateTitle(hearingType).toLowerCase();
-        }
-        return hearingType;
     }
 }
