@@ -55,7 +55,7 @@ public class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends Ba
                              .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_DEFENDANT_RESPONSE_DATE.name())
                              .build())
                 .build()))
-            .isEqualTo(TASK_ID);
+            .isEqualTo("default");
     }
 
     @Test
