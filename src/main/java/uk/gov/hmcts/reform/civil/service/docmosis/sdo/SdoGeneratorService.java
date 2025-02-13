@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -36,6 +37,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper.getFastTrackAllocation;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoGeneratorService {
@@ -202,6 +204,15 @@ public class SdoGeneratorService {
             .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
             .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
 
+        Optional.ofNullable(caseData.getDisposalHearingHearingTime())
+            .filter(hearingTime -> DisposalHearingFinalDisposalHearingTimeEstimate.OTHER.equals(hearingTime.getTime()))
+                .ifPresent(hearingTime -> sdoDocumentBuilder
+                    .disposalHearingTimeEstimate(
+                        String.format("%s hours %s minutes",
+                                      hearingTime.getOtherHours(),
+                                      hearingTime.getOtherMinutes())
+                    ));
+
         sdoDocumentBuilder.hearingLocation(
             locationHelper.getHearingLocation(
                 Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
@@ -218,7 +229,9 @@ public class SdoGeneratorService {
                 .welshLanguageDescription(caseData.getSdoR2DisposalHearingUseOfWelshLanguage() != null
                                               ? caseData.getSdoR2DisposalHearingUseOfWelshLanguage().getDescription() : null);
         }
-        return sdoDocumentBuilder.build();
+        SdoDocumentFormDisposal sdoDocumentFormDisposal = sdoDocumentBuilder.build();
+        log.info("Disposal SDO template data: {} for caseId {}", sdoDocumentFormDisposal, caseData.getCcdCaseReference());
+        return sdoDocumentFormDisposal;
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
