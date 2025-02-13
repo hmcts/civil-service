@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -287,8 +288,8 @@ class HearingNoticeHmcGeneratorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isCaseProgressionEnabled) {
+    @CsvSource({"true, false", "false, false", "true, true", "false, false"})
+    void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isCaseProgressionEnabled, boolean isWelsh) {
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isCaseProgressionEnabled);
 
         var hearing = baseHearing.toBuilder()
@@ -323,23 +324,26 @@ class HearingNoticeHmcGeneratorTest {
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
-                                                            HEARING_NOTICE_HMC);
+                                                            isWelsh ? HEARING_NOTICE_HMC_WELSH : HEARING_NOTICE_HMC);
+        var creationDate = LocalDate.now();
         var expected = HearingNoticeHmc.builder()
-            .title("trial")
+            .title(isWelsh ? "Dreial" : "trial")
             .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
+            .creationDate(creationDate)
+            .creationDateWelshText(isWelsh ? DateUtils.formatDateInWelsh(creationDate, true) : null)
             .claimant(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1().getPartyName())
             .claimantReference(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())
             .defendantReference(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
             .feeAmount("£1")
-            .hearingSiteName("VenueName")
+            .hearingSiteName(isWelsh ? "WelshVenueValue" : "VenueName")
             .caseManagementLocation("CML-Site - CourtAddress - Postcode")
             .hearingLocation("SiteName - CourtAddress - Postcode")
-            .hearingDays("01 January 2023 at 00:00 for 12 hours")
-            .totalHearingDuration("2 days")
-            .hearingType("trial")
+            .hearingDays(isWelsh ? "01 Ionawr 2023 am 00:00 am 12 oriau" : "01 January 2023 at 00:00 for 12 hours")
+            .totalHearingDuration(isWelsh ? "2 dyddiau" : "2 days")
+            .hearingType(isWelsh ? "dreial" : "trial")
             .hearingDueDate(LocalDate.of(2023, 1, 1))
+            .hearingDueDateWelshText(isWelsh ? "01 Ionawr 2023" : null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
             .partiesAttendingInPerson("Chloe Landale")
             .partiesAttendingByVideo("Michael Carver")

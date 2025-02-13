@@ -31,6 +31,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_NOTICE_HMC_WELSH;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDaysText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingTypeContentText;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPhoneAttendeeNames;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getVideoAttendeesNames;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.translateContent;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.translateTitle;
 
 @Service
@@ -82,19 +84,25 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         var hearingDueDate = paymentFailed && hearingFeeRequired(hearingType) ? HearingFeeUtils
             .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
                 .getHearingStartDateTime().toLocalDate()) : null;
+        var isWelsh = HEARING_NOTICE_HMC_WELSH.equals(template);
+        var creationDate = LocalDate.now();
 
         LocationRefData caseManagementLocation =
             getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
 
         return HearingNoticeHmc.builder()
-            .title(HEARING_NOTICE_HMC_WELSH.equals(template)
-                       ? translateTitle(getHearingTypeTitleText(caseData, hearing)) : getHearingTypeTitleText(caseData, hearing))
+            .title(isWelsh
+                       ? translateTitle(getHearingTypeTitleText(caseData, hearing))
+                       : getHearingTypeTitleText(caseData, hearing))
             .hearingSiteName(getExternalShortName(template, caseManagementLocation))
             .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
-            .creationDate(LocalDate.now())
-            .hearingType(getHearingTypeContentText(caseData, hearing))
+            .creationDate(creationDate)
+            .creationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
+            .hearingType(isWelsh
+                             ? translateContent(getHearingTypeContentText(caseData, hearing))
+                             : getHearingTypeContentText(caseData, hearing))
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -106,10 +114,13 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .defendant2(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .defendant2Reference(caseData.getRespondentSolicitor2Reference())
-            .hearingDays(getHearingDaysText(hearing))
-            .totalHearingDuration(getTotalHearingDurationText(hearing))
+            .hearingDays(getHearingDaysText(hearing, isWelsh))
+            .totalHearingDuration(getTotalHearingDurationText(hearing, isWelsh))
             .feeAmount(feeAmount)
             .hearingDueDate(hearingDueDate)
+            .hearingDueDateWelshText(isWelsh && nonNull(hearingDueDate)
+                                         ? formatDateInWelsh(hearingDueDate, true)
+                                         : null)
             .hearingFeePaymentDetails(caseData.getHearingFeePaymentDetails())
             .partiesAttendingInPerson(getInPersonAttendeeNames(hearing))
             .partiesAttendingByTelephone(getPhoneAttendeeNames(hearing))
@@ -127,8 +138,10 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             && !caseManagementLocation.getWelshExternalShortName().isEmpty()) {
             return caseManagementLocation.getWelshExternalShortName();
         }
-
-        return caseManagementLocation.getExternalShortName();
+        if (nonNull(caseManagementLocation)) {
+            return caseManagementLocation.getExternalShortName();
+        }
+        return null;
     }
 }
 

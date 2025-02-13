@@ -10,11 +10,12 @@ import static uk.gov.hmcts.reform.civil.enums.DocumentContext.TITLE;
 @Getter
 @RequiredArgsConstructor
 public enum DocumentHearingType {
-    TRI("trial"),
-    DIS("disposal hearing"),
-    DRH("dispute resolution hearing");
+    TRI("trial", "dreial"),
+    DIS("disposal hearing", ""),
+    DRH("dispute resolution hearing", "");
 
     private final String label;
+    private final String labelWelsh;
 
     /**
      * Gets the {@link DocumentHearingType} based on the provided hearing type string.
