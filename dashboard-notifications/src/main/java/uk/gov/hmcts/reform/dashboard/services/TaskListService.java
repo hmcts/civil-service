@@ -49,16 +49,22 @@ public class TaskListService {
     public TaskListEntity saveOrUpdate(TaskListEntity taskList) {
 
         TaskItemTemplateEntity taskItemTemplate = taskList.getTaskItemTemplate();
-        Optional<TaskListEntity> existingEntity = taskListRepository
+        List<TaskListEntity> entities = taskListRepository
             .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
                 taskList.getReference(),
                 taskItemTemplate.getRole(),
                 taskItemTemplate.getTemplateName()
             );
 
+        Optional<TaskListEntity> latestEntity = entities.stream()
+            .max(Comparator.comparing(TaskListEntity::getCreatedAt));
+
         TaskListEntity beingUpdated = taskList;
-        if (existingEntity.isPresent()) {
-            beingUpdated = taskList.toBuilder().id(existingEntity.get().getId()).build();
+        if (latestEntity.isPresent()) {
+            beingUpdated = taskList.toBuilder().id(latestEntity.get().getId()).build();
+            entities.stream()
+                .filter(e -> !e.equals(latestEntity.get()))
+                .forEach(duplicateEntity -> taskListRepository.deleteById(duplicateEntity.getId()));
         }
 
         return taskListRepository.save(beingUpdated);
