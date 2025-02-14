@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -23,15 +22,18 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
@@ -39,19 +41,23 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private CaseProceedOfflineDefendantNotificationHandler handler;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -97,12 +103,11 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-
-            verify(dashboardApiClient).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
@@ -141,11 +146,10 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -170,11 +174,11 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             // Then
-            verify(dashboardApiClient, never()).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
+            verify(dashboardScenariosService, never()).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
 
@@ -199,10 +203,10 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             // Then
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+            verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -227,25 +231,23 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             // Then
-            verify(dashboardApiClient, never()).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
+            verify(dashboardScenariosService, never()).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
 
         private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(),
-                "DEFENDANT",
-                "BEARER_TOKEN"
+                "DEFENDANT"
             );
-            verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
                 "DEFENDANT",
-                GA,
-                "BEARER_TOKEN"
+                GA
             );
         }
 
@@ -279,16 +281,15 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
                 "54326781",
-                "APPLICANT",
-                "BEARER_TOKEN"
+                "APPLICANT"
             );
 
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -318,11 +319,10 @@ public class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCall
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
