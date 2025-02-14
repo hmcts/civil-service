@@ -1370,7 +1370,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test =
-                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
+                "The Judgment request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
                     + "### Claim amount \n"
                     + " £1010.00\n"
                     + " ### Claim interest amount \n"
@@ -1426,7 +1426,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             String test =
-                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
+                "The Judgment request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.\n"
                     + "### Claim amount \n"
                     + " £1010.00\n"
                     + " ### Claim interest amount \n"

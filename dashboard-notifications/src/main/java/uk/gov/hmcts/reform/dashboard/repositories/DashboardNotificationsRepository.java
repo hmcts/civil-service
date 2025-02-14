@@ -15,7 +15,7 @@ public interface DashboardNotificationsRepository extends CrudRepository<Dashboa
 
     List<DashboardNotificationsEntity> findByReferenceAndCitizenRole(String reference, String role);
 
-    Optional<DashboardNotificationsEntity> findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
+    List<DashboardNotificationsEntity> findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
         String reference, String role, Long templateId);
 
     int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String role);
