@@ -68,7 +68,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
             featureToggleService.isGaForLipsEnabled(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
-            featureToggleService.isGaForLipsEnabled()
+            featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0
         );
     }
 

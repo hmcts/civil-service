@@ -77,7 +77,7 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
             featureToggleService.isGaForLipsEnabled(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
-            featureToggleService.isGaForLipsEnabled()
+            featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0
         );
     }
 

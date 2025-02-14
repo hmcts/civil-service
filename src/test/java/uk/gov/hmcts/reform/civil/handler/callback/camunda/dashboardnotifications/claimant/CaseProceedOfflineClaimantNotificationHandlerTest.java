@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,6 +82,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                     .respondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)
                     .ccdCaseReference(1234L)
+                .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
                     .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);

@@ -86,9 +86,14 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
         @Test
         void shouldRecordScenario_whenInvokedWithoutCPToggle() {
             // Given
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("54326781").build())
+                    .build());
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                     .respondent1Represented(YesOrNo.NO)
                     .ccdCaseReference(12890L)
+                .generalApplications(gaApplications)
                     .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
