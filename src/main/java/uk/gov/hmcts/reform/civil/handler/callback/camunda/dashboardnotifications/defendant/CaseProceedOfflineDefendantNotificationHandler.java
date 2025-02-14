@@ -11,8 +11,11 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
+import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
@@ -32,7 +35,7 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
                 CaseState.DECISION_OUTCOME,
                 CaseState.All_FINAL_ORDERS_ISSUED);
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
-
+    public static final String GA = "Applications";
     public CaseProceedOfflineDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                           DashboardNotificationsParamsMapper mapper,
                                                           FeatureToggleService featureToggleService) {
@@ -56,6 +59,16 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario();
         }
         return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
+    }
+    @Override
+    public Map<String, Boolean> getScenarios(CaseData caseData) {
+
+        return Map.of(
+            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
+            featureToggleService.isGaForLipsEnabled(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
+            featureToggleService.isGaForLipsEnabled()
+        );
     }
 
     @Override
@@ -87,6 +100,7 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
         dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
+            GA,
             authToken
         );
 

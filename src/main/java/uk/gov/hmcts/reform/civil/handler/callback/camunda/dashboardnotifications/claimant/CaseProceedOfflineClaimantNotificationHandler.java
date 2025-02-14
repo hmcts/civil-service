@@ -11,10 +11,13 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
+import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
 
 @Service
 public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCallbackHandler {
@@ -30,7 +33,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
                 CaseState.DECISION_OUTCOME,
                 CaseState.All_FINAL_ORDERS_ISSUED);
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationCaseProceedOffline";
-
+    public static final String GA = "Applications";
     public CaseProceedOfflineClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
                                                          DashboardNotificationsParamsMapper mapper,
                                                          FeatureToggleService featureToggleService) {
@@ -48,6 +51,16 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario();
         }
         return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario();
+    }
+
+    @Override
+    public Map<String, Boolean> getScenarios(CaseData caseData) {
+        return Map.of(
+            SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
+            featureToggleService.isGaForLipsEnabled(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
+            featureToggleService.isGaForLipsEnabled()
+        );
     }
 
     @Override
@@ -78,6 +91,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
         dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
+            GA,
             authToken
         );
     }
