@@ -20,7 +20,7 @@ import java.util.List;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
@@ -157,7 +157,7 @@ public class ShowWarningTask {
         return ((CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
             && bothClaimantsHaveLitigationFriends(caseData))
             || ((DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen) || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen))
-            && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && bothDefendantsHaveLitigationFriends(caseData));
     }
 

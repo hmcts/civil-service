@@ -96,7 +96,7 @@ public class ClaimDetailsNotifiedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAfterSDO_insteadOfSDONotDrawnAfterClaimDetailsNotified_in1v2Scenario() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
             .build();
         assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
         assertTrue(takenOfflineAfterSDO.test(caseData));

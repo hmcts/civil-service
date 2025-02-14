@@ -10,7 +10,7 @@ public enum MultiPartyScenario {
     /**
      * one claimant vs two defendants with one LR for both defendants.
      */
-    ONE_V_TWO_ONE_LEGAL_REP,
+    ONE_V_TWO_SAME_LEGAL_REP,
     /**
      * two claimants vs one defendant.
      */
@@ -18,21 +18,35 @@ public enum MultiPartyScenario {
     /**
      * one claimant vs two defendants with one LR for each defendant.
      */
-    ONE_V_TWO_TWO_LEGAL_REP;
+    ONE_V_TWO_TWO_LEGAL_REP,
+
+    ONE_V_TWO_ONE_LEGAL_REP;
 
     public static MultiPartyScenario getMultiPartyScenario(CaseData caseData) {
-        if (caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES)) {
+        if (has2Applicants(caseData)) {
             return TWO_V_ONE;
         }
 
-        if (caseData.getRespondent2() != null || caseData.getRespondent2Copy() != null) {
-            return (caseData.getRespondent2SameLegalRepresentative() == null
-                || caseData.getRespondent2SameLegalRepresentative().equals(NO))
-                ? ONE_V_TWO_TWO_LEGAL_REP
-                : ONE_V_TWO_ONE_LEGAL_REP;
+        if (has2Respondents(caseData)) {
+            YesOrNo respondent2SameLegalRepresentative = caseData.getRespondent2SameLegalRepresentative();
+            if(respondent2SameLegalRepresentative == null) {
+               return ONE_V_TWO_ONE_LEGAL_REP;
+            } else if(respondent2SameLegalRepresentative.equals(YES)){
+                return ONE_V_TWO_SAME_LEGAL_REP;
+            } else {
+                return ONE_V_TWO_TWO_LEGAL_REP;
+            }
+        } else {
+            return ONE_V_ONE;
         }
+    }
 
-        return ONE_V_ONE;
+    private static boolean has2Applicants(CaseData caseData) {
+        return caseData.getAddApplicant2() != null && caseData.getAddApplicant2().equals(YES);
+    }
+
+    private static boolean has2Respondents(CaseData caseData) {
+        return caseData.getRespondent2() != null || caseData.getRespondent2Copy() != null;
     }
 
     public static boolean isMultiPartyScenario(CaseData caseData) {
@@ -44,7 +58,7 @@ public enum MultiPartyScenario {
     }
 
     public static boolean isOneVTwoLegalRep(CaseData caseData) {
-        return ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData));
+        return ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData));
     }
 
     public static boolean isTwoVOne(CaseData caseData) {

@@ -85,7 +85,7 @@ public class PrepareEventTask {
                     addApplicantOptions2v1(dynamicListOptions, caseData, true);
                     addDefendant1Options(dynamicListOptions, caseData, true);
                 }
-                case ONE_V_TWO_ONE_LEGAL_REP -> {
+                case ONE_V_TWO_SAME_LEGAL_REP -> {
                     addApplicant1Options(dynamicListOptions, caseData, true);
                     addDefendantOptions1v2SameSolicitor(dynamicListOptions, caseData, true);
                 }
@@ -98,7 +98,7 @@ public class PrepareEventTask {
             }
         } else if (isApplicantSolicitor(roles)) {
             switch (multiPartyScenario) {
-                case ONE_V_ONE, ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                case ONE_V_ONE, ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                     addApplicant1Options(dynamicListOptions, caseData, false);
                 case TWO_V_ONE -> addApplicantOptions2v1(dynamicListOptions, caseData, false);
                 default -> throw new CallbackException(invalidParticipants);
@@ -107,7 +107,7 @@ public class PrepareEventTask {
             switch (multiPartyScenario) {
                 case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP, TWO_V_ONE ->
                     addDefendant1Options(dynamicListOptions, caseData, false);
-                case ONE_V_TWO_ONE_LEGAL_REP ->
+                case ONE_V_TWO_SAME_LEGAL_REP ->
                     addDefendantOptions1v2SameSolicitor(dynamicListOptions, caseData, false);
                 default -> throw new CallbackException(invalidParticipants);
             }

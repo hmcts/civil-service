@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
@@ -38,7 +38,7 @@ public class SpecResponse1v2DivergentText implements RespondToClaimConfirmationT
 
     private boolean isDivergentResponse1v2SameSolicitor(CaseData caseData) {
         if (NO.equals(caseData.getRespondentResponseIsSame())
-            && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            && ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
             RespondentResponseTypeSpec respondent1Response = caseData.getRespondent1ClaimResponseTypeForSpec();
             RespondentResponseTypeSpec respondent2Response = caseData.getRespondent2ClaimResponseTypeForSpec();
             if ((respondent1Response.equals(RespondentResponseTypeSpec.FULL_DEFENCE)

@@ -66,7 +66,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
 
     private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> isNotSuitableSDO(caseData)
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_SAME_LEGAL_REP -> isNotSuitableSDO(caseData)
                 && caseData.getRespondent1AcknowledgeNotificationDate() != null
                 && caseData.getRespondent1TimeExtensionDate() != null
                 && caseData.getRespondent1ResponseDate() == null
@@ -85,7 +85,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilder extends MidT
 
     private static boolean getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> caseData.getTakenOfflineByStaffDate() != null
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_SAME_LEGAL_REP -> caseData.getTakenOfflineByStaffDate() != null
                 && caseData.getRespondent1AcknowledgeNotificationDate() != null
                 && caseData.getRespondent1TimeExtensionDate() != null
                 && caseData.getRespondent2AcknowledgeNotificationDate() != null

@@ -4678,7 +4678,7 @@ class EventHistoryMapperTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
-                    .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
                     .respondentResponseIsSame(YES)
                     .respondent1DQ(Respondent1DQ.builder()
                                        .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -4840,7 +4840,7 @@ class EventHistoryMapperTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                         .atState(FULL_DEFENCE_PROCEED)
-                        .atStateApplicantProceedAllMediation(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                        .atStateApplicantProceedAllMediation(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
                         .respondentResponseIsSame(YES)
                         .build();
                 if (caseData.getRespondent2OrgRegistered() != null
@@ -5094,7 +5094,7 @@ class EventHistoryMapperTest {
                     + "Claimant has provided intention: not proceed against defendant: Mr. John Rambo";
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
@@ -5167,7 +5167,7 @@ class EventHistoryMapperTest {
                     + "Claimant has provided intention: proceed against defendant: Mr. John Rambo";
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
                     .respondentResponseIsSame(YES)
                     .build();

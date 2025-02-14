@@ -69,7 +69,7 @@ import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
@@ -648,7 +648,7 @@ public class EventHistoryMapper {
                                                   boolean goingOffline) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
         LocalDateTime respondent2ResponseDate;
-        if (ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+        if (ONE_V_TWO_SAME_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
             // even if response is not the same, the date is
             respondent2ResponseDate = caseData.getRespondent1ResponseDate();
         } else {
@@ -790,7 +790,7 @@ public class EventHistoryMapper {
             ));
         } else {
             RespondToClaim respondToClaim;
-            if (ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            if (ONE_V_TWO_SAME_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
                 && caseData.getSameSolicitorSameResponse() == YES) {
                 respondToClaim = caseData.getRespondToClaim();
             } else {
@@ -885,7 +885,7 @@ public class EventHistoryMapper {
             }
         } else {
             String paginatedMessage = "";
-            if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+            if (scenario.equals(ONE_V_TWO_SAME_LEGAL_REP)) {
                 paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
             }
             defaultText = (format(
@@ -1386,7 +1386,7 @@ public class EventHistoryMapper {
                     buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_SAME_LEGAL_REP:
                 proceedRespondent1 =
                     caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
                 proceedRespondent2 =
@@ -1513,7 +1513,7 @@ public class EventHistoryMapper {
         String currentTime = time.now().toLocalDate().toString();
 
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
+            case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
                 eventDetailsText.add(String.format(
                     "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
                     currentTime,
@@ -1762,7 +1762,7 @@ public class EventHistoryMapper {
     public String prepareFullDefenceEventText(DQ dq, CaseData caseData, boolean isRespondent1, Party respondent) {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         String paginatedMessage = "";
-        if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+        if (scenario.equals(ONE_V_TWO_SAME_LEGAL_REP)) {
             paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
         }
         return (format(
@@ -1930,7 +1930,7 @@ public class EventHistoryMapper {
                 builder.acknowledgementOfServiceReceived(events);
                 break;
             }
-            case ONE_V_TWO_ONE_LEGAL_REP: {
+            case ONE_V_TWO_SAME_LEGAL_REP: {
                 String currentTime = time.now().toLocalDate().toString();
 
                 builder
@@ -2270,7 +2270,7 @@ public class EventHistoryMapper {
         String extensionDate = party.getSolicitorAgreedDeadlineExtension()
             .format(DateTimeFormatter.ofPattern("dd MM yyyy"));
         switch (scenario) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_SAME_LEGAL_REP:
                 return format("Defendant(s) have agreed extension: %s", extensionDate);
             case ONE_V_TWO_TWO_LEGAL_REP:
                 return format("Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),

@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -88,7 +88,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
 
         //finding extension date for the correct respondent in a 1v2 different solicitor scenario
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if ((multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) || (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP)) {
+        if ((multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) || (multiPartyScenario == ONE_V_TWO_SAME_LEGAL_REP)) {
             if ((caseData.getRespondent1ResponseDeadline() == null)
                 && (caseData.getRespondent2ResponseDeadline() != null)) {
                 extensionDate = caseData.getRespondent2ResponseDeadline();

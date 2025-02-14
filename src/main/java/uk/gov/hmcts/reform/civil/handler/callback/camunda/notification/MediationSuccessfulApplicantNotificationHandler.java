@@ -21,7 +21,7 @@ import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -69,7 +69,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                     lipProperties(caseData),
                     referenceTemplate
                 );
-            } else if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP) || scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+            } else if (scenario.equals(ONE_V_TWO_SAME_LEGAL_REP) || scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 sendEmail(
                     caseData.getApplicantSolicitor1UserDetails().getEmail(),
                     notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation(),

@@ -263,7 +263,7 @@ public class DQGeneratorFormBuilder {
             witnessesIncludingDefendants = YES.equals(witnesses.getWitnessesToAppear())
                 ? witnesses.getDetails().size() : 0;
             MultiPartyScenario multiParty = MultiPartyScenario.getMultiPartyScenario(caseData);
-            if (multiParty == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
+            if (multiParty == MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP
                 || multiParty == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
                 witnessesIncludingDefendants += 2;
             } else {

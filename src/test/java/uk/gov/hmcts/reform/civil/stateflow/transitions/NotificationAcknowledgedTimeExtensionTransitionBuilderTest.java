@@ -98,7 +98,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAfterSDONotDrawnNotificationAcknowledgedTimeExtension_1v2() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
             .build();
         assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
         assertTrue(takenOfflineAfterSDO.test(caseData));

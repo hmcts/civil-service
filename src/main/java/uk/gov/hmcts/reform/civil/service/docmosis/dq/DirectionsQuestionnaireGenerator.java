@@ -85,7 +85,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                         ? DQ_RESPONSE_1V2_DS_FAST_TRACK_INT : DQ_RESPONSE_1V2_DS;
                 }
                 break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_SAME_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = isFastTrackOrMinti

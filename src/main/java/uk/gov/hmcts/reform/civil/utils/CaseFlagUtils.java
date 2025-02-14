@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -140,7 +140,7 @@ public class CaseFlagUtils {
     public static void addRespondentDQPartiesFlagStructure(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
         addRespondent1ExpertAndWitnessFlagsStructure(builder, caseData);
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)) || (
-            ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && NO.equals(caseData.getRespondentResponseIsSame())
             && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()))) {
             addRespondent2ExpertAndWitnessFlagsStructure(builder, caseData);

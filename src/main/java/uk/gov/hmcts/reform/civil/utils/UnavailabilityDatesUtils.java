@@ -13,7 +13,7 @@ import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
@@ -50,7 +50,7 @@ public class UnavailabilityDatesUtils {
             builder.respondent1(resp1.build())
                 .respondent1UnavailableDatesForTab(updatedUnavailableDates);
 
-            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_SAME_LEGAL_REP)) {
                 Party.PartyBuilder resp2 = caseData.getRespondent2().toBuilder()
                     .unavailableDates(updatedUnavailableDates);
                 builder.respondent2(resp2.build())

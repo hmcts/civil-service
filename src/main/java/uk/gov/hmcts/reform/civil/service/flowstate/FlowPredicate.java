@@ -64,7 +64,7 @@ public class FlowPredicate {
         boolean respondent2Acknowledged = caseData.getRespondent2AcknowledgeNotificationDate() != null;
 
         return switch (scenario) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> respondent1Acknowledged || respondent2Acknowledged;
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_SAME_LEGAL_REP -> respondent1Acknowledged || respondent2Acknowledged;
             default -> respondent1Acknowledged;
         };
     }
@@ -87,7 +87,7 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseType() == responseType;
 
         return switch (scenario) {
-            case ONE_V_TWO_ONE_LEGAL_REP -> respondent1Matches
+            case ONE_V_TWO_SAME_LEGAL_REP -> respondent1Matches
                 && (YES.equals(caseData.getRespondentResponseIsSame()) || caseData.getRespondent2ClaimResponseType() == responseType);
             case ONE_V_TWO_TWO_LEGAL_REP -> respondent1Matches && caseData.getRespondent2ClaimResponseType() == responseType;
             case ONE_V_ONE -> respondent1Matches;
@@ -99,7 +99,7 @@ public class FlowPredicate {
 
     private static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP ->
+            case ONE_V_TWO_SAME_LEGAL_REP ->
                 //scenario: either of them have submitted full defence response
                 !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
                     && (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
@@ -138,7 +138,7 @@ public class FlowPredicate {
                 //scenario: neither responses are full defence
                 || (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
                 && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)));
-            case ONE_V_TWO_ONE_LEGAL_REP ->
+            case ONE_V_TWO_SAME_LEGAL_REP ->
                 !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
                     && (!caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
                     && !caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE));
@@ -260,7 +260,7 @@ public class FlowPredicate {
             && caseData.getClaimDismissedDate() == null;
 
         if (getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
-            || getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP) {
+            || getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP) {
             return commonConditions
                 && caseData.getRespondent2ResponseDate() == null
                 && caseData.getRespondent2AcknowledgeNotificationDate() == null
@@ -282,7 +282,7 @@ public class FlowPredicate {
 
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
 
-        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP || scenario == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP) {
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP || scenario == MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP) {
             return commonConditions
                 && caseData.getRespondent2AcknowledgeNotificationDate() == null
                 && caseData.getRespondent2TimeExtensionDate() == null
@@ -338,7 +338,7 @@ public class FlowPredicate {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
 
         return switch (scenario) {
-            case ONE_V_TWO_ONE_LEGAL_REP -> basePredicate && (YES.equals(caseData.getRespondentResponseIsSame())
+            case ONE_V_TWO_SAME_LEGAL_REP -> basePredicate && (YES.equals(caseData.getRespondentResponseIsSame())
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == responseType);
             case ONE_V_TWO_TWO_LEGAL_REP -> basePredicate
                 && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType
@@ -365,7 +365,7 @@ public class FlowPredicate {
         }
 
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP ->
+            case ONE_V_TWO_SAME_LEGAL_REP ->
                 // scenario: only one of them has submitted a full defence response
                 caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -404,7 +404,7 @@ public class FlowPredicate {
 
         return switch (getMultiPartyScenario(caseData)) {
             // 1v2 different solicitors, DQ is always created for both defendants
-            case ONE_V_TWO_ONE_LEGAL_REP ->
+            case ONE_V_TWO_SAME_LEGAL_REP ->
                 caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
@@ -430,14 +430,14 @@ public class FlowPredicate {
     private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
+                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
                     YES.equals(caseData.getApplicant1ProceedWithClaim());
                 case TWO_V_ONE -> YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
                 default -> false;
             };
         } else {
             return switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                         || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 case ONE_V_ONE -> YES.equals(caseData.getApplicant1ProceedWithClaim());
@@ -450,14 +450,14 @@ public class FlowPredicate {
     private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
+                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
                     NO.equals(caseData.getApplicant1ProceedWithClaim());
                 case TWO_V_ONE -> NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
                 default -> false;
             };
         } else {
             return switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                     NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                         && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 case ONE_V_ONE -> NO.equals(caseData.getApplicant1ProceedWithClaim());

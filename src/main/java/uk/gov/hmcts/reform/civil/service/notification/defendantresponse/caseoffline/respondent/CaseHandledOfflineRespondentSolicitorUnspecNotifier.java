@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
@@ -41,7 +41,7 @@ public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHan
     }
 
     private void sendNotificationToSolicitor(CaseData caseData, String recipientEmailAddress, String templateID, CaseHandledOfflineRecipient recipientType) {
-        if (is1v1Or2v1Case(caseData) || ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+        if (is1v1Or2v1Case(caseData) || ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             || recipientType.equals(CaseHandledOfflineRecipient.RESPONDENT_SOLICITOR1)) {
             notificationService.sendMail(
                 recipientEmailAddress,

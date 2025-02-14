@@ -158,7 +158,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private void addCarmMediationDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP ->
+            case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_SAME_LEGAL_REP ->
                 populateCarmMediationFieldsForRespondent1(builder, caseData);
             case ONE_V_TWO_TWO_LEGAL_REP -> populateCarmMediationFieldsForRelevantRespondent(builder, caseData);
             default -> throw new CallbackException("Cannot populate CARM fields");

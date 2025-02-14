@@ -102,7 +102,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -398,7 +398,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             if (caseData.getRespondent2().getType() != Party.Type.COMPANY
                 && caseData.getRespondent2().getType() != Party.Type.ORGANISATION) {
                 if ((scenario == ONE_V_TWO_TWO_LEGAL_REP && needFinancialInfo21v2ds(caseData))
-                    || (scenario == ONE_V_TWO_ONE_LEGAL_REP
+                    || (scenario == ONE_V_TWO_SAME_LEGAL_REP
                     && ((caseData.getRespondentResponseIsSame() != YES && needFinancialInfo21v2ds(caseData))
                     || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES)))) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
@@ -427,7 +427,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (YES.equals(caseData.getIsRespondent1())
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE
-            && (scenario != ONE_V_TWO_ONE_LEGAL_REP || caseData.getRespondentResponseIsSame() == YES)) {
+            && (scenario != ONE_V_TWO_SAME_LEGAL_REP || caseData.getRespondentResponseIsSame() == YES)) {
             return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != IMMEDIATELY
                 && caseData.getSpecDefenceFullAdmittedRequired() != YES
                 && caseData.getSpecDefenceAdmittedRequired() != YES;
@@ -438,7 +438,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private boolean respondent2doesNotPayImmediately(CaseData caseData, MultiPartyScenario scenario) {
         if (caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE) {
-            if (scenario == ONE_V_TWO_ONE_LEGAL_REP && caseData.getRespondentResponseIsSame() == YES) {
+            if (scenario == ONE_V_TWO_SAME_LEGAL_REP && caseData.getRespondentResponseIsSame() == YES) {
                 return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != IMMEDIATELY
                     && caseData.getSpecDefenceFullAdmittedRequired() != YES
                     && caseData.getSpecDefenceAdmittedRequired() != YES;
@@ -552,7 +552,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.specFullAdmissionOrPartAdmission(NO);
         }
 
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+        if (ONE_V_TWO_SAME_LEGAL_REP.equals(multiPartyScenario)
             && Objects.equals(
             caseData.getRespondent1ClaimResponseTypeForSpec(),
             caseData.getRespondent2ClaimResponseTypeForSpec()
@@ -562,14 +562,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondentResponseIsSame(YES)
                 .build();
         }
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+        if (ONE_V_TWO_SAME_LEGAL_REP.equals(multiPartyScenario)
             && caseData.getRespondentResponseIsSame().equals(NO)) {
             updatedData.sameSolicitorSameResponse(NO);
             if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 updatedData.respondentClaimResponseTypeForSpecGeneric(FULL_DEFENCE);
             }
-        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+        } else if (ONE_V_TWO_SAME_LEGAL_REP.equals(multiPartyScenario)
             && caseData.getRespondentResponseIsSame().equals(YES)) {
             updatedData.sameSolicitorSameResponse(YES);
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
@@ -803,7 +803,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 }
                 break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_SAME_LEGAL_REP:
                 if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     if (caseData.getRespondentResponseIsSame() == YES
                         || caseData.getRespondent2ClaimResponseTypeForSpec()
@@ -904,7 +904,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     }
                 }
                 break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_SAME_LEGAL_REP:
                 if (caseData.getRespondentResponseIsSame() == YES) {
                     fullDefenceAndPaidLess(
                         caseData.getRespondent1ClaimResponseTypeForSpec(),
@@ -1179,7 +1179,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             case ONE_V_ONE, TWO_V_ONE:
                 set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
                 break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_SAME_LEGAL_REP:
                 set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
                 set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
                 break;
@@ -1292,7 +1292,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             } else {
                 updatedData.sameSolicitorSameResponse(NO).build();
             }
-        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+        } else if (ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
             if (NO.equals(caseData.getRespondentResponseIsSame())) {
                 updatedData.sameSolicitorSameResponse(NO).build();
@@ -1566,7 +1566,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                     .build();
             }
-        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP && twoVsOneDivergent(caseData)) {
+        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_SAME_LEGAL_REP && twoVsOneDivergent(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
@@ -1611,7 +1611,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             Address newAddress = caseData.getSpecAoSRespondentCorrespondenceAddressdetails();
             updatedCaseData.specRespondentCorrespondenceAddressdetails(newAddress)
                 .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
-            if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP) {
+            if (getMultiPartyScenario(caseData) == ONE_V_TWO_SAME_LEGAL_REP) {
                 // to keep with heading tab
                 updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
             }

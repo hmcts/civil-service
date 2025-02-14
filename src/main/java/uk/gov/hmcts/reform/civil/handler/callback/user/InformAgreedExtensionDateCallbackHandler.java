@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -112,7 +112,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         }
 
         if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
-            || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
+            || multiPartyScenario.equals(ONE_V_TWO_SAME_LEGAL_REP))
             && caseData.getRespondent1TimeExtensionDate() != null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_EXTENSION_DATE_SUBMITTED))

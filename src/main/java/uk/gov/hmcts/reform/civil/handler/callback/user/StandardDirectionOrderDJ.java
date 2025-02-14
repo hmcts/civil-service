@@ -183,7 +183,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             case ONE_V_ONE ->
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName());
-            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+            case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
             case TWO_V_ONE ->

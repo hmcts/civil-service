@@ -231,7 +231,7 @@ public class DocmosisTemplateDataUtils {
                     responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
                 }
                 break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_SAME_LEGAL_REP:
                 responseIntentions.add("Defendant 1 :"
                                            + caseData.getRespondent1ClaimResponseIntentionType().getLabel());
                 responseIntentions.add("Defendant 2 :"
