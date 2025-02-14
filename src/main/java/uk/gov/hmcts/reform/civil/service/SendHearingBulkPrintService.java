@@ -14,6 +14,7 @@ import java.util.List;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_NOTICE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_DEFENDANT_HMC;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class SendHearingBulkPrintService {
     }
 
     private boolean isDefendantPrint(String task) {
-        return task.equals(TASK_ID_DEFENDANT);
+        return task.equals(TASK_ID_DEFENDANT) || task.equals(TASK_ID_DEFENDANT_HMC);
     }
 
     private byte[] generateLetterContent(String authorisation, CaseData caseData, String task, CaseDocument... caseDocument) {
