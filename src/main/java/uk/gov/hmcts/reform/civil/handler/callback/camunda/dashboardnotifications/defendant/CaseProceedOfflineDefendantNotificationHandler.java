@@ -69,6 +69,7 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
         }
         return SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario();
     }
+
     @Override
     public Map<String, Boolean> getScenarios(CaseData caseData) {
 
