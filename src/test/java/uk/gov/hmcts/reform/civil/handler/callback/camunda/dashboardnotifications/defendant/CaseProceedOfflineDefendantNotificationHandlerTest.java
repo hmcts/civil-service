@@ -109,13 +109,13 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-            verify(dashboardApiClient).recordScenario(
+            verify(dashboardScenariosService).recordScenarios(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-            verify(dashboardApiClient).recordScenario(
+            verify(dashboardScenariosService).recordScenarios(
                 caseData.getCcdCaseReference().toString(),
                 SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
                 "BEARER_TOKEN",
