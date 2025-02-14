@@ -4,10 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 
@@ -21,11 +23,17 @@ public class StayCaseDefendantNotificationHandler extends CaseEventsDashboardCal
         List.of(CREATE_DASHBOARD_NOTIFICATION_STAY_CASE_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardNotificationStayCaseDefendant";
     public static final String GA = "Applications";
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public StayCaseDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public StayCaseDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
-                                                FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+                                                FeatureToggleService featureToggleService,
+                                                DashboardNotificationService dashboardNotificationService,
+                                                TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -45,17 +53,14 @@ public class StayCaseDefendantNotificationHandler extends CaseEventsDashboardCal
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
+        final String role = "DEFENDANT";
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
+            caseId, role
+        );
 
-        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            authToken
-        );
-        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            GA,
-            authToken
-        );
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseId,
+                                                                              role,
+                                                                              GA);
     }
 }

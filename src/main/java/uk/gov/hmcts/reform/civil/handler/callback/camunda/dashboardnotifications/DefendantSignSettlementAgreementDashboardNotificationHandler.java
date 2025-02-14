@@ -8,12 +8,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE);
     public static final String TASK_ID = "GenerateDashboardNotificationSignSettlementAgreement";
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
 
@@ -61,10 +61,10 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
         String[] scenarios = getScenario(optionalCaseDataLiP);
         for (String scenario : scenarios) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                scenario,
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder()
                     .params(mapper.mapCaseDataToParams(caseData)).build()
             );
