@@ -37,6 +37,7 @@ public class CaseQueriesUtil {
             .map(caseMessage -> LatestQuery.builder()
                 .queryId(caseMessage.getId())
                 .isHearingRelated(caseMessage.getIsHearingRelated())
+                .subject(caseMessage.getSubject())
                 .build())
             .orElse(null);
     }
