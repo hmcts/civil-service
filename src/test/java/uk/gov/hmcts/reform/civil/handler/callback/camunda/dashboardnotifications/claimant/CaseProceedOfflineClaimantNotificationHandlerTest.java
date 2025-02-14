@@ -53,6 +53,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
     private FeatureToggleService toggleService;
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationCaseProceedOffline";
     public static final String GA = "Applications";
+
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE);
@@ -80,14 +81,14 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                     .ccdCaseReference(1234L)
                     .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder()
+                    .eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
             // When
             handler.handle(params);
 
@@ -101,15 +102,15 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                     ScenarioRequestParams.builder().params(scenarioParams).build()
             );
             verify(dashboardScenariosService).recordScenarios(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
             verify(dashboardScenariosService).recordScenarios(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
