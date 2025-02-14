@@ -60,7 +60,7 @@ public class GenerateDJFormHandlerSpecNonDivergent extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        if (!caseData.isLipvLipOneVOne()){
+        if (!caseData.isLipvLipOneVOne()) {
             log.info("Case is not lipvliponevone, generating default judgment form");
             buildDocument(callbackParams, caseDataBuilder);
         }
