@@ -315,7 +315,7 @@ camunda-bpm:
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}
     devcpuRequests: 500m
-    devmemoryRequests: 512Mi
+    devmemoryRequests: 1024Mi
     devcpuLimits: 1
     devmemoryLimits: 1Gi
     environment:
