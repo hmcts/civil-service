@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 public class LatestQuery {
 
     private final String queryId;
+    private final String subject;
     private final YesOrNo isHearingRelated;
 
 }
