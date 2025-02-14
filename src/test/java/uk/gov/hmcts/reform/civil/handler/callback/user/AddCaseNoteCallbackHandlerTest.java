@@ -14,6 +14,7 @@ import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -146,14 +147,11 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseNotes")
                 .isEqualTo(objectMapper.convertValue(updatedCaseNotes, new TypeReference<>() {
                 }));
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .isEqualTo(objectMapper.convertValue(businessProcess(), new TypeReference<>() {
-                }));
-        }
 
-        private BusinessProcess businessProcess() {
-            return BusinessProcess.ready(CaseEvent.ADD_CASE_NOTE);
+            var businessProcess = objectMapper.convertValue(response.getData().get("businessProcess"), BusinessProcess.class);
+
+            assertThat(businessProcess.getStatus()).isEqualTo(BusinessProcessStatus.READY);
+            assertThat(businessProcess.getCamundaEvent()).isEqualTo(CaseEvent.ADD_CASE_NOTE.name());
         }
     }
 }
