@@ -55,7 +55,12 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         } else {
             sb.append("'s");
         }
-        sb.append(" legal representative if you need details on how to pay.</p>");
+        if (caseData.isApplicantRepresented()) {
+            sb.append(" if you need details on how to pay.</p>");
+            sb.append("<p>This case will now proceed offline.</p>");
+        } else {
+            sb.append(" legal representative if you need details on how to pay.</p>");
+        }
         return Optional.of(sb.toString());
     }
 }
