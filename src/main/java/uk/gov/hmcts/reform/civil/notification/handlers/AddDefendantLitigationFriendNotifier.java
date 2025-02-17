@@ -23,6 +23,9 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Slf4j
 public class AddDefendantLitigationFriendNotifier extends Notifier implements NotificationData {
 
+    private static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
+
     public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
                                                 NotificationsProperties notificationsProperties,
                                                 OrganisationService organisationService,

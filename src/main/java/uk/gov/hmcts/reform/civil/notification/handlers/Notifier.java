@@ -16,8 +16,6 @@ import java.util.Set;
 @AllArgsConstructor
 public abstract class Notifier {
 
-    protected static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
-    protected static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
     protected final NotificationService notificationService;
     protected final NotificationsProperties notificationsProperties;
     protected final OrganisationService organisationService;
