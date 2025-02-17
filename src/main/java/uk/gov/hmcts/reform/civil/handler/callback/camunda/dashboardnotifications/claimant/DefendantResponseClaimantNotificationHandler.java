@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEF_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_REFUSED_MEDIATION_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_NOTICE_AAA6_DEF_LR_RESPONSE_FULL_DEFENCE_COUNTERCLAIM_CLAIMANT;
 
 @Service
 public class DefendantResponseClaimantNotificationHandler extends DashboardCallbackHandler {
@@ -62,8 +63,16 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
             case FULL_DEFENCE -> getFullDefenceScenario(caseData);
             case FULL_ADMISSION -> getFullAdmissionScenario(caseData);
             case PART_ADMISSION -> getPartAdmissionScenario(caseData);
+            case COUNTER_CLAIM -> getCounterClaimScenario(caseData);
             default -> null;
         };
+    }
+
+    private String getCounterClaimScenario(CaseData caseData) {
+        if (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
+            return SCENARIO_NOTICE_AAA6_DEF_LR_RESPONSE_FULL_DEFENCE_COUNTERCLAIM_CLAIMANT.getScenario();
+        }
+        return null;
     }
 
     private String getPartAdmissionScenario(CaseData caseData) {
