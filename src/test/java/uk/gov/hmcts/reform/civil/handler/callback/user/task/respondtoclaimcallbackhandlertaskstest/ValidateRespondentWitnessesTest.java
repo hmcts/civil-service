@@ -134,7 +134,7 @@ class ValidateRespondentWitnessesTest {
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(false, false);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .respondent2DQ(Respondent2DQ
                                .builder().respondent2DQWitnesses(Witnesses.builder()
                                                                      .build())

@@ -138,7 +138,7 @@ class ValidateRespondentExpertsTest {
         when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
             .thenReturn(false, false);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .respondent2DQ(Respondent2DQ
                                .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
                                .build())

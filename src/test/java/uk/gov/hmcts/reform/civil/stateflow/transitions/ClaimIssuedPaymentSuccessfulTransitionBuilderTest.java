@@ -121,7 +121,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
     @Test
     void shouldReturnTrue_forMultipartyCaseOneVTwoWithOneRep() {
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .setClaimTypeToSpecClaim().build().toBuilder().build();
         assertTrue(multipartyCase.test(caseData));
     }

@@ -637,7 +637,7 @@ class FlowPredicateTest {
             void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2OneLR_ProceedVsRespondent1() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
                     .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                     .build();
@@ -648,7 +648,7 @@ class FlowPredicateTest {
             void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2OneLR_ProceedVsRespondent2() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
                     .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
                     .build();
@@ -709,7 +709,7 @@ class FlowPredicateTest {
             void shouldReturnTrue_whenCaseDataAtStateFullDefence1v2SameSol_ApplicantNotProceedAgainstBothDefendants() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
                     .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                     .build();
@@ -1278,7 +1278,7 @@ class FlowPredicateTest {
                     @BeforeEach
                     void setup() {
                         caseDataBuilder = CaseDataBuilder.builder()
-                            .multiPartyClaimOneDefendantSolicitor()
+                            .multiPartyClaimSameDefendantSolicitor()
                             .setClaimTypeToSpecClaim();
                     }
 

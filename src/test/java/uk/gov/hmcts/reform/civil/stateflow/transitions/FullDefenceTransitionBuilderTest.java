@@ -286,7 +286,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse_1v2SS() {
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .atStateBothRespondentsSameResponse(FULL_DEFENCE)
             .takenOfflineByStaff().build();
         assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));

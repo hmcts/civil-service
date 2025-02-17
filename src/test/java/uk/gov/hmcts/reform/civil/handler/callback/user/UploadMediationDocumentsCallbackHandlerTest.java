@@ -186,7 +186,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 void shouldReturnExpectedList_WhenInvokedFor1v2SameSolAsRespondent1LR() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(RESPONDENT_SOLICITOR_ONE_ROLE, RESPONDENT_SOLICITOR_TWO_ROLE));
                     CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-                        .multiPartyClaimOneDefendantSolicitor()
+                        .multiPartyClaimSameDefendantSolicitor()
                         .build();
 
                     CallbackParams params = callbackParamsOf(caseData, MID, PARTY_OPTIONS_PAGE);

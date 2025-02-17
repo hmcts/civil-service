@@ -334,7 +334,7 @@ class ManageContactInformationUtilsTest {
     @Test
     void shouldAddCorrectOptions_forDefendants1v2SameSolicitorAsLegalRep() {
         CaseData caseDataWithExpertsAndWitnesses = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .atStateRespondentFullDefence_1v2_Resp1CounterClaimAndResp2FullDefence()
             .addRespondent1LitigationFriend()
             .addRespondent2LitigationFriend()
@@ -343,7 +343,7 @@ class ManageContactInformationUtilsTest {
             .build();
 
         CaseData caseDataWithoutExpertsAndWitnesses = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .addRespondent1LitigationFriend()
             .addRespondent2LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();
@@ -361,7 +361,7 @@ class ManageContactInformationUtilsTest {
     void shouldAddCorrectOptions_forDefendant1v2SameSolicitorAsAdmin() {
         CaseData caseData = CaseDataBuilder.builder()
             .addRespondent2(YES)
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .addRespondent2LitigationFriend()
             .addRespondent1LitigationFriend()
             .atStateApplicantRespondToDefenceAndProceed().build();

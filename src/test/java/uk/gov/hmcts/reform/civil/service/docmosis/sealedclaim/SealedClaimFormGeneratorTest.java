@@ -150,7 +150,7 @@ class SealedClaimFormGeneratorTest {
     void shouldGenerateSealedClaimForm_when1V2SameSolicitorDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDetailsNotified()
-            .multiPartyClaimOneDefendantSolicitor().build();
+            .multiPartyClaimSameDefendantSolicitor().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
@@ -248,7 +248,7 @@ class SealedClaimFormGeneratorTest {
         void whenCaseIsAtClaimDetailsNotified_shouldGetSealedClaimFormDataFor1V2SameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .multiPartyClaimOneDefendantSolicitor().build().toBuilder()
+                .multiPartyClaimSameDefendantSolicitor().build().toBuilder()
                 .applicant1LitigationFriend(LitigationFriend.builder()
                                                 .firstName("applicant")
                                                 .lastName("LF")

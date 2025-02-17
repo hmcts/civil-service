@@ -246,7 +246,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor1_when1v2SameSolicitorCase() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .build();
 
                 CallbackParams params = CallbackParamsBuilder.builder()
@@ -273,7 +273,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor2_when1v2SameSolicitorCase() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondentSolicitor2EmailAddress(null)
                     .respondent2SameLegalRepresentative(YesOrNo.YES)
                     .build();
@@ -302,7 +302,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor2_when1v2DifferentSolicitorCase() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .respondentSolicitor2EmailAddress(null)
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
@@ -333,7 +333,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor1_when1v2DifferentSolicitorCase() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondentSolicitor1EmailAddress(null)
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
@@ -364,7 +364,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
 
@@ -393,7 +393,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
 
@@ -422,7 +422,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
 
@@ -452,7 +452,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .setClaimTypeToSpecClaim()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
                 when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
@@ -488,7 +488,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
 

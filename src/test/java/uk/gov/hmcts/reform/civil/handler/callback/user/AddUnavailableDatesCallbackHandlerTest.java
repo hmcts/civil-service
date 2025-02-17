@@ -149,7 +149,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldPrepopulateDynamicListWithOptions_whenInvoked_1v2SameSolicitor() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -543,7 +543,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                        .multiPartyClaimOneDefendantSolicitor()
+                        .multiPartyClaimSameDefendantSolicitor()
                         .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -564,7 +564,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                        .multiPartyClaimOneDefendantSolicitor()
+                        .multiPartyClaimSameDefendantSolicitor()
                         .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -585,7 +585,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                        .multiPartyClaimOneDefendantSolicitor()
+                        .multiPartyClaimSameDefendantSolicitor()
                         .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -957,7 +957,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .multiPartyClaimOneDefendantSolicitor()
+                        .multiPartyClaimSameDefendantSolicitor()
                         .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -985,7 +985,7 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
-                        .multiPartyClaimOneDefendantSolicitor()
+                        .multiPartyClaimSameDefendantSolicitor()
                         .updateDetailsForm(form)
                         .build();
                     CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

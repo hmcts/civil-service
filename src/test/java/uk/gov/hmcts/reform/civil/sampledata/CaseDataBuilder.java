@@ -3571,21 +3571,21 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateAddLitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
-        multiPartyClaimOneDefendantSolicitor();
+        multiPartyClaimSameDefendantSolicitor();
         addGenericRespondentLitigationFriend();
         return this;
     }
 
     public CaseDataBuilder atStateAddRespondent1LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
-        multiPartyClaimOneDefendantSolicitor();
+        multiPartyClaimSameDefendantSolicitor();
         addRespondent1LitigationFriend();
         return this;
     }
 
     public CaseDataBuilder atStateAddRespondent2LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
-        multiPartyClaimOneDefendantSolicitor();
+        multiPartyClaimSameDefendantSolicitor();
         addRespondent2LitigationFriend();
         return this;
     }
@@ -3766,7 +3766,7 @@ public class CaseDataBuilder {
         atStatePaymentSuccessful();
         atStatePendingClaimIssued();
         atStateClaimIssued();
-        multiPartyClaimOneDefendantSolicitor();
+        multiPartyClaimSameDefendantSolicitor();
         respondent1ResponseDate = LocalDateTime.now();
         return this;
     }
@@ -5566,9 +5566,10 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder multiPartyClaimOneDefendantSolicitor() {
+    public CaseDataBuilder multiPartyClaimSameDefendantSolicitor() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2Represented = YES;
         this.respondent2SameLegalRepresentative = YES;
         return this;
     }

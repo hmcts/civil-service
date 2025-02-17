@@ -678,7 +678,7 @@ class EventHistoryMapperTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
-                    .multiPartyClaimOneDefendantSolicitor()
+                    .multiPartyClaimSameDefendantSolicitor()
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
@@ -1319,7 +1319,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2SameSolicitorBothRespondentFullAdmissionNoOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .atStateBothRespondentsSameResponse1v2SameSolicitor(FULL_ADMISSION)
                 .respondentResponseIsSame(YES)
                 .build();
@@ -2239,7 +2239,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2SameSolicitorBothRespondentPartAdmissionNoOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .atStateBothRespondentsSameResponse1v2SameSolicitor(PART_ADMISSION)
                 .respondentResponseIsSame(YES)
                 .build();
@@ -2633,7 +2633,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2SameSolicitorBothRespondentCounterClaimNoOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .atStateBothRespondentsSameResponse1v2SameSolicitor(COUNTER_CLAIM)
                 .respondentResponseIsSame(YES)
                 .build();
@@ -2917,7 +2917,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWithFullDefence1v2SameSolicitorWithoutOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent2Responds1v2SameSol(FULL_DEFENCE)
                 .respondentResponseIsSame(YES)
@@ -3525,7 +3525,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2SameSolResp1FullAdmissionResp2PartAdmissionNoOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, PART_ADMISSION)
                 .respondentResponseIsSame(NO)
                 .build();
@@ -3627,7 +3627,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2SameSolResp1FullAdmissionResp2FullDefenceNoOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondentResponseIsSame(NO)
                 .respondent2DQ()
@@ -3741,7 +3741,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenClaimWith1v2ssR1FullAdmissionR2FullDefenceNoOptionalEventsSpec() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondentResponseIsSame(NO)
                 .respondent2DQ()

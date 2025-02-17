@@ -119,7 +119,7 @@ class SetApplicantResponseDeadlineTest {
             .build();
 
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(YES)
             .respondent2SameLegalRepresentative(YES)
@@ -164,7 +164,7 @@ class SetApplicantResponseDeadlineTest {
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)

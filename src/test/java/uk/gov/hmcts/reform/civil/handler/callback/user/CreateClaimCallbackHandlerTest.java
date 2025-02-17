@@ -1287,7 +1287,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .multiPartyClaimOneDefendantSolicitor()
+                .multiPartyClaimSameDefendantSolicitor()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
                 .build();
@@ -2263,7 +2263,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .multiPartyClaimOneDefendantSolicitor().build();
+                    .multiPartyClaimSameDefendantSolicitor().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -2283,7 +2283,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .multiPartyClaimOneDefendantSolicitor().build();
+                    .multiPartyClaimSameDefendantSolicitor().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -2303,7 +2303,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3AndCOSIsOn() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .multiPartyClaimOneDefendantSolicitor().build();
+                    .multiPartyClaimSameDefendantSolicitor().build();
                 CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 

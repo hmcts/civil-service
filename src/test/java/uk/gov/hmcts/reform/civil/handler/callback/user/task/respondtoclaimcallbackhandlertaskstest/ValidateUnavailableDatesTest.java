@@ -163,7 +163,7 @@ class ValidateUnavailableDatesTest {
             .build();
 
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQHearing(respondent1Hearing)
                                .build())

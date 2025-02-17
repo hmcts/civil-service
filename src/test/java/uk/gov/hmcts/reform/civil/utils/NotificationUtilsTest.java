@@ -52,7 +52,7 @@ class NotificationUtilsTest {
     @Test
     void shouldReturnReferences_when1v2SSBothReferencesProvided() {
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
+            .multiPartyClaimSameDefendantSolicitor()
             .atStateApplicantRespondToDefenceAndProceed()
             .build();
 
