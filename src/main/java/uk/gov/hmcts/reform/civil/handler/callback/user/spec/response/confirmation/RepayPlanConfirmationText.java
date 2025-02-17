@@ -66,8 +66,9 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         } else {
             sb.append(" legal representative if you need details on how to pay");
         }
-            sb.append("<br><br>")
-                .append("If you do not pay immediately, ").append(applicantName);
+        sb.append("<br><br>")
+            .append("If you do not pay immediately, ").append(applicantName);
+
         if (caseData.getRespondent2() != null || caseData.getApplicant2() != null) {
             sb.append(" can either:")
                 .append("<ul>")
