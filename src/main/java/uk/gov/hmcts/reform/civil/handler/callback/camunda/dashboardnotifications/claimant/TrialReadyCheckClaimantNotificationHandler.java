@@ -4,12 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
@@ -23,10 +23,10 @@ public class TrialReadyCheckClaimantNotificationHandler extends CaseProgressionD
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_TRIAL_READY_CHECK_CLAIMANT1);
     public static final String TASK_ID = "TrialReadyCheckDashboardNotificationsForClaimant1";
 
-    public TrialReadyCheckClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
-                                                     DashboardNotificationsParamsMapper mapper,
-                                                     FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+    public TrialReadyCheckClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
+                                                      DashboardNotificationsParamsMapper mapper,
+                                                      FeatureToggleService featureToggleService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override
