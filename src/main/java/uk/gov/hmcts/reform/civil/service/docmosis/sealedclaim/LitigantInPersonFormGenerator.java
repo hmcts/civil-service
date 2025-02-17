@@ -12,9 +12,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 
-import java.util.Optional;
-
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.getFormattedCaseReference;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +40,7 @@ public class LitigantInPersonFormGenerator implements TemplateDataGenerator<Liti
     @Override
     public LitigantInPersonForm getTemplateData(CaseData caseData) {
         return LitigantInPersonForm.builder()
-            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
+            .ccdCaseReference(getFormattedCaseReference(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .build();
     }

@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -31,6 +33,7 @@ public class DocmosisTemplateDataUtils {
             ? caseName.replace(" vs ", " \nvs ")
             : caseName;
     };
+    public static final String DELIMITER = "-";
 
     private DocmosisTemplateDataUtils() {
         //NO-OP
@@ -248,5 +251,15 @@ public class DocmosisTemplateDataUtils {
                 return responseIntentions;
         }
         return responseIntentions;
+    }
+
+    public static String getFormattedCaseReference(CaseData caseData) {
+        return Optional.ofNullable(caseData.getCcdCaseReference())
+            .map(val -> String.join(
+                DELIMITER,
+                Arrays.stream(
+                val.toString().split("(?<=\\G.{4})")
+            ).toList()))
+            .orElse("");
     }
 }
