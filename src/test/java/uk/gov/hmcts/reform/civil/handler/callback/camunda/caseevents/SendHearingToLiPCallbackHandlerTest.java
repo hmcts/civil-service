@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,14 +16,13 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
-import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_HEARING_TO_LIP_CLAIMANT;
@@ -33,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HE
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
+class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private SendHearingToLiPCallbackHandler handler;
@@ -44,7 +42,7 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendHearingToClaimantLIP";
@@ -58,8 +56,7 @@ public class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient, never())
-            .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+        verifyNoInteractions(dashboardScenariosService);
     }
 
     @Test
