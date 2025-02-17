@@ -316,4 +316,13 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
+        var hmcCui = "hmc-cui-enabled";
+        givenToggle(hmcCui, toggleStat);
+
+        assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
+    }
 }

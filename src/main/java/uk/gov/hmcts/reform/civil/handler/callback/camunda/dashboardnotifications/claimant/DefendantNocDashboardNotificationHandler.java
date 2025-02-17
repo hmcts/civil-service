@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -16,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,8 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
     public static final String TASK_ID = "CreateClaimantDashboardNotificationDefendantNoc";
     private static final String CLAIMANT_ROLE = "CLAIMANT";
 
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
+    private final DashboardNotificationService dashboardNotificationService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
 
@@ -60,32 +62,31 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         ScenarioRequestParams params = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         if (!featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
-            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(),
-                CLAIMANT_ROLE,
-                authToken
+                CLAIMANT_ROLE
             );
 
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 params
             );
         } else {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 params
             );
         }
 
         if (isNull(caseData.getTrialReadyApplicant()) && SdoHelper.isFastTrack(caseData)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_TRIAL_ARRANGEMENTS_TASK_LIST.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 params
             );
         }
@@ -96,10 +97,10 @@ public class DefendantNocDashboardNotificationHandler extends CallbackHandler {
             && (isNull(hearingFeePaymentDetails) || hearingFeePaymentDetails.getStatus() != PaymentStatus.SUCCESS);
 
         if (isHearingFeeNotPaid || isFeePaymentOutcomeNotDone) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 params
             );
         }
