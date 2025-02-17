@@ -9,21 +9,18 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AddDefendantLitigationFriendNotifier;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LitigationFriendAddedNotificationHandler extends CallbackHandler implements NotificationData {
+public class LitigationFriendAddedNotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT);
 
@@ -52,13 +49,5 @@ public class LitigationFriendAddedNotificationHandler extends CallbackHandler im
         addDefendantLitigationFriendNotifier.notifyParties(callbackParams.getCaseData());
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
-        ));
     }
 }

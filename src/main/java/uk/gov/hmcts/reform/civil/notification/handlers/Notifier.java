@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -9,12 +11,11 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Component
 @AllArgsConstructor
-public abstract class Notifier {
+public abstract class Notifier implements NotificationData {
 
     protected final NotificationService notificationService;
     protected final NotificationsProperties notificationsProperties;
@@ -34,8 +35,6 @@ public abstract class Notifier {
         partiesToEmail.addAll(getRespondents(caseData));
         sendNotification(partiesToEmail);
     }
-
-    protected abstract Map<String, String> addProperties(CaseData caseData);
 
     protected abstract EmailDTO getApplicant(CaseData caseData);
 
