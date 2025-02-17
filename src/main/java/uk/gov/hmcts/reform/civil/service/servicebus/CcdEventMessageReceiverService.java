@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.handler.message.CcdEventMessageHandler;
+import uk.gov.hmcts.reform.civil.model.Result;
 import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 import java.util.List;
 
@@ -15,8 +17,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CcdEventMessageReceiverService {
 
+    private static final String CCD_SERVICE_BUS_TASK = "ccd service bus task";
     private final ObjectMapper objectMapper;
     private final List<CcdEventMessageHandler> messageHandlers;
+    private final CaseTaskTrackingService caseTaskTrackingService;
 
     public void handleCcdCaseEventAsbMessage(String messageId,
                                              String sessionId,
@@ -27,11 +31,20 @@ public class CcdEventMessageReceiverService {
     }
 
     private void handleMessage(CcdEventMessage caseEventMessage) {
+        Result result = null;
+
         for (var handler : messageHandlers) {
             if (handler.canHandle(caseEventMessage.getEventId())) {
-                handler.handle(caseEventMessage);
+                result = handler.handle(caseEventMessage);
                 break;
             }
+        }
+
+        if (result instanceof Result.Error error) {
+            caseTaskTrackingService.trackCaseTask(caseEventMessage.getCaseId(),
+                                                  CCD_SERVICE_BUS_TASK,
+                                                  error.eventName(),
+                                                  error.messageProps());
         }
     }
 
