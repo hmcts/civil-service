@@ -4,12 +4,14 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+
 import java.util.Collections;
 import java.util.List;
+
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT;
 
 @Service
@@ -18,10 +20,10 @@ public class CoscCertificateGeneratedDefendantNotificationHandler extends Dashbo
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT);
     private static final String TASK_ID = "GenerateDashboardNotificationCoSCCertificateGenerated";
 
-    public CoscCertificateGeneratedDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public CoscCertificateGeneratedDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                                 DashboardNotificationsParamsMapper mapper,
                                                                 FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

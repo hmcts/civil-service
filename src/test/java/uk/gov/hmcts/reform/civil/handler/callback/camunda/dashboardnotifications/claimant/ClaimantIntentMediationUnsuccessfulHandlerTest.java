@@ -7,12 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -20,16 +17,16 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -40,13 +37,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ClaimantIntentMediationUnsuccessfulHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private FeatureToggleService toggleService;
@@ -78,8 +75,6 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
@@ -101,10 +96,10 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
             ).build();
 
             handler.handle(params);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.ClaimantIntent.MediationUnsuccessful.Claimant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -112,10 +107,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
         @Test
         void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsGeneric() {
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
             scenarioParams.put("ccdCaseReference", "123");
-            MediationUnsuccessfulReason reason = APPOINTMENT_NO_AGREEMENT;
-
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
@@ -126,7 +118,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
                 .ccdCaseReference(1234L)
                 .respondent1ResponseDeadline(dateTime)
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(APPOINTMENT_NO_AGREEMENT)).build())
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -134,10 +126,10 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
                 .build();
 
             handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -145,10 +137,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
         @Test
         void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonClaimantNonAttendance() {
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
-
             scenarioParams.put("ccdCaseReference", "123");
-            MediationUnsuccessfulReason reason = NOT_CONTACTABLE_CLAIMANT_ONE;
-
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
@@ -159,7 +148,7 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
                 .ccdCaseReference(1234L)
                 .respondent1ResponseDeadline(dateTime)
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE)).build())
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -167,10 +156,10 @@ public class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallback
                 .build();
 
             handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_MEDIATION_UNSUCCESSFUL_CLAIMANT_NONATTENDANCE.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
