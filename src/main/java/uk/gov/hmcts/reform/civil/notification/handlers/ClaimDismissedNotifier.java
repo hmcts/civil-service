@@ -61,11 +61,11 @@ public class ClaimDismissedNotifier extends Notifier {
         sendNotification(partiesToEmail);
     }
 
-    private Set<EmailDTO> getApplicants(CaseData caseData) {
-        return new HashSet<>(Set.of(getApplicant1(caseData)));
+    protected Set<EmailDTO> getApplicants(CaseData caseData) {
+        return new HashSet<>(Set.of(getApplicant(caseData)));
     }
 
-    private EmailDTO getApplicant1(CaseData caseData) {
+    protected EmailDTO getApplicant(CaseData caseData) {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()

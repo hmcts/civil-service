@@ -41,32 +41,18 @@ public class AddDefendantLitigationFriendNotifier extends Notifier implements No
     }
 
     @Override
-    public void notifyParties(CaseData caseData) {
-        log.info("Building list of recipients for Litigation Friend Added event. Case id - {}",
-                caseData.getCcdCaseReference());
-        Set<EmailDTO> partiesToEmail = new HashSet<>();
-        partiesToEmail.addAll(getApplicants(caseData));
-        partiesToEmail.addAll(getRespondents(caseData));
-
-        sendNotification(partiesToEmail);
-    }
-
-    private Set<EmailDTO> getApplicants(CaseData caseData) {
-        return new HashSet<>(Set.of(getApplicant1(caseData)));
-    }
-
-    private EmailDTO getApplicant1(CaseData caseData) {
+    protected EmailDTO getApplicant(CaseData caseData) {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
                 .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                 .parameters(properties)
-                .reference(String.format(REFERENCE_TEMPLATE_APPLICANT_FOR_LITIGATION_FRIEND_ADDED,
-                        caseData.getLegacyCaseReference()))
+                .reference(String.format(REFERENCE_TEMPLATE_APPLICANT_FOR_LITIGATION_FRIEND_ADDED, caseData.getLegacyCaseReference()))
                 .build();
     }
 
+    @Override
     protected Set<EmailDTO> getRespondents(CaseData caseData) {
         Set<EmailDTO> recipients = new HashSet<>();
         recipients.add(getRespondent(caseData, true));
@@ -77,18 +63,16 @@ public class AddDefendantLitigationFriendNotifier extends Notifier implements No
         return recipients;
     }
 
-    protected EmailDTO getRespondent(CaseData caseData, boolean isRespondent1) {
+    private EmailDTO getRespondent(CaseData caseData, boolean isRespondent1) {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                 isRespondent1, organisationService));
 
         return EmailDTO.builder()
-                        .targetEmail(caseData.getRespondentSolicitor1EmailAddress())
-                        .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
-                        .parameters(properties)
-                        .reference(String.format(
-                                REFERENCE_TEMPLATE_RESPONDENT_FOR_LITIGATION_FRIEND_ADDED,
-                                caseData.getLegacyCaseReference()))
-                        .build();
+                .targetEmail(isRespondent1 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress())
+                .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
+                .parameters(properties)
+                .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT_FOR_LITIGATION_FRIEND_ADDED, caseData.getLegacyCaseReference()))
+                .build();
     }
 }
