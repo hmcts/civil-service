@@ -5,37 +5,39 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 public class CaseQueriesUtil {
+
+    private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
 
     private CaseQueriesUtil() {
         //NO-OP
     }
 
     public static CaseQueriesCollection getUserQueriesByRole(CaseData caseData, List<String> roles) {
-        if (roles.contains("[APPLICANTSOLICITORONE]")) {
+        if (isApplicantSolicitor(roles)) {
             return caseData.getQmApplicantSolicitorQueries();
-        } else if (roles.contains("[RESPONDENTSOLICITORONE]")) {
+        } else if (isRespondentSolicitorOne(roles)) {
             return caseData.getQmRespondentSolicitor1Queries();
-        } else if (roles.contains("[RESPONDENTSOLICITORTWO]")) {
+        } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getQmRespondentSolicitor2Queries();
         } else {
-            throw new IllegalArgumentException("User does have a supported case role for query management.");
+            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
     }
 
-    public static LatestQuery getLatestQuery(CaseQueriesCollection usersQueries) {
-        return unwrapElements(usersQueries.getCaseMessages()).stream()
-            .max(Comparator.comparing(CaseMessage::getCreatedOn))
-            .map(latestMessage -> LatestQuery.builder()
-                .queryId(latestMessage.getId())
-                .isHearingRelated(latestMessage.getIsHearingRelated())
+    public static LatestQuery buildLatestQuery(CaseMessage latestCaseMessage) {
+        return Optional.ofNullable(latestCaseMessage)
+            .map(caseMessage -> LatestQuery.builder()
+                .queryId(caseMessage.getId())
+                .isHearingRelated(caseMessage.getIsHearingRelated())
                 .build())
             .orElse(null);
     }
-
 }
