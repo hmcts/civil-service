@@ -10,10 +10,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -33,18 +31,18 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -56,7 +54,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
@@ -65,7 +62,11 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @InjectMocks
@@ -83,8 +84,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
         @MethodSource("provideCaseStateAndScenarioArguments")
         void shouldRecordScenario_whenInvokedInJudicialReferralState(CaseState caseState, DashboardScenarios dashboardScenarios) {
             // Given
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             if (dashboardScenarios.equals(SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM)) {
                 when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             }
@@ -101,23 +100,22 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(params);
 
             // Then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenarios.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                dashboardScenarios.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
             if (caseState.equals(CaseState.CASE_SETTLED)) {
-                verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+                verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
                     caseData.getCcdCaseReference().toString(),
-                    "CLAIMANT",
-                    "BEARER_TOKEN"
+                    "CLAIMANT"
                 );
 
-                verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                     caseData.getCcdCaseReference().toString(),
                     "CLAIMANT",
-                    "BEARER_TOKEN"
+                    null
                 );
             }
         }
@@ -161,19 +159,9 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(params);
 
             // Then
-            verifyNoInteractions(dashboardApiClient);
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenInvokedWhenCaseStateIsNotClaimSettled() {
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
-            ).build();
-
-            handler.handle(params);
-
-            verifyNoInteractions(dashboardApiClient);
+            verifyNoInteractions(dashboardScenariosService);
+            verifyNoInteractions(dashboardNotificationService);
+            verifyNoInteractions(taskListService);
         }
 
         @Test
@@ -198,10 +186,10 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             // When
             handler.handle(params);
             // Then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                DashboardScenarios.SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                DashboardScenarios.SCENARIO_AAA6_CLAIM_PART_ADMIT_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -234,10 +222,10 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(callbackParams);
 
             // Then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -272,10 +260,10 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(callbackParams);
 
             // Then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -310,10 +298,10 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(callbackParams);
 
             // Then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -348,10 +336,10 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(callbackParams);
 
             // Then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -379,11 +367,10 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
