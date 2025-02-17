@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.isAfterFourPM;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.getFormattedCaseReference;
 
 @Service
 @RequiredArgsConstructor
@@ -122,7 +123,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         return SealedClaimFormForSpec.builder()
-            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
+            .ccdCaseReference(getFormattedCaseReference(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .applicantExternalReference(solicitorReferences
@@ -217,7 +218,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             interest = interestCalculator.calculateBulkInterest(caseData);
         }
         return SealedClaimFormForSpec.builder()
-            .ccdCaseReference(Optional.ofNullable(caseData.getCcdCaseReference()).map(String::valueOf).orElse(""))
+            .ccdCaseReference(getFormattedCaseReference(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .applicantExternalReference(solicitorReferences.map(SolicitorReferences::getApplicantSolicitor1Reference).orElse(""))
