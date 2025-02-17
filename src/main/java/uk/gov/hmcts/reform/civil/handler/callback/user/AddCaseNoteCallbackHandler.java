@@ -35,7 +35,7 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
     private final CaseNoteService caseNoteService;
     private final ObjectMapper objectMapper;
 
-    @Value("azure.service-bus.ccd-events-topic.enabled:false")
+    @Value("${azure.service-bus.ccd-events-topic.enabled:false}")
     private boolean ccdEventsServiceBusEnabled;
 
     @Override
