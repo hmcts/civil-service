@@ -6,13 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.civil.model.Result;
 import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
-import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
@@ -25,9 +23,6 @@ class AddCaseNoteMessageHandlerTest {
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
-
-    @Mock
-    private CaseTaskTrackingService caseTaskTrackingService;
 
     @InjectMocks
     private AddCaseNoteMessageHandler addCaseNoteMessageHandler;
@@ -52,9 +47,10 @@ class AddCaseNoteMessageHandlerTest {
             .caseTypeId("CIVIL")
             .build();
 
-        addCaseNoteMessageHandler.handle(ccdEventMessage);
+        Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
 
         verify(coreCaseDataService).triggerEvent(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED);
+        assertThat(result).isInstanceOf(Result.Success.class);
     }
 
     @Test
@@ -68,12 +64,12 @@ class AddCaseNoteMessageHandlerTest {
             .caseTypeId("CIVIL")
             .build();
 
-        addCaseNoteMessageHandler.handle(ccdEventMessage);
+        Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
 
-        verify(caseTaskTrackingService).trackCaseTask(eq(String.valueOf(CASE_ID)),
-                                                      eq("service bus message"),
-                                                      eq(NOTIFY_RPA_ON_CONTINUOUS_FEED.name()),
-                                                      any());
+        assertThat(result).isInstanceOf(Result.Error.class);
+        Result.Error error = (Result.Error) result;
+        assertThat(error.eventName()).isEqualTo(NOTIFY_RPA_ON_CONTINUOUS_FEED.name());
+        assertThat(error.messageProps()).containsKeys("exceptionMessage", "userId");
     }
 
 }
