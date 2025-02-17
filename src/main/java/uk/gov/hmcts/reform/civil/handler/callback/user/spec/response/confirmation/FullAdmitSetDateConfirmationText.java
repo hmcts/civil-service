@@ -75,7 +75,7 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
         sb.append("<ul>")
             .append("<li>the court will decide how you must pay</li>")
             .append("</ul>");
-        if (caseData.isApplicantRepresented()) {
+        if (caseData.isApplicantNotRepresented()) {
             sb.append("<p>This case will now proceed offline.</p>");
         }
         return Optional.of(sb.toString());
