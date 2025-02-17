@@ -21,6 +21,7 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -49,10 +50,11 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         CaseData caseData = callbackParams.getCaseData();
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         boolean shouldSendEmailToDefendantLR = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
+        boolean proceedWithTheClaim = YES.equals(caseData.getApplicant1ProceedsWithClaimSpec());
         if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
                 shouldSendEmailToDefendantLR ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
-                shouldSendEmailToDefendantLR ? notificationsProperties.getNotifyDefendantLRForMediation()
+                shouldSendEmailToDefendantLR ? getRespondent1LREmailTemplate(proceedWithTheClaim)
                     : getRespondent1LipEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -70,6 +72,11 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private String getRespondent1LipEmailTemplate(CaseData caseData) {
         return caseData.isRespondentResponseBilingual() ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
             : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
+    }
+
+    private String getRespondent1LREmailTemplate(boolean proceedWithTheClaim) {
+        return proceedWithTheClaim ? notificationsProperties.getNotifyDefendantLRForMediation()
+            : notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
     }
 
     @Override
@@ -93,6 +100,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             caseData,
             featureToggleService.isCarmEnabledForCase(caseData)
         )) {
+            //todo add partyReferences attibute
             return Map.of(
                 CLAIM_REFERENCE_NUMBER,
                 caseData.getCcdCaseReference().toString(),
