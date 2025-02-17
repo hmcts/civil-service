@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,9 +21,9 @@ public abstract class OrderCallbackHandler extends DashboardWithParamsCallbackHa
 
     protected final WorkingDayIndicator workingDayIndicator;
 
-    protected OrderCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper,
+    protected OrderCallbackHandler(DashboardScenariosService dashboardScenariosService, DashboardNotificationsParamsMapper mapper,
                                    FeatureToggleService featureToggleService, WorkingDayIndicator workingDayIndicator) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
         this.workingDayIndicator = workingDayIndicator;
     }
 
