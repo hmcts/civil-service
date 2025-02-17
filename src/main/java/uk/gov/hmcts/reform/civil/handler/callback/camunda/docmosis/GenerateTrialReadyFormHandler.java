@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +41,7 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
     private static final String TASK_ID_RESPONDENT2 = "GenerateTrialReadyFormRespondent2";
 
     private final TrialReadyFormGenerator trialReadyFormGenerator;
-
+    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -93,6 +95,17 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
         caseDataBuilder.trialReadyDocuments(documents);
+        if (featureToggleService.isHmcForLipEnabled()) {
+            addDocumentCreatedDate(role, caseDataBuilder);
+        }
+    }
+
+    private void addDocumentCreatedDate(CaseRole role, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (role == CaseRole.CLAIMANT) {
+            caseDataBuilder.claimantTrialReadyDocumentCreated(LocalDateTime.now());
+        } else if (role == CaseRole.DEFENDANT) {
+            caseDataBuilder.defendantTrialReadyDocumentCreated(LocalDateTime.now());
+        }
     }
 
 }
