@@ -89,7 +89,7 @@ public class FlowPredicate {
         return switch (scenario) {
             case ONE_V_TWO_SAME_LEGAL_REP -> respondent1Matches
                 && (YES.equals(caseData.getRespondentResponseIsSame()) || caseData.getRespondent2ClaimResponseType() == responseType);
-            case ONE_V_TWO_TWO_LEGAL_REP -> respondent1Matches && caseData.getRespondent2ClaimResponseType() == responseType;
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> respondent1Matches && caseData.getRespondent2ClaimResponseType() == responseType;
             case ONE_V_ONE -> respondent1Matches;
             case TWO_V_ONE -> respondent1Matches && caseData.getRespondent1ClaimResponseTypeToApplicant2() == responseType;
         };
@@ -340,7 +340,7 @@ public class FlowPredicate {
         return switch (scenario) {
             case ONE_V_TWO_SAME_LEGAL_REP -> basePredicate && (YES.equals(caseData.getRespondentResponseIsSame())
                 || caseData.getRespondent2ClaimResponseTypeForSpec() == responseType);
-            case ONE_V_TWO_TWO_LEGAL_REP -> basePredicate
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> basePredicate
                 && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType
                 // For the time being, even if the response is the same, 1v2ds only deals with full defence
                 && responseType == RespondentResponseTypeSpec.FULL_DEFENCE;
@@ -437,7 +437,7 @@ public class FlowPredicate {
             };
         } else {
             return switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP ->
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                         || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 case ONE_V_ONE -> YES.equals(caseData.getApplicant1ProceedWithClaim());
@@ -457,7 +457,7 @@ public class FlowPredicate {
             };
         } else {
             return switch (getMultiPartyScenario(caseData)) {
-                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
+                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP ->
                     NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                         && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
                 case ONE_V_ONE -> NO.equals(caseData.getApplicant1ProceedWithClaim());

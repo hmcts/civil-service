@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.enums;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public enum MultiPartyScenario {
@@ -25,20 +24,22 @@ public enum MultiPartyScenario {
     public static MultiPartyScenario getMultiPartyScenario(CaseData caseData) {
         if (has2Applicants(caseData)) {
             return TWO_V_ONE;
-        }
-
-        if (has2Respondents(caseData)) {
-            YesOrNo respondent2SameLegalRepresentative = caseData.getRespondent2SameLegalRepresentative();
-            if(respondent2SameLegalRepresentative == null) {
-               return ONE_V_TWO_ONE_LEGAL_REP;
-            } else if(respondent2SameLegalRepresentative.equals(YES)){
+        } else if (has2Respondents(caseData)) {
+            if (YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
                 return ONE_V_TWO_SAME_LEGAL_REP;
-            } else {
+            } else if (has2DifferentLegalRepresentatives(caseData)) {
                 return ONE_V_TWO_TWO_LEGAL_REP;
+            } else {
+                return ONE_V_TWO_ONE_LEGAL_REP;
             }
         } else {
             return ONE_V_ONE;
         }
+    }
+
+    private static boolean has2DifferentLegalRepresentatives(CaseData caseData) {
+        return YES.equals(caseData.getRespondent1Represented())
+            && YES.equals(caseData.getRespondent2Represented());
     }
 
     private static boolean has2Applicants(CaseData caseData) {
