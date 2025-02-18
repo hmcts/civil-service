@@ -56,16 +56,18 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
             .append("<li>keep proof of any payments you make</li>")
             .append("</ul>")
             .append("Contact ").append(applicantName);
-        if (applicantName.endsWith("s")) {
-            sb.append("'");
-        } else {
-            sb.append("'s");
-        }
-        if (caseData.isApplicant1NotRepresented()) {
-            sb.append(" if you need details on how to pay</p>");
-        } else {
+
+        if (!caseData.isApplicant1NotRepresented()) {
+            if (applicantName.endsWith("s")) {
+                sb.append("'");
+            } else {
+                sb.append("'s");
+            }
             sb.append(" legal representative if you need details on how to pay</p>");
+        } else {
+            sb.append(" if you need details on how to pay</p>");
         }
+
         sb.append("If you do not pay immediately, ").append(applicantName);
         if (caseData.getRespondent2() != null || caseData.getApplicant2() != null) {
             sb.append(" can either:")
