@@ -14,6 +14,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
 
 import java.util.Map;
@@ -31,6 +35,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
 class ClaimDismissedHandlerTest {
@@ -43,6 +48,12 @@ class ClaimDismissedHandlerTest {
 
     @Mock
     private CaseDismissedSearchService searchService;
+
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -59,14 +70,49 @@ class ClaimDismissedHandlerTest {
     @Test
     void shouldEmitMoveCaseToStuckOutEvent_whenCasesFound() {
         long caseId = 1L;
-        Map<String, Object> data = Map.of("data", "some data");
+        Map<String, Object> data = Map.of("data", "some data",
+                                          "ccdCaseReference", caseId);
         Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDismissed()
+            .respondent1ResponseDate(null)
+            .respondent2ResponseDate(null)
+            .takenOfflineByStaffDate(null)
+            .build();
+
+        when(coreCaseDataService.getCase(anyLong())).thenReturn(CaseDetails.builder().data(data).build());
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new DismissClaimEvent(caseId));
+        verify(externalTaskService).complete(mockTask, null);
+    }
+
+    @Test
+    void shouldEmitMoveCaseToStuckOutEvent_whenCasesFoundButNotEligibleForDismiss() {
+        long caseId = 1L;
+        Map<String, Object> data = Map.of("data", "some data",
+                                          "ccdCaseReference", caseId);
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
+
+        when(searchService.getCases()).thenReturn(caseDetails);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDismissed()
+            .respondent1ResponseDate(null)
+            .respondent2ResponseDate(null)
+            .takenOfflineByStaffDate(null)
+            .setRequestDJDamagesFlagForWA(YES)
+            .build();
+
+        when(coreCaseDataService.getCase(anyLong())).thenReturn(CaseDetails.builder().data(data).build());
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verifyNoInteractions(applicationEventPublisher);
         verify(externalTaskService).complete(mockTask, null);
     }
 
@@ -123,17 +169,28 @@ class ClaimDismissedHandlerTest {
     void shouldHandleExceptionAndContinue_whenOneCaseErrors() {
         long caseId = 1L;
         long otherId = 2L;
-        Map<String, Object> data = Map.of("data", "some data");
+        Map<String, Object> data = Map.of("data", "some data",
+                                          "ccdCaseReference", caseId);
         Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
 
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDismissed()
+            .respondent1ResponseDate(null)
+            .respondent2ResponseDate(null)
+            .takenOfflineByStaffDate(null)
+            .build();
+
+        when(coreCaseDataService.getCase(anyLong())).thenReturn(CaseDetails.builder().data(data).build());
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new DismissClaimEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new DismissClaimEvent(caseId));
 
         handler.execute(mockTask, externalTaskService);
 
