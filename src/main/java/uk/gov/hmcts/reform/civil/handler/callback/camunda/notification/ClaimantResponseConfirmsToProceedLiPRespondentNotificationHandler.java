@@ -23,8 +23,6 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -56,7 +54,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         boolean shouldSendEmailToDefendantLR = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
         if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
-                shouldSendEmailToDefendantLR || isIntermediateOrMultiClaimProceedForLipVsLR(caseData)
+                shouldSendEmailToDefendantLR || isClaimProceedForLipVsLR(caseData)
                     ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
                 getEmailTemplate(caseData, shouldSendEmailToDefendantLR),
                 addProperties(caseData),
@@ -67,8 +65,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     }
 
     private String getEmailTemplate(CaseData caseData, boolean shouldSendEmailToDefendantLR) {
-        if (isIntermediateOrMultiClaimProceedForLipVsLR(caseData)) {
-            return notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
+        if (isClaimProceedForLipVsLR(caseData)) {
+            return caseData.isSmallClaim()
+                ? notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()
+                : notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
         }
         if (shouldSendEmailToDefendantLR) {
             return notificationsProperties.getNotifyDefendantLRForMediation();
@@ -80,27 +80,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
             && (!caseData.isClaimantBilingual()
             || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId));
-    }
-
-    private String getNotificationTemplate(CaseData caseData, boolean isCarmEnabled) {
-        if (featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
-            if (!caseData.isRespondent1NotRepresented()
-                && caseData.isRespondentResponseFullDefence()
-                && caseData.isFullDefence()
-                && (caseData.isSmallClaim() || caseData.isFastTrackClaim())) {
-                return caseData.isSmallClaim()
-                    ? notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()
-                    : notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
-            }
-        }
-        if (isCarmEnabled
-            && !caseData.isRespondent1NotRepresented()
-            && (YES.equals(caseData.getApplicant1ProceedsWithClaimSpec())
-            || (caseData.getCaseDataLiP() != null
-            && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim())))) {
-            return notificationsProperties.getNotifyDefendantLRForMediation();
-        }
-        return getRespondent1LipEmailTemplate(caseData);
     }
 
     private String getRespondent1LipEmailTemplate(CaseData caseData) {
@@ -126,7 +105,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        if (isIntermediateOrMultiClaimProceedForLipVsLR(caseData)) {
+        if (isClaimProceedForLipVsLR(caseData)) {
             return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                           CLAIM_REFERENCE_NUMBER,
                           caseData.getCcdCaseReference().toString(),
@@ -135,7 +114,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                               caseData.getRespondent1OrganisationPolicy(),
                               organisationService
                           ),
-                          APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+                          APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                          CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
         if (shouldSendMediationNotificationDefendant1LRCarm(
@@ -161,10 +141,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         );
     }
 
-    private boolean isIntermediateOrMultiClaimProceedForLipVsLR(CaseData caseData) {
-        List<String> responseClaimTrack = Arrays.asList("INTERMEDIATE_CLAIM", "MULTI_CLAIM");
-        return responseClaimTrack.contains(caseData.getResponseClaimTrack())
-            && caseData.isLipvLROneVOne()
+    private boolean isClaimProceedForLipVsLR(CaseData caseData) {
+        return caseData.isLipvLROneVOne()
             && caseData.getApplicant1ProceedWithClaim().equals(
             YesOrNo.YES)
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
