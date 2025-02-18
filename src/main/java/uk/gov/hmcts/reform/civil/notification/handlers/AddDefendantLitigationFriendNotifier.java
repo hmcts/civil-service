@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationExceptionRecordRepository;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,8 +30,9 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
     public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
                                                 NotificationsProperties notificationsProperties,
                                                 OrganisationService organisationService,
-                                                SimpleStateFlowEngine stateFlowEngine) {
-        super(notificationService, notificationsProperties, organisationService, stateFlowEngine);
+                                                SimpleStateFlowEngine stateFlowEngine,
+                                                NotificationExceptionRecordRepository exceptionRecordRepository) {
+        super(notificationService, notificationsProperties, organisationService, stateFlowEngine, exceptionRecordRepository);
     }
 
     @Override
