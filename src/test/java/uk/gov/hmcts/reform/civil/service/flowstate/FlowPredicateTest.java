@@ -830,15 +830,27 @@ class FlowPredicateTest {
             }
 
             @Test
-            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGa() {
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGaAndGaMadeByApplicant() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDismissed()
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(null)
                     .takenOfflineByStaffDate(null)
-                    .getGeneralApplicationWithStrikeOut("001")
+                    .getGeneralApplicationWithStrikeOut("001", YES)
                     .build();
                 assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGaAndGaNotMadeByApplicant() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .getGeneralApplicationWithStrikeOut("001", NO)
+                    .build();
+                assertTrue(caseDismissedAfterDetailNotified.test(caseData));
             }
 
             @Test
@@ -1559,7 +1571,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void isInHearingReadiness_whenHearingNoticeSubmitted() {
+        void isInHearingReadiness_whenHearingNoticeSubmitted() {
             CaseData caseData = CaseData.builder()
                 .hearingReferenceNumber("11111")
                 .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -1569,7 +1581,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
+        void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
             CaseData caseData = CaseData.builder()
                 .hearingReferenceNumber("11111")
                 .listingOrRelisting(ListingOrRelisting.RELISTING)
