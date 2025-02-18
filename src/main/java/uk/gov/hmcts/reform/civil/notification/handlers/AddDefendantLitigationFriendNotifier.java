@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -41,12 +42,12 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
     }
 
     @Override
-    public void notifyParties(CaseData caseData) {
+    @NotNull
+    protected Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         partiesToEmail.add(getApplicant(caseData));
         partiesToEmail.addAll(getRespondents(caseData));
-
-        sendNotification(partiesToEmail);
+        return partiesToEmail;
     }
 
     private EmailDTO getApplicant(CaseData caseData) {

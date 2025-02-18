@@ -21,9 +21,14 @@ public abstract class Notifier implements NotificationData {
     protected final OrganisationService organisationService;
     protected final SimpleStateFlowEngine stateFlowEngine;
 
-    protected abstract void notifyParties(CaseData caseData);
+    protected abstract Set<EmailDTO> getPartiesToNotify(final CaseData caseData);
 
-    protected void sendNotification(Set<EmailDTO> recipients) {
+    protected void notifyParties(CaseData caseData) {
+        final Set<EmailDTO> partiesToEmail = getPartiesToNotify(caseData);
+        sendNotification(partiesToEmail);
+    }
+
+    private void sendNotification(Set<EmailDTO> recipients) {
         for (EmailDTO recipient : recipients) {
             notificationService.sendMail(
                 recipient.getTargetEmail(), recipient.getEmailTemplate(), recipient.getParameters(),
