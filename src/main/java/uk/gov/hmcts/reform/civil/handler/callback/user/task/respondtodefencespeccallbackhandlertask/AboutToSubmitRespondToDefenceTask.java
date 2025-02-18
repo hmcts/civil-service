@@ -208,6 +208,9 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private void updateCaselocationDetails(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        log.info("TEST1 feature toggle , {}", featureToggleService.isMultiOrIntermediateTrackEnabled(caseData));
+        log.info("TEST1 isMultiOrIntTrackSpec, {}", isMultiOrIntTrackSpec(caseData));
+        log.info("TEST1 lip case, {}", caseData.isLipCase());
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && isMultiOrIntTrackSpec(caseData)
             && caseData.isLipCase()) {
