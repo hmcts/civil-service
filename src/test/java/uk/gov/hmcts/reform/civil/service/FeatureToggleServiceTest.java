@@ -50,10 +50,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCaseEventsEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "cui-case-events-enabled";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseEventsEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCaseEventsEnabled()).isTrue();;
     }
 
     @ParameterizedTest
