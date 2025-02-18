@@ -301,8 +301,8 @@ public class LocationHelper {
     }
 
     private boolean isMultiOrIntTrackSpec(CaseData caseData) {
-            return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
-                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+        return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
 
     }
 }
