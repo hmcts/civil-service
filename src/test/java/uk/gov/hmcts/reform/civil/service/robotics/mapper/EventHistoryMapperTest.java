@@ -105,11 +105,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RECORD_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_REASON;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_RECORD_JUDGMENT_REASON;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
@@ -1007,7 +1007,7 @@ class EventHistoryMapperTest {
             }
         }
 
-        public Event expectedDeadLineExtendedEvent(PartyData partyData, String expectedMessage) {
+        Event expectedDeadLineExtendedEvent(PartyData partyData, String expectedMessage) {
             return Event.builder()
                 .eventSequence(4)
                 .eventCode("45")
@@ -6190,7 +6190,7 @@ class EventHistoryMapperTest {
             final String eventDetailText = "APPLICATION TO Strike Out";
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
-                    .getGeneralApplicationWithStrikeOut("001")
+                    .getGeneralApplicationWithStrikeOut("001", YES)
                     .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
                     .build();
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -6246,7 +6246,7 @@ class EventHistoryMapperTest {
             String eventDetailText = "APPLICATION TO Strike Out";
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
-                    .getGeneralApplicationWithStrikeOut("004")
+                    .getGeneralApplicationWithStrikeOut("004", YES)
                     .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
                     .build();
 
@@ -6303,7 +6303,7 @@ class EventHistoryMapperTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
-                    .getGeneralApplicationWithStrikeOut("001")
+                    .getGeneralApplicationWithStrikeOut("001", YES)
                     .getGeneralStrikeOutApplicationsDetailsWithCaseState("Order Made")
                     .build();
 
@@ -7709,7 +7709,7 @@ class EventHistoryMapperTest {
     class InterlocutoryJudgment {
 
         @Test
-        public void shouldgenerateRPAfeedfor_IJNoDivergent() {
+        void shouldgenerateRPAfeedfor_IJNoDivergent() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
@@ -7730,7 +7730,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldgenerateRPAfeedfor_IJWithDivergent() {
+        void shouldgenerateRPAfeedfor_IJWithDivergent() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
@@ -7756,7 +7756,7 @@ class EventHistoryMapperTest {
     class DefaultJudgment {
 
         @Test
-        public void shouldgenerateRPAfeedfor_DJNoDivergent() {
+        void shouldgenerateRPAfeedfor_DJNoDivergent() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
@@ -7789,7 +7789,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldgenerateRPAfeedfor_DJWithDivergent() {
+        void shouldgenerateRPAfeedfor_DJWithDivergent() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
@@ -7823,7 +7823,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldgenerateRPAfeedfor_DJNoDivergent_case_online_999_event() {
+        void shouldgenerateRPAfeedfor_DJNoDivergent_case_online_999_event() {
 
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
@@ -7864,7 +7864,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldgenerateRPAfeedfor_DJNoDivergent_case_offline_999_event() {
+        void shouldgenerateRPAfeedfor_DJNoDivergent_case_offline_999_event() {
 
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
@@ -7905,7 +7905,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldgenerateRPAfeedfor_DJ_event_update_sequenceno() {
+        void shouldgenerateRPAfeedfor_DJ_event_update_sequenceno() {
 
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
@@ -7954,7 +7954,7 @@ class EventHistoryMapperTest {
     class SetAsideJudgment {
 
         @Test
-        public void shouldGenerateRPAFeedfor_SetAside() {
+        void shouldGenerateRPAFeedfor_SetAside() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
@@ -7981,7 +7981,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPAFeedfor_SetAsideDefence() {
+        void shouldGenerateRPAFeedfor_SetAsideDefence() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
@@ -8008,7 +8008,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPAFeedfor_SetAside_Error() {
+        void shouldGenerateRPAFeedfor_SetAside_Error() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
@@ -8032,7 +8032,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPAfeedfor_SetAside_1v2() {
+        void shouldGenerateRPAfeedfor_SetAside_1v2() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
@@ -8054,7 +8054,7 @@ class EventHistoryMapperTest {
         final String partyID = "002";
 
         @Test
-        public void shouldGenerateRPA_PartAdmitRejectPayment() {
+        void shouldGenerateRPA_PartAdmitRejectPayment() {
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt = DynamicList.builder()
                 .listItems(locationValues.getListItems())
@@ -8113,7 +8113,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_FullAdmitRejectPayment() {
+        void shouldGenerateRPA_FullAdmitRejectPayment() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -8136,7 +8136,7 @@ class EventHistoryMapperTest {
         final String partyID = "002";
 
         @Test
-        public void shouldGenerateRPA_ForPartAdmit_WhenClaimIsInMediation() {
+        void shouldGenerateRPA_ForPartAdmit_WhenClaimIsInMediation() {
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt = DynamicList.builder()
                 .listItems(locationValues.getListItems())
@@ -8203,7 +8203,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediation() {
+        void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediation() {
             BigDecimal claimValue = BigDecimal.valueOf(1000);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt = DynamicList.builder()
@@ -8287,7 +8287,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediationNoLegalRep() {
+        void shouldGenerateRPA_ForFullDefence_WhenClaimIsInMediationNoLegalRep() {
             BigDecimal claimValue = BigDecimal.valueOf(1500);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             DynamicList preferredCourt = DynamicList.builder()
@@ -8377,7 +8377,7 @@ class EventHistoryMapperTest {
     @Nested
     class RequestJudgmentByAdmission {
         @Test
-        public void shouldGenerateRPA_ForFullAdmit_WhenClaimAgreedRepaymentPlan_BySetDate() {
+        void shouldGenerateRPA_ForFullAdmit_WhenClaimAgreedRepaymentPlan_BySetDate() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -8424,7 +8424,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_ForFullAdmit_WhenClaimAgreedRepaymentPlan() {
+        void shouldGenerateRPA_ForFullAdmit_WhenClaimAgreedRepaymentPlan() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -8475,7 +8475,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_ForFullAdmit_WhenClaimImmediately() {
+        void shouldGenerateRPA_ForFullAdmit_WhenClaimImmediately() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -8516,7 +8516,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_ForFullAdmit_WhenClaimImmediatelyForLip() {
+        void shouldGenerateRPA_ForFullAdmit_WhenClaimImmediatelyForLip() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
 
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -8687,7 +8687,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_BySetDate_JoLiveFeed() {
+        void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_BySetDate_JoLiveFeed() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
             RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
@@ -8718,7 +8718,7 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_JoLiveFeed() {
+        void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_JoLiveFeed() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
             RepaymentPlanLRspec respondent1RepaymentPlan = RepaymentPlanLRspec.builder()
@@ -8780,7 +8780,7 @@ class EventHistoryMapperTest {
         @Nested
         class CancelledStatus {
             @Test
-            public void shouldGenerateRPA_Cancelled_MarkPaidInFull_CoscApplied() {
+            void shouldGenerateRPA_Cancelled_MarkPaidInFull_CoscApplied() {
                 CertOfSC certOfSC = CertOfSC.builder()
                     .defendantFinalPaymentDate(LocalDate.now())
                     .debtPaymentEvidence(DebtPaymentEvidence.builder()
@@ -8817,7 +8817,7 @@ class EventHistoryMapperTest {
             }
 
             @Test
-            public void shouldGenerateRPA_Cancelled_MarkPaidInFull_NoCoscApplied() {
+            void shouldGenerateRPA_Cancelled_MarkPaidInFull_NoCoscApplied() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
                     .joMarkedPaidInFullIssueDate(markPaidInFullIssueDate)
@@ -8847,7 +8847,7 @@ class EventHistoryMapperTest {
             }
 
             @Test
-            public void shouldGenerateRPA_Cancelled_NotMarkPaidInFull_CoscApplied() {
+            void shouldGenerateRPA_Cancelled_NotMarkPaidInFull_CoscApplied() {
                 CertOfSC certOfSC = CertOfSC.builder()
                     .defendantFinalPaymentDate(defendantFinalPaymentDate)
                     .debtPaymentEvidence(DebtPaymentEvidence.builder()
@@ -8888,7 +8888,7 @@ class EventHistoryMapperTest {
         @Nested
         class SatisfiedStatus {
             @Test
-            public void shouldGenerateRPA_MarkedPaidInFull_CoscApplied() {
+            void shouldGenerateRPA_MarkedPaidInFull_CoscApplied() {
                 CertOfSC certOfSC = CertOfSC.builder()
                     .defendantFinalPaymentDate(LocalDate.now())
                     .debtPaymentEvidence(DebtPaymentEvidence.builder()

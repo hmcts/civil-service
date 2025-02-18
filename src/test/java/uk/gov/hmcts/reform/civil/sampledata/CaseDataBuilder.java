@@ -190,7 +190,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -5509,8 +5508,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder getGeneralApplicationWithStrikeOut(final String litigiousPartyID) {
-        List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
+    public CaseDataBuilder getGeneralApplicationWithStrikeOut(final String litigiousPartyID, YesOrNo isParentClaimantIsApplicant) {
+        List<GeneralApplicationTypes> types = List.of(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
             GeneralApplication.builder()
                 .applicantPartyName("partyName")
@@ -5520,7 +5519,7 @@ public class CaseDataBuilder {
                 .generalAppType(GAApplicationType.builder()
                     .types(types)
                     .build())
-
+                .parentClaimantIsApplicant(isParentClaimantIsApplicant)
                 .caseLink(CaseLink.builder().caseReference("12345678").build())
                 .businessProcess(BusinessProcess.builder()
                     .camundaEvent("NotifyRoboticsOnCaseHandedOffline")

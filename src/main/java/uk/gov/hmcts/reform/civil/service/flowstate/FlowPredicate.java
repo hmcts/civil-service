@@ -279,7 +279,7 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseIntentionType() == null
             && caseData.getRespondent1ResponseDate() == null
             && caseData.getTakenOfflineByStaffDate() == null
-            && (caseData.getGeneralApplications() == null || caseData.getGeneralApplications().isEmpty())
+            && !isThereAnyGaAndMadeByApplicant(caseData)
             && caseData.getSetRequestDJDamagesFlagForWA() == null;
 
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
@@ -291,8 +291,13 @@ public class FlowPredicate {
                 && caseData.getRespondent2ClaimResponseIntentionType() == null
                 && caseData.getRespondent2ResponseDate() == null;
         }
-
         return commonConditions;
+    }
+
+    private static boolean isThereAnyGaAndMadeByApplicant(CaseData caseData) {
+        return caseData.getGeneralApplications() != null
+            && caseData.getGeneralApplications().stream()
+            .anyMatch(generalApplication -> YES.equals(generalApplication.getValue().getParentClaimantIsApplicant()));
     }
 
     public static final Predicate<CaseData> applicantOutOfTimeNotBeingTakenOffline = caseData ->
