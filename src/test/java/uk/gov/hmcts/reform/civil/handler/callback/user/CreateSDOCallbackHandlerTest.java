@@ -915,6 +915,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
 
             given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
+            given(featureToggleService.isHmcForLipEnabled()).willReturn(false);
         }
 
         @Test
@@ -948,6 +949,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
+            when(featureToggleService.isHmcForLipEnabled()).thenReturn(false);
         }
 
         @Test
@@ -1064,78 +1066,46 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "true, NO, NO, YES",
-        "false, NO, NO, NO",
-        "true, YES, NO, YES"
+        //LR scenarios trigger hmcEaCourt and ignore hmcLipEnabled
+        "true, YES, YES, YES, YES",
+        "false, YES, YES, YES, NO",
+        // LiP vs LR - ignore HMC court
+        "true,  NO, YES, NO,",
+        "false,  NO, YES, NO,",
+        //LR vs LiP - ignore HMC court
+        "true, YES, NO, YES,",
+        "false, YES, NO, NO,",
+        //LiP vs LiP - ignore HMC court
+        "true, NO, NO, YES,",
+        "false, NO, NO, NO,"
     })
-    void shouldSetEaCourtLocationBasedOnConditions(boolean isLocationWhiteListed, YesOrNo applicant1Represented, YesOrNo respondent1Represented, YesOrNo expectedEaCourtLocation) {
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .respondent1Represented(respondent1Represented)
-            .applicant1Represented(applicant1Represented)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isLocationWhiteListed);
+    void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
+                                                             YesOrNo respondent1Represented,
+                                                             YesOrNo eaCourtLocation, YesOrNo hmcEaCourtLocation) {
 
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        if (NO.equals(respondent1Represented) || NO.equals(applicantRepresented)) {
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+        } else {
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
+        }
 
-        assertEquals(expectedEaCourtLocation, responseCaseData.getEaCourtLocation());
-    }
-
-    @Test
-    void shouldNotPopulateHmcEarlyAdoptersFlag_whenLiP() {
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(options)
-            .smallClaimsMethodInPerson(options)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .build();
-
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
 
         CallbackParams params = callbackParamsOf(caseData.toBuilder()
-                                                     .applicant1Represented(YesOrNo.NO)
+                                                     .applicant1Represented(applicantRepresented)
+                                                     .respondent1Represented(respondent1Represented)
                                                      .build(), ABOUT_TO_SUBMIT);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
-
-        params = callbackParamsOf(caseData.toBuilder()
-                                      .respondent1Represented(YesOrNo.NO)
-                                      .build(), ABOUT_TO_SUBMIT);
-
-        response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
+        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+        assertEquals(hmcEaCourtLocation, responseCaseData.getHmcEaCourtLocation());
     }
 
     @Test
