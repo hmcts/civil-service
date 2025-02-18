@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +20,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.REFERENCE_TEMPLATE_APPLICANT_FOR_CLAIM_DISMISSED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
@@ -72,7 +73,7 @@ public class ClaimDismissedNotifier extends Notifier {
                 .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                 .parameters(properties)
-                .reference(String.format(NotificationUtils.REFERENCE_TEMPLATE_APPLICANT_FOR_CLAIM_DISMISSED,
+                .reference(String.format(REFERENCE_TEMPLATE_APPLICANT_FOR_CLAIM_DISMISSED,
                         caseData.getLegacyCaseReference()))
                 .build();
     }
@@ -96,7 +97,7 @@ public class ClaimDismissedNotifier extends Notifier {
                 .targetEmail(caseData.getRespondentSolicitor1EmailAddress())
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                 .parameters(properties)
-                .reference(String.format(NotificationUtils.REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED,
+                .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED,
                         caseData.getLegacyCaseReference()))
                 .build();
     }
