@@ -208,15 +208,14 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private void updateCaselocationDetails(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        log.info("TEST1 feature toggle , {}", featureToggleService.isMultiOrIntermediateTrackEnabled(caseData));
-        log.info("TEST1 isMultiOrIntTrackSpec, {}", isMultiOrIntTrackSpec(caseData));
-        log.info("TEST1 lip case, {}", caseData.isLipCase());
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)
             && isMultiOrIntTrackSpec(caseData)
             && caseData.isLipCase()) {
-            // If case is Multi or Intermediate, and has a LIP involved, CML should be set/maintained at CNBC for transfer offline tasks (takeCaseOfflineMinti)
+            // If case is Multi or Intermediate, and has a LIP involved, and even if transferred online
+            // CML should be set/maintained at CNBC for transfer offline tasks (takeCaseOfflineMinti)
             builder.caseManagementLocation(CaseLocationCivil.builder().baseLocation(cnbcEpimsId).region(cnbcRegionId).build());
-            // Otherwise If not, if case has been transferred online (i.e. current CML is NOT CNBC) we maintain that CML
+            // Otherwise If not Multi or Intermediate, and has a LIP involved,
+            // if case has been transferred online (i.e. current CML is NOT CNBC) we maintain that CML
         } else if (notTransferredOnline(caseData)) {
             // If neither, we update CML using logic in location helper (either preferred court, or under 1000 logic)
             updateCaseManagementLocation(callbackParams, builder);
