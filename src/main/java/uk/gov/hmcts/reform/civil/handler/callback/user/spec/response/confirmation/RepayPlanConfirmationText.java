@@ -85,7 +85,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
             sb.append(" rejects your offer</h3>");
         }
         sb.append("The court will decide how you must pay");
-        if (caseData.isApplicantNotRepresented()) {
+        if (caseData.isApplicant1NotRepresented()) {
             sb.append("<br></br>")
                 .append("<p>This case will now proceed offline.</p>");
         }

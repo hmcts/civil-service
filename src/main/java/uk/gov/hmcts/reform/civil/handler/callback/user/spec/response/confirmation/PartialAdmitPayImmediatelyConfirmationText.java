@@ -55,7 +55,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         } else {
             sb.append("'s");
         }
-        if (caseData.isApplicantNotRepresented()) {
+        if (caseData.isApplicant1NotRepresented()) {
             sb.append(" if you need details on how to pay.</p>");
             sb.append("<p>This case will now proceed offline.</p>");
         } else {
