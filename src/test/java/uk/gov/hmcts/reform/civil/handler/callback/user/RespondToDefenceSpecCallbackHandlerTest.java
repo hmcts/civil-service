@@ -1872,7 +1872,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdateLocation_WhenCmlIsCnbcToggleOn() {
+        void shouldUpdateLocation_WhenCmlIsCnbcNonMintiLip() {
             // Given
             var caseData = CaseDataBuilder.builder()
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -1890,7 +1890,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotUpdateLocation_WhenCmlIsNotCnbcAndToggleOn() {
+        void shouldNotUpdateLocation_WhenCmlIsNotCnbcNonMintiLip() {
             // Given
             var caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
@@ -1904,6 +1904,26 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsExactly("3", "12345");
+        }
+
+        @Test
+        void shouldUpdateMaintainLocationToCnbc_WhenMintiLip() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .responseClaimTrack("INTERMEDIATE_CLAIM")
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").region("420219").build())
+                .respondent1Represented(NO)
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("2", "420219");
         }
 
         @Test
