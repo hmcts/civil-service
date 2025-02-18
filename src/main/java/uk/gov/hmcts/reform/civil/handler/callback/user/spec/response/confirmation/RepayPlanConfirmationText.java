@@ -64,9 +64,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         if (caseData.isApplicantRepresented()) {
             sb.append(" legal representative");
         }
-        sb.append(" if you need details on how to pay</p>");
-
-        sb.append("<br><br>")
+        sb.append(" if you need details on how to pay</p>")
             .append("If you do not pay immediately, ").append(applicantName);
 
         if (caseData.getRespondent2() != null || caseData.getApplicant2() != null) {
@@ -88,7 +86,8 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         }
         sb.append("The court will decide how you must pay");
         if (caseData.isApplicantNotRepresented()) {
-            sb.append("<p>This case will now proceed offline.</p>");
+            sb.append("<br></br>")
+                .append("<p>This case will now proceed offline.</p>");
         }
         return Optional.of(sb.toString());
     }
