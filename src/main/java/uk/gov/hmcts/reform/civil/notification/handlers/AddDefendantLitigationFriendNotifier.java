@@ -41,7 +41,15 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
     }
 
     @Override
-    protected EmailDTO getApplicant(CaseData caseData) {
+    public void notifyParties(CaseData caseData) {
+        Set<EmailDTO> partiesToEmail = new HashSet<>();
+        partiesToEmail.add(getApplicant(caseData));
+        partiesToEmail.addAll(getRespondents(caseData));
+
+        sendNotification(partiesToEmail);
+    }
+
+    private EmailDTO getApplicant(CaseData caseData) {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
@@ -52,7 +60,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
                 .build();
     }
 
-    protected Set<EmailDTO> getRespondents(CaseData caseData) {
+    private Set<EmailDTO> getRespondents(CaseData caseData) {
         Set<EmailDTO> recipients = new HashSet<>();
         recipients.add(getRespondent(caseData, true));
         if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
@@ -62,7 +70,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
         return recipients;
     }
 
-    protected EmailDTO getRespondent(CaseData caseData, boolean isRespondent1) {
+    private EmailDTO getRespondent(CaseData caseData, boolean isRespondent1) {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                 isRespondent1, organisationService));
