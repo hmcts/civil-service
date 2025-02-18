@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.client.CcdCaseEventsConsumer;
 
@@ -17,7 +16,6 @@ import java.util.stream.IntStream;
 @Slf4j
 @Component
 @ConditionalOnProperty("azure.service-bus.ccd-events-topic.enabled")
-@Profile("!functional & !local")
 @RequiredArgsConstructor
 public class CcdCaseEventsExecutor {
 
