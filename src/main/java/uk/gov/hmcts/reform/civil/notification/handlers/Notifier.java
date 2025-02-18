@@ -23,7 +23,7 @@ public abstract class Notifier implements NotificationData {
 
     protected abstract Set<EmailDTO> getPartiesToNotify(final CaseData caseData);
 
-    protected void notifyParties(CaseData caseData) {
+    public void notifyParties(CaseData caseData) {
         final Set<EmailDTO> partiesToEmail = getPartiesToNotify(caseData);
         sendNotification(partiesToEmail);
     }
