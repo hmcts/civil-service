@@ -62,10 +62,11 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
             sb.append("'s");
         }
 
-        if (caseData.isApplicantRepresented()) {
-            sb.append(" legal representative");
+        if (caseData.isApplicant1NotRepresented()) {
+            sb.append(" if you need details on how to pay</p>");
+        } else {
+            sb.append(" legal representative if you need details on how to pay</p>");
         }
-        sb.append(" if you need details on how to pay.</p>");
         sb.append("<p>If you do not pay immediately, ").append(applicantName)
             .append(" can request a county court judgment against you.</p>")
             .append("<h3 class=\"govuk-heading-m\">If ")
