@@ -76,8 +76,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         void shouldNotifyLipRespondent_whenInvoked() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1ProceedWithClaim(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
                     .build()).build();
@@ -96,8 +95,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         void shouldNotifyLipRespondent_whenTranslatedDocUploaded() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1ProceedWithClaim(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setClaimantBilingualLanguagePreference("BOTH");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name())
@@ -115,8 +113,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
         @Test
         void shouldNotNotifyLipRespondent_ifBilingual() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1ProceedWithClaim(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
             caseData.setClaimantBilingualLanguagePreference("BOTH");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -130,8 +127,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
         @Test
         void shouldNotNotifyLipRespondent_ifNoPartyEmail() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1ProceedWithClaim(YES).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.getRespondent1().setPartyEmail(null);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
@@ -152,7 +148,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                                                                                              .build()));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1ProceedWithClaim(YES)
                 .caseDataLip(CaseDataLiP.builder()
                                  .applicant1SettleClaim(NO)
                                  .build())
@@ -255,7 +250,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 BILINGUAL_RESPONDENT_EMAIL_TEMPLATE);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1ProceedWithClaim(YES)
                 .build().toBuilder()
                 .caseDataLiP(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
