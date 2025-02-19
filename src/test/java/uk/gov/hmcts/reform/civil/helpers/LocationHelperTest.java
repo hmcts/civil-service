@@ -1,10 +1,16 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -16,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,21 +30,33 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
+@ExtendWith(MockitoExtension.class)
 class LocationHelperTest {
 
     private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
     private static final String CCMCC_REGION_ID = "ccmccRegionId";
     private static final String CCMCC_EPIMS = "ccmccEpims";
-    private final LocationHelper helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
+    private static final String CNBC_EPIMS = "cnbcEpims";
+    private static final String CNBC_REGION_ID = "cnbcRegionId";
+    @Mock
+    private FeatureToggleService featureToggleService;
+    private LocationHelper helper;
     private final CaseLocationCivil claimantPreferredCourt = CaseLocationCivil.builder()
         .baseLocation("123456").region("region 1").build();
     private final CaseLocationCivil defendant1PreferredCourt = CaseLocationCivil.builder()
         .baseLocation("987456").region("region 1").build();
     private final CaseLocationCivil defendant2PreferredCourt = CaseLocationCivil.builder()
         .baseLocation("101010").region("region 3").build();
+
+    @BeforeEach
+    void setup() {
+        helper = new LocationHelper(CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID, CNBC_EPIMS, CNBC_REGION_ID, featureToggleService);
+    }
 
     @Test
     void thereIsAMatchingLocation() {
@@ -219,6 +238,49 @@ class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
         Assertions.assertThat(court.orElseThrow().getCaseLocation()).isEqualTo(claimantPreferredCourt);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "INTERMEDIATE_CLAIM, NO, cnbcEpims, cnbcRegionId",
+        "MULTI_CLAIM, NO, cnbcEpims, cnbcRegionId",
+        "INTERMEDIATE_CLAIM, YES, 123456, region 1",
+        "MULTI_CLAIM, YES, 123456, region 1"
+    })
+    void whenSpecMultiOrIntermediateAndLip_courtIsCnbcSpec(String claimTrack, String represented, String epimm, String region) {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(1000000))
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .caseLocation(claimantPreferredCourt)
+                                      .build()
+                              )
+                              .build())
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1(Party.builder()
+                             .type(Party.Type.ORGANISATION)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .caseLocation(defendant1PreferredCourt)
+                                       .responseCourtCode("123")
+                                       .build()
+                               )
+                               .build())
+            .respondent1Represented(YesOrNo.valueOf(represented))
+            .responseClaimTrack(claimTrack)
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Assertions.assertThat(court.orElseThrow().getCaseLocation())
+            .isEqualTo(CaseLocationCivil.builder().baseLocation(epimm).region(region).build());
     }
 
     @Test
