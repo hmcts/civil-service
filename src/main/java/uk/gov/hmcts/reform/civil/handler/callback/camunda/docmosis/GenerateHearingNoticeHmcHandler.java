@@ -159,7 +159,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             }
             caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
         }
-
     }
 
     private String getHearingLocation(String hearingId, HearingGetResponse hearing,

@@ -65,7 +65,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
             jsonPath("$[0].titleCy").value("Talu ar unwaith"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rydych wedi derbyn cynnig Dave Indent i dalu £{fullAdmitPayImmediatelyPaymentAmount} " +
-                    "ar unwaith. Rhaid i’r arian gyrraedd eich cyfrif erbyn " + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid) + ".</p>" +
+                    "ar unwaith. Rhaid i’r arian gyrraedd eich cyfrif erbyn " + DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false) + ".</p>" +
                     "<p class=\"govuk-body\">Os na fyddwch wedi cael yr arian erbyn hynny, <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"" +
                     "  rel=\"noopener noreferrer\" class=\"govuk-link\">gallwch wneud cais am Ddyfarniad Llys Sifil (CCJ)</a>.</p>")
 

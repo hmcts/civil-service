@@ -61,7 +61,7 @@ public class SdoLegalAdviserClaimantScenarioTest extends CaseProgressionDashboar
         handler.handle(callbackParamsTestSDO(caseData));
 
         String requestForReconsiderationDeadlineEn = DateUtils.formatDate(LocalDate.now().plusDays(7));
-        String requestForReconsiderationDeadlineCy = DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7));
+        String requestForReconsiderationDeadlineCy = DateUtils.formatDateInWelsh(LocalDate.now().plusDays(7), false);
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
