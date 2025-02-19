@@ -84,6 +84,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().qmLatestQuery(
                 buildLatestQuery(latestCaseMessage))
+                      .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
                       .build().toMap(objectMapper))
             .build();
     }
