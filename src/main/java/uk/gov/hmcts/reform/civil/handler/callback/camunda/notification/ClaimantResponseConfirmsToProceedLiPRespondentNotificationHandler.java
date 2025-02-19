@@ -118,7 +118,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                           APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
         }
-        if (isClaimantNotProcessLipVsLRWithNoc(caseData)){
+        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
             return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                           CLAIM_REFERENCE_NUMBER,
                           caseData.getCcdCaseReference().toString(),
