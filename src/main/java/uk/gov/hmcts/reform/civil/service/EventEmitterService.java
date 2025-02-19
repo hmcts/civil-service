@@ -8,8 +8,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,10 +33,20 @@ public class EventEmitterService {
             if (dispatchProcess) {
                 applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
             }
-            runtimeService.createMessageCorrelation(camundaEvent)
-                .tenantId(TENANT_ID)
-                .setVariable("caseId", caseId)
-                .correlateStartMessage();
+            if (camundaEvent.equals("queryManagementRaiseQuery")) {
+                CaseMessage latestQuery = getLatestQuery(caseData);
+                String queryId = latestQuery != null ? latestQuery.getId() : null;
+                runtimeService.createMessageCorrelation(camundaEvent)
+                    .tenantId(TENANT_ID)
+                    .setVariable("caseId", caseId)
+                    .setVariable("queryId", queryId)
+                    .correlateStartMessage();
+            } else {
+                runtimeService.createMessageCorrelation(camundaEvent)
+                    .tenantId(TENANT_ID)
+                    .setVariable("caseId", caseId)
+                    .correlateStartMessage();
+            }
             log.info("Camunda event emitted successfully with tenant");
         } catch (RemoteProcessEngineException ex) {
             nullTenantAttempt = true;
