@@ -120,7 +120,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseEventsEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
+        return true;
     }
 
     public boolean isAmendBundleEnabled() {
