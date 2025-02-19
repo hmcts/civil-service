@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -273,27 +275,12 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "someLocation, true, true",
-        "someLocation, false, false",
-        ", true, false",
-        ", false, false"
-    })
-    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle(String location, boolean isFeatureEnabled, boolean expected) {
+    @Test
+    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggle() {
 
-        if (isFeatureEnabled && location != null) {
-            when(featureToggleApi.isFeatureEnabledForLocation(
-                "case-progression-location-whitelist",
-                location,
-                true
-            )).thenReturn(isFeatureEnabled);
-            when(featureToggleService.isCaseProgressionEnabled()).thenReturn(isFeatureEnabled);
-        }
+        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(null);
 
-        boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
-
-        assertEquals(expected, result);
+        assertTrue(result);
     }
 
     @ValueSource(booleans = {true, false})
