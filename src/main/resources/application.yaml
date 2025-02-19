@@ -23,7 +23,6 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    type: caffeine
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
