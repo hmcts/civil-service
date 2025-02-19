@@ -18,8 +18,8 @@ ext.libraries = [
 
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
-  implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.6.15.Final'
-  implementation group: 'org.hibernate', name: 'hibernate-validator', version: '7.0.5.Final'
+  implementation group: 'org.hibernate', name: 'hibernate-core', version: '6.6.8.Final'
+  implementation group: 'org.hibernate', name: 'hibernate-validator', version: '8.0.2.Final'
   implementation group: 'javax.persistence', name: 'javax.persistence-api', version: 2.2
   implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
   implementation 'javax.validation:validation-api:2.0.1.Final'
@@ -28,7 +28,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.28'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
-  implementation group:'org.hibernate', name: 'hibernate-jcache', version: '5.6.15.Final'
+  implementation group:'org.hibernate', name: 'hibernate-jcache', version: '6.6.8.Final'
   implementation group:'com.github.ben-manes.caffeine', name: 'jcache', version: '3.1.8'
 
   runtimeOnly 'org.postgresql:postgresql:42.7.5'
