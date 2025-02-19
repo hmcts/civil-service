@@ -54,7 +54,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         boolean shouldSendEmailToDefendantLR = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
         if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
-                shouldSendEmailToDefendantLR || isIntermediateOrMultiClaimProceedForLipVsLR(caseData)
+                shouldSendEmailToDefendantLR || isIntermediateOrMultiClaimProceedForLipVsLR(caseData) || isClaimantNotProcessLipVsLRWithNoc(caseData)
                     ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
                 getEmailTemplate(caseData, shouldSendEmailToDefendantLR),
                 addProperties(caseData),
@@ -67,6 +67,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private String getEmailTemplate(CaseData caseData, boolean shouldSendEmailToDefendantLR) {
         if (isIntermediateOrMultiClaimProceedForLipVsLR(caseData)) {
             return notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
+        }
+        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
+            return notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
         }
         if (shouldSendEmailToDefendantLR) {
             return notificationsProperties.getNotifyDefendantLRForMediation();
@@ -115,6 +118,17 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                           APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
         }
+        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
+            return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                          CLAIM_REFERENCE_NUMBER,
+                          caseData.getCcdCaseReference().toString(),
+                          CLAIM_LEGAL_ORG_NAME_SPEC,
+                          getRespondentLegalOrganizationName(
+                              caseData.getRespondent1OrganisationPolicy(),
+                              organisationService
+                          )
+            );
+        }
         if (shouldSendMediationNotificationDefendant1LRCarm(
             caseData,
             featureToggleService.isCarmEnabledForCase(caseData)
@@ -138,6 +152,13 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             && caseData.isLipvLROneVOne()
             && caseData.getApplicant1ProceedWithClaim().equals(
             YesOrNo.YES)
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData);
+    }
+
+    private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
+        return caseData.isLipvLROneVOne()
+            && caseData.getApplicant1ProceedWithClaim().equals(
+            YesOrNo.NO)
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
 }
