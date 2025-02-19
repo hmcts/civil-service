@@ -43,6 +43,7 @@ class EventEmitterServiceTest {
 
     private static final String TEST_EVENT = "TEST_EVENT";
     private static final String TEST_EVENT_QM = "queryManagementRaiseQuery";
+    private static final String TEST_EVENT_QM_RESPONSE = "queryManagementRespondQuery";
     private static final long CASE_ID = 1L;
     private static final String QUERY_ID = "1";
 
@@ -69,6 +70,18 @@ class EventEmitterServiceTest {
         CaseData caseData = createCaseData(TEST_EVENT_QM, CASE_ID);
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
         verify(runtimeService).createMessageCorrelation(TEST_EVENT_QM);
+        verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
+        verify(messageCorrelationBuilder).setVariable("queryId", QUERY_ID);
+        verify(messageCorrelationBuilder).tenantId("civil");
+        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
+    }
+
+    @Test
+    void shouldSendMessageAndTriggerResponseToQueryEvent_whenInvoked_withTenantId() {
+        CaseData caseData = createCaseData(TEST_EVENT_QM_RESPONSE, CASE_ID);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
+        verify(runtimeService).createMessageCorrelation(TEST_EVENT_QM_RESPONSE);
         verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
         verify(messageCorrelationBuilder).setVariable("queryId", QUERY_ID);
         verify(messageCorrelationBuilder).tenantId("civil");
