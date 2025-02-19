@@ -429,8 +429,7 @@ public class HmcDataUtils {
     }
 
     public static boolean isWelshHearingTemplate(CaseData caseData) {
-        return (YesOrNo.NO.equals(caseData.getApplicant1Represented()) && (caseData.isClaimantBilingual() || isClaimantDQDocumentsWelsh(caseData)))
-            || (YesOrNo.NO.equals(caseData.getRespondent1Represented()) && (caseData.isRespondentResponseBilingual() || isDefendantDQDocumentsWelsh(caseData)));
+        return isWelshHearingTemplateClaimant(caseData) || isWelshHearingTemplateDefendant(caseData);
     }
 
     public static boolean isClaimantDQDocumentsWelsh(CaseData caseData) {

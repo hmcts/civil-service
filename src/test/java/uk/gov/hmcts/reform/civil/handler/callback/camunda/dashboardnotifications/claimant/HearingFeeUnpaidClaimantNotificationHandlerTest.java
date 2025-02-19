@@ -7,10 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -21,15 +19,15 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -37,12 +35,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(MockitoExtension.class)
-public class HearingFeeUnpaidClaimantNotificationHandlerTest {
+class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
     @InjectMocks
     private HearingFeeUnpaidClaimantNotificationHandler handler;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -70,8 +70,6 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
         }
 
@@ -96,14 +94,14 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
             handler.handle(params);
 
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(), "CLAIMANT", "BEARER_TOKEN");
+            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+                caseData.getCcdCaseReference().toString(), "CLAIMANT");
         }
 
         @Test
@@ -122,11 +120,10 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
             ).build();
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -152,10 +149,10 @@ public class HearingFeeUnpaidClaimantNotificationHandlerTest {
 
             handler.handle(params);
 
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
