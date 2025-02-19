@@ -1,20 +1,16 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
-import uk.gov.hmcts.reform.dashboard.cache.CacheConfig;
 
-import javax.persistence.Cacheable;
+import java.io.Serializable;
+import java.time.OffsetDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -22,8 +18,6 @@ import java.time.OffsetDateTime;
 @lombok.AllArgsConstructor
 @Entity
 @Immutable
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = CacheConfig.READ_ONLY_ENTITY)
 @Table(name = "task_item_template", schema = "dbs")
 public class TaskItemTemplateEntity implements Serializable {
 
