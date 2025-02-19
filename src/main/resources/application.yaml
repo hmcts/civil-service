@@ -33,8 +33,7 @@ spring:
           use_second_level_cache: true
           use_query_cache: true
           region:
-            factory_class: org.hibernate.cache.spi.support.DirectAccessRegionFactory
-
+            factory_class: org.hibernate.cache.spi.caffeine.CaffeineRegionFactory
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
