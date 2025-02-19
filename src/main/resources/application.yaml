@@ -23,7 +23,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    type: jcache
+    type: caffeine
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
@@ -32,11 +32,9 @@ spring:
       hibernate:
         cache:
           use_second_level_cache: true
+          use_query_cache: true
           region:
-            factory_class: jcache
-        javax:
-          cache:
-            provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+            factory_class: org.hibernate.cache.spi.support.DirectAccessRegionFactory
 
   datasource:
     driverClassName: org.postgresql.Driver
