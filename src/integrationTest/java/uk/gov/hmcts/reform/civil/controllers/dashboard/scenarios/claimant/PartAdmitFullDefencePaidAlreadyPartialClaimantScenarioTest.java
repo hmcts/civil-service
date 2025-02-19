@@ -63,7 +63,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £10 yn barod ar " + DateUtils.formatDateInWelsh(paymentDate) + "." +
+                    "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £10 yn barod ar " + DateUtils.formatDateInWelsh(paymentDate, false) + "." +
                         " Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )
@@ -114,7 +114,7 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £10 yn barod ar " + DateUtils.formatDateInWelsh(paymentDate) + "." +
+                    "<p class=\"govuk-body\">Mae’r diffynnydd wedi dweud eu bod wedi talu £10 yn barod ar " + DateUtils.formatDateInWelsh(paymentDate, false) + "." +
                         " Gallwch gadarnhau bod y taliad wedi’i wneud a setlo, neu barhau â’r hawliad.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )

@@ -82,14 +82,14 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .judgementDate(isCourtPermissionGranted(caseData)
                         ? caseData.getPermissionGrantedComplex().getPermissionGrantedDate() : null)
                 .judgementDateWelsh(isCourtPermissionGranted(caseData)
-                        ? formatDateInWelsh(caseData.getPermissionGrantedComplex().getPermissionGrantedDate()) : null)
+                        ? formatDateInWelsh(caseData.getPermissionGrantedComplex().getPermissionGrantedDate(), false) : null)
                 .typeOfDiscontinuance(caseData.getTypeOfDiscontinuance().toString())
                 .typeOfDiscontinuanceTxt(caseData.getTypeOfDiscontinuance().getType())
                 .partOfDiscontinuanceTxt(caseData.getPartDiscontinuanceDetails())
                 .discontinuingAgainstOneDefendant(getDiscontinueAgainstOneDefendant(caseData))
                 .discontinuingAgainstBothDefendants(nonNull(caseData.getIsDiscontinuingAgainstBothDefendants())
                         ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null)
-                .welshDate(formatDateInWelsh(LocalDate.now()));
+                .welshDate(formatDateInWelsh(LocalDate.now(), false));
         return noticeOfDiscontinueBuilder.build();
     }
 

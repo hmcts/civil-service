@@ -48,7 +48,7 @@ public class RequestForReconsiderationRecipientDefendantScenarioTest extends Das
         handler.handle(callbackParams(caseData));
 
         String requestForReconsiderationDeadlineEn = DateUtils.formatDate(LocalDate.of(2024, 6, 14));
-        String requestForReconsiderationDeadlineCy = DateUtils.formatDateInWelsh(LocalDate.of(2024, 6, 14));
+        String requestForReconsiderationDeadlineCy = DateUtils.formatDateInWelsh(LocalDate.of(2024, 6, 14), false);
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")

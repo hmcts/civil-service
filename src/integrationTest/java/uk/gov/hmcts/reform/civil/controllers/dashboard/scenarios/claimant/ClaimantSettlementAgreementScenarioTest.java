@@ -61,7 +61,7 @@ public class ClaimantSettlementAgreementScenarioTest extends DashboardBaseIntegr
                     "<p class=\"govuk-body\">Rydych wedi derbyn cynnig Mr. Sole Trader ac wedi gofyn " +
                         "iddynt lofnodi cytundeb setlo.</p><p class=\"govuk-body\">Mae’n rhaid i’r diffynnydd ymateb " +
                         "erbyn " +
-                        DateUtils.formatDateInWelsh(respondent1SettlementDeadline.toLocalDate()) +
+                        DateUtils.formatDateInWelsh(respondent1SettlementDeadline.toLocalDate(), false) +
                         ".</p><p class=\"govuk-body\">Os na fyddant wedi ymateb erbyn hynny, neu os byddant yn gwrthod " +
                         "y cytundeb, gallwch wneud cais am Ddyfarniad Llys Sifil (CCJ).</p>")
             );

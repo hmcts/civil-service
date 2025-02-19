@@ -85,7 +85,7 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ResponseDeadline", applicant1ResponseDeadline);
             params.put("applicant1ResponseDeadlineEn", DateUtils.formatDate(applicant1ResponseDeadline));
             params.put("applicant1ResponseDeadlineCy",
-                       DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate()));
+                       DateUtils.formatDateInWelsh(applicant1ResponseDeadline.toLocalDate(), false));
         }
 
         if (featureToggleService.isJudgmentOnlineLive()
@@ -107,7 +107,7 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1AdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
             params.put(
                 "respondent1AdmittedAmountPaymentDeadlineCy",
-                DateUtils.formatDateInWelsh(whenWillThisAmountBePaid)
+                DateUtils.formatDateInWelsh(whenWillThisAmountBePaid, false)
             );
         }
         if (nonNull(caseData.getClaimFee())) {
@@ -121,7 +121,7 @@ public class DashboardNotificationsParamsMapper {
             LocalDate respondentResponseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
             params.put("respondent1ResponseDeadline", caseData.getRespondent1ResponseDeadline());
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(respondentResponseDeadline));
-            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDateInWelsh(respondentResponseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDateInWelsh(respondentResponseDeadline, false));
         }
 
         if (caseData.getClaimIssueRemissionAmount() != null) {
@@ -149,13 +149,13 @@ public class DashboardNotificationsParamsMapper {
             params.put("claimSettledObjectionsDeadline",
                        date.plusDays(CLAIM_SETTLED_OBJECTION_DEADLINE_DAYS).atTime(END_OF_DAY));
             params.put("claimSettledDateEn", DateUtils.formatDate(date));
-            params.put("claimSettledDateCy", DateUtils.formatDateInWelsh(date));
+            params.put("claimSettledDateCy", DateUtils.formatDateInWelsh(date, false));
         });
 
         getRespondToSettlementAgreementDeadline(caseData).ifPresent(date -> {
             params.put("respondent1SettlementAgreementDeadline", date.atTime(END_OF_DAY));
             params.put("respondent1SettlementAgreementDeadlineEn", DateUtils.formatDate(date));
-            params.put("respondent1SettlementAgreementDeadlineCy", DateUtils.formatDateInWelsh(date));
+            params.put("respondent1SettlementAgreementDeadlineCy", DateUtils.formatDateInWelsh(date, false));
             params.put("claimantSettlementAgreementEn", getClaimantRepaymentPlanDecision(caseData));
             params.put("claimantSettlementAgreementCy", getClaimantRepaymentPlanDecisionCy(caseData));
         });
@@ -165,14 +165,14 @@ public class DashboardNotificationsParamsMapper {
             params.put("applicant1ClaimSettledObjectionsDeadline",
                        claimSettleDate.plusDays(CLAIM_SETTLED_OBJECTION_DEADLINE_DAYS).atTime(END_OF_DAY));
             params.put("applicant1ClaimSettledDateEn", DateUtils.formatDate(claimSettleDate));
-            params.put("applicant1ClaimSettledDateCy", DateUtils.formatDateInWelsh(claimSettleDate));
+            params.put("applicant1ClaimSettledDateCy", DateUtils.formatDateInWelsh(claimSettleDate, false));
         }
 
         if (nonNull(caseData.getRespondent1RepaymentPlan())) {
             getInstalmentAmount(caseData).ifPresent(amount -> params.put("instalmentAmount", amount));
             getInstalmentStartDate(caseData).ifPresent(date -> {
                 params.put("instalmentStartDateEn", DateUtils.formatDate(date));
-                params.put("instalmentStartDateCy", DateUtils.formatDateInWelsh(date));
+                params.put("instalmentStartDateCy", DateUtils.formatDateInWelsh(date, false));
             });
         }
 
@@ -190,7 +190,7 @@ public class DashboardNotificationsParamsMapper {
             );
             getFirstRepaymentDate(caseData).ifPresent(date -> {
                 params.put("firstRepaymentDateEn", DateUtils.formatDate(date));
-                params.put("firstRepaymentDateCy", DateUtils.formatDateInWelsh(date));
+                params.put("firstRepaymentDateCy", DateUtils.formatDateInWelsh(date, false));
             });
         }
 
@@ -198,13 +198,13 @@ public class DashboardNotificationsParamsMapper {
             LocalDate date = caseData.getHearingDueDate();
             params.put("hearingDueDate", date.atTime(END_OF_DAY));
             params.put("hearingDueDateEn", DateUtils.formatDate(date));
-            params.put("hearingDueDateCy", DateUtils.formatDateInWelsh(date));
+            params.put("hearingDueDateCy", DateUtils.formatDateInWelsh(date, false));
         }
 
         Optional<LocalDate> hearingDocumentDeadline = getHearingDocumentDeadline(caseData);
         hearingDocumentDeadline.ifPresent(date -> {
             params.put("sdoDocumentUploadRequestedDateEn", DateUtils.formatDate(date));
-            params.put("sdoDocumentUploadRequestedDateCy", DateUtils.formatDateInWelsh(date));
+            params.put("sdoDocumentUploadRequestedDateCy", DateUtils.formatDateInWelsh(date, false));
         });
 
         params.put("claimantRepaymentPlanDecision", getClaimantRepaymentPlanDecision(caseData));
@@ -213,7 +213,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getHearingDate())) {
             LocalDate date = caseData.getHearingDate();
             params.put("hearingDateEn", DateUtils.formatDate(date));
-            params.put("hearingDateCy", DateUtils.formatDateInWelsh(date));
+            params.put("hearingDateCy", DateUtils.formatDateInWelsh(date, false));
         }
 
         if (nonNull(caseData.getHearingLocation())) {
@@ -225,7 +225,7 @@ public class DashboardNotificationsParamsMapper {
             LocalDate date = caseData.getHearingDate().minusWeeks(4);
             params.put("trialArrangementDeadline", date.atTime(END_OF_DAY));
             params.put("trialArrangementDeadlineEn", DateUtils.formatDate(date));
-            params.put("trialArrangementDeadlineCy", DateUtils.formatDateInWelsh(date));
+            params.put("trialArrangementDeadlineCy", DateUtils.formatDateInWelsh(date, false));
         }
         if (nonNull(caseData.getHearingFee())) {
             params.put(
@@ -253,13 +253,13 @@ public class DashboardNotificationsParamsMapper {
             params.put("requestForReconsiderationDeadlineEn",
                        DateUtils.formatDate(caseData.getRequestForReconsiderationDeadline()));
             params.put("requestForReconsiderationDeadlineCy",
-                       DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate()));
+                       DateUtils.formatDateInWelsh(caseData.getRequestForReconsiderationDeadline().toLocalDate(), false));
         }
 
         Optional<LocalDateTime> latestBundleCreatedOn = getLatestBundleCreatedOn(caseData);
         latestBundleCreatedOn.ifPresent(date -> {
             params.put("bundleRestitchedDateEn", DateUtils.formatDate(date));
-            params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate()));
+            params.put("bundleRestitchedDateCy", DateUtils.formatDateInWelsh(date.toLocalDate(), false));
         });
 
         if (caseData.getGeneralAppPBADetails() != null) {
@@ -271,14 +271,14 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseData.getCertOfSC())) {
             params.put("coscFullPaymentDateEn", DateUtils.formatDate(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
-            params.put("coscFullPaymentDateCy", DateUtils.formatDateInWelsh(caseData.getCertOfSC().getDefendantFinalPaymentDate()));
+            params.put("coscFullPaymentDateCy", DateUtils.formatDateInWelsh(caseData.getCertOfSC().getDefendantFinalPaymentDate(), false));
             params.put("coscNotificationDateEn", DateUtils.formatDate(LocalDate.now()));
-            params.put("coscNotificationDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
+            params.put("coscNotificationDateCy", DateUtils.formatDateInWelsh(LocalDate.now(), false));
         }
 
         if (nonNull(caseData.getMarkPaidConsent()) && MarkPaidConsentList.YES == caseData.getMarkPaidConsent()) {
             params.put("settleClaimPaidInFullDateEn", DateUtils.formatDate(LocalDate.now()));
-            params.put("settleClaimPaidInFullDateCy", DateUtils.formatDateInWelsh(LocalDate.now()));
+            params.put("settleClaimPaidInFullDateCy", DateUtils.formatDateInWelsh(LocalDate.now(), false));
         }
         return params;
     }
@@ -315,7 +315,7 @@ public class DashboardNotificationsParamsMapper {
             );
             params.put(
                 "ccjPaymentMessageCy",
-                "erbyn " + DateUtils.formatDateInWelsh(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate())
+                "erbyn " + DateUtils.formatDateInWelsh(judgmentDetails.getPaymentPlan().getPaymentDeadlineDate(), false)
             );
         }
     }
@@ -342,7 +342,7 @@ public class DashboardNotificationsParamsMapper {
             case MONTHLY -> "mewn rhandaliadau misol o £" + convertedAmount;
         };
 
-        return message + ". Bydd y taliad cyntaf yn ddyledus ar " + DateUtils.formatDateInWelsh(instalmentDetails.getStartDate());
+        return message + ". Bydd y taliad cyntaf yn ddyledus ar " + DateUtils.formatDateInWelsh(instalmentDetails.getStartDate(), false);
     }
 
     private static String getStringPaymentMessage(JudgmentInstalmentDetails instalmentDetails) {

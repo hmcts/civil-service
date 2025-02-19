@@ -68,7 +68,7 @@ public class ClaimSettledCourtDecisionInFavorOfDefendantScenarioTest extends Das
                     .value("<p class=\"govuk-body\">Mae Mr. John Rambo wedi gwrthod eich cynnig ac wedi gofyn i chi lofnodi cytundeb setlo.</p>" +
                                "<p class=\"govuk-body\">Mi wnaeth Mr. John Rambo gynnig cynllun ad-dalu newydd, ac yna mi wnaeth " +
                                "y llys ymateb gyda chynllun arall a gafodd ei dderbyn.</p>" +
-                               "<p class=\"govuk-body\"> Mae’n rhaid i chi ymateb erbyn " + DateUtils.formatDateInWelsh(responseDeadline.toLocalDate()) +
+                               "<p class=\"govuk-body\"> Mae’n rhaid i chi ymateb erbyn " + DateUtils.formatDateInWelsh(responseDeadline.toLocalDate(), false) +
                                ". Os na fyddwch wedi ymateb erbyn hynny, neu os byddwch yn gwrthod y cytundeb, gallant wneud cais am Ddyfarniad Llys Sifil (CCJ).</p>" +
                                "<p class=\"govuk-body\">Gallwch <a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" " +
                                "class=\"govuk-link\">weld y cynllun ad-dalu</a> neu <a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  " +

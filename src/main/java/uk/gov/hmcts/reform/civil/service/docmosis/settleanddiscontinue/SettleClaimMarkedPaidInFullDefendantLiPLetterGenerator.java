@@ -96,14 +96,14 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
             .builder()
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .letterIssueDate(LocalDate.now())
-            .letterIssueDateWelsh(formatDateInWelsh(LocalDate.now()))
+            .letterIssueDateWelsh(formatDateInWelsh(LocalDate.now(), false))
             .defendantLipName(caseData.getRespondent1().getPartyName())
             .addressLine1(caseData.getRespondent1().getPrimaryAddress().getAddressLine1())
             .addressLine2(caseData.getRespondent1().getPrimaryAddress().getAddressLine2())
             .addressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
             .postCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
             .dateOfEvent(LocalDate.now())
-            .dateOfEventWelsh(formatDateInWelsh(LocalDate.now()))
+            .dateOfEventWelsh(formatDateInWelsh(LocalDate.now(), false))
             .build();
     }
 

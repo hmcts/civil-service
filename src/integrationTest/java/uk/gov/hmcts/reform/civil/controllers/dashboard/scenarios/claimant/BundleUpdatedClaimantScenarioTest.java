@@ -92,7 +92,7 @@ public class BundleUpdatedClaimantScenarioTest extends CaseProgressionDashboardB
                 jsonPath("$[0].titleCy").value("Mae bwndel yr achos wedi'i ddiweddaru"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Cafodd bwndel yr achos ei newid a'i ail-uwchlwytho ar " +
-                        DateUtils.formatDateInWelsh(april.toLocalDate()) +
+                        DateUtils.formatDateInWelsh(april.toLocalDate(), false) +
                         ". <a href=\"{VIEW_BUNDLE_REDIRECT}\" class=\"govuk-link\">Adolygu’r bwndel newydd</a></p>")
             );
         } else {
