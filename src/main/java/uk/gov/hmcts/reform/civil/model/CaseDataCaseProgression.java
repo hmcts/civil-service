@@ -241,6 +241,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private TaskManagementLocationTypes taskManagementLocations;
     private TaskManagementLocationTab taskManagementLocationsTab;
     private TaskManagementLocationTab caseManagementLocationTab;
+    private DynamicList hearingListedDynamicList;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
