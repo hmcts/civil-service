@@ -213,17 +213,24 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         @Test
         void shouldNotifyLRRespondent_whenApplicantNoProceeds() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
                 RESPONDENT_LR_EMAIL_TEMPLATE);
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .applicant1ProceedWithClaim(NO)
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
                                  .applicant1SettleClaim(NO)
                                  .build())
+                .build();
+            caseData = caseData.toBuilder()
+                .respondent1Represented(NO)
+                .applicant1ProceedWithClaim(NO)
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
@@ -234,7 +241,11 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_LR_EMAIL_TEMPLATE,
-                getNotificationDataMapCarm(),
+                Map.of(
+                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                ),
                 REFERENCE_NUMBER
             );
         }
@@ -275,7 +286,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
         private Map<String, String> getNotificationDataMapCarm() {
             return Map.of(
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
