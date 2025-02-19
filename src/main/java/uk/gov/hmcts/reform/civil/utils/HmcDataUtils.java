@@ -447,4 +447,12 @@ public class HmcDataUtils {
             .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
             .orElse(false);
     }
+
+    public static boolean isWelshHearingTemplateClaimant(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getApplicant1Represented()) && (caseData.isClaimantBilingual() || isClaimantDQDocumentsWelsh(caseData));
+    }
+
+    public static boolean isWelshHearingTemplateDefendant(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getRespondent1Represented()) && (caseData.isRespondentResponseBilingual() || isDefendantDQDocumentsWelsh(caseData));
+    }
 }
