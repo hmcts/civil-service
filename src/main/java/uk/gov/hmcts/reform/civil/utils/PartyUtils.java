@@ -267,7 +267,7 @@ public class PartyUtils {
                     responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
                 }
                 break;
-            case ONE_V_TWO_SAME_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
                 responseIntentions.append("\nDefendant 1: ")
                     .append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
                 responseIntentions.append("\n");
@@ -317,7 +317,7 @@ public class PartyUtils {
                         .append(caseData.getRespondent1().getPartyName());
                 }
                 break;
-            case ONE_V_TWO_SAME_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
                 defendantNames.append("\nDefendant 1: ")
                     .append(caseData.getRespondent1().getPartyName());
                 defendantNames.append("\n");

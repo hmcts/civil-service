@@ -220,7 +220,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .build();

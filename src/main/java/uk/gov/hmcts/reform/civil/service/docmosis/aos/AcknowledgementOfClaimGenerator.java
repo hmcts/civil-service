@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N11;
@@ -40,7 +40,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
     public CaseDocument generate(CaseData caseData, String authorisation) {
         AcknowledgementOfClaimForm templateData = getTemplateDataForAcknowldgeClaim(caseData);
         DocmosisTemplates docmosisTemplate =
-            getMultiPartyScenario(caseData) == ONE_V_TWO_SAME_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N11;
+            getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP ? N9_MULTIPARTY_SAME_SOL : N11;
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 
@@ -85,7 +85,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
                         .map(LitigationFriend::getFullName)
                         .orElse(""))
                 .build()));
-        if ((multiPartyScenario == ONE_V_TWO_SAME_LEGAL_REP) || (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP)) {
+        if ((multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) || (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP)) {
             var respondent2 = caseData.getRespondent2();
             respondentParties.add(Party.builder()
                                       .name(respondent2.getPartyName())

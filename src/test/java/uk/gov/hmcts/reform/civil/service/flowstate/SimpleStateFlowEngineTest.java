@@ -2034,7 +2034,7 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
-                    .multiPartyClaimSameDefendantSolicitor()
+                    .multiPartyClaimOneDefendantSolicitor()
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
@@ -3947,7 +3947,7 @@ class SimpleStateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
-                    .multiPartyClaimSameDefendantSolicitor()
+                    .multiPartyClaimOneDefendantSolicitor()
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {

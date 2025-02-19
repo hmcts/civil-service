@@ -862,7 +862,7 @@ public class HearingsPartyMapperTest {
     @Test
     void shouldBuildPartyDetails_whenClaimantResponds1v2SS() {
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimSameDefendantSolicitor()
+            .multiPartyClaimOneDefendantSolicitor()
             .atStateRespondentFullDefence_1v2_Resp1CounterClaimAndResp2FullDefence()
             .addApplicant1LitigationFriend()
             .addRespondent1LitigationFriend()

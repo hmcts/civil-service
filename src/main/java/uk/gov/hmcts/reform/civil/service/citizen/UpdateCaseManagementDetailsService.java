@@ -144,7 +144,7 @@ public class UpdateCaseManagementDetailsService {
     private StringBuilder caseParticipants(CaseData caseData) {
         StringBuilder participantString = new StringBuilder();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
             participantString.append(caseData.getApplicant1().getPartyName())
                 .append(" v ").append(caseData.getRespondent1().getPartyName())

@@ -24,7 +24,7 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
@@ -118,7 +118,7 @@ public class HearingsPartyMapper {
             // 1v2 Same sol and defs file different response
             // or 1v2 diff sol
             // only def 2 files full defence
-            if (((ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            if (((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
                 && NO.equals(caseData.getDefendantSingleResponseToBothClaimants()))
                 || ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData)))
                 && (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())

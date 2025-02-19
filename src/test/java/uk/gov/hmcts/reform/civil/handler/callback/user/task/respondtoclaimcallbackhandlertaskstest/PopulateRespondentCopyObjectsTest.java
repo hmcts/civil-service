@@ -91,7 +91,7 @@ class PopulateRespondentCopyObjectsTest  {
     void shouldReturnError_whenRespondent1HasAlreadySubmittedResponse() {
 
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimSameDefendantSolicitor()
+            .multiPartyClaimOneDefendantSolicitor()
             .respondent1ResponseDate(LocalDateTime.now())
             .build().toBuilder().ccdCaseReference(1234L)
             .build();

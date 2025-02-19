@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 
@@ -37,7 +37,7 @@ public class OrgPolicyValidator {
         List<String> errors = new ArrayList<>();
 
         if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-            || ONE_V_TWO_SAME_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+            || ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
             || TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (caseData.getRespondent1OrganisationPolicy() != null
                 && caseData.getApplicant1OrganisationPolicy() != null

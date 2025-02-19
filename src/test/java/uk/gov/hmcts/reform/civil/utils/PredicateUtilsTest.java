@@ -105,7 +105,7 @@ public class PredicateUtilsTest {
         @Test
         void shouldReturnTrue_whenDefendant1AcknowledgementExists() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent2Responds1v2SameSol(FULL_DEFENCE)
                 .respondentResponseIsSame(YES)
@@ -118,7 +118,7 @@ public class PredicateUtilsTest {
         @Test
         void shouldReturnTrue_whenDefendant2AcknowledgementExists() {
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent2Responds1v2SameSol(FULL_DEFENCE)
                 .respondentResponseIsSame(YES)

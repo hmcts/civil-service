@@ -208,7 +208,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private String getDescriptionFullDefenceProceed(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
                 return format(
                     "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())

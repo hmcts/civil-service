@@ -286,7 +286,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse_1v2SS() {
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimSameDefendantSolicitor()
+            .multiPartyClaimOneDefendantSolicitor()
             .atStateBothRespondentsSameResponse(FULL_DEFENCE)
             .takenOfflineByStaff().build();
         assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
@@ -532,7 +532,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenMediationUnsuccessful_OneVTwoOneLegalRep() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+            .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
 
         assertFalse(declinedMediation.test(caseData));
@@ -541,7 +541,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenMediationUnsuccessfulCarm_OneVTwoOneLegalRep() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+            .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
 
         assertFalse(declinedMediation.test(caseData));
@@ -550,7 +550,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnFalse_whenMediationSuccessful_OneVTwoOneLegalRep() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateMediationSuccessful(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+            .atStateMediationSuccessful(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
 
         assertFalse(declinedMediation.test(caseData));

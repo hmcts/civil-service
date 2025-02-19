@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -48,9 +47,7 @@ class MultiPartyScenarioTest {
     void shouldReturnOneVTwoTwoRepWhenTwoRespondentsRepresentedByDifferentReps() {
         CaseData caseData = CaseData.builder()
             .respondent1(PartyBuilder.builder().build())
-            .respondent1Represented(YesOrNo.YES)
             .respondent2(PartyBuilder.builder().build())
-            .respondent2Represented(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .applicant1(PartyBuilder.builder().build())
             .build();
@@ -59,31 +56,18 @@ class MultiPartyScenarioTest {
     }
 
     @Test
-    void shouldReturnOneVTwoOneRepWhenRespondent1IsRepresentedAndRespondent2NotRepresented() {
+    void shouldReturnOneVTwoWhenRespondent1IsRepresentedAndRespondent2NotRepresented() {
         // When respondent 2 is not represented there is no screen to for to choose respondent2SameLegalRepresentative,
         // therefore respondent2SameLegalRepresentative is null
-        CaseData caseData = getOneVTwoOneLegalRepCaseData();
+        CaseData caseData = getOneVTwoTwoLegalRepCaseData();
 
-        assertThat(getMultiPartyScenario(caseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
+        assertThat(getMultiPartyScenario(caseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
     }
 
     private static CaseData getOneVTwoTwoLegalRepCaseData() {
         CaseData caseData = CaseData.builder()
             .respondent1(PartyBuilder.builder().build())
-            .respondent1Represented(YesOrNo.YES)
             .respondent2(PartyBuilder.builder().build())
-            .respondent2Represented(YesOrNo.YES)
-            .applicant1(PartyBuilder.builder().build())
-            .build();
-        return caseData;
-    }
-
-    private static CaseData getOneVTwoOneLegalRepCaseData() {
-        CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent1Represented(YesOrNo.YES)
-            .respondent2(PartyBuilder.builder().build())
-            .respondent2Represented(YesOrNo.NO)
             .applicant1(PartyBuilder.builder().build())
             .build();
         return caseData;
@@ -99,7 +83,7 @@ class MultiPartyScenarioTest {
             .applicant1(PartyBuilder.builder().build())
             .build();
 
-        assertThat(getMultiPartyScenario(caseData)).isEqualTo(ONE_V_TWO_SAME_LEGAL_REP);
+        assertThat(getMultiPartyScenario(caseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
     }
 
     @Test

@@ -66,7 +66,7 @@ class UploadMediationDocumentsUtilsTest {
     @Test
     void addSameSolicitorDefendantOptions() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .multiPartyClaimSameDefendantSolicitor()
+            .multiPartyClaimOneDefendantSolicitor()
             .build();
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
         UploadMediationDocumentsUtils.addSameSolicitorDefendantOptions(dynamicListOptions, caseData);

@@ -101,7 +101,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
         assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
         assertTrue(takenOfflineAfterSDO.test(caseData));

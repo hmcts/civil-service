@@ -491,7 +491,7 @@ class CaseEventTaskHandlerTest {
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstBothDefendants() {
                     CaseData caseData = CaseDataBuilder.builder()
-                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                         .businessProcess(businessProcess)
                         .build();
@@ -517,7 +517,7 @@ class CaseEventTaskHandlerTest {
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstFirstDefendantOnly() {
                     CaseData caseData = CaseDataBuilder.builder()
-                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
                         .businessProcess(businessProcess)
                         .build();
@@ -543,7 +543,7 @@ class CaseEventTaskHandlerTest {
                 @Test
                 void shouldHaveExpectedDescription_WhenClaimantProceedsAgainstSecondDefendantOnly() {
                     CaseData caseData = CaseDataBuilder.builder()
-                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP)
+                        .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
                         .businessProcess(businessProcess)
                         .build();

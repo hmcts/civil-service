@@ -153,7 +153,7 @@ public class ClaimIssuedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalseWhenSingleDefendantFullDefenceReceived() {
-        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimSameDefendantSolicitor()
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
         assertFalse(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
     }
@@ -182,7 +182,7 @@ public class ClaimIssuedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalseWhenSingleDefendantFullAdmitReceived() {
-        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimSameDefendantSolicitor()
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
         assertFalse(awaitingResponsesFullAdmitReceivedSpec.test(caseData));
     }
@@ -210,7 +210,7 @@ public class ClaimIssuedTransitionBuilderTest {
 
     @Test
     void shouldReturnFalseWhenSingleDefendantNonFullDefenceReceived() {
-        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimSameDefendantSolicitor()
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor()
             .setClaimTypeToSpecClaim().build();
         assertFalse(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
     }

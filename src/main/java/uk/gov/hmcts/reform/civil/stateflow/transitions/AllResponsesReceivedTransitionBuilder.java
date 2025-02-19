@@ -74,9 +74,9 @@ public class AllResponsesReceivedTransitionBuilder extends MidTransitionBuilder 
         boolean basePredicate = caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1ClaimResponseType() == responseType;
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_SAME_LEGAL_REP -> basePredicate && (caseData.getRespondentResponseIsSame() == YES
+            case ONE_V_TWO_ONE_LEGAL_REP -> basePredicate && (caseData.getRespondentResponseIsSame() == YES
                 || caseData.getRespondent2ClaimResponseType() == responseType);
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
+            case ONE_V_TWO_TWO_LEGAL_REP -> basePredicate && caseData.getRespondent2ClaimResponseType() == responseType;
             case ONE_V_ONE -> basePredicate;
             case TWO_V_ONE -> basePredicate && caseData.getRespondent1ClaimResponseTypeToApplicant2() == responseType;
         };

@@ -299,7 +299,7 @@ class RoboticsNotificationServiceTest {
     void shouldSendNotificationEmailForMultiPartyWithMiscellaneousMsg_whenCaseDataIsProvided() {
         // Given
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimSameDefendantSolicitor()
+            .multiPartyClaimOneDefendantSolicitor()
             .atState(FlowState.Main.FULL_DEFENCE)
             .respondent2Responds1v2SameSol(FULL_DEFENCE)
             .respondentResponseIsSame(YES)

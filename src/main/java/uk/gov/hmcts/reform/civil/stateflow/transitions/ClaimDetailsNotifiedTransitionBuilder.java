@@ -84,7 +84,7 @@ public class ClaimDetailsNotifiedTransitionBuilder extends MidTransitionBuilder 
             && caseData.getClaimDismissedDate() == null;
 
         return switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_SAME_LEGAL_REP -> baseCondition
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> baseCondition
                 && caseData.getRespondent2ResponseDate() == null
                 && caseData.getRespondent2AcknowledgeNotificationDate() == null
                 && caseData.getRespondent2TimeExtensionDate() == null;

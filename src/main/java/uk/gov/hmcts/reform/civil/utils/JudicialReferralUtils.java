@@ -29,8 +29,7 @@ public class JudicialReferralUtils {
             MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
             return switch (multiPartyScenario) {
-                case ONE_V_ONE, ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP ->
-                    caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+                case ONE_V_ONE, ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
             };
         } else {
@@ -43,7 +42,7 @@ public class JudicialReferralUtils {
                 case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
                     && caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
-                case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP ->
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                     caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
                         && caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
             };

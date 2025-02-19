@@ -228,7 +228,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             caseBuilder::respondentSolicitor2ServiceAddressRequired,
             caseBuilder::respondentSolicitor2ServiceAddress
         );
-        if (MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+        if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
             // copy 1 into 2
             CaseData temp = caseBuilder.build();
             caseBuilder
@@ -281,7 +281,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                     .specRespondentCorrespondenceAddressdetails(
                         caseData.getRespondentSolicitor1ServiceAddress()
                     );
-                if (MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+                if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
                     caseDataBuilder
                         .specRespondent2CorrespondenceAddressdetails(
                             caseData.getRespondentSolicitor1ServiceAddress())

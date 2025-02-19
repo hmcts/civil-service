@@ -107,7 +107,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()

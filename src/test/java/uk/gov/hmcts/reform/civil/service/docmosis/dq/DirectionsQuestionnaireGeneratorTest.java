@@ -466,7 +466,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .multiPartyClaimSameDefendantSolicitor()
+                    .multiPartyClaimOneDefendantSolicitor()
                     .businessProcess(BusinessProcess.builder()
                         .camundaEvent("CLAIMANT_RESPONSE").build())
                     .applicantsProceedIntention(YesOrNo.YES)
@@ -687,7 +687,7 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void whenCaseStateIsFullDefence1v2_ONE_LR_Applicant1ProceedsLRSpec_shouldGetApplicantDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .multiPartyClaimSameDefendantSolicitor()
+                    .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2()
                     .applicant1DQWithLocation()
                     .applicant1DQWithExperts()
@@ -733,7 +733,7 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void whenCaseStateIsFullDefence1v2_TWO_LR_Applicant1ProceedsLRSpec_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .multiPartyClaimSameDefendantSolicitor()
+                    .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2_DiffSol()
                     .applicant1DQWithLocation()
                     .applicant1DQWithFixedRecoverableCosts()
@@ -2563,7 +2563,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .businessProcess(BusinessProcess.builder()
                     .camundaEvent("CLAIMANT_RESPONSE").build())
                 .applicantsProceedIntention(YesOrNo.YES)
@@ -2590,7 +2590,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .businessProcess(BusinessProcess.builder()
                     .camundaEvent("CLAIMANT_RESPONSE").build())
                 .applicantsProceedIntention(YesOrNo.YES)
@@ -2620,7 +2620,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .businessProcess(BusinessProcess.builder()
                     .camundaEvent("CLAIMANT_RESPONSE").build())
                 .applicantsProceedIntention(YesOrNo.YES)

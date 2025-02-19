@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.Optional;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 /**
@@ -19,7 +19,7 @@ public class SpecResponse1v2DivergentHeaderText implements RespondToClaimConfirm
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (!ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+        if (!ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
             return Optional.empty();
         }
 

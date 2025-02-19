@@ -59,7 +59,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -135,7 +135,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                                                  .file(document.getValue().getDocumentLink())
                                                                  .build());
             }
-            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_SAME_LEGAL_REP)) {
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
                 updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
                                                                       .file(document.getValue().getDocumentLink())
                                                                       .build());
@@ -180,7 +180,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         if ((multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP
             && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
-            || (multiPartyScenario == ONE_V_TWO_SAME_LEGAL_REP
+            || (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP
             && YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()))) {
             updatedData.claimantResponseDocumentToDefendant2Flag(YES);
@@ -282,7 +282,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
-        if (multiPartyScenario == ONE_V_TWO_SAME_LEGAL_REP) {
+        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);
         }
 
@@ -429,7 +429,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     break;
                 }
                 // FALL-THROUGH
-            case ONE_V_TWO_SAME_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP:
                 // XOR: If they are the opposite of each other - Divergent response
                 if (YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
                     ^ YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())) {

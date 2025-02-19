@@ -35,7 +35,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -366,7 +365,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
-            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_SAME_LEGAL_REP);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
             assertThat(updatedCaseData.getDefendant2LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
@@ -404,7 +403,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
                 .isEqualTo("requester@example.com");
-            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_SAME_LEGAL_REP);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isEqualTo(caseData.getRespondent2LRIndividuals());
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
@@ -415,7 +414,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .atStateClaimIssued()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
@@ -451,11 +450,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .atStateClaimIssued()
-                .multiPartyClaimSameDefendantSolicitor()
-                .changeOfRepresentation(false, false, NEW_ORG_ID, "QWERTY R",
-                                        null)
-                .changeOrganisationRequestField(false, false, null, null,
-                                                "requester@example.com")
+                .multiPartyClaimOneDefendantSolicitor()
+                .changeOfRepresentation(false, false, NEW_ORG_ID, "QWERTY R", null)
+                .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, false, NEW_ORG_ID)
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep1")
@@ -560,7 +557,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo(NEW_ORG_ID);
             assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
-            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getDefendant2LIPAtClaimIssued()).isEqualTo(NO);
@@ -791,7 +788,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
-            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_SAME_LEGAL_REP);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
@@ -802,7 +799,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .atStateClaimIssued()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
@@ -902,7 +899,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getSpecRespondent2Represented()).isEqualTo(YES);
             assertSolicitorReferences(false, false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
-            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();

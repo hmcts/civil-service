@@ -152,7 +152,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v2SSRepresented() {
                 executeTest(
                     CaseDataBuilder.builder().atStateClaimIssued()
-                        .multiPartyClaimSameDefendantSolicitor()
+                        .multiPartyClaimOneDefendantSolicitor()
                         .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
                         .build(),
                     RESPONDENT_ONE_ORG_POLICY
@@ -163,7 +163,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2SSRepresented() {
                 executeTest(
                     CaseDataBuilder.builder().atStateClaimIssued()
-                        .multiPartyClaimSameDefendantSolicitor()
+                        .multiPartyClaimOneDefendantSolicitor()
                         .changeOrganisationRequestField(false, true, "1234", "QWERTY R2", REQUESTER_EMAIL)
                         .build(),
                     RESPONDENT_TWO_ORG_POLICY

@@ -74,7 +74,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -379,7 +379,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantListTwo() == null) {
                 errors.add(format(JUDGE_HEARD_FROM_EMPTY, "second claimant"));
             }
-            if ((getMultiPartyScenario(caseData).equals(ONE_V_TWO_SAME_LEGAL_REP) || getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP))
+            if ((getMultiPartyScenario(caseData).equals(ONE_V_TWO_ONE_LEGAL_REP) || getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP))
                 && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantTwoList() == null) {
                 errors.add(format(JUDGE_HEARD_FROM_EMPTY, "second defendant"));
             }
@@ -515,7 +515,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         claimantTwoPartyName = null;
         defendantTwoPartyName = null;
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
-        if (scenario == ONE_V_TWO_SAME_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
+        if (scenario == ONE_V_TWO_ONE_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
             defendantTwoPartyName = caseData.getRespondent2().getPartyName();
         }
         if (scenario == TWO_V_ONE) {

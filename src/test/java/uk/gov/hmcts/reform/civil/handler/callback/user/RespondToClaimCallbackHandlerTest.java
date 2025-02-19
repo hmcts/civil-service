@@ -392,7 +392,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .multiPartyClaimSameDefendantSolicitor()
+                    .multiPartyClaimOneDefendantSolicitor()
                     .build();
 
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -532,7 +532,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .build().toBuilder().ccdCaseReference(1234L)
@@ -558,7 +558,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
@@ -586,7 +586,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(NO)
@@ -611,7 +611,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
@@ -637,7 +637,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
@@ -662,7 +662,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2DQ(Respondent2DQ.builder().build())
                 .respondent2SameLegalRepresentative(YES)
@@ -688,7 +688,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -872,7 +872,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ
                     .builder().respondent2DQExperts(Experts.builder().expertRequired(NO).build())
                     .build())
@@ -894,7 +894,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
                     .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
                     .build())
@@ -915,7 +915,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
                     .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
                     .build())
@@ -936,7 +936,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
                     .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
                     .build())
@@ -958,7 +958,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent1DQ(Respondent1DQ
                     .builder().respondent1DQExperts(Experts.builder().expertRequired(NO).build())
                     .build())
@@ -980,7 +980,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
                 .willReturn(false, false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ
                     .builder().build())
                 .respondent1DQ(Respondent1DQ
@@ -1103,7 +1103,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateWitness_whenMultipartyAndSameLRepAndRespondent1DQIsNull() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When Respondent1DQ() is null and try to validate witness of Respondent1DQ()
@@ -1119,7 +1119,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateWitness_whenMultipartyAndDiffLRepAndRespondent1DQIsNull() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2SameLegalRepresentative(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1136,7 +1136,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateWitness_whenMultipartyAndSameLRepRespondent2DQAndRespondent1DQIsNull() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(null)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -1155,7 +1155,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateWitness_whenMultipartyAndSameLRepRespondent2DQWitNullAndRespondent1DQIsNull() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(null).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -1177,7 +1177,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(NO)
@@ -1197,7 +1197,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class))).willReturn(false, false);
             Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .respondent2DQ(Respondent2DQ.builder().respondent2DQWitnesses(witnesses).build())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
@@ -1357,7 +1357,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondentResponseIsSame(YES)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -1378,7 +1378,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .respondentResponseIsSame(YES)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -1406,7 +1406,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
                 .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -1437,7 +1437,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
                 .respondent2SameLegalRepresentative(NO)
@@ -1469,7 +1469,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
                 .respondent2SameLegalRepresentative(NO)
@@ -1496,7 +1496,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2NotPresent() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(NO)
                 .respondent2SameLegalRepresentative(NO)
@@ -1529,7 +1529,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondentIsNull() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(null)
                 .respondent2SameLegalRepresentative(NO)
@@ -1556,7 +1556,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2Present() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -1592,7 +1592,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondentResponseIsSame(NO)
                 .respondent2ClaimResponseType(COUNTER_CLAIM)
@@ -1622,7 +1622,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .atStateClaimSubmitted()
                 .respondent1(PartyBuilder.builder().individual()
                     .individualDateOfBirth(LocalDate.now().minusYears(1))
@@ -1664,7 +1664,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 //respondent1ClaimResponseType is copied into respondent2ClaimResponseType via handler
                 .atStateRespondentFullDefence()
                 .respondentResponseIsSame(YES)
@@ -2263,7 +2263,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .thenReturn(locationA);
 
                     CaseData caseData = CaseDataBuilder.builder()
-                        .multiPartyClaimSameDefendantSolicitor()
+                        .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence()
                         .respondentResponseIsSame(YES)
                         .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -2315,7 +2315,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
                     CaseData caseData = CaseDataBuilder.builder()
-                        .multiPartyClaimSameDefendantSolicitor()
+                        .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                         .respondentResponseIsSame(NO)
                         .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -2760,7 +2760,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence_1v2_Resp1CounterClaimAndResp2FullDefence()
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
@@ -173,14 +173,14 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
             caseDataBuilder.applicant1LRIndividuals(null);
         } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
-            if (ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+            if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
                 // if it's diff to same sol after noc, copy from defendant 2
                 caseDataBuilder.respondent1LRIndividuals(caseData.getRespondent2LRIndividuals());
                 caseDataBuilder.respondent2LRIndividuals(null);
             } else {
                 // if it's same to diff sol after noc, copy into def 2 and clear def 1
                 if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-                    && ONE_V_TWO_SAME_LEGAL_REP.equals(getMultiPartyScenario(oldCaseData))) {
+                    && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(oldCaseData))) {
                     caseDataBuilder.respondent2LRIndividuals(caseData.getRespondent1LRIndividuals());
                 }
                 caseDataBuilder.respondent1LRIndividuals(null);

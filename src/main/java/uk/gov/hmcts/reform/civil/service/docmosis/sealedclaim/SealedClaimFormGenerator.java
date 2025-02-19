@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -99,7 +99,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP:
                 return N1;
-            case TWO_V_ONE, ONE_V_TWO_SAME_LEGAL_REP:
+            case TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP:
                 return N1_MULTIPARTY_SAME_SOL;
             default:
                 throw new IllegalArgumentException("Multiparty scenario doesn't exist");
@@ -118,7 +118,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                 .representative(respondent1Representative)
                 .build()));
 
-        if (multiPartyScenario == ONE_V_TWO_SAME_LEGAL_REP) {
+        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             var respondent2 = caseData.getRespondent2();
             respondentParties.add(Party.builder()
                                       .type(respondent2.getType().getDisplayValue())

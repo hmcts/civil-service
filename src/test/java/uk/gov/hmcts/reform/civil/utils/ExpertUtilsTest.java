@@ -49,7 +49,7 @@ class ExpertUtilsTest {
     @Test
     void shouldAddEventAndDateAddedToRespondentExperts_1v2SSSingleResponse() {
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimSameDefendantSolicitor()
+            .multiPartyClaimOneDefendantSolicitor()
             .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
             .addRespondent1ExpertsAndWitnesses()
             .respondentResponseIsSame(YES)
@@ -75,7 +75,7 @@ class ExpertUtilsTest {
     @Test
     void shouldAddEventAndDateAddedToRespondentExperts_1v2SSDivergentResponse() {
         CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimSameDefendantSolicitor()
+            .multiPartyClaimOneDefendantSolicitor()
             .atStateDivergentResponseWithRespondent2FullDefence1v2SameSol_NotSingleDQ()
             .addRespondent2ExpertsAndWitnesses()
             .build();

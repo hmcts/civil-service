@@ -214,7 +214,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_COND
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.ComplexityBand.BAND_1;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
@@ -3571,21 +3571,21 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateAddLitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
-        multiPartyClaimSameDefendantSolicitor();
+        multiPartyClaimOneDefendantSolicitor();
         addGenericRespondentLitigationFriend();
         return this;
     }
 
     public CaseDataBuilder atStateAddRespondent1LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
-        multiPartyClaimSameDefendantSolicitor();
+        multiPartyClaimOneDefendantSolicitor();
         addRespondent1LitigationFriend();
         return this;
     }
 
     public CaseDataBuilder atStateAddRespondent2LitigationFriend_1v2_SameSolicitor() {
         atStateClaimDetailsNotified();
-        multiPartyClaimSameDefendantSolicitor();
+        multiPartyClaimOneDefendantSolicitor();
         addRespondent2LitigationFriend();
         return this;
     }
@@ -3766,7 +3766,7 @@ public class CaseDataBuilder {
         atStatePaymentSuccessful();
         atStatePendingClaimIssued();
         atStateClaimIssued();
-        multiPartyClaimSameDefendantSolicitor();
+        multiPartyClaimOneDefendantSolicitor();
         respondent1ResponseDate = LocalDateTime.now();
         return this;
     }
@@ -4613,7 +4613,7 @@ public class CaseDataBuilder {
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
         caseManagementLocation = CaseLocationCivil.builder().baseLocation("00000").region("4").build();
         switch (mpScenario) {
-            case ONE_V_TWO_SAME_LEGAL_REP: {
+            case ONE_V_TWO_ONE_LEGAL_REP: {
                 respondent2SameLegalRepresentative = YES;
                 return atStateRespondentFullDefenceRespondent2();
             }
@@ -5187,7 +5187,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
-        if (mpScenario == ONE_V_TWO_SAME_LEGAL_REP) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
         } else if (mpScenario == TWO_V_ONE) {
             atStateBothApplicantsRespondToDefenceAndProceed_2v1();
@@ -5205,10 +5205,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario mpScenario, boolean isReason) {
-        if (mpScenario == ONE_V_TWO_SAME_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
             atStateClaimDetailsNotified1v1().respondent2Copy(respondent2).build();
-            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_SAME_LEGAL_REP ? YES : NO;
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
         } else {
             atStateClaimDetailsNotified1v1();
         }
@@ -5239,10 +5239,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario mpScenario, boolean isReason) {
-        if (mpScenario == ONE_V_TWO_SAME_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
             atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
-            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_SAME_LEGAL_REP ? YES : NO;
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
         } else {
             atStateNotificationAcknowledged();
         }
@@ -5259,10 +5259,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario mpScenario, boolean isReason) {
-        if (mpScenario == ONE_V_TWO_SAME_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
             atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
-            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_SAME_LEGAL_REP ? YES : NO;
+            respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
             respondent1TimeExtensionDate = LocalDateTime.now();
             respondent2TimeExtensionDate = LocalDateTime.now();
         } else {
@@ -5283,7 +5283,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflineAfterSDO(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
-        if (mpScenario == ONE_V_TWO_SAME_LEGAL_REP) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
         } else if (mpScenario == TWO_V_ONE) {
             atStateBothApplicantsRespondToDefenceAndProceed_2v1();
@@ -5297,7 +5297,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario mpScenario) {
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
-        if (mpScenario == ONE_V_TWO_SAME_LEGAL_REP) {
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
         } else if (mpScenario == TWO_V_ONE) {
             atStateBothApplicantsRespondToDefenceAndProceed_2v1();
@@ -5323,7 +5323,7 @@ public class CaseDataBuilder {
 
         if (mpScenario == ONE_V_ONE) {
             atStateRespondentFullDefenceSpec();
-        } else if (mpScenario == ONE_V_TWO_SAME_LEGAL_REP) {
+        } else if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
             atStateRespondentFullDefenceSpec();
         } else if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
@@ -5566,10 +5566,9 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder multiPartyClaimSameDefendantSolicitor() {
+    public CaseDataBuilder multiPartyClaimOneDefendantSolicitor() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
-        this.respondent2Represented = YES;
         this.respondent2SameLegalRepresentative = YES;
         return this;
     }

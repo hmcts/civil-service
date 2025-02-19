@@ -55,7 +55,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_SAME_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -210,7 +210,7 @@ public class SubmitClaimTask {
         }
 
         List<String> errors = new ArrayList<>();
-        if (getMultiPartyScenario(caseData) == ONE_V_TWO_SAME_LEGAL_REP
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
             && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
             // to keep with heading tab
             dataBuilder

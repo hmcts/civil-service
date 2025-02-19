@@ -105,7 +105,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 dynamicListOptions.add(defendant);
                 break;
             }
-            case ONE_V_TWO_SAME_LEGAL_REP: {
+            case ONE_V_TWO_ONE_LEGAL_REP: {
                 dynamicListOptions.add(claimant);
                 dynamicListOptions.add("Defendants");
                 break;
@@ -221,7 +221,7 @@ public class AddUnavailableDatesCallbackHandler extends CallbackHandler {
                 }
                 break;
             }
-            case ONE_V_TWO_SAME_LEGAL_REP: {
+            case ONE_V_TWO_ONE_LEGAL_REP: {
                 if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
                     addDateToRespondent1(caseData, updatedData);
                     addDateToRespondent2(caseData, updatedData);

@@ -203,7 +203,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
                                                    .organisation(Organisation.builder()
                                                                      .organisationID("OrgId2").build())
                                                    .build())
-                .multiPartyClaimSameDefendantSolicitor()
+                .multiPartyClaimOneDefendantSolicitor()
                 .build();
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
