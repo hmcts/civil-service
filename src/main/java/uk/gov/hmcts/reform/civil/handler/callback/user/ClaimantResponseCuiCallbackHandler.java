@@ -125,8 +125,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData)) {
             CaseData updatedCaseData = builder.build();
-            builder.activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData));
-            builder.joIsLiveJudgmentExists(YES);
+            builder
+                .activeJudgment(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(updatedCaseData))
+                .joIsLiveJudgmentExists(YES)
+                .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 
         CaseData updatedData = builder.build();

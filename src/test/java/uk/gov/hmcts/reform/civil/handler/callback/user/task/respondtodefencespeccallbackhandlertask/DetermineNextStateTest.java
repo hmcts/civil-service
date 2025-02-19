@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
@@ -18,16 +19,19 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
@@ -107,7 +111,7 @@ class DetermineNextStateTest {
     @Test
     void shouldSetStateAllFinalOrdersIssuedWhenApplicantAcceptedRepaymentPlan() {
 
-        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -120,22 +124,39 @@ class DetermineNextStateTest {
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-        JudgmentDetails activeJudgment = mock(JudgmentDetails.class);
+        LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
 
-        when(activeJudgment.getTotalAmount()).thenReturn("1000");
-        when(activeJudgment.getOrderedAmount()).thenReturn("500");
-        when(activeJudgment.getCosts()).thenReturn("150");
-        when(activeJudgment.getClaimFeeAmount()).thenReturn("50");
-        when(activeJudgment.getAmountAlreadyPaid()).thenReturn("200");
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .judgmentId(123)
+            .lastUpdateTimeStamp(now)
+            .courtLocation("123456")
+            .totalAmount("123")
+            .orderedAmount("500")
+            .costs("150")
+            .claimFeeAmount("12")
+            .amountAlreadyPaid("234")
+            .issueDate(now.toLocalDate())
+            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .cancelDate(now.toLocalDate())
+            .defendant1Name("Defendant 1")
+            .defendant1Dob(LocalDate.of(1980, 1, 1))
+            .build();
 
         when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
 
-        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
-                                                                   builder, "", businessProcess);
+        String resultState;
+        try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mock.when(LocalDateTime::now).thenReturn(now);
+            resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                       builder, "", businessProcess);
+        }
+
+        CaseData results = builder.build();
 
         assertEquals(All_FINAL_ORDERS_ISSUED.name(), resultState);
-        verify(builder).activeJudgment(activeJudgment);
-        verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
+        assertThat(results.getActiveJudgment()).isEqualTo(activeJudgment);
+        assertThat(results.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
+        assertThat(results.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
     }
 
     @Test
@@ -276,7 +297,7 @@ class DetermineNextStateTest {
     @Test
     void shouldSetProceedsInHeritageSystemWhenApplicantAcceptedRepaymentPlanAndNotLrVLip() {
 
-        CaseData.CaseDataBuilder<?, ?> builder = mock(CaseData.CaseDataBuilder.class);
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -284,24 +305,43 @@ class DetermineNextStateTest {
             .respondent1Represented(YES)
             .applicant1Represented(YES)
             .build();
-        JudgmentDetails activeJudgment = mock(JudgmentDetails.class);
 
-        when(activeJudgment.getTotalAmount()).thenReturn("1000");
-        when(activeJudgment.getOrderedAmount()).thenReturn("500");
-        when(activeJudgment.getCosts()).thenReturn("150");
-        when(activeJudgment.getClaimFeeAmount()).thenReturn("50");
-        when(activeJudgment.getAmountAlreadyPaid()).thenReturn("200");
-        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
-                                                                   builder, "", businessProcess);
+        LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .judgmentId(123)
+            .lastUpdateTimeStamp(now)
+            .courtLocation("123456")
+            .totalAmount("123")
+            .orderedAmount("500")
+            .costs("150")
+            .claimFeeAmount("12")
+            .amountAlreadyPaid("234")
+            .issueDate(now.toLocalDate())
+            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .cancelDate(now.toLocalDate())
+            .defendant1Name("Defendant 1")
+            .defendant1Dob(LocalDate.of(1980, 1, 1))
+            .build();
+
+        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
+
+        String resultState;
+        try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+            mock.when(LocalDateTime::now).thenReturn(now);
+            resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                builder, "", businessProcess);
+        }
+        CaseData results = builder.build();
 
         assertNotNull(resultState);
         assertEquals(PROCEEDS_IN_HERITAGE_SYSTEM.name(), resultState);
-        verify(builder).activeJudgment(activeJudgment);
-        verify(builder).joIsLiveJudgmentExists(YesOrNo.YES);
+        assertThat(results.getActiveJudgment()).isEqualTo(activeJudgment);
+        assertThat(results.getJoIsLiveJudgmentExists()).isEqualTo(YesOrNo.YES);
+        assertThat(results.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
     }
 
     @Test

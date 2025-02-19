@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-
+import java.time.LocalDateTime;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
@@ -134,9 +134,11 @@ public class DetermineNextState  {
         }
         if (featureToggleService.isJudgmentOnlineLive()) {
             JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
-            builder.activeJudgment(activeJudgment);
-            builder.joIsLiveJudgmentExists(YesOrNo.YES);
-            builder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            builder
+                .activeJudgment(activeJudgment)
+                .joIsLiveJudgmentExists(YesOrNo.YES)
+                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment))
+                .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 
         return Pair.of(nextState, businessProcess);

@@ -621,10 +621,16 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+            AboutToStartOrSubmitCallbackResponse response;
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
             CaseData updatedCaseData = getCaseData(response);
             assertThat(updatedCaseData.getActiveJudgment()).isNotNull();
             assertThat(updatedCaseData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
+            assertThat(updatedCaseData.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
         }
     }
 
