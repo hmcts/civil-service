@@ -28,7 +28,8 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
             || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == BY_SET_DATE
             || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
             &&
-            (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && caseData.isApplicantRepresented())
         ) {
             emailTemplate = notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction();
         } else {
