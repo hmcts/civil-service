@@ -146,7 +146,7 @@ class EventEmitterServiceTest {
             .businessProcess(businessProcess)
             .ccdCaseReference(caseId);
 
-        if (TEST_EVENT_QM.equals(event)) {
+        if (TEST_EVENT_QM.equals(event) || TEST_EVENT_QM_RESPONSE.equals(event)) {
             caseDataBuilder.qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
                                                             .caseMessages(wrapElements(
                                                                 CaseMessage.builder()
