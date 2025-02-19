@@ -237,7 +237,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
 
     // // MINTI case prog
     private DynamicList requestHearingNoticeDynamic;
-    private YesOrNo requestAnotherHearing;
     private final List<ConfirmListingTickBox> confirmListingTickBox;
     private TaskManagementLocationTypes taskManagementLocations;
     private TaskManagementLocationTab taskManagementLocationsTab;

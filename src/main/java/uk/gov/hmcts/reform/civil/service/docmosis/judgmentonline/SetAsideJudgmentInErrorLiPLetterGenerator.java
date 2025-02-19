@@ -9,8 +9,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.judgmentonline.SetAsideJudgmentInErrorLiPDefendantLetter;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
@@ -78,7 +80,16 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
             .letterIssueDate(LocalDate.now())
-            .issueDate(caseData.getJoIssuedDate())
+            .issueDate(getJudgmentIssueDate(caseData))
             .build();
+    }
+
+    private LocalDate getJudgmentIssueDate(CaseData caseData) {
+        if (!caseData.getHistoricJudgment().isEmpty()) {
+            List<Element<JudgmentDetails>> judgmentList = caseData.getHistoricJudgment();
+            JudgmentDetails judgmentDetails = judgmentList.get(judgmentList.size() - 1).getValue();
+            return judgmentDetails.getIssueDate();
+        }
+        return LocalDate.now();
     }
 }

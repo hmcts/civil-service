@@ -420,6 +420,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     .atStateNotificationAcknowledged().build();
                 caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
                     .respondent1DQ(Respondent1DQ.builder().build())
+                    .applicant1Represented(NO)
                     .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                     .build();
@@ -432,7 +433,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-respondent-template-id-action",
+                    "spec-respondent-template-id",
                     getNotificationDataMapSpec(),
                     "defendant-response-applicant-notification-000DC001"
                 );

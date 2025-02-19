@@ -31,7 +31,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -108,7 +107,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 APPLICANT_ONE_NAME, "Mr. John Rambo"
             );
         }

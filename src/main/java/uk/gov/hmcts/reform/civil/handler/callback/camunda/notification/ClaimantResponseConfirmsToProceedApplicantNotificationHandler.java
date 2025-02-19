@@ -70,21 +70,21 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     }
 
     private String getEmailTemplate(CaseData caseData) {
-        if (isBilingualForLipvsLip(caseData)) {
+        if (isBilingualForLipApplicant(caseData)) {
             return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
         }
         return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
     }
 
-    private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+    private boolean isBilingualForLipApplicant(CaseData caseData) {
+        return caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()
             && caseData.isClaimantBilingual();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         );
     }

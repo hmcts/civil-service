@@ -90,8 +90,6 @@ public class RequestAHearingCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
 
-        caseDataUpdated.requestAnotherHearing(null);
-
         String claimTrack = getClaimTrack(caseData);
         if (nonNull(claimTrack) && claimTrack.equals("INTERMEDIATE_CLAIM")) {
             caseDataUpdated.requestHearingNoticeDynamic(INTERMEDIATE_LIST);
