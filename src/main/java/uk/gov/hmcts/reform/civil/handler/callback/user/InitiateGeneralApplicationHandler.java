@@ -123,7 +123,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 /*
                  * General Application can only be initiated if Defendant is assigned to the case
                  * */
-                if (Objects.isNull(caseData.getDefendantUserDetails())) {
+                if (caseData.isRespondent1NotRepresented() && Objects.isNull(caseData.getDefendantUserDetails())) {
+                    log.info("Respondent is not represented {}", caseData.isRespondent1NotRepresented());
                     errors.add(RESP_NOT_ASSIGNED_ERROR_LIP);
                 }
             }
