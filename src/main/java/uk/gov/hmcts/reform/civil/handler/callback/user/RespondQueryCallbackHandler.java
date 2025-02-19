@@ -26,7 +26,6 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(queryManagementRespondQuery);
 
     private final ObjectMapper mapper;
-    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
