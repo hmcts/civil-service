@@ -27,6 +27,10 @@ public class CaseQueriesUtil {
             return caseData.getQmRespondentSolicitor1Queries();
         } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getQmRespondentSolicitor2Queries();
+        } else if (roles.contains("[CLAIMANT]")) {
+            return caseData.getQmApplicantCitizenQueries();
+        } else if (roles.contains("[DEFENDANT]")) {
+            return caseData.getQmRespondentCitizenQueries();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
