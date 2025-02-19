@@ -226,10 +226,10 @@ dashboard:
 
 logging:
   level:
-    org.springframework.cache: DEBUG    # Spring Cache Abstraction
-    javax.cache: DEBUG                  # JCache API (general caching)
-    com.github.benmanes.caffeine.cache: TRACE  # Caffeine specific logs
-    org.hibernate.cache: DEBUG           # Hibernate 2nd Level Cache (if use
+    org.springframework.cache: INFO    # Spring Cache Abstraction
+    javax.cache: INFO                  # JCache API (general caching)
+    com.github.benmanes.caffeine.cache: INFO  # Caffeine specific logs
+    org.hibernate.cache: INFO           # Hibernate 2nd Level Cache (if use
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
