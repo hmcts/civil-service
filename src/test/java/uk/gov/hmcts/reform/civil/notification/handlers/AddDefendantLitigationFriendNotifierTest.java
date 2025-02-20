@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.LitigationFriendAddedNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -57,7 +59,7 @@ class AddDefendantLitigationFriendNotifierTest {
     void shouldNotifyApplicantAndRespondentSolicitor_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
-        addDefendantLitigationFriendNotifier.notifyParties(caseData);
+        addDefendantLitigationFriendNotifier.notifyParties(caseData, LitigationFriendAddedNotificationHandler.TASK_ID);
 
         verifyApplicantAndRespondentEmail();
     }
@@ -68,7 +70,7 @@ class AddDefendantLitigationFriendNotifierTest {
 
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
 
-        addDefendantLitigationFriendNotifier.notifyParties(caseData);
+        addDefendantLitigationFriendNotifier.notifyParties(caseData, LitigationFriendAddedNotificationHandler.TASK_ID);
 
         verifyApplicantAndRespondentEmail();
 
