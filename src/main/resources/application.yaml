@@ -26,17 +26,6 @@ spring:
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
-  jpa:
-    properties:
-      hibernate:
-        cache:
-          use_second_level_cache: true
-          region:
-            factory_class: jcache
-        javax:
-          cache:
-            provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
-
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
