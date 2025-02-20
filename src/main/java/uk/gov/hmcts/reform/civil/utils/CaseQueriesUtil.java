@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
+@Slf4j
 public class CaseQueriesUtil {
 
     private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
@@ -63,6 +65,7 @@ public class CaseQueriesUtil {
 
     public static CaseMessage getQueryById(CaseData caseData, String queryId) {
         List<CaseMessage> latestQueries = new ArrayList<>();
+        log.info("get query by id: " + queryId);
         if (caseData.getQmApplicantSolicitorQueries() != null) {
             latestQueries.addAll(unwrapElements(caseData.getQmApplicantSolicitorQueries().getCaseMessages()));
         }
@@ -72,6 +75,9 @@ public class CaseQueriesUtil {
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.addAll(unwrapElements(caseData.getQmRespondentSolicitor2Queries().getCaseMessages()));
         }
+        log.info("all queries size " + latestQueries.size());
+        log.info("0 created by " + latestQueries.get(0).getCreatedBy());
+        log.info("1 created by " + latestQueries.get(1).getCreatedBy());
         return latestQueries.stream().filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
     }
