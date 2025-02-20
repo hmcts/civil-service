@@ -316,6 +316,18 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
+    @ValueSource(booleans = {true})
+    void shouldReturnCorrectValue_whenIsDefendantNoCOnlineForCase(Boolean toggleStat) {
+        var nocOnlineKey = "is-defendant-noc-online-for-case";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
+
+        assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
         var hmcCui = "hmc-cui-enabled";
