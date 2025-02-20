@@ -153,7 +153,14 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
-    public boolean isDefendantNoCOnlineForCase(CaseData caseData) {
+    public boolean isDefendantNoCOnlineForCase(CaseData caseData)  {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
         return true;
     }
 
