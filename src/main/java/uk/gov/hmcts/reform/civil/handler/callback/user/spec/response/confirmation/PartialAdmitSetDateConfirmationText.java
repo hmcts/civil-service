@@ -38,7 +38,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
         BigDecimal admitOwed = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
-
+        Boolean isLipVLR = caseData.isLipvLROneVOne();
         if (Stream.of(admitOwed, whenWillYouPay, totalClaimAmount)
             .anyMatch(Objects::isNull)) {
             return Optional.empty();
@@ -116,8 +116,16 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             .append(applicantName)
             .append(" rejects your offer to pay by ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
-            .append("</h3>")
-            .append("<p>The court will decide how you must pay</p>");
+            .append("</h3>");
+            if (isLipVLR){
+                sb.append("<p>If the claim value is below £10,000 then the next step will be mediation. The mediation service will contact you to give you a date for your appointment. If you can not reach an agreement at mediation, the court will review your claim.</p>")
+                    .append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount of ").append(totalClaimAmount).append(".</p>")
+                    .append("<p>This case will now proceed offline.</p>");
+
+            } else {
+                sb.append("<p>The court will decide how you must pay</p>");
+            }
+
         return Optional.of(sb.toString());
     }
 }
