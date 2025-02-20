@@ -79,7 +79,7 @@ public class PartAdmitPayByInstalmentsScenarioTest extends DashboardBaseIntegrat
                         + MonetaryConversions.penniesToPounds(installmentAmount).toPlainString().replace(
                         ".00", "")
                         + " " + frequency.getDashboardLabelWelsh() + ". Maent yn cynnig gwneud hyn o "
-                        + DateUtils.formatDateInWelsh(firstPaymentDate)
+                        + DateUtils.formatDateInWelsh(firstPaymentDate, false)
                         + " ymlaen.</p>"
                         + "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb"
                         + "</a></p>"
