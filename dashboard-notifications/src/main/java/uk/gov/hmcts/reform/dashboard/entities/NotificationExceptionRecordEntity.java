@@ -27,7 +27,7 @@ import java.util.UUID;
     @TypeDef(
         name = "string-array",
         typeClass = StringArrayType.class
-    )
+        )
 })
 public class NotificationExceptionRecordEntity implements Serializable {
 
