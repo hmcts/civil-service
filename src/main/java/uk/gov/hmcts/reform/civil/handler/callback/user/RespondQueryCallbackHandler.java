@@ -9,10 +9,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
@@ -32,7 +30,6 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(queryManagementRespondQuery);
 
     private final ObjectMapper mapper;
-    private final Time time;
     private final AssignCategoryId assignCategoryId;
 
     @Override
@@ -56,8 +53,6 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId);
 
         caseData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
-            .takenOfflineDate(time.now())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
