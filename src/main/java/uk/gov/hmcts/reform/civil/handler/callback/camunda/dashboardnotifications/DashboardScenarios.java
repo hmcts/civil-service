@@ -147,6 +147,14 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES("Scenario.AAA6.CaseProceedsInCaseman.Claimant.FastTrack"),
+    SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT(
+        "Scenario.AAA6.GeneralApplication.InitiateApplication.Inactive.Claimant"),
+    SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT(
+        "Scenario.AAA6.GeneralApplication.InitiateApplication.Inactive.Defendant"),
+    SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT(
+        "Scenario.AAA6.GeneralApplication.ViewApplicationAvailable.Defendant"),
+    SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT(
+        "Scenario.AAA6.GeneralApplication.ViewApplicationAvailable.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES("Scenario.AAA6.CaseProceedsInCaseman.Defendant.FastTrack"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.Uploaded.Claimant"),
     SCENARIO_AAA6_CP_HEARING_DOCUMENTS_NOT_UPLOADED_CLAIMANT("Scenario.AAA6.CP.HearingDocuments.NotUploaded.Claimant"),
