@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -150,6 +151,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
             .respondent1DQ(Respondent1DQ.builder().build())
+            .applicant1Represented(YesOrNo.YES)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .build();

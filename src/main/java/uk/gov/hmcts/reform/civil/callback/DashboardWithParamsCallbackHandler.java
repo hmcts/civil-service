@@ -4,11 +4,11 @@ import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.Map;
 
@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 @RequiredArgsConstructor
 public abstract class DashboardWithParamsCallbackHandler extends CallbackHandler {
 
-    protected final DashboardApiClient dashboardApiClient;
+    protected final DashboardScenariosService dashboardScenariosService;
     protected final DashboardNotificationsParamsMapper mapper;
     protected final FeatureToggleService featureToggleService;
 
@@ -41,15 +41,14 @@ public abstract class DashboardWithParamsCallbackHandler extends CallbackHandler
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String scenario = getScenario(caseData, callbackParams);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                scenario,
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                scenario,
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                     caseData)).build()
             );
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

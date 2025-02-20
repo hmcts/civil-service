@@ -8,11 +8,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class ClaimantNocOnlineDashboardNotificationHandler extends CallbackHandl
     public static final String TASK_ID = "createOnlineDashboardNotificationForClaimant";
     private static final String CLAIMANT_ROLE = "CLAIMANT";
 
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService toggleService;
 
@@ -43,7 +43,7 @@ public class ClaimantNocOnlineDashboardNotificationHandler extends CallbackHandl
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            callbackParams -> configureScenarioForClaimantNotification(callbackParams)
+            this::configureScenarioForClaimantNotification
         );
     }
 
@@ -56,10 +56,10 @@ public class ClaimantNocOnlineDashboardNotificationHandler extends CallbackHandl
         ScenarioRequestParams params =
             ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
 
-        dashboardApiClient.recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
+        dashboardScenariosService.recordScenarios(
             authToken,
+            SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             params
         );
 

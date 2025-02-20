@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.querymanagement;
 
 import lombok.Builder;
 import lombok.Data;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;

@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
@@ -26,10 +26,10 @@ public class ClaimantIntentMediationUnsuccessfulHandler extends DashboardCallbac
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_MEDIATION_UNSUCCESSFUL);
     public static final String TASK_ID = "GenerateDashboardNotificationMediationUnsuccessfulForApplicant1";
 
-    public ClaimantIntentMediationUnsuccessfulHandler(DashboardApiClient dashboardApiClient,
-                                                    DashboardNotificationsParamsMapper mapper,
-                                                    FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+    public ClaimantIntentMediationUnsuccessfulHandler(DashboardScenariosService dashboardScenariosService,
+                                                      DashboardNotificationsParamsMapper mapper,
+                                                      FeatureToggleService featureToggleService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override
@@ -61,11 +61,11 @@ public class ClaimantIntentMediationUnsuccessfulHandler extends DashboardCallbac
         return SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT.getScenario();
     }
 
-    private Boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
+    private boolean isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(CaseData caseData) {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE));
     }
 
-    private Boolean isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(CaseData caseData) {
+    private boolean isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(CaseData caseData) {
         return findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE));
     }
 }

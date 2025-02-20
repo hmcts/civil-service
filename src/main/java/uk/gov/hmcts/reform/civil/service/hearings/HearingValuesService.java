@@ -148,7 +148,11 @@ public class HearingValuesService {
 
     private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            throw new IncludesLitigantInPersonException();
+            if (featuretoggleService.isHmcForLipEnabled()) {
+                isEarlyAdopter(caseData);
+            } else {
+                throw new IncludesLitigantInPersonException();
+            }
         }
     }
 

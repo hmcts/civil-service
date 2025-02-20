@@ -4,12 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +23,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT;
 
 @Service
 public class StayLiftedDefendantNotificationHandler extends CaseEventsDashboardCallbackHandler {
@@ -33,10 +33,10 @@ public class StayLiftedDefendantNotificationHandler extends CaseEventsDashboardC
         List.of(CREATE_DASHBOARD_NOTIFICATION_STAY_LIFTED_DEFENDANT);
     public static final String TASK_ID = "DashboardNotificationStayLiftedDefendant";
 
-    public StayLiftedDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public StayLiftedDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                   DashboardNotificationsParamsMapper mapper,
                                                   FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

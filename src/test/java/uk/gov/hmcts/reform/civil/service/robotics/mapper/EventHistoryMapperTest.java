@@ -7844,6 +7844,7 @@ class EventHistoryMapperTest {
                         + "Subtotal \n £1172.00\n\n ### Amount"
                         + " already paid \n£100.00\n ## Total still owed \n £1072.00")
                 .respondent2SameLegalRepresentative(YES)
+                .joDJCreatedDate(LocalDateTime.now())
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
@@ -7875,6 +7876,7 @@ class EventHistoryMapperTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .joDJCreatedDate(LocalDateTime.now())
                 .repaymentSummaryObject(
                     "The judgment will order dsfsdf ffdg to pay £1072.00, "
                         + "including the claim fee and interest,"
@@ -7942,7 +7944,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventSequence").asString().contains("5");
+                .extracting("eventSequence").asString().contains("3");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().isNotEmpty();
         }

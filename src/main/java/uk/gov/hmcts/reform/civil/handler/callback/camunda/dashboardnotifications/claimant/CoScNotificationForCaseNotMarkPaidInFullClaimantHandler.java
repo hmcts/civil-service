@@ -4,11 +4,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
@@ -22,10 +22,10 @@ public class CoScNotificationForCaseNotMarkPaidInFullClaimantHandler extends Das
         List.of(CREATE_DASHBOARD_NOTIFICATION_COSC_NOT_PAID_FULL_CLAIMANT);
     public static final String TASK_ID = "ClaimantDashboardNotificationMarkNotPaidInFull";
 
-    public CoScNotificationForCaseNotMarkPaidInFullClaimantHandler(DashboardApiClient dashboardApiClient,
+    public CoScNotificationForCaseNotMarkPaidInFullClaimantHandler(DashboardScenariosService dashboardScenariosService,
                                                                    DashboardNotificationsParamsMapper mapper,
                                                                    FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

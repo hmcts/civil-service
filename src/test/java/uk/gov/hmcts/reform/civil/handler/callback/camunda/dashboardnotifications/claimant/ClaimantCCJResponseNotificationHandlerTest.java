@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 
@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
 
@@ -70,10 +70,10 @@ class ClaimantCCJResponseNotificationHandlerTest extends BaseCallbackHandlerTest
             handler.handle(callbackParams);
 
             // Then
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }

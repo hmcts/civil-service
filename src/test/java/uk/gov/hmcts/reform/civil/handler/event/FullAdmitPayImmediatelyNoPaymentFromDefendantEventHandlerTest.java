@@ -7,7 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.FullAdmitPayImmediatelyNoPaymentFromDefendantEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
@@ -21,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,7 +28,6 @@ import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +39,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -84,12 +83,11 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
 
         handler.createClaimantDashboardScenario(new FullAdmitPayImmediatelyNoPaymentFromDefendantEvent(CASE_ID));
 
-        verify(dashboardApiClient, times(1)).recordScenario(
-            CASE_ID.toString(),
-            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
+            DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
+            CASE_ID.toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-
     }
 }

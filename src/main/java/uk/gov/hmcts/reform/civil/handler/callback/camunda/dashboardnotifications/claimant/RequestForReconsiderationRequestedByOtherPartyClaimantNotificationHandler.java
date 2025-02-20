@@ -4,19 +4,19 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT_RECIPIENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_LR_RECIPIENT_DELETE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_CLAIMANT_RECIPIENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_DELETE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_REQUEST_FOR_RECONSIDERATION_REQUESTED_BY_OTHER_PARTY_LR_RECIPIENT_DELETE;
 
 /**
  * CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT is triggered when defendant has requested reconsideration
@@ -29,10 +29,10 @@ public class RequestForReconsiderationRequestedByOtherPartyClaimantNotificationH
         List.of(CREATE_NOTIFICATION_REQUEST_FOR_RECONSIDERATION_CLAIMANT);
     public static final String TASK_ID = "CreateNotificationRequestForReconsiderationClaimant";
 
-    public RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public RequestForReconsiderationRequestedByOtherPartyClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                                                      DashboardNotificationsParamsMapper mapper,
                                                                                      FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

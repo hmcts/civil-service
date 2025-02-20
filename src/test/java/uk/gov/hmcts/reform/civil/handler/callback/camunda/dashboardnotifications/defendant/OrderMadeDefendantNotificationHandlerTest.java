@@ -13,12 +13,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
@@ -34,16 +32,17 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -60,13 +59,17 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private OrderMadeDefendantNotificationHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
 
     @Mock
     private DashboardNotificationsParamsMapper mapper;
@@ -105,8 +108,6 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
@@ -131,10 +132,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
 
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.CP.OrderMade.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.CP.OrderMade.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -158,11 +159,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.CP.OrderMade.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.CP.OrderMade.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -186,11 +186,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.CP.OrderMade.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.CP.OrderMade.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -223,11 +222,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -262,11 +260,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -299,11 +296,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             handler.handle(params);
-
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Defendant",
+            verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.MediationUnsuccessfulWithoutUploadDocuments.TrackChange.CARM.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -339,10 +335,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
 
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+            verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -375,11 +371,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             handler.handle(params);
-
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+            verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.MediationUnsuccessful.TrackChange.CARM.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -402,11 +397,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -434,14 +428,11 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                 .build();
 
             when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any()))
-                .thenReturn(ResponseEntity.of(Optional.empty()));
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.CP.OrderMade.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.CP.OrderMade.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -465,10 +456,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
             ).build();
             handler.handle(params);
             ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
-            verify(dashboardApiClient).recordScenario(
-                eq(caseData.getCcdCaseReference().toString()),
-                secondParamCaptor.capture(),
+            verify(dashboardScenariosService).recordScenarios(
                 eq("BEARER_TOKEN"),
+                secondParamCaptor.capture(),
+                eq(caseData.getCcdCaseReference().toString()),
                 eq(ScenarioRequestParams.builder().params(scenarioParams).build())
             );
             String capturedSecondParam = secondParamCaptor.getValue();
@@ -498,10 +489,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
             handler.handle(params);
             ArgumentCaptor<String> secondParamCaptor = ArgumentCaptor.forClass(String.class);
-            verify(dashboardApiClient).recordScenario(
-                eq(caseData.getCcdCaseReference().toString()),
-                secondParamCaptor.capture(),
+            verify(dashboardScenariosService).recordScenarios(
                 eq("BEARER_TOKEN"),
+                secondParamCaptor.capture(),
+                eq(caseData.getCcdCaseReference().toString()),
                 eq(ScenarioRequestParams.builder().params(scenarioParams).build())
             );
             String capturedSecondParam = secondParamCaptor.getValue();
@@ -540,10 +531,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -568,10 +559,10 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -594,26 +585,24 @@ public class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.Update.Defendant.TaskList.UploadDocuments.FinalOrders",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
-        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            "BEARER_TOKEN"
+            "DEFENDANT"
         );
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
-            "BEARER_TOKEN"
+            null
         );
     }
 }

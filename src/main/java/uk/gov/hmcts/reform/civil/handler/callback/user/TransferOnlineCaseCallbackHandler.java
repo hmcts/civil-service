@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -141,12 +142,10 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             if (!isLipCase) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(YES);
-                caseDataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
-            } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId())) {
-                caseDataBuilder.eaCourtLocation(YES);
+                caseDataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
             } else {
-                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                caseDataBuilder.eaCourtLocation(NO);
+                boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData, newCourtLocation.getEpimmsId());
+                caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
             }
         }
 

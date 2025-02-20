@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 
@@ -21,10 +21,10 @@ public class SettleClaimPaidInFullDefendantDashboardNotificationHandler extends 
         List.of(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_SETTLE_CLAIM_PAID_IN_FULL);
     public static final String TASK_ID = "CreateDefendantDashboardNotificationSettleClaimPaidInFull";
 
-    public SettleClaimPaidInFullDefendantDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+    public SettleClaimPaidInFullDefendantDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                                       DashboardNotificationsParamsMapper mapper,
                                                                       FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

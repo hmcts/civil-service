@@ -9,14 +9,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,15 +23,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT1_HWF_DASHBOARD_NOTIFICATION;
@@ -58,10 +54,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_HWF_UPDATED;
 
 @ExtendWith(MockitoExtension.class)
-public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
+class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -90,9 +86,6 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
-
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
             scenarioParams.put("claimIssueRemissionAmount", "£1000");
@@ -109,10 +102,10 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             handler.handle(params);
 
             //Then
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenario.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                dashboardScenario.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -132,8 +125,6 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 .build();
 
             when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("hearingFeeRemissionAmount", "£1000");
@@ -150,11 +141,11 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             handler.handle(params);
 
             //Then
-            verify(dashboardApiClient, times(0)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenario.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
+                dashboardScenario.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
 
@@ -181,12 +172,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             handler.handle(params);
 
             //Then
-            verify(dashboardApiClient, times(0)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenario.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
-            );
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @ParameterizedTest
@@ -210,12 +196,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             handler.handle(params);
 
             //Then
-            verify(dashboardApiClient, times(0)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenario.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
-            );
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @ParameterizedTest
@@ -241,12 +222,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             handler.handle(params);
 
             //Then
-            verify(dashboardApiClient, times(0)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenario.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(new HashMap<>()).build()
-            );
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         private static Stream<Arguments> provideClaimIssueHwfEventsForConfigureScenario() {

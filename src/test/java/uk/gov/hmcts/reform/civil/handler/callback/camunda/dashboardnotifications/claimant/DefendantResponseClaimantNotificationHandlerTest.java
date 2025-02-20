@@ -11,10 +11,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -33,18 +31,16 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -70,7 +66,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
     private DefendantResponseClaimantNotificationHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -111,14 +107,12 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(8723L))
+                .ccdCaseReference(8723L)
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1(Party.builder()
                                  .type(Party.Type.valueOf(partyType.name())).build())
@@ -136,10 +130,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
             handler.handle(callbackParams);
 
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenario.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                dashboardScenario.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -147,12 +141,8 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         @ParameterizedTest
         @MethodSource("defendantTypeAndScenarioArguments")
         void configureDashboardNotificationsForDefendantResponseForFullAdmitPayByDate(Enum partyType, DashboardScenarios dashboardScenario) {
-
             HashMap<String, Object> params = new HashMap<>();
-
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             LocalDate admitPaymentDeadline = OffsetDateTime.now().toLocalDate();
 
@@ -176,11 +166,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .build();
 
             handler.handle(callbackParams);
-
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                dashboardScenario.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                dashboardScenario.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -211,11 +200,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .build();
 
             handler.handle(callbackParams);
-
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_FULL_ADMIT_PAY_IMMEDIATELY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -249,10 +237,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             //when
             handler.handle(callbackParams);
             //then
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -284,10 +272,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             //when
             handler.handle(callbackParams);
             //then
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_ADMIT_AND_PAID_PARTIAL_ALREADY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -317,11 +305,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .build();
 
             handler.handle(callbackParams);
-
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AA6_DEFENDANT_RESPONSE_PAY_BY_INSTALLMENTS_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -329,12 +316,8 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         @ParameterizedTest
         @EnumSource(value = AllocatedTrack.class, mode = EnumSource.Mode.EXCLUDE, names = {"SMALL_CLAIM"})
         void configureDashboardNotificationsForDefendantResponseFullDefenseFastTackForClaimant(AllocatedTrack track) {
-
             HashMap<String, Object> params = new HashMap<>();
-
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
@@ -353,28 +336,22 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .build();
 
             handler.handle(callbackParams);
-
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_RESPONSE_FULLDISPUTE_MULTI_INT_FAST_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
 
         @Test
         void configureDashboardNotificationsForDefendantResponseForFullDefenceFullDisputeMediationClaimant() {
-
             HashMap<String, Object> params = new HashMap<>();
-
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(1234L))
+                .ccdCaseReference(1234L)
                 .applicant1Represented(YesOrNo.NO)
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -388,11 +365,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .build();
 
             handler.handle(callbackParams);
-
-            verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_MEDIATION_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -413,11 +389,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.DefResponse.PartAdmit.PayImmediately.Claimant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -437,18 +412,14 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
     @Test
     void configureDashboardNotificationsForDefendantResponseForFullAdmitFullPaidClaimant() {
-
         HashMap<String, Object> params = new HashMap<>();
-
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-            Optional.empty()));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
             .toBuilder()
             .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
+            .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
@@ -467,23 +438,18 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_ALREADY_PAID_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
 
     @Test
     void configureDashboardNotificationsForDefendantResponseForPartAdmitAfterNocClaimant() {
-
         HashMap<String, Object> params = new HashMap<>();
-
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-            Optional.empty()));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -491,7 +457,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .changeOfRepresentation(ChangeOfRepresentation.builder().build())
             .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
+            .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .responseClaimTrack(SMALL_CLAIM.name())
@@ -506,23 +472,18 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
 
     @Test
     void configureDashboardNotificationsForDefendantResponseForFullAdmitAfterNocClaimant() {
-
         HashMap<String, Object> params = new HashMap<>();
-
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-            Optional.empty()));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
@@ -530,7 +491,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .changeOfRepresentation(ChangeOfRepresentation.builder().build())
             .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(1234L))
+            .ccdCaseReference(1234L)
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .responseClaimTrack(SMALL_CLAIM.name())
@@ -545,23 +506,18 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
 
     @Test
     void configureDashboardNotificationsForDefendantResponseFullDefenceDisputeAllClaimantCarm() {
-
         HashMap<String, Object> params = new HashMap<>();
-
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-            Optional.empty()));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
@@ -589,10 +545,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
         handler.handle(callbackParams);
 
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_DEFENDANT_RESPONSE_FULL_DEFENCE_FULL_DISPUTE_CLAIMANT_CARM.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -622,6 +578,6 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         //when
         handler.handle(callbackParams);
         //then
-        verifyNoInteractions(dashboardApiClient);
+        verifyNoInteractions(dashboardScenariosService);
     }
 }

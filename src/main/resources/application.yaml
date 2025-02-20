@@ -215,6 +215,13 @@ dashboard:
   api:
     url: http://localhost:4000
 
+logging:
+  level:
+    org.springframework.cache: INFO    # Spring Cache Abstraction
+    javax.cache: INFO                  # JCache API (general caching)
+    com.github.benmanes.caffeine.cache: INFO  # Caffeine specific logs
+    org.hibernate.cache: INFO           # Hibernate 2nd Level Cache (if use
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "d89ce52e-c943-4bee-aa2e-24ff05d7d1e5"
@@ -566,6 +573,10 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
+    hikari:
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      idle-timeout: 600000 # 10 minutes
 
 fees:
   api:
@@ -667,6 +678,11 @@ spring:
       connectionTimeout: 10000
       idleTimeout: 30000
       maxLifetime: 60000
+  cache:
+    type: jcache
+    cache-names: userInfoCache, accessTokenCache
+    caffeine:
+      spec: expireAfterWrite=3600s
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:

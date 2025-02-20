@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dashboard.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
@@ -44,24 +45,32 @@ public class TaskListService {
             .toList();
     }
 
+    @Transactional
     public TaskListEntity saveOrUpdate(TaskListEntity taskList) {
 
         TaskItemTemplateEntity taskItemTemplate = taskList.getTaskItemTemplate();
-        Optional<TaskListEntity> existingEntity = taskListRepository
+        List<TaskListEntity> entities = taskListRepository
             .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
                 taskList.getReference(),
                 taskItemTemplate.getRole(),
                 taskItemTemplate.getTemplateName()
             );
 
+        Optional<TaskListEntity> latestEntity = entities.stream()
+            .max(Comparator.comparing(TaskListEntity::getCreatedAt));
+
         TaskListEntity beingUpdated = taskList;
-        if (existingEntity.isPresent()) {
-            beingUpdated = taskList.toBuilder().id(existingEntity.get().getId()).build();
+        if (latestEntity.isPresent()) {
+            beingUpdated = taskList.toBuilder().id(latestEntity.get().getId()).build();
+            entities.stream()
+                .filter(e -> !e.equals(latestEntity.get()))
+                .forEach(duplicateEntity -> taskListRepository.deleteById(duplicateEntity.getId()));
         }
 
         return taskListRepository.save(beingUpdated);
     }
 
+    @Transactional
     public TaskListEntity updateTaskListItem(UUID taskItemIdentifier) {
 
         Optional<TaskListEntity> existingEntity = taskListRepository.findById(taskItemIdentifier);
@@ -72,6 +81,7 @@ public class TaskListService {
         }).orElseThrow(() -> new IllegalArgumentException("Invalid task item identifier " + taskItemIdentifier));
     }
 
+    @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory) {
         List<TaskListEntity> tasks = new ArrayList<>();
         if (Objects.nonNull(excludedCategory)) {

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.Map;
 
@@ -10,8 +10,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 public abstract class CaseEventsDashboardCallbackHandler extends DashboardCallbackHandler {
 
-    public CaseEventsDashboardCallbackHandler(DashboardApiClient dashboardApiClient, DashboardNotificationsParamsMapper mapper, FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+    protected CaseEventsDashboardCallbackHandler(DashboardScenariosService dashboardScenariosService,
+                                              DashboardNotificationsParamsMapper mapper,
+                                              FeatureToggleService featureToggleService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override

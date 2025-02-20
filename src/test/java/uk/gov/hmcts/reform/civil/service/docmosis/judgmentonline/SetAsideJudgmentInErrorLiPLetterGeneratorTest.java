@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -32,6 +33,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SET_ASIDE_JUDGMENT_IN_ERROR_LIP_DEFENDANT_LETTER;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
@@ -66,7 +68,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
             .applicant1(applicant)
             .respondent1(defendant)
             .buildJudmentOnlineCaseDataWithPaymentByInstalment();
-
+        caseData.setHistoricJudgment(wrapElements(JudgmentDetails.builder().issueDate(LocalDate.now()).build()));
         caseData.setJoIssuedDate(LocalDate.now());
         caseData.setJoSetAsideJudgmentErrorText("Some text");
 

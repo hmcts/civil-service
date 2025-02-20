@@ -54,7 +54,8 @@ class SendHearingBulkPrintServiceTest {
             .applicant1(party);
 
         if (addHearingDocuments) {
-            return caseDataBuilder.build().toBuilder().hearingDocuments(wrapElements(caseDocument)).build();
+            return caseDataBuilder.build().toBuilder().hearingDocuments(wrapElements(caseDocument))
+                .hearingDocumentsWelsh(wrapElements(caseDocument)).build();
         }
 
         return caseDataBuilder.build();
@@ -79,7 +80,7 @@ class SendHearingBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
 
         // then
         verifyPrintLetter(caseData, respondent1);
@@ -94,7 +95,7 @@ class SendHearingBulkPrintServiceTest {
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, false);
 
         // then
         verifyPrintLetter(caseData, claimant);
@@ -107,7 +108,7 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(null).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -119,7 +120,7 @@ class SendHearingBulkPrintServiceTest {
         CaseData caseData = buildCaseData(null, SEALED_CLAIM, false);
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -133,7 +134,7 @@ class SendHearingBulkPrintServiceTest {
             .build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -148,7 +149,7 @@ class SendHearingBulkPrintServiceTest {
             .build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -161,7 +162,48 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(List.of()).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+
+        // then
+        verifyNoInteractions(bulkPrintService);
+    }
+
+    @Test
+    void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfully() {
+        // given
+        Party claimant = PartyBuilder.builder().soleTrader().build();
+        CaseData caseData = buildCaseData(claimant, HEARING_FORM, true);
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
+
+        // when
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT, true);
+
+        // then
+        verifyPrintLetter(caseData, claimant);
+    }
+
+    @Test
+    void shouldNotDownloadDocument_whenSystemGeneratedCaseWelshDocumentsIsEmpty() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(List.of()).build();
+
+        // when
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
+
+        // then
+        verifyNoInteractions(bulkPrintService);
+    }
+
+    @Test
+    void shouldNotDownloadDocument_whenSystemGeneratedCaseWelshDocumentsIsNull() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(null).build();
+
+        // when
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, true);
 
         // then
         verifyNoInteractions(bulkPrintService);

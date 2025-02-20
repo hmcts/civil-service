@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 
@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT;
@@ -36,12 +37,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private CourtOfficerOrderClaimantNotificationHandler handler;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -88,16 +89,16 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
             // When
             handler.handle(params);
 
-            verify(dashboardApiClient, atLeastOnce()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService, atLeastOnce()).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -121,18 +122,16 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
             ).build();
             // When
             handler.handle(params);
-
-            verify(dashboardApiClient, atLeastOnce()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService, atLeastOnce()).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
-
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService, never()).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -156,17 +155,10 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
             // When
             handler.handle(params);
 
-            verify(dashboardApiClient, atLeastOnce()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
+            verify(dashboardScenariosService, atLeastOnce()).recordScenarios(
+                "BEARER_TOKEN",
                 SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_HEARING_FEE_CLAIMANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-
-            verify(dashboardApiClient, atLeastOnce()).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario(),
-                "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -183,25 +175,11 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
                     CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
             ).build();
             when(toggleService.isCaseEventsEnabled()).thenReturn(true);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-
             // When
             handler.handle(params);
 
             // Then
-            verify(dashboardApiClient, never()).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -213,7 +191,6 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
                 .build();
 
             when(toggleService.isCaseEventsEnabled()).thenReturn(false);
-            HashMap<String, Object> scenarioParams = new HashMap<>();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
@@ -223,19 +200,7 @@ public class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallba
             handler.handle(params);
 
             // Then
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_CLAIMANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
-
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
+            verifyNoInteractions(dashboardScenariosService);
         }
     }
 

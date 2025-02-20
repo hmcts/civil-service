@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 
@@ -27,13 +27,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
-public class HelpWithFeeDashboardNoticeHandlerTest extends BaseCallbackHandlerTest {
+class HelpWithFeeDashboardNoticeHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private HelpWithFeeDashboardNoticeHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -81,10 +81,10 @@ public class HelpWithFeeDashboardNoticeHandlerTest extends BaseCallbackHandlerTe
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            DashboardScenarios.SCENARIO_AAA6_CP_HEARING_FEE_HELP_WITH_FEE_APPLIED_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }

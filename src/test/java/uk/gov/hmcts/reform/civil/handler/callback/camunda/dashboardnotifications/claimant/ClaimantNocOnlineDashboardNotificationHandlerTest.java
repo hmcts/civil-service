@@ -5,23 +5,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -30,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 class ClaimantNocOnlineDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper mapper;
@@ -64,8 +62,7 @@ class ClaimantNocOnlineDashboardNotificationHandlerTest extends BaseCallbackHand
 
         handler.handle(callbackParams);
         // Then
-        verifyNoInteractions(dashboardApiClient);
-        //assertThat(response).isNotNull();
+        verifyNoInteractions(dashboardScenariosService);
     }
 
     @Test
@@ -78,14 +75,13 @@ class ClaimantNocOnlineDashboardNotificationHandlerTest extends BaseCallbackHand
         )));
 
         // When
-        AboutToStartOrSubmitCallbackResponse response =
-            (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+        handler.handle(callbackParams);
 
         // Then
-        verify(dashboardApiClient, times(1)).recordScenario(
-            eq("1234567890123456"),
-            eq("Scenario.AAA6.DefendantNoticeOfChange.ClaimRemainsOnline.Claimant"),
+        verify(dashboardScenariosService).recordScenarios(
             eq("BEARER_TOKEN"),
+            eq("Scenario.AAA6.DefendantNoticeOfChange.ClaimRemainsOnline.Claimant"),
+            eq("1234567890123456"),
             argThat(params ->
                         params.getParams().containsKey("respondent1PartyName")
                             && "Mr defendant".equals(params.getParams().get("respondent1PartyName"))

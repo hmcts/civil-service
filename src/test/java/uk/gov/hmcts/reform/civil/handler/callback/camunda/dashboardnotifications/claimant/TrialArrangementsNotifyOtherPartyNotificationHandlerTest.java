@@ -8,10 +8,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,15 +19,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -41,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -75,8 +72,6 @@ class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallb
         void shouldRecordScenario_whenInvoked(CaseData caseData, String expectedScenario) {
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -84,10 +79,10 @@ class TrialArrangementsNotifyOtherPartyNotificationHandlerTest extends BaseCallb
             ).build();
 
             handler.handle(params);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                expectedScenario,
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                expectedScenario,
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }

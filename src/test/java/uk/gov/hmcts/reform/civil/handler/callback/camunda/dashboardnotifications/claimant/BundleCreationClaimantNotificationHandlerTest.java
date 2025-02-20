@@ -7,10 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -21,26 +19,25 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_BUNDLE_CREATED_FOR_CLAIMANT1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private BundleCreationClaimantNotificationHandler handler;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -56,9 +53,6 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
 
         @Test
         void shouldRecordScenario_whenInvokedWhenNotTrialReady() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
@@ -75,11 +69,10 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -97,11 +90,10 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -124,11 +116,10 @@ public class BundleCreationClaimantNotificationHandlerTest extends BaseCallbackH
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
-
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_BUNDLE_CREATED_TRIAL_READY_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }

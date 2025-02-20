@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
     private static final List<CaseEvent> EVENTS =
         List.of(CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT);
     public static final String TASK_ID = "GenerateDashboardNotificationHearingScheduledDefendant";
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService toggleService;
     private final LocationReferenceDataService locationRefDataService;
@@ -61,6 +61,7 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
 
     private CallbackResponse configureScenarioForHearingScheduled(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getHearingCourtLocations(authToken));
@@ -70,21 +71,21 @@ public class HearingScheduledDefendantNotificationHandler extends CallbackHandle
         }
 
         if (caseData.isRespondent1NotRepresented()) {
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), authToken,
+            dashboardScenariosService.recordScenarios(authToken,
+                                              SCENARIO_AAA6_CP_HEARING_SCHEDULED_DEFENDANT.getScenario(), caseId,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
 
             if (AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
                 && isNull(caseData.getTrialReadyRespondent1())) {
-                dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(), authToken,
+                dashboardScenariosService.recordScenarios(authToken,
+                                                  SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT.getScenario(), caseId,
                                                   ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
                 );
             }
 
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(), authToken,
+            dashboardScenariosService.recordScenarios(authToken,
+                                              SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_DEFENDANT.getScenario(), caseId,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }

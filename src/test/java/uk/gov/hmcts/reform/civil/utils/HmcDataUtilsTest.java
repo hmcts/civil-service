@@ -8,7 +8,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.HearingIndividual;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -1499,5 +1506,383 @@ class HmcDataUtilsTest {
                 startTime).build()).collect(
                 Collectors.toList()))
             .build();
+    }
+
+    @Nested
+    class IsClaimantDQDocumentsWelshTests {
+
+        @Test
+        void shouldReturnFalse_whenApplicant1DQIsNull() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(null)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicant1DQLanguageIsNull() {
+            // Given
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(null)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenDocumentsIsEnglish() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.ENGLISH)
+                .build();
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.WELSH)
+                .build();
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsBoth() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.BOTH)
+                .build();
+            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .applicant1DQ(applicant1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isClaimantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+    }
+
+    @Nested
+    class IsDefendantDQDocumentsWelshTests {
+
+        @Test
+        void shouldReturnFalse_whenRespondent1DQIsNull() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(null)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondent1DQLanguageIsNull() {
+            // Given
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(null)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenDocumentsIsEnglish() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.ENGLISH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.WELSH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDocumentsIsBoth() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.BOTH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isDefendantDQDocumentsWelsh(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+    }
+
+    @Nested
+    class IsWelshHearingTemplateTests {
+
+        @Test
+        void shouldReturnTrue_whenApplicantNoRepAndClaimantBilingual() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                // -> isClaimantBilingual() = true
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenApplicantNoRepAndClaimantDQDocumentsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.BOTH)
+                .build();
+            Applicant1DQ dq = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                // -> isClaimantBilingual() = false (ej: ENGLISH)
+                .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
+                .applicant1DQ(dq)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentNoRepAndRespondentResponseBilingual() {
+            // Given
+            // -> isRespondentResponseBilingual() = true si "BOTH" o "WELSH"
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("BOTH") // => true
+                                            .build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(caseDataLiP)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentNoRepAndDefendantDQDocumentsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.WELSH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+
+            // -> isRespondentResponseBilingual() = false (ej: "ENGLISH")
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("ENGLISH").build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .respondent1DQ(respondent1DQ)
+                .caseDataLiP(caseDataLiP)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicantYesRepAndRespondentYesRep() {
+            // Given
+            // Ninguno es NO => toda la expresión OR se evalúa a false
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicantNoRepButNotBilingualNotDQ_andRespondentNoRepButNotBilingualNotDQ() {
+            // Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("ENGLISH").build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.ENGLISH.toString()) // => false
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(caseDataLiP)
+                // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnWrandawiad_whenTitleIsHearingLowercase() {
+            // Given
+            String input = "hearing";
+            // When
+            String result = HmcDataUtils.translateTitle(input);
+            // Then
+            assertEquals("Wrandawiad", result);
+        }
+
+        @Test
+        void shouldReturnWrandawiad_whenTitleIsHearingUppercase() {
+            // Given
+            String input = "Hearing";
+            // When
+            String result = HmcDataUtils.translateTitle(input);
+            // Then
+            assertEquals("Wrandawiad", result);
+        }
+
+        @Test
+        void shouldReturnDreial_whenTitleIsTrialLowercase() {
+            // Given
+            String input = "trial";
+            // When
+            String result = HmcDataUtils.translateTitle(input);
+            // Then
+            assertEquals("Dreial", result);
+        }
+
+        @Test
+        void shouldReturnDreial_whenTitleIsTrialUppercase() {
+            // Given
+            String input = "Trial";
+            // When
+            String result = HmcDataUtils.translateTitle(input);
+            // Then
+            assertEquals("Dreial", result);
+        }
+
+        @Test
+        void shouldReturnSameTitle_whenTitleIsNotHearingOrTrial() {
+            // Given
+            String input = "anythingElse";
+            // When
+            String result = HmcDataUtils.translateTitle(input);
+            // Then
+            assertEquals("anythingElse", result);
+        }
     }
 }

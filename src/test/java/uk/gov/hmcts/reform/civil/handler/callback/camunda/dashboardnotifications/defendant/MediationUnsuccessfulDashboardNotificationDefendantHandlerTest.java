@@ -8,9 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
@@ -18,11 +16,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.HashMap;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -36,13 +37,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC;
 
 @ExtendWith(MockitoExtension.class)
-public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends BaseCallbackHandlerTest {
+class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private MediationUnsuccessfulDashboardNotificationDefendantHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -92,10 +93,10 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
                 .build();
 
             handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -106,8 +107,6 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             params.put("ccdCaseReference", "123");
-            MediationUnsuccessfulReason reason = APPOINTMENT_NO_AGREEMENT;
-
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
             LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
@@ -118,7 +117,7 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
                 .ccdCaseReference(1234L)
                 .respondent1ResponseDeadline(dateTime)
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(APPOINTMENT_NO_AGREEMENT)).build())
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -126,10 +125,10 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
                 .build();
 
             handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_GENERIC.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }
@@ -138,10 +137,7 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
         void createDashboardNotificationsWhenCarmIsEnabledAndMediationReasonIsDefendantNonAttendance() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             params.put("ccdCaseReference", "123");
-            MediationUnsuccessfulReason reason = NOT_CONTACTABLE_DEFENDANT_ONE;
-
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
             LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
@@ -152,7 +148,7 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
                 .ccdCaseReference(1234L)
                 .respondent1ResponseDeadline(dateTime)
                 .mediation(Mediation.builder()
-                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_DEFENDANT_ONE)).build())
                 .build();
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -160,10 +156,10 @@ public class MediationUnsuccessfulDashboardNotificationDefendantHandlerTest exte
                 .build();
 
             handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_DEFENDANT_MEDIATION_UNSUCCESSFUL_DEFENDANT_NONATTENDANCE.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
             );
         }

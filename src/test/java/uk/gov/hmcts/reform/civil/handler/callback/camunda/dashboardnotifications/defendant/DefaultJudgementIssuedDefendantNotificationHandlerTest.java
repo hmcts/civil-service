@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -29,13 +29,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-public class DefaultJudgementIssuedDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class DefaultJudgementIssuedDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private DefaultJudgementIssuedDefendantNotificationHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -83,10 +83,10 @@ public class DefaultJudgementIssuedDefendantNotificationHandlerTest extends Base
             .build();
 
         handler.handle(callbackParams);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }

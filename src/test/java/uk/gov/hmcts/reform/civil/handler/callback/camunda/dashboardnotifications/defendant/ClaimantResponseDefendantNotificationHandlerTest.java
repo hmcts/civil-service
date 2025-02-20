@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
@@ -34,6 +33,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -70,14 +72,18 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ClaimantResponseDefendantNotificationHandler handler;
     @Mock
     private FeatureToggleService featureToggleService;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
@@ -121,23 +127,22 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
         handler.handle(callbackParams);
 
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
 
-        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            "BEARER_TOKEN"
+            "DEFENDANT"
         );
 
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
-            "BEARER_TOKEN"
+            null
         );
     }
 
@@ -162,11 +167,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -193,10 +197,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
         handler.handle(callbackParams);
 
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -228,11 +232,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
 
         handler.handle(callbackParams);
 
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
-                .getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -261,11 +264,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -291,12 +293,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                 .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(params).build()
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(params).build()
         );
     }
 
@@ -320,11 +321,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -353,12 +353,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
-                .getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -387,13 +385,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
                 .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
-                    .getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(params).build()
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(params).build()
         );
     }
 
@@ -417,11 +413,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -448,11 +443,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_REJECTED_NOT_PAID_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -480,12 +474,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT
-                .getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENSE_CLAIMANT_DISPUTES_NO_MEDIATION_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -508,11 +500,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -540,11 +531,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_CCJ_CLAIMANT_REJECTS_DEF_PLAN_CLAIMANT_DISAGREES_COURT_PLAN_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -580,11 +570,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         handler.handle(callbackParams);
 
         // Then
-        verify(dashboardApiClient, times(1)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(params).build()
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(params).build()
         );
     }
 
@@ -603,11 +593,11 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         handler.handle(callbackParams);
 
         // Then
-        verify(dashboardApiClient, times(numberOfTimesApiCalled)).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(params).build()
+        verify(dashboardScenariosService, times(numberOfTimesApiCalled)).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(params).build()
         );
     }
 
@@ -630,11 +620,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_DEFENDANT_CARM.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -663,11 +652,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT_ACCEPTED_DEFENDANT_PLAN_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -767,11 +755,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -800,11 +787,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -833,11 +819,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -968,11 +953,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }
@@ -1000,11 +984,10 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .build();
 
         handler.handle(callbackParams);
-
-        verify(dashboardApiClient, times(1)).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
     }

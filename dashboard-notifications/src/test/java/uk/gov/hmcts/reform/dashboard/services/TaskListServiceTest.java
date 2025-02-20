@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -288,6 +289,48 @@ class TaskListServiceTest {
                 return true;
             }
         ));
+    }
+
+    @Test
+    public void shouldDeleteWhenThereWereDuplicateEntriesInTheRepository() {
+        TaskListEntity task = getTaskListEntity(UUID.randomUUID()).toBuilder()
+            .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
+            .taskNameEn("<a href=\"somewhere\">Link name</A >")
+            .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+            .createdAt(OffsetDateTime.MAX)
+            .build();
+
+        TaskListEntity task2 = getTaskListEntity(UUID.randomUUID()).toBuilder()
+            .taskNameEn("<a href=\"somewhere\">Link name</A >")
+            .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+            .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+            .createdAt(OffsetDateTime.MIN.plusDays(99L))
+            .build();
+
+        TaskListEntity task3 = getTaskListEntity(UUID.randomUUID()).toBuilder()
+            .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
+            .taskNameEn("<a href=\"somewhere\">Link name</A >")
+            .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+            .createdAt(OffsetDateTime.MIN.plusDays(20L))
+            .build();
+
+        List<TaskListEntity> tasks = new ArrayList<>();
+        tasks.add(task);
+        tasks.add(task2);
+        tasks.add(task3);
+
+        when(taskListRepository
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
+                any(),
+                any(),
+                any()
+            )).thenReturn(tasks);
+
+        taskListService.saveOrUpdate(task);
+
+        verify(taskListRepository).deleteById(task2.getId());
+        verify(taskListRepository).deleteById(task3.getId());
+        verify(taskListRepository).save(task);
     }
 
 }

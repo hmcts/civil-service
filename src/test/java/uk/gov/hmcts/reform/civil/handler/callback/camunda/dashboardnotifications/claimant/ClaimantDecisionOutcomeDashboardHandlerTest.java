@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,6 +16,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 
@@ -30,12 +32,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTest {
+class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ClaimantDecisionOutcomeDashboardHandler handler;
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private TaskListService taskListService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
@@ -74,10 +80,10 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -98,10 +104,10 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
             handler.handle(params);
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_DECISION_OUTCOME.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_DECISION_OUTCOME.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
@@ -123,25 +129,24 @@ public class ClaimantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHan
             handler.handle(params);
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CLAIMANT_TRIAL_READY_DECISION_OUTCOME.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
-        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            "BEARER_TOKEN"
+            "CLAIMANT"
         );
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
-            "BEARER_TOKEN"
+            null
         );
     }
 }

@@ -7,11 +7,13 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,19 +26,26 @@ public abstract class ConfirmOrderReviewNotificationHandler extends CaseEventsDa
     protected final String role;
     protected final String taskId;
     protected final List<CaseEvent> events;
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public ConfirmOrderReviewNotificationHandler(DashboardApiClient dashboardApiClient,
-                                                 DashboardNotificationsParamsMapper mapper,
-                                                 FeatureToggleService featureToggleService,
-                                                 ObjectMapper objectMapper,
-                                                 String role,
-                                                 String taskId,
-                                                 List<CaseEvent> events) {
-        super(dashboardApiClient, mapper, featureToggleService);
+    @SuppressWarnings("squid:S00107")
+    protected ConfirmOrderReviewNotificationHandler(DashboardScenariosService dashboardScenariosService,
+                                                    DashboardNotificationsParamsMapper mapper,
+                                                    FeatureToggleService featureToggleService,
+                                                    ObjectMapper objectMapper,
+                                                    String role,
+                                                    String taskId,
+                                                    List<CaseEvent> events,
+                                                    DashboardNotificationService dashboardNotificationService,
+                                                    TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
         this.objectMapper = objectMapper;
         this.role = role;
         this.taskId = taskId;
         this.events = events;
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -54,27 +63,25 @@ public abstract class ConfirmOrderReviewNotificationHandler extends CaseEventsDa
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
 
         if (shouldRecordScenario(caseData)) {
-            dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseId,
                 role,
-                "Applications",
-                authToken
+                "Applications"
             );
-            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                role,
-                authToken
-            );
+
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(caseId, role);
+
             HashMap<String, Object> paramsMap = (HashMap<String, Object>) mapper.mapCaseDataToParams(caseData, caseEvent);
 
             String scenario = getScenario(caseData);
             if (!Strings.isNullOrEmpty(scenario)) {
-                dashboardApiClient.recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    scenario,
+                dashboardScenariosService.recordScenarios(
                     authToken,
+                    scenario,
+                    caseId,
                     ScenarioRequestParams.builder().params(paramsMap).build()
                 );
             }

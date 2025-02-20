@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.Map;
 
@@ -12,10 +12,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 public abstract class AbstractCaseDismissDashboardNotificationHandler extends DashboardCallbackHandler {
 
-    public AbstractCaseDismissDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+    protected AbstractCaseDismissDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                            DashboardNotificationsParamsMapper mapper,
                                                            FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override
