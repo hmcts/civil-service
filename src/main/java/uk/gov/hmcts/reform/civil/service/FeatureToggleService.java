@@ -153,7 +153,7 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
     }
 
-    public boolean isDefendantNoCOnlineForCase(CaseData caseData) {
+    public boolean isDefendantNoCOnlineForCase() {
         return true;
     }
 
