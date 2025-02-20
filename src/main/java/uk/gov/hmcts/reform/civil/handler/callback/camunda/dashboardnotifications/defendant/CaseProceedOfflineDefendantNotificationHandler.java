@@ -112,14 +112,5 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             "DEFENDANT",
             GA
         );
-
-        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
-            caseData.getGeneralApplications()
-                .forEach(application ->
-                             dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                                 application.getValue().getCaseLink().getCaseReference(),
-                                 "APPLICANT"
-                ));
-        }
     }
 }

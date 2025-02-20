@@ -285,13 +285,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             // When
             handler.handle(params);
 
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-                "54326781",
-                "APPLICANT"
-            );
-
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
