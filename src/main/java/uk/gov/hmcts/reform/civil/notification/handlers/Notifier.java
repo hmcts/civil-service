@@ -105,7 +105,7 @@ public abstract class Notifier implements NotificationData {
                 .id(UUID.randomUUID())
                 .reference(ccdCaseReference.toString())
                 .successfulActions(successfulNotificationTasks.stream().map(Enum::name).toList())
-                .retryCount("0")
+                .retryCount(0)
                 .taskId(taskId)
                 .build();
         }

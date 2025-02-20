@@ -57,7 +57,7 @@ public class NotificationExceptionRecordEntity implements Serializable {
     private List<String> successfulActions;
 
     @Schema(name = "retry_count")
-    private String retryCount;
+    private int retryCount;
 
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;
