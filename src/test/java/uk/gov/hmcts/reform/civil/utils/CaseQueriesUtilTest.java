@@ -8,18 +8,24 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -29,6 +35,8 @@ class CaseQueriesUtilTest {
 
     @InjectMocks
     private AssignCategoryId assignCategoryId;
+    @Mock
+    private CoreCaseUserService coreCaseUserService;
 
     @Test
     void shouldReturnApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
@@ -109,7 +117,7 @@ class CaseQueriesUtilTest {
     }
 
     @Test
-    void shouldAssignCategoryIDToAttachments() {
+    void shouldAssignCategoryIDToAttachments_whenApplicantUploadsAttachment() {
         CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
             .toBuilder()
             .createdOn(LocalDateTime.now())
@@ -118,12 +126,156 @@ class CaseQueriesUtilTest {
                 Document.builder().documentFileName("b").build()))
             .build();
 
-        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId);
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                      List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenRespondent1UploadsAttachment() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(LocalDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                      List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenRespondent2UploadsAttachment() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(LocalDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                      List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldThrowError_whenUserHasUnsupportedRole() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(LocalDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()))
+            .build();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                          List.of("New role"))
+        );
+
+        assertEquals("Unsupported case role for query management.", exception.getMessage());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenCaseworkerRespondsToApplicant() {
+        List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                               .caseMessages(queries)
+                                               .build())
+            .build();
+
+        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
+
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
+                                                                coreCaseUserService,
+                                                                "id");
+
+        List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
+
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenCaseworkerRespondsToRespondent1() {
+        List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(queries)
+                                               .build())
+            .build();
+
+        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
+
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
+                                                                coreCaseUserService,
+                                                                "id");
+
+        List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenCaseworkerRespondsToRespondent2() {
+        List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(queries)
+                                               .build())
+            .build();
+
+        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
+
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
+                                                      coreCaseUserService,
+                                                      "id");
+
+        List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldThrowError_whenParentUserHasUnsupportedRole() {
+        List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
+        CaseData caseData = CaseData.builder()
+            .ccdCaseReference(1L)
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder()
+                                               .caseMessages(queries)
+                                               .build())
+            .build();
+
+        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("new role"));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
+                                                          coreCaseUserService,
+                                                          "id")
+        );
+
+        assertEquals("Unsupported case role for query management.", exception.getMessage());
     }
 
     @Test
@@ -225,5 +377,36 @@ class CaseQueriesUtilTest {
             .createdOn(LocalDateTime.now())
             .createdBy("System")
             .build();
+    }
+
+    private List<Element<CaseMessage>> buildCaseMessageWithFollowUpQuery() {
+        return wrapElements(
+            CaseMessage.builder()
+                .id("id")
+                .subject("subject")
+                .name("John Doe")
+                .body("Sample body text")
+                .attachments(wrapElements(
+                    Document.builder().documentFileName("a").build(),
+                    Document.builder().documentFileName("b").build()))
+                .isHearingRelated(NO)
+                .hearingDate(LocalDate.now())
+                .createdOn(LocalDateTime.now())
+                .createdBy("System")
+                .build(),
+            CaseMessage.builder()
+                .id("follow-up-id")
+                .subject("subject")
+                .name("John Doe")
+                .body("Sample body text")
+                .attachments(wrapElements(
+                    Document.builder().documentFileName("c").build(),
+                    Document.builder().documentFileName("d").build()))
+                .isHearingRelated(NO)
+                .hearingDate(LocalDate.now())
+                .createdOn(LocalDateTime.now())
+                .createdBy("System")
+                .parentId("id")
+                .build());
     }
 }
