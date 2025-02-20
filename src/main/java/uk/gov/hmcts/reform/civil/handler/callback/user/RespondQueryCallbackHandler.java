@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -27,7 +26,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class RespondQueryCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(queryManagementRespondQuery);
@@ -54,12 +52,6 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
-        log.info("latest case message: id " + latestCaseMessage.getId());
-        log.info("latest case message: createdby " + latestCaseMessage.getCreatedBy());
-        log.info("latest case message: parentid " + latestCaseMessage.getParentId());
-        log.info("latest case message: body " + latestCaseMessage.getBody());
-        log.info("latest case message: name " + latestCaseMessage.getName());
-        log.info("latest case message: subject " + latestCaseMessage.getSubject());
         String parentQueryId = latestCaseMessage.getParentId();
         assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId,
                                                 coreCaseUserService, parentQueryId);
