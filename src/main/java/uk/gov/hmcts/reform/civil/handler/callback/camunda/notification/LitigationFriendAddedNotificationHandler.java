@@ -46,7 +46,7 @@ public class LitigationFriendAddedNotificationHandler extends CallbackHandler {
     }
 
     private CallbackResponse notifyForLitigationFriendAdded(CallbackParams callbackParams) {
-        addDefendantLitigationFriendNotifier.notifyParties(callbackParams.getCaseData());
+        addDefendantLitigationFriendNotifier.notifyParties(callbackParams.getCaseData(), TASK_ID);
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

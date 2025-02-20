@@ -15,6 +15,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.model.NotificationParty.APPLICANT_1;
+import static uk.gov.hmcts.reform.civil.model.NotificationParty.DEFENDANT_1;
+import static uk.gov.hmcts.reform.civil.model.NotificationParty.DEFENDANT_2;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
@@ -57,6 +60,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
                 .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .party(APPLICANT_1)
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                 .parameters(properties)
                 .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
@@ -82,6 +86,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
                         .targetEmail(isRespondent1 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress())
                         .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                         .parameters(properties)
+                        .party(isRespondent1 ? DEFENDANT_1 : DEFENDANT_2)
                         .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference()))
                         .build();
     }
