@@ -56,7 +56,7 @@ class AddDefendantLitigationFriendNotifierTest {
         when(notificationsProperties.getSolicitorLitigationFriendAdded()).thenReturn("template-id");
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-        when(notificationExceptionRecordRepository.findByReferenceAndEventId(anyString(), anyString())).thenReturn(Optional.empty());
+        when(notificationExceptionRecordRepository.findByReferenceAndTaskId(anyString(), anyString())).thenReturn(Optional.empty());
     }
 
     @Test
