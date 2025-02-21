@@ -148,9 +148,13 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         );
     }
 
+    private boolean isFullDefenceStatesPaid(CaseData caseData) {
+        return HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+            && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
+    }
+
     private boolean isIntermediateOrMultiClaimProceedForLipVsLR(CaseData caseData) {
         List<String> responseClaimTrack = Arrays.asList("INTERMEDIATE_CLAIM", "MULTI_CLAIM");
-
         return responseClaimTrack.contains(caseData.getResponseClaimTrack())
             && caseData.isLipvLROneVOne()
             && (isFullDefenceStatesPaid(caseData)
@@ -161,12 +165,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
         return caseData.isLipvLROneVOne()
             && (isFullDefenceStatesPaid(caseData)
-            ||caseData.getApplicant1ProceedWithClaim().equals(YesOrNo.NO))
+                || caseData.getApplicant1ProceedWithClaim().equals(YesOrNo.NO))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
 
-    private boolean isFullDefenceStatesPaid(CaseData caseData){
-     return HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
-         && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
-    }
 }
