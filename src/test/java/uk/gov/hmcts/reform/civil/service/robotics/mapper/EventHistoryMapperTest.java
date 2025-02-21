@@ -7844,6 +7844,7 @@ class EventHistoryMapperTest {
                         + "Subtotal \n £1172.00\n\n ### Amount"
                         + " already paid \n£100.00\n ## Total still owed \n £1072.00")
                 .respondent2SameLegalRepresentative(YES)
+                .joDJCreatedDate(LocalDateTime.now())
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .defendantDetailsSpec(DynamicList.builder()
@@ -7875,6 +7876,7 @@ class EventHistoryMapperTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .joDJCreatedDate(LocalDateTime.now())
                 .repaymentSummaryObject(
                     "The judgment will order dsfsdf ffdg to pay £1072.00, "
                         + "including the claim fee and interest,"
@@ -7942,7 +7944,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .extracting("eventSequence").asString().contains("5");
+                .extracting("eventSequence").asString().contains("3");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().isNotEmpty();
         }
@@ -8374,6 +8376,8 @@ class EventHistoryMapperTest {
 
     @Nested
     class RequestJudgmentByAdmission {
+        LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
+
         @Test
         public void shouldGenerateRPA_ForFullAdmit_WhenClaimAgreedRepaymentPlan_BySetDate() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -8397,8 +8401,9 @@ class EventHistoryMapperTest {
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                 .respondToClaimAdmitPartLRspec(paymentDetails)
-                .applicant1ResponseDate(LocalDateTime.now())
+                .applicant1ResponseDate(now)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8447,6 +8452,7 @@ class EventHistoryMapperTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondent1RepaymentPlan(respondent1RepaymentPlan)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8497,6 +8503,7 @@ class EventHistoryMapperTest {
                 .respondToClaimAdmitPartLRspec(paymentDetails)
                 .totalInterest(BigDecimal.ZERO)
                 .applicant1ResponseDate(LocalDateTime.now())
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8542,6 +8549,7 @@ class EventHistoryMapperTest {
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8576,6 +8584,7 @@ class EventHistoryMapperTest {
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             //When
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8633,6 +8642,7 @@ class EventHistoryMapperTest {
                 .totalInterest(BigDecimal.ZERO)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8669,6 +8679,7 @@ class EventHistoryMapperTest {
                 .specRespondent1Represented(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8700,6 +8711,7 @@ class EventHistoryMapperTest {
                 .respondToClaimAdmitPartLRspec(paymentDetails)
                 .applicant1ResponseDate(LocalDateTime.now())
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
@@ -8732,6 +8744,7 @@ class EventHistoryMapperTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
                 .respondent1RepaymentPlan(respondent1RepaymentPlan)
                 .totalInterest(BigDecimal.ZERO)
+                .joJudgementByAdmissionIssueDate(now)
                 .build();
             given(featureToggleService.isJOLiveFeedActive()).willReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
