@@ -115,6 +115,8 @@ public interface NotificationData {
     String LEGAL_REP_NAME_WITH_SPACE = "legal rep name";
     String REFERENCE = "reference";
 
+    String QUERY_DATE = "queryDate";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
