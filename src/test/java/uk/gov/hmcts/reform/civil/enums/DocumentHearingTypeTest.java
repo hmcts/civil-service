@@ -69,7 +69,7 @@ public class DocumentHearingTypeTest {
         "DIS, FAST_CLAIM, disposal hearing"
     })
     void shouldReturnExpectedTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
-        assertEquals(expected, getTitleText(hearingType, allocatedTrack));
+        assertEquals(expected, getTitleText(hearingType, allocatedTrack, false));
     }
 
     @ParameterizedTest
@@ -82,7 +82,32 @@ public class DocumentHearingTypeTest {
         "DIS, FAST_CLAIM, hearing"
     })
     void shouldReturnExpectedContentText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
-        assertEquals(expected, getContentText(hearingType, allocatedTrack));
+        assertEquals(expected, getContentText(hearingType, allocatedTrack, false));
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "TRI, SMALL_CLAIM, wrandawiad",
+        "TRI, FAST_CLAIM, dreial",
+        "DRH, SMALL_CLAIM, wrandawiad datrys anghydfod",
+        "DRH, FAST_CLAIM, wrandawiad datrys anghydfod",
+        "DIS, SMALL_CLAIM, wrandawiad gwaredu",
+        "DIS, FAST_CLAIM, wrandawiad gwaredu"
+    })
+    void shouldReturnExpectedTitleTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
+        assertEquals(expected, getTitleText(hearingType, allocatedTrack, true));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "TRI, SMALL_CLAIM, wrandawiad",
+        "TRI, FAST_CLAIM, dreial",
+        "DRH, SMALL_CLAIM, wrandawiad",
+        "DRH, FAST_CLAIM, wrandawiad",
+        "DIS, SMALL_CLAIM, wrandawiad",
+        "DIS, FAST_CLAIM, wrandawiad"
+    })
+    void shouldReturnExpectedContentTextWelsh(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, String expected) {
+        assertEquals(expected, getContentText(hearingType, allocatedTrack, true));
+    }
 }
