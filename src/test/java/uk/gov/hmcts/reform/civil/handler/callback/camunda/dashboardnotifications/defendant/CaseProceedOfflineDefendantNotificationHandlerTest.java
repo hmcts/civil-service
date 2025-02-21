@@ -39,6 +39,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
@@ -61,6 +63,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
     @Mock
     private FeatureToggleService toggleService;
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCaseProceedOffline";
+    public static final String GA = "Applications";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -83,18 +86,24 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
         @Test
         void shouldRecordScenario_whenInvokedWithoutCPToggle() {
             // Given
+            List<Element<GeneralApplication>> gaApplications = wrapElements(
+                GeneralApplication.builder()
+                    .caseLink(CaseLink.builder().caseReference("54326781").build())
+                    .build());
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                     .respondent1Represented(YesOrNo.NO)
                     .ccdCaseReference(12890L)
+                .generalApplications(gaApplications)
                     .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
-            ).build();
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder()
+                    .eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
             // When
             handler.handle(params);
 
@@ -106,6 +115,19 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+
         }
 
         @Test
@@ -231,7 +253,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
                 "DEFENDANT",
-                null
+                GA
             );
         }
 
@@ -262,13 +284,6 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
 
             // When
             handler.handle(params);
-
-            // Then
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
-            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
-                "54326781",
-                "APPLICANT"
-            );
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
