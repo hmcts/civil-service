@@ -1412,6 +1412,22 @@ class HmcDataUtilsTest {
 
             assertEquals(expected, actual);
         }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, wrandawiad",
+            "TRI, FAST_CLAIM, dreial",
+            "DRH, SMALL_CLAIM, wrandawiad datrys anghydfod",
+            "DIS, SMALL_CLAIM, wrandawiad gwaredu"
+        })
+        void shouldReturnExpectedTitleWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getHearingTypeTitleText(caseData, hearing, true);
+
+            assertEquals(expected, actual);
+        }
     }
 
     @Nested
@@ -1445,6 +1461,38 @@ class HmcDataUtilsTest {
             CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
 
             String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, false);
+
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, gwrandawiad",
+            "TRI, FAST_CLAIM, treial",
+            "DRH, SMALL_CLAIM, gwrandawiad",
+            "DIS, FAST_CLAIM, gwrandawiad",
+        })
+        void shouldReturnExpectedTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getHearingTypeContentText(caseData, hearing, true);
+
+            assertEquals(expected, actual);
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "TRI, SMALL_CLAIM, wrandawiadau",
+            "TRI, FAST_CLAIM, dreialon",
+            "DRH, SMALL_CLAIM, wrandawiadau",
+            "DIS, SMALL_CLAIM, wrandawiadau",
+        })
+        void shouldReturnExpectedPluralTextWelsh_specClaim(String hearingType, AllocatedTrack allocatedTrack, String expected) {
+            HearingGetResponse hearing = buildHearing(hearingType);
+            CaseData caseData = CaseData.builder().responseClaimTrack(allocatedTrack.name()).build();
+
+            String actual = HmcDataUtils.getPluralHearingTypeTextWelsh(caseData, hearing);
 
             assertEquals(expected, actual);
         }

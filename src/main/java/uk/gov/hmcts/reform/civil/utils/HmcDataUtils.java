@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getContentText;
+import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getPluralTypeTextWelsh;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getTitleText;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
@@ -401,6 +402,10 @@ public class HmcDataUtils {
 
     public static String getHearingTypeContentText(CaseData caseData, HearingGetResponse hearing, boolean isWelsh) {
         return getContentText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType(), isWelsh);
+    }
+
+    public static String getPluralHearingTypeTextWelsh(CaseData caseData, HearingGetResponse hearing) {
+        return getPluralTypeTextWelsh(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
     }
 
     @Nullable
