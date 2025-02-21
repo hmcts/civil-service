@@ -2,16 +2,11 @@
  * welsh amends
  */
 /**
- * example 2
-UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'Bydd y ffi gwneud ${applicationFeeTypeCy} llawn o ${applicationFee} yn cael ei ddileu.', 'Bydd y ffi lawn ${applicationFeeTypeCy} o ${applicationFee} yn cael ei ddileu.') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.FullRemission.Applicant' ;
-
- */
-/**
  * example 3
  */
 UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'Byddwch yn cael help i dalu’r ', 'Byddwch yn cael help gyda’r ffi ') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.PartRemission.Applicant' ;
 /**
- * item 4
+ * item 4 - removing gwneud
  */
 UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'ffi gwneud', 'ffi') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwFRejected.Applicant';
 UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'ffi gwneud', 'ffi') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.InvalidRef.Applicant';
