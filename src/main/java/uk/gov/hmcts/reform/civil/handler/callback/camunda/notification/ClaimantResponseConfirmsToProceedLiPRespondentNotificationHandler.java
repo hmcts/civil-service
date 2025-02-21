@@ -153,19 +153,19 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
         return responseClaimTrack.contains(caseData.getResponseClaimTrack())
             && caseData.isLipvLROneVOne()
-            && (isFullDefense(caseData)
+            && (isFullDefenceStatesPaid(caseData)
                 || caseData.getApplicant1ProceedWithClaim().equals(YesOrNo.YES))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
 
     private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
         return caseData.isLipvLROneVOne()
-            && (isFullDefense(caseData)
+            && (isFullDefenceStatesPaid(caseData)
             ||caseData.getApplicant1ProceedWithClaim().equals(YesOrNo.NO))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
 
-    private boolean isFullDefense(CaseData caseData){
+    private boolean isFullDefenceStatesPaid(CaseData caseData){
      return HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
          && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
     }
