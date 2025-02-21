@@ -23,6 +23,8 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -148,17 +150,23 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private boolean isIntermediateOrMultiClaimProceedForLipVsLR(CaseData caseData) {
         List<String> responseClaimTrack = Arrays.asList("INTERMEDIATE_CLAIM", "MULTI_CLAIM");
+
         return responseClaimTrack.contains(caseData.getResponseClaimTrack())
             && caseData.isLipvLROneVOne()
-            && caseData.getApplicant1ProceedWithClaim().equals(
-            YesOrNo.YES)
+            && (isFullDefense(caseData)
+                || caseData.getApplicant1ProceedWithClaim().equals(YesOrNo.YES))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
 
     private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
         return caseData.isLipvLROneVOne()
-            && caseData.getApplicant1ProceedWithClaim().equals(
-            YesOrNo.NO)
+            && (isFullDefense(caseData)
+            ||caseData.getApplicant1ProceedWithClaim().equals(YesOrNo.NO))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
+    }
+
+    private boolean isFullDefense(CaseData caseData){
+     return HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+         && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
     }
 }
