@@ -43,8 +43,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
-import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationInMinutes;
 
 @Service
 @RequiredArgsConstructor
@@ -159,7 +159,6 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             }
             caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
         }
-
     }
 
     private String getHearingLocation(String hearingId, HearingGetResponse hearing,

@@ -27,9 +27,13 @@ public class DateUtils {
         return date.format(formatter);
     }
 
-    public static String formatDateInWelsh(LocalDate date) {
+    public static String formatDateInWelsh(LocalDate date, Boolean padDays) {
         String month = MonthNamesWelsh.getWelshNameByValue(date.getMonth().getValue());
-        return date.getDayOfMonth() + " " + month + " " + date.getYear();
+        String dayOfMonth = padDays && date.getDayOfMonth() < 10
+            ? 0 + String.valueOf(date.getDayOfMonth())
+            : String.valueOf(date.getDayOfMonth());
+
+        return dayOfMonth + " " + month + " " + date.getYear();
     }
 
     public static LocalDateTime convertFromUTC(LocalDateTime utcDate) {
