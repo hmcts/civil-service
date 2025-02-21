@@ -4,6 +4,8 @@ import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -384,10 +386,16 @@ class RoboticsDataMapperTest {
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 
-    @Test
-    void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData() {
+    @ParameterizedTest
+    @CsvSource({
+        "FAST_CLAIM, FAST TRACK",
+        "MULTI_CLAIM, MULTI TRACK",
+        "SMALL_CLAIM, SMALL CLAIM TRACK",
+        "INTERMEDIATE_CLAIM, INTERMEDIATE TRACK",
+    })
+    void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData(String claimTrack, String expectedName) {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
-            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+            .allocatedTrack(AllocatedTrack.valueOf(claimTrack))
             .build();
         RoboticsCaseData testHeader = RoboticsCaseData.builder()
             .header(CaseHeader.builder()
@@ -396,7 +404,7 @@ class RoboticsDataMapperTest {
                         .owningCourtName("CCMCC")
                         .caseType("PERSONAL INJURY")
                         .preferredCourtCode("121")
-                        .caseAllocatedTo("INTERMEDIATE TRACK")
+                        .caseAllocatedTo(expectedName)
                         .build())
             .build();
 

@@ -222,8 +222,7 @@ public class RoboticsNotificationService {
             return roboticsEmailConfiguration.getSpecRecipient();
         }
 
-        return isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+        return "mark.drummond@hmcts.net";
     }
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
