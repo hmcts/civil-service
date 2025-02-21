@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -27,6 +28,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.RaiseQueryCallbackHandler.INVALID_CASE_STATE_ERROR;
 
 @ExtendWith(MockitoExtension.class)
 class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -61,6 +64,84 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToStartCallback {
+
+        @Test
+        public void shouldNotReturnError_whenClaimIssued() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .ccdState(CaseState.CASE_ISSUED)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        public void shouldReturnError_whenClaimPendingIssued() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .ccdState(CaseState.PENDING_CASE_ISSUED)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).containsOnly(INVALID_CASE_STATE_ERROR);
+        }
+
+        @Test
+        public void shouldReturnError_whenCaseDismissedState() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .ccdState(CaseState.CASE_DISMISSED)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).containsOnly(INVALID_CASE_STATE_ERROR);
+        }
+
+        @Test
+        public void shouldReturnError_whenCaseOffline() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).containsOnly(INVALID_CASE_STATE_ERROR);
+        }
+
+        @Test
+        public void shouldReturnError_whenCaseClosed() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .ccdState(CaseState.CLOSED)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).containsOnly(INVALID_CASE_STATE_ERROR);
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallback {
 
         @BeforeEach
         void setupTest() {
