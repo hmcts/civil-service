@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
@@ -15,6 +21,7 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -29,18 +36,19 @@ import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getContentText
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getTitleText;
 import static uk.gov.hmcts.reform.civil.enums.DocumentHearingType.getType;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.textToPlural;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.TELCVP;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
+@Slf4j
 public class HmcDataUtils {
 
     private HmcDataUtils() {
         // NO OP
     }
 
-    private static final String HEARING = "hearing";
     private static final int HOURS_PER_DAY = 6;
     private static final int MINUTES_PER_HOUR = 60;
 
@@ -149,13 +157,30 @@ public class HmcDataUtils {
     }
 
     /**
+     * Returns and formats information for each individual day of the hearing.
+     * Returns the date of hearing, time of hearing and total duration of hearing.
+     * @return e.g. "30 June 2023 at 10:00 for 3 hours"
+     */
+    private static String formatDayWelsh(HearingDaySchedule day) {
+        LocalDate date = convertFromUTC(day.getHearingStartDateTime()).toLocalDate();
+        String dateString = formatDateInWelsh(date, true);
+        String timeString = convertFromUTC(day.getHearingStartDateTime()).toLocalTime().toString();
+
+        int hearingDayDurationInMinutes = getHearingDayMinutesDuration(day);
+        int hours = (int)Math.floor((double)hearingDayDurationInMinutes / MINUTES_PER_HOUR);
+        int minutes = hearingDayDurationInMinutes - (hours * MINUTES_PER_HOUR);
+
+        return String.format("%s am %s am %s", dateString, timeString, hoursMinutesFormatWelsh(actualHours(hours), minutes));
+    }
+
+    /**
      * Returns the details from formatDay() for each individual hearing as a list.
      * @return e.g. "29 June 2023 at 10:00 for 3 hours", "30 June 2023 at 14:00 for 2 hours"
      */
-    public static List<String> getHearingDaysTextList(HearingGetResponse hearing) {
+    public static List<String> getHearingDaysTextList(HearingGetResponse hearing, Boolean inWelsh) {
         return hearing.getHearingResponse().getHearingDaySchedule().stream()
             .sorted(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
-            .map(day -> formatDay(day))
+            .map(day -> inWelsh ? formatDayWelsh(day) : formatDay(day))
             .toList();
     }
 
@@ -164,8 +189,8 @@ public class HmcDataUtils {
      * @return e.g. "29 June 2023 at 10:00 for 3 hours",
      *              "30 June 2023 at 14:00 for 2 hours"
      */
-    public static String getHearingDaysText(HearingGetResponse hearing) {
-        return org.apache.commons.lang.StringUtils.join(getHearingDaysTextList(hearing), "\n");
+    public static String getHearingDaysText(HearingGetResponse hearing, Boolean inWelsh) {
+        return org.apache.commons.lang.StringUtils.join(getHearingDaysTextList(hearing, inWelsh), "\n");
     }
 
     /**
@@ -188,9 +213,11 @@ public class HmcDataUtils {
      *           Else if duration is greater than 6 but not a multiple: splits into hours and days e.g. 15 hours returns "2 days and 3 hours"
      *           Else: returns duration in hours format only e.g. 3 hours returns "3 hours"
      */
-    public static String getTotalHearingDurationText(HearingGetResponse hearing) {
+    public static String getTotalHearingDurationText(HearingGetResponse hearing, Boolean isWelsh) {
         Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+        String caseRef = hearing.getCaseDetails() != null ? hearing.getCaseDetails().getCaseRef() : "reference not available";
         if (totalDurationInMinutes == null) {
+            log.info("Total Duration In Minutes from Hmc handler is null for caseId {}", caseRef);
             return null;
         }
 
@@ -199,8 +226,11 @@ public class HmcDataUtils {
         int days = (int)Math.floor(totalDurationInHours / HOURS_PER_DAY);
         int hours = (int)(totalDurationInHours - (days * HOURS_PER_DAY));
         int minutes = (int)(totalDurationInMinutes - (totalDurationInHours * MINUTES_PER_HOUR));
-
-        return daysHoursMinutesFormat(days, hours, minutes);
+        String hearingDurationText = isWelsh
+            ? daysHoursMinutesFormatWelsh(days, hours, minutes)
+            : daysHoursMinutesFormat(days, hours, minutes);
+        log.info("Total hearing duration from Hmc handler: {} for caseId {}", hearingDurationText, caseRef);
+        return hearingDurationText;
     }
 
     /**
@@ -213,6 +243,21 @@ public class HmcDataUtils {
         return strings.stream()
             .filter(string -> string != null && !string.equals(""))
             .reduce((acc, displayText) -> String.format("%s and %s", acc, displayText))
+            .orElse("");
+    }
+
+    /**
+     * Concatenates the given list of strings with "and" as a separator.
+     *
+     * @param strings the list of strings to concatenate
+     * @param vowelStart whether the second number starts with a vowel and requires 'ac' in front rather than 'a'.
+     * @return the concatenated string
+     */
+    private static String concatWithWelshAnd(List<String> strings, Boolean vowelStart) {
+        String andText = vowelStart ? "ac" : "a";
+        return strings.stream()
+            .filter(string -> string != null && !string.equals(""))
+            .reduce((acc, displayText) -> String.format("%s %s %s", acc, andText, displayText))
             .orElse("");
     }
 
@@ -240,6 +285,45 @@ public class HmcDataUtils {
     private static String daysHoursMinutesFormat(int days, int hours, int minutes) {
         String daysText = formatValueWithLabel(days, "day");
         return concatWithAnd(List.of(daysText, hoursMinutesFormat(hours, minutes)));
+    }
+
+    /**
+     * Concatenates the given hours and minutes with "and" as a separator.
+     *
+     * @param hours the number of hours
+     * @param minutes the number of minutes
+     * @return the concatenated string
+     */
+    private static String hoursMinutesFormatWelsh(int hours, int minutes) {
+        String hoursFullText = timeFormatWelsh(hours, "awr", "oriau");
+        String minutesFullText = timeFormatWelsh(minutes, "munud", "munudau");
+
+        //The 'and' for minutes cannot be one as it is done in increments of 5. So minute number never starts with vowel.
+        return concatWithWelshAnd(List.of(hoursFullText, minutesFullText), false);
+    }
+
+    /**
+     * Concatenates the given days, hours and minutes with "and" as a separator.
+     *
+     * @param days the number of days
+     * @param hours the number of hours
+     * @param minutes the number of minutes
+     * @return the concatenated string
+     */
+    private static String daysHoursMinutesFormatWelsh(int days, int hours, int minutes) {
+        String daysFullText = timeFormatWelsh(days, "dydd", "dyddiau");
+        //Number of hours could be one, which would mean we need to use the Welsh And for vowels.
+        Boolean vowelStart = hours == 1;
+        return concatWithWelshAnd(List.of(daysFullText, hoursMinutesFormatWelsh(hours, minutes)), vowelStart);
+    }
+
+    private static String timeFormatWelsh(int time, String textSingular, String textPlural) {
+        if (time > 0) {
+            String timeWelshText = time > 1 ? textPlural : textSingular;
+            return String.format("%s %s", time, timeWelshText);
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -311,12 +395,12 @@ public class HmcDataUtils {
         return concatenateNames(getHearingAttendeeNames(hearing, VIDCVP));
     }
 
-    public static String getHearingTypeTitleText(CaseData caseData, HearingGetResponse hearing) {
-        return getTitleText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
+    public static String getHearingTypeTitleText(CaseData caseData, HearingGetResponse hearing, boolean isWelsh) {
+        return getTitleText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType(), isWelsh);
     }
 
-    public static String getHearingTypeContentText(CaseData caseData, HearingGetResponse hearing) {
-        return getContentText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType());
+    public static String getHearingTypeContentText(CaseData caseData, HearingGetResponse hearing, boolean isWelsh) {
+        return getContentText(getType(hearing.getHearingDetails().getHearingType()), caseData.getAssignedTrackType(), isWelsh);
     }
 
     @Nullable
@@ -342,5 +426,33 @@ public class HmcDataUtils {
             .min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime))
             .orElse(HearingDaySchedule.builder().build())
             .getHearingStartDateTime();
+    }
+
+    public static boolean isWelshHearingTemplate(CaseData caseData) {
+        return isWelshHearingTemplateClaimant(caseData) || isWelshHearingTemplateDefendant(caseData);
+    }
+
+    public static boolean isClaimantDQDocumentsWelsh(CaseData caseData) {
+        return Optional.ofNullable(caseData.getApplicant1DQ())
+            .map(Applicant1DQ::getApplicant1DQLanguage)
+            .map(WelshLanguageRequirements::getDocuments)
+            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
+            .orElse(false);
+    }
+
+    public static boolean isDefendantDQDocumentsWelsh(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQLanguage)
+            .map(WelshLanguageRequirements::getDocuments)
+            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
+            .orElse(false);
+    }
+
+    public static boolean isWelshHearingTemplateClaimant(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getApplicant1Represented()) && (caseData.isClaimantBilingual() || isClaimantDQDocumentsWelsh(caseData));
+    }
+
+    public static boolean isWelshHearingTemplateDefendant(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getRespondent1Represented()) && (caseData.isRespondentResponseBilingual() || isDefendantDQDocumentsWelsh(caseData));
     }
 }

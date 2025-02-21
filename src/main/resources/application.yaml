@@ -215,6 +215,13 @@ dashboard:
   api:
     url: http://localhost:4000
 
+logging:
+  level:
+    org.springframework.cache: INFO    # Spring Cache Abstraction
+    javax.cache: INFO                  # JCache API (general caching)
+    com.github.benmanes.caffeine.cache: INFO  # Caffeine specific logs
+    org.hibernate.cache: INFO           # Hibernate 2nd Level Cache (if use
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "d89ce52e-c943-4bee-aa2e-24ff05d7d1e5"
@@ -287,6 +294,7 @@ notifications:
   respondentDeadlineExtensionWelsh: "5fb6d574-e1b8-42bc-9d97-fcd8042f36d3"
   claimantDeadlineExtension: "f4313f23-e3a5-4a27-ad3b-bbef691489d8"
   claimantLipDeadlineExtension: "77cc47b1-4a9a-4baf-9313-98542698d32a"
+  claimantLipDeadlineExtensionWelsh: "4ad7ff45-d139-4e30-8251-729a7320ebb8"
   respondentChangeOfAddressNotificationTemplate: "c78090fa-f86c-4231-b808-470dab9abf31"
   respondentLipFullAdmitOrPartAdmitTemplate: "81caadd5-40ef-4c4c-8fb4-0d2af0e2a8e1"
   respondentLipFullDefenceWithMediationTemplate: "31ac1f84-8c40-4636-862b-47cc8ef64716"
@@ -438,6 +446,7 @@ notifications:
   notifyDefendantLrAfterNoticeOfChangeTemplate: "632b8aa4-8de2-4abc-b4f5-126f325a31f5"
   notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
   notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
+  notifyNewDefendantSolicitorNOC: "b6eebb9d-ee0c-4ae4-88bf-49bd98be3f5f"
 
   notifyDJNonDivergentSpecClaimantTemplate: "7c4be349-fe65-4e65-abed-802a81ba60d1"
   notifyDJNonDivergentSpecDefendantTemplate: "0acc8e5f-3572-410b-9bbf-ad973c1609f4"
@@ -564,6 +573,10 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
+    hikari:
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      idle-timeout: 600000 # 10 minutes
 
 fees:
   api:
@@ -665,6 +678,11 @@ spring:
       connectionTimeout: 10000
       idleTimeout: 30000
       maxLifetime: 60000
+  cache:
+    type: jcache
+    cache-names: userInfoCache, accessTokenCache
+    caffeine:
+      spec: expireAfterWrite=3600s
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
