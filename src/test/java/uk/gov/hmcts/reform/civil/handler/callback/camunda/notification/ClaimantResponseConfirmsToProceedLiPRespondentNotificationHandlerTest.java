@@ -37,10 +37,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -159,7 +162,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE,
-                getNotificationDataMapCarm(),
+                getNotificationDataMapCarm(caseData),
                 REFERENCE_NUMBER
             );
         }
@@ -235,10 +238,12 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             );
         }
 
-        private Map<String, String> getNotificationDataMapCarm() {
+        private Map<String, String> getNotificationDataMapCarm(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
 

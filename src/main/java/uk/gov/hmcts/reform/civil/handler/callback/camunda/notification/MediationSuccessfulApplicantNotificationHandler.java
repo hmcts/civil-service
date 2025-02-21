@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -130,9 +131,11 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     public Map<String, String> addProperties(CaseData caseData) {
 
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -141,7 +144,9 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -150,7 +155,9 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_ONE, getPartyNameBasedOnType(caseData.getRespondent1()),
-            DEFENDANT_NAME_TWO, getPartyNameBasedOnType(caseData.getRespondent2())
+            DEFENDANT_NAME_TWO, getPartyNameBasedOnType(caseData.getRespondent2()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

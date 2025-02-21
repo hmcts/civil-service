@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+
 @RequiredArgsConstructor
 public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler implements NotificationData {
 
@@ -58,7 +60,9 @@ public abstract class AbstractNotifyCaseStayedHandler extends CallbackHandler im
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, getPartyName(callbackParams),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

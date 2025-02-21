@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @RequiredArgsConstructor
 public abstract class AbstractCaseDismissNotificationHandler extends CallbackHandler implements NotificationData {
@@ -31,7 +32,9 @@ public abstract class AbstractCaseDismissNotificationHandler extends CallbackHan
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, getPartyName(caseData, callbackParams),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
