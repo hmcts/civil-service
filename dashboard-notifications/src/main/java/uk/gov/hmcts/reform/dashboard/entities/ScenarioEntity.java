@@ -1,16 +1,12 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
-import uk.gov.hmcts.reform.dashboard.cache.CacheConfig;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Map;
-import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,8 +20,6 @@ import javax.validation.constraints.NotNull;
 @lombok.AllArgsConstructor
 @Entity
 @Immutable
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = CacheConfig.READ_ONLY_ENTITY)
 @Table(name = "scenario", schema = "dbs")
 public class ScenarioEntity implements Serializable {
 
