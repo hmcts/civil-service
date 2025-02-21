@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NotificationExceptionRecordRepository extends CrudRepository<NotificationExceptionRecordEntity, UUID> {
 
-    Optional<NotificationExceptionRecordEntity> findByReferenceAndEventId(String reference, String eventId);
+    Optional<NotificationExceptionRecordEntity> findByReferenceAndTaskId(String reference, String taskId);
 }

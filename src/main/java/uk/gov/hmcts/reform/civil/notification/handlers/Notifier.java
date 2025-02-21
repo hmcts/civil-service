@@ -48,7 +48,7 @@ public abstract class Notifier implements NotificationData {
                                   Long ccdCaseReference,
                                   String taskId) {
         Optional<NotificationExceptionRecordEntity> existingRecord =
-            exceptionRecordRepository.findByReferenceAndEventId(String.valueOf(ccdCaseReference), taskId);
+            exceptionRecordRepository.findByReferenceAndTaskId(String.valueOf(ccdCaseReference), taskId);
 
         List<NotificationTask> successfulNotificationTasks = getSuccessfulNotifications(existingRecord);
 
