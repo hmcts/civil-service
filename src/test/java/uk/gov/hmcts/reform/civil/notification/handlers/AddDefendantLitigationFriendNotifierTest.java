@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationExceptionRecordRepository;
 
 import java.util.Map;
 import java.util.Optional;
@@ -46,6 +47,8 @@ class AddDefendantLitigationFriendNotifierTest {
     private SimpleStateFlowEngine stateFlowEngine;
     @Mock
     private StateFlow stateFlow;
+    @Mock
+    private NotificationExceptionRecordRepository notificationExceptionRecordRepository;
 
     @BeforeEach
     public void setUp() {
@@ -53,6 +56,7 @@ class AddDefendantLitigationFriendNotifierTest {
         when(notificationsProperties.getSolicitorLitigationFriendAdded()).thenReturn("template-id");
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+        when(notificationExceptionRecordRepository.findByReferenceAndEventId(anyString(), anyString())).thenReturn(Optional.empty());
     }
 
     @Test
