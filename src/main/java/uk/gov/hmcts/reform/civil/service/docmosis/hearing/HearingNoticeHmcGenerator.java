@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingTypeTitleTe
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getInPersonAttendeeNames;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPhoneAttendeeNames;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getPluralHearingTypeTextWelsh;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getTotalHearingDurationText;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getVideoAttendeesNames;
 
@@ -96,7 +97,8 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(creationDate)
             .creationDateWelshText(isWelsh ? formatDateInWelsh(creationDate, true) : null)
-            .hearingType(getHearingTypeContentText(caseData, hearing, isWelsh ? true : false))
+            .hearingType(getHearingTypeContentText(caseData, hearing, isWelsh))
+            .hearingTypePluralWelsh(isWelsh ? getPluralHearingTypeTextWelsh(caseData, hearing) : null)
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
