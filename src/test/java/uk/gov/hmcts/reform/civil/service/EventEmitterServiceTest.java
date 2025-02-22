@@ -13,12 +13,15 @@ import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class EventEmitterServiceTest {
@@ -39,7 +42,9 @@ class EventEmitterServiceTest {
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
     private static final String TEST_EVENT = "TEST_EVENT";
+    private static final String TEST_EVENT_QM = "queryManagementRaiseQuery";
     private static final long CASE_ID = 1L;
+    private static final String QUERY_ID = "1";
 
     @BeforeEach
     void setup() {
@@ -54,6 +59,18 @@ class EventEmitterServiceTest {
         eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
         verify(runtimeService).createMessageCorrelation(TEST_EVENT);
         verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
+        verify(messageCorrelationBuilder).tenantId("civil");
+        verify(messageCorrelationBuilder).correlateStartMessage();
+        verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
+    }
+
+    @Test
+    void shouldSendMessageAndTriggerQueryManagementEvent_whenInvoked_withTenantId() {
+        CaseData caseData = createCaseData(TEST_EVENT_QM, CASE_ID);
+        eventEmitterService.emitBusinessProcessCamundaEvent(caseData, true);
+        verify(runtimeService).createMessageCorrelation(TEST_EVENT_QM);
+        verify(messageCorrelationBuilder).setVariable("caseId", CASE_ID);
+        verify(messageCorrelationBuilder).setVariable("queryId", QUERY_ID);
         verify(messageCorrelationBuilder).tenantId("civil");
         verify(messageCorrelationBuilder).correlateStartMessage();
         verify(applicationEventPublisher).publishEvent(new DispatchBusinessProcessEvent(CASE_ID, caseData.getBusinessProcess()));
@@ -112,9 +129,18 @@ class EventEmitterServiceTest {
 
     private CaseData createCaseData(String event, long caseId) {
         BusinessProcess businessProcess = BusinessProcess.builder().camundaEvent(event).build();
-        return CaseData.builder()
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
             .businessProcess(businessProcess)
-            .ccdCaseReference(caseId)
-            .build();
+            .ccdCaseReference(caseId);
+
+        if (TEST_EVENT_QM.equals(event)) {
+            caseDataBuilder.qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                                            .caseMessages(wrapElements(
+                                                                CaseMessage.builder()
+                                                                    .id("1")
+                                                                    .build()))
+                                                            .build());
+        }
+        return caseDataBuilder.build();
     }
 }
