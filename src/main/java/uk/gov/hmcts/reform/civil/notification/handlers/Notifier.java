@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.model.NotificationParty.APPLICANT_1;
 import static uk.gov.hmcts.reform.civil.model.NotificationParty.APPLICANT_2;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.Notifier.Notificat
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public abstract class Notifier implements NotificationData {
 
     protected final NotificationService notificationService;
@@ -68,8 +71,24 @@ public abstract class Notifier implements NotificationData {
 
                 successfulNotificationTasks.add(fromNotificationParty(recipient.getParty()));
             } catch (Exception e) {
-                persistExceptionRecord(ccdCaseReference, existingRecord, successfulNotificationTasks, taskId);
+                log.error("Error sending email for case {} with error {}", ccdCaseReference, e.getMessage());
             }
+        }
+
+        if (successfulNotificationTasks.size() != recipients.size()) {
+            persistExceptionRecord(ccdCaseReference, existingRecord, successfulNotificationTasks, taskId);
+
+            String recipientList = recipients.stream()
+                .map(EmailDTO::getParty).map(Enum::name)
+                .collect(Collectors.joining(", "));
+
+            String partiesSuccessfullyEmailed = successfulNotificationTasks.stream()
+                .map(NotificationTask::getNotificationParty).map(Enum::name)
+                .collect(Collectors.joining(", "));
+
+            String errorMessage = "Failed to send message for case %s with recipient list %s and successful emails sent %s"
+                .formatted(ccdCaseReference, recipientList, partiesSuccessfullyEmailed);
+            throw new RuntimeException(errorMessage);
         }
     }
 
