@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionId;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionRecordEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationExceptionRecordRepository;
 
@@ -101,10 +102,14 @@ public abstract class Notifier implements NotificationData {
                 .build();
         } else {
             exceptionRecordEntity = NotificationExceptionRecordEntity.builder()
-                .reference(ccdCaseReference.toString())
+                .notificationExceptionId(
+                    NotificationExceptionId.builder()
+                        .reference(ccdCaseReference.toString())
+                        .taskId(taskId)
+                        .build()
+                )
                 .successfulActions(successfulNotificationTasks.stream().map(Enum::name).toList())
                 .retryCount(0)
-                .taskId(taskId)
                 .build();
         }
 
