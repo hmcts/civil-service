@@ -218,7 +218,7 @@ public class RoboticsNotificationService {
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
-     return "kala.chandrasekar@hmcts.net";
+        return "kala.chandrasekar@hmcts.net";
     }
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
