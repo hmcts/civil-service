@@ -123,6 +123,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     public void contentCheckRespondent2() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("case reference")
+            .ccdCaseReference(1234567890123456L)
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
             .respondent1DQ(Respondent1DQ.builder().respondent1DQStatementOfTruth(
                 StatementOfTruth.builder()
@@ -165,6 +166,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
             caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
+        Assertions.assertEquals(caseData.getCcdCaseReference().toString(), templateData.getCcdCaseReference());
         Assertions.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim2(),
                                 templateData.getWhyDisputeTheClaim());
         Assertions.assertEquals(caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName(),
