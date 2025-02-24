@@ -30,10 +30,13 @@ public abstract class Notifier implements NotificationData {
 
     private void sendNotification(Set<EmailDTO> recipients) {
         for (EmailDTO recipient : recipients) {
-            notificationService.sendMail(
-                recipient.getTargetEmail(), recipient.getEmailTemplate(), recipient.getParameters(),
-                recipient.getReference()
-            );
+            String targetEmail = recipient.getTargetEmail();
+            if (targetEmail != null && !targetEmail.isBlank()) {
+                notificationService.sendMail(
+                        targetEmail, recipient.getEmailTemplate(), recipient.getParameters(),
+                        recipient.getReference()
+                );
+            }
         }
     }
 }
