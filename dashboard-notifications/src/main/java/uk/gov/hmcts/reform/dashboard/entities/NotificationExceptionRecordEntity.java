@@ -7,10 +7,9 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -33,16 +32,8 @@ public class NotificationExceptionRecordEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 8313686152850559308L;
 
-    @Id
-    @NotNull
-    @Schema(name = "id")
-    private Long id;
-
-    @Schema(name = "reference")
-    private String reference;
-
-    @Schema(name = "task_id")
-    private String taskId;
+    @EmbeddedId
+    NotificationExceptionId notificationExceptionId;
 
     @Schema(name = "party_type")
     private String partyType;
