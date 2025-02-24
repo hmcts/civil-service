@@ -19,10 +19,18 @@ public class DateUtilsTest {
 
     @Test
     public void testFormatDateInWelsh() {
-        LocalDate date = LocalDate.of(2022, 7, 28);
-        String dateFormatted = DateUtils.formatDateInWelsh(date);
+        LocalDate date = LocalDate.of(2022, 7, 8);
+        String dateFormatted = DateUtils.formatDateInWelsh(date, false);
 
-        Assertions.assertEquals("28 Gorffennaf 2022", dateFormatted);
+        Assertions.assertEquals("8 Gorffennaf 2022", dateFormatted);
+    }
+
+    @Test
+    public void testFormatDateInWelshPadded() {
+        LocalDate date = LocalDate.of(2022, 7, 8);
+        String dateFormatted = DateUtils.formatDateInWelsh(date, true);
+
+        Assertions.assertEquals("08 Gorffennaf 2022", dateFormatted);
     }
 
     @Test

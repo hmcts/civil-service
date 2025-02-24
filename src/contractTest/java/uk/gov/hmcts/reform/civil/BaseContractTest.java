@@ -6,16 +6,13 @@ import org.json.JSONException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.civil.config.TestCacheConfig;
 
 import java.io.IOException;
 
 @ExtendWith(PactConsumerTestExt.class)
 @ActiveProfiles("integration-test")
 @SpringBootTest
-@Import(TestCacheConfig.class)
 public class BaseContractTest {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";

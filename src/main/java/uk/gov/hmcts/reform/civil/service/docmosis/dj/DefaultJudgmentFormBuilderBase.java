@@ -75,7 +75,7 @@ public abstract class DefaultJudgmentFormBuilderBase {
     }
 
     protected String getDateInWelsh(LocalDate dateToConvert) {
-        return formatDateInWelsh(dateToConvert);
+        return formatDateInWelsh(dateToConvert, false);
     }
 
     protected String getInstallmentAmount(String amount) {

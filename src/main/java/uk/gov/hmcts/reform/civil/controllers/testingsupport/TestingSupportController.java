@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.judgments.CjesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.List;
@@ -61,6 +62,7 @@ public class TestingSupportController {
     private final IStateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
     private final RoboticsDataMapper roboticsDataMapper;
+    private final RoboticsDataMapperForSpec roboticsSpecDataMapper;
     private final CjesMapper cjesMapper;
 
     private final ClaimDismissedHandler claimDismissedHandler;
@@ -154,6 +156,14 @@ public class TestingSupportController {
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
         return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+    }
+
+    @PostMapping(
+        value = "/testing-support/rpaJsonSpec",
+        produces = "application/json")
+    public String getRPAJsonInformationForSpecCaseData(
+        @RequestBody CaseData caseData) throws JsonProcessingException {
+        return roboticsSpecDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
     }
 
     @PostMapping(

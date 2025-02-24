@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +29,8 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -44,6 +47,8 @@ import java.time.LocalDateTime;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -442,6 +447,23 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
     @Nested
     class AboutToSubmitCallbackTest {
+        LocalDateTime now = LocalDate.now().atTime(12, 0, 1);
+
+        JudgmentDetails activeJudgment = JudgmentDetails.builder()
+            .judgmentId(123)
+            .lastUpdateTimeStamp(now)
+            .courtLocation("123456")
+            .totalAmount("123")
+            .orderedAmount("500")
+            .costs("150")
+            .claimFeeAmount("12")
+            .amountAlreadyPaid("234")
+            .issueDate(now.toLocalDate())
+            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .cancelDate(now.toLocalDate())
+            .defendant1Name("Defendant 1")
+            .defendant1Dob(LocalDate.of(1980, 1, 1))
+            .build();
 
         @Test
         void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIsJudgmentOnlineLiveDisabled() {
@@ -513,14 +535,18 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                                           .build())
                 .respondent1(PartyBuilder.builder().individual().build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .activeJudgment(activeJudgment)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response;
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
             assertThat(response.getState())
                 .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             assertThat(response.getData())
@@ -550,14 +576,18 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .respondent1(PartyBuilder.builder().individual().build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .activeJudgment(activeJudgment)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response;
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
             assertThat(response.getState())
                 .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData())
@@ -567,16 +597,16 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             assertThat(response.getData()).extracting("activeJudgment").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("state").isEqualTo("ISSUED");
             assertThat(response.getData().get("activeJudgment")).extracting("type").isEqualTo("JUDGMENT_BY_ADMISSION");
-            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(1);
+            assertThat(response.getData().get("activeJudgment")).extracting("judgmentId").isEqualTo(123);
             assertThat(response.getData().get("activeJudgment")).extracting("isRegisterWithRTL").isEqualTo("Yes");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Name").isEqualTo("Mr. John Rambo");
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Address").isNotNull();
             assertThat(response.getData().get("activeJudgment")).extracting("defendant1Dob").isNotNull();
+            assertThat(response.getData().get("joJudgementByAdmissionIssueDate")).isEqualTo(now.toString());
         }
 
         @Test
         void shouldSetUpBusinessProcessAndContinueOfflineAndCaseState_whenIs1v2AndPaidImmediately() {
-
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
@@ -600,14 +630,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                                                   .build())
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .activeJudgment(activeJudgment)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response;
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
+
             assertThat(response.getState())
                 .isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
             assertThat(response.getData())
@@ -715,14 +750,19 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .respondent1(PartyBuilder.builder().individual().build())
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .activeJudgment(activeJudgment)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response;
+            try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDateTime::now).thenReturn(now);
+                response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            }
+
             assertThat(response.getState())
                 .isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
             assertThat(response.getData())

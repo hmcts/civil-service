@@ -62,7 +62,7 @@ public class DefendantFullDefenceFullDisputeMediationScenarioTest extends Dashbo
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae James John wedi gwrthod yr hawliad ac wedi awgrymu cyfryngu. Gallwch wrthod neu gytuno i gyfryngu." +
-                        " Mae angen i chi ymateb erbyn " + DateUtils.formatDateInWelsh(paymentDate) + ".</p>" +
+                        " Mae angen i chi ymateb erbyn " + DateUtils.formatDateInWelsh(paymentDate, false) + ".</p>" +
                         "<p class=\"govuk-body\"><a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gweld ac ymateb</a></p>"
                 )
             );

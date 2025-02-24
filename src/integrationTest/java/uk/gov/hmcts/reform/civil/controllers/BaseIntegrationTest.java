@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -26,7 +25,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
-import uk.gov.hmcts.reform.civil.config.TestCacheConfig;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
@@ -50,7 +48,6 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("integration-test")
 @SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
 @AutoConfigureMockMvc
-@Import(TestCacheConfig.class)
 public abstract class BaseIntegrationTest {
 
     protected static final String BEARER_TOKEN = "Bearer eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3k"
