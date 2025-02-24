@@ -166,8 +166,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
         return caseData.isLipvLROneVOne()
             && (
-                (isFullDefenceStatesPaid(caseData) &&
-                    NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
+                (isFullDefenceStatesPaid(caseData) && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
                 || YesOrNo.NO.equals(caseData.getApplicant1ProceedWithClaim()))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
