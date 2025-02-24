@@ -143,9 +143,6 @@ public class HearingValuesService {
     }
 
     private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
-        System.out.println("TESTTTTT" + caseData.isApplicantLiP());
-        System.out.println("TESTTTTT" + caseData.isRespondent1LiP());
-        System.out.println("TESTTTTT" + caseData.isRespondent2LiP());
 
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
             if (featuretoggleService.isHmcForLipEnabled()) {
