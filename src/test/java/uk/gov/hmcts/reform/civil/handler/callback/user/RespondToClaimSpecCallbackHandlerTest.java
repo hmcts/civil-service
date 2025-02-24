@@ -3137,7 +3137,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void hideHadPaidSomeAmountFOr1V2() {
 
-
             // Given
             CaseData caseData =
                 CaseDataBuilder.builder().atStateClaimDetailsNotified().isRespondent2(YES)
@@ -3160,7 +3159,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         public void hideHadPaidSomeAmountFOr1V2IfNOCFlagIsOff() {
-
 
             // Given
             CaseData caseData =
