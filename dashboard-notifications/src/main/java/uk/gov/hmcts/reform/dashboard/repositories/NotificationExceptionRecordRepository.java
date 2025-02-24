@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.repositories;
 
+import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionId;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionRecordEntity;
 
 import java.util.Optional;
@@ -11,5 +12,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NotificationExceptionRecordRepository extends CrudRepository<NotificationExceptionRecordEntity, UUID> {
 
-    Optional<NotificationExceptionRecordEntity> findByReferenceAndTaskId(String reference, String taskId);
+    Optional<NotificationExceptionRecordEntity> findNotificationExceptionRecordEntitiesByNotificationExceptionId(
+        NotificationExceptionId notificationExceptionId);
 }
