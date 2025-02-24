@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionId;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationExceptionRecordRepository;
 
 import java.util.Map;
@@ -56,7 +57,8 @@ class AddDefendantLitigationFriendNotifierTest {
         when(notificationsProperties.getSolicitorLitigationFriendAdded()).thenReturn("template-id");
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-        when(notificationExceptionRecordRepository.findByReferenceAndTaskId(anyString(), anyString())).thenReturn(Optional.empty());
+        when(notificationExceptionRecordRepository.findNotificationExceptionRecordEntitiesByNotificationExceptionId(any(
+            NotificationExceptionId.class))).thenReturn(Optional.empty());
     }
 
     @Test
