@@ -3109,6 +3109,80 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class HideHadPaidSomeAmount {
+        @Test
+        public void hideHadPaidSomeAmountFOr1V1() {
+
+            // Given
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().isRespondent1(YES)
+                    .respondent1ClaimResponseTypeForSpec(
+                        FULL_ADMISSION).build();
+            CaseData updatedCaseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
+                DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
+            )).build();
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "set-generic-response-type-flag");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains("WHEN_WILL_CLAIM_BE_PAID");
+            ;
+        }
+
+        @Test
+        public void hideHadPaidSomeAmountFOr1V2() {
+
+
+            // Given
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().isRespondent2(YES)
+                    .respondent2ClaimResponseTypeForSpec(
+                        FULL_ADMISSION).build();
+            CaseData updatedCaseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
+                DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+            )).build();
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "set-generic-response-type-flag");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains("WHEN_WILL_CLAIM_BE_PAID");
+            ;
+        }
+
+        @Test
+        public void hideHadPaidSomeAmountFOr1V2IfNOCFlagIsOff() {
+
+
+            // Given
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().isRespondent2(YES)
+                    .respondent2ClaimResponseTypeForSpec(
+                        FULL_ADMISSION).build();
+            CaseData updatedCaseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
+                DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+            )).build();
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "set-generic-response-type-flag");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("showConditionFlags").asList()
+                .contains("SHOW_ADMITTED_AMOUNT_SCREEN");
+            ;
+        }
+    }
+
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(DEFENDANT_RESPONSE_SPEC);

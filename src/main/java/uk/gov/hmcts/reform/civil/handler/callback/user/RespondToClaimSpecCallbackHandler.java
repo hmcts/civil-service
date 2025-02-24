@@ -127,6 +127,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_PAID_LESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_ADMITS_PART_OR_FULL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_PAID_LESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.SHOW_ADMITTED_AMOUNT_SCREEN;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.SOMEONE_DISPUTES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.TIMELINE_MANUALLY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.TIMELINE_UPLOAD;
@@ -172,6 +173,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -283,6 +285,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .errors(errors)
                 .build();
         }
+        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) &&
+            featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent1()) &&
+            caseData.getSpecDefenceFullAdmittedRequired() == null) {
+            caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
+        }
+
+        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()) &&
+            featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent2()) &&
+            caseData.getSpecDefenceFullAdmitted2Required() == null) {
+            caseData = caseData.toBuilder().specDefenceFullAdmitted2Required(NO).build();
+        }
+
+
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
@@ -729,8 +744,45 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             )::contains);
             updatedShowConditions.add(CURRENT_ADMITS_PART_OR_FULL);
         }
+        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) &&
+            YES.equals(caseData.getIsRespondent1()) &&
+            featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
+            updatedData.specDefenceFullAdmittedRequired(NO);
+            updatedData.fullAdmissionAndFullAmountPaid(NO);
+            updatedData.specPaidLessAmountOrDisputesOrPartAdmission(NO);
+            updatedData.specDisputesOrPartAdmission(NO);
+            updatedData.specFullAdmitPaid(NO);
+            updatedShowConditions.removeAll(EnumSet.of(
+                NEED_FINANCIAL_DETAILS_1,
+                NEED_FINANCIAL_DETAILS_2,
+                WHY_1_DOES_NOT_PAY_IMMEDIATELY,
+                WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+                WHEN_WILL_CLAIM_BE_PAID,
+                SHOW_ADMITTED_AMOUNT_SCREEN
+            ));
+            if (mustWhenWillClaimBePaidBeShown(updatedData.build())) {
+                updatedShowConditions.add(WHEN_WILL_CLAIM_BE_PAID);
+            }
+        } else if (
+            RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()) &&
+                YES.equals(caseData.getIsRespondent2()) &&
+                featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
+            updatedData.specDefenceFullAdmitted2Required(NO);
+            updatedShowConditions.removeAll(EnumSet.of(
+                NEED_FINANCIAL_DETAILS_1,
+                NEED_FINANCIAL_DETAILS_2,
+                WHY_1_DOES_NOT_PAY_IMMEDIATELY,
+                WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+                WHEN_WILL_CLAIM_BE_PAID,
+                SHOW_ADMITTED_AMOUNT_SCREEN
+            ));
+            if (mustWhenWillClaimBePaidBeShown(updatedData.build())) {
+                updatedShowConditions.add(WHEN_WILL_CLAIM_BE_PAID);
+            }
+        } else {
+            updatedShowConditions.add(SHOW_ADMITTED_AMOUNT_SCREEN);
+        }
         updatedData.showConditionFlags(updatedShowConditions);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
