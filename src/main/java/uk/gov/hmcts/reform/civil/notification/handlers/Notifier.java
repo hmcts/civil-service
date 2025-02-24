@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.model.NotificationParty.APPLICANT_1;
 import static uk.gov.hmcts.reform.civil.model.NotificationParty.APPLICANT_2;
@@ -102,7 +101,6 @@ public abstract class Notifier implements NotificationData {
                 .build();
         } else {
             exceptionRecordEntity = NotificationExceptionRecordEntity.builder()
-                .id(UUID.randomUUID())
                 .reference(ccdCaseReference.toString())
                 .successfulActions(successfulNotificationTasks.stream().map(Enum::name).toList())
                 .retryCount(0)
