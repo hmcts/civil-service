@@ -15,7 +15,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -37,7 +36,7 @@ public class NotificationExceptionRecordEntity implements Serializable {
     @Id
     @NotNull
     @Schema(name = "id")
-    private UUID id;
+    private Long id;
 
     @Schema(name = "reference")
     private String reference;
