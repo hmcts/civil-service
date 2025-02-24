@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,6 +17,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -30,10 +32,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerTest {
+class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerTest {
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
 
@@ -83,19 +89,18 @@ public class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackH
             ).build();
 
             handler.handle(params);
-            verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT");
+            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
                 "CLAIMANT",
-                "BEARER_TOKEN");
-            verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                "BEARER_TOKEN");
+                null);
 
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                "Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant",
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
