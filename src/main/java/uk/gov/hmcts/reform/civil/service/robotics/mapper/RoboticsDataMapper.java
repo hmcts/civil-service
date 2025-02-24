@@ -104,16 +104,13 @@ public class RoboticsDataMapper {
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
-        switch (allocatedTrack) {
-            case FAST_CLAIM:
-                return "FAST TRACK";
-            case MULTI_CLAIM:
-                return "MULTI TRACK";
-            case SMALL_CLAIM:
-                return "SMALL CLAIM TRACK";
-            default:
-                return "";
-        }
+        return switch (allocatedTrack) {
+            case FAST_CLAIM -> "FAST TRACK";
+            case MULTI_CLAIM -> "MULTI TRACK";
+            case SMALL_CLAIM -> "SMALL CLAIM TRACK";
+            case INTERMEDIATE_CLAIM -> "INTERMEDIATE TRACK";
+            default -> "";
+        };
     }
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {

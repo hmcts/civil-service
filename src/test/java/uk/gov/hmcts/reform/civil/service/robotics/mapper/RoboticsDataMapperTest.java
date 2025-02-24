@@ -4,6 +4,8 @@ import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -15,11 +17,13 @@ import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
+import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
@@ -382,23 +386,54 @@ class RoboticsDataMapperTest {
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 
-    @Test
-    void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
+    @ParameterizedTest
+    @CsvSource({
+        "FAST_CLAIM, FAST TRACK",
+        "MULTI_CLAIM, MULTI TRACK",
+        "SMALL_CLAIM, SMALL CLAIM TRACK",
+        "INTERMEDIATE_CLAIM, INTERMEDIATE TRACK",
+    })
+    void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData(String claimTrack, String expectedName) {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .allocatedTrack(AllocatedTrack.valueOf(claimTrack))
+            .build();
+        RoboticsCaseData testHeader = RoboticsCaseData.builder()
+            .header(CaseHeader.builder()
+                        .caseNumber(caseData.getLegacyCaseReference())
+                        .owningCourtCode("807")
+                        .owningCourtName("CCMCC")
+                        .caseType("PERSONAL INJURY")
+                        .preferredCourtCode("121")
+                        .caseAllocatedTo(expectedName)
+                        .build())
+            .build();
 
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
-        assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("121");
+        assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
     }
 
     @Test
-    void shouldReturnEmptyStringWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
+    void shouldReturnHeaderWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        RoboticsCaseData testHeader = RoboticsCaseData.builder()
+            .header(CaseHeader.builder()
+                        .caseNumber(caseData.getLegacyCaseReference())
+                        .owningCourtCode("807")
+                        .owningCourtName("CCMCC")
+                        .caseType("PERSONAL INJURY")
+                        .preferredCourtCode("")
+                        .caseAllocatedTo("FAST TRACK")
+                        .build())
+            .build();
+
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
-        assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("");
+        assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
     }
 
     @Test
