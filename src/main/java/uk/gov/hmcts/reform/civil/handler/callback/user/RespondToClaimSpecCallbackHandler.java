@@ -285,18 +285,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .errors(errors)
                 .build();
         }
-        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) &&
-            featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent1()) &&
-            caseData.getSpecDefenceFullAdmittedRequired() == null) {
+        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent1())
+            && caseData.getSpecDefenceFullAdmittedRequired() == null) {
             caseData = caseData.toBuilder().specDefenceFullAdmittedRequired(NO).build();
         }
 
-        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()) &&
-            featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent2()) &&
-            caseData.getSpecDefenceFullAdmitted2Required() == null) {
+        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData) && YES.equals(caseData.getIsRespondent2())
+            && caseData.getSpecDefenceFullAdmitted2Required() == null) {
             caseData = caseData.toBuilder().specDefenceFullAdmitted2Required(NO).build();
         }
-
 
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
@@ -744,9 +743,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             )::contains);
             updatedShowConditions.add(CURRENT_ADMITS_PART_OR_FULL);
         }
-        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) &&
-            YES.equals(caseData.getIsRespondent1()) &&
-            featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
+        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && YES.equals(caseData.getIsRespondent1())
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
             updatedData.specDefenceFullAdmittedRequired(NO);
             updatedData.fullAdmissionAndFullAmountPaid(NO);
             updatedData.specPaidLessAmountOrDisputesOrPartAdmission(NO);
@@ -764,9 +763,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedShowConditions.add(WHEN_WILL_CLAIM_BE_PAID);
             }
         } else if (
-            RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()) &&
-                YES.equals(caseData.getIsRespondent2()) &&
-                featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
+            RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                && YES.equals(caseData.getIsRespondent2())
+                && featureToggleService.isDefendantNoCOnlineForCase(caseData)) {
             updatedData.specDefenceFullAdmitted2Required(NO);
             updatedShowConditions.removeAll(EnumSet.of(
                 NEED_FINANCIAL_DETAILS_1,
