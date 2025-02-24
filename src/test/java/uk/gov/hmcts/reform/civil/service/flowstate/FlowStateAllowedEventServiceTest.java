@@ -1599,7 +1599,9 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REQUEST_JUDGEMENT_ADMISSION_SPEC
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        JUDGMENT_PAID_IN_FULL,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -2165,7 +2167,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         LIP_CLAIM_SETTLED,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        JUDGMENT_PAID_IN_FULL,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -2194,7 +2198,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(

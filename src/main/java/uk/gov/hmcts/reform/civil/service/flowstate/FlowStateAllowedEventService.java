@@ -1563,7 +1563,9 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                JUDGMENT_PAID_IN_FULL,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
@@ -1599,7 +1601,8 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 SET_ASIDE_JUDGMENT,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
@@ -2148,7 +2151,9 @@ public class FlowStateAllowedEventService {
                 DISCONTINUE_CLAIM_CLAIMANT,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 NOC_REQUEST,
-                APPLY_NOC_DECISION
+                APPLY_NOC_DECISION,
+                JUDGMENT_PAID_IN_FULL,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
@@ -2181,7 +2186,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
