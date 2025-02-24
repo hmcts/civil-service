@@ -29,7 +29,7 @@ def versions = [
   jackson           : '2.18.2',
   testcontainers    : '1.20.3',
   pdfbox            : '3.0.2',
-  tika              : '2.9.2'
+  tika              : '2.9.3'
 ]
 
 allprojects {
