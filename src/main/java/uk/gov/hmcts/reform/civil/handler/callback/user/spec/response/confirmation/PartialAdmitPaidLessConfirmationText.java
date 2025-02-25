@@ -21,7 +21,7 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
             || NO.equals(caseData.getSpecDefenceAdmittedRequired())) {
             return Optional.empty();
         }
-
+        Boolean isLipVLr  = caseData.isLipvLROneVOne();
         BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
             .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
@@ -35,19 +35,29 @@ public class PartialAdmitPaidLessConfirmationText implements RespondToClaimConfi
         }
         String applicantName = caseData.getApplicant1().getPartyName();
 
-        String sb = "<br>You told us you've paid the &#163;"
-            + MonetaryConversions.penniesToPounds(howMuchWasPaid)
-            + ". We've sent "
-            + applicantName
-            + " this response."
-            + "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-            + "<h3 class=\"govuk-heading-m\">If "
-            + applicantName + " accepts your response</h3>"
-            + "<p>The claim will be settled. We'll contact you when they respond.</p>"
-            + "<h3 class=\"govuk-heading-m\">If "
-            + applicantName + " rejects your response</h3>"
-            + "<p>The court will review the case. You may have to go to a hearing.</p>"
-            + "<p>We'll contact you to tell you what to do next.</p>";
-        return Optional.of(sb);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<br>You told us you've paid the &#163;")
+            .append(MonetaryConversions.penniesToPounds(howMuchWasPaid))
+            .append(". We've sent ")
+            .append(applicantName)
+            .append(" this response.")
+            .append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName)
+            .append(" accepts your response</h3>")
+            .append("<p>The claim will be settled. We'll contact you when they respond.</p>")
+            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(applicantName)
+            .append(" rejects your response</h3>");
+            if(isLipVLr){
+                sb.append("<p>If the claim value is below £10,000 then the next step will be mediation. The mediation service will contact you to give you a date for your appointment. If you can not reach an agreement at mediation, the court will review your claim.</p>")
+                    .append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount of &#163;").append(totalClaimAmount.setScale(2)).append(".</p>")
+                    .append("<p>This case will now proceed offline.</p>");
+            } else {
+                sb.append("<p>The court will review the case. You may have to go to a hearing.</p>")
+                    .append("<p>We'll contact you to tell you what to do next.</p>");
+            }
+
+        return Optional.of(sb.toString());
     }
 }
