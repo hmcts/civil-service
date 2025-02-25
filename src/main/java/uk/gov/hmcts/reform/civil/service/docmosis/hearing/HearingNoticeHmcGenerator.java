@@ -89,10 +89,17 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         LocationRefData caseManagementLocation =
             getLocationRefData(hearingId, caseData.getCaseManagementLocation().getBaseLocation(), bearerToken, locationRefDataService);
 
+        String caseManagementLocationText = "";
+        if (nonNull(caseManagementLocation) && isWelsh) {
+            caseManagementLocationText = LocationReferenceDataService.getDisplayEntryWelsh(caseManagementLocation);
+        } else if (nonNull(caseManagementLocation)) {
+            caseManagementLocationText = LocationReferenceDataService.getDisplayEntry(caseManagementLocation);
+        }
+
         return HearingNoticeHmc.builder()
             .title(getHearingTypeTitleText(caseData, hearing, isWelsh ? true : false))
             .hearingSiteName(getExternalShortName(template, caseManagementLocation))
-            .caseManagementLocation(nonNull(caseManagementLocation) ? LocationReferenceDataService.getDisplayEntry(caseManagementLocation) : null)
+            .caseManagementLocation(caseManagementLocationText)
             .hearingLocation(hearingLocation)
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(creationDate)
