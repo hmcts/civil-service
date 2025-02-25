@@ -680,11 +680,6 @@ spring:
       connectionTimeout: 10000
       idleTimeout: 30000
       maxLifetime: 60000
-  cache:
-    type: jcache
-    cache-names: userInfoCache, accessTokenCache
-    caffeine:
-      spec: expireAfterWrite=3600s
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
