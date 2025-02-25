@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskDTO;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -122,5 +123,22 @@ class CamundaRuntimeClientTest {
         Map<String, Object> actual = camundaClient.getEvaluatedDmnCourtLocations("123456", "MULTI_CLAIM");
 
         assertNull(actual);
+    }
+
+    @Test
+    void shouldReturnTasksWhenProcessInstanceIdValid() {
+        var expectedData = List.of(
+            ExternalTaskDTO.builder()
+                .id("id1")
+                .build(),
+            ExternalTaskDTO.builder().id("id2")
+                .build()
+        );
+        final String id = "someId";
+        when(camundaApi.getExternalTasks(id)).thenReturn(expectedData);
+
+        List<ExternalTaskDTO> actual = camundaClient.getTasksForProcessInstance(id);
+
+        assertEquals(actual, expectedData);
     }
 }

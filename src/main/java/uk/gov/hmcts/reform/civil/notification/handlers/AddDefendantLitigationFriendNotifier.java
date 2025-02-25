@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationExceptionRecordRepository;
 
@@ -34,8 +35,9 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
                                                 NotificationsProperties notificationsProperties,
                                                 OrganisationService organisationService,
                                                 SimpleStateFlowEngine stateFlowEngine,
-                                                NotificationExceptionRecordRepository exceptionRecordRepository) {
-        super(notificationService, notificationsProperties, organisationService, stateFlowEngine, exceptionRecordRepository);
+                                                NotificationExceptionRecordRepository exceptionRecordRepository,
+                                                CamundaRuntimeClient camundaRuntimeClient) {
+        super(notificationService, notificationsProperties, organisationService, stateFlowEngine, exceptionRecordRepository, camundaRuntimeClient);
     }
 
     @Override
