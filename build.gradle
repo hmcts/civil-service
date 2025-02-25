@@ -368,7 +368,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.7'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.8'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -407,7 +407,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.98'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.34'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.27'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.5'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -449,7 +449,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.6:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.7:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
