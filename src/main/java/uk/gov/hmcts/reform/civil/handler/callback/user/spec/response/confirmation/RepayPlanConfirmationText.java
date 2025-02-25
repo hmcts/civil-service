@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.Optional;
 
@@ -29,6 +30,8 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         ) {
             return Optional.empty();
         }
+        Boolean isLipVLr  = caseData.isLipvLROneVOne();
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount().setScale(2);
 
         StringBuilder sb = new StringBuilder();
         String applicantName = caseData.getApplicant1().getPartyName();
@@ -81,7 +84,16 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         } else {
             sb.append(" rejects your offer</h3>");
         }
-        sb.append("The court will decide how you must pay");
+        if (isLipVLr){
+            sb.append("<p>If the claim value is below £10,000 then the next step will be mediation. The mediation service will contact you to give you a date for your appointment. If you can not reach an agreement at mediation, the court will review your claim.</p>")
+                .append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount of &#163;").append(totalClaimAmount).append(".</p>")
+                .append("<p>This case will now proceed offline.</p>");
+
+        } else {
+            sb.append("The court will decide how you must pay");
+        }
+
+
 
         return Optional.of(sb.toString());
     }
