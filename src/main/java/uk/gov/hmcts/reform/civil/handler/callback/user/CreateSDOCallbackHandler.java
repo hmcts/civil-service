@@ -1610,7 +1610,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             dataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
         } else {
             boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
-            log.info("isLipCaseEaCourt -- {}", isLipCaseEaCourt);
             dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
         }
 
@@ -1653,12 +1652,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        log.info("caseData.isLipvLipOneVOne() --{}", caseData.isLipvLipOneVOne());
-        log.info("caseData.isLRvLipOneVOne() --{}", caseData.isLRvLipOneVOne());
-        log.info("caseData.nocApplyForLiPDefendantBeforeOffline() --{}", caseData.nocApplyForLiPDefendantBeforeOffline());
-        log.info("isCaseProgressionEnabledAndLocationWhiteListed --{}",
-                 featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(
-                     caseData.getCaseManagementLocation().getBaseLocation()));
         return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.nocApplyForLiPDefendantBeforeOffline())
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
