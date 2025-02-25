@@ -4,9 +4,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.Collections;
@@ -19,11 +21,14 @@ public class CoscCertificateGeneratedDefendantNotificationHandler extends Dashbo
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_COSC_GEN_FOR_DEFENDANT);
     private static final String TASK_ID = "GenerateDashboardNotificationCoSCCertificateGenerated";
+    private final DashboardNotificationService dashboardNotificationService;
 
     public CoscCertificateGeneratedDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                                 DashboardNotificationsParamsMapper mapper,
+                                                                DashboardNotificationService dashboardNotificationService,
                                                                 FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
     }
 
     @Override
@@ -44,5 +49,19 @@ public class CoscCertificateGeneratedDefendantNotificationHandler extends Dashbo
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return caseData.isRespondent1NotRepresented();
+    }
+
+    @Override
+    protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
+            caseData.getGeneralApplications().stream()
+                .filter(application ->
+                            application.getValue().getGeneralAppType().getTypes().contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID))
+                .findFirst()
+                .ifPresent(coscApplication -> dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                    coscApplication.getValue().getCaseLink().getCaseReference(),
+                    "APPLICANT"
+                ));
+        }
     }
 }
