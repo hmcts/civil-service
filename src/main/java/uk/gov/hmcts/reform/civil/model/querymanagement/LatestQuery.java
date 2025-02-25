@@ -10,5 +10,6 @@ public class LatestQuery {
 
     private final String queryId;
     private final YesOrNo isHearingRelated;
+    private final YesOrNo isAdditionalQuestion;
 
 }

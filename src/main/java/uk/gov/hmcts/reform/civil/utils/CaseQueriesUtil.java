@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
@@ -38,6 +39,7 @@ public class CaseQueriesUtil {
             .map(latestMessage -> LatestQuery.builder()
                 .queryId(latestMessage.getId())
                 .isHearingRelated(latestMessage.getIsHearingRelated())
+                .isAdditionalQuestion(latestMessage.getCreatedBy().contains("Admin") ? YesOrNo.NO : YesOrNo.YES)
                 .build())
             .orElse(null);
     }
