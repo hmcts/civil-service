@@ -13,15 +13,10 @@ plugins {
   id "io.freefair.lombok" version "8.10.2"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1512'
   id "org.flywaydb.flyway" version "10.20.1"
-  id 'maven-publish'
 }
 
-def buildNumber = System.getenv("RELEASE_VERSION")?.replace("refs/tags/", "") ?: "DEV-SNAPSHOT"
-
-println "buildNumber: $buildNumber"
-
 group = 'uk.gov.hmcts.reform'
-version = buildNumber
+version = '0.0.1'
 
 def versions = [
   junit             : '5.11.4',
@@ -91,15 +86,6 @@ allprojects {
       ossIndex {
         enabled = false
       }
-
-      nvd {
-        apiKey  = '5c4e3e8c-4943-4131-b1a8-d224190d1c1f'
-        delay   = 10000
-        maxRetryCount = 10
-//        autoUpdate = false // default is true
-//        waitTime = 3000 // does not work in v10.0 of dependency-check library
-      }
-
     }
   }
 
@@ -325,44 +311,6 @@ jacocoTestReport {
 jacocoTestReport.dependsOn {
   subprojects*.test
 }
-
-def gitRepo = "https://github.com/hmcts/civil-service"
-
-def now = LocalDateTime.now();
-def buildYear = now.getYear();
-
-println("Build year: $buildYear")
-println("rootProject.name:    $rootProject.name")
-println("rootProject.version: $rootProject.version")
-
-publishing {
-  publications {
-    maven(MavenPublication) {
-      groupId = project.group
-      artifactId = rootProject.name
-      version = rootProject.version
-
-      from components.java
-
-      pom {
-        name = 'Civil Service'
-        description = 'Civil CCD Callback Service.'
-        url = gitRepo
-        licenses {
-          license {
-            name = "MIT License, Copyright (c) ${buildYear} HM Courts & Tribunals Service"
-            url = "https://www.opensource.org/licenses/MIT"
-          }
-        }
-        scm {
-          url = gitRepo
-        }
-      }
-    }
-  }
-}
-
-
 
 ext.libraries = [
   junit5: [
