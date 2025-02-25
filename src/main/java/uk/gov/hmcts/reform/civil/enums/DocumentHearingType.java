@@ -42,7 +42,7 @@ public enum DocumentHearingType {
                 labelText = documentHearingType.getLabel();
                 hearingText = "hearing";
                 return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
-            } else if (documentHearingType.equals(TRI) && isWelsh && context.equals(TITLE)) {
+            } else if (context.equals(TITLE)) {
                 labelText = documentHearingType.getLabelWelsh();
                 hearingText = "wrandawiad";
                 return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
