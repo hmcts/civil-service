@@ -3,13 +3,15 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ConfirmOrderReviewNotificationHandler;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ConfirmOrderReviewNotificationHandler;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 
@@ -21,15 +23,27 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @Service
 public class ConfirmOrderReviewDefendantNotificationHandler extends ConfirmOrderReviewNotificationHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT);
+    private static final List<CaseEvent> CASE_EVENTS = List.of(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT);
     private static final String TASK_ID = "UpdateTaskListConfirmOrderReviewDefendant";
-    private static final String ROLE = "DEFENDANT";
+    private static final String USER_ROLE = "DEFENDANT";
 
-    public ConfirmOrderReviewDefendantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public ConfirmOrderReviewDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                           DashboardNotificationsParamsMapper mapper,
                                                           FeatureToggleService featureToggleService,
-                                                          ObjectMapper objectMapper) {
-        super(dashboardApiClient, mapper, featureToggleService, objectMapper, ROLE, TASK_ID, EVENTS);
+                                                          ObjectMapper objectMapper,
+                                                          DashboardNotificationService dashboardNotificationService,
+                                                          TaskListService taskListService) {
+        super(
+            dashboardScenariosService,
+            mapper,
+            featureToggleService,
+            objectMapper,
+            USER_ROLE,
+            TASK_ID,
+            CASE_EVENTS,
+            dashboardNotificationService,
+            taskListService
+        );
     }
 
     @Override

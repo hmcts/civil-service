@@ -4,13 +4,15 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,11 +39,17 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE);
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationClaimantResponse";
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public ClaimantResponseNotificationHandler(DashboardApiClient dashboardApiClient,
+    public ClaimantResponseNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                DashboardNotificationsParamsMapper mapper,
-                                               FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+                                               FeatureToggleService featureToggleService,
+                                               DashboardNotificationService dashboardNotificationService,
+                                               TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -94,17 +102,16 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
         if (caseData.getCcdState() == CASE_SETTLED) {
-            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                authToken
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseId,
+                "CLAIMANT"
             );
-
-            dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseId,
                 "CLAIMANT",
-                authToken
+                null
             );
         }
     }

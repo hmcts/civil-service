@@ -1,21 +1,23 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 
+import java.io.Serializable;
+import java.time.OffsetDateTime;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.time.OffsetDateTime;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
+@Immutable
 @Table(name = "task_item_template", schema = "dbs")
 public class TaskItemTemplateEntity implements Serializable {
 

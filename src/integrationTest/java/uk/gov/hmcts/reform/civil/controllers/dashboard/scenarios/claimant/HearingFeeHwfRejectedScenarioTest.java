@@ -63,7 +63,7 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
                 "Mae eich cais am help i dalu ffioedd wedi cael ei wrthod"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rydym wedi gwrthod eich cais am help i dalu ffi'r gwrandawiad. Gweler yr e-bost am ragor o fanylion. Rhaid i chi <a href={PAY_HEARING_FEE} class=\"govuk-link\">dalu'r ffi lawn</a> o £455 erbyn "
-                    + DateUtils.formatDateInWelsh(LocalDate.of(2024, 4, 4))
+                    + DateUtils.formatDateInWelsh(LocalDate.of(2024, 4, 4), false)
                     + ". Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}. Os na fyddwch yn talu, bydd eich hawliad yn cael ei ddileu.</p>")
         );
 
