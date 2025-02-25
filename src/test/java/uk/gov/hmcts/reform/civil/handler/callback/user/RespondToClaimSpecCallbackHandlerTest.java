@@ -3179,6 +3179,50 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("SHOW_ADMITTED_AMOUNT_SCREEN");
             ;
         }
+
+        @Test
+        public void shouldsetspecDefenceFullAdmittedRequiredFor1V1() {
+            // Given
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().isRespondent1(YES)
+                    .respondent1ClaimResponseTypeForSpec(
+                        FULL_ADMISSION).build();
+            CaseData updatedCaseData = caseData.toBuilder().showConditionFlags(EnumSet.of(
+                DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
+            )).build();
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "specHandleAdmitPartClaim");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getData()).extracting("specDefenceFullAdmittedRequired").isEqualTo("No");
+        }
+
+        @Test
+        public void shouldsetspecDefenceFullAdmitted2RequiredFOr1V2() {
+
+            // Given
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotified().isRespondent2(YES)
+                    .respondent2ClaimResponseTypeForSpec(
+                        FULL_ADMISSION).build();
+            CaseData updatedCaseData =
+                caseData.toBuilder().respondent2(Party.builder().type(Party.Type.INDIVIDUAL).build())
+                    .showConditionFlags(EnumSet.of(
+                        DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+                    )).build();
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            CallbackParams params = callbackParamsOf(updatedCaseData, MID, "specHandleAdmitPartClaim");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("specDefenceFullAdmitted2Required").isEqualTo("No");
+
+        }
     }
 
     @Test
