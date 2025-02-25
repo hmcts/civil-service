@@ -253,7 +253,7 @@ public class DocmosisTemplateDataUtils {
         return responseIntentions;
     }
 
-    public static String getFormattedCaseReference(CaseData caseData) {
+    public static String formatCcdCaseReference(CaseData caseData) {
         return Optional.ofNullable(caseData.getCcdCaseReference())
             .map(val -> String.join(
                 DELIMITER,

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchApplicantName;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
-import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.getFormattedCaseReference;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
 
 class DocmosisTemplateDataUtilsTest {
@@ -504,7 +504,7 @@ class DocmosisTemplateDataUtilsTest {
     void shouldReturnEmptyForMissingCaseReference() {
         CaseData caseData = CaseData.builder()
             .build();
-        String formattedCaseReference = getFormattedCaseReference(caseData);
+        String formattedCaseReference = formatCcdCaseReference(caseData);
         assertThat(formattedCaseReference).isEmpty();
     }
 
@@ -524,7 +524,7 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(inputCaseReference)
             .build();
-        String formattedCaseReference = getFormattedCaseReference(caseData);
+        String formattedCaseReference = formatCcdCaseReference(caseData);
         assertThat(formattedCaseReference).isNotEmpty();
         assertThat(formattedCaseReference).isEqualTo(expectedCaseReference);
     }
