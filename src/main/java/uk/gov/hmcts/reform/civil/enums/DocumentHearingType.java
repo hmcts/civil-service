@@ -10,11 +10,12 @@ import static uk.gov.hmcts.reform.civil.enums.DocumentContext.TITLE;
 @Getter
 @RequiredArgsConstructor
 public enum DocumentHearingType {
-    TRI("trial"),
-    DIS("disposal hearing"),
-    DRH("dispute resolution hearing");
+    TRI("trial", "dreial"),
+    DIS("disposal hearing", "wrandawiad gwaredu"),
+    DRH("dispute resolution hearing", "wrandawiad datrys anghydfod");
 
     private final String label;
+    private final String labelWelsh;
 
     /**
      * Gets the {@link DocumentHearingType} based on the provided hearing type string.
@@ -32,19 +33,22 @@ public enum DocumentHearingType {
         }
     }
 
-    private static String getTypeText(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack, DocumentContext context) {
+    private static String getTypeText(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack, DocumentContext context, boolean isWelsh) {
+        String labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
+        String hearingText = isWelsh ? "wrandawiad" : "hearing";
+
         if (documentHearingType.equals(TRI)) {
-            return allocatedTrack.equals(FAST_CLAIM) ? documentHearingType.getLabel() : "hearing";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
         }
-        return context.equals(TITLE) ? documentHearingType.getLabel() : "hearing";
+        return context.equals(TITLE) ? labelText : hearingText;
     }
 
-    public static String getTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack) {
-        return getTypeText(hearingType, allocatedTrack, TITLE);
+    public static String getTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, boolean isWelsh) {
+        return getTypeText(hearingType, allocatedTrack, TITLE, isWelsh);
     }
 
-    public static String getContentText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack) {
-        return getTypeText(hearingType, allocatedTrack, CONTENT);
+    public static String getContentText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, boolean isWelsh) {
+        return getTypeText(hearingType, allocatedTrack, CONTENT, isWelsh);
     }
 
 }

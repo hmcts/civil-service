@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -22,9 +23,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
@@ -111,6 +115,24 @@ class UpdatePaymentStatusServiceTest {
         verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_CLAIM_ISSUE_PAYMENT);
         verify(coreCaseDataService).submitUpdate(any(), any());
 
+    }
+
+    @Test
+    void shouldThrowCaseDataUpdateExceptionWhenExceptionOccurs() {
+        FeeType feeType = FeeType.CLAIMISSUED; // Replace with an actual FeeType
+        String caseReference = "123456";
+        CardPaymentStatusResponse cardPaymentStatusResponse = mock(CardPaymentStatusResponse.class);
+
+        when(coreCaseDataService.getCase(Long.valueOf(caseReference))).thenThrow(new RuntimeException("Database error"));
+
+        CaseDataUpdateException exception = assertThrows(
+            CaseDataUpdateException.class,
+            () -> updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, cardPaymentStatusResponse)
+        );
+
+        verify(coreCaseDataService).getCase(Long.valueOf(caseReference));
+
+        verifyNoInteractions(caseDetailsConverter);
     }
 
     private CaseDetails buildCaseDetails(CaseData caseData) {

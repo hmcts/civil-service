@@ -369,7 +369,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())) {
             repaymentBreakdown.append(
-                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
+                "The Judgment request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
             if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
                 repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
@@ -486,6 +486,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseData.setActiveJudgment(activeJudgment);
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            caseData.setJoDJCreatedDate(LocalDateTime.now());
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();

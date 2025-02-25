@@ -781,12 +781,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             caseDataBuilder.eaCourtLocation(YES);
-            caseDataBuilder.hmcEaCourtLocation(!isLipCase && isLocationWhiteListed ? YES : NO);
-        } else if (isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData)) {
-            caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+            caseDataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
         } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-            caseDataBuilder.eaCourtLocation(NO);
+            boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
+            caseDataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
         }
 
         if (featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
