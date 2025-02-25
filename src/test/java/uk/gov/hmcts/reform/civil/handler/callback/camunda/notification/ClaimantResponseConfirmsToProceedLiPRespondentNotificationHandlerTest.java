@@ -39,8 +39,11 @@ import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
@@ -169,11 +172,11 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         }
 
         @ParameterizedTest()
-        @ValueSource(strings = {"INTERMEDIATE_CLAIM", "MULTI_CLAIM"})
+        @ValueSource(strings = {"FAST_CLAIM", "INTERMEDIATE_CLAIM", "MULTI_CLAIM"})
         void shouldNotNotifyLRRespondent_whenApplicantProceedsForLipVSLR(String claimType) {
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn(
-                RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
+                RESPONDENT_EMAIL_TEMPLATE);
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
                                                                                              .name("org name")
                                                                                              .build()));
@@ -195,12 +198,51 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
             verify(notificationService, times(1)).sendMail(
                 "respondentsolicitor@example.com",
+                RESPONDENT_EMAIL_TEMPLATE,
+                Map.of(
+                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
+                    "Claimant name", "Mr. John Rambo",
+                    CASEMAN_REF, "000DC001"
+                ),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyLRRespondent_whenApplicantProceedsSmallClaimForLipVSLR() {
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            when(notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()).thenReturn(
+                RESPONDENT_MEDIATION_EMAIL_TEMPLATE);
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
+                                                                                             .name("org name")
+                                                                                             .build()));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1SettleClaim(NO)
+                                 .build())
+                .responseClaimTrack("SMALL_CLAIM")
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .applicant1ProceedWithClaim(YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                "respondentsolicitor@example.com",
                 RESPONDENT_MEDIATION_EMAIL_TEMPLATE,
                 Map.of(
                     CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                     CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
                     "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    "Claimant name", "Mr. John Rambo"
+                    "Claimant name", "Mr. John Rambo",
+                    "casemanRef", "000DC001"
                 ),
                 REFERENCE_NUMBER
             );
@@ -324,7 +366,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         private Map<String, String> getNotificationDataMapCarm() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                APPLICANT_ONE_NAME, "Mr. John Rambo",
+                CASEMAN_REF, "000DC001"
             );
         }
 

@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -57,7 +58,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         boolean shouldSendEmailToDefendantLR = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
         if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
-                shouldSendEmailToDefendantLR || isIntermediateOrMultiClaimProceedForLipVsLR(caseData) || isClaimantNotProcessLipVsLRWithNoc(caseData)
+                shouldSendEmailToDefendantLR || isClaimProceedForLipVsLR(caseData) || isClaimantNotProcessLipVsLRWithNoc(caseData)
                     ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
                 getEmailTemplate(caseData, shouldSendEmailToDefendantLR),
                 addProperties(caseData),
@@ -68,8 +69,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     }
 
     private String getEmailTemplate(CaseData caseData, boolean shouldSendEmailToDefendantLR) {
-        if (isIntermediateOrMultiClaimProceedForLipVsLR(caseData)) {
-            return notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
+        if (isClaimProceedForLipVsLR(caseData)) {
+            return caseData.isSmallClaim()
+                ? notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()
+                : notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
         }
         if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
             return notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
@@ -109,7 +112,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        if (isIntermediateOrMultiClaimProceedForLipVsLR(caseData)) {
+        if (isClaimProceedForLipVsLR(caseData)) {
             return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                           CLAIM_REFERENCE_NUMBER,
                           caseData.getCcdCaseReference().toString(),
@@ -118,7 +121,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                               caseData.getRespondent1OrganisationPolicy(),
                               organisationService
                           ),
-                          APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+                          APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                          CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
         if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
@@ -140,7 +144,13 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 CLAIM_REFERENCE_NUMBER,
                 caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC,
-                getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+                getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
+                APPLICANT_ONE_NAME,
+                getPartyNameBasedOnType(caseData.getApplicant1()),
+                CASEMAN_REF,
+                caseData.getLegacyCaseReference(),
+                PARTY_REFERENCES,
+                buildPartiesReferencesEmailSubject(caseData)
             );
         }
         return Map.of(
@@ -154,12 +164,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
     }
 
-    private boolean isIntermediateOrMultiClaimProceedForLipVsLR(CaseData caseData) {
-        List<String> responseClaimTrack = Arrays.asList("INTERMEDIATE_CLAIM", "MULTI_CLAIM");
-        return responseClaimTrack.contains(caseData.getResponseClaimTrack())
-            && caseData.isLipvLROneVOne()
-            && (isFullDefenceStatesPaid(caseData)
-                || YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim()))
+    private boolean isClaimProceedForLipVsLR(CaseData caseData) {
+        return caseData.isLipvLROneVOne()
+            && ((isFullDefenceStatesPaid(caseData) && YES.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
+                || YES.equals(caseData.getApplicant1ProceedWithClaim()))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
 
