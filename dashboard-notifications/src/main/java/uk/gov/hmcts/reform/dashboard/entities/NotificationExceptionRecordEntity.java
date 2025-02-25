@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import com.vladmihalcea.hibernate.type.array.StringArrayType;
+import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -13,6 +14,7 @@ import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @lombok.Data
@@ -23,8 +25,8 @@ import java.util.List;
 @Table(name = "notification_exception_record", schema = "dbs")
 @TypeDefs({
     @TypeDef(
-        name = "string-array",
-        typeClass = StringArrayType.class
+        name = "list-array",
+        typeClass = ListArrayType.class
         )
 })
 public class NotificationExceptionRecordEntity implements Serializable {
@@ -39,12 +41,13 @@ public class NotificationExceptionRecordEntity implements Serializable {
     private String partyType;
 
     @Schema(name = "successful_actions")
-    @Type(type = "string-array")
+    @Type(type = "list-array")
     @Column(
         name = "successful_actions",
         columnDefinition = "text[]"
     )
-    private List<String> successfulActions;
+    @Builder.Default
+    private List<String> successfulActions = new ArrayList<>();
 
     @Schema(name = "retry_count")
     private int retryCount;

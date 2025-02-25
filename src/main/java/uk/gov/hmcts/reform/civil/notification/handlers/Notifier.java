@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskDTO;
 import uk.gov.hmcts.reform.civil.model.NotificationParty;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionId;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionRecordEntity;
@@ -39,17 +40,22 @@ public abstract class Notifier implements NotificationData {
     protected final OrganisationService organisationService;
     protected final SimpleStateFlowEngine stateFlowEngine;
     protected final NotificationExceptionRecordRepository exceptionRecordRepository;
+    private final CamundaRuntimeClient camundaClient;
 
     protected abstract Set<EmailDTO> getPartiesToNotify(final CaseData caseData);
 
     public void notifyParties(CaseData caseData, String eventId) {
         final Set<EmailDTO> partiesToEmail = getPartiesToNotify(caseData);
-        sendNotification(partiesToEmail, caseData.getCcdCaseReference(), eventId);
+        sendNotification(partiesToEmail,
+                         caseData.getCcdCaseReference(),
+                         eventId,
+                         caseData.getBusinessProcess().getProcessInstanceId());
     }
 
     private void sendNotification(Set<EmailDTO> recipients,
                                   Long ccdCaseReference,
-                                  String taskId) {
+                                  String taskId,
+                                  String processInstanceId) {
         Optional<NotificationExceptionRecordEntity> existingRecord =
             exceptionRecordRepository.findNotificationExceptionRecordEntitiesByNotificationExceptionId(new NotificationExceptionId(String.valueOf(ccdCaseReference), taskId));
 
@@ -76,7 +82,7 @@ public abstract class Notifier implements NotificationData {
         }
 
         if (successfulNotificationTasks.size() != recipients.size()) {
-            persistExceptionRecord(ccdCaseReference, existingRecord, successfulNotificationTasks, taskId);
+            persistExceptionRecord(ccdCaseReference, existingRecord, successfulNotificationTasks, taskId, processInstanceId);
 
             String recipientList = recipients.stream()
                 .map(EmailDTO::getParty).map(Enum::name)
@@ -86,8 +92,8 @@ public abstract class Notifier implements NotificationData {
                 .map(NotificationTask::getNotificationParty).map(Enum::name)
                 .collect(Collectors.joining(", "));
 
-            String errorMessage = "Failed to send message for case %s with recipient list %s and successful emails sent %s"
-                .formatted(ccdCaseReference, recipientList, partiesSuccessfullyEmailed);
+            String errorMessage = "Failed to send email for eventId %s for case %s with recipient list %s and successful emails sent %s"
+                .formatted(taskId, ccdCaseReference, recipientList, partiesSuccessfullyEmailed);
             throw new RuntimeException(errorMessage);
         }
     }
@@ -109,13 +115,15 @@ public abstract class Notifier implements NotificationData {
     private void persistExceptionRecord(Long ccdCaseReference,
                                         Optional<NotificationExceptionRecordEntity> existingRecord,
                                         List<NotificationTask> successfulNotificationTasks,
-                                        String taskId) {
+                                        String taskId,
+                                        String processInstanceId) {
         NotificationExceptionRecordEntity exceptionRecordEntity;
+        int retryCount = getRetryCount(processInstanceId);
 
         if (existingRecord.isPresent()) {
             exceptionRecordEntity = existingRecord.get()
                 .toBuilder()
-                .retryCount(existingRecord.get().getRetryCount() + 1)
+                .retryCount(retryCount)
                 .successfulActions(successfulNotificationTasks.stream().map(Enum::name).toList())
                 .updatedOn(OffsetDateTime.now())
                 .build();
@@ -128,11 +136,21 @@ public abstract class Notifier implements NotificationData {
                         .build()
                 )
                 .successfulActions(successfulNotificationTasks.stream().map(Enum::name).toList())
-                .retryCount(0)
+                .retryCount(retryCount)
                 .build();
         }
 
         exceptionRecordRepository.save(exceptionRecordEntity);
+    }
+
+    private int getRetryCount(String processInstanceId) {
+        List<ExternalTaskDTO> externalTasks = camundaClient.getTasksForProcessInstance(processInstanceId);
+
+        if (externalTasks == null || externalTasks.size() != 1) {
+            return 0;
+        }
+
+        return externalTasks.get(0).getRetries();
     }
 
     protected enum NotificationTask {
@@ -161,4 +179,3 @@ public abstract class Notifier implements NotificationData {
         }
     }
 }
-

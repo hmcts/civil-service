@@ -9,12 +9,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.LitigationFriendAddedNotificationHandler;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationExceptionId;
@@ -50,6 +52,8 @@ class AddDefendantLitigationFriendNotifierTest {
     private StateFlow stateFlow;
     @Mock
     private NotificationExceptionRecordRepository notificationExceptionRecordRepository;
+    @Mock
+    private CamundaRuntimeClient camundaClient;
 
     @BeforeEach
     public void setUp() {
@@ -63,7 +67,9 @@ class AddDefendantLitigationFriendNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitor_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().businessProcess(
+            BusinessProcess.builder().processInstanceId("someId").build()
+        ).build();
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
         addDefendantLitigationFriendNotifier.notifyParties(caseData, LitigationFriendAddedNotificationHandler.TASK_ID);
 
@@ -72,7 +78,8 @@ class AddDefendantLitigationFriendNotifierTest {
 
     @Test
     void shouldNotifyRespondent2Solicitor_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            .businessProcess(BusinessProcess.builder().processInstanceId("someId").build()).build();
 
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
 
