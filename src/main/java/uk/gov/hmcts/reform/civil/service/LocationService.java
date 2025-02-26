@@ -71,7 +71,8 @@ public class LocationService {
     }
 
     private boolean hasSDOBeenMade(CaseData caseData) {
-        return !statesBeforeSDO.contains(caseData.getCcdState())
+        return (!statesBeforeSDO.contains(caseData.getCcdState())
+            && settleDiscontinueStates.contains(caseData.getCcdState())
             || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
             && settleDiscontinueStates.contains(caseData.getCcdState()));
     }
