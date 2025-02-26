@@ -14,4 +14,6 @@ public interface NotificationExceptionRecordRepository extends CrudRepository<No
 
     Optional<NotificationExceptionRecordEntity> findNotificationExceptionRecordEntitiesByNotificationExceptionId(
         NotificationExceptionId notificationExceptionId);
+
+    void deleteByNotificationExceptionId(NotificationExceptionId notificationExceptionId);
 }
