@@ -1643,6 +1643,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        JUDGMENT_PAID_IN_FULL,
+                        INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
@@ -2233,6 +2235,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         ADD_CASE_NOTE,
+                        JUDGMENT_PAID_IN_FULL,
+                        INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
@@ -2265,6 +2269,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION,
                         REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),

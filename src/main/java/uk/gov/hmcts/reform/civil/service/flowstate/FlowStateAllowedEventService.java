@@ -1612,6 +1612,8 @@ public class FlowStateAllowedEventService {
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                JUDGMENT_PAID_IN_FULL,
+                INITIATE_GENERAL_APPLICATION,
                 REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
@@ -1628,7 +1630,8 @@ public class FlowStateAllowedEventService {
                     ADD_CASE_NOTE,
                     NOC_REQUEST,
                     APPLY_NOC_DECISION,
-                    REQUEST_JUDGEMENT_ADMISSION_SPEC)
+                    REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                    REFER_JUDGE_DEFENCE_RECEIVED)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),
@@ -1654,6 +1657,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
+                INITIATE_GENERAL_APPLICATION,
                 REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
@@ -2225,6 +2229,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
+                JUDGMENT_PAID_IN_FULL,
+                INITIATE_GENERAL_APPLICATION,
                 REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
@@ -2261,6 +2267,7 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION,
                 REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
