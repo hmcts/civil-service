@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.GeneralApps.ApplicationProceedsOffline.Applicant',
-        '{Notice.AAA6.GeneralApps.RespondentResponseSubmitted.Applicant}',
+        '{}',
         '{"Notice.AAA6.GeneralApps.ApplicationProceedsOffline.Applicant": []}');
 
 /**
