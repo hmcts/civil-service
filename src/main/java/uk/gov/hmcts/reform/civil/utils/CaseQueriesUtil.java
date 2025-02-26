@@ -10,7 +10,11 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.*;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 
 public class CaseQueriesUtil {
 
