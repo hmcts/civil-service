@@ -75,7 +75,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
+        return true;
     }
 
     public boolean isCjesServiceAvailable() {
@@ -103,8 +103,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("minti")
-            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        return true;
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
