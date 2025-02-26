@@ -13,6 +13,8 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PROCESS;
@@ -2260,7 +2262,8 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
