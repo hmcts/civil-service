@@ -64,7 +64,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             )
             .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
             .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
-            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)            .build();
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
+            .build();
 
     }
 
