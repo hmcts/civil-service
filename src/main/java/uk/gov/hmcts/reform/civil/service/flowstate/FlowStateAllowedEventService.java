@@ -888,8 +888,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
-                CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE
+                CASE_PROCEEDS_IN_CASEMAN
             )
         ),
         entry(
@@ -2220,15 +2219,13 @@ public class FlowStateAllowedEventService {
             SIGN_SETTLEMENT_AGREEMENT.fullName(),
             List.of(
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED,
-                ADD_CASE_NOTE
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
             CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
             List.of(
-                CASE_PROCEEDS_IN_CASEMAN,
-                ADD_CASE_NOTE
+                CASE_PROCEEDS_IN_CASEMAN
             )
         )
     );
