@@ -219,7 +219,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(NO)
+                                 .applicant1SettleClaim(YES)
                                  .build())
                 .build();
             caseData = caseData.toBuilder()
@@ -259,7 +259,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(NO)
+                                 .applicant1SettleClaim(YES)
                                  .build())
                 .build();
             caseData = caseData.toBuilder()
