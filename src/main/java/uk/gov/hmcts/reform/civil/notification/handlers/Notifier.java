@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Notificat
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskDTO;
 import uk.gov.hmcts.reform.civil.model.NotificationParty;
+import uk.gov.hmcts.reform.civil.notification.EmailNotificationFailedException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -56,8 +57,9 @@ public abstract class Notifier implements NotificationData {
                                   Long ccdCaseReference,
                                   String taskId,
                                   String processInstanceId) {
+        NotificationExceptionId notificationExceptionId = new NotificationExceptionId(String.valueOf(ccdCaseReference), taskId);
         Optional<NotificationExceptionRecordEntity> existingRecord =
-            exceptionRecordRepository.findNotificationExceptionRecordEntitiesByNotificationExceptionId(new NotificationExceptionId(String.valueOf(ccdCaseReference), taskId));
+            exceptionRecordRepository.findNotificationExceptionRecordEntitiesByNotificationExceptionId(notificationExceptionId);
 
         List<NotificationTask> successfulNotificationTasks = getSuccessfulNotifications(existingRecord);
 
@@ -94,8 +96,10 @@ public abstract class Notifier implements NotificationData {
 
             String errorMessage = "Failed to send email for eventId %s for case %s with recipient list %s and successful emails sent %s"
                 .formatted(taskId, ccdCaseReference, recipientList, partiesSuccessfullyEmailed);
-            throw new RuntimeException(errorMessage);
+            throw new EmailNotificationFailedException(errorMessage);
         }
+
+        exceptionRecordRepository.deleteByNotificationExceptionId(notificationExceptionId);
     }
 
     @NotNull
@@ -128,6 +132,7 @@ public abstract class Notifier implements NotificationData {
                 .updatedOn(OffsetDateTime.now())
                 .build();
         } else {
+            OffsetDateTime createdAt = OffsetDateTime.now();
             exceptionRecordEntity = NotificationExceptionRecordEntity.builder()
                 .notificationExceptionId(
                     NotificationExceptionId.builder()
@@ -137,6 +142,8 @@ public abstract class Notifier implements NotificationData {
                 )
                 .successfulActions(successfulNotificationTasks.stream().map(Enum::name).toList())
                 .retryCount(retryCount)
+                .createdAt(createdAt)
+                .updatedOn(createdAt)
                 .build();
         }
 
