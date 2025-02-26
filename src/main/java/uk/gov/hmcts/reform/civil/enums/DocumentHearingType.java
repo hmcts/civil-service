@@ -37,24 +37,23 @@ public enum DocumentHearingType {
         String labelText;
         String hearingText;
 
-        if (documentHearingType.equals(TRI)) {
-            if (!isWelsh) {
-                labelText = documentHearingType.getLabel();
-                hearingText = "hearing";
-                return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
-            } else if (context.equals(TITLE)) {
-                labelText = documentHearingType.getLabelWelsh();
-                hearingText = "wrandawiad";
-                return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
-            } else {
-                labelText = "treial";
-                hearingText = "gwrandawiad";
-                return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
-            }
+        if (documentHearingType.equals(TRI) && !isWelsh) {
+            labelText = documentHearingType.getLabel();
+            hearingText = "hearing";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else if (documentHearingType.equals(TRI) && context.equals(TITLE)) {
+            labelText = documentHearingType.getLabelWelsh();
+            hearingText = "wrandawiad";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else if (documentHearingType.equals(TRI)) {
+            labelText = "treial";
+            hearingText = "gwrandawiad";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else {
+            labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
+            hearingText = isWelsh ? "gwrandawiad" : "hearing";
+            return context.equals(TITLE) ? labelText : hearingText;
         }
-        labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
-        hearingText = isWelsh ? "gwrandawiad" : "hearing";
-        return context.equals(TITLE) ? labelText : hearingText;
     }
 
     public static String getTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, boolean isWelsh) {
