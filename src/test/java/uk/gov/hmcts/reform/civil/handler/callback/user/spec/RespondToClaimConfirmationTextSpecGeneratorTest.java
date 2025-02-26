@@ -63,8 +63,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
                     .build()
             )
             .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
-            .respondent1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
-            .build();
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)            .build();
 
     }
 
@@ -87,7 +87,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
                     .whenWillThisAmountBePaid(whenWillPay)
                     .build()
             )
-            .respondent1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
@@ -114,7 +115,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
@@ -156,7 +158,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .specDefenceAdmittedRequired(YesOrNo.YES)
             .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
             .totalClaimAmount(totalClaimAmount)
-            .respondent1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
@@ -178,7 +181,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .specDefenceAdmittedRequired(YesOrNo.YES)
             .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
             .totalClaimAmount(totalClaimAmount)
-            .respondent1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
