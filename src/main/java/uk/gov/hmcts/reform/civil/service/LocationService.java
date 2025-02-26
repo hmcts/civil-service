@@ -19,7 +19,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 
@@ -37,8 +39,11 @@ public class LocationService {
                                                                     IN_MEDIATION,
                                                                     AWAITING_APPLICANT_INTENTION);
 
+    public static final Set<CaseState> settleDiscontinueStates = EnumSet.of(CASE_SETTLED,
+                                                                            CASE_DISCONTINUED);
+
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
-        if (hasSDOBeenMade(caseData.getCcdState())) {
+        if (hasSDOBeenMade(caseData)) {
             return Pair.of(assignCaseManagementLocationToMainCaseLocation(caseData, authToken), false);
         } else {
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
@@ -65,8 +70,10 @@ public class LocationService {
         return Pair.of(courtLocation, true);
     }
 
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !statesBeforeSDO.contains(state);
+    private boolean hasSDOBeenMade(CaseData caseData) {
+        return !statesBeforeSDO.contains(caseData.getCcdState())
+            || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
+            && settleDiscontinueStates.contains(caseData.getCcdState()));
     }
 
     public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
