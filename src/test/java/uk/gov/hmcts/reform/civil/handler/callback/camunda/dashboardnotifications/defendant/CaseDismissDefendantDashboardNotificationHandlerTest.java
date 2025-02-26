@@ -55,6 +55,10 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
     @Test
     void shouldRecordScenario_whenInvoked() {
         // Given
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
@@ -64,8 +68,6 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT.name()).build()
         ).build();
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When
         handler.handle(params);

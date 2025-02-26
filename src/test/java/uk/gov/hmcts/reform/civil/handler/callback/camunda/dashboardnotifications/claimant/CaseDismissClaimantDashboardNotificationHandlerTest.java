@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -33,6 +34,9 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
 
     @InjectMocks
     private CaseDismissClaimantDashboardNotificationHandler handler;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Mock
     private DashboardScenariosService dashboardScenariosService;
@@ -57,6 +61,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_CLAIMANT.name()).build()
         ).build();
         HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When

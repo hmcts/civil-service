@@ -41,7 +41,7 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @Mock
-    private FeatureToggleService toggleService;
+    private FeatureToggleService featureToggleService;
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationCourtOfficerOrder";
 
     @Test
@@ -65,14 +65,15 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordScenario_whenInvokedForCaseEventFeatureToggle() {
             // Given
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .trialReadyRespondent1(YesOrNo.YES)
                 .ccdCaseReference(1234L)
                 .build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
@@ -98,14 +99,15 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
         @Test
         void shouldRecordTrialReadyScenario_whenInvokedForCaseEventFeatureToggle() {
             // Given
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .responseClaimTrack("FAST_CLAIM")
                 .ccdCaseReference(1234L)
                 .build();
-
-            HashMap<String, Object> scenarioParams = new HashMap<>();
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
