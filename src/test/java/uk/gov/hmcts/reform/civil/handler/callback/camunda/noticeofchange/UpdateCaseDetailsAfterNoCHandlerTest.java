@@ -684,7 +684,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
                 .isEqualTo("requester@example.com");
-            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getOrgName()).isEqualTo(ORGANISATION.getName());
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine1()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine1());
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine2()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine2());
