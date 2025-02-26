@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.assertj.core.util.Strings;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -8,10 +9,6 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 
 import java.util.List;
 import java.util.Optional;
-
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
-import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 public class CaseQueriesUtil {
 
@@ -42,8 +39,15 @@ public class CaseQueriesUtil {
             .map(caseMessage -> LatestQuery.builder()
                 .queryId(caseMessage.getId())
                 .isHearingRelated(caseMessage.getIsHearingRelated())
-                .isAdditionalQuestion(caseMessage.getCreatedBy().contains("Admin") ? YesOrNo.NO : YesOrNo.YES)
+                .isAdditionalQuestion(isAdditionalQuestion(caseMessage))
                 .build())
             .orElse(null);
+    }
+
+    private static YesOrNo isAdditionalQuestion(CaseMessage message) {
+        if (Strings.isNullOrEmpty(message.getParentId())) {
+            return YesOrNo.NO;
+        }
+        return message.getCreatedBy().contains("Admin") ? YesOrNo.NO : YesOrNo.YES;
     }
 }
