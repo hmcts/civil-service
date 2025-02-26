@@ -70,6 +70,7 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToAdmittedClaimOwingAmountPounds(admitted)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
                     .whenWillThisAmountBePaid(whenWillPay)
