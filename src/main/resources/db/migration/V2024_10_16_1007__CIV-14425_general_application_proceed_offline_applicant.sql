@@ -1,4 +1,3 @@
-@ -1,19 +0,0 @@
 /**
  * Add scenario for claimant
  */
