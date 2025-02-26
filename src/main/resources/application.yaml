@@ -23,21 +23,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    type: jcache
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
-  jpa:
-    properties:
-      hibernate:
-        cache:
-          use_second_level_cache: true
-          region:
-            factory_class: jcache
-        javax:
-          cache:
-            provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
-
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
@@ -229,10 +217,10 @@ dashboard:
 
 logging:
   level:
-    org.springframework.cache: DEBUG    # Spring Cache Abstraction
-    javax.cache: DEBUG                  # JCache API (general caching)
-    com.github.benmanes.caffeine.cache: TRACE  # Caffeine specific logs
-    org.hibernate.cache: DEBUG           # Hibernate 2nd Level Cache (if use
+    org.springframework.cache: INFO    # Spring Cache Abstraction
+    javax.cache: INFO                  # JCache API (general caching)
+    com.github.benmanes.caffeine.cache: INFO  # Caffeine specific logs
+    org.hibernate.cache: INFO           # Hibernate 2nd Level Cache (if use
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
@@ -690,37 +678,16 @@ spring:
       connectionTimeout: 10000
       idleTimeout: 30000
       maxLifetime: 60000
-  cache:
-    type: jcache
-    cache-names: userInfoCache, accessTokenCache
-    caffeine:
-      spec: expireAfterWrite=3600s
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       naming:
         physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
-
     properties:
       hibernate:
-        jdbc:
-          timeout: 300
         show_sql: false
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        cache:
-          use_second_level_cache: true
-          use_query_cache: true
-          region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
-          region:
-            factory_class: jcache
-        javax:
-          cache:
-            provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
-          persistence:
-            query:
-              timeout: 300000  # 5 minutes (in milliseconds)
-
   flyway:
     enabled: true
     baselineOnMigrate: true
