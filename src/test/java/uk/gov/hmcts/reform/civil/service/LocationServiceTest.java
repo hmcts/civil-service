@@ -57,7 +57,7 @@ class LocationServiceTest {
     @Test
     void shouldThrowException_whenApplicationMadeAfterSDOMainCaseCMLNotInRefData() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
+            .getCaseDataForWorkAllocation(CaseState.JUDICIAL_REFERRAL, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
                                           respondent2DQ
             );
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(getSampleCourLocationsRefObjectPostSdoNotInRefData());
