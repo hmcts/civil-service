@@ -71,7 +71,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             sb.append("<p>The claim will be settled. </p>");
             sb.append("<h2 class=\"govuk-heading-m\">If ").append(applicantName).append( " rejects your offer").append("</h2>");
             sb.append("<p>If the claim value is below £10,000 then the next step will be mediation. The mediation service will contact you to give you a date for your appointment.  If you can not reach an agreement at mediation, the court will review your claim.</p>");
-            sb.append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount of &#163;").append(totalClaimAmount).append(".</p>");
+            sb.append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount.</p>");
             sb.append("<p>This case will now proceed offline.</p>");
         }
 

@@ -55,7 +55,7 @@ public class PartialAdmitPaidFullConfirmationText implements RespondToClaimConfi
             .append(" rejects your response</h3>");
             if(isLipVLr){
                 sb.append("<p>If the claim value is below £10,000 then the next step will be mediation. The mediation service will contact you to give you a date for your appointment. If you can not reach an agreement at mediation, the court will review your claim.</p>")
-                    .append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount of &#163;").append(totalClaimAmount.setScale(2)).append(".</p>")
+                    .append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount.</p>")
                     .append("<p>This case will now proceed offline.</p>");
             }else {
                 sb.append("<p>The court will review the case. You may have to go to a hearing.</p>")
