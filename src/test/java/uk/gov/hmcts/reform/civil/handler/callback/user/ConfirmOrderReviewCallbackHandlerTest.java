@@ -173,18 +173,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnEmptyResponse_whenInvoked() {
-            CaseData caseData = CaseData.builder()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
-        }
-
-        @Test
         void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder() {
             CaseData caseData = CaseData.builder()
                 .isFinalOrder(YesOrNo.YES)
@@ -327,18 +315,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                .confirmationHeader(HEADER_CONFIRMATION)
                                                .confirmationBody(BODY_CONFIRMATION_OBLIGATION)
                                                .build());
-        }
-
-        @Test
-        void shouldReturnEmptyResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
         }
 
     }

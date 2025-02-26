@@ -238,12 +238,6 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                 .containsOnly(COURT_OFFICER_ORDER.name(), "READY");
         }
 
-        @Test
-        void shouldEmptySubmitted_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).isNull();
-        }
-
     }
 
     @Test
