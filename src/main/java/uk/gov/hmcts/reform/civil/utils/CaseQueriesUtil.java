@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.*;
+
 public class CaseQueriesUtil {
 
     private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
@@ -19,15 +21,15 @@ public class CaseQueriesUtil {
     }
 
     public static CaseQueriesCollection getUserQueriesByRole(CaseData caseData, List<String> roles) {
-        if (roles.contains("[APPLICANTSOLICITORONE]")) {
+        if (isApplicantSolicitor(roles)) {
             return caseData.getQmApplicantSolicitorQueries();
-        } else if (roles.contains("[RESPONDENTSOLICITORONE]")) {
+        } else if (isRespondentSolicitorOne(roles)) {
             return caseData.getQmRespondentSolicitor1Queries();
-        } else if (roles.contains("[RESPONDENTSOLICITORTWO]")) {
+        } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getQmRespondentSolicitor2Queries();
-        } else if (roles.contains("[CLAIMANT]")) {
+        } else if (isLIPClaimant(roles)) {
             return caseData.getQmApplicantCitizenQueries();
-        } else if (roles.contains("[DEFENDANT]")) {
+        } else if (isLIPDefendant(roles)) {
             return caseData.getQmRespondentCitizenQueries();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
