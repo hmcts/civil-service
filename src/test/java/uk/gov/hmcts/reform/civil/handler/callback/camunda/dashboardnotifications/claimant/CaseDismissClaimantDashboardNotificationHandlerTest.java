@@ -60,7 +60,6 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_CLAIMANT.name()).build()
         ).build();
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 

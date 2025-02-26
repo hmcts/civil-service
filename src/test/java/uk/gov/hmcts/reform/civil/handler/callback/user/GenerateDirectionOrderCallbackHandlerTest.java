@@ -2082,7 +2082,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -2106,7 +2105,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
@@ -2130,7 +2128,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                             .forename("Judge")
                                                                             .surname("Judy")
                                                                             .roles(Collections.emptyList()).build());
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             // Given
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));

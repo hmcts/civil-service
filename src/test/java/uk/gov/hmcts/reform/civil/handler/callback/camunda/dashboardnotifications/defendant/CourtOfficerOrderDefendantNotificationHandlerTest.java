@@ -71,7 +71,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
                 .ccdCaseReference(1234L)
                 .build();
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -105,7 +104,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
                 .ccdCaseReference(1234L)
                 .build();
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -138,7 +136,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
                 .ccdCaseReference(1234L)
                 .build();
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
             ).build();
@@ -156,8 +153,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
                 .respondent1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
                 .build();
-
-            when(toggleService.isCaseEventsEnabled()).thenReturn(false);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()

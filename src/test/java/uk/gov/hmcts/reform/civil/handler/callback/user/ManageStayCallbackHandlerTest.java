@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -88,7 +87,6 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleFalse() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -100,7 +98,6 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseState preStayState = CaseState.JUDICIAL_REFERRAL;
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build()
                 .toBuilder().manageStayOption("LIFT_STAY").ccdState(preStayState)
@@ -123,7 +120,6 @@ public class ManageStayCallbackHandlerTest {
         @ParameterizedTest
         @MethodSource("provideCaseStatesForLiftStay")
         void shouldSetCorrectCaseState_WhenManageStayOptionIsLiftStay(CaseState preStayState, CaseState expectedState) {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .manageStayOption("LIFT_STAY").ccdState(preStayState)
                 .preStayState(preStayState.name()).build();
@@ -137,7 +133,6 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldNotChangeCaseState_WhenManageStayOptionIsNotLiftStay() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .manageStayOption("REQUEST_UPDATE").ccdState(CASE_STAYED).build();
@@ -168,7 +163,6 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenSubmittedIsInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
 
@@ -180,7 +174,6 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithLiftStay() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .manageStayOption("LIFT_STAY").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
@@ -195,7 +188,6 @@ public class ManageStayCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithRequestUpdate() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .manageStayOption("REQUEST_UPDATE").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();

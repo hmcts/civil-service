@@ -79,7 +79,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .ccdCaseReference(1234L)
                 .build();
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -113,7 +112,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .ccdCaseReference(1234L)
                 .build();
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -145,7 +143,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .ccdCaseReference(1234L)
                 .build();
 
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -174,7 +171,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
             ).build();
-            when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             // When
             handler.handle(params);
 
@@ -189,8 +185,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
                 .applicant1Represented(YesOrNo.NO)
                 .ccdCaseReference(1234L)
                 .build();
-
-            when(toggleService.isCaseEventsEnabled()).thenReturn(false);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()

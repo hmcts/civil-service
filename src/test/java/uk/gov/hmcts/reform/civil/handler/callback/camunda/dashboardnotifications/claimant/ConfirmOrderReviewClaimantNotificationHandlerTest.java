@@ -78,8 +78,6 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
     @Test
     void shouldConfigureDashboardNotificationsStayCase() {
 
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().applicant1Represented(YesOrNo.NO)
             .isFinalOrder(YesOrNo.YES)
@@ -133,7 +131,6 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
                 .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         handler.handle(params);
 
         // Then
@@ -160,7 +157,6 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
                 .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         handler.handle(params);
 
         // Then

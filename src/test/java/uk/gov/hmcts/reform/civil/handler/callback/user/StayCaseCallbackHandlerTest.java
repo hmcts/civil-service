@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -69,7 +68,6 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleFalse() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState("CASE_PROGRESSION");
@@ -81,7 +79,6 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenAboutToSubmitIsInvokedToggleTrue() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build().toBuilder()
                 .hearingDate(LocalDate.now())
                 .hearingDueDate(LocalDate.now()).build();
@@ -106,7 +103,6 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNoError_WhenSubmittedIsInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
 
@@ -118,7 +114,6 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
