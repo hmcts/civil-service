@@ -65,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -878,6 +879,24 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMadeCaseDiscontinued() {
+        when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(CASE_DISCONTINUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                          respondent2DQ).toBuilder().previousCCDState(CASE_ISSUED).build();
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("420219");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getRegion())
+            .isEqualTo("2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
+            .isEqualTo("Civil");
+    }
+
+    @Test
     void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMadeAndCaseTransferred() {
         when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourtLocationsTransferred(), true));
         when(coreCaseEventDataService.getEventsForCase(any())).thenReturn(buildCaseEventDetails());
@@ -919,6 +938,19 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .getCaseDataForWorkAllocation(null, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ,
                                           respondent2DQ
             );
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("22222");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecOrgClaimantCaseDiscontinued() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(CASE_DISCONTINUED, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ,
+                                          respondent2DQ).toBuilder().previousCCDState(null).build();
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
