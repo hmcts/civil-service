@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -166,7 +166,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
         return caseData.isLipvLROneVOne()
             && (
-                (isFullDefenceStatesPaid(caseData) && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
+                (isFullDefenceStatesPaid(caseData) && YES.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
                 || YesOrNo.NO.equals(caseData.getApplicant1ProceedWithClaim()))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
