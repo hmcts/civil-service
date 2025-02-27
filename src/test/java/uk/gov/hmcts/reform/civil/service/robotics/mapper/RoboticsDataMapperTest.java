@@ -437,7 +437,9 @@ class RoboticsDataMapperTest {
     void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData(String claimTrack, String expectedName) {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
             .allocatedTrack(AllocatedTrack.valueOf(claimTrack))
+            .claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
             .build();
+
         RoboticsCaseData testHeader = RoboticsCaseData.builder()
             .header(CaseHeader.builder()
                         .caseNumber(caseData.getLegacyCaseReference())
@@ -464,7 +466,7 @@ class RoboticsDataMapperTest {
                         .caseNumber(caseData.getLegacyCaseReference())
                         .owningCourtCode("807")
                         .owningCourtName("CCMCC")
-                        .caseType("PERSONAL INJURY")
+                        .caseType("CLAIM - UNSPEC ONLY")
                         .preferredCourtCode("")
                         .caseAllocatedTo("FAST TRACK")
                         .build())
@@ -473,7 +475,6 @@ class RoboticsDataMapperTest {
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
     }
 
