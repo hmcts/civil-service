@@ -191,6 +191,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
+        var mintiKey = "minti";
+        givenToggle(mintiKey, toggleStat);
+
+        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisCjesServiceAvailableEnabled(Boolean toggleStat) {
         var key = "isCjesServiceAvailable";
         givenToggle(key, toggleStat);

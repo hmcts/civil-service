@@ -75,7 +75,7 @@ public class FeatureToggleService {
     }
 
     public boolean isMintiEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("minti");
     }
 
     public boolean isCjesServiceAvailable() {
