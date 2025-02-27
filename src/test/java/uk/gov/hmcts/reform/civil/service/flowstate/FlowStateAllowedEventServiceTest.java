@@ -757,7 +757,8 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -788,7 +789,8 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -1330,7 +1332,8 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -1534,7 +1537,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -1580,7 +1584,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -1653,7 +1658,8 @@ class FlowStateAllowedEventServiceTest {
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -1692,7 +1698,8 @@ class FlowStateAllowedEventServiceTest {
                         JUDGMENT_PAID_IN_FULL,
                         SET_ASIDE_JUDGMENT,
                         ADD_CASE_NOTE,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -1761,7 +1768,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         MEDIATION_UNSUCCESSFUL,
                         MEDIATION_SUCCESSFUL,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -2245,7 +2253,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -2278,7 +2287,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(

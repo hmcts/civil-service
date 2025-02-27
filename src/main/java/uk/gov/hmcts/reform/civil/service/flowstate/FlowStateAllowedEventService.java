@@ -716,7 +716,8 @@ public class FlowStateAllowedEventService {
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -748,7 +749,8 @@ public class FlowStateAllowedEventService {
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -1196,7 +1198,8 @@ public class FlowStateAllowedEventService {
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 SET_ASIDE_JUDGMENT,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -1223,7 +1226,8 @@ public class FlowStateAllowedEventService {
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 SET_ASIDE_JUDGMENT,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -1286,7 +1290,8 @@ public class FlowStateAllowedEventService {
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
@@ -1494,7 +1499,8 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
@@ -1541,7 +1547,8 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -1622,7 +1629,8 @@ public class FlowStateAllowedEventService {
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 JUDGMENT_PAID_IN_FULL,
                 INITIATE_GENERAL_APPLICATION,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
@@ -1639,7 +1647,8 @@ public class FlowStateAllowedEventService {
                     NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                    REFER_JUDGE_DEFENCE_RECEIVED)
+                    REFER_JUDGE_DEFENCE_RECEIVED,
+                    GENERATE_DIRECTIONS_ORDER)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),
@@ -1666,7 +1675,8 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 INITIATE_GENERAL_APPLICATION,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
@@ -1738,7 +1748,8 @@ public class FlowStateAllowedEventService {
                 APPLY_NOC_DECISION,
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -2054,7 +2065,8 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
@@ -2076,7 +2088,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 COURT_OFFICER_ORDER,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
@@ -2241,7 +2254,8 @@ public class FlowStateAllowedEventService {
                 APPLY_NOC_DECISION,
                 JUDGMENT_PAID_IN_FULL,
                 INITIATE_GENERAL_APPLICATION,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
@@ -2278,7 +2292,8 @@ public class FlowStateAllowedEventService {
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
                 INITIATE_GENERAL_APPLICATION,
-                REFER_JUDGE_DEFENCE_RECEIVED
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
