@@ -237,11 +237,11 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
 
     // // MINTI case prog
     private DynamicList requestHearingNoticeDynamic;
-    private YesOrNo requestAnotherHearing;
     private final List<ConfirmListingTickBox> confirmListingTickBox;
     private TaskManagementLocationTypes taskManagementLocations;
     private TaskManagementLocationTab taskManagementLocationsTab;
     private TaskManagementLocationTab caseManagementLocationTab;
+    private DynamicList hearingListedDynamicList;
 
     /**
      * Claimant has requested a reconsideration of the SDO.
