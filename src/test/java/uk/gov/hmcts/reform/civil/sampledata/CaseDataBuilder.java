@@ -321,7 +321,7 @@ public class CaseDataBuilder {
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final LocalDate PAST_DATE = now().minusDays(1);
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
-    public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
+    public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10001);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
     public static final String CUSTOMER_REFERENCE = "12345";
 
