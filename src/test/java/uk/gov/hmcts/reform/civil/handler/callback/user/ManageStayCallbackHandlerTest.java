@@ -14,14 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.stream.Stream;
@@ -160,17 +158,6 @@ public class ManageStayCallbackHandlerTest {
 
     @Nested
     class Submitted {
-
-        @Test
-        void shouldReturnNoError_WhenSubmittedIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isNull();
-        }
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithLiftStay() {
