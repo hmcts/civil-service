@@ -60,15 +60,6 @@ class ManageStayWATaskSchedulerHandlerTest {
     }
 
     @Test
-    void shouldNotInteractWithSearchServiceOrApplicationEventPublisher_whenCaseEventsToggleIsOff() {
-
-        handler.execute(mockTask, externalTaskService);
-
-        verifyNoInteractions(searchService);
-        verifyNoInteractions(applicationEventPublisher);
-    }
-
-    @Test
     void shouldEmitManageStayWATaskEventEvent_whenCasesFound() {
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");

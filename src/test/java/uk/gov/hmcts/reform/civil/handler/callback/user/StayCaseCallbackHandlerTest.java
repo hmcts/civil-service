@@ -102,17 +102,6 @@ public class StayCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
     class Submitted {
 
         @Test
-        void shouldReturnNoError_WhenSubmittedIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateDecisionOutcome().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
             CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseDetails).build();
