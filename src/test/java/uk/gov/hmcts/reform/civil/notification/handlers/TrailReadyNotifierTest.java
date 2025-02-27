@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDEN
 
 @ExtendWith(MockitoExtension.class)
 public class TrailReadyNotifierTest {
+
     public static final Long CASE_ID = 1594901956117591L;
     @Mock
     NotificationService notificationService;
@@ -58,7 +59,7 @@ public class TrailReadyNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondent1_whenRespondent2NotifyOthersIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
 
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
@@ -84,7 +85,7 @@ public class TrailReadyNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondent2_whenRespondent1NotifyOthersIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck(ONE_V_TWO_TWO_LEGAL_REP).build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck(ONE_V_TWO_TWO_LEGAL_REP).build();
 
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
@@ -99,7 +100,6 @@ public class TrailReadyNotifierTest {
         parameters.put(PARTY_REFERENCES, "Claimant reference: 123456 - Defendant 1 reference: 123456 - Defendant 2 reference: Not provided");
         parameters.put(HEARING_DATE, LocalDate.now().plusWeeks(5).plusDays(6)
             .format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK)));
-
 
         verify(notificationService).sendMail(
             "applicantsolicitor@example.com",
@@ -118,7 +118,7 @@ public class TrailReadyNotifierTest {
 
     @Test
     void shouldNotifyApplicant_whenRespondent1NotifyOthersIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
 
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
@@ -138,7 +138,7 @@ public class TrailReadyNotifierTest {
 
     @Test
     void shouldNotifyRespondent1AndRespondent2_whenApplicantNotifyOthersIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck(ONE_V_TWO_TWO_LEGAL_REP).build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck(ONE_V_TWO_TWO_LEGAL_REP).build();
 
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
@@ -171,7 +171,7 @@ public class TrailReadyNotifierTest {
 
     @Test
     void shouldNotifyRespondent1_whenApplicantNotifyOthersIsInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
 
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
@@ -191,7 +191,7 @@ public class TrailReadyNotifierTest {
 
     @Test
     void shouldNotifyApplicantLipAndRespondentLipNotBilingual_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
 
@@ -219,7 +219,7 @@ public class TrailReadyNotifierTest {
 
     @Test
     void shouldNotifyApplicantLipBilingual_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
+        final CaseData caseData = CaseDataBuilder.builder()
             .atStateTrialReadyCheckLiP(true)
             .claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
 

@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
 public class TrialReadyNotificationHandlerTest {
+
     @Mock
     private TrailReadyNotifier trailReadyNotifier;
     @InjectMocks
