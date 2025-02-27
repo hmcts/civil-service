@@ -727,7 +727,7 @@ class HmcDataUtilsTest {
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
         List<String> expectedResult = isWelsh
-            ?  List.of("23 Rhagfyr 2023 am 14:30 am 1 awr a 30 munudau")
+            ?  List.of("23 Rhagfyr 2023 am 14:30 am 1 awr a 30 munud")
             : List.of("23 December 2023 at 14:30 for 1 hour and 30 minutes");
 
         assertEquals(result, expectedResult);
@@ -750,7 +750,7 @@ class HmcDataUtilsTest {
 
         List<String> expectedList = isWelsh
             ? List.of(
-            "23 Rhagfyr 2023 am 14:00 am 30 munudau")
+            "23 Rhagfyr 2023 am 14:00 am 30 munud")
             : List.of(
             "23 December 2023 at 14:00 for 30 minutes");
         assertEquals(result, expectedList);
@@ -773,7 +773,7 @@ class HmcDataUtilsTest {
 
         List<String> expectedResult = isWelsh
             ? List.of(
-            "23 Rhagfyr 2023 am 14:45 am 1 awr a 15 munudau")
+            "23 Rhagfyr 2023 am 14:45 am 1 awr a 15 munud")
             : List.of(
             "23 December 2023 at 14:45 for 1 hour and 15 minutes");
 
@@ -797,7 +797,7 @@ class HmcDataUtilsTest {
 
         List<String> expectedResult = isWelsh
             ? List.of(
-            "23 Rhagfyr 2023 am 14:15 am 1 awr a 45 munudau")
+            "23 Rhagfyr 2023 am 14:15 am 1 awr a 45 munud")
             : List.of(
             "23 December 2023 at 14:15 for 1 hour and 45 minutes");
 
@@ -824,7 +824,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "1 diwrnod a 3 awr a 30 munudau" : "1 day and 3 hours and 30 minutes");
+        assertEquals(result, isWelsh ? "1 diwrnod a 3 awr a 30 munud" : "1 day and 3 hours and 30 minutes");
     }
 
     @ParameterizedTest
@@ -847,7 +847,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "1 diwrnod ac 1 awr a 30 munudau" : "1 day and 1 hour and 30 minutes");
+        assertEquals(result, isWelsh ? "1 diwrnod ac 1 awr a 30 munud" : "1 day and 1 hour and 30 minutes");
     }
 
     @ParameterizedTest
@@ -865,7 +865,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "30 munudau" : "30 minutes");
+        assertEquals(result, isWelsh ? "30 munud" : "30 minutes");
     }
 
     @ParameterizedTest
@@ -901,7 +901,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "5 awr a 30 munudau" : "5 hours and 30 minutes");
+        assertEquals(result, isWelsh ? "5 awr a 30 munud" : "5 hours and 30 minutes");
     }
 
     @ParameterizedTest
@@ -919,7 +919,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "5 awr ac 20 munudau" : "5 hours and 20 minutes");
+        assertEquals(result, isWelsh ? "5 awr ac 20 munud" : "5 hours and 20 minutes");
     }
 
     @ParameterizedTest
@@ -960,7 +960,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "1 diwrnod a 30 munudau" : "1 day and 30 minutes");
+        assertEquals(result, isWelsh ? "1 diwrnod a 30 munud" : "1 day and 30 minutes");
     }
 
     @ParameterizedTest
@@ -983,7 +983,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getTotalHearingDurationText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "1 diwrnod a 5 awr a 30 munudau" : "1 day and 5 hours and 30 minutes");
+        assertEquals(result, isWelsh ? "1 diwrnod a 5 awr a 30 munud" : "1 day and 5 hours and 30 minutes");
     }
 
     @ParameterizedTest
