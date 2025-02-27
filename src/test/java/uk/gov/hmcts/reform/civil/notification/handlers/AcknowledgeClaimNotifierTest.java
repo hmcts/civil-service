@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -26,6 +27,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -66,7 +69,6 @@ class AcknowledgeClaimNotifierTest {
         when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
         acknowledgeClaimNotifier.notifyParties(caseData);
-
         verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
@@ -74,7 +76,7 @@ class AcknowledgeClaimNotifierTest {
                         CLAIM_REFERENCE_NUMBER, "1594901956117591",
                         RESPONDENT_NAME, "Mr. Sole Trader",
                         PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                        RESPONSE_DEADLINE, formatLocalDate(LocalDate.of(2025, 3, 10), DATE),
+                        RESPONSE_DEADLINE, formatLocalDate(getResponseDeadline(caseData), DATE),
                         RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim",
                         CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
                 ),
@@ -102,7 +104,7 @@ class AcknowledgeClaimNotifierTest {
                         CLAIM_REFERENCE_NUMBER, "1594901956117591",
                         RESPONDENT_NAME, "Mr. Sole Trader",
                         PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                        RESPONSE_DEADLINE, formatLocalDate(LocalDate.of(2025, 3, 10), DATE),
+                        RESPONSE_DEADLINE, formatLocalDate(getResponseDeadline(caseData), DATE),
                         RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim",
                         CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
                 ),
@@ -130,7 +132,7 @@ class AcknowledgeClaimNotifierTest {
                         CLAIM_REFERENCE_NUMBER, "1594901956117591",
                         RESPONDENT_NAME, "Mr. Sole Trader",
                         PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                        RESPONSE_DEADLINE, formatLocalDate(LocalDate.of(2025, 3, 10), DATE),
+                        RESPONSE_DEADLINE, formatLocalDate(getResponseDeadline(caseData), DATE),
                         RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim",
                         CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
                 ),
@@ -157,6 +159,7 @@ class AcknowledgeClaimNotifierTest {
         // only applicant notification sent
         verify(notificationService, times(1)).sendMail(anyString(),
                 anyString(), anyMap(), anyString());
+
     }
 
     @Test
@@ -173,7 +176,7 @@ class AcknowledgeClaimNotifierTest {
                         CLAIM_REFERENCE_NUMBER, "1594901956117591",
                         RESPONDENT_NAME, "Mr. Sole Trader",
                         PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                        RESPONSE_DEADLINE, formatLocalDate(LocalDate.of(2025, 3, 10), DATE),
+                        RESPONSE_DEADLINE, formatLocalDate(getResponseDeadline(caseData), DATE),
                         RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim",
                         CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
                 ),
@@ -367,5 +370,27 @@ class AcknowledgeClaimNotifierTest {
                 ),
                 "acknowledge-claim-applicant-notification-000DC001"
         );
+    }
+
+    private LocalDate getResponseDeadline(CaseData caseData) {
+        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                responseDeadline = caseData.getRespondent2ResponseDeadline();
+            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() == null)) {
+                responseDeadline = caseData.getRespondent1ResponseDeadline();
+            } else if (caseData.getRespondent1AcknowledgeNotificationDate() != null) {
+                if (caseData.getRespondent2AcknowledgeNotificationDate()
+                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                    responseDeadline = caseData.getRespondent2ResponseDeadline();
+                } else {
+                    responseDeadline = caseData.getRespondent1ResponseDeadline();
+                }
+            }
+        }
+        return LocalDate.of(responseDeadline.getYear(), responseDeadline.getMonth(), responseDeadline.getDayOfMonth());
     }
 }

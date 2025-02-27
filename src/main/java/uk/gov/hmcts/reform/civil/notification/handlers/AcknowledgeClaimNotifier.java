@@ -41,6 +41,8 @@ public class AcknowledgeClaimNotifier extends Notifier {
 
     @Override
     protected Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
+        log.info("Retrieving recipients to notify for Acknowledge Claim for case id {}",
+                caseData.getLegacyCaseReference());
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         partiesToEmail.add(getApplicant(caseData));
         partiesToEmail.add(getRespondent(caseData));
