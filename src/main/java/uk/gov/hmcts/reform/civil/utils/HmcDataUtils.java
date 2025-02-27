@@ -297,7 +297,7 @@ public class HmcDataUtils {
      */
     private static String hoursMinutesFormatWelsh(int hours, int minutes) {
         String hoursFullText = timeFormatWelsh(hours, "awr");
-        String minutesFullText = timeFormatWelsh(minutes, "munudau");
+        String minutesFullText = timeFormatWelsh(minutes, "munud");
 
         //The 'and' for minutes cannot be one as it is done in increments of 5. So minute number never starts with vowel.
         return concatWithWelshAnd(List.of(hoursFullText, minutesFullText), numberStartsWithVowel(minutes));
