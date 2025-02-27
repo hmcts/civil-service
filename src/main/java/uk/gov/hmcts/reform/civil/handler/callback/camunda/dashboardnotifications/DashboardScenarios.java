@@ -221,6 +221,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT("Scenario.AAA6.CP.Stay.Lifted.View.Documents.Task.Available.Defendant"),
     SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT("Scenario.AAA6.CP.Stay.Lifted.View.Documents.Task.Not.Available.Defendant"),
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant"),
+    SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.Update.CaseProceedsInCaseman.Claimant"),
     SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_FAST_TRACK("Scenario.AAA6.Update.CaseProceedsInCaseman.Defendant.FastTrack"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Claimant"),
     SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_DEFENDANT("Scenario.AAA6.CP.Trial.Arrangements.Relist.Hearing.Defendant"),
