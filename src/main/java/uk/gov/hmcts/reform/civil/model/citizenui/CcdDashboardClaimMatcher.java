@@ -5,8 +5,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -218,7 +216,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public Optional<LocalDateTime> getWhenWasHearingScheduled() {
-        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED))
+        return getMostRecentEventOfType(EnumSet.of(CaseEvent.HEARING_SCHEDULED, CaseEvent.GENERATE_HEARING_NOTICE_HMC))
             .map(CaseEventDetail::getCreatedDate);
     }
 
@@ -241,6 +239,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return CaseState.HEARING_READINESS.equals(caseData.getCcdState())
             && (hearingScheduledDate.isPresent())
             && !isTrialArrangementStatusActive()
+            && !isBundleCreatedStatusActive()
             && (orderDate.isEmpty()
             || orderDate.get().isBefore(hearingScheduledDate.get()));
     }
@@ -258,34 +257,15 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean isTrialArrangementStatusActive() {
-        Optional<LocalDate> hearingDate = getHearingDate();
-        if (caseData.isFastTrackClaim()
-            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState()) || CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(caseData.getCcdState()))
-            && !ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())
-            && hearingDate.isPresent()
-            && YesOrNo.YES.equals(caseData.getTrialReadyNotified())
-            && isHearingLessThanDaysAway(DAY_LIMIT)
-            && Objects.isNull(caseData.getTrialReadyChecked())
-            && !isBundleCreatedStatusActive()) {
-            Optional<LocalDateTime> lastOrder = getTimeOfLastNonSDOOrder();
-            return lastOrder.isEmpty()
-                || hearingDate.get().minusDays(DAY_LIMIT)
-                .isAfter(lastOrder.get().toLocalDate());
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public boolean isBundleCreatedStatusActive() {
         Optional<LocalDateTime> bundleDate = getBundleCreationDate();
         Optional<LocalDateTime> lastOrderDate = getTimeOfLastNonSDOOrder();
         return isHearingScheduled()
-            && caseData.getCcdState() == CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING
+            && (CaseState.HEARING_READINESS.equals(caseData.getCcdState())
+                || caseData.getCcdState() == CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
             && isHearingLessThanDaysAway(3 * 7)
             && bundleDate.isPresent()
             && (lastOrderDate.isEmpty()
-            || lastOrderDate.get().isBefore(bundleDate.get()));
+                || lastOrderDate.get().isBefore(bundleDate.get()));
     }
 }

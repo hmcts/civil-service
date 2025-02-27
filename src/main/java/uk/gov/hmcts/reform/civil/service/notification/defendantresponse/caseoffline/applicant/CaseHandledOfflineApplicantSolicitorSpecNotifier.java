@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandledOfflineApplicantSolicitorNotifier {
@@ -35,27 +36,42 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     }
 
     public void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData) {
-        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
         String templateID;
-
-        if (is1v1Or2v1Case(caseData)) {
-            templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
+        if (caseData.isLipvLROneVOne()) {
+            sendNotificationToLiPApplicant(caseData);
         } else {
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                templateID = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+            String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+            if (is1v1Or2v1Case(caseData)) {
+                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
             } else {
-                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
+                if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                    templateID = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+                } else {
+                    templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
+                }
+            }
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
+                sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
+            } else if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                sendNotificationToSolicitorSpec(caseData, recipient);
+            } else {
+                sendNotificationToSolicitor(caseData, recipient, templateID);
             }
         }
-        if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
-            sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
-        } else if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-            sendNotificationToSolicitorSpec(caseData, recipient);
-        } else {
-            sendNotificationToSolicitor(caseData, recipient, templateID);
-        }
 
+    }
+
+    private void sendNotificationToLiPApplicant(CaseData caseData) {
+        String emailTemplate = caseData.isClaimantBilingual()
+            ? notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()
+            : notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        notificationService.sendMail(
+            caseData.getApplicant1Email(),
+            emailTemplate,
+            addPropertiesLipApplicant(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
     }
 
     private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData, String recipient) {
@@ -85,6 +101,13 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         );
+    }
+
+    public Map<String, String> addPropertiesLipApplicant(CaseData caseData) {
+        return Map.of(
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+            );
     }
 
     public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData) {

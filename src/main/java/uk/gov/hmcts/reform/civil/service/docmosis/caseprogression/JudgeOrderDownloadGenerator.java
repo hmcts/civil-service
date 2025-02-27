@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -45,10 +46,12 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
     public DocmosisTemplates docmosisTemplate;
     private static final String DATE_FORMAT = "dd-MM-yyyy";
-    public static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band.";
-    public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
-    public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
-    public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s because %s.";
+    public static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not assigned a complexity band.";
+    public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not assigned a complexity band because %s.";
+    public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is assigned to complexity band %s.";
+    public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is assigned to complexity band %s because %s.";
+    public static final String ORDER_AFTER_HEARING_ON = "This order is made following a hearing on %s.";
+    public static final String ORDER_AFTER_HEARING_BETWEEN = "This order is made following a hearing between %s and %s.";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
@@ -103,7 +106,9 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     }
 
     public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
-        return getBaseTemplateData(caseData, authorisation).build();
+        return getBaseTemplateData(caseData, authorisation)
+            .orderAfterHearingDate(getOrderAfterHearingDateText(caseData))
+            .build();
     }
 
     public JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
@@ -182,4 +187,13 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
         return null;
     }
 
+    private String getOrderAfterHearingDateText(CaseData caseData) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
+        return switch (caseData.getOrderAfterHearingDate().getDateType()) {
+            case SINGLE_DATE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getDate().format(formatter));
+            case DATE_RANGE -> format(ORDER_AFTER_HEARING_BETWEEN, caseData.getOrderAfterHearingDate().getFromDate().format(formatter),
+                                      caseData.getOrderAfterHearingDate().getToDate().format(formatter));
+            case BESPOKE_RANGE -> format(ORDER_AFTER_HEARING_ON, caseData.getOrderAfterHearingDate().getBespokeDates());
+        };
+    }
 }

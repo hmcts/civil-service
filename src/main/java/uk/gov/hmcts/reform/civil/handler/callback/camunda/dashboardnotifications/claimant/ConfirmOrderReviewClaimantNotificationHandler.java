@@ -1,44 +1,41 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ConfirmOrderReviewNotificationHandler;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT;
 
 @Service
-public class ConfirmOrderReviewClaimantNotificationHandler extends CaseEventsDashboardCallbackHandler {
+public class ConfirmOrderReviewClaimantNotificationHandler extends ConfirmOrderReviewNotificationHandler {
 
-    private static final List<CaseEvent> EVENTS =
-        List.of(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT);
-    public static final String TASK_ID = "UpdateTaskListConfirmOrderReviewClaimant";
-    public static final String GA = "Applications";
+    private static final List<CaseEvent> CASE_EVENTS = List.of(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT);
+    private static final String TASK_ID = "UpdateTaskListConfirmOrderReviewClaimant";
+    private static final String USER_ROLE = "CLAIMANT";
 
-    public ConfirmOrderReviewClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public ConfirmOrderReviewClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                          DashboardNotificationsParamsMapper mapper,
-                                                         FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
-    }
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
-
-    @Override
-    public String getScenario(CaseData caseData) {
-        return null;
+                                                         FeatureToggleService featureToggleService,
+                                                         ObjectMapper objectMapper,
+                                                         DashboardNotificationService dashboardNotificationService,
+                                                         TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService,
+              objectMapper, USER_ROLE, TASK_ID, CASE_EVENTS,
+              dashboardNotificationService, taskListService);
     }
 
     @Override
@@ -48,24 +45,14 @@ public class ConfirmOrderReviewClaimantNotificationHandler extends CaseEventsDas
     }
 
     @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
+    public String getScenario(CaseData caseData) {
+        if (isOrderMadeFastTrackTrialNotResponded(caseData)) {
+            return SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT.getScenario();
+        }
+        return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
     }
 
-    @Override
-    public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        if (shouldRecordScenario(caseData)) {
-            dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                GA,
-                authToken
-            );
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
+        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 }

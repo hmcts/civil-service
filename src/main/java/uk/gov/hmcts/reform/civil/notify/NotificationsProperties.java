@@ -162,6 +162,9 @@ public class NotificationsProperties {
     private String respondentSolicitorNotifyToProceedSpecWithAction;
 
     @NotEmpty
+    private String respondentSolicitorNotifyToProceedInMediation;
+
+    @NotEmpty
     private String applicantSolicitor1DefaultJudgmentReceived;
 
     @NotEmpty
@@ -264,6 +267,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String noticeOfChangeOtherParties;
+
+    @NotEmpty
+    private String notifyNewDefendantSolicitorNOC;
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
@@ -429,6 +435,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantLipDeadlineExtension;
+
+    @NotEmpty
+    private String claimantLipDeadlineExtensionWelsh;
 
     @NotEmpty
     private String notifyClaimantLipTemplateManualDetermination;

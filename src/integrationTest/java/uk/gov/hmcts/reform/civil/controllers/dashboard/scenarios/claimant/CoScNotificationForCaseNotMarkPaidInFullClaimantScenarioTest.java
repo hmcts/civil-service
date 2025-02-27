@@ -53,10 +53,10 @@ public class CoScNotificationForCaseNotMarkPaidInFullClaimantScenarioTest extend
                 jsonPath("$[0].titleCy").value("Cadarnhau a yw dyled dyfarniad wedi'i thalu"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae diffynnydd a oedd arnynt arian ichi wedi dweud wrthym eu bod wedi talu’n llawn ar " + DateUtils.formatDateInWelsh(
-                        coscFullPaymentDate) +
+                        coscFullPaymentDate, false) +
                         ". Dylech <a href=\"{CONFIRM_YOU_HAVE_BEEN_PAID_URL}\" class=\"govuk-link\">gadarnhau os ydych wedi cael eich talu</a>." +
                         "<br><br>Os nad ydych wedi cael eich talu, bydd angen i chi ysgrifennu at y llys lle cyhoeddwyd y dyfarniad o fewn mis i " + DateUtils.formatDateInWelsh(
-                        coscFullPaymentDate) +
+                        coscFullPaymentDate, false) +
                         " fel y gall barnwr rhanbarth adolygu’r cais. Gallwch ddod o hyd i enw’r llys ar ochr dde uchaf y dyfarniad." +
                         " Yna gallwch <u>chwilio am fanylion cyswllt y llys</u> i gael y cyfeiriad.</p>"));
     }

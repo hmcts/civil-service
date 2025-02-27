@@ -99,6 +99,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
@@ -182,6 +185,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo parentClaimantIsApplicant;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
+    private final YesOrNo gaEaCourtLocation;
 
     @Builder.Default
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
@@ -624,6 +628,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
+    @Builder.Default
+    private final List<Element<CaseDocument>> hearingDocumentsWelsh = new ArrayList<>();
+
     // GA for LIP
     private final YesOrNo isGaApplicantLip;
     private final YesOrNo isGaRespondentOneLip;
@@ -699,6 +706,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joFullyPaymentMadeDate;
     private LocalDateTime joMarkedPaidInFullIssueDate;
     private LocalDateTime joDefendantMarkedPaidInFullIssueDate;
+    private LocalDateTime joJudgementByAdmissionIssueDate;
     private CoscRPAStatus joCoscRpaStatus;
     private String joOrderedAmount;
     private String joCosts;
@@ -706,6 +714,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joIsDisplayInJudgmentTab;
     private String joRepaymentSummaryObject;
     private YesOrNo respondForImmediateOption;
+    private LocalDateTime joDJCreatedDate;
 
     private final TransferCaseDetails transferCaseDetails;
 
@@ -772,6 +781,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
+
+    //QueryManagement
+    private final CaseQueriesCollection qmApplicantSolicitorQueries;
+    private final CaseQueriesCollection qmRespondentSolicitor1Queries;
+    private final CaseQueriesCollection qmRespondentSolicitor2Queries;
+    private final CaseMessage caseMessage;
+    private final LatestQuery qmLatestQuery;
 
     private List<DocumentToKeepCollection> documentToKeepCollection;
 
