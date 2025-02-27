@@ -227,7 +227,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
 
@@ -252,7 +253,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
 
@@ -277,7 +279,8 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
-                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
 
@@ -1192,7 +1195,8 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
 
@@ -1218,7 +1222,8 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                REFER_JUDGE_DEFENCE_RECEIVED
             )
         ),
 
