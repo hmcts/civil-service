@@ -23,6 +23,9 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC;
+import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -54,7 +57,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         boolean shouldSendEmailToDefendantLR = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
         if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
-                shouldSendEmailToDefendantLR || isIntermediateOrMultiClaimProceedForLipVsLR(caseData)
+                shouldSendEmailToDefendantLR || isIntermediateOrMultiClaimProceedForLipVsLR(caseData) || isClaimantNotProcessLipVsLRWithNoc(caseData)
                     ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
                 getEmailTemplate(caseData, shouldSendEmailToDefendantLR),
                 addProperties(caseData),
@@ -67,6 +70,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private String getEmailTemplate(CaseData caseData, boolean shouldSendEmailToDefendantLR) {
         if (isIntermediateOrMultiClaimProceedForLipVsLR(caseData)) {
             return notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
+        }
+        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
+            return notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
         }
         if (shouldSendEmailToDefendantLR) {
             return notificationsProperties.getNotifyDefendantLRForMediation();
@@ -115,6 +121,17 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                           APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
         }
+        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
+            return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                          CLAIM_REFERENCE_NUMBER,
+                          caseData.getCcdCaseReference().toString(),
+                          CLAIM_LEGAL_ORG_NAME_SPEC,
+                          getRespondentLegalOrganizationName(
+                              caseData.getRespondent1OrganisationPolicy(),
+                              organisationService
+                          )
+            );
+        }
         if (shouldSendMediationNotificationDefendant1LRCarm(
             caseData,
             featureToggleService.isCarmEnabledForCase(caseData)
@@ -132,12 +149,26 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         );
     }
 
+    private boolean isFullDefenceStatesPaid(CaseData caseData) {
+        return HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
+            && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
+    }
+
     private boolean isIntermediateOrMultiClaimProceedForLipVsLR(CaseData caseData) {
         List<String> responseClaimTrack = Arrays.asList("INTERMEDIATE_CLAIM", "MULTI_CLAIM");
         return responseClaimTrack.contains(caseData.getResponseClaimTrack())
             && caseData.isLipvLROneVOne()
-            && caseData.getApplicant1ProceedWithClaim().equals(
-            YesOrNo.YES)
+            && (isFullDefenceStatesPaid(caseData)
+                || YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim()))
             && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
+
+    private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
+        return caseData.isLipvLROneVOne()
+            && (
+                (isFullDefenceStatesPaid(caseData) && YES.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
+                || YesOrNo.NO.equals(caseData.getApplicant1ProceedWithClaim()))
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData);
+    }
+
 }
