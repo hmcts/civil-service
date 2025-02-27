@@ -282,7 +282,8 @@ class FlowStateAllowedEventServiceTest {
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         SET_ASIDE_JUDGMENT,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -307,7 +308,8 @@ class FlowStateAllowedEventServiceTest {
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         SET_ASIDE_JUDGMENT,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -332,7 +334,8 @@ class FlowStateAllowedEventServiceTest {
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         SET_ASIDE_JUDGMENT,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -373,7 +376,8 @@ class FlowStateAllowedEventServiceTest {
                         SET_ASIDE_JUDGMENT,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
