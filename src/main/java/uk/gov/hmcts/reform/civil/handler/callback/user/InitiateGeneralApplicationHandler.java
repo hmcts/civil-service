@@ -114,7 +114,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()
-                || caseData.isRespondentResponseBilingual()) {
+                || (caseData.isRespondentResponseBilingual() && !caseData.isLipvLROneVOne())) {
+                errors.add(LR_VS_LIP);
+            } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
+                && caseData.isClaimantBilingual()) {
                 errors.add(LR_VS_LIP);
             } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                               .getCaseManagementLocation().getBaseLocation()))) {
@@ -188,7 +191,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             );
             return !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
         } else {
-            return false;
+            return true;
         }
     }
 
