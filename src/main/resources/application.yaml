@@ -277,6 +277,7 @@ notifications:
   respondentSolicitorNotifyToProceedSpec: "fad116e6-ea5e-4ff4-a07c-e9156dbb7f84"
   claimantSolicitorConfirmsToProceedSpecWithAction: "16d84581-e5e8-417d-9ade-a7c94d500138"
   respondentSolicitorNotifyToProceedSpecWithAction: "7ec2ac5f-b12e-4b3a-a4da-cdd54c393917"
+  respondentSolicitorNotifyToProceedInMediation: "e231e271-93b9-49e8-99d3-5b3ceac4b3af"
   applicantSolicitor1DefaultJudgmentReceived: "bceecea2-b70e-4288-be31-0a4203b31f3e"
   claimantSolicitorCounterClaimForSpec: "082c6017-9bcf-4227-bc0a-bcfec2b8ebf4"
   respondentSolicitorCounterClaimForSpec: "cb31a195-2a9f-4229-9abf-7f4935260ee1"
