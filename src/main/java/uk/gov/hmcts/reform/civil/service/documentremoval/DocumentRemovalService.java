@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import java.util.Optional;
 
 import static java.lang.String.format;
 
-@AllArgsConstructor
 @Service
 @Slf4j
 public class DocumentRemovalService {
@@ -35,10 +33,18 @@ public class DocumentRemovalService {
     private static final String DOCUMENT_UPLOAD_TIMESTAMP = "upload_timestamp";
     private static final String VALUE_KEY = "value";
     private final ObjectMapper objectMapper;
+
+    public DocumentRemovalService(ObjectMapper objectMapper, DocumentManagementService documentManagementService,
+                                  @Value("${docStore.doc.removal.enabled:false}") boolean docStoreRemovalEnabled) {
+        this.objectMapper = objectMapper;
+        this.documentManagementService = documentManagementService;
+        this.docStoreRemovalEnabled = docStoreRemovalEnabled;
+    }
+
     private final DocumentManagementService documentManagementService;
 
     @Value("${docStore.doc.removal.enabled:false}")
-    private final  Boolean docStoreRemovalEnabled;
+    private final Boolean docStoreRemovalEnabled;
 
     public List<DocumentToKeepCollection> getCaseDocumentsList(CaseData caseData) {
         JsonNode root = objectMapper.valueToTree(caseData);

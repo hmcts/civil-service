@@ -555,6 +555,10 @@ feign:
       document-management-metadata-download-api:
         loggerLevel: full
 
+docStore:
+  doc:
+    removal:
+      enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
 ---
 
 spring:
@@ -731,11 +735,6 @@ reference:
 
 document_management:
   url: ${DOCUMENT_MANAGEMENT_URL:http://fake-document-management-api}
-
-docStore:
-  doc:
-    removal:
-      enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
 
 docmosis:
   tornado:
