@@ -1,18 +1,14 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Immutable;
-import uk.gov.hmcts.reform.dashboard.cache.CacheConfig;
 
-import javax.persistence.Cacheable;
+import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -20,8 +16,6 @@ import java.util.Date;
 @lombok.AllArgsConstructor
 @Entity
 @Immutable
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = CacheConfig.READ_ONLY_ENTITY)
 @Table(name = "dashboard_notifications_templates", schema = "dbs")
 public class NotificationTemplateEntity implements Serializable {
 
