@@ -240,7 +240,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     public JudgmentByAdmissionOrDetermination toNonDivergentWelshDocs(CaseData caseData, JudgmentByAdmissionOrDetermination builder) {
         return builder.toBuilder()
-            .welshDate(formatDateInWelsh(LocalDate.now()))
+            .welshDate(formatDateInWelsh(LocalDate.now(), false))
             .welshPayByDate(getWelshPayByDate(caseData))
             .welshRepaymentDate(getWelshRepaymentDate(caseData))
             .welshRepaymentFrequency(caseData.isPayByInstallment()
@@ -255,7 +255,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             DateFormatHelper.formatLocalDate(
                 caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(),
                 DateFormatHelper.DATE
-            ), dateTimeFormatter)) : null;
+            ), dateTimeFormatter), false) : null;
     }
 
     private String getWelshRepaymentDate(CaseData caseData) {
@@ -263,7 +263,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             ? formatDateInWelsh(LocalDate.parse(DateFormatHelper.formatLocalDate(
             caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(),
             DateFormatHelper.DATE
-        ), dateTimeFormatter)) : null;
+        ), dateTimeFormatter), false) : null;
     }
 
     private String getRepaymentString(PaymentFrequencyLRspec repaymentFrequency) {

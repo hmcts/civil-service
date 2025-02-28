@@ -23,21 +23,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
   cache:
-    type: jcache
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
-  jpa:
-    properties:
-      hibernate:
-        cache:
-          use_second_level_cache: true
-          region:
-            factory_class: jcache
-        javax:
-          cache:
-            provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
-
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
@@ -229,10 +217,10 @@ dashboard:
 
 logging:
   level:
-    org.springframework.cache: DEBUG    # Spring Cache Abstraction
-    javax.cache: DEBUG                  # JCache API (general caching)
-    com.github.benmanes.caffeine.cache: TRACE  # Caffeine specific logs
-    org.hibernate.cache: DEBUG           # Hibernate 2nd Level Cache (if use
+    org.springframework.cache: INFO    # Spring Cache Abstraction
+    javax.cache: INFO                  # JCache API (general caching)
+    com.github.benmanes.caffeine.cache: INFO  # Caffeine specific logs
+    org.hibernate.cache: INFO           # Hibernate 2nd Level Cache (if use
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
@@ -289,6 +277,7 @@ notifications:
   respondentSolicitorNotifyToProceedSpec: "3ff54f97-76de-47a1-a381-680e2830fba8"
   claimantSolicitorConfirmsToProceedSpecWithAction: "5d20822e-3a92-458d-94aa-2e989e192c7e"
   respondentSolicitorNotifyToProceedSpecWithAction: "78856c57-8f78-4d5e-9abe-66f6cb0f07d6"
+  respondentSolicitorNotifyToProceedInMediation: "e231e271-93b9-49e8-99d3-5b3ceac4b3af"
   applicantSolicitor1DefaultJudgmentReceived: "bceecea2-b70e-4288-be31-0a4203b31f3e"
   claimantSolicitorCounterClaimForSpec: "082c6017-9bcf-4227-bc0a-bcfec2b8ebf4"
   respondentSolicitorCounterClaimForSpec: "cb31a195-2a9f-4229-9abf-7f4935260ee1"
@@ -697,37 +686,16 @@ spring:
       connectionTimeout: 10000
       idleTimeout: 30000
       maxLifetime: 60000
-  cache:
-    type: jcache
-    cache-names: userInfoCache, accessTokenCache
-    caffeine:
-      spec: expireAfterWrite=3600s
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       naming:
         physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
-
     properties:
       hibernate:
-        jdbc:
-          timeout: 300
         show_sql: false
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        cache:
-          use_second_level_cache: true
-          use_query_cache: true
-          region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
-          region:
-            factory_class: jcache
-        javax:
-          cache:
-            provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
-          persistence:
-            query:
-              timeout: 300000  # 5 minutes (in milliseconds)
-
   flyway:
     enabled: true
     baselineOnMigrate: true

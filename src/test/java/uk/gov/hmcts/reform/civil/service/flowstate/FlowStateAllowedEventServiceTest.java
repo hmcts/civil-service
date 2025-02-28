@@ -267,7 +267,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_SUBMITTED,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -291,7 +290,6 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -313,7 +311,6 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         NOC_REQUEST,
                         APPLY_NOC_DECISION,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -346,7 +343,6 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -385,7 +381,6 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         DISCONTINUE_CLAIM,
                         WITHDRAW_CLAIM,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -419,7 +414,6 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -471,7 +465,6 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -514,7 +507,6 @@ class FlowStateAllowedEventServiceTest {
                         INFORM_AGREED_EXTENSION_DATE,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -555,7 +547,6 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
@@ -607,7 +598,6 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -640,7 +630,6 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -673,7 +662,6 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -704,7 +692,6 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
                         TAKE_CASE_OFFLINE,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -733,7 +720,6 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -764,7 +750,6 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -793,7 +778,6 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -827,7 +811,6 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -882,7 +865,6 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -906,7 +888,6 @@ class FlowStateAllowedEventServiceTest {
                     CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE,
                     new CaseEvent[] {
                         CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -925,7 +906,6 @@ class FlowStateAllowedEventServiceTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                     new CaseEvent[] {
                         CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         NotSuitable_SDO,
                         REQUEST_FOR_RECONSIDERATION,
@@ -943,15 +923,13 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
                     new CaseEvent[] {
-                        CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE
+                        CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
                     new CaseEvent[] {
-                        CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE
+                        CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
@@ -973,7 +951,6 @@ class FlowStateAllowedEventServiceTest {
                     PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[] {
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -991,7 +968,6 @@ class FlowStateAllowedEventServiceTest {
                     PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[] {
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -1018,57 +994,49 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        ADD_CASE_NOTE,
                         AMEND_RESTITCH_BUNDLE,
                         asyncStitchingComplete
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_BY_STAFF,
-                    new CaseEvent[] {
-                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
+                    new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
-                    new CaseEvent[] {
-                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
+                    new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
-                    new CaseEvent[] {
-                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
+                    new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
-                    new CaseEvent[] {
-                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
+                    new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
-                    new CaseEvent[] {
-                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
+                    new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
-                    new CaseEvent[] {
-                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
+                    new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
-                    new CaseEvent[] {
-                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM,
+                    new CaseEvent[] { APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
                 ),
@@ -1112,7 +1080,6 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         NotSuitable_SDO,
@@ -1219,7 +1186,6 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         NOC_REQUEST,
                         APPLY_NOC_DECISION,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -1272,7 +1238,6 @@ class FlowStateAllowedEventServiceTest {
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_OR_AMEND_CLAIM_DOCUMENTS,
-                        ADD_CASE_NOTE,
                         AMEND_PARTY_DETAILS,
                         ACKNOWLEDGEMENT_OF_SERVICE,
                         INFORM_AGREED_EXTENSION_DATE,
@@ -1485,7 +1450,6 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK
                     }
@@ -1521,7 +1485,6 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
                         ORDER_REVIEW_OBLIGATION_CHECK
@@ -1566,7 +1529,6 @@ class FlowStateAllowedEventServiceTest {
                         FULL_REMISSION_HWF,
                         UPDATE_HELP_WITH_FEE_NUMBER,
                         INVALID_HWF_REFERENCE,
-                        ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
                         ORDER_REVIEW_OBLIGATION_CHECK
@@ -1609,22 +1571,19 @@ class FlowStateAllowedEventServiceTest {
                     PART_ADMIT_REJECT_REPAYMENT,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                        ADD_CASE_NOTE
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC
                     }
                 ),
                 of(
                     PART_ADMIT_PROCEED,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        ADD_CASE_NOTE
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
                     }
                 ),
                 of(
                     PART_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        ADD_CASE_NOTE
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
                     }
                 ),
                 of(
@@ -1636,24 +1595,23 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        REQUEST_JUDGEMENT_ADMISSION_SPEC
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        JUDGMENT_PAID_IN_FULL,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
                     PART_ADMIT_AGREE_SETTLE,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        ADD_CASE_NOTE
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
                     }
                 ),
                 of(
                     FULL_ADMIT_PAY_IMMEDIATELY,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        ADD_CASE_NOTE,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC
                     }
                 ),
@@ -1666,8 +1624,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     FULL_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        ADD_CASE_NOTE
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
                     }
                 ),
                 of(
@@ -1676,8 +1633,7 @@ class FlowStateAllowedEventServiceTest {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
-                        SET_ASIDE_JUDGMENT,
-                        ADD_CASE_NOTE
+                        SET_ASIDE_JUDGMENT
                     }
                 ),
                 of(
@@ -1712,7 +1668,6 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         ADD_UNAVAILABLE_DATES,
                         SET_ASIDE_JUDGMENT,
@@ -1771,8 +1726,7 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        ADD_CASE_NOTE
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
                     }
                 ),
                 of(
@@ -1831,7 +1785,6 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DISMISS_CLAIM,
                         migrateCase,
-                        ADD_CASE_NOTE,
                         AMEND_RESTITCH_BUNDLE,
                         asyncStitchingComplete
                     }
@@ -1852,7 +1805,6 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         CASE_PROCEEDS_IN_CASEMAN,
                         DISMISS_CLAIM,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -1941,7 +1893,6 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         CASE_PROCEEDS_IN_CASEMAN,
                         AMEND_PARTY_DETAILS,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
@@ -2023,7 +1974,6 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
-                        ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         ADD_UNAVAILABLE_DATES,
                         LIP_CLAIM_SETTLED,
@@ -2065,7 +2015,6 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CONFIRM_ORDER_REVIEW,
                         COURT_OFFICER_ORDER,
@@ -2113,7 +2062,6 @@ class FlowStateAllowedEventServiceTest {
                         CUI_UPLOAD_MEDIATION_DOCUMENTS,
                         TRANSFER_ONLINE_CASE,
                         COURT_OFFICER_ORDER,
-                        ADD_CASE_NOTE,
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
@@ -2149,7 +2097,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_BY_STAFF,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -2157,7 +2104,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -2165,7 +2111,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -2173,7 +2118,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -2181,7 +2125,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -2189,7 +2132,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -2197,7 +2139,6 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -2205,14 +2146,12 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_SDO_NOT_DRAWN,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         migrateCase
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_SDO,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE,
                         AMEND_PARTY_DETAILS
                     }
                 ),
@@ -2227,7 +2166,8 @@ class FlowStateAllowedEventServiceTest {
                         LIP_CLAIM_SETTLED,
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
-                        ADD_CASE_NOTE
+                        JUDGMENT_PAID_IN_FULL,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -2235,8 +2175,7 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                        LIP_CLAIM_SETTLED,
-                        ADD_CASE_NOTE
+                        LIP_CLAIM_SETTLED
                     }
                 ),
                 of(
@@ -2256,9 +2195,9 @@ class FlowStateAllowedEventServiceTest {
                         STAY_CASE,
                         DISMISS_CASE,
                         MANAGE_STAY,
-                        ADD_CASE_NOTE,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
@@ -2273,7 +2212,6 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         NO_REMISSION_HWF,
                         LIP_CLAIM_SETTLED,
-                        ADD_CASE_NOTE,
                         CITIZEN_CLAIM_ISSUE_PAYMENT
                     }
                 ),
@@ -2283,7 +2221,6 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
                         CHANGE_SOLICITOR_EMAIL,
-                        ADD_CASE_NOTE,
                         ORDER_REVIEW_OBLIGATION_CHECK
                     }
                 ),
@@ -2291,15 +2228,13 @@ class FlowStateAllowedEventServiceTest {
                     SIGN_SETTLEMENT_AGREEMENT,
                     new CaseEvent[] {
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                        LIP_CLAIM_SETTLED,
-                        ADD_CASE_NOTE
+                        LIP_CLAIM_SETTLED
                     }
                 ),
                 of(
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
                     new CaseEvent[] {
-                        CASE_PROCEEDS_IN_CASEMAN,
-                        ADD_CASE_NOTE
+                        CASE_PROCEEDS_IN_CASEMAN
                     }
                 )
             );
@@ -2660,7 +2595,7 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
-            .isEqualTo(true);
+            .isTrue();
     }
 
     @Test
@@ -2669,7 +2604,7 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
-            .isEqualTo(true);
+            .isTrue();
     }
 
     @Test
@@ -2678,7 +2613,7 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
-            .isEqualTo(true);
+            .isTrue();
     }
 
     @Test
@@ -2687,14 +2622,14 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UpdateNextHearingInfo))
-            .isEqualTo(true);
+            .isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenAddCaseNoteEvent_forMediationUnsuccessfulProceedFlowstate() {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateMediationUnsuccessful().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, ADD_CASE_NOTE))
-            .isEqualTo(true);
+            .isTrue();
     }
 
     @Test
@@ -2703,7 +2638,7 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
-            .isEqualTo(true);
+            .isTrue();
     }
 
     @Test

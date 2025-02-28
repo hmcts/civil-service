@@ -29,7 +29,7 @@ def versions = [
   jackson           : '2.18.2',
   testcontainers    : '1.20.3',
   pdfbox            : '3.0.2',
-  tika              : '2.9.2'
+  tika              : '2.9.3'
 ]
 
 allprojects {
@@ -368,7 +368,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.7'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.8'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -390,8 +390,6 @@ dependencies {
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.8'
-  implementation group:'org.hibernate', name: 'hibernate-jcache', version: '5.6.15.Final'
-  implementation group:'com.github.ben-manes.caffeine', name: 'jcache', version: '3.1.8'
 
   implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
@@ -409,7 +407,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.98'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.34'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.27'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.5'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -452,9 +450,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.6:all'
-  testImplementation group:'org.hibernate', name: 'hibernate-jcache', version: '5.6.15.Final'
-  testImplementation group:'com.github.ben-manes.caffeine', name: 'jcache', version: '3.1.8'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.7:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
@@ -466,10 +462,6 @@ dependencies {
 
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.4')
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.4')
-  integrationTestImplementation group:'org.hibernate', name: 'hibernate-jcache', version: '5.6.15.Final'
-  integrationTestImplementation group:'com.github.ben-manes.caffeine', name: 'jcache', version: '3.1.8'
-
-  // dashboard specific changes
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
