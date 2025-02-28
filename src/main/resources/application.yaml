@@ -770,6 +770,11 @@ rd_commondata:
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:fake-key}
+
+docStore:
+  doc:
+    removal:
+      enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
 ---
 
 spring:
