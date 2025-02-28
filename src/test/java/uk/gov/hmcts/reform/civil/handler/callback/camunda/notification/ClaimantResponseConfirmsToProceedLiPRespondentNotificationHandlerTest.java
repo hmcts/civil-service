@@ -405,8 +405,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CASEMAN_REF, caseData.getLegacyCaseReference()
-                APPLICANT_ONE_NAME, "Mr. John Rambo",
+                CASEMAN_REF, caseData.getLegacyCaseReference(),
+                APPLICANT_ONE_NAME, "Mr. John Rambo"
             );
         }
 
