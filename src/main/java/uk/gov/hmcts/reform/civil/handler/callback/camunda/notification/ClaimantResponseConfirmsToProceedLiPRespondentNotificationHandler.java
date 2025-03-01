@@ -139,16 +139,12 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             featureToggleService.isCarmEnabledForCase(caseData)
         )) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER,
-                caseData.getCcdCaseReference().toString(),
-                CLAIM_LEGAL_ORG_NAME_SPEC,
-                getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
-                APPLICANT_ONE_NAME,
-                getPartyNameBasedOnType(caseData.getApplicant1()),
-                CASEMAN_REF,
-                caseData.getLegacyCaseReference(),
-                PARTY_REFERENCES,
-                buildPartiesReferencesEmailSubject(caseData)
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), 
+                                                                              organisationService),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference(),
+                APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
         }
         return Map.of(

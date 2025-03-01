@@ -123,7 +123,8 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             RESPONDENT_NAME, getPartyNameBasedOnType(respondent),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),
-            RESPONSE_INTENTION, getResponseIntentionForEmail(caseData)
+            RESPONSE_INTENTION, getResponseIntentionForEmail(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

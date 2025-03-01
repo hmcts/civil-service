@@ -170,6 +170,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
                             .organisation(Organisation.builder().organisationID("HR2D876").build())
                             .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                             .build())
+                    .ccdCaseReference(12345L)
                     .applicantSolicitor1UserDetails(
                             IdamUserDetails.builder().id("submitter-id").email("applicantsolicitor@example.com").build())
                     .build();

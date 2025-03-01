@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID_CC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -358,7 +359,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),
                 RESPONSE_INTENTION, getResponseIntentionForEmail(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

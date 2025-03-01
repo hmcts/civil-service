@@ -68,7 +68,8 @@ public class LitigationFriendAddedApplicantNotificationHandler extends CallbackH
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }

@@ -110,7 +110,8 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             AGREED_EXTENSION_DATE, formatLocalDate(extensionDate.toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            DEFENDANT_NAME, fetchDefendantName(caseData)
+            DEFENDANT_NAME, fetchDefendantName(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 

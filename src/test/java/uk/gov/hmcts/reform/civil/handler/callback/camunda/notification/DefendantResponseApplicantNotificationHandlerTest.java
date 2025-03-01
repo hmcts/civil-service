@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.De
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -602,7 +603,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                     RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                     PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                    ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
+                    ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
+                    CASEMAN_REF, "000DC001"
                 );
             } else {
                 //if there are 2 respondents on the case, concatenate the names together for the template subject line
@@ -614,7 +616,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                         .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
                     PARTY_REFERENCES, is1v2DS ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234"
                     : "Claimant reference: 12345 - Defendant reference: 6789",
-                    ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
+                    ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
+                    CASEMAN_REF, "000DC001"
                 );
             }
         }
@@ -624,7 +627,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -641,7 +645,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 

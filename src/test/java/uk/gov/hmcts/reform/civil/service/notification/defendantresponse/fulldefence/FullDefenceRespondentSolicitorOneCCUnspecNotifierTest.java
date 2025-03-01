@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
@@ -81,7 +82,8 @@ class FullDefenceRespondentSolicitorOneCCUnspecNotifierTest {
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
+                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
+                CASEMAN_REF, "000DC001"
             );
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
@@ -92,7 +94,8 @@ class FullDefenceRespondentSolicitorOneCCUnspecNotifierTest {
                     .concat(" and ")
                     .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
+                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
+                CASEMAN_REF, "000DC001"
             );
         }
     }

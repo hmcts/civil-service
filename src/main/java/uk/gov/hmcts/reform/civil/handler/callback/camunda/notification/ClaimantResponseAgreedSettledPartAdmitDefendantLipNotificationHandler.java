@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -55,12 +56,16 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
