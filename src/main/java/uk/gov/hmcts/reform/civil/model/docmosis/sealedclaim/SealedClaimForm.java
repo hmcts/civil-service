@@ -26,6 +26,7 @@ public class SealedClaimForm implements MappableObject {
     private final List<Party> applicants;
     private final List<Party> respondents;
     private final String referenceNumber;
+    private final String ccdCaseReference;
     private final String applicantExternalReference;
     private final String respondent1ExternalReference;
     private final String respondent2ExternalReference;
