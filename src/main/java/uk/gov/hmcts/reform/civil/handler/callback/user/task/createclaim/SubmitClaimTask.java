@@ -187,9 +187,7 @@ public class SubmitClaimTask {
 
         populateWithPartyIds(dataBuilder);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            dataBuilder.anyRepresented(YES);
-        }
+        dataBuilder.anyRepresented(YES);
 
         if (caseData.getSdtRequestIdFromSdt() != null) {
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed

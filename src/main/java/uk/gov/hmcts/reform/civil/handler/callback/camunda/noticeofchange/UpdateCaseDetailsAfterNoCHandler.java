@@ -228,9 +228,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent2Represented(YES)
             .defendant2LIPAtClaimIssued(NO);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            caseDataBuilder.anyRepresented(YES);
-        }
+        caseDataBuilder.anyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
@@ -260,9 +258,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent1Represented(YES)
             .defendant1LIPAtClaimIssued(NO);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            caseDataBuilder.anyRepresented(YES);
-        }
+        caseDataBuilder.anyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)
@@ -302,9 +298,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         caseDataBuilder.applicantSolicitor1PbaAccounts(null)
             .applicantSolicitor1PbaAccountsIsEmpty(YES);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            caseDataBuilder.anyRepresented(YES);
-        }
+        caseDataBuilder.anyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder
