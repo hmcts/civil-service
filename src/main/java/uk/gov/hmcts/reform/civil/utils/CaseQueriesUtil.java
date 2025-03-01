@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.assertj.core.util.Strings;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
@@ -15,6 +17,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 
 public class CaseQueriesUtil {
 
@@ -31,6 +35,10 @@ public class CaseQueriesUtil {
             return caseData.getQmRespondentSolicitor1Queries();
         } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getQmRespondentSolicitor2Queries();
+        } else if (isLIPClaimant(roles)) {
+            return caseData.getQmApplicantCitizenQueries();
+        } else if (isLIPDefendant(roles)) {
+            return caseData.getQmRespondentCitizenQueries();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
@@ -78,7 +86,15 @@ public class CaseQueriesUtil {
             .map(caseMessage -> LatestQuery.builder()
                 .queryId(caseMessage.getId())
                 .isHearingRelated(caseMessage.getIsHearingRelated())
+                .isAdditionalQuestion(isAdditionalQuestion(caseMessage))
                 .build())
             .orElse(null);
+    }
+
+    private static YesOrNo isAdditionalQuestion(CaseMessage message) {
+        if (Strings.isNullOrEmpty(message.getParentId())) {
+            return YesOrNo.NO;
+        }
+        return message.getCreatedBy().contains("Admin") ? YesOrNo.NO : YesOrNo.YES;
     }
 }
