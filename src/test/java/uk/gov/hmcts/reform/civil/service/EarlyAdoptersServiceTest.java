@@ -26,13 +26,13 @@ class EarlyAdoptersServiceTest {
     @CsvSource({
         "true, true",
         "false, false"})
-    void isPartOfHmcEarlyAdoptersRollout(boolean isCmlWhiteListed, boolean expected) {
+    void isPartOfHmcLipEarlyAdoptersRollout(boolean isCmlWhiteListed, boolean expected) {
         String caseManagementLocation = "111111";
 
         when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(caseManagementLocation)))
             .thenReturn(isCmlWhiteListed);
 
-        boolean actual = earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(
+        boolean actual = earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(
             caseDataWithCML(caseManagementLocation));
 
         assertEquals(expected, actual);

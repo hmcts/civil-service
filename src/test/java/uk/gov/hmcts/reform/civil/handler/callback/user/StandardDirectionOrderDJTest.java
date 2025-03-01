@@ -61,7 +61,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -941,52 +940,23 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldPopulateHmcEarlyAdoptersFlag_whenPartOfNationalRolloutAndNationalRolloutEnabled(Boolean isLocationWhiteListed) {
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
-            .build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-            .toBuilder()
-            .disposalHearingMethodInPersonDJ(options)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
-            isLocationWhiteListed);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getHmcEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
     @CsvSource({
-        //LR scenarios trigger hmcEaCourt and ignore hmcLipEnabled
-        "true, YES, YES, YES, YES",
-        "false, YES, YES, YES, NO",
+        //LR scenarios trigger and ignore hmcLipEnabled
+        "true, YES, YES, YES",
+        "false, YES, YES, YES",
         // LiP vs LR - ignore HMC court
-        "true,  NO, YES, NO,",
-        "false,  NO, YES, NO,",
+        "true,  NO, YES, NO",
+        "false,  NO, YES, NO",
         //LR vs LiP - ignore HMC court
-        "true, YES, NO, YES,",
-        "false, YES, NO, NO,",
+        "true, YES, NO, YES",
+        "false, YES, NO, NO",
         //LiP vs LiP - ignore HMC court
-        "true, NO, NO, YES,",
-        "false, NO, NO, NO,"
+        "true, NO, NO, YES",
+        "false, NO, NO, NO"
     })
     void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
                                                              YesOrNo respondent1Represented,
-                                                             YesOrNo eaCourtLocation, YesOrNo hmcEaCourtLocation) {
+                                                             YesOrNo eaCourtLocation) {
 
         if (NO.equals(respondent1Represented)) {
             when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
@@ -1010,7 +980,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
-        assertEquals(hmcEaCourtLocation, responseCaseData.getHmcEaCourtLocation());
     }
 
     @Test
