@@ -45,7 +45,7 @@ public class GeneralApplicationHwfMoreInfoScenarioTest extends BaseIntegrationTe
                         "If you’ve already read the email and taken action, you can disregard this message.</p>" +
                         "<p class=\"govuk-body\">You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae arnom angen mwy o wybodaeth ar gyfer eich cais am help i dalu'r ffi gwneud ${applicationFeeTypeCy}.</p>" +
+                    "<p class=\"govuk-body\">Mae arnom angen mwy o wybodaeth ar gyfer eich cais am help i dalu'r ffi ${applicationFeeTypeCy}.</p>" +
                         "<p class=\"govuk-body\">Anfonwyd e-bost atoch gyda rhagor o fanylion. " +
                         "Os ydych wedi darllen yr e-bost yn barod ac wedi gweithredu, gallwch anwybyddu'r neges hon.</p>" +
                         "<p class=\"govuk-body\">Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
