@@ -168,7 +168,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     private String getRecipient(CaseData caseData, boolean isApplicantLip) {
-        return isApplicantLip ? caseData.getClaimantUserDetails().getEmail()
+        return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
