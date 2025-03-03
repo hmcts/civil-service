@@ -248,11 +248,14 @@ public class NotificationUtils {
                 stringBuilder.append(" - ");
             }
             stringBuilder.append("Defendant 2 reference: ");
-            if (caseData.getRespondentSolicitor2Reference() != null) {
-                stringBuilder.append(caseData.getRespondentSolicitor2Reference());
-            } else {
-                stringBuilder.append(REFERENCE_NOT_PROVIDED);
-            }
+            String respondent2Reference = caseData.getSolicitorReferences() != null
+                && caseData.getSolicitorReferences().getRespondentSolicitor2Reference() != null
+                ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference()
+                : caseData.getRespondentSolicitor2Reference() != null
+                ? caseData.getRespondentSolicitor2Reference()
+                : REFERENCE_NOT_PROVIDED;
+            stringBuilder.append(respondent2Reference);
+
         }
         return stringBuilder.toString();
     }
