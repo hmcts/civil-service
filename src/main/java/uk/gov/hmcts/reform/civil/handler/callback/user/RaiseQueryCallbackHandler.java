@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -82,7 +83,9 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().qmLatestQuery(
-                buildLatestQuery(latestCaseMessage)).build().toMap(objectMapper))
+                buildLatestQuery(latestCaseMessage))
+                      .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
+                      .build().toMap(objectMapper))
             .build();
     }
 
