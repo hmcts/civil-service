@@ -21,12 +21,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Collections;
 import java.util.Map;
 
@@ -54,6 +56,8 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 @ExtendWith(MockitoExtension.class)
 public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
 
+    private static final LocalDateTime date = LocalDateTime.of(2025, Month.MARCH, 3, 9, 3);
+
     @Mock
     private NotificationService notificationService;
 
@@ -71,6 +75,9 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
 
     @Mock
     private Time time;
@@ -93,6 +100,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 .thenReturn("template-id");
             when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
+            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
 
             // Given
             CaseData caseData = getCaseData("testorg@email.com");
@@ -114,6 +122,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldNotNotifyRespondent1Solicitor_whenNoEmailIsEntered() {
+            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
+
             // Given
             CaseData caseData = getCaseData(null);
             CallbackParams params = getCallbackParams(caseData);
@@ -127,6 +137,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
+            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
             given(pipLetterGenerator.downloadLetter(any(), any())).willReturn(LETTER_CONTENT);
 
             when(notificationsProperties.getRespondentDefendantResponseForSpec())
@@ -175,6 +186,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
 
             // Given
             CaseData caseData = getCaseData("testorg@email.com");

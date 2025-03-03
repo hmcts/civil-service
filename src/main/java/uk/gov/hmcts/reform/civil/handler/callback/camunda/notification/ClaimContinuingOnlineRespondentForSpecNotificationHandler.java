@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -45,6 +46,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final DeadlinesCalculator deadlinesCalculator;
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -71,7 +73,16 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
         final CaseData.CaseDataBuilder caseDataBuilder
             = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
-        String targetEmail = isRespondent1Event(callbackParams)
+
+        boolean isRespondent1Event = isRespondent1Event(callbackParams);
+
+        if (isRespondent1Event) {
+            caseDataBuilder.respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(time.now()));
+        } else {
+            caseDataBuilder.respondent2ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(time.now()));
+        }
+
+        String targetEmail = isRespondent1Event
             || caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
             ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getRespondentSolicitor2EmailAddress();
@@ -80,9 +91,8 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             targetEmail = caseData.getRespondentSolicitor1EmailAddress();
         }
 
-        if (isRespondent1Event(callbackParams)
-            || (isRespondent2Event(callbackParams)
-            && YesOrNo.YES.equals(caseData.getAddRespondent2()))) {
+        if (isRespondent1Event
+            || (isRespondent2Event(callbackParams) && YesOrNo.YES.equals(caseData.getAddRespondent2()))) {
             notificationService.sendMail(
                 targetEmail,
                 notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
