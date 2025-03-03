@@ -21,6 +21,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT2_FOR_RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Service
@@ -95,21 +96,25 @@ public class RecordJudgmentDeterminationMeansRespondentNotificationHandler exten
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, NotificationUtils.getRespondentLegalOrganizationName(
                 caseData.getRespondent1OrganisationPolicy(),
                 organisationService),
-            DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData)
+            DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
     public Map<String, String> addRespondent2Properties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, NotificationUtils.getRespondentLegalOrganizationName(
                 caseData.getRespondent2OrganisationPolicy(),
                 organisationService),
-            DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData)
+            DEFENDANT_NAME, NotificationUtils.getDefendantNameBasedOnCaseType(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
