@@ -14,6 +14,7 @@ UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(descri
 UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'ffi gwneud', 'ffi') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.FeePaid.Applicant';
 UPDATE dbs.dashboard_notifications_templates SET title_cy = replace(title_cy, 'ffi gwneud', 'ffi') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.FeePaid.Applicant';
 UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'ffi gwneud', 'ffi') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwF.FullRemission.Applicant';
+UPDATE dbs.dashboard_notifications_templates SET description_Cy = replace(description_Cy, 'ffi sef', 'ffi') WHERE template_name  = 'Notice.AAA6.GeneralApps.HwFRequested.Applicant';
 /**
  * item 8
  */
