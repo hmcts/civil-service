@@ -73,7 +73,8 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }
