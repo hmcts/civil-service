@@ -74,7 +74,8 @@ public class CaseTakenOfflineForSpecApplicantNotificationHandler extends Callbac
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID(), caseData)
+                .getOrganisation().getOrganisationID(), caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

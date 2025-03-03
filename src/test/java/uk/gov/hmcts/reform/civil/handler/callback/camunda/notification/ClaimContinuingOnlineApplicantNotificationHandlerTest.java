@@ -21,6 +21,7 @@ import java.util.Map;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
@@ -57,7 +58,8 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
                 ISSUED_ON, formatLocalDate(CLAIM_ISSUED_DATE, DATE),
                 NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+                CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+                CASEMAN_REF, "000DC001"
             );
         }
 
