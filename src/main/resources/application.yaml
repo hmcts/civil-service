@@ -472,6 +472,8 @@ notifications:
   notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
   notifyClaimantLRCoscApplied: "392cc0d5-51b3-4a82-8576-922424775617"
 
+  queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
