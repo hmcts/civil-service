@@ -74,16 +74,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
             .csrf().disable()
             .formLogin().disable()
+            .addFilter(authCheckerUserOnlyFilter)
             .logout().disable()
             .authorizeRequests()
             .antMatchers(AUTH_WHITELIST).permitAll()
             .antMatchers("/cases/callbacks/**", "/case/document/generateAnyDoc", "/dashboard/**")
             .hasAnyAuthority(AUTHORITIES)
             .anyRequest()
-            .authenticated()
-            .and()
-            .oauth2ResourceServer()
-            .and()
-            .oauth2Client();
+            .authenticated();
     }
 }
