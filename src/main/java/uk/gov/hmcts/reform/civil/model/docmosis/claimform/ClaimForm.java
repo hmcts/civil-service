@@ -24,6 +24,7 @@ import java.util.List;
 public class ClaimForm implements MappableObject {
 
     private final String claimNumber;
+    private final String ccdCaseReference;
     private final LipFormParty claimant;
     private final LipFormParty defendant;
     private final Address claimantCorrespondenceAddress;
