@@ -58,7 +58,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.authenticationManager = authenticationManager;
     }
 
-
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(AUTH_WHITELIST);
@@ -87,5 +86,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
             .oauth2Client();
     }
-
 }
