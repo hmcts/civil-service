@@ -174,7 +174,7 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
                     HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
                     "legalOrgName", "Test Org Name",
                     "claimReferenceNumber", "1594901956117591",
-                    PARTY_REFERENCES, "Claimant reference: 123456 - Defendant 1 reference: 123456 - Defendant 2 reference: Not provided",
+                    PARTY_REFERENCES, "Claimant reference: 123456 - Defendant 1 reference: 123456 - Defendant 2 reference: 123456",
                     CASEMAN_REF, "000DC001"
                 );
             } else {
