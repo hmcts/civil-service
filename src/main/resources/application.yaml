@@ -54,7 +54,7 @@ spring:
     baseline-on-migrate: true
 
 oidc:
-  issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
+  issuer: ${OIDC_ISSUER:https://idam-web-public.aat.platform.hmcts.net/o}
 
 cmc-claim-store:
   api:
