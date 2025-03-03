@@ -379,9 +379,7 @@ public class InitiateGeneralApplicationService {
             }
             applicationBuilder.certOfSC(caseData.getCertOfSC());
         }
-        if (featureToggleService.isMintiEnabled()) {
-            applicationBuilder.gaWaTrackLabel(getClaimTrackForTaskName(caseData));
-        }
+        applicationBuilder.gaWaTrackLabel(getClaimTrackForTaskName(caseData));
     }
 
 }

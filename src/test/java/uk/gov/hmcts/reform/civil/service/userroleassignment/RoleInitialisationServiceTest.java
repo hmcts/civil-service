@@ -96,8 +96,6 @@ class RoleInitialisationServiceTest {
 
     @Test
     void shouldCallRoleAssignmentServiceWithExpectedRequest_caseAllocator() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
-
         RoleAssignmentRequest expected = RoleAssignmentRequest.builder()
             .roleRequest(RoleRequest.builder()
                              .assignerId(USER_ID)
