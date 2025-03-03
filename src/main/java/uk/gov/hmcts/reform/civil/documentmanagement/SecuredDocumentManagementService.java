@@ -218,6 +218,17 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
+    @Override
+    public void deleteDocument(String authorisation, String documentPath) {
+        log.info("Deleting document {}", documentPath);
+        try {
+            caseDocumentClientApi.deleteDocument(authorisation, authTokenGenerator.generate(), getDocumentIdFromSelfHref(documentPath), true);
+        } catch (Exception ex) {
+            log.error("Failed deleting document {}", documentPath, ex);
+            throw new DocumentDownloadException(documentPath, ex);
+        }
+    }
+
     public Document getDocumentMetaData(String authorisation, String documentPath) {
         log.info("Getting metadata for file {}", documentPath);
 
