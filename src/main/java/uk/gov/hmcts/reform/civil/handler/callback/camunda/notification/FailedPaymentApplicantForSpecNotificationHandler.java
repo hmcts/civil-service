@@ -71,7 +71,8 @@ public class FailedPaymentApplicantForSpecNotificationHandler extends CallbackHa
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                 .getOrganisation().getOrganisationID(), caseData),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
