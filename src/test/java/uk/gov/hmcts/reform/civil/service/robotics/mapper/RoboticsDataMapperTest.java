@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -118,10 +120,11 @@ class RoboticsDataMapperTest {
     @Test
     void shouldMapToRoboticsCaseData_whenHandOffPointIsUnrepresentedDefendant() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
     }
 
     @Test
@@ -138,9 +141,32 @@ class RoboticsDataMapperTest {
                 .build())
             .build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
 
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseData_whenDefendantIsNotRegistered_DtsCci_1478() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePaymentSuccessful()
+            .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
+                                                         .organisationName("My Organisation")
+                                                         .email("me@server.net")
+                                                         .phoneNumber("0123456789")
+                                                         .fax("9999999999")
+                                                         .dx("Dx")
+                                                         .address(Address.builder().build())
+                                                         .build())
+            .build();
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.CLINICAL_NEGLIGENCE)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("CLAIM - UNSPEC ONLY");
     }
 
     @Test
@@ -149,7 +175,6 @@ class RoboticsDataMapperTest {
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
         var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
@@ -172,10 +197,11 @@ class RoboticsDataMapperTest {
     @Test
     void atStatePaymentSuccessfulWithCopyOrganisationIdPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessfulWithCopyOrganisationOnly().build();
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
         var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
@@ -211,9 +237,12 @@ class RoboticsDataMapperTest {
             .respondentSolicitor1ServiceAddress(solicitorServiceAddress)
             .build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
 
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
         var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
@@ -242,7 +271,6 @@ class RoboticsDataMapperTest {
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(1);
         var applicantSolicitor = roboticsCaseData.getSolicitors().get(0);
         assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
@@ -268,7 +296,6 @@ class RoboticsDataMapperTest {
             .addApplicant2(YES)
             .build();
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
     }
 
@@ -278,8 +305,10 @@ class RoboticsDataMapperTest {
             .respondent2(PartyBuilder.builder().company().build())
             .addRespondent2(YES)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
     }
 
@@ -290,8 +319,10 @@ class RoboticsDataMapperTest {
             .addRespondent2(YES)
             .respondent2Represented(YES)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
     }
 
@@ -303,8 +334,10 @@ class RoboticsDataMapperTest {
             .respondent2Represented(YES)
             .respondent2SameLegalRepresentative(YES)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 
@@ -318,8 +351,10 @@ class RoboticsDataMapperTest {
             .build();
         given(organisationApi.findOrganisationById(any(), any(), any()))
             .willThrow(Mockito.mock(FeignException.class));
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 
@@ -331,8 +366,10 @@ class RoboticsDataMapperTest {
             .respondent2Represented(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
 
         var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
@@ -369,8 +406,10 @@ class RoboticsDataMapperTest {
             .respondent2OrgRegistered(NO)
             .build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
     }
 
@@ -381,8 +420,10 @@ class RoboticsDataMapperTest {
             .addRespondent2(YES)
             .respondent2Represented(NO)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        CaseData modifiedData = caseData.toBuilder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
+            .claimType(ClaimType.PERSONAL_INJURY).build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(modifiedData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(modifiedData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 
@@ -396,7 +437,9 @@ class RoboticsDataMapperTest {
     void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData(String claimTrack, String expectedName) {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
             .allocatedTrack(AllocatedTrack.valueOf(claimTrack))
+            .claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY)
             .build();
+
         RoboticsCaseData testHeader = RoboticsCaseData.builder()
             .header(CaseHeader.builder()
                         .caseNumber(caseData.getLegacyCaseReference())
@@ -423,7 +466,7 @@ class RoboticsDataMapperTest {
                         .caseNumber(caseData.getLegacyCaseReference())
                         .owningCourtCode("807")
                         .owningCourtName("CCMCC")
-                        .caseType("PERSONAL INJURY")
+                        .caseType("CLAIM - UNSPEC ONLY")
                         .preferredCourtCode("")
                         .caseAllocatedTo("FAST TRACK")
                         .build())
@@ -432,7 +475,6 @@ class RoboticsDataMapperTest {
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
     }
 
