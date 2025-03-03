@@ -215,6 +215,13 @@ dashboard:
   api:
     url: http://localhost:4000
 
+logging:
+  level:
+    org.springframework.cache: INFO    # Spring Cache Abstraction
+    javax.cache: INFO                  # JCache API (general caching)
+    com.github.benmanes.caffeine.cache: INFO  # Caffeine specific logs
+    org.hibernate.cache: INFO           # Hibernate 2nd Level Cache (if use
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "d89ce52e-c943-4bee-aa2e-24ff05d7d1e5"
@@ -270,6 +277,7 @@ notifications:
   respondentSolicitorNotifyToProceedSpec: "3ff54f97-76de-47a1-a381-680e2830fba8"
   claimantSolicitorConfirmsToProceedSpecWithAction: "5d20822e-3a92-458d-94aa-2e989e192c7e"
   respondentSolicitorNotifyToProceedSpecWithAction: "78856c57-8f78-4d5e-9abe-66f6cb0f07d6"
+  respondentSolicitorNotifyToProceedInMediation: "e231e271-93b9-49e8-99d3-5b3ceac4b3af"
   applicantSolicitor1DefaultJudgmentReceived: "bceecea2-b70e-4288-be31-0a4203b31f3e"
   claimantSolicitorCounterClaimForSpec: "082c6017-9bcf-4227-bc0a-bcfec2b8ebf4"
   respondentSolicitorCounterClaimForSpec: "cb31a195-2a9f-4229-9abf-7f4935260ee1"
@@ -464,6 +472,8 @@ notifications:
   notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
   notifyClaimantLRCoscApplied: "a2f38927-7e54-4066-bbce-ff6ffda821ac"
 
+  queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
@@ -566,6 +576,10 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
+    hikari:
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      idle-timeout: 600000 # 10 minutes
 
 fees:
   api:

@@ -20,6 +20,7 @@ public enum DocmosisTemplates {
     N121_SPEC_NON_IMMEDIATE("CV-SPC-DEC-ENG-00913.docx", "default_judgment_spec_form_%s.pdf"),
     N121_SPEC_DEFENDANT("CV-SPC-DEC-ENG-00911.docx", "default_judgment_spec_form_%s.pdf"),
     N121_SPEC_CLAIMANT("CV-SPC-DEC-ENG-00912.docx", "default_judgment_spec_form_%s.pdf"),
+    N121_SPEC_CLAIMANT_WELSH("CV-SPC-DEC-WEL-00912.docx", "default_judgment_spec_form_%s.pdf"),
     N121("CV-UNS-DEC-ENG-01280.docx", "default_judgment_form_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1V1("CV-SPC-HRN-ENG-01361.docx", "%s_response_sealed_form.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1V2("CV-SPC-HRN-ENG-01360.docx", "%s_response_sealed_form.pdf"),
@@ -65,6 +66,7 @@ public enum DocmosisTemplates {
     DQ_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01283.docx", "%s_directions_questionnaire_form_%s.pdf"),
     TRIAL_READY("CV-UNS-HRN-ENG-01247-10180.docx", "%s_%s_Trial_Arrangements.pdf"),
     HEARING_NOTICE_HMC("CV-UNS-HNO-ENG-01200.docx", "hearing_notice_%s.pdf"),
+    HEARING_NOTICE_HMC_WELSH("CV-UNS-HNO-WEL-01200.docx", "hearing_notice_welsh_%s.pdf"),
 
     DRAFT_CLAIM_FORM("CV-SPC-CLM-ENG-00001-DRAFT.docx", "draft_claim_form_%s.pdf"),
     HEARING_SMALL_CLAIMS_AHN("CV-UNS-HNO-ENG-01202.docx", "hearing_small_claim_%s.pdf"),
@@ -92,7 +94,6 @@ public enum DocmosisTemplates {
     GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf"),
     RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-DEC-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf"),
-    DEFAULT_JUDGMENT_COVER_LETTER_DEFENDANT_LEGAL_ORG("CV-CMC-LET-ENG-LR-JO0002.docx", "cover_letter.pdf"),
     JUDGMENT_BY_ADMISSION_CLAIMANT("CV-SPC-DEC-ENG-00916.docx", "Judgment_by_admission_claimant.pdf"),
     JUDGMENT_BY_ADMISSION_DEFENDANT("CV-SPC-DEC-ENG-00915.docx", "Judgment_by_admission_defendant.pdf"),
     JUDGMENT_BY_ADMISSION_CLAIMANT_BILINGUAL("CV-SPC-DEC-WEL-00916.docx", "Judgment_by_admission_claimant.pdf"),

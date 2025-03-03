@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -553,7 +552,7 @@ public class EventHistoryMapper {
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(setApplicant1ResponseDate(caseData))
+                .dateReceived(getJbADate(caseData))
                 .eventDetailsText(detailsTextRequested)
                 .eventDetails(EventDetails.builder()
                                   .miscText(miscTextRequested)
@@ -629,7 +628,7 @@ public class EventHistoryMapper {
                                    ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
                                    : null)
             .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
-            .dateOfJudgment(setApplicant1ResponseDate(caseData))
+            .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
             .miscText("")
@@ -639,7 +638,7 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
             .litigiousPartyID(APPLICANT_ID)
-            .dateReceived(setApplicant1ResponseDate(caseData))
+            .dateReceived(getJbADate(caseData))
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
@@ -2064,7 +2063,7 @@ public class EventHistoryMapper {
                                            .build()
             );
             buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent1ResponseDate());
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
@@ -2098,9 +2097,9 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             final Party respondent1 = caseData.getRespondent1();
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-
+            buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
+            Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
                 && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
@@ -2345,8 +2344,7 @@ public class EventHistoryMapper {
         String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
 
-        if (featureToggleService.isJOLiveFeedActive()
-            && caseData.getCcdState() == CaseState.All_FINAL_ORDERS_ISSUED) {
+        if (featureToggleService.isJOLiveFeedActive()) {
             miscTextGranted = RECORD_JUDGMENT;
         }
 
@@ -2355,7 +2353,7 @@ public class EventHistoryMapper {
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
+                    .dateReceived(getDateOfDjCreated(caseData))
                     .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                     .eventDetails(EventDetails.builder()
                                       .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
@@ -2515,6 +2513,22 @@ public class EventHistoryMapper {
         return applicant1ResponseDate;
     }
 
+    private void buildMiscellaneousForRespondentResponseLipVSLr(EventHistory.EventHistoryBuilder builder,
+                                                                CaseData caseData) {
+        if (caseData.isLipvLROneVOne()) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText("RPA Reason: LiP vs LR - full/part admission received.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: LiP vs LR - full/part admission received.")
+                                      .build())
+                    .build());
+        }
+    }
+
     private LocalDate getCoscDate(CaseData caseData) {
         if (caseData.getJoFullyPaymentMadeDate() != null) {
             return caseData.getJoFullyPaymentMadeDate();
@@ -2522,5 +2536,11 @@ public class EventHistoryMapper {
             return caseData.getCertOfSC().getDefendantFinalPaymentDate();
         }
         throw new IllegalArgumentException("Payment date cannot be null");
+    }
+
+    private LocalDateTime getJbADate(CaseData caseData) {
+        return featureToggleService.isJOLiveFeedActive()
+            ? caseData.getJoJudgementByAdmissionIssueDate()
+            : setApplicant1ResponseDate(caseData);
     }
 }

@@ -46,7 +46,7 @@ public class SettleClaimMarkedPaidInFullDefendantScenarioTest extends DashboardB
                         "You do not need to attend court and any hearings scheduled will not go ahead.</p>"),
                 jsonPath("$[0].titleCy").value("Hawliad wedi’i nodi fel wedi ei dalu’n llawn"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae’r hawliad hwn wedi’i farcio fel un a dalwyd yn llawn ers " + DateUtils.formatDateInWelsh(paidInFullDate) + ".<br>" +
+                    "<p class=\"govuk-body\">Mae’r hawliad hwn wedi’i farcio fel un a dalwyd yn llawn ers " + DateUtils.formatDateInWelsh(paidInFullDate, false) + ".<br>" +
                         "Nid oes angen i chi fynychu'r llys ac ni fydd unrhyw wrandawiadau a drefnwyd yn cael eu cynnal.</p>")
             );
     }

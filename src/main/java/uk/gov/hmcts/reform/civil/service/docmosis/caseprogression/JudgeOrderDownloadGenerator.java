@@ -46,10 +46,10 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     private final DocumentHearingLocationHelper documentHearingLocationHelper;
     public DocmosisTemplates docmosisTemplate;
     private static final String DATE_FORMAT = "dd-MM-yyyy";
-    public static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band.";
-    public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not allocated a complexity band because %s.";
-    public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s.";
-    public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is allocated to complexity band %s because %s.";
+    public static final String INTERMEDIATE_NO_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is not assigned a complexity band.";
+    public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not assigned a complexity band because %s.";
+    public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is assigned to complexity band %s.";
+    public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is assigned to complexity band %s because %s.";
     public static final String ORDER_AFTER_HEARING_ON = "This order is made following a hearing on %s.";
     public static final String ORDER_AFTER_HEARING_BETWEEN = "This order is made following a hearing between %s and %s.";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
