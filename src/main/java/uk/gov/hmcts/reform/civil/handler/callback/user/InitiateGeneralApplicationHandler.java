@@ -191,7 +191,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             );
             return !(UserRoleUtils.isLIPDefendant(roles) || UserRoleUtils.isLIPClaimant(roles));
         } else {
-            return true;
+            return false;
         }
     }
 
