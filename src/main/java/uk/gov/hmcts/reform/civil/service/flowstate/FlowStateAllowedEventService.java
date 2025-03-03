@@ -1238,7 +1238,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
         entry(
