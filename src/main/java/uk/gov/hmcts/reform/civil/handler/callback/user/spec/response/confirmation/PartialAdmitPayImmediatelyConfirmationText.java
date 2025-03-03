@@ -61,11 +61,11 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         }
 
         sb.append(" legal representative if you need details on how to pay.</p>");
-        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount().setScale(2);
+        BigDecimal claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
 
         if (isLipVLr) {
             sb.append("<h2 class=\"govuk-heading-m\">If ").append(applicantName).append(" accepts your offer of &#163;")
-                .append(totalClaimAmount)
+                .append(claimOwingAmount)
                 .append("</h2>");
             sb.append("<p>The claim will be settled. </p>");
             sb.append("<h2 class=\"govuk-heading-m\">If ")
