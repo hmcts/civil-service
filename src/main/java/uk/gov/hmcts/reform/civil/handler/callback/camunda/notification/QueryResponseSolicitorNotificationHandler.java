@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
@@ -25,7 +24,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -36,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getProperties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -48,7 +48,6 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
     public static final String TASK_ID = "QueryResponseNotify";
     private static final String REFERENCE_TEMPLATE = "response-to-query-notification-%s";
-    private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
     private static final String QUERY_NOT_FOUND = "Matching parent query not found.";
 
     private final NotificationService notificationService;
@@ -86,7 +85,8 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
         String email = getEmail(caseData, roles);
-        Map<String, String> properties = getProperties(caseData, roles);
+        Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
+                                                       organisationService);
         LocalDate queryDate = getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery);
         properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
 
@@ -140,52 +140,9 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
         return new HashMap<>(Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID(), caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()));
-    }
-
-    public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
-
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
-    }
-
-    private String getEmail(CaseData caseData, List<String> roles) {
-        if (isApplicantSolicitor(roles)) {
-            return caseData.getApplicantSolicitor1UserDetails().getEmail();
-        } else if (isRespondentSolicitorOne(roles)) {
-            return caseData.getRespondentSolicitor1EmailAddress();
-        } else if (isRespondentSolicitorTwo(roles)) {
-            return caseData.getRespondentSolicitor2EmailAddress();
-        } else {
-            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
-        }
-    }
-
-    private Map<String, String> getProperties(CaseData caseData, List<String> roles) {
-        Map<String, String> properties = addProperties(caseData);
-        if (isApplicantSolicitor(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
-                caseData.getApplicant1OrganisationPolicy()
-                    .getOrganisation().getOrganisationID(),
-                caseData));
-        } else if (isRespondentSolicitorOne(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
-                caseData.getRespondent1OrganisationPolicy()
-                    .getOrganisation().getOrganisationID(), caseData));
-        } else if (isRespondentSolicitorTwo(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
-                caseData.getRespondent2OrganisationPolicy()
-                    .getOrganisation().getOrganisationID(), caseData));
-        } else {
-            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
-        }
-        return properties;
     }
 }
