@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
@@ -48,6 +49,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final PiPLetterGenerator pipLetterGenerator;
     private final FeatureToggleService featureToggleService;
     private final BulkPrintService bulkPrintService;
+    private final DeadlinesCalculator deadlinesCalculator;
+
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -69,8 +72,11 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private CallbackResponse notifyRespondentForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
+
         final CaseData.CaseDataBuilder caseDataBuilder
-            = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
+            = caseData.toBuilder().claimNotificationDate(claimNotificationDate)
+            .respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
+                LocalDateTime.now()));
 
         if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
             generatePIPEmail(caseData);
