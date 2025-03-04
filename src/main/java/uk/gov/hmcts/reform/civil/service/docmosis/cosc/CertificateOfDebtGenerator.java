@@ -36,6 +36,7 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
 
     public static final String MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED = "Marked to show that the debt is satisfied.";
     public static final String REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT = "REMOVED (as payment has been made in full within one month of judgment).";
+
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final LocationReferenceDataService locationRefDataService;
@@ -79,6 +80,7 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
                 DateFormatHelper.DATE
             ))
             .judgmentStatusText(getJudgmentText(caseData.getActiveJudgment()))
+            .judgmentStatus(caseData.getActiveJudgment().getState().getLabel())
             .courtLocationName(getCourtName(caseData, authorisation));
 
         return certificateOfDebtForm.build();

@@ -23,4 +23,5 @@ public class CertificateOfDebtForm implements MappableObject {
     private String dateFinalPaymentMade;
     private String judgmentTotalAmount;
     private String judgmentStatusText;
+    private String judgmentStatus;
 }
