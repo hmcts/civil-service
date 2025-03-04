@@ -44,20 +44,15 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
     private final QueryManagementCamundaService runtimeService;
 
     @Override
-    protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForQueryRaised
-        );
-    }
-
-    @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
     }
 
     @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
+    protected Map<String, Callback> callbacks() {
+        return Map.of(
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForQueryRaised
+        );
     }
 
     private CallbackResponse notifyPartyForQueryRaised(CallbackParams callbackParams) {
@@ -89,5 +84,10 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
+    }
+
+    @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
     }
 }

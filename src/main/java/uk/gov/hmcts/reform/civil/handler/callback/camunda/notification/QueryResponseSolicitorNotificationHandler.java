@@ -58,7 +58,7 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForQueryRaised
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForResponseToQuery
         );
     }
 
@@ -72,7 +72,7 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         return EVENTS;
     }
 
-    private CallbackResponse notifyPartyForQueryRaised(CallbackParams callbackParams) {
+    private CallbackResponse notifyPartyForResponseToQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
