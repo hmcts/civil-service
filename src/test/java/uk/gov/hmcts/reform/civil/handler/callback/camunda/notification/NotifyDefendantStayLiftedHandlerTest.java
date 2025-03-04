@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_STAY_LIFTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyDefendantStayLiftedHandlerTest {
@@ -117,7 +118,9 @@ class NotifyDefendantStayLiftedHandlerTest {
                 Map.of(
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jim Jameson",
-                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson"
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
+                    "partyReferences", buildPartiesReferencesEmailSubject(caseData),
+                    "casemanRef", caseData.getLegacyCaseReference()
                 ),
                 "stay-lifted-defendant-notification-1594901956117591"
             );
@@ -128,7 +131,9 @@ class NotifyDefendantStayLiftedHandlerTest {
                 Map.of(
                     "claimReferenceNumber", "1594901956117591",
                     "name", "Jack Jackson",
-                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson"
+                    "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
+                    "partyReferences", buildPartiesReferencesEmailSubject(caseData),
+                    "casemanRef", caseData.getLegacyCaseReference()
                 ),
                 "stay-lifted-defendant-notification-1594901956117591"
             );

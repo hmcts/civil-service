@@ -29,9 +29,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -199,12 +202,17 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             if (caseData.isRespondent1NotRepresented()) {
                 return Map.of(
                     RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                    CASEMAN_REF, caseData.getLegacyCaseReference()
+
                 );
             } else {
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                    CASEMAN_REF, caseData.getLegacyCaseReference()
                 );
             }
         }

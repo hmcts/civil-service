@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_TAKEN_OFFLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CaseTakenOfflineRespondentNotificationHandler.TASK_ID_RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CaseTakenOfflineRespondentNotificationHandler.TASK_ID_RESPONDENT_TWO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -162,7 +163,8 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -171,7 +173,8 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 

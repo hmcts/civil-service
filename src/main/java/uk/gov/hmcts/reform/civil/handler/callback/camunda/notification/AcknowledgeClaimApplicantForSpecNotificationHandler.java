@@ -88,7 +88,8 @@ public class AcknowledgeClaimApplicantForSpecNotificationHandler extends Callbac
                 .getOrganisation().getOrganisationID(), caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -99,7 +100,8 @@ public class AcknowledgeClaimApplicantForSpecNotificationHandler extends Callbac
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(), caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

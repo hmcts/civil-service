@@ -83,7 +83,8 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy,
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         } else {
             return Map.of(
@@ -91,7 +92,8 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+                CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
     }

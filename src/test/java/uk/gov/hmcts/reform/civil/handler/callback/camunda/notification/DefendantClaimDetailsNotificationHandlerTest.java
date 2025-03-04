@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantClaimDetailsNotificationHandler.TASK_ID_EMAIL_APP_SOL_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantClaimDetailsNotificationHandler.TASK_ID_EMAIL_FIRST_SOL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -135,7 +136,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                     deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
                          .toLocalDate(), DATE),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 

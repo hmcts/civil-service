@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID_RESPONDENT_SOL2_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.Task_ID_RESPONDENT_SOL2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -424,7 +425,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -433,7 +435,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -444,7 +447,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

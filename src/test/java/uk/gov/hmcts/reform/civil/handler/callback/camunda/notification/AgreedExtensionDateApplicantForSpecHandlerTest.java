@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -444,7 +445,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
                 DEFENDANT_NAME, fetchDefendantName(caseData),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -454,7 +456,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -464,7 +467,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 

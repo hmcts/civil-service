@@ -93,7 +93,8 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
                 CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                     caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
         if (caseData.isRespondent1NotRepresented()) {

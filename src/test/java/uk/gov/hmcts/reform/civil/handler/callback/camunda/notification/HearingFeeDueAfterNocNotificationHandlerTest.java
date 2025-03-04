@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.HearingFeeDueAfterNocNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.COURT_LOCATION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
@@ -42,9 +43,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_FEE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_TIME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class HearingFeeDueAfterNocNotificationHandlerTest {
@@ -154,26 +156,30 @@ class HearingFeeDueAfterNocNotificationHandlerTest {
     @NotNull
     private Map<String, String> getNotificationDataMap2(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, "Signer Name",
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             COURT_LOCATION, "County Court",
             HEARING_TIME, "1215",
             HEARING_FEE, "£300.00",
-            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE)
+            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
     @NotNull
     private Map<String, String> getNotificationDataMap1(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, "Test org name",
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             COURT_LOCATION, "County Court",
             HEARING_TIME, "1215",
             HEARING_FEE, "£300.00",
-            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE)
+            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

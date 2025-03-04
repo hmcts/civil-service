@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.Task_ID_RESPONDENT_SOL2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -201,7 +202,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -237,7 +239,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 
@@ -247,7 +250,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
+            CASEMAN_REF, "000DC001"
         );
     }
 
