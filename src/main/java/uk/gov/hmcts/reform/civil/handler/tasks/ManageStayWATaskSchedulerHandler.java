@@ -24,23 +24,21 @@ public class ManageStayWATaskSchedulerHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (featureToggleService.isCaseEventsEnabled()) {
 
-            Set<CaseDetails> cases = caseSearchService.getCases();
-            log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        Set<CaseDetails> cases = caseSearchService.getCases();
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-            cases.forEach(caseDetails -> {
-                try {
-                    applicationEventPublisher.publishEvent(new ManageStayWATaskEvent(caseDetails.getId()));
-                } catch (Exception e) {
-                    log.error(
-                        "Manage Stay WA Task scheduler failed to process case with id: '{}",
-                        caseDetails.getId(),
-                        e
-                    );
-                }
-            });
-        }
+        cases.forEach(caseDetails -> {
+            try {
+                applicationEventPublisher.publishEvent(new ManageStayWATaskEvent(caseDetails.getId()));
+            } catch (Exception e) {
+                log.error(
+                    "Manage Stay WA Task scheduler failed to process case with id: '{}",
+                    caseDetails.getId(),
+                    e
+                );
+            }
+        });
         return ExternalTaskData.builder().build();
     }
 }

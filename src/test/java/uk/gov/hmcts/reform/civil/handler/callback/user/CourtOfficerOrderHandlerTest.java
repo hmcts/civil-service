@@ -232,18 +232,10 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSubmitted_whenInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(COURT_OFFICER_ORDER.name(), "READY");
-        }
-
-        @Test
-        void shouldEmptySubmitted_whenInvoked() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).isNull();
         }
 
     }

@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.junit.jupiter.api.BeforeEach;
@@ -209,10 +207,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiP(boolean caseEventsEnabled) {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiP() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1LiP()
@@ -243,11 +239,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getDefendant1LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
-            if (caseEventsEnabled) {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
-            } else {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
-            }
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
         }
 
         @Test
@@ -481,10 +473,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isEqualTo(caseData.getRespondent1LRIndividuals());
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2LiP(boolean caseEventsEnabled) {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2LiP() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -519,17 +509,11 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if (caseEventsEnabled) {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
-            } else {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
-            }
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2BothRespondentsLiP(boolean caseEventsEnabled) {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2BothRespondentsLiP() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -564,11 +548,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if (caseEventsEnabled) {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
-            } else {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
-            }
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
         }
 
         @Test
@@ -641,10 +621,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiPSpec(boolean caseEventsEnabled) {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiPSpec() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1LiP()
@@ -672,16 +650,11 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
-            if (caseEventsEnabled) {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
-            } else {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
-            }
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
         }
 
         @Test
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiPSpecForLiPNoC() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(ORGANISATION));
 
@@ -711,7 +684,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
                 .isEqualTo("requester@example.com");
-            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getOrgName()).isEqualTo(ORGANISATION.getName());
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine1()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine1());
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine2()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine2());
@@ -827,11 +800,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2LiPSpec(boolean caseEventsEnabled) {
-
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2LiPSpec() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -863,17 +833,11 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if (caseEventsEnabled) {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
-            } else {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
-            }
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2BothRespondentsLiPSpec(boolean caseEventsEnabled) {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2BothRespondentsLiPSpec() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -905,18 +869,11 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
-            if (caseEventsEnabled) {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
-            } else {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
-            }
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldUpdateSolicitorDetails_afterNocSubmittedByApplicantSolicitorForClaimantLip(boolean caseEventsEnabled) {
-
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldUpdateSolicitorDetails_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
@@ -940,11 +897,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicantSolicitor1UserDetails().getEmail())
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getApplicant1Represented()).isEqualTo(YES);
-            if (caseEventsEnabled) {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
-            } else {
-                assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(NO);
-            }
+            assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
         }
 
         private void assertSolicitorReferences(boolean isApplicant, boolean isRespondent1, boolean respondent2Exists,

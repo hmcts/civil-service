@@ -38,10 +38,7 @@ public class OrderReviewObligationCheckCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        Callback callback = featureToggleService.isCaseEventsEnabled()
-            ? this::orderReviewObligationCheck
-            : this::emptyCallbackResponse;
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), callback);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::orderReviewObligationCheck);
     }
 
     private CallbackResponse orderReviewObligationCheck(CallbackParams callbackParams) {

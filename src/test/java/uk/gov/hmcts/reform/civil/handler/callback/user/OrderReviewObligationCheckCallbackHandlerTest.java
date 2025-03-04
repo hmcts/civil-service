@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +66,6 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
                                    .build())
                         .build()))
                 .build();
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -102,7 +100,6 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
                                .obligationReason(ObligationReason.UNLESS_ORDER)
                                .build())
                     .build())).build();
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -121,7 +118,6 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
                                    .build())
                         .build()))
                 .build();
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -150,7 +146,6 @@ class OrderReviewObligationCheckCallbackHandlerTest extends BaseCallbackHandlerT
                         .build()))
                 .ccdState(caseState)
                 .build();
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

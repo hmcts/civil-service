@@ -77,7 +77,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         handler = new ConfirmOrderReviewCallbackHandler(toggleService, objectMapper, userService, time);
-        Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
     }
 
     @Nested
@@ -174,21 +173,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnEmptyResponse_whenInvoked() {
-            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(false);
-            CaseData caseData = CaseData.builder()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response).isEqualTo(AboutToStartOrSubmitCallbackResponse.builder().build());
-        }
-
-        @Test
         void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder() {
-            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .isFinalOrder(YesOrNo.YES)
                 .build();
@@ -210,7 +195,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                            .forename("John")
                                                                            .surname("Smith")
                                                                            .build());
-            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
 
             LocalDate obligationDate = LocalDate.of(2024, 12, 12);
             CaseData caseData = CaseData.builder()
@@ -258,7 +242,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                            .forename("John")
                                                                            .surname("Smith")
                                                                            .build());
-            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
 
             LocalDate obligationDate = LocalDate.of(2024, 12, 12);
             CaseData caseData = CaseData.builder()
@@ -304,7 +287,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnConfirmationBodyInResponse_whenInvoked() {
-            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
             caseData.builder().obligationDatePresent(NO).build();
@@ -321,7 +303,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnConfirmationBodyWithTextInResponse_whenInvoked() {
-            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .build();
             caseData = caseData.builder().obligationDatePresent(YesOrNo.YES).build();
@@ -334,19 +315,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                .confirmationHeader(HEADER_CONFIRMATION)
                                                .confirmationBody(BODY_CONFIRMATION_OBLIGATION)
                                                .build());
-        }
-
-        @Test
-        void shouldReturnEmptyResponse_whenInvoked() {
-            Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
         }
 
     }

@@ -137,11 +137,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             return DO_NOT_SHOW;
         }
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            return (hasPaidFee || isHWFFullRemissionGranted) ? DO_NOT_SHOW : SHOW;
-        }
-
-        return SHOW;
+        return (hasPaidFee || isHWFFullRemissionGranted) ? DO_NOT_SHOW : SHOW;
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
