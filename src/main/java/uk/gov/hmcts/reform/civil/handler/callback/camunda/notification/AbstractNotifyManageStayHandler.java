@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @RequiredArgsConstructor
 public abstract class AbstractNotifyManageStayHandler extends CallbackHandler implements NotificationData {
@@ -56,11 +57,21 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
 
     protected Map<String, String> addPropertiesForStayLifted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_NAME, getPartyName(callbackParams),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
-        );
+        if (isLiP(caseData)) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_NAME, getPartyName(callbackParams),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+            );
+        } else {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_NAME, getPartyName(callbackParams),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
+            );
+        }
     }
 
     @Override
