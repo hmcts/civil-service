@@ -98,6 +98,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
             if (caseData.isApplicant1NotRepresented()) {
                 sb.append("<br></br>")
                     .append("<p>This case will now proceed offline.</p>");
+            }
          }
         return Optional.of(sb.toString());
     }
