@@ -585,7 +585,7 @@ class NotificationClaimantOfHearingHandlerTest {
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
-                "applicant1@example.com",
+                "rambo@email.com",
                 "test-template-claimant-lip-id",
                 getNotificationLipDataMap(caseData),
                 "notification-of-hearing-lip-000HN001"
@@ -620,7 +620,7 @@ class NotificationClaimantOfHearingHandlerTest {
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
-                "applicant1@example.com",
+                "rambo@email.com",
                 "test-template-claimant-lip-id",
                 getNotificationLipDataMap(caseData),
                 "notification-of-hearing-lip-HER1234"
@@ -648,7 +648,7 @@ class NotificationClaimantOfHearingHandlerTest {
             handler.handle(params);
             // Then
             verify(notificationService).sendMail(
-                "applicant1@example.com",
+                "rambo@email.com",
                 "test-template-claimant-lip-welsh-id",
                 getNotificationLipDataMap(caseData),
                 "notification-of-hearing-lip-000HN001"

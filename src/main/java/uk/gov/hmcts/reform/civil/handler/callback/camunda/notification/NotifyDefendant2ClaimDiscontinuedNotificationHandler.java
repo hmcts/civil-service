@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT2;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Service
@@ -80,9 +81,11 @@ public class NotifyDefendant2ClaimDiscontinuedNotificationHandler extends Callba
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference(),
+            caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME,
-            getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService)
+            getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }
