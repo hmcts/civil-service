@@ -33,7 +33,8 @@ public class EventEmitterService {
             if (dispatchProcess) {
                 applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
             }
-            if (camundaEvent.equals("queryManagementRaiseQuery")) {
+            if (camundaEvent.equals("queryManagementRaiseQuery")
+                || camundaEvent.equals("queryManagementRespondQuery")) {
                 CaseMessage latestQuery = getLatestQuery(caseData);
                 String queryId = latestQuery != null ? latestQuery.getId() : null;
                 runtimeService.createMessageCorrelation(camundaEvent)
