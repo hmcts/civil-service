@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyClaimantStayUpdateRequestedHandlerTest {
@@ -88,7 +89,9 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
             Map.of(
                 "claimantvdefendant", "John Doe V Jack Jackson",
                 "claimReferenceNumber", "1594901956117591",
-                "name", "John Doe"
+                "name", "John Doe",
+                "partyReferences", buildPartiesReferencesEmailSubject(caseData),
+                "casemanRef", caseData.getLegacyCaseReference()
             ),
             "stay-update-requested-claimant-notification-1594901956117591"
         );

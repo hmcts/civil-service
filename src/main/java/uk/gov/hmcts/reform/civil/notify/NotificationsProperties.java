@@ -162,6 +162,9 @@ public class NotificationsProperties {
     private String respondentSolicitorNotifyToProceedSpecWithAction;
 
     @NotEmpty
+    private String respondentSolicitorNotifyToProceedInMediation;
+
+    @NotEmpty
     private String applicantSolicitor1DefaultJudgmentReceived;
 
     @NotEmpty
