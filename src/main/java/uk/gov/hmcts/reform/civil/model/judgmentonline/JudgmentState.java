@@ -9,7 +9,7 @@ public enum JudgmentState {
     REQUESTED("requested"),
     ISSUED("issued"),
     MODIFIED("modified"),
-    SATISFIED ("satisfied"),
+    SATISFIED("satisfied"),
     SET_ASIDE("set aside"),
     SET_ASIDE_ERROR("set aside in error"),
     CANCELLED("cancelled");
