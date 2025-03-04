@@ -139,11 +139,6 @@ public class FeatureToggleService {
             && isGaForLipsEnabled();
     }
 
-    public boolean isHmcNroEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-nro");
-
-    }
-
     public boolean isJOLiveFeedActive() {
         return isJudgmentOnlineLive()
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
