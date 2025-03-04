@@ -180,6 +180,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                                  ? MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
                                      Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount()))).toString()
                                  : (BigDecimal.valueOf(0)).toString())
+            .respondentsOrgRegistered(getRespondentsOrgRegistered(caseData))
             .build();
     }
 
@@ -355,4 +356,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .build();
     }
 
+    private YesOrNo getRespondentsOrgRegistered(CaseData caseData) {
+        if (YesOrNo.NO.equals(caseData.getRespondent1OrgRegistered())
+            || YesOrNo.NO.equals(caseData.getRespondent2OrgRegistered())) {
+            return YesOrNo.NO;
+        }
+        return YES;
+    }
 }
