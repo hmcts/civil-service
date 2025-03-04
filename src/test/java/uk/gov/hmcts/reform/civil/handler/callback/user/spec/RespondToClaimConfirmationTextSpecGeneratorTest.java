@@ -313,7 +313,6 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
                 Pair.of(getPartialAdmitPayFull(true), PartialAdmitPaidFullConfirmationText.class),
                 Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
                 Pair.of(getPartialAdmitPayLess(true), PartialAdmitPaidLessConfirmationText.class),
-                Pair.of(getCounterClaim(), CounterClaimConfirmationText.class)
                 Pair.of(getCounterClaim(), CounterClaimConfirmationText.class),
                 Pair.of(getFullAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
                 Pair.of(getFullAdmitRepayPlanLiPvLr(), RepayPlanConfirmationText.class),
