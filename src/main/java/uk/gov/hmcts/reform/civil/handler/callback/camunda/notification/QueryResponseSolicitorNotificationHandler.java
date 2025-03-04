@@ -149,26 +149,6 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
             CASEMAN_REF, caseData.getLegacyCaseReference()));
     }
 
-    public Map<String, String> addPropertiesForRespondent(CaseData caseData) {
-
-        return new HashMap<>(Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(), caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()));
-    }
-
-    public Map<String, String> addPropertiesForRespondent2(CaseData caseData) {
-
-        return new HashMap<>(Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
-                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID(), caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()));
-    }
-
     public String getApplicantLegalOrganizationName(String id, CaseData caseData) {
 
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
@@ -189,14 +169,23 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
     }
 
     private Map<String, String> getProperties(CaseData caseData, List<String> roles) {
+        Map<String, String> properties = addProperties(caseData);
         if (isApplicantSolicitor(roles)) {
-            return addProperties(caseData);
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
+                caseData.getApplicant1OrganisationPolicy()
+                    .getOrganisation().getOrganisationID(),
+                caseData));
         } else if (isRespondentSolicitorOne(roles)) {
-            return addPropertiesForRespondent(caseData);
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
+                caseData.getRespondent1OrganisationPolicy()
+                    .getOrganisation().getOrganisationID(), caseData));
         } else if (isRespondentSolicitorTwo(roles)) {
-            return addPropertiesForRespondent2(caseData);
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(
+                caseData.getRespondent2OrganisationPolicy()
+                    .getOrganisation().getOrganisationID(), caseData));
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
+        return properties;
     }
 }
