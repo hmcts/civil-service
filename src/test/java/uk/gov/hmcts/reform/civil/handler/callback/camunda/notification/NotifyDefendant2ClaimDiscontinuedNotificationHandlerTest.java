@@ -26,8 +26,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @SpringBootTest(classes = {
     NotifyDefendant2ClaimDiscontinuedNotificationHandler.class,
@@ -68,6 +71,7 @@ class NotifyDefendant2ClaimDiscontinuedNotificationHandlerTest extends BaseCallb
 
             CaseData caseData = CaseDataBuilder.builder()
                 .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(12345L)
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .atStateClaimDraft().build();
 
@@ -92,8 +96,10 @@ class NotifyDefendant2ClaimDiscontinuedNotificationHandlerTest extends BaseCallb
 
         public Map<String, String> addProperties(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                LEGAL_ORG_NAME, "Test Org Name 2"
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                LEGAL_ORG_NAME, "Test Org Name 2",
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
     }
