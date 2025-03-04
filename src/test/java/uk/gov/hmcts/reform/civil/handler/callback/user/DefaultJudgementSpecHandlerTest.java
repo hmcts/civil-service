@@ -1466,6 +1466,31 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 handler.handle(params);
             });
         }
+
+        @Test
+        void givenValidRequest_ShouldSetOverallTotal() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(100)
+                );
+            Fee fee = Fee.builder()
+                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                .version("1")
+                .code("CODE")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .claimFee(fee)
+                .fixedCosts(null)
+                .partialPayment(NO)
+                .totalClaimAmount(BigDecimal.valueOf(3000))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            var repaymentDue = response.getData().get("repaymentDue");
+            assertThat(repaymentDue).isEqualTo("3101.00");
+        }
     }
 
     @Nested
