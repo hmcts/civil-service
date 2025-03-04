@@ -289,9 +289,6 @@ public class SdoGeneratorService {
             .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
             .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
             .fastTrackTrial(caseData.getFastTrackTrial())
-            .fastTrackTrialBundleTypeText(
-                SdoHelper.getFastTrackTrialBundleTypeText(caseData)
-            )
             .fastTrackMethod(caseData.getFastTrackMethod())
             .fastTrackMethodInPerson(caseData.getFastTrackMethodInPerson())
             .fastTrackMethodTelephoneHearing(

@@ -124,7 +124,8 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
             DEFENDANT_NAME, fetchDefendantName(caseData),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -168,7 +169,8 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(), caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
