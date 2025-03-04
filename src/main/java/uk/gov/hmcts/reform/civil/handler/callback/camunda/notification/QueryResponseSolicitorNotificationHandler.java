@@ -51,16 +51,15 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
     private static final String QUERY_NOT_FOUND = "Matching parent query not found.";
 
     private final NotificationService notificationService;
-    private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
-    private final CoreCaseUserService coreCaseUserService;
     private final QueryManagementCamundaService runtimeService;
+    private final OrganisationService organisationService;
+    private final NotificationsProperties notificationsProperties;
+    private final CoreCaseUserService coreCaseUserService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForQueryRaised,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForQueryRaised
         );
     }
 

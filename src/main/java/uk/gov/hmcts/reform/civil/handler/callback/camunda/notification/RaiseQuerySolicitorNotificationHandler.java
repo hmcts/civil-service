@@ -47,8 +47,7 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForQueryRaised,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartyForQueryRaised
         );
     }
 
