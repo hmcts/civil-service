@@ -44,8 +44,13 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     }
 
     private CaseData getPartialAdmitSetDate() {
+        return getPartialAdmitSetDate(false);
+    }
+
+    private CaseData getPartialAdmitSetDate(boolean isLipVLR) {
         BigDecimal admitted = BigDecimal.valueOf(1000);
         LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+
         return CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .build().toBuilder()
@@ -58,10 +63,17 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
                     .build()
             )
             .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
+
     }
 
     private CaseData getPartialAdmitPayImmediately() {
+        return getPartialAdmitPayImmediately(false);
+    }
+
+    private CaseData getPartialAdmitPayImmediately(boolean isLipVLR) {
         BigDecimal admitted = BigDecimal.valueOf(1000);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         return CaseDataBuilder.builder()
@@ -70,11 +82,14 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToAdmittedClaimOwingAmountPounds(admitted)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
                     .whenWillThisAmountBePaid(whenWillPay)
                     .build()
             )
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
@@ -121,6 +136,10 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
     }
 
     private CaseData getPartialAdmitRepayPlan() {
+        return getPartialAdmitRepayPlan(false);
+    }
+
+    private CaseData getPartialAdmitRepayPlan(boolean isLipVLR) {
         return CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .build().toBuilder()
@@ -128,6 +147,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
@@ -179,7 +200,7 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .build();
     }
 
-    private CaseData getPartialAdmitPayFull() {
+    private CaseData getPartialAdmitPayFull(boolean isLipVLR) {
         BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
         BigDecimal howMuchWasPaid = new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount));
         return CaseDataBuilder.builder()
@@ -189,10 +210,20 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .specDefenceAdmittedRequired(YesOrNo.YES)
             .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
             .totalClaimAmount(totalClaimAmount)
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
+    private CaseData getPartialAdmitPayFull() {
+        return getPartialAdmitPayFull(false);
+    }
+
     private CaseData getPartialAdmitPayLess() {
+        return getPartialAdmitPayLess(false);
+    }
+
+    private CaseData getPartialAdmitPayLess(boolean isLipVLR) {
         BigDecimal howMuchWasPaid = BigDecimal.valueOf(1000);
         BigDecimal totalClaimAmount = BigDecimal.valueOf(10000);
         return CaseDataBuilder.builder()
@@ -202,6 +233,8 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .specDefenceAdmittedRequired(YesOrNo.YES)
             .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(howMuchWasPaid).build())
             .totalClaimAmount(totalClaimAmount)
+            .respondent1Represented(isLipVLR ? YesOrNo.YES :  YesOrNo.NO)
+            .applicant1Represented(isLipVLR ? YesOrNo.NO :  YesOrNo.YES)
             .build();
     }
 
@@ -268,13 +301,18 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             List.of(
                 Pair.of(getFullAdmitAlreadyPaidCase(), FullAdmitAlreadyPaidConfirmationText.class),
                 Pair.of(getPartialAdmitSetDate(), PartialAdmitSetDateConfirmationText.class),
+                Pair.of(getPartialAdmitSetDate(true), PartialAdmitSetDateConfirmationText.class),
                 Pair.of(getPartialAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
+                Pair.of(getPartialAdmitPayImmediately(true), PartialAdmitPayImmediatelyConfirmationText.class),
                 Pair.of(getFullAdmitRepayPlan(), RepayPlanConfirmationText.class),
                 Pair.of(getPartialAdmitRepayPlan(), RepayPlanConfirmationText.class),
+                Pair.of(getPartialAdmitRepayPlan(true), RepayPlanConfirmationText.class),
                 Pair.of(getFullAdmitAlreadyPaid(), FullAdmitAlreadyPaidConfirmationText.class),
                 Pair.of(getFullAdmitPayBySetDate(), FullAdmitSetDateConfirmationText.class),
                 Pair.of(getPartialAdmitPayFull(), PartialAdmitPaidFullConfirmationText.class),
+                Pair.of(getPartialAdmitPayFull(true), PartialAdmitPaidFullConfirmationText.class),
                 Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
+                Pair.of(getPartialAdmitPayLess(true), PartialAdmitPaidLessConfirmationText.class),
                 Pair.of(getCounterClaim(), CounterClaimConfirmationText.class),
                 Pair.of(getFullAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
                 Pair.of(getFullAdmitRepayPlanLiPvLr(), RepayPlanConfirmationText.class),
