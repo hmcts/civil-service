@@ -55,14 +55,19 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
             .append("<li>keep proof of any payments you make</li>")
             .append("</ul>")
             .append("Contact ").append(applicantName);
-        if (applicantName.endsWith("s")) {
-            sb.append("'");
+
+        if (!caseData.isApplicant1NotRepresented()) {
+            if (applicantName.endsWith("s")) {
+                sb.append("'");
+            } else {
+                sb.append("'s");
+            }
+            sb.append(" legal representative if you need details on how to pay</p>");
         } else {
-            sb.append("'s");
+            sb.append(" if you need details on how to pay</p>");
         }
-        sb.append(" legal representative if you need details on how to pay")
-            .append("<br><br>")
-            .append("If you do not pay immediately, ").append(applicantName);
+
+        sb.append("If you do not pay immediately, ").append(applicantName);
         if (caseData.getRespondent2() != null || caseData.getApplicant2() != null) {
             sb.append(" can either:")
                 .append("<ul>")
@@ -89,8 +94,11 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
                     "<p>If the claim value is greater than £10,000 then the court will review the case for the full amount.</p>")
                 .append("<p>This case will now proceed offline.</p>");
         } else {
-            sb.append("The court will decide how you must pay");
-        }
+            sb.append("The court will decide how you must pay");            
+            if (caseData.isApplicant1NotRepresented()) {
+                sb.append("<br></br>")
+                    .append("<p>This case will now proceed offline.</p>");
+         }
         return Optional.of(sb.toString());
     }
 }

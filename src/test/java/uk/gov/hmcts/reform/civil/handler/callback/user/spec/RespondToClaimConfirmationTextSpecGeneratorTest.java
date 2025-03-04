@@ -93,12 +93,43 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .build();
     }
 
+    private CaseData getFullAdmitPayImmediately() {
+        BigDecimal admitted = BigDecimal.valueOf(1000);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        return CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .applicant1Represented(YesOrNo.NO)
+            .respondToAdmittedClaimOwingAmountPounds(admitted)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .build();
+    }
+
     private CaseData getFullAdmitRepayPlan() {
         return CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .build().toBuilder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .specDefenceFullAdmittedRequired(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.YES)
+            .defenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .build();
+    }
+
+    private CaseData getFullAdmitRepayPlanLiPvLr() {
+        return CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .specDefenceFullAdmittedRequired(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
@@ -139,6 +170,26 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .specDefenceFullAdmittedRequired(YesOrNo.NO)
             .totalClaimAmount(BigDecimal.valueOf(1000))
+            .applicant1Represented(YesOrNo.YES)
+            .defenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .build();
+    }
+
+    private CaseData getFullAdmitPayBySetDateLipVLr() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        return CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .specDefenceFullAdmittedRequired(YesOrNo.NO)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(
@@ -263,6 +314,10 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
                 Pair.of(getPartialAdmitPayLess(), PartialAdmitPaidLessConfirmationText.class),
                 Pair.of(getPartialAdmitPayLess(true), PartialAdmitPaidLessConfirmationText.class),
                 Pair.of(getCounterClaim(), CounterClaimConfirmationText.class)
+                Pair.of(getCounterClaim(), CounterClaimConfirmationText.class),
+                Pair.of(getFullAdmitPayImmediately(), PartialAdmitPayImmediatelyConfirmationText.class),
+                Pair.of(getFullAdmitRepayPlanLiPvLr(), RepayPlanConfirmationText.class),
+                Pair.of(getFullAdmitPayBySetDateLipVLr(), FullAdmitSetDateConfirmationText.class)
             ));
         get2v1DifferentResponseCase().forEach(caseData -> list.add(
             Pair.of(caseData, SpecResponse2v1DifferentText.class))
