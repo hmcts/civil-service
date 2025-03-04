@@ -497,6 +497,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
+            caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
         }
