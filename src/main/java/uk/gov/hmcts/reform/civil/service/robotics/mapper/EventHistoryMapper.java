@@ -134,6 +134,7 @@ public class EventHistoryMapper {
     public static final String RECORD_JUDGMENT = "Judgment recorded.";
     public static final String RPA_RECORD_JUDGMENT_REASON = "RPA Reason: Judgment recorded.";
     public static final String RPA_IN_MEDIATION = "IN MEDIATION";
+    public static final String QUERIES_ON_CASE = "There has been a query on this case";
     static final String ENTER = "Enter";
     static final String LIFTED = "Lifted";
 
@@ -1005,6 +1006,7 @@ public class EventHistoryMapper {
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
                                                              CaseData caseData) {
+        buildQueriesEvent(builder, caseData, caseData.getTakenOfflineDate());
         String detailsText = "RPA Reason: Claim moved offline after no response from applicant past response deadline.";
         builder.miscellaneous(
             Event.builder()
@@ -1068,6 +1070,7 @@ public class EventHistoryMapper {
     }
 
     private void buildTakenOfflineByStaff(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        buildQueriesEvent(builder, caseData, caseData.getTakenOfflineByStaffDate());
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -1078,6 +1081,24 @@ public class EventHistoryMapper {
                                   .miscText(prepareTakenOfflineEventDetails(caseData))
                                   .build())
                 .build());
+    }
+
+    private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                   LocalDateTime dateReceived) {
+        if (caseData.getQmApplicantSolicitorQueries() != null
+            || caseData.getQmRespondentSolicitor1Queries() != null
+            || caseData.getQmRespondentSolicitor2Queries() != null) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(dateReceived)
+                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(QUERIES_ON_CASE)
+                                      .build())
+                    .build());
+        }
     }
 
     private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
