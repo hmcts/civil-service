@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
@@ -37,7 +36,6 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
 
     public static final String TASK_ID = "QueryRaisedNotify";
     private static final String REFERENCE_TEMPLATE = "query-raised-notification-%s";
-
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;

@@ -17,6 +17,10 @@ public class QueryNotificationUtils {
 
     public static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
 
+    private QueryNotificationUtils() {
+        //NO-OP
+    }
+
     public static String getEmail(CaseData caseData, List<String> roles) {
         if (isApplicantSolicitor(roles)) {
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
