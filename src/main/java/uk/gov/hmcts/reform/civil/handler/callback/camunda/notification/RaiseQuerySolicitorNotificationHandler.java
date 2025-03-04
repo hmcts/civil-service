@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaS
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,10 +86,10 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        return Map.of(
+        return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
     }
 }
