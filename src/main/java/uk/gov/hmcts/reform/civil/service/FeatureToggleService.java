@@ -119,10 +119,6 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isCaseEventsEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
-    }
-
     public boolean isAmendBundleEnabled() {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
@@ -141,11 +137,6 @@ public class FeatureToggleService {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
             && isGaForLipsEnabled();
-    }
-
-    public boolean isHmcNroEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-nro");
-
     }
 
     public boolean isJOLiveFeedActive() {
