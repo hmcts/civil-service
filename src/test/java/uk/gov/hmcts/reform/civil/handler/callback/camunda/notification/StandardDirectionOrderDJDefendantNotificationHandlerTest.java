@@ -182,7 +182,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
         public void shouldThrowErrorWhenMissingEmail() {
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-            doThrow(new RuntimeException()).when(notificationService).sendMail(isNull(),any(),any(),any());
+            doThrow(new RuntimeException()).when(notificationService).sendMail(isNull(), any(), any(), any());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
@@ -212,7 +212,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             final String invalidEmail = "invalidEmail@123";
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-            doThrow(new RuntimeException()).when(notificationService).sendMail(eq(invalidEmail),any(),any(),any());
+            doThrow(new RuntimeException()).when(notificationService).sendMail(eq(invalidEmail), any(), any(), any());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
