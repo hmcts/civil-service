@@ -49,15 +49,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCaseEventsEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "cui-case-events-enabled";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseEventsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "amend-bundle-enabled";
         givenToggle(caseFlagsKey, toggleStat);
@@ -294,15 +285,6 @@ class FeatureToggleServiceTest {
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
 
         assertEquals(expected, result);
-    }
-
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHmcNroCEnabled(Boolean toggleStat) {
-        var isCoSCEnabledKey = "hmc-nro";
-        givenToggle(isCoSCEnabledKey, toggleStat);
-
-        assertThat(featureToggleService.isHmcNroEnabled()).isEqualTo(toggleStat);
-
     }
 
     @ParameterizedTest
