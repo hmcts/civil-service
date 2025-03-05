@@ -45,11 +45,11 @@ public class StayCaseCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse handleAboutToSubmit(CallbackParams params) {
-        return featureToggleService.isCaseEventsEnabled() ? stayCase(params) : emptyCallbackResponse(params);
+        return stayCase(params);
     }
 
     private CallbackResponse handleSubmitted(CallbackParams params) {
-        return featureToggleService.isCaseEventsEnabled() ? addConfirmationScreen(params) : emptyCallbackResponse(params);
+        return addConfirmationScreen(params);
     }
 
     private CallbackResponse stayCase(CallbackParams callbackParams) {
