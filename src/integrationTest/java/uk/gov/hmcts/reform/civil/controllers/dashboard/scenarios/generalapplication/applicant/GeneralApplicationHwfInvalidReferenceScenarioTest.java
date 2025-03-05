@@ -45,7 +45,7 @@ public class GeneralApplicationHwfInvalidReferenceScenarioTest extends BaseInteg
                         "If you've already read the email and taken action, you can disregard this message.</p>" +
                         "<p class=\"govuk-body\">You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi gwneud cais am help i dalu'r ffi gwneud ${applicationFeeTypeCy}, ond mae'r cyfeirnod yn annilys.</p>" +
+                    "<p class=\"govuk-body\">Rydych wedi gwneud cais am help i dalu'r ffi ${applicationFeeTypeCy}, ond mae'r cyfeirnod yn annilys.</p>" +
                         "<p class=\"govuk-body\">Anfonwyd e-bost atoch gyda chyfarwyddiadau ar beth i'w wneud nesaf. " +
                         "Os ydych wedi darllen yr e-bost yn barod ac wedi gweithredu, gallwch anwybyddu'r neges hon.</p>" +
                         "<p class=\"govuk-body\">Gallwch dalu dros y ffôn drwy ffonio {civilMoneyClaimsTelephone}.</p>")
