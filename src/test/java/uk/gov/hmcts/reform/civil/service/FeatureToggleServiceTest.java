@@ -215,22 +215,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
-        var caseFileKey = "multi-or-intermediate-track";
-        givenToggle(mintiKey, toggleStat);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .build();
-        if (toggleStat) {
-            when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
-                .thenReturn(true);
-        }
-        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(false);
-    }
-
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
