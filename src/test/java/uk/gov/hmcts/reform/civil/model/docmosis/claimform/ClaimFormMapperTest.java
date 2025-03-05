@@ -476,6 +476,7 @@ class ClaimFormMapperTest {
         ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getClaimNumber()).isEqualTo("000MC038");
+        assertThat(form.getCcdCaseReference()).isEqualTo("1234-5678-9012-3456");
     }
 
     @Test
@@ -509,6 +510,7 @@ class ClaimFormMapperTest {
     private static CaseData getCaseData() {
         return CaseData.builder()
             .legacyCaseReference("000MC038")
+            .ccdCaseReference(1234567890123456L)
             .applicant1(Party.builder()
                             .companyName(ORGANISATION)
                             .partyEmail(EMAIL)

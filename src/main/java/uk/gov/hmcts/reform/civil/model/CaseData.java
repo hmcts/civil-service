@@ -17,14 +17,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
-import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
-import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
-import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
@@ -36,22 +32,15 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SettlementReason;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
-import uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus;
-import uk.gov.hmcts.reform.civil.enums.settlediscontinue.ConfirmOrderGivesPermission;
-import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
-import uk.gov.hmcts.reform.civil.enums.settlediscontinue.MarkPaidConsentList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
-import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
@@ -60,8 +49,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
@@ -86,27 +73,9 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideOrderType;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentSetAsideReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
-import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
-import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
-import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
-import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
-import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
-import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -634,158 +603,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo isGaApplicantLip;
     private final YesOrNo isGaRespondentOneLip;
     private final YesOrNo isGaRespondentTwoLip;
-
-    //case progression
-    private final List<Element<DocumentWithName>> documentAndName;
-    private final List<Element<DocumentWithName>> documentAndNameToAdd;
-    private final List<Element<DocumentAndNote>> documentAndNote;
-    private final List<Element<DocumentAndNote>> documentAndNoteToAdd;
-    private final CaseNoteType caseNoteType;
-    private final String caseNoteTA;
-    private final List<Element<CaseNote>> caseNotesTA;
-    private final LocalDateTime noteAdditionDateTime;
-    private final String caseTypeFlag;
-    private final String witnessStatementFlag;
-    private final String witnessSummaryFlag;
-    private final String witnessReferredStatementFlag;
-    private final String expertReportFlag;
-    private final String expertJointFlag;
-    private final String trialAuthorityFlag;
-    private final String trialCostsFlag;
-    private final String trialDocumentaryFlag;
-
-    private final YesOrNo urgentFlag;
-    private final String caseProgAllocatedTrack;
-    private final DynamicList evidenceUploadOptions;
-
-    private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
-    private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
-
-    private final String respondent1DocumentURL;
-    private final String respondent2DocumentURL;
-    private final String respondent2DocumentGeneration;
-    private final String hearingHelpFeesReferenceNumber;
-
-    private final String hearingLocationCourtName;
-    // bulk claims
-    private final String bulkCustomerId;
-    private final String sdtRequestIdFromSdt;
-    private final List<Element<String>> sdtRequestId;
-
-    //Judgments Online
-    private JudgmentRecordedReason joJudgmentRecordReason;
-    private LocalDate joOrderMadeDate;
-    private LocalDate joIssuedDate;
-    private String joAmountOrdered;
-    private String joAmountCostOrdered;
-    private YesOrNo joIsRegisteredWithRTL;
-    private JudgmentPaymentPlan joPaymentPlan;
-    private JudgmentInstalmentDetails joInstalmentDetails;
-    private YesOrNo joIsLiveJudgmentExists;
-    private JudgmentPaidInFull joJudgmentPaidInFull;
-    private JudgmentSetAsideReason joSetAsideReason;
-    private String joSetAsideJudgmentErrorText;
-    private JudgmentSetAsideOrderType joSetAsideOrderType;
-    private LocalDate joSetAsideOrderDate;
-    private LocalDate joSetAsideApplicationDate;
-    private LocalDate joSetAsideDefenceReceivedDate;
-    private YesOrNo joShowRegisteredWithRTLOption;
-    private JudgmentDetails activeJudgment;
-    private List<Element<JudgmentDetails>> historicJudgment;
-    private LocalDateTime joSetAsideCreatedDate;
-
-    private String joDefendantName1;
-    private String joDefendantName2;
-    private PaymentPlanSelection joPaymentPlanSelected;
-    private String joRepaymentAmount;
-    private LocalDate joRepaymentStartDate;
-    private PaymentFrequency joRepaymentFrequency;
-    private LocalDate joIssueDate;
-    private JudgmentState joState;
-    private LocalDate joFullyPaymentMadeDate;
-    private LocalDateTime joMarkedPaidInFullIssueDate;
-    private LocalDateTime joDefendantMarkedPaidInFullIssueDate;
-    private CoscRPAStatus joCoscRpaStatus;
-    private String joOrderedAmount;
-    private String joCosts;
-    private String joTotalAmount;
-    private YesOrNo joIsDisplayInJudgmentTab;
-    private String joRepaymentSummaryObject;
-    private YesOrNo respondForImmediateOption;
-    private LocalDateTime joDJCreatedDate;
-
-    private final TransferCaseDetails transferCaseDetails;
-
-    //SDO-R2
-    private YesOrNo isFlightDelayClaim;
-    private FlightDelayDetails flightDelayDetails;
-    private ReasonForReconsideration reasonForReconsiderationApplicant;
-    private ReasonForReconsideration reasonForReconsiderationRespondent1;
-    private ReasonForReconsideration reasonForReconsiderationRespondent2;
-    private String casePartyRequestForReconsideration;
-    private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
-    private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
-    private String dashboardNotificationTypeOrder;
-    private CaseDocument decisionOnReconsiderationDocument;
-    private CaseDocument requestForReconsiderationDocument;
-    private CaseDocument requestForReconsiderationDocumentRes;
-    private LocalDateTime requestForReconsiderationDeadline;
-    private YesOrNo requestForReconsiderationDeadlineChecked;
-
-    //Settle And Discontinue
-    private YesOrNo markPaidForAllClaimants;
-    private DynamicList claimantWhoIsSettling;
-    private DynamicList claimantWhoIsDiscontinuing;
-    private DynamicList discontinuingAgainstOneDefendant;
-    private String selectedClaimantForDiscontinuance;
-    private SettleDiscontinueYesOrNoList courtPermissionNeeded;
-    private SettleDiscontinueYesOrNoList isPermissionGranted;
-    private PermissionGranted permissionGrantedComplex;
-    private String permissionGrantedJudgeCopy;
-    private LocalDate permissionGrantedDateCopy;
-    private DiscontinuanceTypeList typeOfDiscontinuance;
-    private String partDiscontinuanceDetails;
-    private ConfirmOrderGivesPermission confirmOrderGivesPermission;
-    private SettleDiscontinueYesOrNoList isDiscontinuingAgainstBothDefendants;
-    private SettlementReason settleReason;
-    private final MarkPaidConsentList markPaidConsent;
-    private YesOrNo claimantsConsentToDiscontinuance;
-    private CaseDocument applicant1NoticeOfDiscontinueCWViewDoc;
-    private CaseDocument respondent1NoticeOfDiscontinueCWViewDoc;
-    private CaseDocument respondent2NoticeOfDiscontinueCWViewDoc;
-    private CaseDocument applicant1NoticeOfDiscontinueAllPartyViewDoc;
-    private CaseDocument respondent1NoticeOfDiscontinueAllPartyViewDoc;
-    private CaseDocument respondent2NoticeOfDiscontinueAllPartyViewDoc;
-
-    @JsonUnwrapped
-    private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
-    private LocalDate coscSchedulerDeadline;
-    private CoscApplicationStatus coSCApplicationStatus;
-
-    //Caseworker events
-    private YesOrNo obligationDatePresent;
-    private CourtStaffNextSteps courtStaffNextSteps;
-    private List<Element<ObligationData>> obligationData;
-    private List<Element<StoredObligationData>> storedObligationData;
-    private YesOrNo isFinalOrder;
-    private SendAndReplyOption sendAndReplyOption;
-    private SendMessageMetadata sendMessageMetadata;
-    private String sendMessageContent;
-    private MessageReply messageReplyMetadata;
-    private String messageHistory;
-    private DynamicList messagesToReplyTo;
-    private List<Element<Message>> messages;
-    private ObligationWAFlag obligationWAFlag;
-    private Message lastMessage;
-    private String lastMessageAllocatedTrack;
-    private String lastMessageJudgeLabel;
-
-    //QueryManagement
-    private final CaseQueriesCollection qmApplicantSolicitorQueries;
-    private final CaseQueriesCollection qmRespondentSolicitor1Queries;
-    private final CaseQueriesCollection qmRespondentSolicitor2Queries;
-    private final CaseMessage caseMessage;
-    private final LatestQuery qmLatestQuery;
 
 
     /**
