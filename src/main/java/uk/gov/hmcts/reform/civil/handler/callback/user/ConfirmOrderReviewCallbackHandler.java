@@ -65,22 +65,13 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-
-        if (featureToggleService.isCaseEventsEnabled()) {
-            return Map.of(
-                callbackKey(ABOUT_TO_START), this::cleanObligationData,
-                callbackKey(MID, "validate-obligation-date"), this:: validateObligationDate,
-                callbackKey(MID, "validate-tasks-left"), this:: validateTasksLeft,
-                callbackKey(ABOUT_TO_SUBMIT), this::confirmOrderReview,
-                callbackKey(SUBMITTED), this::fillConfirmationScreen
-            );
-        } else {
-            return Map.of(
-                callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-                callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
-                callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
-            );
-        }
+        return Map.of(
+            callbackKey(ABOUT_TO_START), this::cleanObligationData,
+            callbackKey(MID, "validate-obligation-date"), this:: validateObligationDate,
+            callbackKey(MID, "validate-tasks-left"), this:: validateTasksLeft,
+            callbackKey(ABOUT_TO_SUBMIT), this::confirmOrderReview,
+            callbackKey(SUBMITTED), this::fillConfirmationScreen
+        );
     }
 
     @Override
