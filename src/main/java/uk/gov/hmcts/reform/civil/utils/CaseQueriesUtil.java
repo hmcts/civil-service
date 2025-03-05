@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
@@ -37,6 +39,34 @@ public class CaseQueriesUtil {
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
+    }
+
+//    public static CaseQueriesCollection getCollectionByMessage(CaseData caseData, CaseMessage message) {
+//        if (collectionHasMessage(caseData.getQmApplicantSolicitorQueries(), message)) {
+//            return caseData.getQmApplicantSolicitorQueries();
+//        }
+//        if (collectionHasMessage(caseData.getQmRespondentSolicitor1Queries(), message)) {
+//            return caseData.getQmRespondentSolicitor1Queries();
+//        }
+//        if (collectionHasMessage(caseData.getQmRespondentSolicitor2Queries(), message)) {
+//            return caseData.getQmRespondentSolicitor1Queries();
+//        }
+//        return null;
+//    }
+//
+//    public static boolean collectionHasMessage(CaseQueriesCollection collection, CaseMessage message) {
+//        return nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().contains(message);
+//    }
+
+    public static CaseQueriesCollection getCollectionByMessage(CaseData caseData, CaseMessage message) {
+        return Stream.of(
+                caseData.getQmApplicantSolicitorQueries(),
+                caseData.getQmRespondentSolicitor1Queries(),
+                caseData.getQmRespondentSolicitor2Queries()
+            )
+            .filter(collection -> nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().contains(message))
+            .findFirst()
+            .orElse(null);
     }
 
     public static CaseMessage getLatestQuery(CaseData caseData) {
@@ -96,6 +126,13 @@ public class CaseQueriesUtil {
             }
         }
     }
+
+    public static void assignCategoryIdToQueryDocument(Document document,
+                                                       AssignCategoryId assignCategoryId,
+                                                       List<String> roles) {
+        String categoryId = getCategoryIdForRole(roles);
+        assignCategoryId.assignCategoryIdToDocument(document, categoryId);
+    };
 
     public static void assignCategoryIdToCaseworkerAttachments(CaseData caseData,
                                                                CaseMessage latestCaseMessage,

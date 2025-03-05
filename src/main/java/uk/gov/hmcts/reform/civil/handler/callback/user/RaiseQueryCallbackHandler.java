@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToQueryDocument;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -95,14 +96,16 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseQueriesCollection queriesCollection = getUserQueriesByRole(caseData, roles);
         CaseMessage latestCaseMessage = queriesCollection.latest();
         String parentId = nonNull(latestCaseMessage.getParentId()) ? latestCaseMessage.getParentId() : latestCaseMessage.getId();
-        List<Element<CaseMessage>> messageThread = queriesCollection.messageThread(parentId);
 
         CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+
+        List<Element<CaseMessage>> messageThread = queriesCollection.messageThread(parentId);
         buildDocument(
             messageThread,
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            roles,
             builder
-            );
+        );
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
 
@@ -119,11 +122,11 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         return coreCaseUserService.getUserCaseRoles(caseReference, userInfo.getUid());
     }
 
-    private void buildDocument(List<Element<CaseMessage>> messageThread, String auth, CaseData.CaseDataBuilder builder) {
-        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(messageThread, auth);
+    private void buildDocument(List<Element<CaseMessage>> messageThread, String auth, List<String> roles, CaseData.CaseDataBuilder builder) {
+        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(messageThread, auth, roles);
+        CaseData caseData = builder.build();
         List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
         queryDocuments.add(element(caseDocuments.get(0)));
-        CaseData caseData = builder.build();
         if (!isEmpty(caseData.getQueryDocuments())) {
             queryDocuments.addAll(caseData.getHearingDocuments());
         }
