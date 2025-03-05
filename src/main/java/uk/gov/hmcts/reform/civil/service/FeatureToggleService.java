@@ -119,10 +119,6 @@ public class FeatureToggleService {
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
-    public boolean isCaseEventsEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
-    }
-
     public boolean isAmendBundleEnabled() {
         return featureToggleApi.isFeatureEnabled("amend-bundle-enabled");
     }
