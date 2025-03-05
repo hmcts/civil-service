@@ -9,31 +9,42 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.QueryDocumentGenerator;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static io.jsonwebtoken.lang.Collections.isEmpty;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRaiseQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
+@SuppressWarnings("unchecked")
 @RequiredArgsConstructor
 public class RaiseQueryCallbackHandler extends CallbackHandler {
 
@@ -42,6 +53,8 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     protected final UserService userService;
     protected final CoreCaseUserService coreCaseUserService;
+    private final AssignCategoryId assignCategoryId;
+    protected final QueryDocumentGenerator queryDocumentGenerator;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
 
@@ -79,10 +92,22 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
+        CaseQueriesCollection queriesCollection = getUserQueriesByRole(caseData, roles);
+        CaseMessage latestCaseMessage = queriesCollection.latest();
+        String parentId = nonNull(latestCaseMessage.getParentId()) ? latestCaseMessage.getParentId() : latestCaseMessage.getId();
+        List<Element<CaseMessage>> messageThread = queriesCollection.messageThread(parentId);
+
+        CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
+        buildDocument(
+            messageThread,
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            builder
+            );
+
+        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().qmLatestQuery(
+            .data(builder.qmLatestQuery(
                 buildLatestQuery(latestCaseMessage))
                       .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
                       .build().toMap(objectMapper))
@@ -92,6 +117,17 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {
         UserInfo userInfo = userService.getUserInfo(userToken);
         return coreCaseUserService.getUserCaseRoles(caseReference, userInfo.getUid());
+    }
+
+    private void buildDocument(List<Element<CaseMessage>> messageThread, String auth, CaseData.CaseDataBuilder builder) {
+        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(messageThread, auth);
+        List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
+        queryDocuments.add(element(caseDocuments.get(0)));
+        CaseData caseData = builder.build();
+        if (!isEmpty(caseData.getQueryDocuments())) {
+            queryDocuments.addAll(caseData.getHearingDocuments());
+        }
+        builder.queryDocuments(queryDocuments);
     }
 
 }

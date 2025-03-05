@@ -787,6 +787,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final CaseQueriesCollection qmRespondentSolicitor2Queries;
     private final CaseMessage caseMessage;
     private final LatestQuery qmLatestQuery;
+    @Builder.Default
+    private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
 
 
     /**
