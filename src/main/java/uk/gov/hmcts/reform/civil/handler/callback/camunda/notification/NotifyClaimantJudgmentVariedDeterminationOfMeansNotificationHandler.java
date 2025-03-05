@@ -19,6 +19,7 @@ import java.util.Map;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
@@ -75,9 +76,11 @@ public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
-                DEFENDANT_NAME,  getDefendantNameBasedOnCaseType(caseData)
+                DEFENDANT_NAME,  getDefendantNameBasedOnCaseType(caseData),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
     }
 

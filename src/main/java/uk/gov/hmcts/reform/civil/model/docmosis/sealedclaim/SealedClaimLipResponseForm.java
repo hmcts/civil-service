@@ -40,6 +40,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
+
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -47,6 +49,7 @@ import java.util.stream.Stream;
 public class SealedClaimLipResponseForm implements MappableObject {
 
     private final String claimReferenceNumber;
+    private final String ccdCaseReference;
     private final String claimantReferenceNumber;
     private final String defendantReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -89,6 +92,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     public static SealedClaimLipResponseForm toTemplate(final CaseData caseData) {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
+            .ccdCaseReference(formatCcdCaseReference(caseData))
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .claimant1(LipFormPartyDefence.toLipDefenceParty(caseData.getApplicant1()))
             .defendant1(LipFormPartyDefence.toLipDefenceParty(
