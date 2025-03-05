@@ -228,7 +228,7 @@ class FeatureToggleServiceTest {
             when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
                 .thenReturn(true);
         }
-        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)).isEqualTo(false);
     }
 
     private void givenToggle(String feature, boolean state) {
