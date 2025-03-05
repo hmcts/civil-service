@@ -666,4 +666,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String queryRaised;
+
+    @NotEmpty
+    private String queryResponseReceived;
 }
