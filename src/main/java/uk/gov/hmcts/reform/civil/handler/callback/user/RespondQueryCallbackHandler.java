@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.ethlo.time.DateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -46,7 +44,6 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(queryManagementRespondQuery);
 
     private final ObjectMapper mapper;
-    private final Time time;
     private final AssignCategoryId assignCategoryId;
     private final CoreCaseUserService coreCaseUserService;
     protected final QueryDocumentGenerator queryDocumentGenerator;
@@ -69,24 +66,18 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
-        String parentQueryId = getQueryById(caseData, latestCaseMessage.getParentId()).getParentId();
+        String parentQueryId = latestCaseMessage.getParentId();
         assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId,
                                                 coreCaseUserService, parentQueryId);
         CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
-
         latestCaseMessage.getAttachments();
         CaseQueriesCollection currentCollection = getCollectionByMessage(caseData, latestCaseMessage);
         List<Element<CaseMessage>> messageThread = currentCollection.messageThread(parentQueryId);
         String categoryId = getQueriesDocument(caseData, messageThread.get(0).getValue().getCreatedOn()).getDocumentLink().getCategoryID();
         buildDocument(messageThread, callbackParams.getParams().get(BEARER_TOKEN).toString(), categoryId, builder);
 
-        caseData = builder
-            .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
-            .takenOfflineDate(time.now())
-            .build();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
+            .data(builder.build().toMap(mapper))
             .build();
 
     }
