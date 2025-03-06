@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.hasJudgeReallocatedTrack;
 
 @Slf4j
 @Service
@@ -99,7 +100,8 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        log.info("judge has/has not reallocated track {}",  hasJudgeReallocatedTrack(caseData));
+        return featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false) || hasJudgeReallocatedTrack(caseData);
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
