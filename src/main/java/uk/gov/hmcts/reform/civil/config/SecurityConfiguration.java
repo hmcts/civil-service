@@ -53,6 +53,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @SuppressWarnings("java:S4502")
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter) throws Exception {
         http
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -65,7 +66,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/cases/callbacks/**", "/case/document/generateAnyDoc", "/dashboard/**")
                 .hasAnyAuthority(AUTHORITIES)
                 .anyRequest().authenticated()
-            );
+            )
+            .oauth2Client();
 
         return http.build();
     }
