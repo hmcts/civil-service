@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -89,6 +92,7 @@ public class NotificationUtils {
             );
         } else {
             //1v2 template is used and expects different data
+            String respondent2Response = getRespondent2ClaimResponse(caseData);
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
@@ -96,15 +100,35 @@ public class NotificationUtils {
                 RESPONDENT_ONE_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
-                    : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_TWO_RESPONSE, respondent2Response,
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
     }
+
+    private static String getRespondent2ClaimResponse(CaseData caseData) {
+        final String NO_RESPONSE = "No response type available";
+
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            RespondentResponseTypeSpec specResponse = caseData.getRespondent2ClaimResponseTypeForSpec();
+            return specResponse != null ? specResponse.getDisplayedValue() : NO_RESPONSE;
+        }
+
+        RespondentResponseType respondent2Type = caseData.getRespondent2ClaimResponseType();
+        if (respondent2Type != null) {
+            return respondent2Type.getDisplayedValue();
+        }
+
+        if (YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
+            RespondentResponseType respondent1Type = caseData.getRespondent1ClaimResponseType();
+            return respondent1Type != null ? respondent1Type.getDisplayedValue() : NO_RESPONSE;
+        }
+
+        return NO_RESPONSE;
+    }
+
 
     public static String getSolicitorClaimDismissedProperty(List<String> stateHistoryNameList,
                                                             NotificationsProperties notificationsProperties) {
