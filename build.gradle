@@ -113,7 +113,7 @@ allprojects {
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
-      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.16'
+      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
 
       // solves CVE-2022-25857
       dependencySet(
