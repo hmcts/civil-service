@@ -47,6 +47,7 @@ public class NotificationUtils {
     }
 
     public static String REFERENCE_NOT_PROVIDED = "Not provided";
+    public static String NO_RESPONSE = "No response type available";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
@@ -108,9 +109,7 @@ public class NotificationUtils {
         }
     }
 
-    private static String getRespondent2ClaimResponse(CaseData caseData) {
-        final String NO_RESPONSE = "No response type available";
-
+    public static String getRespondent2ClaimResponse(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             RespondentResponseTypeSpec specResponse = caseData.getRespondent2ClaimResponseTypeForSpec();
             return specResponse != null ? specResponse.getDisplayedValue() : NO_RESPONSE;
@@ -128,7 +127,6 @@ public class NotificationUtils {
 
         return NO_RESPONSE;
     }
-
 
     public static String getSolicitorClaimDismissedProperty(List<String> stateHistoryNameList,
                                                             NotificationsProperties notificationsProperties) {
