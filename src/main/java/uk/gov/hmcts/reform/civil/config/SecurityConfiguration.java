@@ -1,20 +1,19 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
-import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter;
-
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import uk.gov.hmcts.reform.auth.checker.core.user.User;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
     private static final String[] AUTHORITIES = {
         "caseworker-civil",
@@ -27,23 +26,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     };
 
     private static final String[] AUTH_WHITELIST = {
-        // -- swagger ui
-        "/v2/api-docs",
-        "/swagger-resources/**",
-        "/swagger-ui.html",
-        "/webjars/**",
-        // other public endpoints of API
-        "/health",
-        "/env",
-        "/health/liveness",
-        "/health/readiness",
-        "/status/health",
         "/",
-        "/loggers/**",
-        "/assignment/**",
-        "/service-request-update",
-        "/service-request-update-claim-issued",
-        "/case/document/downloadDocument/**",
+        "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**",
+        "/health", "/env", "/health/liveness", "/health/readiness", "/status/health",
+        "/loggers/**", "/assignment/**", "/service-request-update",
+        "/service-request-update-claim-issued", "/case/document/downloadDocument/**",
         "/testing-support/flowstate"
     };
 
@@ -58,29 +45,28 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.authenticationManager = authenticationManager;
     }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(AUTH_WHITELIST);
+    @Bean
+    public AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter() {
+        AuthCheckerUserOnlyFilter<User> filter = new AuthCheckerUserOnlyFilter<>(userRequestAuthorizer);
+        filter.setAuthenticationManager(authenticationManager);
+        return filter;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter =
-            new AuthCheckerUserOnlyFilter<>(userRequestAuthorizer);
-
-        authCheckerUserOnlyFilter.setAuthenticationManager(authenticationManager);
-        // @formatter:off
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter) throws Exception {
         http
-            .sessionManagement().sessionCreationPolicy(STATELESS).and()
-            .csrf().disable()
-            .formLogin().disable()
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .csrf(csrf -> csrf.disable())
+            .formLogin(form -> form.disable())
+            .logout(logout -> logout.disable())
             .addFilter(authCheckerUserOnlyFilter)
-            .logout().disable()
-            .authorizeRequests()
-            .antMatchers(AUTH_WHITELIST).permitAll()
-            .antMatchers("/cases/callbacks/**", "/case/document/generateAnyDoc", "/dashboard/**")
-            .hasAnyAuthority(AUTHORITIES)
-            .anyRequest()
-            .authenticated();
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(AUTH_WHITELIST).permitAll()
+                .requestMatchers("/cases/callbacks/**", "/case/document/generateAnyDoc", "/dashboard/**")
+                .hasAnyAuthority(AUTHORITIES)
+                .anyRequest().authenticated()
+            );
+
+        return http.build();
     }
 }

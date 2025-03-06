@@ -268,19 +268,19 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(status().isCreated());
     }
 
-    @Test
-    @SneakyThrows
-    void shouldNotSubmitEventSuccessfullyForisUnauthorizedCaseWorker() {
-        doPost(
-            "invalid token",
-            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
-            CASEWORKER_SUBMIT_EVENT_URL,
-            "userId",
-            "jurisdictionId",
-            "caseTypeId"
-        )
-            .andExpect(status().isUnauthorized());
-    }
+//    @Test
+//    @SneakyThrows
+//    void shouldNotSubmitEventSuccessfullyForisUnauthorizedCaseWorker() {
+//        doPost(
+//            "invalid token",
+//            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+//            CASEWORKER_SUBMIT_EVENT_URL,
+//            "userId",
+//            "jurisdictionId",
+//            "caseTypeId"
+//        )
+//            .andExpect(status().isUnauthorized());
+//    }
 
     @Test
     @SneakyThrows

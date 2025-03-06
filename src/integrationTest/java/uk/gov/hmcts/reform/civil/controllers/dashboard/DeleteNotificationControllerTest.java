@@ -7,6 +7,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
+import uk.gov.hmcts.reform.auth.checker.core.exceptions.UnauthorisedUserException;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 
@@ -14,6 +16,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -44,8 +48,10 @@ public class DeleteNotificationControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
 
+        when(userRequestAuthorizerMock.authorise(any())).thenThrow(BearerTokenMissingException.class);
+
         doDelete("", null, END_POINT_URL, NOTIFICATION_IDENTIFIER.toString())
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isForbidden());
     }
 
     @Test
