@@ -33,17 +33,10 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        if (featureToggleService.isCaseEventsEnabled()) {
-            return Map.of(
-                callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-                callbackKey(SUBMITTED), this::buildConfirmation
-            );
-        } else {
-            return Map.of(
-                callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
-                callbackKey(SUBMITTED), this::emptyCallbackResponse
-            );
-        }
+        return Map.of(
+            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(SUBMITTED), this::buildConfirmation
+        );
     }
 
     @Override
