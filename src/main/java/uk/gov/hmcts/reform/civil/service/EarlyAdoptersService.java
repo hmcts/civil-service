@@ -12,7 +12,7 @@ public class EarlyAdoptersService {
 
     private final FeatureToggleService featureToggleService;
 
-    public boolean isPartOfHmcEarlyAdoptersRollout(CaseData caseData) {
+    public boolean isPartOfHmcLipEarlyAdoptersRollout(CaseData caseData) {
         boolean isWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(
             caseData.getCaseManagementLocation().getBaseLocation());
         logWhiteListingOutcome(caseData.getCcdCaseReference(), "HMC", isWhiteListed);
