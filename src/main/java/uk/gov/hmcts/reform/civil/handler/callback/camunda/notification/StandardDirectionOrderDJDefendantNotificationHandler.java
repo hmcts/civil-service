@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,6 +27,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
@@ -89,11 +91,13 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
             if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
                 if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
                     || checkIfBothDefendants(caseData)) {
+                    var scenario = getMultiPartyScenario(caseData);
+                    String targetEmail = scenario == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
+                        ? caseData.getRespondent1EmailAddress()
+                        : getRespondent2PartyEmail(caseData);
                     try {
                         notificationService.sendMail(
-                            caseData.getRespondentSolicitor2EmailAddress() != null
-                                ? caseData.getRespondentSolicitor2EmailAddress() :
-                                caseData.getRespondentSolicitor1EmailAddress(),
+                            targetEmail,
                             notificationsProperties.getStandardDirectionOrderDJTemplate(),
                             addPropertiesDef2(caseData),
                             String.format(
@@ -102,7 +106,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
                             )
                         );
                     } catch (Exception e) {
-                        log.error("Failed to send email to respondent 1 for case {} due to error {}",
+                        log.error("Failed to send email to respondent 2 for case {} due to error {}",
                                   callbackParams.getRequest().getCaseDetails().getId(), e.getMessage());
                     }
 
@@ -113,6 +117,11 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private static String getRespondent2PartyEmail(CaseData caseData) {
+        return YesOrNo.YES.equals(caseData.getRespondent2Represented())
+            ? caseData.getRespondentSolicitor2EmailAddress() : caseData.getRespondent2().getPartyEmail();
     }
 
     @Override
