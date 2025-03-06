@@ -103,7 +103,8 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return false;
+        return featureToggleApi.isFeatureEnabled("minti")
+            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {

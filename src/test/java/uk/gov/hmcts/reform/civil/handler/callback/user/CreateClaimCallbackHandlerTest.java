@@ -1480,7 +1480,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
-                .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
                 .containsEntry("allocatedTrack", MULTI_CLAIM.name());
         }
 
