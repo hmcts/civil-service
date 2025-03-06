@@ -5,14 +5,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Result;
 import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
+import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINUOUS_FEED;
 
@@ -20,9 +29,18 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINU
 class AddCaseNoteMessageHandlerTest {
 
     private static final long CASE_ID = 1234567891234567L;
+    public static final String ACCESS_TOKEN = "AccessToken";
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
+    @Mock
+    private RoboticsNotifier roboticsNotifier;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private UserService userService;
+    @Mock
+    private SystemUpdateUserConfiguration systemUpdateUserConfiguration;
 
     @InjectMocks
     private AddCaseNoteMessageHandler addCaseNoteMessageHandler;
@@ -39,6 +57,11 @@ class AddCaseNoteMessageHandlerTest {
 
     @Test
     public void shouldPublishEventWhenReceivingHandleableMessage() {
+        CaseDetails details = CaseDetails.builder().id(CASE_ID).build();
+        CaseData data = CaseData.builder().build();
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(details);
+        when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
+        when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
 
         CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
             .caseId(String.valueOf(CASE_ID))
@@ -49,13 +72,20 @@ class AddCaseNoteMessageHandlerTest {
 
         Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
 
-        verify(coreCaseDataService).triggerEvent(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED);
+        verify(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
         assertThat(result).isInstanceOf(Result.Success.class);
     }
 
     @Test
     public void shouldPublishCustomEventObjectToAppInsights_onFailure() {
-        doThrow(new CaseDataUpdateException()).when(coreCaseDataService).triggerEvent(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED);
+        CaseDetails details = CaseDetails.builder().id(CASE_ID).build();
+        CaseData data = CaseData.builder().build();
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(details);
+        when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
+        when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
+
+        doThrow(new NotificationException(new RuntimeException("error")))
+            .when(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
 
         CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
             .caseId(String.valueOf(CASE_ID))
