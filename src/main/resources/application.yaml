@@ -473,6 +473,7 @@ notifications:
   notifyClaimantLRCoscApplied: "392cc0d5-51b3-4a82-8576-922424775617"
 
   queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
+  queryResponseReceived: "4e74a2ab-376f-47e1-9670-8f97648a13a4"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -793,4 +794,4 @@ caseFlags:
 ---
 
 court_location_dmn:
-  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:false}
+  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}

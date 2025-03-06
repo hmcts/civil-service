@@ -28,7 +28,7 @@ def versions = [
   camunda           : '7.20.0',
   jackson           : '2.18.3',
   testcontainers    : '1.20.3',
-  pdfbox            : '3.0.2',
+  pdfbox            : '3.0.4',
   tika              : '2.9.3'
 ]
 
@@ -49,7 +49,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.18.2'
+    toolVersion = '10.21.4'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -405,8 +405,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.100'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.34'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.27'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.36'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson

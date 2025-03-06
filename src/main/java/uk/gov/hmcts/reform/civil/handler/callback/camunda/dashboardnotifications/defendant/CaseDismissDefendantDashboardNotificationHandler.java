@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AbstractCaseDismissDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.List;
 
 @Service
-public class CaseDismissDefendantDashboardNotificationHandler extends AbstractCaseDismissDashboardNotificationHandler {
+public class CaseDismissDefendantDashboardNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List
         .of(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT);
