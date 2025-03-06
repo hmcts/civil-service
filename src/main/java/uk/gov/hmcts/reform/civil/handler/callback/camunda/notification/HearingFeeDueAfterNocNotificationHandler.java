@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +72,7 @@ public class HearingFeeDueAfterNocNotificationHandler extends CallbackHandler
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                          .getOrganisation()
                                                          .getOrganisationID(), caseData),
@@ -79,7 +80,9 @@ public class HearingFeeDueAfterNocNotificationHandler extends CallbackHandler
             COURT_LOCATION, caseData.getHearingLocation().getValue().getLabel(),
             HEARING_TIME, caseData.getHearingTimeHourMinute(),
             HEARING_FEE, String.valueOf(caseData.getHearingFee().formData()),
-            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE)
+            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

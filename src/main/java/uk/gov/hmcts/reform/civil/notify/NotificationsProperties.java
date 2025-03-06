@@ -663,4 +663,10 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrderedSpecEa;
+
+    @NotEmpty
+    private String queryRaised;
+
+    @NotEmpty
+    private String queryResponseReceived;
 }
