@@ -24,6 +24,10 @@ class NotifierTest {
     private static final String TEMPLATE = "template";
     private static final String REFERENCE = "Reference";
     private static final HashMap<String, String> PARAMETERS = new HashMap<>();
+
+    private static final String EVENT_ID = "eventId";
+    private static final String TASK_ID = "taskId";
+
     @Mock
     NotificationService notificationService;
 
@@ -40,7 +44,7 @@ class NotifierTest {
         final HashSet<EmailDTO> parties = new HashSet<>();
         parties.add(emailDTO);
 
-        Notifier notifier = new Notifier(notificationService, null, null, null) {
+        Notifier notifier = new Notifier(notificationService, null, null, null, null) {
             @Override
             protected Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
                 return parties;
@@ -54,7 +58,7 @@ class NotifierTest {
 
         final CaseData caseData = mock(CaseData.class);
 
-        notifier.notifyParties(caseData);
+        notifier.notifyParties(caseData, EVENT_ID, TASK_ID);
 
         verify(notificationService).sendMail(eq(MAIL), eq(TEMPLATE),  eq(PARAMETERS), eq(REFERENCE));
     }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
@@ -29,8 +30,9 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
     public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
                                                 NotificationsProperties notificationsProperties,
                                                 OrganisationService organisationService,
-                                                SimpleStateFlowEngine stateFlowEngine) {
-        super(notificationService, notificationsProperties, organisationService, stateFlowEngine);
+                                                SimpleStateFlowEngine stateFlowEngine,
+                                                CaseTaskTrackingService caseTaskTrackingService) {
+        super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
     }
 
     @Override
