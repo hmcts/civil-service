@@ -17,7 +17,6 @@ public class JudgeReallocatedClaimTrack {
 
     private static boolean isCurrentTrackMinti(CaseData caseData, boolean multiOrIntermediateTrackEnabled) {
         if (!multiOrIntermediateTrackEnabled) {
-            System.out.println("SHOULD BE TRUE");
             return false;
         }
 
