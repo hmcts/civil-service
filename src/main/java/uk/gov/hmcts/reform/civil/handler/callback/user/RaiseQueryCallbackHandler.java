@@ -84,7 +84,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
 
-        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId);
+        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().qmLatestQuery(
