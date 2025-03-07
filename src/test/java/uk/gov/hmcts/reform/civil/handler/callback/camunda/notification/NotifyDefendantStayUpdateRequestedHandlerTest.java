@@ -33,6 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyDefendantStayUpdateRequestedHandlerTest {
@@ -119,7 +120,9 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 Map.of(
                     "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
-                    "name", "Jim Jameson"
+                    "name", "Jim Jameson",
+                    "partyReferences", buildPartiesReferencesEmailSubject(caseData),
+                    "casemanRef", caseData.getLegacyCaseReference()
                 ),
                 "stay-update-requested-defendant-notification-1594901956117591"
             );
@@ -130,7 +133,9 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
                 Map.of(
                     "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
                     "claimReferenceNumber", "1594901956117591",
-                    "name", "Jack Jackson"
+                    "name", "Jack Jackson",
+                    "partyReferences", buildPartiesReferencesEmailSubject(caseData),
+                    "casemanRef", caseData.getLegacyCaseReference()
                 ),
                 "stay-update-requested-defendant-notification-1594901956117591"
             );
