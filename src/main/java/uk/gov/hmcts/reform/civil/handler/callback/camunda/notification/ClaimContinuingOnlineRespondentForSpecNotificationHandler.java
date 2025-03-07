@@ -140,6 +140,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
         Map<String, String> map = new HashMap<>();
         map.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         map.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        map.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         map.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                                          .toLocalDate(), DATE));
         return map;
