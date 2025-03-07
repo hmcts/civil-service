@@ -51,7 +51,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final BulkPrintService bulkPrintService;
     private final DeadlinesCalculator deadlinesCalculator;
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
