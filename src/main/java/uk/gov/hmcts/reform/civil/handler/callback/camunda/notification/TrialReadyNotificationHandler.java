@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT2_NOTIFY_OT
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TrialReadyNotificationHandler extends CallbackHandler {
 
     public static final String TASK_ID_APPLICANT = "ApplicantTrialReadyNotifierOthers";

@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLeg
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Component
-@Slf4j
 @Setter
 public class TrailReadyNotifier extends Notifier {
 
