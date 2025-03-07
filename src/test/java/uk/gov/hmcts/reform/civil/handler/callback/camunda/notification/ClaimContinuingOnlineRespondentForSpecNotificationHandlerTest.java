@@ -18,18 +18,15 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,8 +45,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @ExtendWith(MockitoExtension.class)
 class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    private static final LocalDateTime date = LocalDateTime.of(2025, Month.MARCH, 3, 9, 3);
-
     @Mock
     private NotificationService notificationService;
 
@@ -58,9 +53,6 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
 
     @Mock
     private OrganisationService organisationService;
-
-    @Mock
-    private DeadlinesCalculator deadlinesCalculator;
 
     @Mock
     private Time time;
@@ -79,7 +71,6 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
             when(notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
-            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
@@ -109,7 +100,6 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
             when(notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
-            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
@@ -136,8 +126,6 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
 
         @Test
         void shouldNotNotifyRespondent2SolicitorIfNoSecondDefendant_whenInvoked() {
-            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
-
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
@@ -158,7 +146,6 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
             when(notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
-            when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(date);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()

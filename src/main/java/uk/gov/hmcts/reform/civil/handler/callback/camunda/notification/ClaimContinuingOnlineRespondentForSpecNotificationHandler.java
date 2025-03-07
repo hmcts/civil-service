@@ -73,16 +73,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
 
         final CaseData.CaseDataBuilder caseDataBuilder
             = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
-
-        boolean isRespondent1Event = isRespondent1Event(callbackParams);
-
-        if (isRespondent1Event) {
-            caseDataBuilder.respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(time.now()));
-        } else {
-            caseDataBuilder.respondent2ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(time.now()));
-        }
-
-        String targetEmail = isRespondent1Event
+        String targetEmail = isRespondent1Event(callbackParams)
             || caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
             ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getRespondentSolicitor2EmailAddress();
@@ -91,8 +82,9 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             targetEmail = caseData.getRespondentSolicitor1EmailAddress();
         }
 
-        if (isRespondent1Event
-            || (isRespondent2Event(callbackParams) && YesOrNo.YES.equals(caseData.getAddRespondent2()))) {
+        if (isRespondent1Event(callbackParams)
+            || (isRespondent2Event(callbackParams)
+            && YesOrNo.YES.equals(caseData.getAddRespondent2()))) {
             notificationService.sendMail(
                 targetEmail,
                 notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
