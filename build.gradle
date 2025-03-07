@@ -404,7 +404,7 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.100'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.102'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.36'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
