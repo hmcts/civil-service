@@ -97,6 +97,15 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime applicant1ResponseDate = LocalDateTime.now();
 
+        final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        if (applicant1SuggestInstalmentsPaymentAmountForDefendantSpec != null) {
+            log.info(
+                "case id: {}, applicant1SuggestInstalmentsPaymentAmountForDefendantSpec: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                applicant1SuggestInstalmentsPaymentAmountForDefendantSpec
+            );
+        }
+
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .applicant1ResponseDate(applicant1ResponseDate)
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
