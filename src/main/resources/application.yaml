@@ -794,4 +794,4 @@ caseFlags:
 ---
 
 court_location_dmn:
-  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:false}
+  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
