@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
+import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -20,7 +20,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 
-public abstract class ConfirmOrderReviewNotificationHandler extends CaseEventsDashboardCallbackHandler {
+public abstract class ConfirmOrderReviewNotificationHandler extends DashboardCallbackHandler {
 
     protected final ObjectMapper objectMapper;
     protected final String role;

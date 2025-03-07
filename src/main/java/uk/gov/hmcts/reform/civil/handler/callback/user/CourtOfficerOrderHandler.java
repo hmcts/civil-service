@@ -65,11 +65,10 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        Callback aboutToSubmit = featureToggleService.isCaseEventsEnabled() ? this::handleAboutToSubmit : this::emptyCallbackResponse;
         return Map.of(
             callbackKey(ABOUT_TO_START), this::prePopulateValues,
             callbackKey(MID, "validateValues"), this::validateFormValuesAndGenerateDocument,
-            callbackKey(ABOUT_TO_SUBMIT), aboutToSubmit,
+            callbackKey(ABOUT_TO_SUBMIT), this::handleAboutToSubmit,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
