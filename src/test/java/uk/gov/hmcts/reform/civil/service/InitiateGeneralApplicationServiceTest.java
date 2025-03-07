@@ -702,7 +702,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulatePartyNameDetailsQMOff() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -722,7 +721,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulatePartyNameDetailsQMOn() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -742,7 +740,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulatePartyNameDetailsCaseSettled() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
