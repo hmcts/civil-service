@@ -95,7 +95,7 @@ public class FeatureToggleService {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
         if (caseData.getSubmittedDate() == null) {
-            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+            epoch = LocalDateTime.now().minusMonths(4).atZone(zoneId).toEpochSecond();
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
