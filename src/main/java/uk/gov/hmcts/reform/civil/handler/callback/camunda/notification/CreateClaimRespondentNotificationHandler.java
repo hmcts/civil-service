@@ -150,7 +150,8 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             formatLocalDate(caseData
                                 .getClaimDetailsNotificationDeadline()
                                 .toLocalDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }

@@ -74,10 +74,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
-    public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
-    }
-
     public boolean isCjesServiceAvailable() {
         return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
     }
@@ -103,8 +99,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("minti")
-            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        return featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
@@ -117,10 +112,6 @@ public class FeatureToggleService {
         }
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
-    }
-
-    public boolean isCaseEventsEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
     }
 
     public boolean isAmendBundleEnabled() {
@@ -141,11 +132,6 @@ public class FeatureToggleService {
         return location != null
             && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
             && isGaForLipsEnabled();
-    }
-
-    public boolean isHmcNroEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-nro");
-
     }
 
     public boolean isJOLiveFeedActive() {

@@ -122,6 +122,7 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
         HashMap<String, String> properties = new HashMap<>();
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         return properties;
     }
 }
