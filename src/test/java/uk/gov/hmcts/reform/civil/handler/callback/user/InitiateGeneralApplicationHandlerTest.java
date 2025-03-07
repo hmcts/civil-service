@@ -271,6 +271,29 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldNotThrowError_whenLipVsLrAndDefendantLiPIsNotAssigned() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
     void shouldThrowError_whenLRVsLiPAndLipsNotEnabledAndWhiteListed() {
 
         CaseData caseData = CaseDataBuilder.builder()
