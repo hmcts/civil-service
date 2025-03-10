@@ -603,7 +603,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType(),
                                                          toggleService, caseData));
         }
-        dataBuilder.submittedDate(time.now());
+        dataBuilder.submittedDate(time.now().minusMonths(4));
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
