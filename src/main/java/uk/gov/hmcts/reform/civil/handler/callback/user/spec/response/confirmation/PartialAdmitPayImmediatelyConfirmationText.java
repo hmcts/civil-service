@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfir
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -18,6 +19,8 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
+        Boolean isLipVLr  = caseData.isLipvLROneVOne();
+
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
@@ -35,7 +38,8 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
 
         StringBuilder sb = new StringBuilder();
         sb.append("<br>We've emailed ").append(applicantName)
-            .append(" to say you will pay immediately.")
+            .append(" to say you will pay immediately. ")
+            .append(isLipVLr ? " We'll contact you when they respond." : "")
             .append("<h2 class=\"govuk-heading-m\">What you need to do:</h2>")
             .append("<ul>")
             .append("<li>pay ").append(applicantName).append(" By ")
@@ -60,6 +64,25 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             sb.append(" legal representative if you need details on how to pay.</p>");
         } else {
             sb.append(" if you need details on how to pay.</p>");
+            sb.append("<p>This case will now proceed offline.</p>");
+        }
+
+        sb.append(" legal representative if you need details on how to pay.</p>");
+        BigDecimal claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+
+        if (isLipVLr) {
+            sb.append("<h2 class=\"govuk-heading-m\">If ").append(applicantName).append(" accepts your offer of &#163;")
+                .append(claimOwingAmount)
+                .append("</h2>");
+            sb.append("<p>The claim will be settled. </p>");
+            sb.append("<h2 class=\"govuk-heading-m\">If ")
+                .append(applicantName)
+                .append(" rejects your offer")
+                .append("</h2>");
+            sb.append("<p>If the claim value is below £10,000 then the next step will be mediation.")
+                .append("The mediation service will contact you to give you a date for your appointment.  ")
+                .append("If you can not reach an agreement at mediation, the court will review your claim.</p>");
+            sb.append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount.</p>");
             sb.append("<p>This case will now proceed offline.</p>");
         }
 
