@@ -1649,7 +1649,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.nocApplyForLiPDefendantBeforeOffline())
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
