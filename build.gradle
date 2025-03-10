@@ -436,7 +436,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.11'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.2'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.11'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
