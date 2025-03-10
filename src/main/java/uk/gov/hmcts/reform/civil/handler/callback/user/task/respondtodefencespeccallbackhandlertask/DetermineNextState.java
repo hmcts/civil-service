@@ -133,12 +133,7 @@ public class DetermineNextState  {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         }
         if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
-            builder
-                .activeJudgment(activeJudgment)
-                .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment))
-                .joJudgementByAdmissionIssueDate(LocalDateTime.now());
+            judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder);
         }
 
         return Pair.of(nextState, businessProcess);

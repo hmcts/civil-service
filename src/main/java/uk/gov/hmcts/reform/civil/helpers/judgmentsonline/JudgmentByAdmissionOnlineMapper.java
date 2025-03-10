@@ -73,6 +73,13 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         return activeJudgmentDetails;
     }
 
+    public CaseData.CaseDataBuilder<?, ?> addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
+        builder.activeJudgment(activeJudgmentDetails);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder);
+        return builder;
+    }
+
     @NotNull
     private BigDecimal getOrderAmount(CaseData caseData) {
         return caseData.getCcjPaymentDetails() != null
