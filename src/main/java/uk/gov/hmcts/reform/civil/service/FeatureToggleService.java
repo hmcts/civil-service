@@ -102,8 +102,6 @@ public class FeatureToggleService {
         }
         boolean multiOrIntermediateTrackEnabled = featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
         boolean judgeReallocatedTrackOrAlreadyMinti = judgeReallocatedTrackOrAlreadyMinti(caseData, multiOrIntermediateTrackEnabled);
-
-        log.info("judge has/has not reallocated track {} , {}",  multiOrIntermediateTrackEnabled, judgeReallocatedTrackOrAlreadyMinti);
         return multiOrIntermediateTrackEnabled || judgeReallocatedTrackOrAlreadyMinti;
     }
 
