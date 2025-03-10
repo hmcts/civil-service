@@ -77,6 +77,21 @@ public class ClaimSubmittedTransitionBuilderTest {
     }
 
     @Test
+    void shouldSetBilingualFlag_whenDefendantNoCOnline() {
+        ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
+            mockFeatureToggleService);
+        result = claimSubmittedTransitionBuilder.buildTransitions();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        assertThat(getCaseFlags(result.get(6), caseData)).hasSize(3).contains(
+            entry(FlowFlag.LIP_CASE.name(), true),
+            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
+            entry(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true)
+        );
+    }
+
+    @Test
     void shouldReturnTrue_whenCaseDataAtIssuedStateClaimIssuedPayment() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedPaymentFailed().build();
         assertTrue(paymentFailed.test(caseData));
