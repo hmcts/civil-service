@@ -2,9 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -83,10 +82,8 @@ class SubmitClaimTaskTest {
                                               organisationService, airlineEpimsService, locationRefDataService);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldSubmitClaimSuccessfully(boolean caseEventsEnabled) {
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+    @Test
+    void shouldSubmitClaimSuccessfully() {
 
         CaseData caseData = CaseData.builder()
             .totalClaimAmount(new BigDecimal("1000"))
@@ -111,11 +108,7 @@ class SubmitClaimTaskTest {
         assertThat(response.getData()).isNotNull();
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
-        if (caseEventsEnabled) {
-            assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
-        } else {
-            assertThat(response.getData().get("anyRepresented")).isNull();
-        }
+        assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
     }
 }
 
