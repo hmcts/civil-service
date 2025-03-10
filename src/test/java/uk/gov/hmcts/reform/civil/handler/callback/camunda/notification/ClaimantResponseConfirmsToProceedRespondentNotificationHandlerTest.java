@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -63,6 +64,9 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ClaimantResponseConfirmsToProceedRespondentNotificationHandler handler;
@@ -356,6 +360,30 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 "offline-template-id",
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent_whenMultiTrack_mintiEligibleClaim() {
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .setMultiTrackClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                "template-id",
                 getNotificationDataMap(caseData),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
