@@ -1113,19 +1113,21 @@ public class EventHistoryMapper {
 
     private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                    LocalDateTime dateReceived) {
-        if (caseData.getQmApplicantSolicitorQueries() != null
-            || caseData.getQmRespondentSolicitor1Queries() != null
-            || caseData.getQmRespondentSolicitor2Queries() != null) {
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(dateReceived)
-                    .eventDetailsText(QUERIES_ON_CASE)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
-                                      .build())
-                    .build());
+        if (featureToggleService.isQueryManagementLRsEnabled()) {
+            if (caseData.getQmApplicantSolicitorQueries() != null
+                || caseData.getQmRespondentSolicitor1Queries() != null
+                || caseData.getQmRespondentSolicitor2Queries() != null) {
+                builder.miscellaneous(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(MISCELLANEOUS.getCode())
+                        .dateReceived(dateReceived)
+                        .eventDetailsText(QUERIES_ON_CASE)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(QUERIES_ON_CASE)
+                                          .build())
+                        .build());
+            }
         }
     }
 

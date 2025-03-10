@@ -5727,6 +5727,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists() {
+            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
                 .build().toBuilder()
