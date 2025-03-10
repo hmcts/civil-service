@@ -294,7 +294,29 @@ public class EventHistoryMapper {
         buildCcjEvent(builder, caseData);
         buildSetAsideJudgment(builder, caseData);
         buildCoscEvent(builder, caseData);
+        buildTakenOfflineAfterDefendantNoCDeadlinePassed(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
+    }
+
+    private void buildTakenOfflineAfterDefendantNoCDeadlinePassed(EventHistory.EventHistoryBuilder builder,
+                                                                  CaseData caseData) {
+        boolean sendQueryRpa = false;
+        LocalDateTime takenOfflineDate = caseData.getTakenOfflineDate();
+        if (takenOfflineDate != null) {
+            if (caseData.getAddLegalRepDeadlineRes1() != null
+                && takenOfflineDate.isAfter(caseData.getAddLegalRepDeadlineRes1())
+                && YesOrNo.NO.equals(caseData.getRespondent1Represented())) {
+                sendQueryRpa = true;
+            }
+            if (caseData.getAddLegalRepDeadlineRes2() != null
+                && takenOfflineDate.isAfter(caseData.getAddLegalRepDeadlineRes2())
+                && YesOrNo.NO.equals(caseData.getRespondent2Represented())) {
+                sendQueryRpa = true;
+            }
+            if (sendQueryRpa) {
+                buildQueriesEvent(builder, caseData, takenOfflineDate);
+            }
+        }
     }
 
     private void buildInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -1850,6 +1872,7 @@ public class EventHistoryMapper {
     }
 
     private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        buildQueriesEvent(builder, caseData, caseData.getSubmittedDate());
         builder.miscellaneous(
             List.of(
                 Event.builder()
