@@ -472,7 +472,7 @@ dependencies {
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
   // https://mvnrepository.com/artifact/com.opencsv/opencsv
-  implementation group: 'com.opencsv', name: 'opencsv', version: '5.9', {
+  implementation group: 'com.opencsv', name: 'opencsv', version: '5.10', {
     exclude group: 'commons-collections', module: 'commons-collections'
   }
 }
