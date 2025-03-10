@@ -83,7 +83,6 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                                            .paymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_BY_DATE).build())
                                            .build());
 
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event

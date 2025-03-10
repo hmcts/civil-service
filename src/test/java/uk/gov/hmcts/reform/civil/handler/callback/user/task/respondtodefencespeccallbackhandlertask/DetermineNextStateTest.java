@@ -114,13 +114,6 @@ class DetermineNextStateTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
-            .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1Represented(NO)
-            .applicant1Represented(YES)
-            .build();
-
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
@@ -145,6 +138,13 @@ class DetermineNextStateTest {
         builder.activeJudgment(activeJudgment);
         builder.joIsLiveJudgmentExists(YES);
         builder.joJudgementByAdmissionIssueDate(now);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondent1Represented(NO)
+            .applicant1Represented(YES)
+            .build();
         when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder)).thenReturn(builder);
 
         String resultState;
@@ -303,12 +303,6 @@ class DetermineNextStateTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
-            .respondent1Represented(YES)
-            .applicant1Represented(YES)
-            .build();
-
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
@@ -333,6 +327,13 @@ class DetermineNextStateTest {
         builder.activeJudgment(activeJudgment);
         builder.joIsLiveJudgmentExists(YES);
         builder.joJudgementByAdmissionIssueDate(now);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .build();
+
         when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder)).thenReturn(builder);
 
         String resultState;
