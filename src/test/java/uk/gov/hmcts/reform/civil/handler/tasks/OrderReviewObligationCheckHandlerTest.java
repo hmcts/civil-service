@@ -75,7 +75,6 @@ class OrderReviewObligationCheckHandlerTest {
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
         when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(caseData.getStoredObligationData()).thenReturn(storedObligationData);
@@ -98,7 +97,6 @@ class OrderReviewObligationCheckHandlerTest {
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
         when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(caseData.getStoredObligationData()).thenReturn(storedObligationData);
@@ -120,7 +118,6 @@ class OrderReviewObligationCheckHandlerTest {
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
         when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         when(caseData.getStoredObligationData()).thenReturn(storedObligationData);
@@ -137,7 +134,6 @@ class OrderReviewObligationCheckHandlerTest {
         CaseDetails caseDetails = mock(CaseDetails.class);
 
         when(caseDetails.getId()).thenReturn(Long.valueOf("1"));
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         when(caseSearchService.getCases()).thenReturn(Set.of(caseDetails));
         when(coreCaseDataService.getCase(Long.valueOf("1"))).thenThrow(new RuntimeException("Test exception"));
 
