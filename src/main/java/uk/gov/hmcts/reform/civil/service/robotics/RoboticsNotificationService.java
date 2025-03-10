@@ -91,7 +91,10 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to("sankavi.mohanraj@hmcts.net")
+                                   .to(getRoboticsEmailRecipient(
+                                       params.isMultiParty(),
+                                       SPEC_CLAIM.equals(params.getCaseData().getCaseAccessCategory())
+                                   ))
                                    .attachments(of(json(roboticsJsonData, fileName)))
                                    .build());
         } catch (JsonProcessingException e) {
