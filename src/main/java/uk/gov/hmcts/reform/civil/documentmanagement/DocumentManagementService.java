@@ -15,4 +15,6 @@ public interface DocumentManagementService {
 
     DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath);
 
+    void deleteDocument(String url, String auth);
+
 }
