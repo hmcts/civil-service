@@ -269,6 +269,9 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             case NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK -> caseData.isRespondent2LiP()
                 ? Optional.empty()
                 : Optional.ofNullable(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
+            case NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK -> caseData.isRespondent2LiP()
+                ? Optional.empty()
+                : Optional.ofNullable(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
             default -> getRespondentSolicitorOrganisationName(caseData, caseEvent);
         };
 
