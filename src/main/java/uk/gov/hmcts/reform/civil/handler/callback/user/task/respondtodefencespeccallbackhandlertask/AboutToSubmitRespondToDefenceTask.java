@@ -118,6 +118,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             ));
         }
 
+        builder.previousCCDState(caseData.getCcdState());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .state(nextState)

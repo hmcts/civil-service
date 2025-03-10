@@ -156,4 +156,8 @@ public class FeatureToggleService {
     public boolean isHmcForLipEnabled() {
         return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
     }
+
+    public boolean isQueryManagementLRsEnabled() {
+        return featureToggleApi.isFeatureEnabled("query-management");
+    }
 }
