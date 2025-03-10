@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,21 +22,24 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.Map;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2;
-
-import java.util.Map;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
 @ExtendWith(MockitoExtension.class)
@@ -171,6 +175,64 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                 "template-id-sdo",
                 getNotificationDataMapRes2(),
                 "sdo-dj-order-notification-defendant-000DC001"
+            );
+        }
+
+        @Test
+        public void shouldThrowErrorWhenMissingEmail() {
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            doThrow(new RuntimeException()).when(notificationService).sendMail(isNull(), any(), any(), any());
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .respondentSolicitor1EmailAddress(null)
+                .respondent1Represented(YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                             .caseDetails(CaseDetails.builder().id(123L).build())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                any(),
+                any(),
+                any(),
+                any()
+            );
+        }
+
+        @Test
+        void shouldThrowErrorWhenInvalidDefendant2Email() {
+            final String invalidEmail = "invalidEmail@123";
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            doThrow(new RuntimeException()).when(notificationService).sendMail(eq(invalidEmail), any(), any(), any());
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .respondentSolicitor2EmailAddress(invalidEmail)
+                .respondent2Represented(YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                             .caseDetails(CaseDetails.builder().id(123L).build())
+                             .build())
+                .build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                any(),
+                any(),
+                any(),
+                any()
             );
         }
 
