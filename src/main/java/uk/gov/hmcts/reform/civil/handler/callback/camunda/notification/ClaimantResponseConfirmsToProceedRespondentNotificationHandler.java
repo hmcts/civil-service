@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -145,7 +147,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         String template;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             template = getSpecTemplate(callbackParams, caseData);
-        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack()) && !featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             template = notificationsProperties.getSolicitorCaseTakenOffline();
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
