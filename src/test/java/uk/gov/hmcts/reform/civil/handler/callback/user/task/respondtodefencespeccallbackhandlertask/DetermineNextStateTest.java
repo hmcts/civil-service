@@ -142,7 +142,10 @@ class DetermineNextStateTest {
             .defendant1Dob(LocalDate.of(1980, 1, 1))
             .build();
 
-        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
+        builder.activeJudgment(activeJudgment);
+        builder.joIsLiveJudgmentExists(YES);
+        builder.joJudgementByAdmissionIssueDate(now);
+        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder)).thenReturn(builder);
 
         String resultState;
         try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
@@ -327,7 +330,10 @@ class DetermineNextStateTest {
             .defendant1Dob(LocalDate.of(1980, 1, 1))
             .build();
 
-        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
+        builder.activeJudgment(activeJudgment);
+        builder.joIsLiveJudgmentExists(YES);
+        builder.joJudgementByAdmissionIssueDate(now);
+        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder)).thenReturn(builder);
 
         String resultState;
         try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
