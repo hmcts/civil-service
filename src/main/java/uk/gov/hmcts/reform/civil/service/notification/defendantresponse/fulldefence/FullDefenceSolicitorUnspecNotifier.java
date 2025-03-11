@@ -45,7 +45,8 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
+                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
@@ -56,7 +57,8 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
                     .concat(" and ")
                     .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
+                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
     }
