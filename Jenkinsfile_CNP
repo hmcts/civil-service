@@ -80,13 +80,10 @@ def checkForEnableHelmLabel(branch_name) {
 }
 
 def getCivilCcdDefinitionBranch() {
-  def label = new GithubAPI(this).getLabelsbyPattern(env.BRANCH_NAME, "civilCcdDefinition:");
-  if (label) {
-    return label.trim().substring(19, label.lenght())
-  } else {
-    echo "Branch: master"
-    return "master"
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilCcdDefinition:") ) {
+    return label.trim().substring(19, label.length())
   }
+  return "master"
 }
 
 withPipeline(type, product, component) {
