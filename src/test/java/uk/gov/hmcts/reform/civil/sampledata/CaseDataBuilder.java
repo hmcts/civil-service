@@ -2511,6 +2511,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
+        caseManagementLocation = CaseLocationCivil.builder().region("2").baseLocation("41112").build();
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("214320")
             .applicantPreferredCourtLocationList(
