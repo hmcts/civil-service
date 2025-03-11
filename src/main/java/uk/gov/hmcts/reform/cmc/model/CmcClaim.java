@@ -512,7 +512,12 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isWaitingForClaimantIntentDocUpload() {
+    public boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline() {
+        return false;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPostDefendantNocOnline() {
         return false;
     }
 
