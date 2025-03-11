@@ -40,6 +40,7 @@ public class AddCaseNoteMessageHandler implements CcdEventMessageHandler {
 
         try {
             var response = coreCaseDataService.startUpdate(message.getCaseId(), NOTIFY_RPA_ON_CONTINUOUS_FEED);
+            log.info("Start event response received for case {} with response {}", message.getCaseId(), response);
             CaseData data = caseDetailsConverter.toCaseData(response.getCaseDetails());
             roboticsNotifier.notifyRobotics(data, getSystemUserToken());
         } catch (Exception e) {
