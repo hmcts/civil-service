@@ -1,4 +1,4 @@
-# civil-service
+**# civil-service
 
 Civil CCD Callback Service.
 
@@ -163,8 +163,8 @@ To publish your contracts:
 ## Adding Git Conventions
 
 ### Include the git conventions.
- * Make sure your git version is at least 2.9 using the `git --version` command
- * Run the following command:
+* Make sure your git version is at least 2.9 using the `git --version` command
+* Run the following command:
 ```
 git config --local core.hooksPath .git-config/hooks
 ```
@@ -221,7 +221,7 @@ update body with case id and payment reference no
 
 ## Development / Debugging Environment - Preview with Mirrord
 
-  As an alternative for a development environment there is a procedure in place where after running the command
+As an alternative for a development environment there is a procedure in place where after running the command
 below the required services for Civil are created in Preview under the developer's name, so these will be exclusively
 for the named developer use.
 
@@ -291,5 +291,4 @@ where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DT
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details**
