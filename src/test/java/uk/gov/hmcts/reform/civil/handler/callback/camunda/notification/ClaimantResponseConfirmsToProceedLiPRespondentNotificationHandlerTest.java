@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -83,7 +82,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         void shouldNotifyLipRespondent_whenInvoked() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
                     .build()).build();
@@ -102,7 +101,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         void shouldNotifyLipRespondent_whenTranslatedDocUploaded() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build();
             caseData.setClaimantBilingualLanguagePreference("BOTH");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name())
@@ -287,46 +286,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         }
 
         @Test
-        void shouldNotifyLRRespondent_whenApplicantNoProceeds() {
-            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-            when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
-                RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(NO)
-                                 .build())
-                .build();
-            caseData = caseData.toBuilder()
-                .respondent1Represented(NO)
-                .applicant1ProceedWithClaim(NO)
-                .applicant1Represented(NO)
-                .respondent1Represented(YES)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
-                    .build()).build();
-
-            handler.handle(params);
-
-            verify(notificationService, times(1)).sendMail(
-                "respondentsolicitor@example.com",
-                RESPONDENT_LR_EMAIL_TEMPLATE,
-                Map.of(
-                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
-                ),
-                REFERENCE_NUMBER
-            );
-        }
-
-        @Test
         void shouldNotifyLRRespondent_whenApplicantNoProceedsFullDefence() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
@@ -362,7 +321,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 Map.of(
                     "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
                     CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                    APPLICANT_ONE_NAME, "Mr. John Rambo",
+                    CASEMAN_REF, caseData.getLegacyCaseReference()
                 ),
                 REFERENCE_NUMBER
             );
@@ -402,49 +363,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 Map.of(
                     "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
                     CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
-                ),
-                REFERENCE_NUMBER
-            );
-        }
-
-        @Test
-        void shouldNotifyLRRespondent_whenApplicantNoProceedsFullDefence() {
-            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-            when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn(
-                RESPONDENT_LR_EMAIL_TEMPLATE);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("org name")
-                                                                                             .build()));
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1SettleClaim(YES)
-                                 .build())
-                .build();
-            caseData = caseData.toBuilder()
-                .respondent1Represented(NO)
-                .applicant1ProceedWithClaim(NO)
-                .applicant1Represented(NO)
-                .respondent1Represented(YES)
-                .defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
-                    .build()).build();
-
-            handler.handle(params);
-
-            verify(notificationService, times(1)).sendMail(
-                "respondentsolicitor@example.com",
-                RESPONDENT_LR_EMAIL_TEMPLATE,
-                Map.of(
-                    "partyReferences", "Claimant reference: 12345 - Defendant reference: 6789",
-                    CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                    CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                    APPLICANT_ONE_NAME, "Mr. John Rambo",
+                    CASEMAN_REF, caseData.getLegacyCaseReference()
                 ),
                 REFERENCE_NUMBER
             );
@@ -455,7 +376,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(
                 BILINGUAL_RESPONDENT_EMAIL_TEMPLATE);
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .build().toBuilder()
                 .caseDataLiP(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
