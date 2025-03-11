@@ -69,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument.toCaseDocument;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -723,7 +724,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private void populateTrackToggle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+            if (caseData.getResponseClaimTrack() != null) {
+                caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+            } else {
+                AllocatedTrack provisionalTrack = getAllocatedTrack(caseData.getTotalClaimAmount(),
+                                                                    null, null,
+                                                                    featureToggleService, caseData);
+                caseDataBuilder.finalOrderTrackToggle(provisionalTrack.name());
+            }
 
         }
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
