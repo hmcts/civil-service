@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -40,8 +39,8 @@ public class AddCaseNoteMessageHandler implements CcdEventMessageHandler {
         log.info("Handling Add Case Note Message for case {}", message.getCaseId());
 
         try {
-            CaseDetails caseDetails = coreCaseDataService.getCase(Long.parseLong(message.getCaseId()));
-            CaseData data = caseDetailsConverter.toCaseData(caseDetails);
+            var response = coreCaseDataService.startUpdate(message.getCaseId(), NOTIFY_RPA_ON_CONTINUOUS_FEED);
+            CaseData data = caseDetailsConverter.toCaseData(response.getCaseDetails());
             roboticsNotifier.notifyRobotics(data, getSystemUserToken());
         } catch (Exception e) {
             log.error("Failed to trigger robotics for case {}", message.getCaseId());

@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -28,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINU
 @ExtendWith(MockitoExtension.class)
 class AddCaseNoteMessageHandlerTest {
 
-    private static final long CASE_ID = 1234567891234567L;
+    private static final String CASE_ID = "1234567891234567";
     public static final String ACCESS_TOKEN = "AccessToken";
 
     @Mock
@@ -57,14 +58,14 @@ class AddCaseNoteMessageHandlerTest {
 
     @Test
     public void shouldPublishEventWhenReceivingHandleableMessage() {
-        CaseDetails details = CaseDetails.builder().id(CASE_ID).build();
+        CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).build();
         CaseData data = CaseData.builder().build();
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(details);
+        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED)).thenReturn(startEventResponse(details));
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
 
         CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
-            .caseId(String.valueOf(CASE_ID))
+            .caseId(CASE_ID)
             .eventId(ADD_CASE_NOTE.name())
             .jurisdictionId("Civil")
             .caseTypeId("CIVIL")
@@ -78,9 +79,9 @@ class AddCaseNoteMessageHandlerTest {
 
     @Test
     public void shouldPublishCustomEventObjectToAppInsights_onFailure() {
-        CaseDetails details = CaseDetails.builder().id(CASE_ID).build();
+        CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).build();
         CaseData data = CaseData.builder().build();
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(details);
+        when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED)).thenReturn(startEventResponse(details));
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
 
@@ -88,7 +89,7 @@ class AddCaseNoteMessageHandlerTest {
             .when(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
 
         CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
-            .caseId(String.valueOf(CASE_ID))
+            .caseId(CASE_ID)
             .eventId(ADD_CASE_NOTE.name())
             .jurisdictionId("Civil")
             .caseTypeId("CIVIL")
@@ -100,6 +101,12 @@ class AddCaseNoteMessageHandlerTest {
         Result.Error error = (Result.Error) result;
         assertThat(error.eventName()).isEqualTo(NOTIFY_RPA_ON_CONTINUOUS_FEED.name());
         assertThat(error.messageProps()).containsKeys("exceptionMessage", "userId");
+    }
+
+    private StartEventResponse startEventResponse(CaseDetails caseDetails) {
+        return StartEventResponse.builder()
+            .caseDetails(caseDetails)
+            .build();
     }
 
 }
