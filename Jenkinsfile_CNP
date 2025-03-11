@@ -8,7 +8,6 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "DTSCCI-1699"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
@@ -85,7 +84,7 @@ def getCivilCcdDefinitionBranch() {
   if (label?.contains("civilCcdDefinition:"))
     return label[0].trim().substring(19, label.lenght())
   else
-    return ccdBranch
+    return "master"
 }
 
 withPipeline(type, product, component) {
