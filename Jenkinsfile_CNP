@@ -81,7 +81,7 @@ def checkForEnableHelmLabel(branch_name) {
 }
 
 def getCivilCcdDefinitionBranch() {
-  def label = new GithubAPI(this).getLabelsbyPattern(branch_name, "civilCcdDefinition:");
+  def label = new GithubAPI(this).getLabelsbyPattern(env.BRANCH_NAME, "civilCcdDefinition:");
   if (label.contains("civilCcdDefinition:"))
     return label[0].trim().substring(19, label.lenght())
   else
