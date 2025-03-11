@@ -31,9 +31,8 @@ class RetriggerUpdateLocationDataHandlerTest {
     @Test
     void testHandleTask_RetriggerUpdateCaseData() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("caseEvent")).thenReturn("UPDATE_CASE_DATA");
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
-        when(externalTask.getVariable("ePimsId")).thenReturn("123456");
+        when(externalTask.getVariable("ePimId")).thenReturn("123456");
         when(externalTask.getProcessInstanceId()).thenReturn("1");
 
         handler.handleTask(externalTask);
@@ -42,30 +41,21 @@ class RetriggerUpdateLocationDataHandlerTest {
             1L,
             CaseEvent.UPDATE_CASE_DATA,
             "123456",
-            "Re-trigger of UPDATE_CASE_DATA",
+            "Update locations epimId by 123456",
             EVENT_DESCRIPTION
         );
         verify(coreCaseDataService).triggerUpdateLocationEpimdsIdEvent(
             2L,
             CaseEvent.UPDATE_CASE_DATA,
             "123456",
-            "Re-trigger of UPDATE_CASE_DATA",
+            "Update locations epimId by 123456",
             EVENT_DESCRIPTION
         );
     }
 
     @Test
-    void testHandleTask_RetriggerUpdateLocationWithMissingCaseEvent() {
-        ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("caseEvent")).thenReturn(null);
-
-        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
-    }
-
-    @Test
     void testHandleTask_RetriggerrUpdateLocationWithMissingCaseIds() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("caseEvent")).thenReturn("CASE_EVENT");
         when(externalTask.getVariable("caseIds")).thenReturn(null);
 
         assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
@@ -74,9 +64,8 @@ class RetriggerUpdateLocationDataHandlerTest {
     @Test
     void testHandleTask_RetriggerrUpdateLocationWithMissingEpimsId() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("caseEvent")).thenReturn("CASE_EVENT");
         when(externalTask.getVariable("caseIds")).thenReturn("1");
-        when(externalTask.getVariable("ePimsId")).thenReturn(null);
+        when(externalTask.getVariable("ePimId")).thenReturn(null);
 
         assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
     }

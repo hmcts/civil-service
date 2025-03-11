@@ -20,21 +20,16 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (externalTask.getVariable("caseEvent") == null)  {
-            throw new AssertionError();
-        }
         if (externalTask.getVariable("caseIds") == null) {
-            throw new AssertionError();
+            throw new AssertionError("caseIds is null");
         }
-        if (externalTask.getVariable("ePimsId") == null) {
-            throw new AssertionError();
+        String epimsId = externalTask.getVariable("ePimId");
+        if (epimsId == null) {
+            throw new AssertionError("ePimId is null");
         }
-
         String caseIds = externalTask.getVariable("caseIds");
-        CaseEvent caseEvent = CaseEvent.valueOf(externalTask.getVariable("caseEvent"));
-        String eventSummary = "Re-trigger of " + caseEvent.name();
+        String eventSummary = "Update locations epimId by " + epimsId;
         String eventDescription = "Process ID: %s".formatted(externalTask.getProcessInstanceId());
-        String epimsId = externalTask.getVariable("ePimsId");
 
         for (String caseId : caseIds.split(",")) {
             try {
@@ -42,7 +37,7 @@ public class RetriggerUpdateLocationDataHandler extends BaseExternalTaskHandler 
                 externalTask.getAllVariables().put("caseId", caseId);
                 coreCaseDataService.triggerUpdateLocationEpimdsIdEvent(
                     parseLong(caseId.trim()),
-                    caseEvent,
+                    CaseEvent.UPDATE_CASE_DATA,
                     epimsId,
                     eventSummary,
                     eventDescription
