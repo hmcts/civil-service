@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.10.2"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1512'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1612'
   id "org.flywaydb.flyway" version "10.20.1"
 }
 
@@ -27,7 +27,7 @@ def versions = [
   springSecurity    : '5.8.15',
   camunda           : '7.20.0',
   jackson           : '2.18.3',
-  testcontainers    : '1.20.3',
+  testcontainers    : '1.20.6',
   pdfbox            : '3.0.4',
   tika              : '2.9.3'
 ]
@@ -123,7 +123,7 @@ allprojects {
         entry 'snakeyaml'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.36') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.39') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -355,7 +355,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.46.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.48.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -398,14 +398,14 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.41.2'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.102'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.36'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.39'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
@@ -425,7 +425,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.2'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.9'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
@@ -436,8 +436,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.15.11'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.15.11'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.2'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.2'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -446,7 +446,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.7:all'
@@ -472,7 +472,7 @@ dependencies {
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
   // https://mvnrepository.com/artifact/com.opencsv/opencsv
-  implementation group: 'com.opencsv', name: 'opencsv', version: '5.9', {
+  implementation group: 'com.opencsv', name: 'opencsv', version: '5.10', {
     exclude group: 'commons-collections', module: 'commons-collections'
   }
 }

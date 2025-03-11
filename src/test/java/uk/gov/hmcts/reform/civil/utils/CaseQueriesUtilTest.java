@@ -44,6 +44,9 @@ class CaseQueriesUtilTest {
     @Mock
     private CoreCaseUserService coreCaseUserService;
 
+    @InjectMocks
+    private AssignCategoryId assignCategoryId;
+
     @Test
     void shouldReturnApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
         CaseQueriesCollection applicantSolicitorQueries = CaseQueriesCollection.builder()
