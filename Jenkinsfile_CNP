@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
+def ccdBranch = "DTSCCI-1699"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
@@ -18,7 +18,7 @@ AppPipelineConfig pipelineConf
 def getFunctionalTestsGroups() {
   def githubApi = new GithubAPI(this)
   def functionalTestGroups = []
-  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr_ft_") ) {
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr_ft_")) {
     functionalTestGroups.add(label.substring(6, label.length()))
   }
   return functionalTestGroups.join(",")
@@ -33,19 +33,19 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 }
 
 def secrets = [
-  's2s-${env}': [
+  's2s-${env}'  : [
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
     secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
     secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
   ],
-  'ccd-${env}': [
+  'ccd-${env}'  : [
     secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
     secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
     secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
     secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
-    secret('idam-data-store-client-secret','IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
-    secret('idam-data-store-system-user-username','IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
-    secret('idam-data-store-system-user-password','IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
+    secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
+    secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+    secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY')
   ],
   'civil-${env}': [
@@ -55,13 +55,13 @@ def secrets = [
     secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
     secret('postgres-user', 'POSTGRES_USER'),
     secret('postgres-password', 'POSTGRES_PASSWORD'),
-    secret('default-password','DEFAULT_PASSWORD'),
-    secret('judge-default-password','JUDGE_DEFAULT_PASSWORD'),
-    secret('iac-default-password','IAC_DEFAULT_PASSWORD'),
+    secret('default-password', 'DEFAULT_PASSWORD'),
+    secret('judge-default-password', 'JUDGE_DEFAULT_PASSWORD'),
+    secret('iac-default-password', 'IAC_DEFAULT_PASSWORD'),
     secret('system-update-user-password', 'SYSTEM_USER_PASSWORD'),
     secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS')
   ],
-  'aac-${env}': [
+  'aac-${env}'  : [
     secret('idam-mca-client-secret', 'IDAM_MCA_CLIENT_SECRET'),
     secret('idam-mca-system-user-username', 'IDAM_CAA_USERNAME'),
     secret('idam-mca-system-user-password', 'IDAM_CAA_PASSWORD'),
@@ -77,7 +77,15 @@ env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
 
 def checkForEnableHelmLabel(branch_name) {
-   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
+}
+
+def getCivilCcdDefinitionBranch() {
+  def label = new GithubAPI(this).getLabelsbyPattern(branch_name, "civilCcdDefinition:");
+  if (label.contains("civilCcdDefinition:"))
+    return label[0].substring(19, label.lenght())
+  else
+    return ccdBranch
 }
 
 withPipeline(type, product, component) {
@@ -104,17 +112,17 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
-    env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
-    retry (3) {
+    retry(3) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
         ./bin/wait-for.sh definition-store
         ./bin/add-roles.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-        ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+        ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
       """
     }
@@ -126,8 +134,8 @@ withPipeline(type, product, component) {
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.AAC_API_URL="https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.WIREMOCK_URL="https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.AAC_API_URL = "https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.PR_FT_GROUPS = getFunctionalTestsGroups()
   }
 
@@ -148,18 +156,18 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+      ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
       ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-bpmn-diagram.sh .
     """
-    env.URL="https://civil-service-xui-staging.aat.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
+    env.URL = "https://civil-service-xui-staging.aat.platform.hmcts.net"
+    env.CIVIL_SERVICE_URL = "https://civil-service-staging.aat.platform.hmcts.net"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    env.AAC_API_URL="https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
+    env.AAC_API_URL = "https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
   }
