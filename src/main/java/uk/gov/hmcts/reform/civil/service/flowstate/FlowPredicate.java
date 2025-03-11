@@ -451,7 +451,8 @@ public class FlowPredicate {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return switch (getMultiPartyScenario(caseData)) {
                 case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP, ONE_V_ONE ->
-                    NO.equals(caseData.getApplicant1ProceedWithClaim());
+                    NO.equals(caseData.getApplicant1ProceedWithClaim())
+                    || NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim());
                 case TWO_V_ONE -> NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
                 default -> false;
             };
