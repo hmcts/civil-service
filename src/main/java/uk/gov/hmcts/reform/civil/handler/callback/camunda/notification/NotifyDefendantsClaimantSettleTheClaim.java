@@ -52,16 +52,6 @@ public class NotifyDefendantsClaimantSettleTheClaim extends CallbackHandler impl
     private CallbackResponse notifyDefendants(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
-            log.info("Sending settle-claim email to defendant LiP");
-            notificationService.sendMail(
-                caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate(),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
-        }
-
         if (StringUtils.isNotEmpty(caseData.getRespondentSolicitor1EmailAddress())) {
             log.info("Sending settle-claim email to defendant LR");
             notificationService.sendMail(
@@ -69,6 +59,14 @@ public class NotifyDefendantsClaimantSettleTheClaim extends CallbackHandler impl
                 notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate(),
                 addPropertiesLR(caseData),
                 String.format(REFERENCE_TEMPLATE_LR, caseData.getLegacyCaseReference())
+            );
+        } else if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
+            log.info("Sending settle-claim email to defendant LiP");
+            notificationService.sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                notificationsProperties.getNotifyDefendantLIPClaimantSettleTheClaimTemplate(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
