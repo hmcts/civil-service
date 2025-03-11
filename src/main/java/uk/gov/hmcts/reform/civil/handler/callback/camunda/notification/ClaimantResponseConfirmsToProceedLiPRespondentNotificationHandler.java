@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,8 +57,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         boolean shouldSendEmailToDefendantLR = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
         if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
-                shouldSendEmailToDefendantLR || isIntermediateOrMultiClaimProceedForLipVsLR(caseData) || isClaimantNotProcessLipVsLRWithNoc(caseData)
-                    ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
+                caseData.isRespondent1NotRepresented()
+                    ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress(),
                 getEmailTemplate(caseData, shouldSendEmailToDefendantLR),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -112,7 +111,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        if (isClaimProceedForLipVsLR(caseData)) {
+        if (caseData.isLipvLROneVOne()) {
             return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                           CLAIM_REFERENCE_NUMBER,
                           caseData.getCcdCaseReference().toString(),
@@ -123,28 +122,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                           ),
                           APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                           CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
-        }
-        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
-            return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                          CLAIM_REFERENCE_NUMBER,
-                          caseData.getCcdCaseReference().toString(),
-                          CLAIM_LEGAL_ORG_NAME_SPEC,
-                          getRespondentLegalOrganizationName(
-                              caseData.getRespondent1OrganisationPolicy(),
-                              organisationService
-                          )
-            );
-        }
-        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
-            return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                          CLAIM_REFERENCE_NUMBER,
-                          caseData.getCcdCaseReference().toString(),
-                          CLAIM_LEGAL_ORG_NAME_SPEC,
-                          getRespondentLegalOrganizationName(
-                              caseData.getRespondent1OrganisationPolicy(),
-                              organisationService
-                          )
             );
         }
         if (shouldSendMediationNotificationDefendant1LRCarm(
@@ -169,15 +146,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private boolean isFullDefenceStatesPaid(CaseData caseData) {
         return HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
             && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
-    }
-
-    private boolean isIntermediateOrMultiClaimProceedForLipVsLR(CaseData caseData) {
-        List<String> responseClaimTrack = Arrays.asList("INTERMEDIATE_CLAIM", "MULTI_CLAIM");
-        return responseClaimTrack.contains(caseData.getResponseClaimTrack())
-            && caseData.isLipvLROneVOne()
-            && (isFullDefenceStatesPaid(caseData)
-                || YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim()))
-            && featureToggleService.isDefendantNoCOnlineForCase(caseData);
     }
 
     private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
