@@ -33,7 +33,7 @@ public class GeneralApplicationProceedOfflineDefendantScenarioTest extends BaseI
             .andExpect(status().isOk());
 
         //Verify Notification is created
-        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "RESPONDENT")
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),

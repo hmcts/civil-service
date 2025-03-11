@@ -1286,7 +1286,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -1599,7 +1601,8 @@ class FlowStateAllowedEventServiceTest {
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         JUDGMENT_PAID_IN_FULL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
@@ -1612,7 +1615,8 @@ class FlowStateAllowedEventServiceTest {
                     FULL_ADMIT_PAY_IMMEDIATELY,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        REQUEST_JUDGEMENT_ADMISSION_SPEC
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
@@ -1633,7 +1637,8 @@ class FlowStateAllowedEventServiceTest {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
-                        SET_ASIDE_JUDGMENT
+                        SET_ASIDE_JUDGMENT,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
@@ -2167,7 +2172,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         JUDGMENT_PAID_IN_FULL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(
@@ -2197,7 +2203,8 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        REFER_JUDGE_DEFENCE_RECEIVED
                     }
                 ),
                 of(

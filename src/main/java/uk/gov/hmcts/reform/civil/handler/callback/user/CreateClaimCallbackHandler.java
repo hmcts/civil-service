@@ -565,9 +565,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
-        if (toggleService.isCaseEventsEnabled()) {
-            dataBuilder.anyRepresented(YES);
-        }
+        dataBuilder.anyRepresented(YES);
 
         populateWithPartyIds(dataBuilder);
 

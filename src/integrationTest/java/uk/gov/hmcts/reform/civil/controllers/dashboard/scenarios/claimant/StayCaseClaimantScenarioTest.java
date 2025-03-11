@@ -34,7 +34,6 @@ public class StayCaseClaimantScenarioTest extends DashboardBaseIntegrationTest {
             .build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created
