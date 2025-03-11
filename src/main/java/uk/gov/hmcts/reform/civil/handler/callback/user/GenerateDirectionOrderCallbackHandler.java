@@ -69,7 +69,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument.toCaseDocument;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
@@ -280,7 +279,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse assignTrackToggle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (caseData.getFinalOrderAllocateToTrack().equals(NO)
+        if (NO.equals(caseData.getFinalOrderAllocateToTrack())
             && isJudicialReferral(callbackParams)
             && isSmallOrFastTrack(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -290,7 +289,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         caseDataBuilder = populateDownloadTemplateOptions(caseDataBuilder);
 
-        if (caseData.getFinalOrderAllocateToTrack().equals(YES)) {
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
             caseDataBuilder.finalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
         } else {
             populateTrackToggle(caseData, caseDataBuilder);
@@ -727,10 +726,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             if (caseData.getResponseClaimTrack() != null) {
                 caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
             } else {
-                AllocatedTrack provisionalTrack = getAllocatedTrack(caseData.getTotalClaimAmount(),
-                                                                    null, null,
-                                                                    featureToggleService, caseData);
-                caseDataBuilder.finalOrderTrackToggle(provisionalTrack.name());
+                // track is null when DJ is completed, default to small/fast track journey
+                // in this scenario
+                caseDataBuilder.finalOrderTrackToggle(AllocatedTrack.SMALL_CLAIM.name());
             }
 
         }
