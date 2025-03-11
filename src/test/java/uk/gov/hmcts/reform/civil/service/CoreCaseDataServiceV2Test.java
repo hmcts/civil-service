@@ -74,7 +74,7 @@ class CoreCaseDataServiceV2Test {
         private static final String EVENT_TOKEN = "eventToken";
         private static final String CASE_ID = "1";
         private static final String USER_ID = "User1";
-        private final CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+        private final CaseData caseData = new CaseDataBuilder().atStateClaimDraftMock()
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
@@ -105,7 +105,7 @@ class CoreCaseDataServiceV2Test {
         }
 
         @Test
-        void triggerUpdateLocationEpimdsIdEvent_WhenCalled() {
+        void triggerUpdateLocationEpimdsIdEvent_WhenApplicant1DQRequestedCourtCalled() {
             service.triggerUpdateLocationEpimdsIdEvent(Long.valueOf(CASE_ID),
                                                        CaseEvent.valueOf(EVENT_ID),
                                                        "12345",
