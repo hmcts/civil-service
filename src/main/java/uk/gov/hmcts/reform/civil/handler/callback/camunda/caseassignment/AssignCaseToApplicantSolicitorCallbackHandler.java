@@ -87,6 +87,5 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
             singletonMap("$set", singletonMap("HMCTSServiceId", siteId))
         );
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
-
     }
 }
