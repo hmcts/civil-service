@@ -186,7 +186,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldAssignCategoryIdToLatestQuery() {
+        public void shouldAssignCategoryIdToLatestApplicantQuery() {
             when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
                 APPLICANTSOLICITORONE.name()));
             CaseData caseData = CaseData.builder()
@@ -205,7 +205,55 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             for (Document document : documents) {
-                assertThat(document.getCategoryID()).isEqualTo(DocCategory.QUERY_DOCUMENTS.getValue());
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue());
+            }
+        }
+
+        @Test
+        public void shouldAssignCategoryIdToLatestRespondent1Query() {
+            when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                RESPONDENTSOLICITORONE.name()));
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .qmRespondentSolicitor1Queries(mockQueriesCollectionWithAttachments(QUERY_ID, NOW))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            List<Document> documents = unwrapElements(updatedData.getQmRespondentSolicitor1Queries()
+                                                          .getCaseMessages().get(0).getValue()
+                                                          .getAttachments());
+
+            assertThat(response.getErrors()).isNull();
+            for (Document document : documents) {
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue());
+            }
+        }
+
+        @Test
+        public void shouldAssignCategoryIdToLatestRespondent2Query() {
+            when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                RESPONDENTSOLICITORTWO.name()));
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .qmRespondentSolicitor2Queries(mockQueriesCollectionWithAttachments(QUERY_ID, NOW))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            List<Document> documents = unwrapElements(updatedData.getQmRespondentSolicitor2Queries()
+                                                          .getCaseMessages().get(0).getValue()
+                                                          .getAttachments());
+
+            assertThat(response.getErrors()).isNull();
+            for (Document document : documents) {
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue());
             }
         }
 
