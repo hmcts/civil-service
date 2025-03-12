@@ -119,13 +119,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "someLocation, true, true",
-        "someLocation, false, false",
-        ", true, false",
-        ", false, false"
-    })
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
