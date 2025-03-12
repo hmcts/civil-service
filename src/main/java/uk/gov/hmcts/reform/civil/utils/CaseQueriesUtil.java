@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
@@ -80,5 +83,15 @@ public class CaseQueriesUtil {
                 .isHearingRelated(caseMessage.getIsHearingRelated())
                 .build())
             .orElse(null);
+    }
+
+    public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage, AssignCategoryId assignCategoryId) {
+        List<Element<Document>> attachments = latestCaseMessage.getAttachments();
+        if (attachments != null && !attachments.isEmpty()) {
+            for (Element<Document> attachment : attachments) {
+                assignCategoryId.assignCategoryIdToDocument(attachment.getValue(),
+                                                            DocCategory.QUERY_DOCUMENTS.getValue());
+            }
+        }
     }
 }

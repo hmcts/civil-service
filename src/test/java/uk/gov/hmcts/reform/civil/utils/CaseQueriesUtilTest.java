@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -23,6 +27,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +35,9 @@ class CaseQueriesUtilTest {
 
     @Mock
     private CoreCaseUserService coreCaseUserService;
+
+    @InjectMocks
+    private AssignCategoryId assignCategoryId;
 
     @Test
     void shouldReturnApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
@@ -107,6 +115,24 @@ class CaseQueriesUtilTest {
         );
 
         assertEquals("Unsupported case role for query management.", exception.getMessage());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(LocalDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId);
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -441,6 +467,20 @@ class CaseQueriesUtilTest {
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "3");
 
         assertThat(roles).containsOnly(CaseRole.RESPONDENTSOLICITORTWO.toString());
+    }
+
+    private CaseMessage buildCaseMessageAt(String id, String subject, LocalDateTime createdDate) {
+        return CaseMessage.builder()
+            .id(id)
+            .subject(subject)
+            .name("John Doe")
+            .body("Sample body text")
+            .attachments(List.of())
+            .isHearingRelated(NO)
+            .hearingDate(LocalDate.now())
+            .createdOn(createdDate)
+            .createdBy("System")
+            .build();
     }
 
     private CaseMessage buildCaseMessage(String id, String subject) {
