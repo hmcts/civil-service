@@ -89,7 +89,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGaForLipsEnabled() {
-        return featureToggleApi.isFeatureEnabled("GaForLips");
+        return true;
     }
 
     public boolean isMultiOrIntermediateTrackEnabled(CaseData caseData) {
@@ -132,9 +132,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
-        return location != null
-            && featureToggleApi.isFeatureEnabledForLocation("ea-courts-whitelisted-for-ga-lips", location, false)
-            && isGaForLipsEnabled();
+        return true;
     }
 
     public boolean isJOLiveFeedActive() {
