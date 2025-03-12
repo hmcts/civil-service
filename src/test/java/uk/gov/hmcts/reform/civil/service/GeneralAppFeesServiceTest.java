@@ -147,7 +147,6 @@ class GeneralAppFeesServiceTest {
         static Stream<Arguments> joWithApplicationTypedData() {
             return Stream.of(
                 Arguments.of(GeneralApplicationTypes.VARY_ORDER, APPLICATION_TO_VARY_OR_SUSPEND, FEE_PENCE),
-                Arguments.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT, GENERAL_APPLICATION_WITH_NOTICE, FEE_PENCE),
                 Arguments.of(GeneralApplicationTypes.OTHER, CERTIFICATE_OF_SATISFACTION, FEE_PENCE)
             );
         }
@@ -335,8 +334,6 @@ class GeneralAppFeesServiceTest {
                 Arguments.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT, YesOrNo.YES, YesOrNo.YES, -1, FEE_PENCE),
                 Arguments.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT, YesOrNo.NO, YesOrNo.NO, -1, FEE_PENCE),
                 Arguments.of(GeneralApplicationTypes.SETTLE_BY_CONSENT, YesOrNo.YES, YesOrNo.YES, -1, FEE_PENCE),
-                Arguments.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT, YesOrNo.YES, YesOrNo.YES, -1, FEE_PENCE),
-                Arguments.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT, YesOrNo.NO, YesOrNo.NO, -1, FEE_PENCE),
                 Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.NO, YesOrNo.YES, 1, FEE_PENCE),
                 Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.NO, YesOrNo.NO, 1, FEE_PENCE),
                 Arguments.of(GeneralApplicationTypes.ADJOURN_HEARING, YesOrNo.NO, YesOrNo.NO, 15, FEE_PENCE)
@@ -422,9 +419,7 @@ class GeneralAppFeesServiceTest {
             when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
             when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
 
-            if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT) {
-                when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
-            } else if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
+            if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
                 when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn(APPLICATION_TO_VARY_OR_SUSPEND);
             }
 
@@ -439,9 +434,7 @@ class GeneralAppFeesServiceTest {
                 .isEqualTo(expectedFee);
             List<String> keywords = keywordCaptor.getAllValues();
             assertThat(keywords).contains(GENERAL_APP_WITHOUT_NOTICE);
-            if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT) {
-                assertThat(keywords).contains(GENERAL_APPLICATION_WITH_NOTICE);
-            } else if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
+           if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
                 assertThat(keywords).contains(APPLICATION_TO_VARY_OR_SUSPEND);
             }
         }
