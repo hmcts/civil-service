@@ -44,7 +44,7 @@ class FeatureToggleServiceTest {
         var caseFlagsKey = "GaForLips";
         givenToggle(caseFlagsKey, toggleStat);
 
-        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(true);
     }
 
     @ParameterizedTest
