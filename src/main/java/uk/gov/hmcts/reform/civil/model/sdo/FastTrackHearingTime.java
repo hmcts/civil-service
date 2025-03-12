@@ -21,7 +21,6 @@ public class FastTrackHearingTime {
     private List<DateToShowToggle> dateToToggle;
     private FastTrackHearingTimeEstimate hearingDuration;
     private String helpText1;
-    private String helpText2;
     private String otherHours;
     private String otherMinutes;
 }

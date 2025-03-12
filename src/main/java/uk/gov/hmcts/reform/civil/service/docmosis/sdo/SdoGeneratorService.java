@@ -336,7 +336,7 @@ public class SdoGeneratorService {
             // SNI-5142
             .fastTrackMethodToggle(true)
             .fastTrackAllocation(getFastTrackAllocation(caseData, featureToggleService.isFastTrackUpliftsEnabled()))
-            .showBundleInfo(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData));
+            .showBundleInfo(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialBundleToggle"));
 
         sdoDocumentFormBuilder
             .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
