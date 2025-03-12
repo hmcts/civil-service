@@ -258,6 +258,19 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     }
 
     @Test
+    @PactTestFor(pactMethod = "getFeeForGAWithNotice")
+    public void verifyFeeForGAWithNotice() {
+
+        Fee fee = generalAppFeesService.getFeeForGA(
+            CaseData.builder().generalAppType(
+                    GAApplicationType.builder().types(List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT))
+                        .build())
+                .build());
+        assertThat(fee.getCode(), is(equalTo("FEE0442")));
+        assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(10000))));
+    }
+
+    @Test
     @PactTestFor(pactMethod = "getFeeForConsentWithOrWithout")
     public void verifyFeeForConsentWithOrWithout() {
         Fee fee = generalAppFeesService.getFeeForGA(
