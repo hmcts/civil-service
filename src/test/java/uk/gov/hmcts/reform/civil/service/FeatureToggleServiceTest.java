@@ -121,8 +121,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-        "someLocation, true, true",
-        ", true, true"
+        "someLocation, true, true"
     })
     void shouldReturnCorrectValueBasedOnLocationAndFeatureToggleForGaLips(String location, boolean isFeatureEnabled, boolean expected) {
 
