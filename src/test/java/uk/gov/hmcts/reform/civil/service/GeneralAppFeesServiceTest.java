@@ -434,7 +434,7 @@ class GeneralAppFeesServiceTest {
                 .isEqualTo(expectedFee);
             List<String> keywords = keywordCaptor.getAllValues();
             assertThat(keywords).contains(GENERAL_APP_WITHOUT_NOTICE);
-           if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
+            if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
                 assertThat(keywords).contains(APPLICATION_TO_VARY_OR_SUSPEND);
             }
         }
