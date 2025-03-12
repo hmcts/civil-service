@@ -1009,6 +1009,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimantNotSettlePartAdmitClaim() {
         return hasDefendantNotPaid()
+            || isCcjRequestJudgmentByAdmissionDefendantNotPaid()
             || isSettlementDeclinedByClaimant()
             || isClaimantRejectsClaimAmount();
     }
@@ -1515,5 +1516,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isHearingFeePaid() {
         return nonNull(this.getHearingFeePaymentDetails())
             && SUCCESS.equals(this.getHearingFeePaymentDetails().getStatus()) || this.hearingFeePaymentDoneWithHWF();
+    }
+
+    @JsonIgnore
+    public boolean isCcjRequestJudgmentByAdmissionDefendantNotPaid() {
+        return getCcjPaymentDetails() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null
+            && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
     }
 }
