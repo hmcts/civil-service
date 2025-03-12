@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
@@ -21,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 
 @Service
@@ -32,6 +33,7 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper mapper;
     private final AssignCategoryId assignCategoryId;
+    private final CoreCaseUserService coreCaseUserService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -51,7 +53,9 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
-        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId);
+        String parentQueryId = latestCaseMessage.getParentId();
+        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId,
+                                                coreCaseUserService, parentQueryId);
 
         caseData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
