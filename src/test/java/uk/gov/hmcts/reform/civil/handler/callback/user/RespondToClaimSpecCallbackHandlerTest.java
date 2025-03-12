@@ -2100,6 +2100,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             BigDecimal admitted = BigDecimal.valueOf(1000);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
