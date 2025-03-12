@@ -96,8 +96,8 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
             errors.add(ERROR_MESSAGE_DATE_MUST_BE_IN_PAST);
         }
 
-        if (joJudgmentByAdmissionIssueDate != null &&
-            dateOfPaymentMade.isBefore(joJudgmentByAdmissionIssueDate.toLocalDate())) {
+        if (joJudgmentByAdmissionIssueDate != null
+            && dateOfPaymentMade.isBefore(joJudgmentByAdmissionIssueDate.toLocalDate())) {
             errors.add(ERROR_MESSAGE_DATE_ON_OR_AFTER_JUDGEMENT);
         }
 
