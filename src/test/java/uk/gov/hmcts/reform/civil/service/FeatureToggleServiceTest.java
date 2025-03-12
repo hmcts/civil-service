@@ -39,7 +39,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true, true})
     void shouldReturnCorrectValue_whenIsGAForLipInvoked(Boolean toggleStat) {
 
         assertThat(featureToggleService.isGaForLipsEnabled()).isEqualTo(true);
@@ -117,6 +117,19 @@ class FeatureToggleServiceTest {
             .thenReturn(toggleStat);
 
         assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "someLocation, true, true",
+        "someLocation, false, false",
+        ", true, false",
+        ", true, true"
+    })
+    void shouldReturnCorrectValueBasedOnLocationAndFeatureToggleForGaLips(String location, boolean isFeatureEnabled, boolean expected) {
+
+        boolean result = featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(location);
+        assertEquals(expected, result);
     }
 
     @ParameterizedTest
