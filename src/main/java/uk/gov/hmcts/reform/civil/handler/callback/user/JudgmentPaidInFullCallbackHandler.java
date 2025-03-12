@@ -40,6 +40,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
     private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_PAST = "Date must be in past";
+    private static final String ERROR_MESSAGE_DATE_ON_OR_AFTER_JUDGEMENT = "Paid in full date must be on or after the date of the judgment";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -89,10 +90,19 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
         LocalDate dateOfPaymentMade = caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade();
+        LocalDateTime joJudgmentByAdmissionIssueDate = caseData.getJoJudgementByAdmissionIssueDate();
+
 
         if (JudgmentsOnlineHelper.validateIfFutureDate(dateOfPaymentMade)) {
             errors.add(ERROR_MESSAGE_DATE_MUST_BE_IN_PAST);
         }
+
+        if (joJudgmentByAdmissionIssueDate != null &&
+            dateOfPaymentMade.isBefore(joJudgmentByAdmissionIssueDate.toLocalDate())) {
+            errors.add(ERROR_MESSAGE_DATE_ON_OR_AFTER_JUDGEMENT);
+        }
+
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
