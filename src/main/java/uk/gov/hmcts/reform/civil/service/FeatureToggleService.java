@@ -132,7 +132,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGaForLipsEnabledAndLocationWhiteListed(String location) {
-        return true;
+        return location != null;
     }
 
     public boolean isJOLiveFeedActive() {
