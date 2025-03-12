@@ -280,10 +280,12 @@ For that you should have such file as this:
 ```
 ## Point CCD definitions to a specific branch
 
-add the following label to your GitHub PR.
+Add the following label to your GitHub PR.
 
-civilCcdDefinition:branchName
+```
+civilDefinitionBranch:????
 
+where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
 ```
 
 
