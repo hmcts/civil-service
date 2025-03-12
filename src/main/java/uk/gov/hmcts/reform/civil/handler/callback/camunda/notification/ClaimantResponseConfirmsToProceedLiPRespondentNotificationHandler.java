@@ -73,7 +73,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 ? notificationsProperties.getRespondentSolicitorNotifyToProceedInMediation()
                 : notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction();
         }
-        if (isClaimantNotProcessLipVsLRWithNoc(caseData)) {
+        if (isClaimantNotProceedLipVsLRWithNoc(caseData)) {
             return notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
         }
         if (shouldSendEmailToDefendantLR) {
@@ -148,7 +148,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec());
     }
 
-    private boolean isClaimantNotProcessLipVsLRWithNoc(CaseData caseData) {
+    private boolean isClaimantNotProceedLipVsLRWithNoc(CaseData caseData) {
         return caseData.isLipvLROneVOne()
             && ((isFullDefenceStatesPaid(caseData) && YES.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()))
                 || YesOrNo.NO.equals(caseData.getApplicant1ProceedWithClaim()))
