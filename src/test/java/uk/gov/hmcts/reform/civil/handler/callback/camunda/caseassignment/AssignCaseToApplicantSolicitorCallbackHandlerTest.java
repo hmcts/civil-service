@@ -109,7 +109,6 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @BeforeEach
         void setup() {
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -152,7 +151,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
     class AssignRolesIn1v1CasesUnregisteredAndUnrespresented {
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -181,11 +180,6 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
     @Nested
     class AssignRolesIn1v2Cases {
-
-        @BeforeEach
-        void setup() {
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
-        }
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2SS() {
