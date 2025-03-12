@@ -12,7 +12,7 @@ plugins {
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.13"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1612'
-  id "org.flywaydb.flyway" version "10.20.1"
+  id "org.flywaydb.flyway" version "10.22.0"
 }
 
 group = 'uk.gov.hmcts.reform'
