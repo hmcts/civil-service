@@ -3,14 +3,14 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.querymanagement.QueryMessageThread;
+import uk.gov.hmcts.reform.civil.model.docmosis.querymanagement.QueryDocument;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -31,10 +31,8 @@ public class QueryDocumentGenerator implements TemplateDataGenerator<HearingForm
     private final DocumentGeneratorService documentGeneratorService;
     private final AssignCategoryId assignCategoryId;
 
-    public List<CaseDocument> generate(List<Element<CaseMessage>> messageThread, String authorisation, List<String> roles) {
-
-        List<CaseDocument> caseDocuments = new ArrayList<>();
-        QueryMessageThread templateData = QueryMessageThread.builder().messages(messageThread).build();
+    public List<CaseDocument> generate(String caseId, List<Element<CaseMessage>> messageThread, String authorisation, List<String> roles) {
+        QueryDocument templateData = QueryDocument.from(caseId, messageThread);
         DocmosisTemplates template = QUERY_DOCUMENT;
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
@@ -48,14 +46,15 @@ public class QueryDocumentGenerator implements TemplateDataGenerator<HearingForm
         );
         assignCategoryIdToQueryDocument(caseDocument.getDocumentLink(), assignCategoryId, roles);
         caseDocument.setCreatedDatetime(messageThread.get(0).getValue().getCreatedOn());
+        List<CaseDocument> caseDocuments = new ArrayList<>();
         caseDocuments.add(caseDocument);
         return caseDocuments;
     }
 
-    public List<CaseDocument> generate(List<Element<CaseMessage>> messageThread, String authorisation, String categoryId) {
+    public List<CaseDocument> generate(String caseId, List<Element<CaseMessage>> messageThread, String authorisation, String categoryId) {
 
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        QueryMessageThread templateData = QueryMessageThread.builder().messages(messageThread).build();
+        QueryDocument templateData = QueryDocument.from(caseId, messageThread);
         DocmosisTemplates template = QUERY_DOCUMENT;
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);

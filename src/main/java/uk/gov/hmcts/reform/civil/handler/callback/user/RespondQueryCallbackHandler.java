@@ -19,12 +19,10 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.QueryDocumentGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.jsonwebtoken.lang.Collections.isEmpty;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -33,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespon
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getCollectionByMessage;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueriesDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -72,8 +71,8 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         latestCaseMessage.getAttachments();
         CaseQueriesCollection currentCollection = getCollectionByMessage(caseData, latestCaseMessage);
         List<Element<CaseMessage>> messageThread = currentCollection.messageThread(parentQueryId);
-        String categoryId = getQueriesDocument(caseData, messageThread.get(0).getValue().getCreatedOn()).getDocumentLink().getCategoryID();
-        buildDocument(messageThread, callbackParams.getParams().get(BEARER_TOKEN).toString(), categoryId, builder);
+        String categoryId = getQueriesDocument(caseData, messageThread.get(0).getValue().getCreatedOn()).getValue().getDocumentLink().getCategoryID();
+        buildDocument(caseData.getCcdCaseReference().toString(), messageThread, callbackParams.getParams().get(BEARER_TOKEN).toString(), categoryId, builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder
@@ -83,21 +82,20 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
 
     }
 
-    CaseDocument getQueriesDocument(CaseData caseData, LocalDateTime initialQueryTime) {
-        return caseData.getQueryDocuments().stream().filter(doc -> doc.getValue().getCreatedDatetime()
-            .equals(initialQueryTime)).findFirst()
-            .map(doc -> doc.getValue())
-            .orElse(CaseDocument.builder().build());
-    }
-
-    private void buildDocument(List<Element<CaseMessage>> messageThread, String auth, String categoryId, CaseData.CaseDataBuilder builder) {
-        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(messageThread, auth, categoryId);
+    private void buildDocument(String caseId, List<Element<CaseMessage>> messageThread, String auth, String categoryId, CaseData.CaseDataBuilder builder) {
+        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(caseId, messageThread, auth, categoryId);
         CaseData caseData = builder.build();
-        List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
-        queryDocuments.add(element(caseDocuments.get(0)));
-        if (!isEmpty(caseData.getQueryDocuments())) {
-            queryDocuments.addAll(caseData.getHearingDocuments());
+
+        Element<CaseDocument> existingQueryDocument = getQueriesDocument(
+            caseData,
+            messageThread.get(0).getValue().getCreatedOn()
+        );
+
+        if (nonNull(existingQueryDocument)) {
+            caseData.getQueryDocuments().remove(existingQueryDocument);
         }
-        builder.queryDocuments(queryDocuments);
+
+        caseData.getQueryDocuments().add(element(caseDocuments.get(0)));
+        builder.queryDocuments(caseData.getQueryDocuments());
     }
 }

@@ -105,8 +105,7 @@ public enum DocmosisTemplates {
     CERTIFICATE_OF_DEBT_PAYMENT("CV-SPC-STD-ENG-N441A.docx", "Certificate_of_debt_payment_%s.pdf"),
     COVER_LETTER("CV-SPC-LET-ENG-COVER-LETTER.docx", "cover_letter.pdf"),
     SDO_COVER_LETTER("CV-SPC-STD-ENG-COVER-LETTER.docx", "sdo_cover_letter.pdf"),
-    QUERY_DOCUMENT("CV-UNS-CLM-ENG-0451.docx", "queries_%s.pdf"),
-    ;
+    QUERY_DOCUMENT("CV-UNS-CLM-ENG-0451.docx", "%s.pdf");
 
     private final String template;
     private final String documentTitle;

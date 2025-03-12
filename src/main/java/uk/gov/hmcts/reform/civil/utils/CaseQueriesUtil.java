@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -41,30 +43,14 @@ public class CaseQueriesUtil {
         }
     }
 
-//    public static CaseQueriesCollection getCollectionByMessage(CaseData caseData, CaseMessage message) {
-//        if (collectionHasMessage(caseData.getQmApplicantSolicitorQueries(), message)) {
-//            return caseData.getQmApplicantSolicitorQueries();
-//        }
-//        if (collectionHasMessage(caseData.getQmRespondentSolicitor1Queries(), message)) {
-//            return caseData.getQmRespondentSolicitor1Queries();
-//        }
-//        if (collectionHasMessage(caseData.getQmRespondentSolicitor2Queries(), message)) {
-//            return caseData.getQmRespondentSolicitor1Queries();
-//        }
-//        return null;
-//    }
-//
-//    public static boolean collectionHasMessage(CaseQueriesCollection collection, CaseMessage message) {
-//        return nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().contains(message);
-//    }
-
     public static CaseQueriesCollection getCollectionByMessage(CaseData caseData, CaseMessage message) {
         return Stream.of(
                 caseData.getQmApplicantSolicitorQueries(),
                 caseData.getQmRespondentSolicitor1Queries(),
                 caseData.getQmRespondentSolicitor2Queries()
             )
-            .filter(collection -> nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().contains(message))
+            .filter(collection -> nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().stream()
+                .anyMatch(messageEl -> messageEl.getValue().getCreatedOn().equals(message.getCreatedOn())))
             .findFirst()
             .orElse(null);
     }
@@ -118,7 +104,19 @@ public class CaseQueriesUtil {
     public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
                                                      AssignCategoryId assignCategoryId,
                                                      List<String> roles) {
-        String categoryId = getCategoryIdForRole(roles);
+        String categoryId = getAttachmentsCategoryIdForRole(roles);
+        List<Element<Document>> attachments = latestCaseMessage.getAttachments();
+        if (attachments != null && !attachments.isEmpty()) {
+            for (Element<Document> attachment : attachments) {
+                assignCategoryId.assignCategoryIdToDocument(attachment.getValue(), categoryId);
+            }
+        }
+    }
+
+    public static void assignCategoryIdToQueryDocument(CaseMessage latestCaseMessage,
+                                                     AssignCategoryId assignCategoryId,
+                                                     List<String> roles) {
+        String categoryId = getQueryDocumentCategoryIdForRole(roles);
         List<Element<Document>> attachments = latestCaseMessage.getAttachments();
         if (attachments != null && !attachments.isEmpty()) {
             for (Element<Document> attachment : attachments) {
@@ -130,7 +128,7 @@ public class CaseQueriesUtil {
     public static void assignCategoryIdToQueryDocument(Document document,
                                                        AssignCategoryId assignCategoryId,
                                                        List<String> roles) {
-        String categoryId = getCategoryIdForRole(roles);
+        String categoryId = getQueryDocumentCategoryIdForRole(roles);
         assignCategoryId.assignCategoryIdToDocument(document, categoryId);
     };
 
@@ -143,7 +141,17 @@ public class CaseQueriesUtil {
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
     }
 
-    private static String getCategoryIdForRole(List<String> roles) {
+    private static String getAttachmentsCategoryIdForRole(List<String> roles) {
+        if (isApplicantSolicitor(roles)) {
+            return DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
+        } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
+            return DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
+        } else {
+            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
+        }
+    }
+
+    private static String getQueryDocumentCategoryIdForRole(List<String> roles) {
         if (isApplicantSolicitor(roles)) {
             return DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue();
         } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
@@ -151,5 +159,11 @@ public class CaseQueriesUtil {
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
+    }
+
+    public static Element<CaseDocument> getQueriesDocument(CaseData caseData, LocalDateTime initialQueryTime) {
+        return caseData.getQueryDocuments().stream().filter(doc -> doc.getValue().getCreatedDatetime()
+                .equals(initialQueryTime)).findFirst()
+            .orElse(null);
     }
 }

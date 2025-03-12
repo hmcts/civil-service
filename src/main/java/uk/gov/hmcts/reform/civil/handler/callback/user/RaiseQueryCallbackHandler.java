@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYS
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToQueryDocument;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueriesDocument;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -100,6 +101,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
 
         List<Element<CaseMessage>> messageThread = queriesCollection.messageThread(parentId);
+
         buildDocument(
             messageThread,
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -123,14 +125,20 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     }
 
     private void buildDocument(List<Element<CaseMessage>> messageThread, String auth, List<String> roles, CaseData.CaseDataBuilder builder) {
-        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(messageThread, auth, roles);
         CaseData caseData = builder.build();
-        List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
-        queryDocuments.add(element(caseDocuments.get(0)));
-        if (!isEmpty(caseData.getQueryDocuments())) {
-            queryDocuments.addAll(caseData.getHearingDocuments());
+        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(caseData.getCcdCaseReference().toString(), messageThread, auth, roles);
+
+        Element<CaseDocument> existingQueryDocument = getQueriesDocument(
+            caseData,
+            messageThread.get(0).getValue().getCreatedOn()
+        );
+
+        if (nonNull(existingQueryDocument)) {
+            caseData.getQueryDocuments().remove(existingQueryDocument);
         }
-        builder.queryDocuments(queryDocuments);
+
+        caseData.getQueryDocuments().add(element(caseDocuments.get(0)));
+        builder.queryDocuments(caseData.getQueryDocuments());
     }
 
 }
