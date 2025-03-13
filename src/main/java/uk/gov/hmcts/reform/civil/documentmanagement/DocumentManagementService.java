@@ -18,6 +18,6 @@ public interface DocumentManagementService {
 
     DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath);
 
-    void updateDocumentTimeToLive(String documentPath, String authorisation, LocalDateTime datetime);
+    void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime);
 
 }
