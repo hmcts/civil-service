@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementSer
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.documenthandler.DocumentCategory;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingForm;
@@ -31,8 +33,9 @@ public class QueryDocumentGenerator implements TemplateDataGenerator<HearingForm
     private final DocumentGeneratorService documentGeneratorService;
     private final AssignCategoryId assignCategoryId;
 
-    public List<CaseDocument> generate(String caseId, List<Element<CaseMessage>> messageThread, String authorisation, List<String> roles) {
-        QueryDocument templateData = QueryDocument.from(caseId, messageThread);
+    public CaseDocument generate(Long caseId, List<Element<CaseMessage>> messageThread, String authorisation, DocCategory documentCategory) {
+
+        QueryDocument templateData = QueryDocument.from(caseId.toString(), messageThread);
         DocmosisTemplates template = QUERY_DOCUMENT;
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
@@ -44,32 +47,9 @@ public class QueryDocumentGenerator implements TemplateDataGenerator<HearingForm
                 DocumentType.HEARING_FORM
             )
         );
-        assignCategoryIdToQueryDocument(caseDocument.getDocumentLink(), assignCategoryId, roles);
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, documentCategory.getValue());
         caseDocument.setCreatedDatetime(messageThread.get(0).getValue().getCreatedOn());
-        List<CaseDocument> caseDocuments = new ArrayList<>();
-        caseDocuments.add(caseDocument);
-        return caseDocuments;
-    }
-
-    public List<CaseDocument> generate(String caseId, List<Element<CaseMessage>> messageThread, String authorisation, String categoryId) {
-
-        List<CaseDocument> caseDocuments = new ArrayList<>();
-        QueryDocument templateData = QueryDocument.from(caseId, messageThread);
-        DocmosisTemplates template = QUERY_DOCUMENT;
-        DocmosisDocument document =
-            documentGeneratorService.generateDocmosisDocument(templateData, template);
-        CaseDocument caseDocument = documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(
-                String.format(template.getDocumentTitle(), messageThread.get(0).getValue().getSubject()),
-                document.getBytes(),
-                DocumentType.HEARING_FORM
-            )
-        );
-        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, categoryId);
-        caseDocument.setCreatedDatetime(messageThread.get(0).getValue().getCreatedOn());
-        caseDocuments.add(caseDocument);
-        return caseDocuments;
+        return caseDocument;
     }
 }
 

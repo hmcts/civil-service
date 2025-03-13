@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public interface DocumentManagementService {
 

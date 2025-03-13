@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -18,6 +19,11 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
@@ -69,6 +75,40 @@ public class CaseQueriesUtil {
         return latestQueries.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
             .orElse(null);
     }
+
+    public static QueryCollectionType getCollectionType(CaseQueriesCollection queriesCollection, CaseData caseData) {
+
+        if (queriesCollection.isSame(caseData.getQmApplicantSolicitorQueries())) {
+            return APPLICANT_SOLICITOR_QUERIES;
+        }
+        if (queriesCollection.isSame(caseData.getQmRespondentSolicitor1Queries())) {
+            return RESPONDENT_SOLICITOR_ONE_QUERIES;
+        }
+        if (queriesCollection.isSame(caseData.getQmRespondentSolicitor2Queries())) {
+            return RESPONDENT_SOLICITOR_TWO_QUERIES;
+        }
+
+        return null;
+    }
+
+    public static CaseQueriesCollection getCollection(QueryCollectionType collectionType, CaseData caseData) {
+        return switch(collectionType) {
+            case APPLICANT_SOLICITOR_QUERIES -> caseData.getQmApplicantSolicitorQueries();
+            case RESPONDENT_SOLICITOR_ONE_QUERIES -> caseData.getQmRespondentSolicitor1Queries();
+            case RESPONDENT_SOLICITOR_TWO_QUERIES -> caseData.getQmRespondentSolicitor2Queries();
+            default -> null;
+        };
+    }
+
+    public static DocCategory getQueryDocumentCategory(QueryCollectionType collectionType) {
+        return switch(collectionType) {
+            case APPLICANT_SOLICITOR_QUERIES -> CLAIMANT_QUERY_DOCUMENTS;
+            case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES -> DEFENDANT_QUERY_DOCUMENTS;
+            default -> null;
+        };
+    }
+
+
 
     public static List<String> getUserRoleForQuery(CaseData caseData,
                                                    CoreCaseUserService coreCaseUserService, String queryId) {
@@ -153,17 +193,11 @@ public class CaseQueriesUtil {
 
     private static String getQueryDocumentCategoryIdForRole(List<String> roles) {
         if (isApplicantSolicitor(roles)) {
-            return DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue();
+            return CLAIMANT_QUERY_DOCUMENTS.getValue();
         } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
             return DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
-    }
-
-    public static Element<CaseDocument> getQueriesDocument(CaseData caseData, LocalDateTime initialQueryTime) {
-        return caseData.getQueryDocuments().stream().filter(doc -> doc.getValue().getCreatedDatetime()
-                .equals(initialQueryTime)).findFirst()
-            .orElse(null);
     }
 }

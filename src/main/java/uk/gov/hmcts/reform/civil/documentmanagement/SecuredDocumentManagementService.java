@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentHashToken;
+import uk.gov.hmcts.reform.ccd.document.am.model.DocumentTTLRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -241,9 +242,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
 
     @Override
     public void updateDocumentTimeToLive(String documentPath, String authorisation, LocalDateTime datetime) {
-        Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
-        System.out.println("");
-//        caseDocumentClientApi.patchDocument(authorisation, "", documentMetadata);
+        caseDocumentClientApi.patchDocument(authorisation, authTokenGenerator.generate(), getDocumentIdFromSelfHref(documentPath), new DocumentTTLRequest(datetime));
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.ArrayList;
@@ -51,5 +52,9 @@ public class CaseQueriesCollection {
             .collect(Collectors.toList());
     }
 
+    @JsonIgnore
+    public boolean isSame(CaseQueriesCollection caseQueriesCollection) {
+        return nonNull(caseQueriesCollection) && caseQueriesCollection.equals(this);
+    }
 
 }

@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,17 +16,14 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.QueryDocumentGenerator;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -39,11 +35,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToQueryDocument;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueriesDocument;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @SuppressWarnings("unchecked")
@@ -56,7 +49,6 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final UserService userService;
     protected final CoreCaseUserService coreCaseUserService;
     private final AssignCategoryId assignCategoryId;
-    protected final QueryDocumentGenerator queryDocumentGenerator;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
 
@@ -102,13 +94,6 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         List<Element<CaseMessage>> messageThread = queriesCollection.messageThread(parentId);
 
-        buildDocument(
-            messageThread,
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            roles,
-            builder
-        );
-
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -122,23 +107,6 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     private List<String> retrieveUserCaseRoles(String caseReference, String userToken) {
         UserInfo userInfo = userService.getUserInfo(userToken);
         return coreCaseUserService.getUserCaseRoles(caseReference, userInfo.getUid());
-    }
-
-    private void buildDocument(List<Element<CaseMessage>> messageThread, String auth, List<String> roles, CaseData.CaseDataBuilder builder) {
-        CaseData caseData = builder.build();
-        List<CaseDocument> caseDocuments = queryDocumentGenerator.generate(caseData.getCcdCaseReference().toString(), messageThread, auth, roles);
-
-        Element<CaseDocument> existingQueryDocument = getQueriesDocument(
-            caseData,
-            messageThread.get(0).getValue().getCreatedOn()
-        );
-
-        if (nonNull(existingQueryDocument)) {
-            caseData.getQueryDocuments().remove(existingQueryDocument);
-        }
-
-        caseData.getQueryDocuments().add(element(caseDocuments.get(0)));
-        builder.queryDocuments(caseData.getQueryDocuments());
     }
 
 }
