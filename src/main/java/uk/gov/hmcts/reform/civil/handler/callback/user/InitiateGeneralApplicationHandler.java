@@ -143,7 +143,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 /*
                  * General Application can only be initiated if Defendant is assigned to the case
                  * */
-                if (Objects.isNull(caseData.getDefendantUserDetails())) {
+                if (Objects.isNull(caseData.getDefendantUserDetails()) && !caseData.isLipvLROneVOne()) {
                     errors.add(RESP_NOT_ASSIGNED_ERROR_LIP);
                 }
             }
