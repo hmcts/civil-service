@@ -75,15 +75,6 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
         return SubmittedCallbackResponse.builder().build();
     }
 
-    private CallbackResponse saveSupplementaryData(CallbackParams callbackParams) {
-        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-        String siteId = UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
-        setSupplementaryData(caseData.getCcdCaseReference(), siteId);
-        return SubmittedCallbackResponse.builder().build();
-    }
-
     private void setSupplementaryData(Long caseId, String siteId) {
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
         supplementaryDataCivil.put(
