@@ -79,7 +79,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
             Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(localCaseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
@@ -96,12 +96,12 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
             Map<String, Object> dataMap = objectMapper.convertValue(localCaseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            //Supplementary data must be saved on the submitted callback otherwise it isn't persisted correclty
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(localCaseData);
             assignCaseToApplicantSolicitorCallbackHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryDataSpec());
         }
-
     }
 
     @Nested
@@ -109,7 +109,6 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
         @BeforeEach
         void setup() {
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -152,7 +151,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
     class AssignRolesIn1v1CasesUnregisteredAndUnrespresented {
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -181,11 +180,6 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
     @Nested
     class AssignRolesIn1v2Cases {
-
-        @BeforeEach
-        void setup() {
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
-        }
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2SS() {
