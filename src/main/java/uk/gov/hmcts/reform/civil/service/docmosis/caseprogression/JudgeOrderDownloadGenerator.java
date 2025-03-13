@@ -50,8 +50,8 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
     public static final String INTERMEDIATE_NO_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is not assigned a complexity band because %s.";
     public static final String INTERMEDIATE_WITH_BAND_NO_REASON = "This case is allocated to the Intermediate Track and is assigned to complexity band %s.";
     public static final String INTERMEDIATE_WITH_BAND_WITH_REASON = "This case is allocated to the Intermediate Track and is assigned to complexity band %s because %s.";
-    public static final String ORDER_AFTER_HEARING_ON = "This order is made following a hearing on %s.";
-    public static final String ORDER_AFTER_HEARING_BETWEEN = "This order is made following a hearing between %s and %s.";
+    public static final String ORDER_AFTER_HEARING_ON = "This Order is made following a hearing on %s.";
+    public static final String ORDER_AFTER_HEARING_BETWEEN = "This Order is made following a hearing between %s and %s.";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
 
     public JudgeOrderDownloadGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService,
@@ -153,7 +153,7 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
             && caseData.getFinalOrderAllocateToTrack().equals(YES)) {
             return switch (caseData.getFinalOrderTrackAllocation()) {
                 case INTERMEDIATE_CLAIM -> getIntermediateClaimTrackAndComplexityText(caseData);
-                case MULTI_CLAIM -> "This case is allocated to the Multi Track.";
+                case MULTI_CLAIM -> "This case is allocated to the multi-track.";
                 default -> null;
             };
         }
