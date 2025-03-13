@@ -15,11 +15,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
+import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
@@ -262,11 +265,13 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     public void verifyFeeForGAWithNotice() {
 
         Fee fee = generalAppFeesService.getFeeForGA(
-            CaseData.builder().generalAppType(
+            CaseData.builder().generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppType(
                     GAApplicationType.builder().types(List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT))
                         .build())
                 .build());
-        assertThat(fee.getCode(), is(equalTo("FEE0442")));
+        assertThat(fee.getCode(), is(equalTo("FEE0445")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(10000))));
     }
 
