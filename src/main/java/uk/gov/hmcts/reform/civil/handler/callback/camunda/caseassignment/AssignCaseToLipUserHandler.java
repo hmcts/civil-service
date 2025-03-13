@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT1;
 
 @Service
@@ -38,8 +37,7 @@ public class AssignCaseToLipUserHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
-            callbackKey(SUBMITTED), this::assignUserCaseRole
+            callbackKey(ABOUT_TO_SUBMIT), this::assignUserCaseRole
         );
     }
 
