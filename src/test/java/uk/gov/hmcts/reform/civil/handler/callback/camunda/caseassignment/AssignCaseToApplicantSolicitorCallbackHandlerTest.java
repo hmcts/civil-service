@@ -127,7 +127,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
         }
 
         @Test
@@ -168,7 +168,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
 
@@ -203,7 +203,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
 
@@ -239,7 +239,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
 
@@ -272,7 +272,7 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.name(), CallbackType.SUBMITTED);
 
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
 

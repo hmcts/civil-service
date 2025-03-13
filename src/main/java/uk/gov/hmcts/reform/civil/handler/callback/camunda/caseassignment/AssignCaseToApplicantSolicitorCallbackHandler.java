@@ -45,8 +45,7 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole,
-            callbackKey(SUBMITTED), this::saveSupplementaryData
+            callbackKey(SUBMITTED), this::assignSolicitorCaseRole
         );
     }
 
@@ -70,6 +69,9 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
         log.info("Assigning case {} to solicitor {}", caseId, submitterId);
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
+        String siteId = UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
+        setSupplementaryData(caseData.getCcdCaseReference(), siteId);
 
         return SubmittedCallbackResponse.builder().build();
     }
