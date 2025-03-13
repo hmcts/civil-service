@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -28,6 +27,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -284,14 +284,16 @@ class AssignCaseToApplicantSolicitorCallbackHandlerTest extends BaseCallbackHand
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
-        assertThat(assignCaseToApplicantSolicitorCallbackHandler.handledEvents()).containsOnly(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
+        assertThat(assignCaseToApplicantSolicitorCallbackHandler.handledEvents()).containsOnly(
+            ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
     }
 
     @Test
     void shouldReturnCorrectCamundaTaskID() {
         assertThat(assignCaseToApplicantSolicitorCallbackHandler.camundaActivityId(CallbackParamsBuilder.builder()
-                                                                 .request(CallbackRequest.builder().eventId(
-            "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(TASK_ID);
+                                                                                       .request(CallbackRequest.builder().eventId(
+                                                                                           "ASSIGN_CASE_TO_APPLICANT_SOLICITOR1").build()).build())).isEqualTo(
+            TASK_ID);
     }
 
     private void verifyApplicantSolicitorOneRoles() {
