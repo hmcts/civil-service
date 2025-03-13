@@ -43,8 +43,8 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse,
-            callbackKey(SUBMITTED), this::assignSolicitorCaseRole
+            callbackKey(ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole,
+            callbackKey(SUBMITTED), this::saveSupplementaryData
         );
     }
 
@@ -67,19 +67,25 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
 
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
+
+        return SubmittedCallbackResponse.builder().build();
+    }
+
+    private CallbackResponse saveSupplementaryData(CallbackParams callbackParams) {
         // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
+        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         String siteId = UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
         setSupplementaryData(caseData.getCcdCaseReference(), siteId);
-
         return SubmittedCallbackResponse.builder().build();
     }
 
     private void setSupplementaryData(Long caseId, String siteId) {
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
-        supplementaryDataCivil.put("supplementary_data_updates",
-                                   singletonMap("$set", singletonMap("HMCTSServiceId", siteId)));
+        supplementaryDataCivil.put(
+            "supplementary_data_updates",
+            singletonMap("$set", singletonMap("HMCTSServiceId", siteId))
+        );
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
-
     }
 }
