@@ -333,7 +333,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldNotCreateWelshDocument_whenConditionsAreMetOnDefendantLip() {
+    void shouldCreateWelshDocument_whenConditionsAreMetOnDefendantLip() {
         CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build();
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
@@ -400,7 +400,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldNotCreateWelshDocument_whenConditionsAreMetOnClaimantLip() {
+    void shouldCreateWelshDocument_whenConditionsAreMetOnClaimantLip() {
         CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build();
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
