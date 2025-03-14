@@ -11,8 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
+import uk.gov.hmcts.reform.ccd.document.am.model.CaseDocumentsMetadata;
 import uk.gov.hmcts.reform.ccd.document.am.model.Classification;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.DocumentHashToken;
+import uk.gov.hmcts.reform.ccd.document.am.model.DocumentTTLRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -20,14 +23,17 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResp
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 import uk.gov.hmcts.reform.civil.helpers.LocalDateTimeHelper;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,6 +56,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final UserService userService;
     private final DocumentManagementConfiguration documentManagementConfiguration;
     private final CaseDocumentClientApi caseDocumentClientApi;
+    private final CaseDocumentAmClient caseDocumentAmClientApi;
 
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
     @Override
@@ -243,6 +250,11 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             log.error("Failed getting metadata for {}", documentPath, ex);
             throw new DocumentDownloadException(documentPath, ex);
         }
+    }
+
+    @Override
+    public void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime) {
+        caseDocumentAmClientApi.patchDocument(authorisation, authTokenGenerator.generate(), documentId, new DocumentTTLRequest(datetime));
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
