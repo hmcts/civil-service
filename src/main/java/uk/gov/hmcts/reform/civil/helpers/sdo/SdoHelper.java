@@ -489,6 +489,8 @@ public class SdoHelper {
                     && caseData.getFastTrackHearingTime().getDateToToggle() != null;
             case "sdoR2FastTrackUseOfWelshToggle":
                 return caseData.getSdoR2FastTrackUseOfWelshToggle() != null;
+            case "fastTrackTrialBundleToggle":
+                return caseData.getFastTrackTrialBundleToggle() != null;
             default:
                 return false;
         }

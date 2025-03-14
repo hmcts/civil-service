@@ -2029,13 +2029,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(22).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
                 .isEqualTo(LocalDate.now().plusWeeks(30).toString());
-            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
-                .isEqualTo("Not more than seven nor less than three clear days before the trial, "
-                               + "the claimant must file at court and serve an indexed and paginated bundle of "
-                               + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                               + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                               + "the contents of the bundle before it is filed. The bundle will include a case "
-                               + "summary and a chronology.");
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
                 .isEqualTo(String.format(
                     "This order has been made without hearing. "
