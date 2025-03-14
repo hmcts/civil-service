@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.civil.service.search.CaseDismissedSearchService;
 
 import java.util.Set;
 
+import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.defenceMade;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,7 +37,7 @@ public class ClaimDismissedHandler extends BaseExternalTaskHandler {
             try {
                 CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseDetails.getId()));
                 log.info("Processing case with id: {}", caseData.getCcdCaseReference());
-                if (caseDismissedAfterDetailNotified.test(caseData)) {
+                if (caseDismissedAfterDetailNotified.test(caseData) && not(defenceMade).test(caseData)) {
                     log.info("case with id: {} is eligible for dismiss.", caseData.getCcdCaseReference());
                     applicationEventPublisher.publishEvent(new DismissClaimEvent(caseDetails.getId()));
                 } else {
