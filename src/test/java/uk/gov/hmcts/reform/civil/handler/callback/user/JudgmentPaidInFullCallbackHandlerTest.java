@@ -173,11 +173,24 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldValidateJudgementDate() {
+        void shouldValidateJudgementByAdmissionDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
             caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
             caseData.setJoJudgementByAdmissionIssueDate(LocalDateTime.now());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
+            //When: handler is called with MID event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().contains("Paid in full date must be on or after the date of the judgment"));
+        }
+
+        @Test
+        void shouldValidateDefaultJudgementDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
+            caseData.setJoDJCreatedDate(LocalDateTime.now());
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
             //When: handler is called with MID event

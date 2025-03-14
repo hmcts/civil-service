@@ -91,6 +91,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate dateOfPaymentMade = caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade();
         LocalDateTime joJudgmentByAdmissionIssueDate = caseData.getJoJudgementByAdmissionIssueDate();
+        LocalDateTime joDJCreatedDate = caseData.getJoDJCreatedDate();
 
         if (JudgmentsOnlineHelper.validateIfFutureDate(dateOfPaymentMade)) {
             errors.add(ERROR_MESSAGE_DATE_MUST_BE_IN_PAST);
@@ -98,6 +99,11 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
         if (joJudgmentByAdmissionIssueDate != null
             && dateOfPaymentMade.isBefore(joJudgmentByAdmissionIssueDate.toLocalDate())) {
+            errors.add(ERROR_MESSAGE_DATE_ON_OR_AFTER_JUDGEMENT);
+        }
+
+        if (joDJCreatedDate != null
+            && dateOfPaymentMade.isBefore(joDJCreatedDate.toLocalDate())) {
             errors.add(ERROR_MESSAGE_DATE_ON_OR_AFTER_JUDGEMENT);
         }
 
