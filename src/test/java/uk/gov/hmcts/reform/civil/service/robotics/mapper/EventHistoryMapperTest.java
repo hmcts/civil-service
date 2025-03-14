@@ -8627,6 +8627,8 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("001");
         }
 
         @Test
@@ -8661,6 +8663,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventDetails").asList()
                 .extracting("installmentAmount").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("001");
 
         }
 
@@ -8718,6 +8722,8 @@ class EventHistoryMapperTest {
                 .extracting("isJudgmentForthwith").contains(true);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_RECORD_JUDGMENT_REASON);
         }
@@ -8750,6 +8756,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -8782,6 +8790,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
@@ -8815,6 +8825,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
             assertThat(eventHistory).extracting("judgmentByAdmission").asList()
                 .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("litigiousPartyID").asString().contains("002");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
