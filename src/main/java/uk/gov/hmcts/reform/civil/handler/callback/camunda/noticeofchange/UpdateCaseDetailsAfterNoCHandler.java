@@ -112,7 +112,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             unassignCaseFromDefendantLip(caseData);
             if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
-
             } else {
                 if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
                     updateRespondentSolicitor2Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
