@@ -411,7 +411,7 @@ public class HmcDataUtils {
         if (!matchedLocations.isEmpty()) {
             return matchedLocations.get(0);
         } else {
-            throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId);
+            throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId + " venueId " + venueId);
         }
     }
 
