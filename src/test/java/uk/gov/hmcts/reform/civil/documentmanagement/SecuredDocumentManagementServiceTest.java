@@ -37,8 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException.MESSAGE_TEMPLATE;
@@ -444,6 +446,18 @@ class SecuredDocumentManagementServiceTest {
 
             verify(caseDocumentClientApi)
                 .getMetadataForDocument(anyString(), anyString(), eq(documentId));
+        }
+    }
+
+    @Nested
+    class DeleteDocument {
+
+        @Test
+        void shouldDeleteDocument() {
+            String documentPath = "/documents/85d97996-22a5-40d7-882e-3a382c8ae1b5";
+
+            documentManagementService.deleteDocument(BEARER_TOKEN, documentPath);
+            verify(caseDocumentClientApi, times(1)).deleteDocument(anyString(), any(), any(), anyBoolean());
         }
     }
 
