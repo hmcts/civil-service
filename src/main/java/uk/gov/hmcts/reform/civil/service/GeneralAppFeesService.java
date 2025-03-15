@@ -103,15 +103,6 @@ public class GeneralAppFeesService {
                 result = sdConsentFeeForGA;
             }
         }
-        if (typeSize > 0
-            && CollectionUtils.containsAny(types, SET_ASIDE)) {
-            typeSize--;
-            Fee setAsideFeeForGA = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
-            if (setAsideFeeForGA.getCalculatedAmountInPence()
-                .compareTo(result.getCalculatedAmountInPence()) < 0) {
-                result = setAsideFeeForGA;
-            }
-        }
         if (isUpdateCoScGATypeSize(typeSize, types)) {
             typeSize--;
             Fee certOfSatisfactionOrCancel = getFeeForGA(feesConfiguration.getCertificateOfSatisfaction(), "miscellaneous", "other");
