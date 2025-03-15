@@ -4,6 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -359,5 +363,77 @@ class NotificationUtilsTest {
         } else {
             assertThat(getApplicantEmail(caseData, isApplicantLip)).isEqualTo("lipapplicant@example.com");
         }
+    }
+
+    @Test
+    void shouldReturnNoResponse_whenRespondent2ResponseTypeIsNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent2ClaimResponseType(null)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
+                .build();
+
+        String actual = NotificationUtils.getRespondent2ClaimResponse(caseData);
+
+        assertThat(actual).isEqualTo("No response type available");
+    }
+
+    @Test
+    void shouldReturnRespondent2ResponseType_whenNotNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .build();
+
+        String actual = NotificationUtils.getRespondent2ClaimResponse(caseData);
+
+        assertThat(actual).isEqualTo(RespondentResponseType.FULL_DEFENCE.getDisplayedValue());
+    }
+
+    @Test
+    void shouldReturnRespondent1ResponseType_whenRespondent2SameLegalRepresentative() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent2ClaimResponseType(null)
+                .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .build();
+
+        String actual = NotificationUtils.getRespondent2ClaimResponse(caseData);
+
+        assertThat(actual).isEqualTo(RespondentResponseType.FULL_ADMISSION.getDisplayedValue());
+    }
+
+    @Test
+    void shouldReturnNoResponse_whenRespondent2ResponseTypeForSpecIsNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondent2ClaimResponseTypeForSpec(null)
+                .build();
+
+        String actual = NotificationUtils.getRespondent2ClaimResponse(caseData);
+
+        assertThat(actual).isEqualTo("No response type available");
+    }
+
+    @Test
+    void shouldReturnRespondent2ResponseTypeForSpec_whenNotNull() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .build();
+
+        String actual = NotificationUtils.getRespondent2ClaimResponse(caseData);
+
+        assertThat(actual).isEqualTo(RespondentResponseTypeSpec.FULL_DEFENCE.getDisplayedValue());
+    }
+
+    @Test
+    void shouldReturnNoResponse_whenRespondent1TypeIsNullAndRespondent2SameLegalRepresentative() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1ClaimResponseType(null)
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .build();
+
+        String actual = NotificationUtils.getRespondent2ClaimResponse(caseData);
+
+        assertThat(actual).isEqualTo("No response type available");
     }
 }
