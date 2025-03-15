@@ -64,12 +64,31 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorCaseTakenOffline(),
-            addProperties(caseData),
+            caseData.isLipvLROneVOne() ? caseData.getApplicant1Email() :
+                caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            getEmailTemplate(caseData),
+            caseData.isLipvLROneVOne() ? addPropertiesForLip(caseData) : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getEmailTemplate(CaseData caseData) {
+        if (caseData.isLipvLROneVOne()) {
+            if (caseData.isClaimantBilingual()) {
+                return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
+            }
+            return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        }
+
+        return notificationsProperties.getSolicitorCaseTakenOffline();
+    }
+
+    private Map<String, String> addPropertiesForLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+        );
     }
 
     @Override
