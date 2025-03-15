@@ -67,6 +67,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeOrderDown
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -890,6 +891,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     .isEqualTo(MULTI_OPTIONS.getListItems().get(3).getLabel());
             }
 
+            @Test
+            void shouldDefaultToSmallClaim_whenSpecClaimDJNoClaimTrackMultiClaimAmount() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                    .build().toBuilder()
+                    .totalClaimAmount(BigDecimal.valueOf(1000000))
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                // Then
+                assertThat(updatedData.getFinalOrderDownloadTemplateOptions().getListItems()).hasSize(0);
+                assertThat(updatedData.getFinalOrderTrackToggle())
+                    .isEqualTo(AllocatedTrack.SMALL_CLAIM.name());
+            }
         }
 
         @Nested
