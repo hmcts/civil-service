@@ -263,7 +263,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     @Test
     @PactTestFor(pactMethod = "getFeeForGAWithNotice")
     public void verifyFeeForGAWithNotice() {
-
         Fee fee = generalAppFeesService.getFeeForGA(
             CaseData.builder().generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
                 .generalAppType(
