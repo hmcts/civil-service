@@ -8,7 +8,6 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "CIV-16761-Update-Fast-Track-SDO-Screen-Content"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
@@ -80,6 +79,14 @@ def checkForEnableHelmLabel(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
 
+def getCivilCcdDefinitionBranch() {
+  def githubApi = new GithubAPI(this)
+  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
+    return label.minus("civilDefinitionBranch:").trim()
+  }
+  return "master"
+}
+
 withPipeline(type, product, component) {
 
   onPR {
@@ -114,7 +121,7 @@ withPipeline(type, product, component) {
         ./bin/add-roles.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-        ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+        ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
       """
     }
@@ -148,7 +155,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+      ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
       ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-bpmn-diagram.sh .
     """
