@@ -87,7 +87,7 @@ public class GeneralAppFeesService {
         );
     }
 
-    private Fee  getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
+    private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = types.size();
         if (CollectionUtils.containsAny(types, VARY_TYPES)) {
