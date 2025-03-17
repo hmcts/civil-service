@@ -105,8 +105,14 @@ public class GeneralAppFeesService {
         }
         if (typeSize > 0
             && CollectionUtils.containsAny(types, SET_ASIDE) && Boolean.FALSE.equals(respondentAgreed)) {
+            String feeKeyword;
+            if (Boolean.FALSE.equals(informOtherParty)) {
+                feeKeyword = feesConfiguration.getConsentedOrWithoutNoticeKeyword();
+            } else {
+                feeKeyword = feesConfiguration.getWithNoticeKeyword();
+            }
             typeSize--;
-            Fee setAsideFeeForGA = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
+            Fee setAsideFeeForGA = getFeeForGA(feeKeyword, null, null);
             if (setAsideFeeForGA.getCalculatedAmountInPence()
                 .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = setAsideFeeForGA;
