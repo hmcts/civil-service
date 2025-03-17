@@ -424,7 +424,7 @@ class GeneralAppFeesServiceTest {
             when(feesConfiguration.getEvent()).thenReturn(GENERAL_APPLICATION);
             when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
 
-            if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT) {
+            if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT && hasAgreed == YesOrNo.NO) {
                 when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
             } else if (generalApplicationTypes == GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) {
                 when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn(APPLICATION_TO_VARY_OR_SUSPEND);
