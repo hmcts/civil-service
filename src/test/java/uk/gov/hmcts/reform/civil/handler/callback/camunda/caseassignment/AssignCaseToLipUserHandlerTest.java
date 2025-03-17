@@ -94,7 +94,7 @@ public class AssignCaseToLipUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT1.name(), CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, ASSIGN_CASE_TO_APPLICANT1.name(), CallbackType.SUBMITTED);
 
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
 
