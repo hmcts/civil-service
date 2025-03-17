@@ -104,7 +104,7 @@ public class GeneralAppFeesService {
             }
         }
         if (typeSize > 0
-            && CollectionUtils.containsAny(types, SET_ASIDE) && Boolean.TRUE.equals(respondentAgreed)) {
+            && CollectionUtils.containsAny(types, SET_ASIDE) && Boolean.FALSE.equals(respondentAgreed)) {
             typeSize--;
             Fee setAsideFeeForGA = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
             if (setAsideFeeForGA.getCalculatedAmountInPence()
