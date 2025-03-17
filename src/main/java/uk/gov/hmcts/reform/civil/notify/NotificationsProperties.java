@@ -386,6 +386,9 @@ public class NotificationsProperties {
     private String notifyDefendantLIPClaimantSettleTheClaimTemplate;
 
     @NotEmpty
+    private String notifyDefendantLRClaimantSettleTheClaimTemplate;
+
+    @NotEmpty
     private String  evidenceUploadLipTemplate;
 
     @NotEmpty
@@ -663,4 +666,10 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrderedSpecEa;
+
+    @NotEmpty
+    private String queryRaised;
+
+    @NotEmpty
+    private String queryResponseReceived;
 }

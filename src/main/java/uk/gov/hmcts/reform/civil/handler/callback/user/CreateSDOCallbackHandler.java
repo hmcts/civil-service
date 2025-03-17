@@ -1602,12 +1602,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         // LiP check ensures LiP cases will not automatically get whitelisted, and instead will have their own ea court check.
         boolean isLipCase = (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP());
-        boolean isLocationWhiteListed = featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation());
-
         if (!isLipCase) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YES);
-            dataBuilder.hmcEaCourtLocation(isLocationWhiteListed ? YES : NO);
         } else {
             boolean isLipCaseEaCourt = isLipCaseWithProgressionEnabledAndCourtWhiteListed(caseData);
             dataBuilder.eaCourtLocation(isLipCaseEaCourt ? YesOrNo.YES : YesOrNo.NO);
@@ -1652,7 +1649,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
+            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
