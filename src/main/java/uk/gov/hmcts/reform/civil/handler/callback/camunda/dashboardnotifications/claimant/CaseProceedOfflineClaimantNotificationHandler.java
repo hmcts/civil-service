@@ -86,6 +86,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
         return featureToggleService.isCaseProgressionEnabled()
+            && caseData.getPreviousCCDState() != null
             && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
             && caseData.isLipvLipOneVOne();
     }
