@@ -28,7 +28,12 @@ public class BundleCreationNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_RESPONDENT =  "bundle-created-respondent-notification-%s";
 
-    public BundleCreationNotifier(NotificationService notificationService, NotificationsProperties notificationsProperties, OrganisationService organisationService, SimpleStateFlowEngine stateFlowEngine, CaseTaskTrackingService caseTaskTrackingService) {
+    public BundleCreationNotifier(NotificationService notificationService,
+                                  NotificationsProperties notificationsProperties,
+                                  OrganisationService organisationService,
+                                  SimpleStateFlowEngine stateFlowEngine,
+                                  CaseTaskTrackingService caseTaskTrackingService
+    ) {
         super(
             notificationService,
             notificationsProperties,
@@ -106,7 +111,6 @@ public class BundleCreationNotifier extends Notifier {
 
         return recipients;
     }
-
 
     private EmailDTO getRespondent(CaseData caseData, boolean isRespondent1) {
         boolean isLiP;

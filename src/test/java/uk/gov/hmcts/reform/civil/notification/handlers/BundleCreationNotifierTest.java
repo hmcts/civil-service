@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -67,7 +66,7 @@ public class BundleCreationNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitor_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1Represented(YesOrNo.YES)
             .build();
 
@@ -95,7 +94,7 @@ public class BundleCreationNotifierTest {
 
     @Test
     void shouldNotifyRespondentSolicitor2_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
             .applicant1Represented(YesOrNo.YES)
             .build();
 
@@ -127,7 +126,7 @@ public class BundleCreationNotifierTest {
 
     @Test
     void shouldNotifyApplicantLiPAndRespondentLiPNotBilingual_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
+        final CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimNotified1v1LiP(
                 CertificateOfService.builder()
                     .build()
@@ -159,7 +158,7 @@ public class BundleCreationNotifierTest {
 
     @Test
     void shouldNotifyApplicantLiPAndRespondentLiPBilingual_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
+        final CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimNotified1v1LiP(
                 CertificateOfService.builder()
                     .build()
