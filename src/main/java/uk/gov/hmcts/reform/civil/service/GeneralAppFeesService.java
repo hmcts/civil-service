@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
@@ -86,7 +87,7 @@ public class GeneralAppFeesService {
         );
     }
 
-    private Fee getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
+    private Fee  getFeeForGA(List<GeneralApplicationTypes> types, Boolean respondentAgreed, Boolean informOtherParty, LocalDate hearingScheduledDate) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = types.size();
         if (CollectionUtils.containsAny(types, VARY_TYPES)) {
@@ -101,6 +102,15 @@ public class GeneralAppFeesService {
             if (sdConsentFeeForGA.getCalculatedAmountInPence()
                 .compareTo(result.getCalculatedAmountInPence()) < 0) {
                 result = sdConsentFeeForGA;
+            }
+        }
+        if (typeSize > 0
+            && CollectionUtils.containsAny(types, SET_ASIDE) && respondentAgreed.equals(NO)) {
+            typeSize--;
+            Fee setAsideFeeForGA = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
+            if (setAsideFeeForGA.getCalculatedAmountInPence()
+                .compareTo(result.getCalculatedAmountInPence()) < 0) {
+                result = setAsideFeeForGA;
             }
         }
         if (isUpdateCoScGATypeSize(typeSize, types)) {

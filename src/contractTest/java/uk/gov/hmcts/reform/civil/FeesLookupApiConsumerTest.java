@@ -266,7 +266,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
 
         Fee fee = generalAppFeesService.getFeeForGA(
             CaseData.builder().generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
                 .generalAppType(
                     GAApplicationType.builder().types(List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT))
                         .build())
