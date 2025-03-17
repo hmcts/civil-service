@@ -79,9 +79,9 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED) ||
-            (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), TAKEN_OFFLINE_BY_STAFF) &&
-                caseData.isLipvLROneVOne())) {
+        if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)
+            || (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), TAKEN_OFFLINE_BY_STAFF)
+            && caseData.isLipvLROneVOne())) {
 
             String emailAddress;
             if (NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN.name()
