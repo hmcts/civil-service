@@ -372,8 +372,12 @@ class GeneralAppFeesServiceTest {
                 when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
             } else if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT && hasAgreed == YesOrNo.NO) {
                 when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
-            } else if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT && hasAgreed == YesOrNo.YES) {
-                when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+            } else if (generalApplicationTypes == GeneralApplicationTypes.SET_ASIDE_JUDGEMENT) {
+                if (hasAgreed == YesOrNo.YES) {
+                    when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APP_WITHOUT_NOTICE);
+                } else if (hasAgreed == YesOrNo.NO) {
+                    when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
+                }
             } else if (generalApplicationTypes == GeneralApplicationTypes.ADJOURN_HEARING) {
                 if (isWithNotice == YesOrNo.YES) {
                     when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);

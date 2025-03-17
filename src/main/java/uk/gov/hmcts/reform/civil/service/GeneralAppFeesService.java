@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Slf4j
@@ -105,7 +104,7 @@ public class GeneralAppFeesService {
             }
         }
         if (typeSize > 0
-            && CollectionUtils.containsAny(types, SET_ASIDE) && respondentAgreed.equals(NO)) {
+            && CollectionUtils.containsAny(types, SET_ASIDE) && Boolean.TRUE.equals(respondentAgreed)) {
             typeSize--;
             Fee setAsideFeeForGA = getFeeForGA(feesConfiguration.getWithNoticeKeyword(), null, null);
             if (setAsideFeeForGA.getCalculatedAmountInPence()
