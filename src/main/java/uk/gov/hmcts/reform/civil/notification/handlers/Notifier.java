@@ -30,6 +30,8 @@ public abstract class Notifier implements NotificationData {
     protected final SimpleStateFlowEngine stateFlowEngine;
     protected final CaseTaskTrackingService caseTaskTrackingService;
 
+    protected abstract String getTaskId();
+
     protected abstract Set<EmailDTO> getPartiesToNotify(final CaseData caseData);
 
     public void notifyParties(CaseData caseData, String eventId, String taskId) {

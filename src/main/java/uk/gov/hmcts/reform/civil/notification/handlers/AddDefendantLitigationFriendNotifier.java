@@ -26,6 +26,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
     private static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
+    private static final String TASK_ID = "LitigationFriendAddedNotifier";
 
     public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
                                                 NotificationsProperties notificationsProperties,
@@ -33,6 +34,11 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
                                                 SimpleStateFlowEngine stateFlowEngine,
                                                 CaseTaskTrackingService caseTaskTrackingService) {
         super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
+    }
+
+    @Override
+    public String getTaskId() {
+        return TASK_ID;
     }
 
     @Override
