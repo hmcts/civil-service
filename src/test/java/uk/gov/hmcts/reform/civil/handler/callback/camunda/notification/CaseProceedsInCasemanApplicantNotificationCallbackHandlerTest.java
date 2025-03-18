@@ -9,8 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -28,6 +30,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -78,7 +81,8 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -94,6 +98,55 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             handler.handle(params);
 
             verify(notificationService, never()).sendMail(anyString(), anyString(), anyMap(), anyString());
+        }
+
+        @Test
+        void shouldNotNotifyApplicantLipVSLR_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
+                                .partyEmail("aabc@gmail.com").build())
+                .ccdCaseReference(Long.valueOf("1234"))
+                .legacyCaseReference("000DC001")
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn("template-id");
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "aabc@gmail.com",
+                "template-id",
+                Map.of(
+                    CLAIM_REFERENCE_NUMBER, "1234", "claimantName", "A B"),
+                "case-proceeds-in-caseman-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotNotifyApplicantLipVSLrForBilingualLip_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
+                                .partyEmail("aabc@gmail.com").build())
+                .ccdCaseReference(Long.valueOf("1234"))
+                .legacyCaseReference("000DC001")
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.BOTH.toString())
+                .build();
+            when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn("template-id");
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "aabc@gmail.com",
+                "template-id",
+                Map.of(
+                    CLAIM_REFERENCE_NUMBER, "1234", "claimantName", "A B"),
+                "case-proceeds-in-caseman-applicant-notification-000DC001"
+            );
         }
     }
 }

@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -45,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.TASK_ID_RESPONDENT_SOL2_MULTITRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedRespondentNotificationHandler.Task_ID_RESPONDENT_SOL2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -62,6 +64,9 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ClaimantResponseConfirmsToProceedRespondentNotificationHandler handler;
@@ -361,6 +366,30 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         }
 
         @Test
+        void shouldNotifyRespondent_whenMultiTrack_mintiEligibleClaim() {
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .setMultiTrackClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyRespondent2_whenMultiTrack() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
 
@@ -424,7 +453,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -433,7 +463,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
@@ -444,7 +475,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789"
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
@@ -23,7 +22,6 @@ public class CaseDismissScenarioTest extends DashboardBaseIntegrationTest {
 
     @Test
     void should_create_more_time_requested_scenario() throws Exception {
-        Mockito.when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         String caseId = "12349";
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()

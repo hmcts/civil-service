@@ -109,9 +109,8 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         caseDataBuilder.caseNamePublic(buildCaseName(caseData));
         populateWithPartyIds(caseDataBuilder);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            caseDataBuilder.anyRepresented(NO);
-        }
+        caseDataBuilder.anyRepresented(NO);
+        
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
             caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
         }
