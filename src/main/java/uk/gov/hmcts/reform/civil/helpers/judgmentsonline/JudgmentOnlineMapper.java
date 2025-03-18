@@ -51,6 +51,7 @@ public abstract class JudgmentOnlineMapper {
         } else {
             caseData.setActiveJudgment(activeJudgment);
         }
+        updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
     }
 
     public JudgmentDetails updateDefendantDetails(JudgmentDetails activeJudgment, CaseData caseData, RoboticsAddressMapper addressMapper) {
@@ -76,7 +77,7 @@ public abstract class JudgmentOnlineMapper {
         caseData.setJoDefendantName1(activeJudgment.getDefendant1Name());
         caseData.setJoDefendantName2(activeJudgment.getDefendant2Name());
         caseData.setJoPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
-
+        caseData.setJoState(activeJudgment.getState());
         if (null != activeJudgment.getPaymentPlan()
             && PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(activeJudgment.getPaymentPlan().getType())) {
             caseData.setJoRepaymentAmount(activeJudgment.getInstalmentDetails().getAmount());
@@ -91,9 +92,35 @@ public abstract class JudgmentOnlineMapper {
         if (JudgmentState.CANCELLED.equals(activeJudgment.getState())
             || JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
             caseData.setJoIssueDate(activeJudgment.getIssueDate());
-            caseData.setJoState(activeJudgment.getState());
             caseData.setJoFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
         }
+    }
+
+    public void updateJudgmentTabDataWithActiveJudgment(JudgmentDetails activeJudgment, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
+        caseDataBuilder.joIsDisplayInJudgmentTab(YesOrNo.YES);
+        caseDataBuilder.joDefendantName1(activeJudgment.getDefendant1Name());
+        caseDataBuilder.joDefendantName2(activeJudgment.getDefendant2Name());
+        caseDataBuilder.joPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
+        caseDataBuilder.joState(activeJudgment.getState());
+        if (null != activeJudgment.getPaymentPlan()
+            && PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(activeJudgment.getPaymentPlan().getType())) {
+            caseDataBuilder.joRepaymentAmount(activeJudgment.getInstalmentDetails().getAmount());
+            caseDataBuilder.joRepaymentStartDate(activeJudgment.getInstalmentDetails().getStartDate());
+            caseDataBuilder.joRepaymentFrequency(activeJudgment.getInstalmentDetails().getPaymentFrequency());
+        } else {
+            caseDataBuilder.joRepaymentAmount(null);
+            caseDataBuilder.joRepaymentStartDate(null);
+            caseDataBuilder.joRepaymentFrequency(null);
+        }
+
+        if (JudgmentState.CANCELLED.equals(activeJudgment.getState())
+            || JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
+            caseDataBuilder.joIssueDate(activeJudgment.getIssueDate());
+            caseDataBuilder.joFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
+        }
+        caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment))
+            .joJudgementByAdmissionIssueDate(LocalDateTime.now());
     }
 
     protected abstract JudgmentState getJudgmentState(CaseData caseData);

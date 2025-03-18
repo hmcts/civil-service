@@ -114,13 +114,6 @@ class DetermineNextStateTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
-            .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1Represented(NO)
-            .applicant1Represented(YES)
-            .build();
-
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
@@ -142,7 +135,17 @@ class DetermineNextStateTest {
             .defendant1Dob(LocalDate.of(1980, 1, 1))
             .build();
 
-        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
+        builder.activeJudgment(activeJudgment);
+        builder.joIsLiveJudgmentExists(YES);
+        builder.joJudgementByAdmissionIssueDate(now);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondent1Represented(NO)
+            .applicant1Represented(YES)
+            .build();
+        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder)).thenReturn(builder);
 
         String resultState;
         try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
@@ -300,12 +303,6 @@ class DetermineNextStateTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
-            .respondent1Represented(YES)
-            .applicant1Represented(YES)
-            .build();
-
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
@@ -327,7 +324,17 @@ class DetermineNextStateTest {
             .defendant1Dob(LocalDate.of(1980, 1, 1))
             .build();
 
-        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData)).thenReturn(activeJudgment);
+        builder.activeJudgment(activeJudgment);
+        builder.joIsLiveJudgmentExists(YES);
+        builder.joJudgementByAdmissionIssueDate(now);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
+            .respondent1Represented(YES)
+            .applicant1Represented(YES)
+            .build();
+
+        when(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData, builder)).thenReturn(builder);
 
         String resultState;
         try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {
