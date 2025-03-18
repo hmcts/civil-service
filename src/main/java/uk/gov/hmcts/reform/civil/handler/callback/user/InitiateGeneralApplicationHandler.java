@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_SETTLE_BY_CONSENT;
@@ -67,7 +68,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String INVALID_HEARING_DATE = "The hearing date must be in the future";
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
+    private static final List<CaseEvent> EVENTS = List.of(INITIATE_GENERAL_APPLICATION, INITIATE_GENERAL_APPLICATION_COSC);
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
             + "respondent solicitor are assigned to the case.";
     private static final String RESP_NOT_ASSIGNED_ERROR_LIP = "Application cannot be created until the Defendant "
@@ -111,10 +112,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()
-                || (caseData.isRespondentResponseBilingual() && !caseData.isLipvLROneVOne())) {
+                || (caseData.isRespondentResponseBilingual() && !caseData.isLipvLROneVOne()
+                && !(caseEvent == INITIATE_GENERAL_APPLICATION_COSC))) {
                 errors.add(LR_VS_LIP);
             } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
                 && caseData.isClaimantBilingual()) {
