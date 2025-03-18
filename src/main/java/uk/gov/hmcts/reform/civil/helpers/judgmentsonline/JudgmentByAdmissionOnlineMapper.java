@@ -67,7 +67,6 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .amountAlreadyPaid(amountAlreadyPaid.toString())
             .totalAmount(orderAmount.add(costs).add(claimFeeAmount).toString())
             .build();
-
         
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
 
