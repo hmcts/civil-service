@@ -472,12 +472,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .dateToToggle(dateToShowTrue)
             .helpText1("If either party considers that the time estimate is insufficient, "
                            + "they must inform the court within 7 days of the date of this order.")
-            .helpText2("Not more than seven nor less than three clear days before the trial, "
-                           + "the claimant must file at court and serve an indexed and paginated bundle of "
-                           + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                           + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                           + "the contents of the bundle before it is filed. The bundle will include a case "
-                           + "summary and a chronology.")
             .build();
         updatedData.fastTrackHearingTime(tempFastTrackHearingTime);
 
@@ -1649,7 +1643,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private boolean isLipCaseWithProgressionEnabledAndCourtWhiteListed(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()
+            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData)))
             && featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation());
     }
 
@@ -1790,6 +1785,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackSchedulesOfLossToggle(checkList);
         updatedData.fastTrackCostsToggle(checkList);
         updatedData.fastTrackTrialToggle(checkList);
+        updatedData.fastTrackTrialBundleToggle(checkList);
         updatedData.fastTrackMethodToggle(checkList);
         updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
         updatedData.disposalHearingWitnessOfFactToggle(checkList);
