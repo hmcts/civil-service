@@ -1023,20 +1023,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         //LR scenarios trigger and ignore hmcLipEnabled
-        "true, YES, YES, YES",
-        "false, YES, YES, YES",
+        "true, YES, YES, true, YES",
+        "false, YES, YES, true, YES",
         // LiP vs LR - ignore HMC court
-        "true,  NO, YES, NO",
-        "false,  NO, YES, NO",
+        "true,  NO, YES, false, NO",
+        "true,  NO, YES, TRUE, YES",
+        "false,  NO, YES, true, NO",
         //LR vs LiP - ignore HMC court
-        "true, YES, NO, YES",
-        "false, YES, NO, NO",
+        "true, YES, NO, true, YES",
+        "false, YES, NO, true, NO",
         //LiP vs LiP - ignore HMC court
-        "true, NO, NO, YES",
-        "false, NO, NO, NO"
+        "true, NO, NO, true, YES",
+        "false, NO, NO, true, NO"
     })
     void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
-                                                             YesOrNo respondent1Represented,
+                                                             YesOrNo respondent1Represented, boolean defendantNocOnline,
                                                              YesOrNo eaCourtLocation) {
 
         if (NO.equals(respondent1Represented) || NO.equals(applicantRepresented)) {
@@ -1044,7 +1045,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         } else {
             when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
         }
-
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(defendantNocOnline);
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")
