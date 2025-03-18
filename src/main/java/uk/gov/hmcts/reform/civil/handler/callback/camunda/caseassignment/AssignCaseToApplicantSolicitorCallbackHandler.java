@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -21,11 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandler {
 
@@ -42,7 +44,7 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole
+            callbackKey(SUBMITTED), this::assignSolicitorCaseRole
         );
     }
 
@@ -63,9 +65,9 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
         String submitterId = userDetails.getId();
         String organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
 
+        log.info("Assigning case {} to solicitor {}", caseId, submitterId);
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
-        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7 or Spec service ID AAA6
         String siteId = UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             ? paymentsConfiguration.getSiteId() : paymentsConfiguration.getSpecSiteId();
         setSupplementaryData(caseData.getCcdCaseReference(), siteId);
@@ -80,6 +82,5 @@ public class AssignCaseToApplicantSolicitorCallbackHandler extends CallbackHandl
             singletonMap("$set", singletonMap("HMCTSServiceId", siteId))
         );
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
-
     }
 }
