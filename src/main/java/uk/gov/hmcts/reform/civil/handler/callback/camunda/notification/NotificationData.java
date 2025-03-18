@@ -116,6 +116,9 @@ public interface NotificationData {
     String REFERENCE = "reference";
 
     String QUERY_DATE = "queryDate";
+    //emailTemplates
+    String PHONE_AND_OPENING_TIMES = "phoneAndOpeningTimes";
+    String SMART_SURVEY_URL = "smartSurvey";
 
     Map<String, String> addProperties(CaseData caseData);
 
