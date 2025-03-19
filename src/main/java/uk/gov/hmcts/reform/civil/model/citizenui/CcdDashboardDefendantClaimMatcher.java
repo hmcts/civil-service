@@ -140,7 +140,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isPaperResponse() {
-       return nonNull(caseData.getTakenOfflineDate()) && nonNull(caseData.getCcdState())
+        return nonNull(caseData.getTakenOfflineDate()) && nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
@@ -323,7 +323,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-       return caseData.isPartAdmitClaimSpec()
+        return caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
             && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();

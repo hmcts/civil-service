@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDateTime;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 

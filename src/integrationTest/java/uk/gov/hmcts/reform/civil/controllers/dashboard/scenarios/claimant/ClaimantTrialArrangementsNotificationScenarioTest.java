@@ -25,7 +25,6 @@ public class ClaimantTrialArrangementsNotificationScenarioTest extends Dashboard
     @Autowired
     private TrialArrangementsClaimantNotificationHandler handler;
 
-    @Override
     @BeforeEach
     public void before() {
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
