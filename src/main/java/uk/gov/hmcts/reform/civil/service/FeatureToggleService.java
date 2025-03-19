@@ -134,7 +134,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return true;
+        return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 
     public boolean isHmcForLipEnabled() {
