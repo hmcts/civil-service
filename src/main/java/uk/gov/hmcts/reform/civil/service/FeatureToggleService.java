@@ -79,7 +79,9 @@ public class FeatureToggleService {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return true;
+        return isSpecClaim
+            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
+                                                        epoch, false);
     }
 
     public boolean isGaForLipsEnabled() {
@@ -97,17 +99,6 @@ public class FeatureToggleService {
         boolean multiOrIntermediateTrackEnabled = featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
         boolean judgeReallocatedTrackOrAlreadyMinti = judgeReallocatedTrackOrAlreadyMinti(caseData, multiOrIntermediateTrackEnabled);
         return multiOrIntermediateTrackEnabled || judgeReallocatedTrackOrAlreadyMinti;
-    }
-
-    public boolean isDashboardEnabledForCase(CaseData caseData) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        long epoch;
-        if (caseData.getSubmittedDate() == null) {
-            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
-        } else {
-            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
-        }
-        return true;
     }
 
     public boolean isAmendBundleEnabled() {
