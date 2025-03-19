@@ -582,6 +582,23 @@ class RoboticsDataMapperTest {
         assertThat(roboticsCaseData.getNoticeOfChange()).isNull();
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "FAST_CLAIM, FAST TRACK",
+            "SMALL_CLAIM, SMALL CLAIM TRACK",
+            "OTHER_CLAIM, ''"
+    })
+    void shouldReturnCorrectTrackWhenAllocatedTrackIsNull(String responseClaimTrack, String expectedTrack) {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+                .allocatedTrack(null)
+                .responseClaimTrack(responseClaimTrack)
+                .build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        assertThat(roboticsCaseData.getHeader().getCaseAllocatedTo()).isEqualTo(expectedTrack);
+    }
+
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
         return PreviousOrganisationCollectionItem.builder().value(
             PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
