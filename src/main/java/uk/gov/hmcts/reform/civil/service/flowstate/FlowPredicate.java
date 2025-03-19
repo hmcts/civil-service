@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -247,10 +248,26 @@ public class FlowPredicate {
         }
     };
 
-    public static final Predicate<CaseData> defenceMade = caseData -> FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseType())
-        || RespondentResponseType.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseType())
-        || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-        || RespondentResponseType.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseType());
+    public static final Predicate<CaseData> caseReadyForDismissal = caseData -> {
+        boolean commonConditions = caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && (caseData.getRespondent1TimeExtensionDate() == null
+            || caseData.getRespondent1TimeExtensionDate().isBefore(LocalDateTime.now()))
+            && caseData.getTakenOfflineByStaffDate() == null
+            && noGeneralApplicationMade(caseData)
+            && caseData.getSetRequestDJDamagesFlagForWA() == null;
+        return commonConditions && not(FlowPredicate.defenceMade).test(caseData);
+    };
+
+    public static final Predicate<CaseData> defenceMade = caseData -> {
+        boolean commonConditions = caseData.getRespondent1ClaimResponseType() != null;
+        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+
+        if (scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP || scenario == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP) {
+            return commonConditions && caseData.getRespondent2ClaimResponseIntentionType() != null;
+        }
+        return commonConditions;
+    };
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotified = caseData -> {
         boolean commonConditions = caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
@@ -259,7 +276,7 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseIntentionType() == null
             && caseData.getRespondent1ResponseDate() == null
             && caseData.getTakenOfflineByStaffDate() == null
-            && !isThereAnyGaAndMadeByApplicant(caseData)
+            && noGeneralApplicationMade(caseData)
             && caseData.getSetRequestDJDamagesFlagForWA() == null;
 
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
@@ -274,10 +291,10 @@ public class FlowPredicate {
         return commonConditions;
     };
 
-    private static boolean isThereAnyGaAndMadeByApplicant(CaseData caseData) {
-        return caseData.getGeneralApplications() != null
-            && caseData.getGeneralApplications().stream()
-            .anyMatch(generalApplication -> YES.equals(generalApplication.getValue().getParentClaimantIsApplicant()));
+    private static boolean noGeneralApplicationMade(CaseData caseData) {
+        return caseData.getGeneralApplications() == null
+            || caseData.getGeneralApplications().stream()
+            .noneMatch(generalApplication -> YES.equals(generalApplication.getValue().getParentClaimantIsApplicant()));
     }
 
     public static final Predicate<CaseData> applicantOutOfTimeNotBeingTakenOffline = caseData ->
