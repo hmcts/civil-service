@@ -215,13 +215,6 @@ dashboard:
   api:
     url: http://localhost:4000
 
-logging:
-  level:
-    org.springframework.cache: INFO    # Spring Cache Abstraction
-    javax.cache: INFO                  # JCache API (general caching)
-    com.github.benmanes.caffeine.cache: INFO  # Caffeine specific logs
-    org.hibernate.cache: INFO           # Hibernate 2nd Level Cache (if use
-
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "75f2f3cb-28a2-4ad9-819e-18a31f6d5666"
@@ -368,6 +361,7 @@ notifications:
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
+  notifyDefendantLRClaimantSettleTheClaimTemplate: "e3d3d41d-3ad2-411a-8de1-baa3012f1c17"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
@@ -572,6 +566,10 @@ feign:
       document-management-metadata-download-api:
         loggerLevel: full
 
+docStore:
+  doc:
+    removal:
+      enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
 ---
 
 spring:
@@ -584,10 +582,6 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
-    hikari:
-      max-lifetime: 1800000 # 30 minutes
-      connection-timeout: 30000 # 30 seconds
-      idle-timeout: 600000 # 10 minutes
 
 fees:
   api:
