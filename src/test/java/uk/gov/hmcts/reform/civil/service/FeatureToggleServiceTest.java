@@ -218,6 +218,23 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsDashboardEnabledForCase(Boolean toggleStat) {
+        var dashboardKey = "is-dashboard-enabled-for-case";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
+
+        if (toggleStat) {
+            when(featureToggleApi.isFeatureEnabledForDate(eq(dashboardKey), anyLong(), eq(false)))
+                .thenReturn(true);
+        }
+
+        assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCoSCEnabled(Boolean toggleStat) {
         var isCoSCEnabledKey = "isCoSCEnabled";
         givenToggle(isCoSCEnabledKey, toggleStat);

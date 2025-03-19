@@ -190,7 +190,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             || caseData.getRespondent2SameLegalRepresentative() == null);
 
     public boolean isDashBoardEnabledForCase(CaseData caseData) {
-        return caseContainsLiP.test(caseData);
+        return featureToggleService.isDashboardEnabledForCase(caseData) && caseContainsLiP.test(caseData);
     }
 
     public boolean switchTheGAFlagIfLipExists(CaseData caseData) {

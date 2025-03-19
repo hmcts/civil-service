@@ -84,6 +84,7 @@ public class DraftTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenCaseDataAtClaimSubmittedOneRespondentRepresentativeState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedOneRespondentRepresentative().build();
+        when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
         assertThat(getCaseFlags(result.get(0), caseData)).hasSize(9).contains(
@@ -157,6 +158,7 @@ public class DraftTransitionBuilderTest {
             .respondent1OrgRegistered(NO)
             .respondent2SameLegalRepresentative(NO)
             .build();
+        when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
         assertTrue(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
@@ -191,6 +193,7 @@ public class DraftTransitionBuilderTest {
             .respondent1Represented(NO)
             .respondent2Represented(NO)
             .build();
+        when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
         assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
@@ -236,6 +239,7 @@ public class DraftTransitionBuilderTest {
 
     @Test
     void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
+        when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
@@ -269,6 +273,7 @@ public class DraftTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssuedUnrepresentedDefendant2()
             .defendant2LIPAtClaimIssued(YES).build();
+        when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         assertFalse(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));

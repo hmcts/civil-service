@@ -371,7 +371,7 @@ notifications:
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
-  notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "d0ed48e4-52fe-431d-9250-804fe7a6b29c"
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "a9c1ccba-eb72-414d-8dc7-d75f33c79b28"
   notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
   notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
@@ -480,7 +480,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: ${STITCHING_API_ENABLED:false}
+  enabled: ${STITCHING_API_ENABLED:true}
 
 case-flags:
   logging:
