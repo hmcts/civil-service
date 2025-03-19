@@ -105,15 +105,6 @@ public class TestingSupportController {
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
 
-    @PostMapping(
-        value = "/testing-support/is-dashboard-toggle-enabled",
-        produces = "application/json")
-    public ResponseEntity<FeatureToggleInfo> checkDashboardFeatureToggle(
-        @RequestBody CaseData caseData) {
-        boolean featureEnabled = featureToggleService.isDashboardEnabledForCase(caseData);
-        FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
-        return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
-    }
 
     @Data
     private static class BusinessProcessInfo {

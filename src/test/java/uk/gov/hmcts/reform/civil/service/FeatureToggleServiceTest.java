@@ -67,14 +67,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsLipVLipInvoked(Boolean toggleStat) {
-        var lipVlipKey = "cuiReleaseTwoEnabled";
-        givenToggle(lipVlipKey, toggleStat);
-
-   }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, toggleStat);
@@ -222,25 +214,6 @@ class FeatureToggleServiceTest {
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsDashboardEnabledForCase(Boolean toggleStat) {
-        var cuiReKey = "cuiReleaseTwoEnabled";
-        var dashboardKey = "is-dashboard-enabled-for-case";
-        givenToggle(cuiReKey, toggleStat);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .setClaimTypeToSpecClaim()
-            .build();
-
-        if (toggleStat) {
-            when(featureToggleApi.isFeatureEnabledForDate(eq(dashboardKey), anyLong(), eq(false)))
-                .thenReturn(true);
-        }
-
-        assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
