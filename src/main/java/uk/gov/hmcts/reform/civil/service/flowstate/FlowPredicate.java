@@ -246,8 +246,7 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> caseReadyForDismissal = caseData -> {
         boolean commonConditions = caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-            && (caseData.getRespondent1TimeExtensionDate() == null
-            || caseData.getRespondent1TimeExtensionDate().isBefore(LocalDateTime.now()))
+            && caseData.getRespondent1TimeExtensionDate() == null
             && caseData.getTakenOfflineByStaffDate() == null
             && noGeneralApplicationMade(caseData)
             && caseData.getSetRequestDJDamagesFlagForWA() == null;
