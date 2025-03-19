@@ -94,8 +94,8 @@ public class FlowPredicate {
         };
     }
 
-    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = caseData -> {
-        return switch (getMultiPartyScenario(caseData)) {
+    public static final Predicate<CaseData> divergentRespondWithDQAndGoOffline = caseData ->
+         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP ->
                 //scenario: either of them have submitted full defence response
                 !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
@@ -117,10 +117,10 @@ public class FlowPredicate {
                 && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
             default -> false;
         };
-    };
 
-    public static final Predicate<CaseData> divergentRespondGoOffline = caseData -> {
-        return switch (getMultiPartyScenario(caseData)) {
+
+    public static final Predicate<CaseData> divergentRespondGoOffline = caseData ->
+         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP -> !Objects.equals(
                 caseData.getRespondent1ClaimResponseType(),
                 caseData.getRespondent2ClaimResponseType()
@@ -141,7 +141,7 @@ public class FlowPredicate {
                 .equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
             default -> false;
         };
-    };
+
 
     public static final Predicate<CaseData> allResponsesReceived = caseData -> {
         MultiPartyScenario scenario = Objects.requireNonNull(getMultiPartyScenario(caseData));
