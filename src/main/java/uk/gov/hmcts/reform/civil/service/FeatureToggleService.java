@@ -79,7 +79,9 @@ public class FeatureToggleService {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return true;
+        return isSpecClaim
+            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
+                                                        epoch, false);
     }
 
     public boolean isGaForLipsEnabled() {
@@ -107,7 +109,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return true;
+        return featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
     public boolean isAmendBundleEnabled() {
@@ -143,7 +145,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return true;
+        return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
     }
 
     public boolean isHmcForLipEnabled() {
