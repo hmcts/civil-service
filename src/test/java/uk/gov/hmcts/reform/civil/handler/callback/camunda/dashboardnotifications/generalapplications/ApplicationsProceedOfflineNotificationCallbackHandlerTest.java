@@ -9,10 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,49 +24,50 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCallbackHandlerTest {
+class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @InjectMocks
-    private ApplicationsProceedOfflineNotificationCallbackHandler handler;
-    @Mock
-    private DashboardApiClient dashboardApiClient;
-    @Mock
-    private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService toggleService;
     private static final String EVENT_ID_CLAIMANT = "CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT";
     private static final String EVENT_ID_DEFENDANT = "CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT";
     private static final String TASK_ID_CLAIMANT = "claimantLipApplicationOfflineDashboardNotification";
     private static final String TASK_ID_DEFENDANT = "defendantLipApplicationOfflineDashboardNotification";
+    @InjectMocks
+    private ApplicationsProceedOfflineNotificationCallbackHandler handler;
+    @Mock
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService toggleService;
+    private static final String CLAIMANT = "Claimant";
+    private static final String DEFENDANT = "Defendant";
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
-                Optional.empty()));
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGeneralApplicationsEnabled()).thenReturn(true);
         }
@@ -82,8 +81,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
 
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -95,8 +93,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
 
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -137,8 +134,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -156,8 +152,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -175,8 +170,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -199,8 +193,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -223,8 +216,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -248,8 +240,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -273,8 +264,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -304,10 +294,12 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT.getScenario(),
+            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(),
+                                                                                 CLAIMANT);
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(new HashMap<>()).build()
             );
         }
@@ -333,8 +325,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -358,8 +349,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient, never())
-                .recordScenario(anyString(), anyString(), anyString(), any(ScenarioRequestParams.class));
+            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test
@@ -389,10 +379,12 @@ public class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends B
                 .build();
             // THEN
             handler.handle(callbackParams);
-            verify(dashboardApiClient).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario(),
+            verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(),
+                                                                                 DEFENDANT);
+            verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
+                SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(new HashMap<>()).build()
             );
         }

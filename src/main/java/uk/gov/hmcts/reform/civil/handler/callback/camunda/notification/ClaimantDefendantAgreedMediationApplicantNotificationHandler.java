@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -70,9 +71,11 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
     public Map<String, String> addProperties(CaseData caseData) {
 
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 

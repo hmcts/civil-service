@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -19,14 +18,16 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT;
@@ -35,13 +36,17 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
+class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ConfirmOrderReviewClaimantNotificationHandler handler;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -73,34 +78,32 @@ public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallb
     @Test
     void shouldConfigureDashboardNotificationsStayCase() {
 
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+        scenarioParams.put("orderDocument", "url");
+
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().applicant1Represented(YesOrNo.NO)
             .isFinalOrder(YesOrNo.YES)
             .build();
 
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        scenarioParams.put("orderDocument", "url");
-
-        when(mapper.mapCaseDataToParams(any(), any())).thenReturn(scenarioParams);
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData).request(
                         CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name()).build()).build();
 
         handler.handle(callbackParams);
 
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
-            "Applications",
-            "BEARER_TOKEN"
+            "Applications"
         );
 
-        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            "BEARER_TOKEN"
+            "CLAIMANT"
         );
     }
 
@@ -116,17 +119,8 @@ public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallb
 
         handler.configureDashboardScenario(callbackParams);
 
-        verify(dashboardApiClient, never()).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString()
-        );
-        verify(dashboardApiClient, never()).deleteNotificationsForCaseIdentifierAndRole(
-            anyString(),
-            anyString(),
-            anyString()
-        );
+        verifyNoInteractions(dashboardNotificationService);
+        verifyNoInteractions(taskListService);
     }
 
     @Test
@@ -139,16 +133,17 @@ public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallb
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
                 .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
         handler.handle(params);
 
         // Then
         HashMap<String, Object> scenarioParams = new HashMap<>();
         verifyDeleteNotificationsAndTaskListUpdates(caseData);
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
     }
@@ -166,32 +161,31 @@ public class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallb
             CallbackRequest.builder().eventId(UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT.name())
                 .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
         handler.handle(params);
 
         // Then
         verifyDeleteNotificationsAndTaskListUpdates(caseData);
         HashMap<String, Object> scenarioParams = new HashMap<>();
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
-            "Applications",
-            "BEARER_TOKEN"
+            "Applications"
         );
 
-        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            "BEARER_TOKEN"
+            "CLAIMANT"
         );
     }
 }

@@ -46,7 +46,7 @@ public class AmendRestitchBundleNotificationHandler extends CallbackHandler {
     }
 
     private CallbackResponse notifyForAmendRestitchBundle(CallbackParams callbackParams) {
-        amendRestitchBundleNotifier.notifyParties(callbackParams.getCaseData());
+        amendRestitchBundleNotifier.notifyParties(callbackParams.getCaseData(), NOTIFY_AMEND_RESTITCH_BUNDLE.toString(), TASK_ID);
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }

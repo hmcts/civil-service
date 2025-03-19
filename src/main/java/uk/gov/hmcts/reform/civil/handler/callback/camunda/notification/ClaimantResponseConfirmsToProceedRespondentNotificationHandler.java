@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -145,7 +147,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         String template;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             template = getSpecTemplate(callbackParams, caseData);
-        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+        } else if (MULTI_CLAIM.equals(caseData.getAllocatedTrack()) && !featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)) {
             template = notificationsProperties.getSolicitorCaseTakenOffline();
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
@@ -210,7 +212,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 
@@ -221,7 +224,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -229,7 +233,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -264,6 +269,9 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             case NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK -> caseData.isRespondent2LiP()
                 ? Optional.empty()
                 : Optional.ofNullable(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
+            case NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK -> caseData.isRespondent2LiP()
+                ? Optional.empty()
+                : Optional.ofNullable(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
             default -> getRespondentSolicitorOrganisationName(caseData, caseEvent);
         };
 

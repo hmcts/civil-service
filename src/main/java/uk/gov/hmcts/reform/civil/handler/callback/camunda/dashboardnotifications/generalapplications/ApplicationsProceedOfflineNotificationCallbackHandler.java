@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -17,6 +16,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,8 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
                 CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT);
     public static final String TASK_ID_CLAIMANT = "claimantLipApplicationOfflineDashboardNotification";
     public static final String TASK_ID_DEFENDANT = "defendantLipApplicationOfflineDashboardNotification";
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardScenariosService dashboardScenariosService;
+    private final DashboardNotificationService dashboardNotificationService;
     private final DashboardNotificationsParamsMapper mapper;
     private final FeatureToggleService featureToggleService;
     private static final String CLAIMANT = "Claimant";
@@ -83,12 +85,12 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         if (isApplicationsExistLive(caseData, notificationType)) {
-            dashboardApiClient.recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                notificationType.equals(CLAIMANT)
-                    ? SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT.getScenario()
-                    : SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario(),
+            dashboardScenariosService.recordScenarios(
                 authToken,
+                notificationType.equals(CLAIMANT)
+                    ? SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()
+                    : SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build());
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -99,9 +101,11 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
         String eventId = callbackParams.getRequest().getEventId();
         if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT.name())
             && caseData.isApplicantLiP()) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(), CLAIMANT);
             return CLAIMANT;
         } else if (eventId.equals(CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT.name())
             && caseData.isRespondent1LiP()) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(caseData.getCcdCaseReference().toString(), DEFENDANT);
             return DEFENDANT;
         }
         return null;

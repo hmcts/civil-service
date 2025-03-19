@@ -2,26 +2,34 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AbstractCaseDismissDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 
 @Service
-public class CaseDismissClaimantDashboardNotificationHandler extends AbstractCaseDismissDashboardNotificationHandler {
+public class CaseDismissClaimantDashboardNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List
         .of(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_CLAIMANT);
+    private final DashboardNotificationService dashboardNotificationService;
+    private final TaskListService taskListService;
 
-    public CaseDismissClaimantDashboardNotificationHandler(DashboardApiClient dashboardApiClient,
+    public CaseDismissClaimantDashboardNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                            DashboardNotificationsParamsMapper mapper,
-                                                           FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+                                                           FeatureToggleService featureToggleService,
+                                                           DashboardNotificationService dashboardNotificationService,
+                                                           TaskListService taskListService) {
+        super(dashboardScenariosService, mapper, featureToggleService);
+        this.dashboardNotificationService = dashboardNotificationService;
+        this.taskListService = taskListService;
     }
 
     @Override
@@ -41,16 +49,16 @@ public class CaseDismissClaimantDashboardNotificationHandler extends AbstractCas
 
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
-        dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            authToken
+        final String caseId = String.valueOf(caseData.getCcdCaseReference());
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
+            caseId,
+            "CLAIMANT"
         );
 
-        dashboardApiClient.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseId,
             "CLAIMANT",
-            authToken
+            null
         );
     }
 }

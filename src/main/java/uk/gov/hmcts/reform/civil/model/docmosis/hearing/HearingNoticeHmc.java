@@ -20,6 +20,7 @@ public class HearingNoticeHmc implements MappableObject {
     private final String title;
     private final Long caseNumber;
     private final LocalDate creationDate;
+    private final String creationDateWelshText;
     private final String claimant;
     private final String claimant2;
     private final String defendant;
@@ -35,7 +36,9 @@ public class HearingNoticeHmc implements MappableObject {
     private final String hearingDays;
     private final String totalHearingDuration;
     private final String hearingType;
+    private final String hearingTypePluralWelsh;
     private final LocalDate hearingDueDate;
+    private final String hearingDueDateWelshText;
     private final PaymentDetails hearingFeePaymentDetails;
     private final String partiesAttendingInPerson;
     private final String partiesAttendingByTelephone;

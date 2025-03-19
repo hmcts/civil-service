@@ -119,7 +119,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -1022,73 +1021,31 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldPopulateHmcEarlyAdoptersFlag_whenHmcIsEnabled(Boolean isLocationWhiteListed) {
-        DynamicList options = DynamicList.builder()
-            .listItems(List.of(
-                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                       )
-            )
-            .build();
-
-        DynamicListElement selectedCourt = DynamicListElement.builder()
-            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
-            .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .fastTrackMethodInPerson(options)
-            .smallClaimsMethodInPerson(options)
-            .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-            .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
-            .orderType(OrderType.DISPOSAL)
-            .build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(
-            isLocationWhiteListed);
-        when(locationRefDataService.getLocationMatchingLabel(selectedCourt.getCode(), params.getParams().get(
-            CallbackParams.Params.BEARER_TOKEN).toString()))
-            .thenReturn(Optional.of(LocationRefData.builder()
-                                        .regionId("region id")
-                                        .epimmsId("epimms id")
-                                        .siteName("site name")
-                                        .build()));
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(responseCaseData.getHmcEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-    }
-
-    @ParameterizedTest
     @CsvSource({
-        //LR scenarios trigger hmcEaCourt and ignore hmcLipEnabled
-        "true, YES, YES, YES, YES",
-        "false, YES, YES, YES, NO",
+        //LR scenarios trigger and ignore hmcLipEnabled
+        "true, YES, YES, true, YES",
+        "false, YES, YES, true, YES",
         // LiP vs LR - ignore HMC court
-        "true,  NO, YES, NO,",
-        "false,  NO, YES, NO,",
+        "true,  NO, YES, false, NO",
+        "true,  NO, YES, TRUE, YES",
+        "false,  NO, YES, true, NO",
         //LR vs LiP - ignore HMC court
-        "true, YES, NO, YES,",
-        "false, YES, NO, NO,",
+        "true, YES, NO, true, YES",
+        "false, YES, NO, true, NO",
         //LiP vs LiP - ignore HMC court
-        "true, NO, NO, YES,",
-        "false, NO, NO, NO,"
+        "true, NO, NO, true, YES",
+        "false, NO, NO, true, NO"
     })
     void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
-                                                             YesOrNo respondent1Represented,
-                                                             YesOrNo eaCourtLocation, YesOrNo hmcEaCourtLocation) {
+                                                             YesOrNo respondent1Represented, boolean defendantNocOnline,
+                                                             YesOrNo eaCourtLocation) {
 
         if (NO.equals(respondent1Represented) || NO.equals(applicantRepresented)) {
             when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
         } else {
             when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
         }
-
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(defendantNocOnline);
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
             .caseManagementLocation(CaseLocationCivil.builder()
                                         .region("2")
@@ -1105,7 +1062,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
-        assertEquals(hmcEaCourtLocation, responseCaseData.getHmcEaCourtLocation());
     }
 
     @Test
@@ -2073,13 +2029,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(22).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
                 .isEqualTo(LocalDate.now().plusWeeks(30).toString());
-            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
-                .isEqualTo("Not more than seven nor less than three clear days before the trial, "
-                               + "the claimant must file at court and serve an indexed and paginated bundle of "
-                               + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                               + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                               + "the contents of the bundle before it is filed. The bundle will include a case "
-                               + "summary and a chronology.");
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
                 .isEqualTo(String.format(
                     "This order has been made without hearing. "

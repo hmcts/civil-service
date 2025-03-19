@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_AMEND_RESTITCH_BUNDLE;
 
 @ExtendWith(MockitoExtension.class)
 public class AmendRestitchBundleNotificationHandlerTest {
@@ -28,6 +29,6 @@ public class AmendRestitchBundleNotificationHandlerTest {
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
         amendRestitchBundleNotificationHandler.handle(params);
-        verify(amendRestitchBundleNotifier).notifyParties(caseData);
+        verify(amendRestitchBundleNotifier).notifyParties(caseData, NOTIFY_AMEND_RESTITCH_BUNDLE.toString(), "AmendRestitchBundleNotifier");
     }
 }

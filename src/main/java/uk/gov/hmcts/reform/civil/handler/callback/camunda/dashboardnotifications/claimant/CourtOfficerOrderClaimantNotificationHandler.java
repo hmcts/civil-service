@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.callback.CaseEventsDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,16 +19,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_COURT_OFFICER_ORDER_TRIAL_READY_CLAIMANT;
 
 @Service
-public class CourtOfficerOrderClaimantNotificationHandler extends CaseEventsDashboardCallbackHandler {
+public class CourtOfficerOrderClaimantNotificationHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT);
 
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationCourtOfficerOrder";
 
-    public CourtOfficerOrderClaimantNotificationHandler(DashboardApiClient dashboardApiClient,
+    public CourtOfficerOrderClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                         DashboardNotificationsParamsMapper mapper,
                                                         FeatureToggleService featureToggleService) {
-        super(dashboardApiClient, mapper, featureToggleService);
+        super(dashboardScenariosService, mapper, featureToggleService);
     }
 
     @Override
@@ -55,13 +55,12 @@ public class CourtOfficerOrderClaimantNotificationHandler extends CaseEventsDash
 
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
-        return featureToggleService.isCaseEventsEnabled() && caseData.isApplicantLiP();
+        return caseData.isApplicantLiP();
     }
 
     @Override
     public boolean shouldRecordExtraScenario(CaseData caseData) {
-        return featureToggleService.isCaseEventsEnabled()
-            && caseData.isApplicantLiP()
+        return caseData.isApplicantLiP()
             && AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
             && Objects.isNull(caseData.getTrialReadyApplicant());
     }
