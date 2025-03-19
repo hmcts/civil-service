@@ -77,6 +77,7 @@ public abstract class JudgmentOnlineMapper {
         caseData.setJoDefendantName1(activeJudgment.getDefendant1Name());
         caseData.setJoDefendantName2(activeJudgment.getDefendant2Name());
         caseData.setJoPaymentPlanSelected(activeJudgment.getPaymentPlan().getType());
+        caseData.setJoState(activeJudgment.getState());
         if (null != activeJudgment.getPaymentPlan()
             && PaymentPlanSelection.PAY_IN_INSTALMENTS.equals(activeJudgment.getPaymentPlan().getType())) {
             caseData.setJoRepaymentAmount(activeJudgment.getInstalmentDetails().getAmount());
@@ -90,7 +91,6 @@ public abstract class JudgmentOnlineMapper {
 
         if (JudgmentState.CANCELLED.equals(activeJudgment.getState())
             || JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
-            caseData.setJoState(activeJudgment.getState());
             caseData.setJoIssueDate(activeJudgment.getIssueDate());
             caseData.setJoFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
         }
