@@ -583,11 +583,7 @@ class RoboticsDataMapperTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "FAST_CLAIM, FAST TRACK",
-            "SMALL_CLAIM, SMALL CLAIM TRACK",
-            "OTHER_CLAIM, ''"
-    })
+    @CsvSource({"FAST_CLAIM, FAST TRACK", "SMALL_CLAIM, SMALL CLAIM TRACK", "OTHER_CLAIM, ''"})
     void shouldReturnCorrectTrackWhenAllocatedTrackIsNull(String responseClaimTrack, String expectedTrack) {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
                 .allocatedTrack(null)
