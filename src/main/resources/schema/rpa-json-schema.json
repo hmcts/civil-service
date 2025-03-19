@@ -51,6 +51,7 @@
           "type": "string",
           "enum": [
             "PERSONAL INJURY",
+            "CLAIM - UNSPEC ONLY",
             "CLAIM - SPEC ONLY"
           ],
           "description": ""
@@ -75,6 +76,7 @@
             "FAST TRACK",
             "MULTI TRACK",
             "SMALL CLAIM TRACK",
+            "INTERMEDIATE TRACK",
             ""
           ],
           "description": ""

@@ -88,6 +88,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
         properties.putAll(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,

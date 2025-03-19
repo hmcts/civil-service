@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -18,10 +17,11 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -32,8 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDEN
 class AddDefendantLitigationFriendNotifierTest {
 
     public static final Long CASE_ID = 1594901956117591L;
-    @Mock
-    NotificationService notificationService;
+
     @InjectMocks
     AddDefendantLitigationFriendNotifier addDefendantLitigationFriendNotifier;
     @Mock
@@ -57,9 +56,25 @@ class AddDefendantLitigationFriendNotifierTest {
     void shouldNotifyApplicantAndRespondentSolicitor_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
-        addDefendantLitigationFriendNotifier.notifyParties(caseData);
+        final Set<EmailDTO> partiesToNotify = addDefendantLitigationFriendNotifier.getPartiesToNotify(caseData);
+        final EmailDTO party1 = EmailDTO.builder()
+            .targetEmail("applicantsolicitor@example.com")
+            .emailTemplate("template-id")
+            .parameters(getNotificationDataMap())
+            .reference("litigation-friend-added-applicant-notification-000DC001")
+            .build();
 
-        verifyApplicantAndRespondentEmail();
+        final EmailDTO party2 = EmailDTO.builder()
+            .targetEmail("respondentsolicitor@example.com")
+            .emailTemplate("template-id")
+            .parameters(getNotificationDataMap())
+            .reference("litigation-friend-added-respondent-notification-000DC001")
+            .build();
+
+        final Set<EmailDTO> expected = Set.of(party1, party2);
+
+        assertThat(partiesToNotify.containsAll(expected)).isEqualTo(true);
+        assertThat(partiesToNotify.size()).isEqualTo(expected.size());
     }
 
     @Test
@@ -68,32 +83,33 @@ class AddDefendantLitigationFriendNotifierTest {
 
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
 
-        addDefendantLitigationFriendNotifier.notifyParties(caseData);
+        final Set<EmailDTO> partiesToNotify = addDefendantLitigationFriendNotifier.getPartiesToNotify(caseData);
 
-        verifyApplicantAndRespondentEmail();
+        final EmailDTO party1 = EmailDTO.builder()
+            .targetEmail("applicantsolicitor@example.com")
+            .emailTemplate("template-id")
+            .parameters(getNotificationDataMap())
+            .reference("litigation-friend-added-applicant-notification-000DC001")
+            .build();
 
-        verify(notificationService).sendMail(
-            "respondentsolicitor2@example.com",
-            "template-id",
-            getNotificationDataMap(),
-            "litigation-friend-added-respondent-notification-000DC001"
-        );
-    }
+        final EmailDTO party2 = EmailDTO.builder()
+            .targetEmail("respondentsolicitor@example.com")
+            .emailTemplate("template-id")
+            .parameters(getNotificationDataMap())
+            .reference("litigation-friend-added-respondent-notification-000DC001")
+            .build();
 
-    private void verifyApplicantAndRespondentEmail() {
-        verify(notificationService).sendMail(
-            "applicantsolicitor@example.com",
-            "template-id",
-            getNotificationDataMap(),
-            "litigation-friend-added-applicant-notification-000DC001"
-        );
+        final EmailDTO party3 = EmailDTO.builder()
+            .targetEmail("respondentsolicitor2@example.com")
+            .emailTemplate("template-id")
+            .parameters(getNotificationDataMap())
+            .reference("litigation-friend-added-respondent-notification-000DC001")
+            .build();
 
-        verify(notificationService).sendMail(
-            "respondentsolicitor@example.com",
-            "template-id",
-            getNotificationDataMap(),
-            "litigation-friend-added-respondent-notification-000DC001"
-        );
+        final Set<EmailDTO> expected = Set.of(party1, party2, party3);
+
+        assertThat(partiesToNotify.containsAll(expected)).isEqualTo(true);
+        assertThat(partiesToNotify.size()).isEqualTo(expected.size());
     }
 
     @NotNull

@@ -62,10 +62,11 @@ public class TrialReadyNotificationHandler extends CallbackHandler {
 
     private CallbackResponse notifyForTrialReady(CallbackParams callbackParams) {
         String eventId = callbackParams.getRequest().getEventId();
+        String taskId = callbackParams.getCaseData().getBusinessProcess().getActivityId();
         CaseData caseData = callbackParams.getCaseData();
 
         trailReadyNotifier.setEventId(eventId);
-        trailReadyNotifier.notifyParties(caseData);
+        trailReadyNotifier.notifyParties(caseData, eventId, taskId);
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

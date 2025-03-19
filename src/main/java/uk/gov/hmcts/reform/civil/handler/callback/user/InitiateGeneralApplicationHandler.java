@@ -114,7 +114,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()
-                || caseData.isRespondentResponseBilingual()) {
+                || (caseData.isRespondentResponseBilingual() && !caseData.isLipvLROneVOne())) {
+                errors.add(LR_VS_LIP);
+            } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
+                && caseData.isClaimantBilingual()) {
                 errors.add(LR_VS_LIP);
             } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                               .getCaseManagementLocation().getBaseLocation()))) {
@@ -123,7 +126,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 /*
                  * General Application can only be initiated if Defendant is assigned to the case
                  * */
-                if (Objects.isNull(caseData.getDefendantUserDetails())) {
+                if (Objects.isNull(caseData.getDefendantUserDetails()) && !caseData.isLipvLROneVOne()) {
                     errors.add(RESP_NOT_ASSIGNED_ERROR_LIP);
                 }
             }

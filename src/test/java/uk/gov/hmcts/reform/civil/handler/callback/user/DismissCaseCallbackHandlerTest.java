@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,11 +37,6 @@ class DismissCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService toggleService;
-
-    @BeforeEach
-    void caseEventsEnabled() {
-        Mockito.when(toggleService.isCaseEventsEnabled()).thenReturn(true);
-    }
 
     @Test
     void aboutToSubmitShouldReadyCamundaProcess() {
