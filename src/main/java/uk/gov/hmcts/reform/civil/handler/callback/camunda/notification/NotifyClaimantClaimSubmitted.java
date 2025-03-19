@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.config.EmailTemplateFooterConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -35,6 +36,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimSubmitted
     );
+    private final EmailTemplateFooterConfiguration emailTemplateFooterConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -49,7 +51,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private CallbackResponse notifyApplicantForClaimSubmitted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne()) {
             generateEmail(caseData);
         }
 
@@ -67,7 +69,9 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
         return Map.of(
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
+            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
+            PHONE_AND_OPENING_TIMES, emailTemplateFooterConfiguration.getPhone() + "\n" + emailTemplateFooterConfiguration.getOpeningTime(),
+            SMART_SURVEY_URL, emailTemplateFooterConfiguration.getSmartSurveyUrl()
         );
     }
 
