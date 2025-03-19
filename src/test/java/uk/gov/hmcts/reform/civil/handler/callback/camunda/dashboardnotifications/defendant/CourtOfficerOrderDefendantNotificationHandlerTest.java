@@ -145,25 +145,6 @@ class CourtOfficerOrderDefendantNotificationHandlerTest extends BaseCallbackHand
             // Then
             verifyNoInteractions(dashboardScenariosService);
         }
-
-        @Test
-        void shouldNotRecordScenario_whenCaseEventsIsNotEnabled() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_DEFENDANT.name()).build()
-            ).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verifyNoInteractions(dashboardScenariosService);
-        }
     }
 
 }
