@@ -180,7 +180,7 @@ class JudgeOrderDownloadGeneratorTest {
                     .finalOrderAllocateToTrack(YES)
                     .finalOrderTrackAllocation(MULTI_CLAIM)
                     .build(),
-                "This case is allocated to the Multi Track."
+                "This case is allocated to the multi-track."
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
