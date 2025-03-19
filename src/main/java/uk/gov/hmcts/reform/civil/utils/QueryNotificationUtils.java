@@ -33,6 +33,10 @@ public class QueryNotificationUtils {
         }
     }
 
+    public static boolean isOtherPartyApplicant(List<String> roles) {
+        return isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles);
+    }
+
     public static Map<String, String> getProperties(CaseData caseData, List<String> roles,
                                                     Map<String, String> properties,
                                                     OrganisationService organisationService) {
