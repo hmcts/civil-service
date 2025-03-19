@@ -1011,7 +1011,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isClaimantNotSettlePartAdmitClaim() {
         return hasDefendantNotPaid()
-            || isCcjRequestJudgmentByAdmissionDefendantNotPaid()
             || isSettlementDeclinedByClaimant()
             || isClaimantRejectsClaimAmount();
     }
