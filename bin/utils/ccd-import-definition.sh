@@ -30,6 +30,8 @@ uploadResponse=$(curl --insecure --silent -w "\n%{http_code}"  --show-error --ma
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
   -F "file=@${filepath};filename=${uploadFilename}" || echo 'bypass-if-error')
 
+echo "Definition Upload response is ${uploadResponse}"
+
 upload_http_code=$(echo "$uploadResponse" | tail -n1)
 upload_response_content=$(echo "$uploadResponse" | sed '$d')
 
