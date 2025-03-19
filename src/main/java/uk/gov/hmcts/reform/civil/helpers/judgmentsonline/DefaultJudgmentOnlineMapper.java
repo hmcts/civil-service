@@ -59,6 +59,13 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         return judgmentDetails;
     }
 
+    public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {
+        JudgmentDetails activeJudgmentDetails = this.addUpdateActiveJudgment(caseData);
+        builder.activeJudgment(activeJudgmentDetails);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder);
+        return builder;
+    }
+
     @Override
     protected JudgmentState getJudgmentState(CaseData caseData) {
         return isNonDivergent ? JudgmentState.ISSUED : JudgmentState.REQUESTED;

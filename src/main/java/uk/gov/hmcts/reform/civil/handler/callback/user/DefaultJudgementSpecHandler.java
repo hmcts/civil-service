@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -480,16 +479,14 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
-            caseData.setActiveJudgment(activeJudgment);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
-            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
-            caseData.setJoDJCreatedDate(LocalDateTime.now());
+            caseDataBuilder = djOnlineMapper.addUpdateActiveJudgment(caseData, caseDataBuilder);
+            caseDataBuilder.joDJCreatedDate(LocalDateTime.now());
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
         String nextState;
 
