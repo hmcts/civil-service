@@ -906,6 +906,7 @@ class FlowPredicateTest {
                 assertFalse(caseReadyForDismissal.test(caseData));
             }
         }
+
         @Nested
         class ClaimDismissed {
 
@@ -1020,8 +1021,6 @@ class FlowPredicateTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
                 assertFalse(caseDismissedPastHearingFeeDue.test(caseData));
             }
-
-
         }
 
         @Nested
