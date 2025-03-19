@@ -483,7 +483,6 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -525,7 +524,6 @@ class RoboticsNotificationServiceTest {
                 .build())
             .build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -560,7 +558,6 @@ class RoboticsNotificationServiceTest {
             .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM)
             .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()

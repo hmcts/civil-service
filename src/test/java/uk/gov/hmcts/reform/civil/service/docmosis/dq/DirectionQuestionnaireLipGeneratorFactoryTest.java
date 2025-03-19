@@ -33,8 +33,6 @@ class DirectionQuestionnaireLipGeneratorFactoryTest {
 
     @Test
     void shouldReturnDirectionQuestionnaireLipResposeGenerator_whenLipVLipIsEnabled() {
-        //Given
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
         //When
         DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator = factory.getDirectionQuestionnaire();
         //Then

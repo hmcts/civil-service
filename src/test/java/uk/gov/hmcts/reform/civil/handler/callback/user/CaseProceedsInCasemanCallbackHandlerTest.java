@@ -116,7 +116,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(takenOfflineByStaffDate);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         }
 
         @Test
@@ -146,7 +145,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .respondent1Represented(YesOrNo.NO)
                     .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
@@ -161,7 +159,6 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotAddPreviousCaseState_whenInvokedForLipVLipOrLrVLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             params.getRequest().getCaseDetailsBefore().setState(null);
 

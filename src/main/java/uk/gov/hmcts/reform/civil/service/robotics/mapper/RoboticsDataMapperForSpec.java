@@ -227,7 +227,7 @@ public class RoboticsDataMapperForSpec {
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData) {
-        if (featureToggleService.isLipVLipEnabled() && (caseData.isLipvLipOneVOne() || NO.equals(caseData.getApplicant1Represented()))) {
+        if (caseData.isLipvLipOneVOne() || NO.equals(caseData.getApplicant1Represented())) {
             return null;
         }
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());

@@ -123,7 +123,6 @@ class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest extends 
         CallbackParams params = getCallbackParams(caseData);
         when(notificationsProperties.getBilingualClaimantClaimContinuingOnlineForSpec())
             .thenReturn(BILINGUAL_TEMPLATE_ID);
-        when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
         // When
         handler.handle(params);

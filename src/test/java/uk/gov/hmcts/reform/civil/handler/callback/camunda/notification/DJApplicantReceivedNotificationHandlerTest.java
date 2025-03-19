@@ -152,8 +152,6 @@ class DJApplicantReceivedNotificationHandlerTest {
         void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
                 .thenReturn("test-template-requested-lip-id");
-            when(featureToggleService.isLipVLipEnabled())
-                .thenReturn(true);
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -180,8 +178,6 @@ class DJApplicantReceivedNotificationHandlerTest {
         void shouldNotifyApplicantLip_whenInvokedAndLiPvsLiPEnabledAndBilingual() {
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
                 .thenReturn("test-template-requested-lip-id-bilingual");
-            when(featureToggleService.isLipVLipEnabled())
-                    .thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                     .applicant1(PartyBuilder.builder().individual().build().toBuilder()

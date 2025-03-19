@@ -75,11 +75,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void before() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
-
         @ParameterizedTest
         @MethodSource("provideCaseStateAndScenarioArguments")
         void shouldRecordScenario_whenInvokedInJudicialReferralState(CaseState caseState, DashboardScenarios dashboardScenarios) {
@@ -350,7 +345,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .applicant1Represented(YesOrNo.NO)

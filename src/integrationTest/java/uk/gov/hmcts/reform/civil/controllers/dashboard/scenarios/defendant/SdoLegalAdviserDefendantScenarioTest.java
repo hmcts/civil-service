@@ -42,7 +42,6 @@ public class SdoLegalAdviserDefendantScenarioTest extends CaseProgressionDashboa
         DynamicListElement selectedCourt = DynamicListElement.builder()
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
 

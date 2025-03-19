@@ -122,8 +122,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
             }
         } else {
             if (Objects.nonNull(caseData.getApplicant1Represented())
-                && caseData.isApplicant1NotRepresented()
-                && featureToggleService.isLipVLipEnabled()) {
+                && caseData.isApplicant1NotRepresented()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
                     addTemplate(caseData),

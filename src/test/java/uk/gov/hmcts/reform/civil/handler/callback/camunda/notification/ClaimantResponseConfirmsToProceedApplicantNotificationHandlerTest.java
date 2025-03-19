@@ -83,7 +83,6 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
                     .build();
             when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate())
                     .thenReturn(BILINGUAL_TEMPLATE_ID);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId("NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED")
                             .build()).build();

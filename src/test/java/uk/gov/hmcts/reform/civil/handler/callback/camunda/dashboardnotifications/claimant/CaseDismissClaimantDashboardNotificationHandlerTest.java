@@ -61,7 +61,6 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_CLAIMANT.name()).build()
         ).build();
         HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When

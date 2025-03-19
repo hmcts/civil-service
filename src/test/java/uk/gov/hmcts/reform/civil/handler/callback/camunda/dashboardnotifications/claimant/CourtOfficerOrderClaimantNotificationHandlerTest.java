@@ -71,7 +71,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordScenario_whenInvokedForCaseEventFeatureToggle() {
             // Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
@@ -106,7 +105,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
@@ -139,8 +137,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .responseClaimTrack("FAST_CLAIM")

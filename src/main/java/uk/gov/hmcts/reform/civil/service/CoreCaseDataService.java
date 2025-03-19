@@ -101,21 +101,23 @@ public class CoreCaseDataService {
                                                    CaseEvent eventName,
                                                    Map<String, Object> contentModified) {
         StartEventResponse startEventResponse = startGeneralApplicationUpdate(caseId.toString(), eventName);
-        return submitGeneralApplicationUpdate(caseId.toString(),
-                caseDataContentFromStartEventResponse(startEventResponse, contentModified));
+        return submitGeneralApplicationUpdate(
+            caseId.toString(),
+            caseDataContentFromStartEventResponse(startEventResponse, contentModified)
+        );
     }
 
     public StartEventResponse startGeneralApplicationUpdate(String caseId, CaseEvent eventName) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
         return coreCaseDataApi.startEventForCaseWorker(
-                systemUpdateUser.getUserToken(),
-                authTokenGenerator.generate(),
-                systemUpdateUser.getUserId(),
-                JURISDICTION,
-                GENERALAPPLICATION_CASE_TYPE,
-                caseId,
-                eventName.name()
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            JURISDICTION,
+            GENERALAPPLICATION_CASE_TYPE,
+            caseId,
+            eventName.name()
         );
     }
 
@@ -123,14 +125,14 @@ public class CoreCaseDataService {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
         CaseDetails caseDetails = coreCaseDataApi.submitEventForCaseWorker(
-                systemUpdateUser.getUserToken(),
-                authTokenGenerator.generate(),
-                systemUpdateUser.getUserId(),
-                JURISDICTION,
-                GENERALAPPLICATION_CASE_TYPE,
-                caseId,
-                true,
-                caseDataContent
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            JURISDICTION,
+            GENERALAPPLICATION_CASE_TYPE,
+            caseId,
+            true,
+            caseDataContent
         );
         return caseDetailsConverter.toGACaseData(caseDetails);
     }
@@ -179,8 +181,9 @@ public class CoreCaseDataService {
         Map<String, Object>>> supplementaryData) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
-        return coreCaseDataApi.submitSupplementaryData(systemUpdateUser.getUserToken(), authTokenGenerator.generate(),
-                                                       caseId.toString(), supplementaryData
+        return coreCaseDataApi.submitSupplementaryData(
+            systemUpdateUser.getUserToken(), authTokenGenerator.generate(),
+            caseId.toString(), supplementaryData
         );
     }
 
@@ -212,17 +215,10 @@ public class CoreCaseDataService {
     }
 
     private String createQuery(String authorization, int startIndex, String userEmailField) {
-        if (featureToggleService.isLipVLipEnabled()) {
-            UserDetails defendantInfo = userService.getUserDetails(authorization);
-            return new SearchSourceBuilder()
-                .query(QueryBuilders.boolQuery()
-                           .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))
-                .sort("data.submittedDate", SortOrder.DESC)
-                .from(startIndex)
-                .size(RETURNED_NUMBER_OF_CASES).toString();
-        }
+        UserDetails defendantInfo = userService.getUserDetails(authorization);
         return new SearchSourceBuilder()
-            .query(QueryBuilders.matchAllQuery())
+            .query(QueryBuilders.boolQuery()
+                       .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))
             .sort("data.submittedDate", SortOrder.DESC)
             .from(startIndex)
             .size(RETURNED_NUMBER_OF_CASES).toString();

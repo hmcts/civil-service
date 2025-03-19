@@ -112,7 +112,6 @@ class FeeClientTest {
     @Test
     void shouldCallLookupFeeWhenFastTrackClaimWithHearingEventAndLipVLipFeatureEnabled() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(FeeLookupResponseDto.builder()

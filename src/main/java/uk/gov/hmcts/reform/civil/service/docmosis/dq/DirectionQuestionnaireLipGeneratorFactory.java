@@ -13,9 +13,6 @@ public class DirectionQuestionnaireLipGeneratorFactory {
     private final DirectionQuestionnaireLipResponseGenerator directionQuestionnaireLipResponseGenerator;
 
     public DirectionsQuestionnaireGenerator getDirectionQuestionnaire() {
-        if (featureToggleService.isLipVLipEnabled()) {
-            return directionQuestionnaireLipResponseGenerator;
-        }
-        return directionsQuestionnaireLipGenerator;
+        return directionQuestionnaireLipResponseGenerator;
     }
 }

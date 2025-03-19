@@ -762,7 +762,6 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
         CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now())
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).previousCCDState(CaseState.AWAITING_APPLICANT_INTENTION).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             updatedClaim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
@@ -773,7 +772,6 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
         CaseData updatedClaim = claim.toBuilder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .previousCCDState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 updatedClaim,
@@ -791,7 +789,6 @@ class CcdClaimStatusDashboardFactoryTest {
                                  .camundaEvent(CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name())
                                  .build())
             .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
                 claim,

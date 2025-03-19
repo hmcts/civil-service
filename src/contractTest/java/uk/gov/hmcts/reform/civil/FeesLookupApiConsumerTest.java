@@ -249,7 +249,6 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     @PactTestFor(pactMethod = "getFeeForMoneyClaim")
     public void verifyFeeForMoneyClaim() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         Fee fee = feesService.getFeeDataByClaimValue(
             ClaimValue.builder().statementOfValueInPennies(new BigDecimal(100000)).build()
         );

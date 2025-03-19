@@ -65,11 +65,6 @@ public class DashboardBaseIntegrationTest extends BaseIntegrationTest {
             .build();
     }
 
-    @BeforeEach
-    public void before() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-    }
-
     @AfterEach
     public void after() {
         taskListRepository.deleteAll();

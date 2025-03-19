@@ -55,7 +55,6 @@ public class MediationCSVServiceFactoryTest {
     @Test
     void shouldReturnMediationCSVLipVLip_whenApplicantLip() {
         //Given
-        given(toggleService.isLipVLipEnabled()).willReturn(true);
         given(caseData.isApplicantLiP()).willReturn(true);
         //When
         MediationCSVService mediationCSVService = mediationCsvServiceFactory.getMediationCSVService(caseData);

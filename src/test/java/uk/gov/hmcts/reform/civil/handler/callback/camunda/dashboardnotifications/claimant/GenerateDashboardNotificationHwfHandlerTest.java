@@ -45,10 +45,6 @@ class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTes
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldRecordScenario_whenInvoked_smallClaims() {

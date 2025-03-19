@@ -34,7 +34,6 @@ public class StayCaseDefendantScenarioTest extends DashboardBaseIntegrationTest 
             .respondent1Represented(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(700))
             .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

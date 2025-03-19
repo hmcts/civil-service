@@ -70,10 +70,6 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldRecordScenario_whenInvoked() {

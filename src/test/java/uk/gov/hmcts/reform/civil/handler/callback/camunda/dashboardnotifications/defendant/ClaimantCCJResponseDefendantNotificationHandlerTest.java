@@ -71,10 +71,6 @@ class ClaimantCCJResponseDefendantNotificationHandlerTest extends BaseCallbackHa
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldRecordScenario_whenClaimantAcceptsCourtDecision() {

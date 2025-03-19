@@ -67,10 +67,6 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @ParameterizedTest
         @MethodSource("provideClaimIssueHwfEventsForConfigureScenario")

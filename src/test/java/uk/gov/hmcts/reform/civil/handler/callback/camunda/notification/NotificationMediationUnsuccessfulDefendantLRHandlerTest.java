@@ -352,7 +352,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     @Test
     void shouldSendNotificationToDefendant1LRforLiPvLrCase() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicant1Represented(NO)
@@ -384,7 +383,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     @Test
     void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_LipVLipIsNotSet() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicant1Represented(NO)
@@ -408,7 +406,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     @Test
     void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_applicantRepresented() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
@@ -433,7 +430,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     @Test
     void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_RespondentSolicitorNotSet() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())

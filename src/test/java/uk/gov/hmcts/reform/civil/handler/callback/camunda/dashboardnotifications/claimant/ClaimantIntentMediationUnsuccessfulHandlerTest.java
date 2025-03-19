@@ -73,10 +73,6 @@ class ClaimantIntentMediationUnsuccessfulHandlerTest extends BaseCallbackHandler
 
     @Nested
     class AboutToSubmitCallback {
-        @BeforeEach
-        void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @Test
         void createDashboardNotificationsWhenCarmIsDisabledMediationUnsuccessful() {

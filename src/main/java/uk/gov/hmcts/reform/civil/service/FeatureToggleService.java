@@ -43,10 +43,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
     }
 
-    public boolean isLipVLipEnabled() {
-        return true;
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true

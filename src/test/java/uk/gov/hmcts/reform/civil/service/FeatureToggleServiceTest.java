@@ -71,8 +71,7 @@ class FeatureToggleServiceTest {
         var lipVlipKey = "cuiReleaseTwoEnabled";
         givenToggle(lipVlipKey, toggleStat);
 
-        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(toggleStat);
-    }
+   }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})

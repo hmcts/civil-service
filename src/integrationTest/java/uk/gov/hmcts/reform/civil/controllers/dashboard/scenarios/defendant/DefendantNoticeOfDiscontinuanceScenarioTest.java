@@ -31,8 +31,6 @@ public class DefendantNoticeOfDiscontinuanceScenarioTest extends DashboardBaseIn
             .respondent1Represented(YesOrNo.NO)
             .build();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

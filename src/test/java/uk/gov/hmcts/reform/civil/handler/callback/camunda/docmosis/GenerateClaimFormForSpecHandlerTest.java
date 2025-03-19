@@ -563,7 +563,6 @@ class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest {
             specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                                 "Supported docs",
                                                                 LocalDate.now().toString()));
-            given(toggleService.isLipVLipEnabled()).willReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssuedUnrepresentedDefendant().build().toBuilder()

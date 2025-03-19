@@ -28,7 +28,6 @@ public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardB
 
     @BeforeEach
     public void before() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
     }
 

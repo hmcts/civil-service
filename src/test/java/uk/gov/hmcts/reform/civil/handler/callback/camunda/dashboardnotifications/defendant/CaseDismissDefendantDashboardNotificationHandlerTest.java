@@ -57,7 +57,6 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         // Given
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)

@@ -80,12 +80,9 @@ public class CaseProceedsInCasemanCallbackHandler extends CallbackHandler {
 
     private CaseState getPreviousCaseSate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isLipVLipEnabled()) {
-            return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
+        return (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne() || caseData.isLipvLROneVOne())
                     ? CaseState.valueOf(callbackParams.getRequest().getCaseDetailsBefore().getState())
                     : null;
-        }
-        return null;
     }
 
     private CoscApplicationStatus updateCoScApplicationStatus(CallbackParams callbackParams) {

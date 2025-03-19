@@ -40,9 +40,7 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isLipVLipEnabled()
-            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantSignSettlementAgreement)
-            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForDefendantSignSettlementAgreement);
     }
 
     @Override

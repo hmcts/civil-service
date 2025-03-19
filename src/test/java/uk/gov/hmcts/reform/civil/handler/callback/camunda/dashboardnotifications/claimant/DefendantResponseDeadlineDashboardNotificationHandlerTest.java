@@ -67,11 +67,6 @@ class DefendantResponseDeadlineDashboardNotificationHandlerTest extends BaseCall
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
-
         @Test
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().applicant1Represented(YesOrNo.NO).build();

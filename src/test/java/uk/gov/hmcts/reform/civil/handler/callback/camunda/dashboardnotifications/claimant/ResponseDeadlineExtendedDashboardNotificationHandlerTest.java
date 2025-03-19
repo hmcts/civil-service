@@ -63,7 +63,6 @@ class ResponseDeadlineExtendedDashboardNotificationHandlerTest extends BaseCallb
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().respondent1Represented(YesOrNo.NO).applicant1Represented(YesOrNo.NO)
