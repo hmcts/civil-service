@@ -117,10 +117,6 @@ public interface NotificationData {
 
     String QUERY_DATE = "queryDate";
 
-    //emailTemplates
-    String  PHONE_AND_OPENING_TIMES = "phoneAndOpeningTimes";
-    String SMART_SURVEY_URL = "smartSurvey";
-
     Map<String, String> addProperties(CaseData caseData);
 
 }

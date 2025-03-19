@@ -141,11 +141,6 @@ ocmc:
     id: ${OCMC_CLIENT_ID:cmc_citizen}
     url: ${OCMC_CLIENT_URL:http://localhost:3001}
 
-email-template:
-  phone: Telephone - 0300 123 7050,
-  openingTiming: Hours - 8.30am to 5pm, Monday to Friday
-  smartSurveyUrl: 'https://www.smartsurvey.co.uk/s/CMC_feedback'
-
 manage-case-ui:
   baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
 
