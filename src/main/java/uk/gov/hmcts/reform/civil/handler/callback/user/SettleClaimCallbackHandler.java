@@ -57,10 +57,10 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
-        CaseData caseDataBuilder = callbackParams.getCaseData().toBuilder().build();
-
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .state(CASE_SETTLED.name())
             .build();
     }
