@@ -78,12 +78,12 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
 
         if (multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE) || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
             // When 1v1, 2v1,  or 1v2 same solicitor, "other party" will either be applicant 1, or respondent 1
-            String email = isOtherPartyApplicant(roles) ?
-                caseData.getApplicantSolicitor1UserDetails().getEmail() :
-                caseData.getRespondentSolicitor1EmailAddress();
-            String legalOrgName = isOtherPartyApplicant(roles) ?
-                getApplicantLegalOrganizationName(caseData, organisationService) :
-                getLegalOrganizationNameForRespondent(caseData, true, organisationService);
+            String email = isOtherPartyApplicant(roles)
+                ? caseData.getApplicantSolicitor1UserDetails().getEmail()
+                : caseData.getRespondentSolicitor1EmailAddress();
+            String legalOrgName = isOtherPartyApplicant(roles)
+                ? getApplicantLegalOrganizationName(caseData, organisationService)
+                : getLegalOrganizationNameForRespondent(caseData, true, organisationService);
 
             notificationService.sendMail(
                 email,
