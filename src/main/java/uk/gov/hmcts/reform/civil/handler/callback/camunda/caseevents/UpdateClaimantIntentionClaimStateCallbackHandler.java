@@ -52,6 +52,7 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
+        caseDataBuilder.previousCCDState(caseData.getCcdState());
         CaseData updatedData = caseDataBuilder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
