@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 
+import java.time.LocalDateTime;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @Builder
@@ -18,4 +20,5 @@ public class DocumentToKeep {
 
     private String documentId;
     private CaseDocumentToKeep caseDocumentToKeep;
+    private LocalDateTime uploadedDate;
 }
