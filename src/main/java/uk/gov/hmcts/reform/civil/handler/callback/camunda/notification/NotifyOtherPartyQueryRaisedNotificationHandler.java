@@ -50,20 +50,20 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
     private final CoreCaseUserService coreCaseUserService;
+    private final OrganisationService organisationService;
     private final QueryManagementCamundaService runtimeService;
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::notifyOtherPartyQueryHasBeenRaised
         );
+    }
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
     }
 
     private CallbackResponse notifyOtherPartyQueryHasBeenRaised(CallbackParams callbackParams) {
@@ -73,8 +73,6 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
         String queryId = processVariables.getQueryId();
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
-        System.out.println("MULTI PART SCENARIO IS " + multiPartyScenario);
 
         if (multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE) || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
             // When 1v1, 2v1,  or 1v2 same solicitor, "other party" will either be applicant 1, or respondent 1
