@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
@@ -31,16 +30,13 @@ class TakeCaseOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private Time time;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     private TakeCaseOfflineCallbackHandler handler;
 
     @BeforeEach
     void setup() {
         ObjectMapper mapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        handler = new TakeCaseOfflineCallbackHandler(mapper, time, featureToggleService);
+        handler = new TakeCaseOfflineCallbackHandler(mapper, time);
     }
 
     @Nested
