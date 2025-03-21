@@ -76,7 +76,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             generatePIPEmail(caseData);
         }
 
-        generatePIPLetter(callbackParams);
+        //generatePIPLetter(callbackParams);
 
         String updateCaseState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -93,8 +93,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     }
 
     private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                && caseData.isClaimantBilingual();
+        return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
     }
 
     @Override

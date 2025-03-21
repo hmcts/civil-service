@@ -383,7 +383,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyDefendantLipVLrNotifyDefendant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .setClaimTypeToSpecClaim()
                 .legacyCaseReference(REFERENCE_NUMBER)
@@ -414,7 +413,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyDefendantLrVLipNotifyDefendant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -445,7 +443,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotSendNotificationToDefendantForLipVLip_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();

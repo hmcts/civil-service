@@ -43,10 +43,6 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
     }
 
-    public boolean isLipVLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
-    }
-
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
@@ -113,8 +109,7 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
-            && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
+        return featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
     }
 
     public boolean isAmendBundleEnabled() {

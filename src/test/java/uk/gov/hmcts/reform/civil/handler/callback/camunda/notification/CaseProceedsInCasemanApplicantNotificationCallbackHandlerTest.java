@@ -92,7 +92,6 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
                     .respondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)
                     .build();
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             handler.handle(params);

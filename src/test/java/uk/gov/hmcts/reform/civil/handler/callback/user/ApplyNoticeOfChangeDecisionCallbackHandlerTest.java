@@ -209,8 +209,6 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
                 .respondent1Represented(YesOrNo.NO)
                 .build();
 
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             executeTest(caseData, RESPONDENT_ONE_ORG_POLICY, "APPLY_NOC_DECISION_DEFENDANT_LIP");
         }
 

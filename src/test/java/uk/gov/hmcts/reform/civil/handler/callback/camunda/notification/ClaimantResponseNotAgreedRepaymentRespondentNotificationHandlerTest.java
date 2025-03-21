@@ -80,7 +80,6 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantLip_whenInvoked() {
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             when(notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()).thenReturn("template-id-manual-determination");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()

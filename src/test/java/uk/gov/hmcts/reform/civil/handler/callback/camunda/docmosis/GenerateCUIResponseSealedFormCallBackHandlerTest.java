@@ -137,7 +137,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabled() {
         //Given
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         List<Element<CaseDocument>> documents = List.of(
                 element(CaseDocument.builder().documentName("Stitched document").build()),
@@ -153,7 +152,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         //When
@@ -180,7 +178,6 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         //When

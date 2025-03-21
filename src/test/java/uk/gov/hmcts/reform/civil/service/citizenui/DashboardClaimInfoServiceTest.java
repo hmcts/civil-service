@@ -165,8 +165,6 @@ public class DashboardClaimInfoServiceTest {
 
     @Test
     void shouldReturnClaimsForClaimantSuccessfullyWhenLipVLipEnabled() {
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
-
         List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
         SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
         given(coreCaseDataService.getCCDClaimsForLipClaimant(any(), eq(0))).willReturn(searchResult);
@@ -181,8 +179,6 @@ public class DashboardClaimInfoServiceTest {
 
     @Test
     void shouldReturnOnlyOcmcClaimsForClaimantSuccessfullyWhenLipVLipDisabled() {
-        given(featureToggleService.isLipVLipEnabled()).willReturn(false);
-
         DashboardResponse claimsForClaimant = dashboardClaimInfoService.getDashboardClaimantResponse(
             "authorisation",
             "123",

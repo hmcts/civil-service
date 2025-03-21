@@ -1830,7 +1830,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1859,7 +1858,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
             var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

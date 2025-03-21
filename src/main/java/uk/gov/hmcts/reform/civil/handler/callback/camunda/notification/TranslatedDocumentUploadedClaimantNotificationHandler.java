@@ -55,7 +55,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne()) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
@@ -84,7 +84,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String addTemplate(CaseData caseData) {
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne()) {
             if (caseData.isClaimantBilingual()) {
                 return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
             }
@@ -94,7 +94,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String getEmail(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
+        return (caseData.isLipvLipOneVOne())
             ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }

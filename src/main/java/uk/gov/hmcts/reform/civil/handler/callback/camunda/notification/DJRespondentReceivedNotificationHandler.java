@@ -65,7 +65,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private EmailTemplateReference identifyTemplate(CaseData caseData) {
         EmailTemplateReference emailTemplate = new EmailTemplateReference();
-        if (caseData.isLRvLipOneVOne() || (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled())) {
+        if (caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne()) {
             emailTemplate.template = notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
             return emailTemplate;
@@ -97,7 +97,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
     private CallbackResponse notifyRespondentSolicitorDefaultJudgmentReceived(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         EmailTemplateReference emailTemplate = identifyTemplate(caseData);
-        if ((caseData.isLRvLipOneVOne() || (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()))
+        if ((caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne())
             && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())) {
             if (caseData.getRespondent1().getPartyEmail() != null) {

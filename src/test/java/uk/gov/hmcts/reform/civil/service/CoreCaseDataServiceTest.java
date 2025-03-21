@@ -276,7 +276,6 @@ class CoreCaseDataServiceTest {
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -296,7 +295,6 @@ class CoreCaseDataServiceTest {
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -314,7 +312,6 @@ class CoreCaseDataServiceTest {
         @Test
         void shouldSearchCasesByDefendantUser_whenLipVLipEnabled() {
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -329,7 +326,6 @@ class CoreCaseDataServiceTest {
         @Test
         void shouldSearchCasesByClaimantUser_whenLipVLipEnabled() {
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -343,7 +339,6 @@ class CoreCaseDataServiceTest {
 
         @Test
         void shouldSearchAllCasesForUser_whenLipVLipDisabled() {
-            given(featureToggleService.isLipVLipEnabled()).willReturn(false);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery())
                 .sort("data.submittedDate", SortOrder.DESC)
