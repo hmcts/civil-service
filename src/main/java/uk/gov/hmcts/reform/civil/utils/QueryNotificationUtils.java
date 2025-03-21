@@ -63,7 +63,6 @@ public class QueryNotificationUtils {
         return properties;
     }
 
-
     public static List<Map<String, String>> getOtherPartyEmailDetails(
         CaseData caseData, OrganisationService organisationService,
         CoreCaseUserService coreCaseUserService, String queryId) {
