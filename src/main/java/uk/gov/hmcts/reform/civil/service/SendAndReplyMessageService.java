@@ -49,7 +49,9 @@ public class SendAndReplyMessageService {
         entry("national-business-centre", RolePool.ADMIN),
         entry("circuit-judge", RolePool.JUDICIAL_CIRCUIT),
         entry("district-judge", RolePool.JUDICIAL_DISTRICT),
-        entry("judge", RolePool.JUDICIAL)
+        entry("judge", RolePool.JUDICIAL),
+        entry("allocated-judge", RolePool.JUDICIAL)
+
     );
 
     private static final List<String> SUPPORTED_ROLES = List.of(
@@ -63,7 +65,8 @@ public class SendAndReplyMessageService {
         "national-business-centre",
         "circuit-judge",
         "district-judge",
-        "judge"
+        "judge",
+        "allocated-judge"
     );
 
     private static final Map<RecipientOption, RolePool> ROLE_SELECTION_TO_POOL = Map.of(
