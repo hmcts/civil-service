@@ -122,6 +122,6 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
     }
 
     protected String getDateInWelsh(LocalDate date) {
-        return Objects.isNull(date) ? null : formatDateInWelsh(date);
+        return Objects.isNull(date) ? null : formatDateInWelsh(date, false);
     }
 }
