@@ -5,6 +5,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResp
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.UploadedDocument;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 public interface DocumentManagementService {
 
     CaseDocument uploadDocument(String authorisation, PDF pdf);
@@ -16,5 +19,7 @@ public interface DocumentManagementService {
     DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath);
 
     void deleteDocument(String url, String auth);
+
+    void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime);
 
 }
