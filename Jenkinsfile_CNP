@@ -8,6 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
+def ccdBranch = "feat/CIV-16753"
 def camundaBranch = "master"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
@@ -121,7 +122,7 @@ withPipeline(type, product, component) {
         ./bin/add-roles.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
-        ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
+        ./bin/pull-latest-ccd-files.sh ${ccdBranch}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
       """
     }
