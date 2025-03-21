@@ -15,12 +15,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
-import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
@@ -136,12 +134,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .ccjPaymentDetails(ccjPaymentDetails);
 
         if (featureToggleService.isJudgmentOnlineLive()) {
-            JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
+            caseDataBuilder = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(data, caseDataBuilder);
 
             caseDataBuilder
-                .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment))
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 

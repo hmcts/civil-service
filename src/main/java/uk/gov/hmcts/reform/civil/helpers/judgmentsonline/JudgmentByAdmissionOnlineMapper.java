@@ -74,7 +74,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {
-        JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
+        JudgmentDetails activeJudgmentDetails = this.addUpdateActiveJudgment(caseData);
         builder.activeJudgment(activeJudgmentDetails);
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder);
         return builder;
