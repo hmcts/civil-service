@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLip.TASK_ID_LIP;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -171,7 +172,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader",
+                CASEMAN_REF, "000DC001"
             );
         }
 

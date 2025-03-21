@@ -86,10 +86,6 @@ public class HearingValuesService {
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
 
-        if (!featuretoggleService.isHmcNroEnabled()) {
-            isEarlyAdopter(caseData);
-        }
-
         isLrVLr(caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
@@ -141,14 +137,18 @@ public class HearingValuesService {
     }
 
     private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
-        if (!earlyAdoptersService.isPartOfHmcEarlyAdoptersRollout(caseData)) {
+        if (!earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(caseData)) {
             throw new NotEarlyAdopterCourtException();
         }
     }
 
     private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
         if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
-            throw new IncludesLitigantInPersonException();
+            if (featuretoggleService.isHmcForLipEnabled()) {
+                isEarlyAdopter(caseData);
+            } else {
+                throw new IncludesLitigantInPersonException();
+            }
         }
     }
 

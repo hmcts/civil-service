@@ -323,6 +323,24 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_hearingNoticeDocumentIssuedAndRelisted_AutoHearingNotice_whenGetStatus_thenReturnHearingFormGeneratedRelisting() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .hearingDate(LocalDate.now().plusDays(6 * 7 + 1))
+            .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .hearingDocuments(List.of(Element.<CaseDocument>builder().value(CaseDocument.builder()
+                                                                                .documentName("testDoc")
+                                                                                .build()).build()))
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.singletonList(CaseEventDetail.builder()
+                                                                       .id(CaseEvent.GENERATE_HEARING_NOTICE_HMC.name())
+                                                                       .createdDate(LocalDateTime.now())
+                                                                       .build())));
+        assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED_RELISTING);
+    }
+
+    @Test
     void given_mediation_whenGetSatus_mediationSuccessful() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
@@ -715,7 +733,7 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             caseData, featureToggleService, Collections.emptyList()));
 
-        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD);
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD_PRE_DEF_NOC_ONLINE);
     }
 
     @Test

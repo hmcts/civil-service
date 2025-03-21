@@ -28,7 +28,8 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
             || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == BY_SET_DATE
             || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
             &&
-            (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+            (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && caseData.isApplicantRepresented())
         ) {
             emailTemplate = notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction();
         } else {
@@ -45,14 +46,16 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         } else {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
             );
         }
     }

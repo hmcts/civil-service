@@ -8,17 +8,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.CaseDismissClaimantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.HashMap;
 
@@ -38,7 +39,11 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
     private FeatureToggleService featureToggleService;
 
     @Mock
-    private DashboardApiClient dashboardApiClient;
+    private DashboardScenariosService dashboardScenariosService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private TaskListService taskListService;
 
     @Mock
     private DashboardNotificationsParamsMapper mapper;
@@ -55,28 +60,27 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_CLAIMANT.name()).build()
         ).build();
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
         HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When
         handler.handle(params);
-
+        final String caseId = caseData.getCcdCaseReference().toString();
         // Then
-        verify(dashboardApiClient).deleteNotificationsForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            "BEARER_TOKEN"
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            caseId,
+            "CLAIMANT"
         );
-        verify(dashboardApiClient).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseId,
             "CLAIMANT",
-            "BEARER_TOKEN"
+            null
         );
-        verify(dashboardApiClient).recordScenario(
-            caseData.getCcdCaseReference().toString(),
-            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_CLAIMANT.getScenario(),
+        verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
+            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_CLAIMANT.getScenario(),
+            caseId,
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
     }

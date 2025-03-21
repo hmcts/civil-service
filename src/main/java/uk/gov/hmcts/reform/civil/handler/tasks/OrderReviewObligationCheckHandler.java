@@ -32,26 +32,24 @@ public class OrderReviewObligationCheckHandler extends BaseExternalTaskHandler {
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        if (featureToggleService.isCaseEventsEnabled()) {
-            Set<CaseDetails> cases = caseSearchService.getCases();
-            log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        Set<CaseDetails> cases = caseSearchService.getCases();
+        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-            cases.forEach(caseDetails -> {
-                try {
-                    CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseDetails.getId()));
-                    LocalDate currentDate = LocalDate.now();
+        cases.forEach(caseDetails -> {
+            try {
+                CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseDetails.getId()));
+                LocalDate currentDate = LocalDate.now();
 
-                    caseData.getStoredObligationData().stream()
-                        .map(Element::getValue)
-                        .filter(data -> !data.getObligationDate().isAfter(currentDate) && YesOrNo.NO.equals(data.getObligationWATaskRaised()))
-                        .forEach(data -> applicationEventPublisher.publishEvent(new OrderReviewObligationCheckEvent(
-                            caseDetails.getId())));
+                caseData.getStoredObligationData().stream()
+                    .map(Element::getValue)
+                    .filter(data -> !data.getObligationDate().isAfter(currentDate) && YesOrNo.NO.equals(data.getObligationWATaskRaised()))
+                    .forEach(data -> applicationEventPublisher.publishEvent(new OrderReviewObligationCheckEvent(
+                        caseDetails.getId())));
 
-                } catch (Exception e) {
-                    log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
-                }
-            });
-        }
+            } catch (Exception e) {
+                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
+            }
+        });
         return ExternalTaskData.builder().build();
     }
 }

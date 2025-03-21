@@ -217,30 +217,29 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @ParameterizedTest
-        @CsvSource({"true", "false"})
-        void shouldPopulateHmcEaCourtLocation_whenLocationIsWhiteListed(Boolean isLocationWhiteListed) {
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isLocationWhiteListed);
-            when(courtLocationUtils.findPreferredLocationData(any(), any()))
-                .thenReturn(LocationRefData.builder().siteName("")
-                                .epimmsId("222")
-                                .siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                                .courtLocationCode("other code").build());
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(CaseLocationCivil.builder()
-                                            .region("2")
-                                            .baseLocation("111")
-                                            .build())
-                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        @CsvSource({
+            //LR scenarios trigger and ignore hmcLipEnabled
+            "true, YES, YES, YES",
+            "false, YES, YES, YES",
+            // LiP vs LR - ignore HMC court
+            "true,  NO, YES, NO",
+            "false,  NO, YES, NO",
+            //LR vs LiP - ignore HMC court
+            "true, YES, NO, YES",
+            "false, YES, NO, NO",
+            //LiP vs LiP - ignore HMC court
+            "true, NO, NO, YES",
+            "false, NO, NO, NO"
+        })
+        void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted,
+                                                                 YesOrNo applicantRepresented,
+                                                                 YesOrNo respondent1Represented,
+                                                                 YesOrNo eaCourtLocation) {
 
-            assertThat(responseCaseData.getHmcEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
-        }
+            if (NO.equals(respondent1Represented)) {
+                when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+            }
 
-        @Test
-        void shouldNotPopulateHmcEaCourtLocation_whenLiP() {
             when(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .thenReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
@@ -255,20 +254,13 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                            .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData.toBuilder()
-                                                         .applicant1Represented(YesOrNo.NO)
+                                                         .applicant1Represented(applicantRepresented)
+                                                         .respondent1Represented(respondent1Represented)
                                                          .build(), ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
-
-            params = callbackParamsOf(caseData.toBuilder()
-                                          .respondent1Represented(YesOrNo.NO)
-                                          .build(), ABOUT_TO_SUBMIT);
-            response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(responseCaseData.getHmcEaCourtLocation()).isNull();
+            assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
         }
 
         @Test

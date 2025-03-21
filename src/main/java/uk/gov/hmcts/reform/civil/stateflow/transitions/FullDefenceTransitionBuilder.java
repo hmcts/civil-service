@@ -56,7 +56,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
@@ -66,7 +66,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                           .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.IS_MULTI_TRACK.name(), true);
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
             }, transitions)
@@ -78,7 +78,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
-                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMintiEnabled());
+                flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
             .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
@@ -92,7 +92,10 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
             }, transitions)
-            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
+            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed.or(isCarmApplicableLipCase.negate()
+                                                                                                 .and(lipFullDefenceProceed)
+                                                                                                 .and(CaseData::isLipvLROneVOne)),
+                                                                    transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);

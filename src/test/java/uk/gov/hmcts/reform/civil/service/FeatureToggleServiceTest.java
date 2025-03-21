@@ -49,15 +49,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCaseEventsEnabledInvoked(Boolean toggleStat) {
-        var caseFlagsKey = "cui-case-events-enabled";
-        givenToggle(caseFlagsKey, toggleStat);
-
-        assertThat(featureToggleService.isCaseEventsEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsAmendBundleEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "amend-bundle-enabled";
         givenToggle(caseFlagsKey, toggleStat);
@@ -191,15 +182,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
-        givenToggle(mintiKey, toggleStat);
-
-        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisCjesServiceAvailableEnabled(Boolean toggleStat) {
         var key = "isCjesServiceAvailable";
         givenToggle(key, toggleStat);
@@ -227,9 +209,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
         var caseFileKey = "multi-or-intermediate-track";
-        givenToggle(mintiKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .build();
@@ -296,15 +276,6 @@ class FeatureToggleServiceTest {
         assertEquals(expected, result);
     }
 
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHmcNroCEnabled(Boolean toggleStat) {
-        var isCoSCEnabledKey = "hmc-nro";
-        givenToggle(isCoSCEnabledKey, toggleStat);
-
-        assertThat(featureToggleService.isHmcNroEnabled()).isEqualTo(toggleStat);
-
-    }
-
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
@@ -328,5 +299,23 @@ class FeatureToggleServiceTest {
             .thenReturn(toggleStat);
 
         assertThat(featureToggleService.isDefendantNoCOnlineForCase(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
+        var hmcCui = "hmc-cui-enabled";
+        givenToggle(hmcCui, toggleStat);
+
+        assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
+        var caseFlagsKey = "query-management";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 }

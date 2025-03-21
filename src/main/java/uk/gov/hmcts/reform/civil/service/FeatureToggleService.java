@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
 @Service
@@ -74,10 +75,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
-    public boolean isMintiEnabled() {
-        return featureToggleApi.isFeatureEnabled("minti");
-    }
-
     public boolean isCjesServiceAvailable() {
         return featureToggleApi.isFeatureEnabled("isCjesServiceAvailable");
     }
@@ -103,8 +100,9 @@ public class FeatureToggleService {
         } else {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
-        return featureToggleApi.isFeatureEnabled("minti")
-            && featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        boolean multiOrIntermediateTrackEnabled = featureToggleApi.isFeatureEnabledForDate("multi-or-intermediate-track", epoch, false);
+        boolean judgeReallocatedTrackOrAlreadyMinti = judgeReallocatedTrackOrAlreadyMinti(caseData, multiOrIntermediateTrackEnabled);
+        return multiOrIntermediateTrackEnabled || judgeReallocatedTrackOrAlreadyMinti;
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
@@ -117,10 +115,6 @@ public class FeatureToggleService {
         }
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled")
             && featureToggleApi.isFeatureEnabledForDate("is-dashboard-enabled-for-case", epoch, false);
-    }
-
-    public boolean isCaseEventsEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-events-enabled");
     }
 
     public boolean isAmendBundleEnabled() {
@@ -143,11 +137,6 @@ public class FeatureToggleService {
             && isGaForLipsEnabled();
     }
 
-    public boolean isHmcNroEnabled() {
-        return featureToggleApi.isFeatureEnabled("hmc-nro");
-
-    }
-
     public boolean isJOLiveFeedActive() {
         return isJudgmentOnlineLive()
             && featureToggleApi.isFeatureEnabled("isJOLiveFeedActive");
@@ -162,5 +151,13 @@ public class FeatureToggleService {
             epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         }
         return featureToggleApi.isFeatureEnabledForDate("is-defendant-noc-online-for-case", epoch, false);
+    }
+
+    public boolean isHmcForLipEnabled() {
+        return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
+    }
+
+    public boolean isQueryManagementLRsEnabled() {
+        return featureToggleApi.isFeatureEnabled("query-management");
     }
 }
