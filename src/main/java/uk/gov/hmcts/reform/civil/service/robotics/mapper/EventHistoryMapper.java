@@ -300,21 +300,33 @@ public class EventHistoryMapper {
 
     private void buildTakenOfflineAfterDefendantNoCDeadlinePassed(EventHistory.EventHistoryBuilder builder,
                                                                   CaseData caseData) {
-        boolean sendQueryRpa = false;
+        boolean nocDeadlinePassed = false;
         LocalDateTime takenOfflineDate = caseData.getTakenOfflineDate();
         if (takenOfflineDate != null) {
             if (caseData.getAddLegalRepDeadlineRes1() != null
                 && takenOfflineDate.isAfter(caseData.getAddLegalRepDeadlineRes1())
                 && YesOrNo.NO.equals(caseData.getRespondent1Represented())) {
-                sendQueryRpa = true;
+                nocDeadlinePassed = true;
             }
             if (caseData.getAddLegalRepDeadlineRes2() != null
                 && takenOfflineDate.isAfter(caseData.getAddLegalRepDeadlineRes2())
                 && YesOrNo.NO.equals(caseData.getRespondent2Represented())) {
-                sendQueryRpa = true;
+                nocDeadlinePassed = true;
             }
-            if (sendQueryRpa) {
+            if (nocDeadlinePassed) {
                 buildQueriesEvent(builder, caseData, takenOfflineDate);
+
+                String miscText = "RPA Reason: Claim moved offline after defendant NoC deadline has passed";
+                builder.miscellaneous(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(MISCELLANEOUS.getCode())
+                        .dateReceived(takenOfflineDate)
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build());
             }
         }
     }
