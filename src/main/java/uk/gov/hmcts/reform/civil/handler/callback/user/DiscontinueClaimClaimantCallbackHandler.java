@@ -211,6 +211,7 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
             caseDataBuilder.selectedClaimantForDiscontinuance(caseData.getClaimantWhoIsDiscontinuing()
                                                                   .getValue().getLabel());
         }
+        caseDataBuilder.previousCCDState(caseData.getCcdState());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .state(updateCaseState(caseData))
                 .data(caseDataBuilder.build().toMap(objectMapper))

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.DebtPaymentOptions;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -54,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServic
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INTERMEDIATE_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.MULTI_CLAIM_TRACK;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.SMALL_CLAIM_TRACK;
+import static uk.gov.hmcts.reform.civil.service.LocationService.settleDiscontinueStates;
 import static uk.gov.hmcts.reform.civil.service.LocationService.statesBeforeSDO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -226,8 +226,15 @@ public class InitiateGeneralApplicationService {
         );
     }
 
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !statesBeforeSDO.contains(state);
+    private boolean hasSDOBeenMade(CaseData caseData) {
+        if (featureToggleService.isQueryManagementLRsEnabled()) {
+            return (!statesBeforeSDO.contains(caseData.getCcdState())
+                && !settleDiscontinueStates.contains(caseData.getCcdState()))
+                || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
+                && settleDiscontinueStates.contains(caseData.getCcdState()));
+        } else {
+            return !statesBeforeSDO.contains(caseData.getCcdState());
+        }
     }
 
     private void setGeneralAppEvidenceDocument(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
@@ -289,7 +296,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private void setCaseManagementLocation(CaseData caseData, String authToken, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
-        if (featureToggleService.isGaForLipsEnabled() && caseContainsLiP(caseData) && hasSDOBeenMade(caseData.getCcdState())) {
+        if (featureToggleService.isGaForLipsEnabled() && caseContainsLiP(caseData) && hasSDOBeenMade(caseData)) {
             setLocationDetails(caseData, authToken, applicationBuilder);
         } else {
             setDefaultLocation(caseData, authToken, applicationBuilder);
@@ -322,7 +329,7 @@ public class InitiateGeneralApplicationService {
             caseLocation.getLeft().setPostcode(locationDetails.getPostcode());
         }
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
-        applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState()) ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
+        applicationBuilder.locationName(hasSDOBeenMade(caseData) ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
     }
 
