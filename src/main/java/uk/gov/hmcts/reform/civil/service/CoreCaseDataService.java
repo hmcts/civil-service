@@ -65,7 +65,6 @@ public class CoreCaseDataService {
 
     public StartEventResponse startUpdate(String caseId, CaseEvent eventName) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
-
         return coreCaseDataApi.startEventForCaseWorker(
             systemUpdateUser.getUserToken(),
             authTokenGenerator.generate(),
