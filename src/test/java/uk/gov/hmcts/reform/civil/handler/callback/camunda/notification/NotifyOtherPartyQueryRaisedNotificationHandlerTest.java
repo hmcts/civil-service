@@ -130,7 +130,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative_applicantIsOtherParty(String caseRole, String email) {
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
-                                .queryId("1")
+                                .queryId("2")
                                 .build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
             CaseData caseData = createCaseDataWithQueries1v2SameSol();
@@ -155,7 +155,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2) {
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
-                                .queryId("1")
+                                .queryId("3")
                                 .build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
             CaseData caseData = createCaseData1v2DifferentSolCaseWithQueries();
