@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONWriter;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
@@ -100,7 +101,9 @@ public class SendAndReplyMessageService {
 
     public Message createBaseMessageWithSenderDetails(String userAuth) {
         UserDetails details = userService.getUserDetails(userAuth);
+        log.error("UserDetails: "+ JSONWriter.valueToString(details));
         RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
+        log.error("Role received: "+ JSONWriter.valueToString(role));
         String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
 
         return Message.builder()
@@ -131,7 +134,7 @@ public class SendAndReplyMessageService {
 
     private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
         var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
-
+        log.error("All role assignments received: "+ JSONWriter.valueToString(roleAssignments.getRoleAssignmentResponse()));
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
             .filter(userRole -> SUPPORTED_ROLES.contains(userRole.getRoleName()))
             .min(Comparator.comparingInt(userRole -> SUPPORTED_ROLES.indexOf(userRole.getRoleName())))
