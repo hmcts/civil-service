@@ -27,11 +27,13 @@ import static java.lang.String.format;
 @Slf4j
 public class DocumentRemovalService {
 
-    public static final String DOCUMENT_FILENAME = "document_filename";
-    static final String DOCUMENT_URL = "document_url";
-    private static final String DOCUMENT_BINARY_URL = "document_binary_url";
-    private static final String DOCUMENT_UPLOAD_TIMESTAMP = "upload_timestamp";
-    private static final String VALUE_KEY = "value";
+    protected static final String DOCUMENT_FILENAME = "document_filename";
+    protected static final String DOCUMENT_URL = "document_url";
+    protected static final String DOCUMENT_BINARY_URL = "document_binary_url";
+    protected static final String DOCUMENT_UPLOAD_TIMESTAMP = "upload_timestamp";
+    protected static final String DOCUMENT_UPLOADED_BY = "createdBy";
+    protected static final String VALUE_KEY = "value";
+    protected static final String CIVIL = "Civil";
     private final ObjectMapper objectMapper;
 
     public DocumentRemovalService(ObjectMapper objectMapper, DocumentManagementService documentManagementService,
@@ -100,6 +102,20 @@ public class DocumentRemovalService {
         return documentNodeUploadTimestamp;
     }
 
+    private boolean getSystemGeneratedFlag(JsonNode documentNode) {
+        boolean isSystemGenerated = false;
+
+        String uploadedBy = null;
+        if (Objects.nonNull(documentNode.get(DOCUMENT_UPLOADED_BY))) {
+            uploadedBy = documentNode.get(DOCUMENT_UPLOADED_BY).asText();
+        }
+        if (CIVIL.equalsIgnoreCase(uploadedBy)) {
+            isSystemGenerated = true;
+        }
+
+        return isSystemGenerated;
+    }
+
     private List<DocumentToKeepCollection> buildCaseDocumentList(List<JsonNode> documentNodes) {
 
         List<DocumentToKeepCollection> documentsCollection = new ArrayList<>();
@@ -119,6 +135,8 @@ public class DocumentRemovalService {
                             .documentBinaryUrl(documentNode.get(DOCUMENT_BINARY_URL).asText())
                             .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode))
                             .build())
+                            .uploadedDate(getUploadTimestampFromDocumentNode(documentNode))
+                            .isSystemGenerated(getSystemGeneratedFlag(documentNode))
                         .build())
                     .build());
         }

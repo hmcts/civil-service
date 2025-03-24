@@ -21,4 +21,5 @@ public class DocumentToKeep {
     private String documentId;
     private CaseDocumentToKeep caseDocumentToKeep;
     private LocalDateTime uploadedDate;
+    private boolean isSystemGenerated;
 }
