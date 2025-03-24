@@ -20,6 +20,8 @@ public interface DocumentManagementService {
 
     void deleteDocument(String url, String auth);
 
+    void deleteDocument(String authorisation, UUID docId);
+
     void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime);
 
 }

@@ -71,7 +71,8 @@ public class UpdateQueryDocumentTTLHandler extends CallbackHandler {
         String userAuthToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         UUID documentId = UUID.fromString(
                 camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getDocumentToRemoveId());
-        documentManagementService.updateDocumentTimeToLive(documentId, userAuthToken, LocalDateTime.now().minusDays(1));
+//        documentManagementService.updateDocumentTimeToLive(documentId, userAuthToken, LocalDateTime.now().minusDays(1));
+        documentManagementService.deleteDocument(userAuthToken, documentId);
         return emptyCallbackResponse(callbackParams);
     }
 
