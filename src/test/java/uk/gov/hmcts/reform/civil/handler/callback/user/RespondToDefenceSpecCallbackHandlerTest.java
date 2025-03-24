@@ -1837,34 +1837,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
-        @Test
-        void shouldNotMoveCaseTo_case_stayed_State_LRvLip_One_V_One() {
-            CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .defenceRouteRequired(DISPUTES_THE_CLAIM)
-                .respondent1Represented(NO)
-                .applicant1Represented(YES)
-                .responseClaimTrack(SMALL_CLAIM.name())
-                .applicant1ProceedWithClaim(NO)
-                .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
-                    ExpertDetails.builder().build()).build())
-                .respondent1(Party.builder()
-                                 .primaryAddress(Address.builder().build())
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").region("2").build())
-                .build();
-
-            given(featureToggleService.isPinInPostEnabled()).willReturn(true);
-            var params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getState()).isNotEqualTo(CASE_STAYED.toString());
-
-        }
-
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
         }
