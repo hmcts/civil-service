@@ -25,13 +25,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.getPartialPayment;
 
 @ExtendWith(MockitoExtension.class)
-class JudgmentAmountsCalculatorTest {
+class JudgmentAndSettlementAmountsCalculatorTest {
 
     @Mock
     private InterestCalculator interestCalculator;
 
     @InjectMocks
-    private JudgmentAmountsCalculator judgmentAmountsCalculator;
+    private JudgmentAndSettlementAmountsCalculator judgmentAndSettlementAmountsCalculator;
 
     @Test
     void shouldGetPartialPaymentInPoundsFromCaseData() {
@@ -55,7 +55,7 @@ class JudgmentAmountsCalculatorTest {
             .caseDataLip(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.YES).build()).build())
             .build();
 
-        BigDecimal claimFee = judgmentAmountsCalculator.getClaimFee(caseData);
+        BigDecimal claimFee = judgmentAndSettlementAmountsCalculator.getClaimFee(caseData);
 
         assertThat(claimFee).isEqualTo("50.00");
     }
@@ -71,7 +71,7 @@ class JudgmentAmountsCalculatorTest {
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("1000")).build())
             .build();
 
-        BigDecimal claimFee = judgmentAmountsCalculator.getClaimFee(caseData);
+        BigDecimal claimFee = judgmentAndSettlementAmountsCalculator.getClaimFee(caseData);
 
         assertThat(claimFee).isEqualTo("20.00");
     }
@@ -91,7 +91,7 @@ class JudgmentAmountsCalculatorTest {
 
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("50.00"));
 
-        BigDecimal claimFee = judgmentAmountsCalculator.getClaimFee(caseData);
+        BigDecimal claimFee = judgmentAndSettlementAmountsCalculator.getClaimFee(caseData);
 
         assertThat(claimFee).isEqualTo("130.00");
     }
@@ -109,7 +109,7 @@ class JudgmentAmountsCalculatorTest {
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("8000")).build())
             .build();
 
-        BigDecimal claimFee = judgmentAmountsCalculator.getClaimFee(caseData);
+        BigDecimal claimFee = judgmentAndSettlementAmountsCalculator.getClaimFee(caseData);
 
         assertThat(claimFee).isEqualTo("90.00");
     }
@@ -121,7 +121,7 @@ class JudgmentAmountsCalculatorTest {
             .build();
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("50.00"));
 
-        BigDecimal debtAmount = judgmentAmountsCalculator.getDebtAmount(caseData);
+        BigDecimal debtAmount = judgmentAndSettlementAmountsCalculator.getDebtAmount(caseData);
 
         assertThat(debtAmount).isEqualTo("1050.00");
     }
@@ -134,9 +134,23 @@ class JudgmentAmountsCalculatorTest {
             .build();
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("50.00"));
 
-        BigDecimal debtAmount = judgmentAmountsCalculator.getDebtAmount(caseData);
+        BigDecimal debtAmount = judgmentAndSettlementAmountsCalculator.getDebtAmount(caseData);
 
         assertThat(debtAmount).isEqualTo("850.00");
+    }
+
+    @Test
+    void shouldReturnSettlementAmountWithFeeAndPartialPaymentDeducted_whenPartialPaymentIsProvided() {
+        CaseData caseData = CaseData.builder()
+            .totalClaimAmount(new BigDecimal("1000"))
+            .partialPaymentAmount("20000")
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("10000")).build())
+            .build();
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("50.00"));
+
+        BigDecimal debtAmount = judgmentAndSettlementAmountsCalculator.getSettlementAmount(caseData);
+
+        assertThat(debtAmount).isEqualTo("950.00");
     }
 
     @Test
@@ -146,8 +160,27 @@ class JudgmentAmountsCalculatorTest {
             .build();
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
 
-        BigDecimal debtAmount = judgmentAmountsCalculator.getDebtAmount(caseData);
+        BigDecimal debtAmount = judgmentAndSettlementAmountsCalculator.getDebtAmount(caseData);
 
         assertThat(debtAmount).isEqualTo(BigDecimal.ZERO);
     }
+
+    @Test
+    void shouldReturnClaimFee_whenF() {
+        CaseData caseData = CaseData.builder()
+            .paymentConfirmationDecisionSpec(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal("5000"))
+            .fixedCosts(FixedCosts.builder()
+                .fixedCostAmount("1000")
+                .claimFixedCosts(YesOrNo.YES)
+                .build())
+            .claimFixedCostsOnEntryDJ(YesOrNo.NO)
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("8000")).build())
+            .build();
+
+        BigDecimal claimFee = judgmentAndSettlementAmountsCalculator.getClaimFee(caseData);
+
+        assertThat(claimFee).isEqualTo("90.00");
+    }
+
 }

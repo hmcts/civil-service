@@ -33,7 +33,7 @@ class DefaultJudgmentFormBuilderTest {
     @Mock
     private InterestCalculator interestCalculator;
     @Mock
-    private JudgmentAmountsCalculator judgmentAmountsCalculator;
+    private JudgmentAndSettlementAmountsCalculator judgmentAndSettlementAmountsCalculator;
     @Mock
     private OrganisationService organisationService;
 
@@ -61,8 +61,8 @@ class DefaultJudgmentFormBuilderTest {
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
         uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
-        when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
-        when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("1006.00"));
+        when(judgmentAndSettlementAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
+        when(judgmentAndSettlementAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("1006.00"));
 
         DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
 
@@ -82,8 +82,8 @@ class DefaultJudgmentFormBuilderTest {
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
         uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
-        when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
-        when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("-45.00"));
+        when(judgmentAndSettlementAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
+        when(judgmentAndSettlementAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("-45.00"));
 
         DefaultJudgmentForm form = defaultJudgmentFormBuilder.getDefaultJudgmentForm(caseData, respondent, CaseEvent.GENERATE_DJ_FORM_SPEC.name(), false);
 
