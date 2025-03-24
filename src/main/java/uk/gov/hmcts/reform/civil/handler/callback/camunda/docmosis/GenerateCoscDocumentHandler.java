@@ -63,8 +63,8 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments;
-        if (callbackParams.getCaseData().getDefaultJudgmentDocuments() != null) {
-            systemGeneratedCaseDocuments = callbackParams.getCaseData().getDefaultJudgmentDocuments();
+        if (callbackParams.getCaseData().getSystemGeneratedCaseDocuments() != null) {
+            systemGeneratedCaseDocuments = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
         } else {
             systemGeneratedCaseDocuments = new ArrayList<>();
         }
