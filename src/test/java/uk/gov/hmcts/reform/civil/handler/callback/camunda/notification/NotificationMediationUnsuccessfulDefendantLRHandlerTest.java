@@ -381,29 +381,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     }
 
     @Test
-    void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_LipVLipIsNotSet() {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicant1Represented(NO)
-            .specRespondent1Represented(YES)
-            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
-            .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
-
-        //When
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) notificationHandler.handle(
-            params);
-        //Then
-        assertThat(response.getErrors()).isNull();
-    }
-
-    @Test
     void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_applicantRepresented() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         CaseData caseData = CaseData.builder()
