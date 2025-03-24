@@ -73,16 +73,6 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     }
 
     @Test
-    void shouldNotReturnLipTemplateWhenLipvLipIsNotEnabled() {
-        //Given
-        given(caseData.isRespondent1NotRepresented()).willReturn(true);
-        //When
-        DocmosisTemplates docmosisTemplate = generator.getTemplateId(caseData);
-        //Then
-        assertThat(docmosisTemplate).isNotEqualTo(DQ_LIP_RESPONSE);
-    }
-
-    @Test
     void shouldNotReturnLipTemplateWhenLrvLr() {
         //When
         DocmosisTemplates docmosisTemplate = generator.getTemplateId(caseData);

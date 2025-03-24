@@ -22,15 +22,6 @@ class DirectionQuestionnaireLipGeneratorFactoryTest {
     private DirectionQuestionnaireLipGeneratorFactory factory;
 
     @Test
-    void shouldReturnDirectionQuestionnaireLipGenerator_whenLipVLipIsDisabled() {
-
-        //When
-        DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator = factory.getDirectionQuestionnaire();
-        //Then
-        assertThat(directionsQuestionnaireGenerator).isInstanceOf(DirectionsQuestionnaireLipGenerator.class);
-    }
-
-    @Test
     void shouldReturnDirectionQuestionnaireLipResposeGenerator_whenLipVLipIsEnabled() {
         //When
         DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator = factory.getDirectionQuestionnaire();
