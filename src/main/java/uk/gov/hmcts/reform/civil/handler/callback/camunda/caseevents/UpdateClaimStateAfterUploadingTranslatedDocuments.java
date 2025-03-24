@@ -41,9 +41,11 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
         CaseData caseData = callbackParams.getCaseData();
 
         caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.previousCCDState(caseData.getCcdState());
         String changeToState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .state(changeToState)
             .build();
     }

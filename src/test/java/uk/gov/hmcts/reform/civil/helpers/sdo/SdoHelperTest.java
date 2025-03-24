@@ -639,7 +639,6 @@ public class SdoHelperTest {
         void shouldReturnLabel_whenHearingIsNotNull() {
             FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
                 .helpText1("helpText1")
-                .helpText2("helpText2")
                 .hearingDuration(FastTrackHearingTimeEstimate.FOUR_HOURS)
                 .build();
 
@@ -658,7 +657,6 @@ public class SdoHelperTest {
             var expected = "6 hours 20 minutes";
             FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
                 .helpText1("helpText1")
-                .helpText2("helpText2")
                 .hearingDuration(FastTrackHearingTimeEstimate.OTHER)
                 .otherHours("6")
                 .otherMinutes("20")

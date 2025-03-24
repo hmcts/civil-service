@@ -106,7 +106,7 @@ allprojects {
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 
       //Solves CVE-2023-34034
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.3'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.4'
 
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
       dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
@@ -426,7 +426,7 @@ dependencies {
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
   implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.9'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.10'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox

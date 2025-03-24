@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -169,6 +170,32 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().contains("Date must be in past"));
+        }
+
+        @Test
+        void shouldValidateJudgementByAdmissionDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
+            caseData.setJoJudgementByAdmissionIssueDate(LocalDateTime.now());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
+            //When: handler is called with MID event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().contains("Paid in full date must be on or after the date of the judgment"));
+        }
+
+        @Test
+        void shouldValidateDefaultJudgementDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
+            caseData.setJoDJCreatedDate(LocalDateTime.now());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
+            //When: handler is called with MID event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().contains("Paid in full date must be on or after the date of the judgment"));
         }
     }
 
