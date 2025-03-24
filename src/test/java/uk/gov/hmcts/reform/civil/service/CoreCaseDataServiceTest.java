@@ -337,17 +337,6 @@ class CoreCaseDataServiceTest {
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
         }
 
-        @Test
-        void shouldSearchAllCasesForUser_whenLipVLipDisabled() {
-            String query = new SearchSourceBuilder()
-                .query(QueryBuilders.matchAllQuery())
-                .sort("data.submittedDate", SortOrder.DESC)
-                .from(0)
-                .size(RETURNED_NUMBER_OF_CASES).toString();
-            service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0, "data.defendantUserDetails.email");
-            verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
-            verify(userService, never()).getUserDetails(USER_AUTH_TOKEN);
-        }
     }
 
     @Nested
