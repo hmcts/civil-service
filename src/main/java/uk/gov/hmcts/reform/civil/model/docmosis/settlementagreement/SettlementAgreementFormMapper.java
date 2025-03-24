@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsFormMapper;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAndSettlementAmountsCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -23,35 +25,39 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 @RequiredArgsConstructor
 public class SettlementAgreementFormMapper {
 
+    private final JudgmentAndSettlementAmountsCalculator judgmentAndSettlementAmountsCalculator;
+    private final ResponseRepaymentDetailsFormMapper responseRepaymentDetailsFormMapper;
+
     public SettlementAgreementForm buildFormData(CaseData caseData) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
         Optional<AdditionalLipPartyDetails> applicantDetails =
-                caseDataLip.map(CaseDataLiP::getApplicant1AdditionalLipPartyDetails);
+            caseDataLip.map(CaseDataLiP::getApplicant1AdditionalLipPartyDetails);
         Optional<AdditionalLipPartyDetails> defendantDetails =
-                caseDataLip.map(CaseDataLiP::getRespondent1AdditionalLipPartyDetails);
+            caseDataLip.map(CaseDataLiP::getRespondent1AdditionalLipPartyDetails);
         caseData.getApplicant1().setPartyEmail(caseData.getClaimantUserDetails() != null
-                ? caseData.getClaimantUserDetails().getEmail() : null);
+            ? caseData.getClaimantUserDetails().getEmail() : null);
         LipFormParty claimant = LipFormParty.toLipFormParty(
-                caseData.getApplicant1(),
-                getCorrespondenceAddress(applicantDetails),
-                getContactPerson(applicantDetails)
+            caseData.getApplicant1(),
+            getCorrespondenceAddress(applicantDetails),
+            getContactPerson(applicantDetails)
         );
 
         LipFormParty defendant = LipFormParty.toLipFormParty(
-                caseData.getRespondent1(),
-                getCorrespondenceAddress(defendantDetails),
-                getContactPerson(defendantDetails)
+            caseData.getRespondent1(),
+            getCorrespondenceAddress(defendantDetails),
+            getContactPerson(defendantDetails)
         );
 
         SettlementAgreementForm.SettlementAgreementFormBuilder builder = new SettlementAgreementForm.SettlementAgreementFormBuilder();
         return builder
-                .claimant(claimant)
-                .defendant(defendant)
-                .claimReferenceNumber(caseData.getLegacyCaseReference())
-                .totalClaimAmount(getClaimAmount(caseData))
-                .settlementAgreedDate(getSettlementDate(caseData))
-                .settlementSubmittedDate(caseData.getRespondent1ResponseDate())
-                .build();
+            .claimant(claimant)
+            .defendant(defendant)
+            .claimReferenceNumber(caseData.getLegacyCaseReference())
+            .totalClaimAmount(getSettlementAmount(caseData))
+            .settlementAgreedDate(getSettlementDate(caseData))
+            .settlementSubmittedDate(caseData.getRespondent1ResponseDate())
+            .repaymentDetails(responseRepaymentDetailsFormMapper.toResponsePaymentDetails(caseData))
+            .build();
     }
 
     private Address getCorrespondenceAddress(Optional<AdditionalLipPartyDetails> partyDetails) {
@@ -73,7 +79,7 @@ public class SettlementAgreementFormMapper {
         return null;
     }
 
-    public static LocalDate getClaimantFinalRepaymentDate(CaseData caseData) {
+    public LocalDate getClaimantFinalRepaymentDate(CaseData caseData) {
         BigDecimal paymentAmount = caseData.getRespondent1RepaymentPlan().getPaymentAmount();
         BigDecimal paymentAmountPounds = MonetaryConversions.penniesToPounds(paymentAmount);
         LocalDate firstRepaymentDate = caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate();
@@ -92,12 +98,12 @@ public class SettlementAgreementFormMapper {
         };
     }
 
-    private static long getNumberOfInstallmentsAfterFirst(BigDecimal totalAmount, BigDecimal paymentAmount) {
+    private long getNumberOfInstallmentsAfterFirst(BigDecimal totalAmount, BigDecimal paymentAmount) {
         return totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING).longValue() - 1;
     }
 
-    private String getClaimAmount(CaseData caseData) {
-        BigDecimal claimAmount = caseData.getTotalClaimAmount();
+    private String getSettlementAmount(CaseData caseData) {
+        BigDecimal claimAmount = judgmentAndSettlementAmountsCalculator.getSettlementAmount(caseData);
         if (caseData.isPartAdmitClaimSpec()) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }

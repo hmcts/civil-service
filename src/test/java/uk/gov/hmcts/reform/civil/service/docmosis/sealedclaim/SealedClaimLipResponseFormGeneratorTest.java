@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -50,7 +51,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiPCarm;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsFormMapper;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseFormMapper;
 import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
@@ -58,14 +61,15 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAndSettlementAmountsCalculator;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,7 +88,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ContextConfiguration(classes = {
     SealedClaimLipResponseFormGenerator.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    SealedClaimLipResponseFormMapper.class,
+    ResponseRepaymentDetailsFormMapper.class
 })
 class SealedClaimLipResponseFormGeneratorTest {
 
@@ -95,6 +101,9 @@ class SealedClaimLipResponseFormGeneratorTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
+    @MockBean
+    private JudgmentAndSettlementAmountsCalculator judgmentAndSettlementAmountsCalculator;
+
     @Autowired
     private SealedClaimLipResponseFormGenerator generator;
 
@@ -102,6 +111,11 @@ class SealedClaimLipResponseFormGeneratorTest {
     private FeatureToggleService featureToggleService;
     @Captor
     ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
+
+    @BeforeEach
+    void setUp() {
+        when(judgmentAndSettlementAmountsCalculator.getSettlementAmount(any())).thenReturn(BigDecimal.valueOf(1000));
+    }
 
     @Test
     void shouldGenerateDocumentSuccessfully() {
@@ -202,10 +216,10 @@ class SealedClaimLipResponseFormGeneratorTest {
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .firstRepaymentDate(LocalDate.now().plusDays(5))
-                                          .paymentAmount(BigDecimal.valueOf(200))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                          .build())
+                .firstRepaymentDate(LocalDate.now().plusDays(5))
+                .paymentAmount(BigDecimal.valueOf(200))
+                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = financialDetails(builder).build();
@@ -224,8 +238,8 @@ class SealedClaimLipResponseFormGeneratorTest {
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
-                                               .build())
+                .whenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
+                .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = financialDetails(builder).build();
@@ -296,10 +310,10 @@ class SealedClaimLipResponseFormGeneratorTest {
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .firstRepaymentDate(LocalDate.now().plusDays(5))
-                                          .paymentAmount(BigDecimal.valueOf(200))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                          .build())
+                .firstRepaymentDate(LocalDate.now().plusDays(5))
+                .paymentAmount(BigDecimal.valueOf(200))
+                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = timeline(financialDetails(builder))
@@ -324,8 +338,8 @@ class SealedClaimLipResponseFormGeneratorTest {
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
-                                               .build())
+                .whenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
+                .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = timeline(financialDetails(builder))
@@ -344,10 +358,10 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.YES)
             .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(BigDecimal.valueOf(10_000))
-                                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
-                                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
-                                .build())
+                .howMuchWasPaid(BigDecimal.valueOf(10_000))
+                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
+                .build())
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
 
         CaseData caseData = timeline(builder)
@@ -366,10 +380,10 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
             .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(BigDecimal.valueOf(10_000))
-                                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
-                                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
-                                .build())
+                .howMuchWasPaid(BigDecimal.valueOf(10_000))
+                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
+                .build())
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
 
         CaseData caseData = timeline(builder)
@@ -489,114 +503,114 @@ class SealedClaimLipResponseFormGeneratorTest {
         return builder.specResponseTimelineOfEvents(List.of(
             TimelineOfEvents.builder()
                 .value(TimelineOfEventDetails.builder()
-                           .timelineDate(LocalDate.now().minusMonths(7))
-                           .timelineDescription("Event 1")
-                           .build())
+                    .timelineDate(LocalDate.now().minusMonths(7))
+                    .timelineDescription("Event 1")
+                    .build())
                 .build(),
             TimelineOfEvents.builder()
                 .value(TimelineOfEventDetails.builder()
-                           .timelineDate(LocalDate.now().minusMonths(5))
-                           .timelineDescription("Event 2")
-                           .build())
+                    .timelineDate(LocalDate.now().minusMonths(5))
+                    .timelineDescription("Event 2")
+                    .build())
                 .build()
         ));
     }
 
     private static CaseData.CaseDataBuilder<?, ?> financialDetails(CaseData.CaseDataBuilder<?, ?> builder) {
         return builder.respondent1DQ(Respondent1DQ.builder()
-                                         .respondent1DQHomeDetails(
-                                             HomeDetails.builder().type(HomeTypeOptionLRspec.OWNED_HOME).build())
-                                         .respondent1BankAccountList(ElementUtils.wrapElements(
-                                             account(AccountType.CURRENT, YesOrNo.YES, BigDecimal.valueOf(2000)),
-                                             account(AccountType.ISA, YesOrNo.NO, BigDecimal.valueOf(500))
-                                         ))
-                                         .respondent1DQRecurringIncome(ElementUtils.wrapElements(
-                                             new RecurringIncomeLRspec(
-                                                 IncomeTypeLRspec.INCOME_SUPPORT,
-                                                 null,
-                                                 BigDecimal.valueOf(100),
-                                                 PaymentFrequencyLRspec.ONCE_ONE_MONTH
-                                             ),
-                                             new RecurringIncomeLRspec(
-                                                 IncomeTypeLRspec.OTHER,
-                                                 "Details of other income",
-                                                 BigDecimal.valueOf(400),
-                                                 PaymentFrequencyLRspec.ONCE_ONE_MONTH
-                                             )
-                                         ))
-                                         .respondent1DQRecurringExpenses(ElementUtils.wrapElements(
-                                             new RecurringExpenseLRspec(
-                                                 ExpenseTypeLRspec.COUNCIL_TAX,
-                                                 null,
-                                                 BigDecimal.valueOf(300),
-                                                 PaymentFrequencyLRspec.ONCE_ONE_MONTH
-                                             ),
-                                             new RecurringExpenseLRspec(
-                                                 ExpenseTypeLRspec.OTHER,
-                                                 "Details of other expenses",
-                                                 BigDecimal.valueOf(400),
-                                                 PaymentFrequencyLRspec.ONCE_ONE_MONTH
-                                             )
-                                         ))
-                                         .build())
+                .respondent1DQHomeDetails(
+                    HomeDetails.builder().type(HomeTypeOptionLRspec.OWNED_HOME).build())
+                .respondent1BankAccountList(ElementUtils.wrapElements(
+                    account(AccountType.CURRENT, YesOrNo.YES, BigDecimal.valueOf(2000)),
+                    account(AccountType.ISA, YesOrNo.NO, BigDecimal.valueOf(500))
+                ))
+                .respondent1DQRecurringIncome(ElementUtils.wrapElements(
+                    new RecurringIncomeLRspec(
+                        IncomeTypeLRspec.INCOME_SUPPORT,
+                        null,
+                        BigDecimal.valueOf(100),
+                        PaymentFrequencyLRspec.ONCE_ONE_MONTH
+                    ),
+                    new RecurringIncomeLRspec(
+                        IncomeTypeLRspec.OTHER,
+                        "Details of other income",
+                        BigDecimal.valueOf(400),
+                        PaymentFrequencyLRspec.ONCE_ONE_MONTH
+                    )
+                ))
+                .respondent1DQRecurringExpenses(ElementUtils.wrapElements(
+                    new RecurringExpenseLRspec(
+                        ExpenseTypeLRspec.COUNCIL_TAX,
+                        null,
+                        BigDecimal.valueOf(300),
+                        PaymentFrequencyLRspec.ONCE_ONE_MONTH
+                    ),
+                    new RecurringExpenseLRspec(
+                        ExpenseTypeLRspec.OTHER,
+                        "Details of other expenses",
+                        BigDecimal.valueOf(400),
+                        PaymentFrequencyLRspec.ONCE_ONE_MONTH
+                    )
+                ))
+                .build())
             .specDefendant1Debts(Respondent1DebtLRspec.builder()
-                                     .hasLoanCardDebt(YesOrNo.YES)
-                                     .loanCardDebtDetails(ElementUtils.wrapElements(
-                                         LoanCardDebtLRspec.builder()
-                                             .loanCardDebtDetail("Card 1")
-                                             .totalOwed(BigDecimal.valueOf(500))
-                                             .monthlyPayment(BigDecimal.valueOf(50))
-                                             .build(),
-                                         LoanCardDebtLRspec.builder()
-                                             .loanCardDebtDetail("Card 2")
-                                             .totalOwed(BigDecimal.valueOf(1500))
-                                             .monthlyPayment(BigDecimal.valueOf(200))
-                                             .build()
-                                     ))
-                                     .debtDetails(ElementUtils.wrapElements(
-                                         DebtLRspec.builder()
-                                             .debtType(DebtTypeLRspec.GAS)
-                                             .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                             .paymentAmount(BigDecimal.valueOf(30))
-                                             .build(),
-                                         DebtLRspec.builder()
-                                             .debtType(DebtTypeLRspec.MAINTENANCE_PAYMENTS)
-                                             .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                             .paymentAmount(BigDecimal.valueOf(60))
-                                             .build()
-                                     ))
-                                     .build())
+                .hasLoanCardDebt(YesOrNo.YES)
+                .loanCardDebtDetails(ElementUtils.wrapElements(
+                    LoanCardDebtLRspec.builder()
+                        .loanCardDebtDetail("Card 1")
+                        .totalOwed(BigDecimal.valueOf(500))
+                        .monthlyPayment(BigDecimal.valueOf(50))
+                        .build(),
+                    LoanCardDebtLRspec.builder()
+                        .loanCardDebtDetail("Card 2")
+                        .totalOwed(BigDecimal.valueOf(1500))
+                        .monthlyPayment(BigDecimal.valueOf(200))
+                        .build()
+                ))
+                .debtDetails(ElementUtils.wrapElements(
+                    DebtLRspec.builder()
+                        .debtType(DebtTypeLRspec.GAS)
+                        .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                        .paymentAmount(BigDecimal.valueOf(30))
+                        .build(),
+                    DebtLRspec.builder()
+                        .debtType(DebtTypeLRspec.MAINTENANCE_PAYMENTS)
+                        .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                        .paymentAmount(BigDecimal.valueOf(60))
+                        .build()
+                ))
+                .build())
             .respondent1PartnerAndDependent(PartnerAndDependentsLRspec.builder()
-                                                .haveAnyChildrenRequired(YesOrNo.YES)
-                                                .howManyChildrenByAgeGroup(ChildrenByAgeGroupLRspec.builder()
-                                                                               .numberOfUnderEleven("1")
-                                                                               .numberOfElevenToFifteen("2")
-                                                                               .numberOfSixteenToNineteen("0")
-                                                                               .build())
-                                                .supportedAnyoneFinancialRequired(YesOrNo.YES)
-                                                .supportPeopleNumber("3")
-                                                .supportPeopleDetails("Supported people details")
-                                                .build())
+                .haveAnyChildrenRequired(YesOrNo.YES)
+                .howManyChildrenByAgeGroup(ChildrenByAgeGroupLRspec.builder()
+                    .numberOfUnderEleven("1")
+                    .numberOfElevenToFifteen("2")
+                    .numberOfSixteenToNineteen("0")
+                    .build())
+                .supportedAnyoneFinancialRequired(YesOrNo.YES)
+                .supportPeopleNumber("3")
+                .supportPeopleDetails("Supported people details")
+                .build())
 
             .specDefendant1SelfEmploymentDetails(Respondent1SelfEmploymentLRspec.builder()
-                                                     .jobTitle("job title")
-                                                     .annualTurnover(BigDecimal.valueOf(30000))
-                                                     .isBehindOnTaxPayment(YesOrNo.YES)
-                                                     .amountOwed(BigDecimal.valueOf(10000))
-                                                     .reason("reason to owe tax")
-                                                     .build())
+                .jobTitle("job title")
+                .annualTurnover(BigDecimal.valueOf(30000))
+                .isBehindOnTaxPayment(YesOrNo.YES)
+                .amountOwed(BigDecimal.valueOf(10000))
+                .reason("reason to owe tax")
+                .build())
             .responseClaimAdmitPartEmployer(Respondent1EmployerDetailsLRspec.builder()
-                                                .employerDetails(ElementUtils.wrapElements(
-                                                    EmployerDetailsLRspec.builder()
-                                                        .employerName("Employer 1")
-                                                        .jobTitle("Job title 1")
-                                                        .build(),
-                                                    EmployerDetailsLRspec.builder()
-                                                        .employerName("Employer 2")
-                                                        .jobTitle("Job title 2")
-                                                        .build()
-                                                ))
-                                                .build());
+                .employerDetails(ElementUtils.wrapElements(
+                    EmployerDetailsLRspec.builder()
+                        .employerName("Employer 1")
+                        .jobTitle("Job title 1")
+                        .build(),
+                    EmployerDetailsLRspec.builder()
+                        .employerName("Employer 2")
+                        .jobTitle("Job title 2")
+                        .build()
+                ))
+                .build());
     }
 
     private CaseData.CaseDataBuilder<?, ?> commonData() {
@@ -604,9 +618,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .legacyCaseReference("reference")
             .ccdCaseReference(1234567890123456L)
             .solicitorReferences(SolicitorReferences.builder()
-                                     .applicantSolicitor1Reference("claimant reference")
-                                     .respondentSolicitor1Reference("defendant reference")
-                                     .build())
+                .applicantSolicitor1Reference("claimant reference")
+                .respondentSolicitor1Reference("defendant reference")
+                .build())
             .applicant1(company("A"))
             .totalClaimAmount(BigDecimal.valueOf(10_000));
     }
@@ -619,14 +633,14 @@ class SealedClaimLipResponseFormGeneratorTest {
             .partyEmail("email " + suffix)
             .partyName("company " + suffix)
             .primaryAddress(Address.builder()
-                                .postCode("postCode " + suffix)
-                                .addressLine1("line 1 " + suffix)
-                                .addressLine2("line 2 " + suffix)
-                                .addressLine3("line 3 " + suffix)
-                                .postTown("town " + suffix)
-                                .county("county " + suffix)
-                                .country("country " + suffix)
-                                .build())
+                .postCode("postCode " + suffix)
+                .addressLine1("line 1 " + suffix)
+                .addressLine2("line 2 " + suffix)
+                .addressLine3("line 3 " + suffix)
+                .postTown("town " + suffix)
+                .county("county " + suffix)
+                .country("country " + suffix)
+                .build())
             .build();
     }
 
@@ -640,14 +654,14 @@ class SealedClaimLipResponseFormGeneratorTest {
             .partyName("Name Surname" + suffix)
             .partyEmail("email " + suffix)
             .primaryAddress(Address.builder()
-                                .postCode("postCode " + suffix)
-                                .addressLine1("line 1 " + suffix)
-                                .addressLine2("line 2 " + suffix)
-                                .addressLine3("line 3 " + suffix)
-                                .postTown("town " + suffix)
-                                .county("county " + suffix)
-                                .country("country " + suffix)
-                                .build())
+                .postCode("postCode " + suffix)
+                .addressLine1("line 1 " + suffix)
+                .addressLine2("line 2 " + suffix)
+                .addressLine3("line 3 " + suffix)
+                .postTown("town " + suffix)
+                .county("county " + suffix)
+                .country("country " + suffix)
+                .build())
             .build();
     }
 
@@ -659,12 +673,12 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.YES)
-                                                                      .isMediationEmailCorrect(YesOrNo.YES)
-                                                                      .isMediationPhoneCorrect(YesOrNo.YES)
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
-                                                                      .build()).build())
+                .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                    .isMediationContactNameCorrect(YesOrNo.YES)
+                    .isMediationEmailCorrect(YesOrNo.YES)
+                    .isMediationPhoneCorrect(YesOrNo.YES)
+                    .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
+                    .build()).build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -687,15 +701,15 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationContactPerson("Jake")
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
-                                                                      .build()).build())
+                .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                    .isMediationContactNameCorrect(YesOrNo.NO)
+                    .alternativeMediationContactPerson("Jake")
+                    .isMediationEmailCorrect(YesOrNo.NO)
+                    .alternativeMediationEmail("test@gmail.com")
+                    .isMediationPhoneCorrect(YesOrNo.NO)
+                    .alternativeMediationTelephone("23454656")
+                    .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
+                    .build()).build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -716,23 +730,23 @@ class SealedClaimLipResponseFormGeneratorTest {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
         def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                 .toDate(LocalDate.now().plusDays(5))
-                                                 .fromDate(LocalDate.now()).build()));
+            .unavailableDateType(UnavailableDateType.DATE_RANGE)
+            .toDate(LocalDate.now().plusDays(5))
+            .fromDate(LocalDate.now()).build()));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationContactPerson("Jake")
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
-                                                                      .unavailableDatesForMediation(def1UnavailabilityDates)
-                                                                      .build()).build())
+                .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                    .isMediationContactNameCorrect(YesOrNo.NO)
+                    .alternativeMediationContactPerson("Jake")
+                    .isMediationEmailCorrect(YesOrNo.NO)
+                    .alternativeMediationEmail("test@gmail.com")
+                    .isMediationPhoneCorrect(YesOrNo.NO)
+                    .alternativeMediationTelephone("23454656")
+                    .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                    .unavailableDatesForMediation(def1UnavailabilityDates)
+                    .build()).build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -755,23 +769,23 @@ class SealedClaimLipResponseFormGeneratorTest {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
         def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
+            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+            .date(LocalDate.now())
+            .fromDate(LocalDate.now()).build()));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationContactPerson("Jake")
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
-                                                                      .unavailableDatesForMediation(def1UnavailabilityDates)
-                                                                      .build()).build())
+                .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                    .isMediationContactNameCorrect(YesOrNo.NO)
+                    .alternativeMediationContactPerson("Jake")
+                    .isMediationEmailCorrect(YesOrNo.NO)
+                    .alternativeMediationEmail("test@gmail.com")
+                    .isMediationPhoneCorrect(YesOrNo.NO)
+                    .alternativeMediationTelephone("23454656")
+                    .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                    .unavailableDatesForMediation(def1UnavailabilityDates)
+                    .build()).build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -796,7 +810,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(CaseDataLiP.builder()
-                             .build())
+                .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -840,7 +854,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(CaseDataLiP.builder().respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
-                             .build())
+                .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -861,26 +875,26 @@ class SealedClaimLipResponseFormGeneratorTest {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
         def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
+            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+            .date(LocalDate.now())
+            .fromDate(LocalDate.now()).build()));
         def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                .toDate(LocalDate.now().plusDays(5))
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
+            .unavailableDateType(UnavailableDateType.DATE_RANGE)
+            .toDate(LocalDate.now().plusDays(5))
+            .date(LocalDate.now())
+            .fromDate(LocalDate.now()).build()));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
-                                                                      .unavailableDatesForMediation(def1UnavailabilityDates)
-                                                                      .build()).build())
+                .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
+                    .isMediationEmailCorrect(YesOrNo.NO)
+                    .alternativeMediationEmail("test@gmail.com")
+                    .isMediationPhoneCorrect(YesOrNo.NO)
+                    .alternativeMediationTelephone("23454656")
+                    .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                    .unavailableDatesForMediation(def1UnavailabilityDates)
+                    .build()).build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()

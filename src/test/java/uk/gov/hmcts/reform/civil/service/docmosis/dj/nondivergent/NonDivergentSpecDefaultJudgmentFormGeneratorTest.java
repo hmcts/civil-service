@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAmountsCalculator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAndSettlementAmountsCalculator;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -60,7 +60,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
 @ContextConfiguration(classes = {
     NonDivergentSpecDefaultJudgmentFormGenerator.class,
     NonDivergentSpecDefaultJudgementFormBuilder.class,
-    JudgmentAmountsCalculator.class,
+    JudgmentAndSettlementAmountsCalculator.class,
     DefaultJudgmentFormBuilder.class,
     JacksonAutoConfiguration.class
 })

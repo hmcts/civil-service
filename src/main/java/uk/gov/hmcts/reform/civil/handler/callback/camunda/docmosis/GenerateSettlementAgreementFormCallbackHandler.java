@@ -11,12 +11,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlementagreement.SettlementAgreementFormGenerator;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -37,18 +39,21 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
 
-        CaseDocument claimantResponseForm = settlementAgreementFormGenerator.generate(
+        Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
+        boolean isAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
+        if (isAgreed) {
+            CaseDocument claimantResponseForm = settlementAgreementFormGenerator.generate(
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-        updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            );
+            updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 claimantResponseForm,
                 caseData
-        ));
-
+            ));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseDataBuilder.build().toMap(objectMapper))
-                .build();
+            .data(updatedCaseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     @Override

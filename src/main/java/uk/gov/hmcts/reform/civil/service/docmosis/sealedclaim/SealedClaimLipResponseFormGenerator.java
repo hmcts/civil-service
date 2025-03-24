@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseFormMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -29,15 +30,15 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final FeatureToggleService featureToggleService;
+    private final SealedClaimLipResponseFormMapper sealedClaimLipResponseFormMapper;
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
         log.info("Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             log.info("If Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-            SealedClaimLipResponseForm.toTemplate(caseData);
             SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
-                SealedClaimLipResponseForm.toTemplate(caseData).toBuilder()
+                sealedClaimLipResponseFormMapper.toTemplate(caseData).toBuilder()
                     .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
                     .defendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
                     .defendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
@@ -48,7 +49,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
         } else {
             log.info("Else Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-            return  SealedClaimLipResponseForm.toTemplate(caseData);
+            return  sealedClaimLipResponseFormMapper.toTemplate(caseData);
         }
     }
 

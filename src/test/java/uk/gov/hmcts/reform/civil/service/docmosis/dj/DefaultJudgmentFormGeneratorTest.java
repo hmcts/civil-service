@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
 @ContextConfiguration(classes = {
     DefaultJudgmentFormGenerator.class,
     NonImmediatePaymentTypeDefaultJudgmentFormBuilder.class,
-    JudgmentAmountsCalculator.class,
+    JudgmentAndSettlementAmountsCalculator.class,
     DefaultJudgmentFormBuilder.class,
     JacksonAutoConfiguration.class
 })

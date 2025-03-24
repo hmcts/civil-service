@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
-import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsFormMapper;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -42,8 +42,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
 
 @Slf4j
@@ -57,6 +57,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final FeatureToggleService featureToggleService;
     private final ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
     private final StatementOfTruthPopulator statementOfTruthPopulator;
+    private final ResponseRepaymentDetailsFormMapper responseRepaymentDetailsFormMapper;
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
@@ -125,7 +126,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             builder.timelineUploaded(true)
                 .specResponseTimelineDocumentFiles(caseData.getSpecResponseTimelineDocumentFiles()
-                                                       .getDocumentFileName());
+                    .getDocumentFileName());
         } else {
             builder.timelineUploaded(false)
                 .timeline(getTimeLine(caseData));
@@ -147,25 +148,25 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .filter(Objects::nonNull)
             .findFirst()
             .ifPresent(response -> builder.poundsPaid(MonetaryConversions
-                                                          .penniesToPounds(response.getHowMuchWasPaid()).toString())
+                    .penniesToPounds(response.getHowMuchWasPaid()).toString())
                 .paymentDate(response.getWhenWasThisAmountPaid())
                 .paymentMethod(getPaymentMethod(response)));
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
-        builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
+        builder.commonDetails(responseRepaymentDetailsFormMapper.toResponsePaymentDetails(caseData));
     }
 
     private void addCarmMediationDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP ->
-                populateCarmMediationFieldsForRespondent1(builder, caseData);
+            case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP -> populateCarmMediationFieldsForRespondent1(builder, caseData);
             case ONE_V_TWO_TWO_LEGAL_REP -> populateCarmMediationFieldsForRelevantRespondent(builder, caseData);
             default -> throw new CallbackException("Cannot populate CARM fields");
         }
     }
 
-    private void populateCarmMediationFieldsForRespondent1(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void populateCarmMediationFieldsForRespondent1(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder,
+                                                           CaseData caseData) {
         getCarmMediationFields(
             builder,
             getRespondent1MediationFirstName(caseData),
@@ -177,7 +178,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         );
     }
 
-    private void populateCarmMediationFieldsForRelevantRespondent(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+    private void populateCarmMediationFieldsForRelevantRespondent(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder,
+                                                                  CaseData caseData) {
         if (shouldUseRespondent2MediationDetails(caseData)) {
             getCarmMediationFields(
                 builder,

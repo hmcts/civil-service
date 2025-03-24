@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -13,9 +14,11 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
@@ -33,7 +36,7 @@ public class InterestCalculator {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
 
-    private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
+    public BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
@@ -69,7 +72,19 @@ public class InterestCalculator {
             && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
             return getSubmittedDate(caseData);
         }
+        if (Objects.nonNull(caseData.getInterestClaimUntil())
+            && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)) {
+            if ((caseData.getRespondent1RespondToSettlementAgreementDeadline() != null && LocalDateTime.now()
+                .isBefore(caseData.getRespondent1RespondToSettlementAgreementDeadline())) || hasRespondentAgreedToSettlementAgreement(caseData)) {
+                return caseData.getRespondent1ResponseDate().toLocalDate();
+            }
+        }
         return LocalDate.now();
+    }
+
+    private Boolean hasRespondentAgreedToSettlementAgreement(CaseData caseData) {
+        Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
+        return optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
     }
 
     protected BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate

@@ -10,6 +10,7 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsForm;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,4 +32,5 @@ public class SettlementAgreementForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy 'at' HH:mm a")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private final LocalDateTime settlementSubmittedDate;
+    private final ResponseRepaymentDetailsForm repaymentDetails;
 }

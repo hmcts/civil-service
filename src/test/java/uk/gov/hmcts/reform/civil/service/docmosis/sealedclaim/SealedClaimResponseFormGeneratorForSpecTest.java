@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsFormMapper;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -85,6 +86,8 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     private LocationReferenceDataService locationRefDataService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private ResponseRepaymentDetailsFormMapper responseRepaymentDetailsFormMapper;
     @Autowired
     private ReferenceNumberAndCourtDetailsPopulator referenceNumberPopulator;
     @Autowired

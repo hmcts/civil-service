@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 public abstract class DefaultJudgmentFormBuilderBase {
 
     private final InterestCalculator interestCalculator;
-    private final JudgmentAmountsCalculator judgmentAmountsCalculator;
+    private final JudgmentAndSettlementAmountsCalculator judgmentAndSettlementAmountsCalculator;
     private final OrganisationService organisationService;
 
     protected Party getApplicantOrgDetails(OrganisationPolicy organisationPolicy) {
@@ -45,12 +45,12 @@ public abstract class DefaultJudgmentFormBuilderBase {
     }
 
     protected BigDecimal getClaimFee(CaseData caseData) {
-        return judgmentAmountsCalculator.getClaimFee(caseData);
+        return judgmentAndSettlementAmountsCalculator.getClaimFee(caseData);
     }
 
     @NotNull
     protected BigDecimal getDebtAmount(CaseData caseData) {
-        BigDecimal debtAmount = judgmentAmountsCalculator.getDebtAmount(caseData).setScale(2);
+        BigDecimal debtAmount = judgmentAndSettlementAmountsCalculator.getDebtAmount(caseData).setScale(2);
         return debtAmount;
     }
 
