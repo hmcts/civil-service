@@ -66,10 +66,10 @@ public class RoboticsDataMapper {
     public RoboticsCaseData toRoboticsCaseData(CaseData caseData, String authToken) {
         requireNonNull(caseData);
         var roboticsBuilder = RoboticsCaseData.builder()
-                .header(buildCaseHeader(caseData, authToken))
-                .litigiousParties(buildLitigiousParties(caseData))
-                .claimDetails(buildClaimDetails(caseData))
-                .events(eventHistoryMapper.buildEvents(caseData, authToken));
+            .header(buildCaseHeader(caseData, authToken))
+            .litigiousParties(buildLitigiousParties(caseData))
+            .claimDetails(buildClaimDetails(caseData))
+            .events(eventHistoryMapper.buildEvents(caseData, authToken));
 
         if (!(caseData.isLipvLipOneVOne())) {
             roboticsBuilder.solicitors(buildSolicitors(caseData));
@@ -91,14 +91,14 @@ public class RoboticsDataMapper {
         }
 
         return claimDetailsBuilder
-                .courtFee(ofNullable(caseData.getClaimFee())
+            .courtFee(ofNullable(caseData.getClaimFee())
                         .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
                         .orElse(null))
-                .caseIssuedDate(ofNullable(caseData.getIssueDate())
+            .caseIssuedDate(ofNullable(caseData.getIssueDate())
                         .map(issueDate -> issueDate.format(ISO_DATE))
                         .orElse(null))
-                .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
-                .build();
+            .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
+            .build();
     }
 
     private CaseHeader buildCaseHeader(CaseData caseData, String authToken) {
@@ -264,24 +264,24 @@ public class RoboticsDataMapper {
         String respondent1SolicitorId = caseData.getRespondent1Represented() == YES ? RESPONDENT_SOLICITOR_ID : null;
 
         var respondentParties = new ArrayList<>(List.of(
-                buildLitigiousParty(
-                        caseData.getApplicant1(),
-                        caseData.getApplicant1LitigationFriend(),
-                        caseData.isLipvLipOneVOne() ? null : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
-                        "Claimant",
-                        APPLICANT_ID,
-                        APPLICANT_SOLICITOR_ID,
-                        caseData.getClaimDetailsNotificationDate()
-                ),
-                buildLitigiousParty(
-                        caseData.getRespondent1(),
-                        caseData.getRespondent1LitigationFriend(),
-                        OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData),
-                        "Defendant",
-                        RESPONDENT_ID,
-                        respondent1SolicitorId,
-                        caseData.getClaimDetailsNotificationDate()
-                )
+            buildLitigiousParty(
+                caseData.getApplicant1(),
+                caseData.getApplicant1LitigationFriend(),
+                caseData.isLipvLipOneVOne() ? null : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
+                "Claimant",
+                APPLICANT_ID,
+                APPLICANT_SOLICITOR_ID,
+                caseData.getClaimDetailsNotificationDate()
+            ),
+            buildLitigiousParty(
+                caseData.getRespondent1(),
+                caseData.getRespondent1LitigationFriend(),
+                OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData),
+                "Defendant",
+                RESPONDENT_ID,
+                respondent1SolicitorId,
+                caseData.getClaimDetailsNotificationDate()
+            )
         ));
 
         if (caseData.getApplicant2() != null) {
