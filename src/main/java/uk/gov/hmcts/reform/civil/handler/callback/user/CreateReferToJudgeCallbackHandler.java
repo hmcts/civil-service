@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
@@ -49,7 +51,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::aboutToStartCheck)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitReferToJudge)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -60,9 +62,18 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private CallbackResponse aboutToStartCheck(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        log.info("refer to judge about to start callback for caseId {}", caseData.getCcdCaseReference());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse submitReferToJudge(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean leadDefendantIs1 = locationHelper.leadDefendantIs1(caseData);
 
         if (CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             locationHelper.getClaimantRequestedCourt(caseData)
