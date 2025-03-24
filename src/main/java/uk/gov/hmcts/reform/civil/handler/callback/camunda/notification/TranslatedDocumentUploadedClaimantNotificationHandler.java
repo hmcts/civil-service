@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
@@ -32,7 +31,6 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED);
     private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-claimant-notification-%s";
     public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToClaimant";
-    private final FeatureToggleService featureToggleService;
     final  OrganisationService organisationService;
 
     @Override
@@ -54,8 +52,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
-        if (caseData.isLipvLipOneVOne()) {
+        if (caseData.isApplicantNotRepresented()) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
@@ -84,7 +81,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String addTemplate(CaseData caseData) {
-        if (caseData.isLipvLipOneVOne()) {
+        if (caseData.isApplicantNotRepresented()) {
             if (caseData.isClaimantBilingual()) {
                 return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
             }
@@ -94,7 +91,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     }
 
     private String getEmail(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne())
+        return (caseData.isApplicantNotRepresented())
             ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
