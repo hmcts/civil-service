@@ -8,8 +8,8 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
@@ -29,16 +29,19 @@ import java.util.List;
         typeClass = ListArrayType.class
         )
 })
-public class NotificationExceptionRecordEntity implements Serializable {
+public class ExceptionRecordEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 8313686152850559308L;
 
-    @EmbeddedId
-    NotificationExceptionId notificationExceptionId;
+    @Id
+    String idempotencyKey;
 
-    @Schema(name = "party_type")
-    private String partyType;
+    @Schema(name = "reference")
+    private String reference;
+
+    @Schema(name = "task_id")
+    private String taskId;
 
     @Schema(name = "successful_actions")
     @Type(type = "list-array")

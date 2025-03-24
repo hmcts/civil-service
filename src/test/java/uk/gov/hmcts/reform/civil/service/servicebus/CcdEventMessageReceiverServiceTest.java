@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.message.CcdEventMessageHandler;
 import uk.gov.hmcts.reform.civil.model.Result;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+import uk.gov.hmcts.reform.dashboard.repositories.ExceptionRecordRepository;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -34,6 +35,12 @@ class CcdEventMessageReceiverServiceTest {
     @Mock
     private CaseTaskTrackingService caseTaskTrackingService;
 
+    @Mock
+    private IdempotencyKeyGenerator idempotencyKeyGenerator;
+
+    @Mock
+    private ExceptionRecordRepository exceptionRecordRepository;
+
     private CcdEventMessageReceiverService ccdEventMessageReceiverService;
 
     @Spy
@@ -44,7 +51,9 @@ class CcdEventMessageReceiverServiceTest {
         ccdEventMessageReceiverService = new CcdEventMessageReceiverService(
             objectMapper,
             Arrays.asList(messageHandler1, messageHandler2),
-            caseTaskTrackingService
+            caseTaskTrackingService,
+            idempotencyKeyGenerator,
+            exceptionRecordRepository
         );
     }
 
