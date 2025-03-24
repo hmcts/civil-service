@@ -66,7 +66,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
-            .orderedAmount(orderAmount.toString())
+            .orderedAmount(orderAmount.add(totalInterest).toString())
             .costs(costs.toString())
             .claimFeeAmount(claimFeeAmount.toString())
             .amountAlreadyPaid(amountAlreadyPaid.toString())
