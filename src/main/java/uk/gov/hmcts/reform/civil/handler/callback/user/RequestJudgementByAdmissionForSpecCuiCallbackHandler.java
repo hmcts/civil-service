@@ -100,7 +100,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         var totalInterest = interestCalculator.calculateInterest(caseData);
-        log.info("Claim interest: {}", totalInterest);
+        log.info("Claim interest on handler: {}", totalInterest);
         caseData.setTotalInterest(totalInterest);
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));

@@ -33,6 +33,7 @@ public class JudgementService {
         var totalInterest = interestCalculator.calculateInterest(caseData);
         log.info("Claim interest: {}", totalInterest);
         caseData.setTotalInterest(totalInterest);
+        log.info("Interest from caseData: {}", caseData.getTotalInterest());
         return CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
             .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))
