@@ -434,12 +434,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
-
-        if (featureToggleService.isSdoR2Enabled()) {
-            updatedData.sdoR2FastTrackWitnessOfFact(getSdoR2WitnessOfFact()).build();
-        } else {
-            updatedData.fastTrackWitnessOfFact(getFastTrackWitnessOfFact()).build();
-        }
+        updatedData.sdoR2FastTrackWitnessOfFact(getSdoR2WitnessOfFact()).build();
 
         FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
             .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
@@ -533,48 +528,48 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         String partiesLiaseString = "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no ";
         updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
-        if (featureToggleService.isSdoR2Enabled()) {
-            List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
-            SdoR2FastTrackCreditHireDetails tempSdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
-                .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                            + "a) the need to hire a replacement vehicle; and\n"
-                            + "b) impecuniosity")
-                .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
-                .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
-                            + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                            + "save with permission of the Trial Judge.")
-                .input4(partiesLiaseString + laterThanFourPmString)
-                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
-                .build();
 
-            SdoR2FastTrackCreditHire tempSdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
-                .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                            + "disclosure as ordered earlier in this Order must include:\n"
-                            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                            + "commencement of hire until the earlier of:\n "
-                            + "     i) 3 months after cessation of hire\n"
-                            + "     ii) the repair or replacement of the claimant's vehicle\n"
-                            + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-                            + "prior to the commencement of hire until the earlier of:\n"
-                            + "     i) 3 months after cessation of hire\n"
-                            + "     ii) the repair or replacement of the claimant's vehicle\n"
-                            + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-                .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                            + "paragraph above, each party may rely upon written evidence by way of witness statement of "
-                            + "one witness to provide evidence of basic hire rates available within the claimant's "
-                            + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                            + "is available.")
-                .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-                .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-                .input7(claimantEvidenceString)
-                .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
-                .input8(witnessStatementString)
-                .detailsShowToggle(addOrRemoveToggleList)
-                .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
-                .build();
+        List<AddOrRemoveToggle> addOrRemoveToggleList = List.of(AddOrRemoveToggle.ADD);
+        SdoR2FastTrackCreditHireDetails tempSdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
+            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                        + "a) the need to hire a replacement vehicle; and\n"
+                        + "b) impecuniosity")
+            .date1(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(4)))
+            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+                        + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+                        + "save with permission of the Trial Judge.")
+            .input4(partiesLiaseString + laterThanFourPmString)
+            .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(6)))
+            .build();
 
-            updatedData.sdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire).build();
-        }
+        SdoR2FastTrackCreditHire tempSdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
+            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+                        + "disclosure as ordered earlier in this Order must include:\n"
+                        + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                        + "commencement of hire until the earlier of:\n "
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+                        + "prior to the commencement of hire until the earlier of:\n"
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
+            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                        + "paragraph above, each party may rely upon written evidence by way of witness statement of "
+                        + "one witness to provide evidence of basic hire rates available within the claimant's "
+                        + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+                        + "is available.")
+            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
+            .date3(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
+            .input7(claimantEvidenceString)
+            .date4(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(10)))
+            .input8(witnessStatementString)
+            .detailsShowToggle(addOrRemoveToggleList)
+            .sdoR2FastTrackCreditHireDetails(tempSdoR2FastTrackCreditHireDetails)
+            .build();
+
+        updatedData.sdoR2FastTrackCreditHire(tempSdoR2FastTrackCreditHire).build();
+
         FastTrackCreditHire tempFastTrackCreditHire = FastTrackCreditHire.builder()
             .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
                         + "disclosure as ordered earlier in this Order must include:\n"
@@ -667,60 +662,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            SdoR2SmallClaimsWitnessStatements tempSdoR2SmallClaimsWitnessStatements = SdoR2SmallClaimsWitnessStatements
-                .builder()
-                .sdoStatementOfWitness(
-                    "Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
-                        + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
-                        + " the hearing.")
-                .isRestrictWitness(NO)
-                .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
-                                                     .noOfWitnessClaimant(2)
-                                                     .noOfWitnessDefendant(2)
-                                                     .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
-                                                     .build())
-                .isRestrictPages(NO)
-                .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                   .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
-                                                   .noOfPages(12)
-                                                   .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
-                                                   .build())
-                .text(WITNESS_DESCRIPTION_TEXT)
-                .build();
-            updatedData.sdoR2SmallClaimsWitnessStatementOther(tempSdoR2SmallClaimsWitnessStatements).build();
-
-        } else {
-            SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-                .smallClaimsNumberOfWitnessesToggle(checkList)
-                .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
-                            + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
-                            + " the hearing.")
-                .input2("2")
-                .input3("2")
-                .input4("For this limitation, a party is counted as a witness.")
-                .text("A witness statement must: \na) Start with the name of the case and the claim number;"
-                          + "\nb) State the full name and address of the witness; "
-                          + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
-                          + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
-                          + "statement are true. I understand that proceedings for contempt of court may be "
-                          + "brought against anyone who makes, or causes to be made, a false statement in a "
-                          + "document verified by a statement of truth without an honest belief in its truth'."
-                          + "\ne) be signed by the witness and dated."
-                          + "\nf) If a witness is unable to read the statement there must be a certificate that "
-                          + "it has been read or interpreted to the witness by a suitably qualified person and "
-                          + "at the final hearing there must be an independent interpreter who will not be "
-                          + "provided by the Court."
-                          + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
-                          + "statement of any witness whose statement has not been uploaded to the Digital Portal in "
-                          + "accordance with the paragraphs above."
-                          + "\n\nA witness whose statement has been uploaded in accordance with the above must attend "
-                          + "the hearing. If they do not attend, it will be for the court to decide how much "
-                          + "reliance, if any, to place on their evidence.")
-                .build();
-
-            updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
-        }
+        SdoR2SmallClaimsWitnessStatements tempSdoR2SmallClaimsWitnessStatements = SdoR2SmallClaimsWitnessStatements
+            .builder()
+            .sdoStatementOfWitness(
+                "Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+                    + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
+                    + " the hearing.")
+            .isRestrictWitness(NO)
+            .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
+                                                 .noOfWitnessClaimant(2)
+                                                 .noOfWitnessDefendant(2)
+                                                 .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
+                                                 .build())
+            .isRestrictPages(NO)
+            .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
+                                               .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
+                                               .noOfPages(12)
+                                               .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
+                                               .build())
+            .text(WITNESS_DESCRIPTION_TEXT)
+            .build();
+        updatedData.sdoR2SmallClaimsWitnessStatementOther(tempSdoR2SmallClaimsWitnessStatements).build();
 
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
@@ -737,24 +699,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                  .build());
         }
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
-                .smallClaimsFlightDelayToggle(checkList)
-                .relatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
-                                        + "claims relating to the same flight they must notify the court \n"
-                                        + "where the claim is being managed within 14 days of receipt of \n"
-                                        + "this Order providing all relevant details of those claims including \n"
-                                        + "case number(s), hearing date(s) and copy final substantive order(s) \n"
-                                        + "if any, to assist the Court with ongoing case management which may \n"
-                                        + "include the cases being heard together.")
-                .legalDocumentsInput("Any arguments as to the law to be applied to this claim, together with \n"
-                                         + "copies of legal authorities or precedents relied on, shall be uploaded \n"
-                                         + "to the Digital Portal not later than 3 full working days before the \n"
-                                         + "final hearing date.")
-                .build();
+        SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
+            .smallClaimsFlightDelayToggle(checkList)
+            .relatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
+                                    + "claims relating to the same flight they must notify the court \n"
+                                    + "where the claim is being managed within 14 days of receipt of \n"
+                                    + "this Order providing all relevant details of those claims including \n"
+                                    + "case number(s), hearing date(s) and copy final substantive order(s) \n"
+                                    + "if any, to assist the Court with ongoing case management which may \n"
+                                    + "include the cases being heard together.")
+            .legalDocumentsInput("Any arguments as to the law to be applied to this claim, together with \n"
+                                     + "copies of legal authorities or precedents relied on, shall be uploaded \n"
+                                     + "to the Digital Portal not later than 3 full working days before the \n"
+                                     + "final hearing date.")
+            .build();
 
-            updatedData.smallClaimsFlightDelay(tempSmallClaimsFlightDelay).build();
-        }
+        updatedData.smallClaimsFlightDelay(tempSmallClaimsFlightDelay).build();
 
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
@@ -818,7 +778,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
         //This the flow after request for reconsideration
-        if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+        if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
             updatedData.drawDirectionsOrderRequired(null);
             updatedData.drawDirectionsOrderSmallClaims(null);
@@ -847,20 +807,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.sdoR2SmallClaimsUploadDocToggle(null);
         }
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            updateExpertEvidenceFields(updatedData);
-            updateDisclosureOfDocumentFields(updatedData);
-            populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
-            prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
-            List<IncludeInOrderToggle> localIncludeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-            setCheckListNihl(updatedData, localIncludeInOrderToggle);
-            updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-                SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-            updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-                SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-            updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-                SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        }
+        updateExpertEvidenceFields(updatedData);
+        updateDisclosureOfDocumentFields(updatedData);
+        populateDRHFields(callbackParams, updatedData, preferredCourt, hearingMethodList, locationRefDataList);
+        prePopulateNihlFields(updatedData, hearingMethodList, preferredCourt, locationRefDataList);
+        List<IncludeInOrderToggle> localIncludeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
+        setCheckListNihl(updatedData, localIncludeInOrderToggle);
+        updatedData.sdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        updatedData.sdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        updatedData.sdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
+            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -882,24 +840,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .toList();
         hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
         return hearingMethodList;
-    }
-
-    private FastTrackWitnessOfFact getFastTrackWitnessOfFact() {
-        return FastTrackWitnessOfFact.builder()
-            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
-                        + "fact on whom they intend to rely.")
-            .input2("3")
-            .input3("3")
-            .input4("For this limitation, a party is counted as a witness.")
-            .input5("Each witness statement should be no more than")
-            .input6("10")
-            .input7("A4 pages. Statements should be double spaced using a font size of 12.")
-            .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(8)))
-            .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
-                        + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
-                        + "permitted except with permission from the Court.")
-            .build();
     }
 
     private static SdoR2WitnessOfFact getSdoR2WitnessOfFact() {
@@ -1223,7 +1163,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
             .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
 
-        if (featureToggleService.isSdoR2Enabled() && getAllCourts) {
+        if (getAllCourts) {
             //for SDOR2 we need to display all court in alternative court locations
             matchingLocation = Optional.empty();
         }
@@ -1290,19 +1230,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.setSmallClaimsFlag(NO).build();
         updatedData.setFastTrackFlag(NO).build();
+        updatedData.isSdoR2NewScreen(NO).build();
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            updatedData.isSdoR2NewScreen(NO).build();
-        }
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
+            if (SdoHelper.isNihlFastTrack(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         }
@@ -1469,11 +1407,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (!witnessValidationErrorMessage.isEmpty()) {
                 errors.add(witnessValidationErrorMessage);
             }
-        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+        } else if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
             errors.addAll(validateDRHFields(caseData));
         }
 
-        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
+        if (SdoHelper.isNihlFastTrack(caseData)) {
             List<String> errorsNihl;
             errorsNihl = validateFieldsNihl(caseData);
             if (!errorsNihl.isEmpty()) {
@@ -1610,14 +1548,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getFastTrackMethodInPerson()));
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
-        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
+        if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
             && caseData.getSdoR2SmallClaimsHearing() != null) {
             dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
         }
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
         // Avoid location lists (listItems) from being saved in caseData, just save the selected values
-        if (featureToggleService.isSdoR2Enabled() && caseData.getSdoR2Trial() != null) {
+        if (caseData.getSdoR2Trial() != null) {
             SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
             if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
                 sdoR2Trial.setHearingCourtLocationList(DynamicList.builder().value(
@@ -1801,9 +1739,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
-        if (featureToggleService.isSdoR2Enabled()) {
-            updatedData.smallClaimsFlightDelayToggle(checkList);
-        }
+        updatedData.smallClaimsFlightDelayToggle(checkList);
+
         if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
             updatedData.smallClaimsMediationSectionToggle(checkList);
         }
