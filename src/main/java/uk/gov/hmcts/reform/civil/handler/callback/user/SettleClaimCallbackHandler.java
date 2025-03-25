@@ -34,7 +34,6 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::checkState,
             callbackKey(ABOUT_TO_SUBMIT), this::saveJudgmentPaidInFullDetails,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -44,18 +43,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
-    private CallbackResponse checkState(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-
-        SettleClaimHelper.checkState(caseData, errors);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
+    
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());

@@ -34,20 +34,6 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
 
     @Nested
-    class AboutToStartCallback {
-
-        @Test
-        void shouldNotReturn_error() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors()).isEmpty();
-        }
-    }
-
-    @Nested
     class AboutToSubmitCallback {
 
         @Test
