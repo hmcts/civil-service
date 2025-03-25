@@ -44,7 +44,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
         var interest = interestCalculator.calculateInterest(caseData);
         log.info("Claim interest: {}", interest);
-        caseData.setTotalInterest(interest);
+        caseData.setTotalInterest(MonetaryConversions.penniesToPounds(interest));
         BigDecimal costsInPounds = getCosts(caseData);
         BigInteger costs = MonetaryConversions.poundsToPennies(costsInPounds);
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(getOrderAmount(caseData));
