@@ -10,14 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.SettleClaimHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
@@ -43,7 +40,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-    
+
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
