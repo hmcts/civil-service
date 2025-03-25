@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -12,11 +13,17 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CLOSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -270,5 +277,27 @@ public class NotificationUtils {
             }, () -> stringBuilder.append(REFERENCE_NOT_PROVIDED));
 
         return stringBuilder.toString();
+    }
+
+    public static String buildFooter(CaseData caseData, boolean qmForLRsEnabled,
+                                     boolean qmForLiPsEnabled, boolean qmApplicableLipcase) {
+        boolean queryNotAllowedCaseState = queryNotAllowedCaseStates(caseData);
+        if (caseData.isLipCase()) {
+            if (qmForLiPsEnabled && qmApplicableLipcase && !queryNotAllowedCaseState) {
+                return "raise a query lips";
+            }
+        } else {
+            if (qmForLRsEnabled && !queryNotAllowedCaseState) {
+                return "raise a query ";
+            }
+        }
+        return "Email: contacthisemail@contact.com";
+    }
+
+    public static final Set<CaseState> qmNotAllowedStates = EnumSet.of(PENDING_CASE_ISSUED, CLOSED,
+                                                                       PROCEEDS_IN_HERITAGE_SYSTEM, CASE_DISMISSED);
+
+    private static boolean queryNotAllowedCaseStates(CaseData caseData) {
+        return qmNotAllowedStates.contains(caseData.getCcdState());
     }
 }

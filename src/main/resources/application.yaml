@@ -469,6 +469,8 @@ notifications:
   queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
   queryResponseReceived: "4e74a2ab-376f-47e1-9670-8f97648a13a4"
 
+  testTemplate: "0a9582f0-969c-491a-b030-a7d1eb1437df"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
