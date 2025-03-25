@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSIO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends CallbackHandler {
@@ -89,7 +91,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
                 errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.getFormattedJudgementPermittedDate(whenWillThisAmountBePaid)));
             }
         }
-        caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
@@ -98,6 +99,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        var totalInterest = interestCalculator.calculateInterest(caseData);
+        log.info("Claim interest: {}", totalInterest);
+        caseData.setTotalInterest(totalInterest);
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 

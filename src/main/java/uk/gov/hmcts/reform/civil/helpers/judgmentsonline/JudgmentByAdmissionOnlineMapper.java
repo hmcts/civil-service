@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -37,10 +38,13 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent = false;
     private final RoboticsAddressMapper addressMapper;
+    private final InterestCalculator interestCalculator;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-
+        var interest = interestCalculator.calculateInterest(caseData);
+        log.info("Claim interest: {}", interest);
+        caseData.setTotalInterest(interest);
         BigDecimal costsInPounds = getCosts(caseData);
         BigInteger costs = MonetaryConversions.poundsToPennies(costsInPounds);
         BigInteger orderAmount = MonetaryConversions.poundsToPennies(getOrderAmount(caseData));
