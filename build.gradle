@@ -92,7 +92,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.4.5-jre') {
         entry 'guava'
       }
 
@@ -138,7 +138,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.20.1"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.21.0"
     }
   }
 
@@ -438,7 +438,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.4'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.2'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.4'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
