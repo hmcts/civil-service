@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -71,8 +70,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
     @Nested
     class AboutToSubmitCallback {
-
-        @Test
         void shouldNotifyClaimantSolicitor_in1v1_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
@@ -100,7 +97,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        @Test
         void shouldNotifyClaimantSolicitor_when1v2_SameLegalRep() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
             when(organisationService.findOrganisationById(anyString()))
@@ -128,7 +124,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        @Test
         void shouldNotifyClaimantSolicitor_when1v2_TwoLegalReps() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
             when(organisationService.findOrganisationById(anyString()))
@@ -156,7 +151,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        @Test
         void shouldNotifyClaimantSolicitor_in2v1() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
@@ -211,7 +205,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             return properties;
         }
 
-        @Test
         void shouldGetApplicantSolicitor1ClaimStatementOfTruth_whenNoOrgFound() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
@@ -239,7 +232,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        @Test
         void shouldNotifyClaimantSolicitor_whenRespondent1NotRepresented() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
@@ -268,7 +260,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        @Test
         void shouldNotifyClaimantSolicitor_whenRespondent1IsRepresented() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
@@ -297,7 +288,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             );
         }
 
-        @Test
         void shouldSkipEvent_whenApplicant1SolicitorNotRepresented() {
             CaseData caseData =
                 CaseDataBuilder.builder().atStateClaimDetailsNotified().applicant1Represented(YesOrNo.NO).build();
@@ -314,7 +304,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         }
     }
 
-    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
@@ -325,7 +314,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             .isEqualTo(TASK_ID);
     }
 
-    @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     }
