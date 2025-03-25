@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
@@ -79,7 +80,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -94,6 +94,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+import javax.validation.Valid;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -604,6 +605,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo isGaRespondentOneLip;
     private final YesOrNo isGaRespondentTwoLip;
 
+    private List<DocumentToKeepCollection> documentToKeepCollection;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -955,8 +957,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPartAdmitImmediatePaymentClaimSettled() {
         return (isPartAdmitClaimSpec()
-                && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
-                && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
+            && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
+            && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
             && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
@@ -1492,7 +1494,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean nocApplyForLiPDefendant() {
-        return isLipvLROneVOne() && getChangeOfRepresentation() != null &&  this.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+        return isLipvLROneVOne() && getChangeOfRepresentation() != null && this.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
     }
 
     @JsonIgnore
@@ -1515,5 +1517,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isHearingFeePaid() {
         return nonNull(this.getHearingFeePaymentDetails())
             && SUCCESS.equals(this.getHearingFeePaymentDetails().getStatus()) || this.hearingFeePaymentDoneWithHWF();
+    }
+
+    @JsonIgnore
+    public boolean isCcjRequestJudgmentByAdmissionDefendantNotPaid() {
+        return getCcjPaymentDetails() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null
+            && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
     }
 }

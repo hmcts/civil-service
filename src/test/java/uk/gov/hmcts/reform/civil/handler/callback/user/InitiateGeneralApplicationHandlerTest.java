@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -77,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler.NOT_ALLOWED_SETTLE_DISCONTINUE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.INVALID_TRIAL_DATE_RANGE;
@@ -139,6 +141,86 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, generalApplicationValidator, objectMapper, theUserService,
                                                         feesService, locationRefDataService,
                                                         featureToggleService, coreCaseUserService);
+    }
+
+    @Test
+    void shouldThrowError_whenDiscontinuedQMOnNoPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_DISCONTINUED)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors()).containsOnly(NOT_ALLOWED_SETTLE_DISCONTINUE);
+    }
+
+    @Test
+    void shouldThrowError_whenSettledQMOnNoPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_SETTLED)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors()).containsOnly(NOT_ALLOWED_SETTLE_DISCONTINUE);
+    }
+
+    @Test
+    void shouldNotThrowError_whenSettledQMOnPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_SETTLED)
+            .previousCCDState(CaseState.JUDICIAL_REFERRAL)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenDiscontinuedQMOnPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_DISCONTINUED)
+            .previousCCDState(CaseState.JUDICIAL_REFERRAL)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
     }
 
     @Test
@@ -268,6 +350,29 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLipVsLrAndDefendantLiPIsNotAssigned() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
