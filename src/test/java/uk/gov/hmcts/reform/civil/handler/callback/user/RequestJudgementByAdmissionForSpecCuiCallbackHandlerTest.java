@@ -186,6 +186,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -221,6 +222,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -257,6 +259,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -292,6 +295,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
