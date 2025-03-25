@@ -120,6 +120,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
         }
         if (isSDODrawnPreCPRelease(caseData)) {
+            deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
         if (isFinalOrderIssued(callbackParams)) {
@@ -171,11 +172,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         dashboardNotificationService.deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
-        );
-
-        dashboardNotificationService.deleteByNameAndReference(
-                SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_UNSUCCESSFUL_CLAIMANT.getScenario(),
-                caseData.getCcdCaseReference().toString()
         );
 
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
