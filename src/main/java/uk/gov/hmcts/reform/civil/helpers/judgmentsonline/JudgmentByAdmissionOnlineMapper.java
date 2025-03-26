@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
+import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
@@ -50,7 +51,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         BigInteger claimFeeAmount = MonetaryConversions.poundsToPennies(getClaimFeeAmount(caseData));
         BigInteger totalStillOwed = MonetaryConversions.poundsToPennies(getTotalStillOwed(caseData));
         BigInteger amountAlreadyPaid = MonetaryConversions.poundsToPennies(getAmountAlreadyPaid(caseData));
-        BigInteger totalInterest = MonetaryConversions.poundsToPennies(getCCJInterest(caseData));
+        BigInteger totalInterest = nonNull(getCCJInterest(caseData))
+            ? MonetaryConversions.poundsToPennies(getCCJInterest(caseData)) : BigInteger.ZERO;
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
