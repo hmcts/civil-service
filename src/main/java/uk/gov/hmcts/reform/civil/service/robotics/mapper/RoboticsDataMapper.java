@@ -121,6 +121,9 @@ public class RoboticsDataMapper {
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack, String responseClaimTrack) {
         if (allocatedTrack == null) {
+            if (responseClaimTrack == null) {
+                return "";
+            }
             return switch (responseClaimTrack) {
                 case "FAST_CLAIM" -> "FAST TRACK";
                 case "SMALL_CLAIM" -> "SMALL CLAIM TRACK";
