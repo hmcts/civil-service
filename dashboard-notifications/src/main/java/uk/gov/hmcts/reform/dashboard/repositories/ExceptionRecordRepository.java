@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface ExceptionRecordRepository extends CrudRepository<ExceptionRecordEntity, UUID> {
 
-    Optional<ExceptionRecordEntity> findNotificationExceptionRecordEntitiesByNotificationExceptionId(String idempotencyKey);
+    Optional<ExceptionRecordEntity> findByIdempotencyKey(String idempotencyKey);
 
-    void deleteByNotificationExceptionId(String idempotencyKey);
+    void deleteByIdempotencyKey(String idempotencyKey);
 }
