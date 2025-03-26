@@ -268,4 +268,21 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && (lastOrderDate.isEmpty()
                 || lastOrderDate.get().isBefore(bundleDate.get()));
     }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline() {
+        return isWaitingForClaimantIntentDocUpload()
+            && !featureToggleService.isDefendantNoCOnlineForCase(caseData);
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPostDefendantNocOnline() {
+        return isWaitingForClaimantIntentDocUpload()
+            && featureToggleService.isDefendantNoCOnlineForCase(caseData);
+    }
+
+    private boolean isWaitingForClaimantIntentDocUpload() {
+        return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
+            && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
+    }
 }

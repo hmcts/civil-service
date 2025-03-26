@@ -89,11 +89,17 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
                 isDefendantNoCOnlineForCase.and(isLiPvLRCase), transitions
             )
             .set(
-                flags -> flags.putAll(
-                    Map.of(
-                        FlowFlag.LIP_CASE.name(), true,
-                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
-                    )), transitions
+                (c, flags) -> {
+                    flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                        )
+                    );
+                    if (claimIssueBilingual.test(c)) {
+                        flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
+                    }
+                }, transitions
             )
             .moveTo(SPEC_DEFENDANT_NOC, transitions).onlyWhen(not(isDefendantNoCOnlineForCase).and(
                 nocSubmittedForLiPDefendantBeforeOffline), transitions)

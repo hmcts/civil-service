@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISPATCH_BUSINESS_PRO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_AND_REPLY;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM_MARK_PAID_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
@@ -79,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_JUDGE_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -199,7 +201,8 @@ public class FlowStateAllowedEventService {
         SEND_AND_REPLY,
         queryManagementRaiseQuery,
         queryManagementRespondQuery,
-        ADD_CASE_NOTE
+        ADD_CASE_NOTE,
+        REMOVE_DOCUMENT
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
@@ -1151,7 +1154,8 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
 
@@ -1177,7 +1181,8 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 EDIT_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                SET_ASIDE_JUDGMENT
+                SET_ASIDE_JUDGMENT,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
 
@@ -1238,7 +1243,10 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1289,7 +1297,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1321,7 +1330,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
 
@@ -1369,7 +1379,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
 
@@ -1405,7 +1416,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
 
@@ -1443,7 +1455,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1488,7 +1501,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
 
@@ -1525,7 +1539,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1564,7 +1579,10 @@ public class FlowStateAllowedEventService {
                 ORDER_REVIEW_OBLIGATION_CHECK,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 JUDGMENT_PAID_IN_FULL,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1578,7 +1596,9 @@ public class FlowStateAllowedEventService {
             List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                     NOC_REQUEST,
                     APPLY_NOC_DECISION,
-                    REQUEST_JUDGEMENT_ADMISSION_SPEC)
+                    REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                    REFER_JUDGE_DEFENCE_RECEIVED,
+                    GENERATE_DIRECTIONS_ORDER)
         ),
         entry(
             FULL_ADMIT_PROCEED.fullName(),
@@ -1601,7 +1621,10 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1671,7 +1694,8 @@ public class FlowStateAllowedEventService {
                 APPLY_NOC_DECISION,
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
 
@@ -1701,7 +1725,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1795,7 +1820,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1857,7 +1883,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1918,7 +1945,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1979,7 +2007,8 @@ public class FlowStateAllowedEventService {
                 CONFIRM_ORDER_REVIEW,
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -1999,7 +2028,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CONFIRM_ORDER_REVIEW,
                 COURT_OFFICER_ORDER,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                JUDGMENT_PAID_IN_FULL
             )
         ),
         entry(
@@ -2052,7 +2083,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CASE,
                 MANAGE_STAY,
                 CONFIRM_ORDER_REVIEW,
-                ORDER_REVIEW_OBLIGATION_CHECK
+                ORDER_REVIEW_OBLIGATION_CHECK,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -2152,7 +2184,10 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 JUDGMENT_PAID_IN_FULL,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC
             )
         ),
         entry(
@@ -2186,7 +2221,11 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                 APPLY_NOC_DECISION,
                 ORDER_REVIEW_OBLIGATION_CHECK,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                REFER_JUDGE_DEFENCE_RECEIVED,
+                GENERATE_DIRECTIONS_ORDER,
+                INITIATE_GENERAL_APPLICATION_COSC,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
         entry(
