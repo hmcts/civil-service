@@ -336,7 +336,7 @@ dependencies {
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
-  implementation 'com.github.hmcts:civil-commons:CIV-16943-2'
+  implementation 'com.github.hmcts:civil-commons:CIV-16943-3'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
