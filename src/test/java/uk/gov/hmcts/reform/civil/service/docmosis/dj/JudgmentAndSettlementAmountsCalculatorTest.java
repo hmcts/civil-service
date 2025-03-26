@@ -143,14 +143,13 @@ class JudgmentAndSettlementAmountsCalculatorTest {
     void shouldReturnSettlementAmountWithFeeAndPartialPaymentDeducted_whenPartialPaymentIsProvided() {
         CaseData caseData = CaseData.builder()
             .totalClaimAmount(new BigDecimal("1000"))
-            .partialPaymentAmount("20000")
             .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("10000")).build())
             .build();
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("50.00"));
 
-        BigDecimal debtAmount = judgmentAndSettlementAmountsCalculator.getSettlementAmount(caseData);
+        BigDecimal debtAmount = judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(caseData);
 
-        assertThat(debtAmount).isEqualTo("950.00");
+        assertThat(debtAmount).isEqualTo("1150.00");
     }
 
     @Test

@@ -114,7 +114,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        when(judgmentAndSettlementAmountsCalculator.getSettlementAmount(any())).thenReturn(BigDecimal.valueOf(1000));
+        when(judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(any())).thenReturn(BigDecimal.valueOf(1000));
     }
 
     @Test

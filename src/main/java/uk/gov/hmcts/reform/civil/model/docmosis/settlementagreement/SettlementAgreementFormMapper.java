@@ -103,7 +103,7 @@ public class SettlementAgreementFormMapper {
     }
 
     private String getSettlementAmount(CaseData caseData) {
-        BigDecimal claimAmount = judgmentAndSettlementAmountsCalculator.getSettlementAmount(caseData);
+        BigDecimal claimAmount = judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(caseData);
         if (caseData.isPartAdmitClaimSpec()) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }

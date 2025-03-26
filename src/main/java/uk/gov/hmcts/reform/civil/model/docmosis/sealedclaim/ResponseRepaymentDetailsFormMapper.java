@@ -32,7 +32,7 @@ public class ResponseRepaymentDetailsFormMapper {
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
             buildRepaymentDetails(builder, caseData, caseData.getRespondent1ClaimResponseTypeForSpec(),
-                judgmentAndSettlementAmountsCalculator.getSettlementAmount(caseData));
+                judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(caseData));
         } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
             buildRepaymentDetails(builder, caseData, caseData.getRespondent2ClaimResponseTypeForSpec(),
                 caseData.getTotalClaimAmount());
