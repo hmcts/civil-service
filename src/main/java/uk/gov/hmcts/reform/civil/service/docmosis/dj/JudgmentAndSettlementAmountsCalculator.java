@@ -53,10 +53,12 @@ public class JudgmentAndSettlementAmountsCalculator {
     }
 
     @NotNull
-    public BigDecimal getSettlementAmount(CaseData caseData) {
-        BigDecimal settlementAmount = calculateClaimAmountWithInterestMinusPartialPayment(caseData)
+    public BigDecimal getTotalClaimAmount(CaseData caseData) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
+        BigDecimal totalClaimAmount = subTotal
             .add(getClaimFeePounds(caseData, caseData.getClaimFee()));
-        return settlementAmount;
+        return totalClaimAmount;
     }
 
     @NotNull

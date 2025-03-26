@@ -44,7 +44,7 @@ class ResponseRepaymentDetailsFormMapperTest {
                 .whenWillThisAmountBePaid(LocalDate.now().plusDays(7))
                 .build())
             .build();
-        when(judgmentAndSettlementAmountsCalculator.getSettlementAmount(any(CaseData.class)))
+        when(judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(any(CaseData.class)))
             .thenReturn(new BigDecimal("1000.00"));
 
         ResponseRepaymentDetailsForm form = mapper.toResponsePaymentDetails(caseData);
@@ -68,7 +68,7 @@ class ResponseRepaymentDetailsFormMapperTest {
                 .whenWillThisAmountBePaid(LocalDate.now().plusDays(7))
                 .build())
             .build();
-        when(judgmentAndSettlementAmountsCalculator.getSettlementAmount(any(CaseData.class)))
+        when(judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(any(CaseData.class)))
             .thenReturn(new BigDecimal("1000.00"));
 
         ResponseRepaymentDetailsForm form = mapper.toResponsePaymentDetails(caseData);

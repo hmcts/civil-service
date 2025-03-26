@@ -44,7 +44,7 @@ public class SettlementAgreementFormMapperTest {
 
     @BeforeEach
     void setup() {
-        when(judgmentAndSettlementAmountsCalculator.getSettlementAmount(any())).thenReturn(BigDecimal.valueOf(100));
+        when(judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(any())).thenReturn(BigDecimal.valueOf(100));
     }
 
     @Test
