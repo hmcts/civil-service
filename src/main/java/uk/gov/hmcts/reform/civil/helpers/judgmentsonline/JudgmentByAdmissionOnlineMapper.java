@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
-import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
@@ -43,10 +42,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
         var interest = interestCalculator.calculateInterest(caseData);
-        log.info("Claim interest: {}", interest);
-        if (nonNull(interest)) {
-            caseData.setTotalInterest(MonetaryConversions.penniesToPounds(interest.setScale(2)));
-        }
+        caseData.setTotalInterest(interest);
 
         BigDecimal costsInPounds = getCosts(caseData);
         BigInteger costs = MonetaryConversions.poundsToPennies(costsInPounds);
@@ -54,7 +50,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         BigInteger claimFeeAmount = MonetaryConversions.poundsToPennies(getClaimFeeAmount(caseData));
         BigInteger totalStillOwed = MonetaryConversions.poundsToPennies(getTotalStillOwed(caseData));
         BigInteger amountAlreadyPaid = MonetaryConversions.poundsToPennies(getAmountAlreadyPaid(caseData));
-        BigInteger totalInterest = nonNull(getCCJInterest(caseData)) ? getCCJInterest(caseData).toBigInteger() : BigInteger.ZERO;
+        BigInteger totalInterest = MonetaryConversions.poundsToPennies(getCCJInterest(caseData));
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 

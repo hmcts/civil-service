@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSIO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends CallbackHandler {
@@ -51,7 +48,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private static final String NOT_VALID_DJ_BY_ADMISSION = "The Claim is not eligible for Request Judgment By Admission until %s.";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_JUDGEMENT_ADMISSION_SPEC);
     private final ObjectMapper objectMapper;
-    private final InterestCalculator interestCalculator;
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
@@ -99,9 +95,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        var totalInterest = interestCalculator.calculateInterest(caseData);
-        log.info("Claim interest on handler: {}", totalInterest);
-        caseData.setTotalInterest(totalInterest);
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
