@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -28,7 +29,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -135,8 +141,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -154,8 +160,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -173,8 +179,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -213,8 +219,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -235,8 +241,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -257,8 +263,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -674,4 +680,190 @@ class CaseQueriesUtilTest {
                 .parentId("id")
                 .build());
     }
+
+    @Test
+    void shouldReturnMatchingCollection_WhenMessageExistsInApplicantSolicitorQueries() {
+        LocalDateTime createdOn = LocalDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 1")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection applicantSolicitorQueries = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(caseMessage))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantSolicitorQueries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertEquals(applicantSolicitorQueries, result);
+    }
+
+    @Test
+    void shouldReturnMatchingCollection_WhenMessageExistsInRespondentSolicitor1Queries() {
+        LocalDateTime createdOn = LocalDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 2")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection respondentSolicitor1Queries = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(caseMessage))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor1Queries(respondentSolicitor1Queries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertEquals(respondentSolicitor1Queries, result);
+    }
+
+    @Test
+    void shouldReturnMatchingCollection_WhenMessageExistsInRespondentSolicitor2Queries() {
+        LocalDateTime createdOn = LocalDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection respondentSolicitor2Queries = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(caseMessage))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor2Queries(respondentSolicitor2Queries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertEquals(respondentSolicitor2Queries, result);
+    }
+
+    @Test
+    void shouldReturnNull_WhenMessageDoesNotExistInAnyCollection() {
+        LocalDateTime createdOn = LocalDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 4")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseData caseData = CaseData.builder().build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertNull(result);
+    }
+
+    @Test
+    void shouldReturnNull_WhenCaseMessagesAreNull() {
+        LocalDateTime createdOn = LocalDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 5")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection emptyCollection = CaseQueriesCollection.builder().build();
+
+        CaseData caseData = CaseData.builder()
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertNull(result);
+    }
+
+    @Test
+    void shouldAssignCategoryIDToDocument_WhenRoleIsApplicantSolicitor() {
+        Document document = Document.builder().documentFileName("query.doc").build();
+        AssignCategoryId assignCategoryId = mock(AssignCategoryId.class);
+
+        CaseQueriesUtil.assignCategoryIdToQueryDocument(document, assignCategoryId,
+                                                        List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
+
+        verify(assignCategoryId).assignCategoryIdToDocument(document, DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToDocument_WhenRoleIsRespondentSolicitor() {
+        Document document = Document.builder().documentFileName("query.doc").build();
+        AssignCategoryId assignCategoryId = mock(AssignCategoryId.class);
+
+        CaseQueriesUtil.assignCategoryIdToQueryDocument(document, assignCategoryId,
+                                                        List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
+
+        verify(assignCategoryId).assignCategoryIdToDocument(document, DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue());
+    }
+
+    @Test
+    void shouldReturnClaimantQueryDocuments_whenCollectionTypeIsApplicantSolicitorQueries() {
+        DocCategory result = CaseQueriesUtil.getQueryDocumentCategory(APPLICANT_SOLICITOR_QUERIES);
+
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS, result);
+    }
+
+    @Test
+    void shouldReturnDefendantQueryDocuments_whenCollectionTypeIsRespondentSolicitorOneQueries() {
+        DocCategory result = CaseQueriesUtil.getQueryDocumentCategory(RESPONDENT_SOLICITOR_ONE_QUERIES);
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS, result);
+    }
+
+    @Test
+    void shouldReturnDefendantQueryDocuments_whenCollectionTypeIsRespondentSolicitorTwoQueries() {
+        DocCategory result = CaseQueriesUtil.getQueryDocumentCategory(RESPONDENT_SOLICITOR_TWO_QUERIES);
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS, result);
+    }
+
+    @Test
+    void shouldReturnApplicantSolicitorQueries_whenQueriesMatchApplicantSolicitorCollection() {
+        CaseQueriesCollection applicantQueries = CaseQueriesCollection.builder().partyName("app 1").build();
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQueries)
+            .build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(applicantQueries, caseData);
+
+        assertEquals(QueryCollectionType.APPLICANT_SOLICITOR_QUERIES, result);
+    }
+
+    @Test
+    void shouldReturnRespondentSolicitorOneQueries_whenQueriesMatchRespondentSolicitorOneCollection() {
+        CaseQueriesCollection respondent1Queries = CaseQueriesCollection.builder().partyName("res 1").build();
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor1Queries(respondent1Queries)
+            .build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(respondent1Queries, caseData);
+
+        assertEquals(QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES, result);
+    }
+
+    @Test
+    void shouldReturnRespondentSolicitorTwoQueries_whenQueriesMatchRespondentSolicitorTwoCollection() {
+        CaseQueriesCollection respondent2Queries = CaseQueriesCollection.builder().partyName("res 2").build();
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor2Queries(respondent2Queries)
+            .build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(respondent2Queries, caseData);
+
+        assertEquals(QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES, result);
+    }
+
+    @Test
+    void shouldReturnNull_whenQueriesDoNotMatchAnyCollection() {
+        CaseQueriesCollection someQueries = CaseQueriesCollection.builder().build();
+        CaseData caseData = CaseData.builder().build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(someQueries, caseData);
+
+        assertNull(result);
+    }
+
 }

@@ -119,6 +119,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
 
         String claimTrack = determineClaimTrack(caseData);
         Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+
         if (featureToggleService.isHmcForLipEnabled()) {
             caseDataBuilder.hearingDurationInMinutesAHN(totalDurationInMinutes.toString())
                 .trialReadyNotified(null);
