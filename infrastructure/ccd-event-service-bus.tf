@@ -8,7 +8,7 @@ module "servicebus-subscription-ccd-events" {
 
 resource "azurerm_servicebus_subscription_rule" "civil_ccd_jurisdiction_rule" {
   name            = "civil-ccd-event-rule-${var.env}"
-  subscription_id = module.servicebus-subscription.id
+  subscription_id = module.servicebus-subscription-ccd-events.id
   filter_type     = "SqlFilter"
   sql_filter      = "jurisdiction_id IN ('CIVIL','civil')"
 }
