@@ -39,8 +39,8 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
     private static final String TASK_ID = "GenerateCoscDocument";
 
     private final CertificateOfDebtGenerator coscDocumentGenerartor;
-    private final CivilStitchService civilStitchService;
     private final ObjectMapper objectMapper;
+    private final CivilStitchService civilStitchService;
 
     @Override
     public List<CaseEvent> handledEvents() {
