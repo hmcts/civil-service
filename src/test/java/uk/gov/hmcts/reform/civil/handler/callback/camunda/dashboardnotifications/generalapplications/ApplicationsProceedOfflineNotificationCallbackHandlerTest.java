@@ -39,8 +39,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -244,7 +244,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
             handler.handle(callbackParams);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(new HashMap<>()).build()
             );
@@ -273,7 +273,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
             handler.handle(callbackParams);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
+                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(new HashMap<>()).build()
             );
@@ -339,7 +339,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
             handler.handle(callbackParams);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(new HashMap<>()).build()
             );
@@ -368,7 +368,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
             handler.handle(callbackParams);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
+                SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(new HashMap<>()).build()
             );

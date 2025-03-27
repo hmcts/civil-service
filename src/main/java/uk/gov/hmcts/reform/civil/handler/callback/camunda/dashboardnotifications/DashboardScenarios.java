@@ -237,9 +237,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_CLAIMANT("Scenario.AAA6.ClaimantIntent.Multi.Int.Await.Claimant"),
     SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT("Scenario.AAA6.ClaimantIntent.Multi.Int.Await.Defendant"),
     SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT(
-        "Scenario.AAA6.DefendantNoticeOfChange.ClaimRemainsOnline.Claimant"),
-    SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_CLAIMANT("Scenario.AAA6.GeneralApplication.CreateApplicationInactive.Claimant"),
-    SCENARIO_AAA6_GENERAL_APPLICATION_INACTIVE_DEFENDANT("Scenario.AAA6.GeneralApplication.CreateApplicationInactive.Defendant");
+        "Scenario.AAA6.DefendantNoticeOfChange.ClaimRemainsOnline.Claimant");
 
     private final String scenario;
 

@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class GeneralAppInactiveScenarioTest extends BaseIntegrationTest {
 
-    public static final String SCENARIO_GA_INACTIVE = "Scenario.AAA6.GeneralApplication.CreateApplicationInactive.Claimant";
+    public static final String SCENARIO_GA_INACTIVE = "Scenario.AAA6.GeneralApplication.InitiateApplication.Inactive.Claimant";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
@@ -39,7 +39,7 @@ public class GeneralAppInactiveScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].reference").value(caseId.toString()),
                 jsonPath("$[0].taskNameEn").value(
-                    "<a>Contact the court to request a change to my case</a>"),
+                    "Contact the court to request a change to my case"),
                 jsonPath("$[0].currentStatusEn").value("Inactive")
             );
     }
