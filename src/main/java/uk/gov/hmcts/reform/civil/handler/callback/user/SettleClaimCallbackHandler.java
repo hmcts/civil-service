@@ -53,7 +53,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
                                                                            "CLAIMANT", authToken);
         } else if (caseDataBuilder.build().isRespondent1LiP()) {
             dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(caseDataBuilder.build().getCcdCaseReference().toString(),
-                                                                           "RESPONDENT", authToken);
+                                                                           "DEFENDANT", authToken);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
