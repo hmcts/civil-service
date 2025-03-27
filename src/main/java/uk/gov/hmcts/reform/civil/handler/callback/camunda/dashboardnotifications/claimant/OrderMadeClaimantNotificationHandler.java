@@ -119,7 +119,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
         }
         if (isSDODrawnPreCPRelease(caseData)) {
-            deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
         if (isFinalOrderIssued(callbackParams)) {
@@ -129,6 +128,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             }
             return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
+        deleteNotificationAndInactiveTasks(caseData);
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
     }
 
