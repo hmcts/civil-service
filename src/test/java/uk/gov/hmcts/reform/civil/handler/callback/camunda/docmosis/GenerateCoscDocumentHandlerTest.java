@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerato
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,7 +61,7 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
     void shouldGenerate_cosc_doc() {
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
-            .documentName("document name")
+            .documentName("cosc document")
             .documentSize(0L)
             .documentType(CERTIFICATE_OF_DEBT_PAYMENT)
             .createdDatetime(LocalDateTime.now())
@@ -132,6 +133,11 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData())
             .extracting("coSCApplicationStatus")
             .isEqualTo("PROCESSED");
+        List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
+        assertThat(documentsList)
+            .extracting("value")
+            .extracting("documentName")
+            .contains("cosc document");
 
     }
 

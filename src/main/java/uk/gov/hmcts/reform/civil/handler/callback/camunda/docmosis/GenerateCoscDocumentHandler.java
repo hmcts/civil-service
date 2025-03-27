@@ -10,12 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
-import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
+import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus.PROCESSED;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +39,8 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
     private static final String TASK_ID = "GenerateCoscDocument";
 
     private final CertificateOfDebtGenerator coscDocumentGenerartor;
-    private final ObjectMapper objectMapper;
     private final CivilStitchService civilStitchService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -89,7 +90,15 @@ public class GenerateCoscDocumentHandler extends CallbackHandler {
             );
         }
 
-        caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(caseDocument));
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments;
+        if (callbackParams.getCaseData().getSystemGeneratedCaseDocuments() != null) {
+            systemGeneratedCaseDocuments = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
+        } else {
+            systemGeneratedCaseDocuments = new ArrayList<>();
+        }
+        systemGeneratedCaseDocuments.add(element(caseDocument));
+
+        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
     @Override
