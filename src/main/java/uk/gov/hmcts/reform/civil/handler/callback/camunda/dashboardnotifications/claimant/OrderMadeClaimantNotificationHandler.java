@@ -129,6 +129,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             }
             return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
+        deleteNotificationAndInactiveTasks(caseData);
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
     }
 
