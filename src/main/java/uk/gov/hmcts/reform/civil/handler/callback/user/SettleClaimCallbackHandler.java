@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 
@@ -56,7 +57,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?,?> caseDataBuilder, String authToken) {
+    private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String authToken) {
         if (caseDataBuilder.build().isApplicantLiP()) {
             dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(caseDataBuilder.build().getCcdCaseReference().toString(),
                                                                            "CLAIMANT", authToken);
