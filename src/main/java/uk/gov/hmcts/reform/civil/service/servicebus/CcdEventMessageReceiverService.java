@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.dashboard.entities.ExceptionRecordEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.ExceptionRecordRepository;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,17 +35,34 @@ public class CcdEventMessageReceiverService {
         handleMessage(caseEventMessage, idempotencyKey);
     }
 
+    public void retryHandleMessage(ExceptionRecordEntity exceptionRecordEntity) {
+        Result result = null;
+
+        for (var handler : messageHandlers) {
+            if (handler.canHandle(exceptionRecordEntity.getTaskId())) {
+                result = handler.handle(exceptionRecordEntity.getReference(), exceptionRecordEntity.getSuccessfulActions());
+                break;
+            }
+        }
+
+        validateResult(exceptionRecordEntity.getIdempotencyKey(), result);
+    }
+
     private void handleMessage(CcdEventMessage caseEventMessage,
                                String idempotencyKey) {
         Result result = null;
 
         for (var handler : messageHandlers) {
             if (handler.canHandle(caseEventMessage.getEventId())) {
-                result = handler.handle(caseEventMessage);
+                result = handler.handle(caseEventMessage.getCaseId(), Collections.emptyList());
                 break;
             }
         }
 
+        validateResult(idempotencyKey, result);
+    }
+
+    private void validateResult(String idempotencyKey, Result result) {
         Optional<ExceptionRecordEntity> existingRecord = exceptionRecordRepository.findByIdempotencyKey(idempotencyKey);
 
         if (result instanceof Result.Error error) {

@@ -6,14 +6,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExceptionRecord;
 import uk.gov.hmcts.reform.civil.model.Result;
-import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINUOUS_FEED;
@@ -35,20 +34,16 @@ public class AddCaseNoteMessageHandler implements CcdEventMessageHandler {
     }
 
     @Override
-    public Result handle(CcdEventMessage message) {
-        log.info("Handling Add Case Note Message for case {}", message.getCaseId());
+    public Result handle(String caseId, List<String> actions) {
+        log.info("Handling Add Case Note Message for case {}", caseId);
 
         try {
-            var response = coreCaseDataService.startUpdate(message.getCaseId(), NOTIFY_RPA_ON_CONTINUOUS_FEED);
+            var response = coreCaseDataService.startUpdate(caseId, NOTIFY_RPA_ON_CONTINUOUS_FEED);
             CaseData data = caseDetailsConverter.toCaseData(response.getCaseDetails());
             roboticsNotifier.notifyRobotics(data, getSystemUserToken());
         } catch (Exception e) {
-            log.error("Failed to trigger robotics for case {}", message.getCaseId());
-            Map<String, String> messageProps = new HashMap<>();
-            messageProps.put("exceptionMessage", e.getMessage());
-            messageProps.put("userId", message.getUserId());
-
-            return new Result.Error(NOTIFY_RPA_ON_CONTINUOUS_FEED.name(), messageProps);
+            log.error("Failed to notify robotics for case {}", caseId);
+            return new Result.Error(new ExceptionRecord(ADD_CASE_NOTE.name(), caseId));
         }
 
         return new Result.Success();
