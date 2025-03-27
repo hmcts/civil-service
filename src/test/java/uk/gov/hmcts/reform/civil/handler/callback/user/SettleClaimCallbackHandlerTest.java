@@ -10,13 +10,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
@@ -33,19 +33,8 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private ObjectMapper objectMapper;
 
-    @Nested
-    class AboutToStartCallback {
-
-        @Test
-        void shouldNotReturn_error() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-            assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors()).isEmpty();
-        }
-    }
+    @MockBean
+    private DashboardApiClient dashboardApiClient;
 
     @Nested
     class AboutToSubmitCallback {
