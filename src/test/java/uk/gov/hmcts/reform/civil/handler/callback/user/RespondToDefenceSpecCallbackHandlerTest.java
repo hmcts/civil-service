@@ -99,7 +99,6 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -243,8 +242,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private AddressLinesMapper linesMapper;
     @MockBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
-    @MockBean
-    private InterestCalculator interestCalculator;
 
     @Nested
     class AboutToStart {
@@ -2390,7 +2387,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondToAdmittedClaim(respondToAdmittedClaim)
                 .totalClaimAmount(BigDecimal.valueOf(5000_00))
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -2447,7 +2443,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2483,7 +2478,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2520,7 +2514,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

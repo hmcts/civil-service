@@ -37,11 +37,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @RunWith(MockitoJUnitRunner.class)
 public class EditJudgmentsOnlineMapperTest {
 
-    private InterestCalculator interestCalculator = new InterestCalculator();
+    private InterestCalculator interestCalculator;
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
     private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, interestCalculator);
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
     private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
 
     private Time time;
@@ -49,7 +49,6 @@ public class EditJudgmentsOnlineMapperTest {
     @BeforeEach
     public void setUpTest() {
         time = Mockito.mock(Time.class);
-        interestCalculator = new InterestCalculator();
         defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 

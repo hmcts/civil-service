@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -89,9 +88,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
-    private InterestCalculator interestCalculator;
-
     @Autowired
     RoboticsAddressMapper addressMapper;
 
@@ -110,7 +106,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .ccdState(AWAITING_APPLICANT_INTENTION)
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -186,7 +181,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -222,7 +216,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -259,7 +252,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -295,7 +287,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(BigDecimal.ZERO);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
