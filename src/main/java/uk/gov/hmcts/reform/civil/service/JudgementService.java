@@ -25,11 +25,8 @@ public class JudgementService {
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private final FeatureToggleService featureToggleService;
-    private final InterestCalculator interestCalculator;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
-        var totalInterest = interestCalculator.calculateInterest(caseData);
-        caseData.setTotalInterest(totalInterest);
         return CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
             .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))
