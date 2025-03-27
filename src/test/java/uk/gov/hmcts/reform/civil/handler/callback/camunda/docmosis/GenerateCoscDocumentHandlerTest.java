@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 
