@@ -4,7 +4,6 @@ module "servicebus-subscription-ccd-events" {
   namespace_name      = "ccd-servicebus-${var.env}"
   topic_name          = "ccd-case-events-${var.env}"
   resource_group_name = "ccd-shared-${var.env}"
-  status              = "Disabled"
 }
 
 resource "azurerm_servicebus_subscription_rule" "civil_ccd_jurisdiction_rule" {
