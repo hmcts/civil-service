@@ -12,24 +12,25 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
-import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
+import uk.gov.hmcts.reform.civil.service.docmosis.cosc.CertificateOfDebtGenerator;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -72,7 +73,8 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
                               .build())
             .build();
 
-        when(certificateOfDebtGenerator.generateDoc(any(CaseData.class), anyString(), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT))).thenReturn(document);
+        when(certificateOfDebtGenerator.generateDoc(any(CaseData.class), anyString(),
+                                                    eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT))).thenReturn(document);
 
         CaseData caseData = CaseDataBuilder.builder()
             .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().toBuilder()
@@ -82,10 +84,19 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        verify(certificateOfDebtGenerator).generateDoc(any(CaseData.class), eq("BEARER_TOKEN"), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT));
+        verify(certificateOfDebtGenerator).generateDoc(any(CaseData.class),
+                                                       eq("BEARER_TOKEN"), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT));
         assertThat(response.getData())
             .extracting("coSCApplicationStatus")
             .isEqualTo("PROCESSED");
+        assertThat(response.getData())
+            .extracting("coSCApplicationStatus")
+            .isEqualTo("PROCESSED");
+        List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
+        assertThat(documentsList)
+            .extracting("value")
+            .extracting("documentName")
+            .contains("cosc document");
 
     }
 
@@ -93,7 +104,7 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
     void shouldGenerate_cosc_bilingualdoc() {
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
-            .documentName("document name")
+            .documentName("cosc document")
             .documentSize(0L)
             .documentType(CERTIFICATE_OF_DEBT_PAYMENT)
             .createdDatetime(LocalDateTime.now())
@@ -140,5 +151,4 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
             .contains("cosc document");
 
     }
-
 }
