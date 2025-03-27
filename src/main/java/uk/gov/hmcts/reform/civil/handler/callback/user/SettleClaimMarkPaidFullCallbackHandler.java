@@ -90,6 +90,7 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder();
 
         if (caseData.getMarkPaidForAllClaimants() == null || YES.equals(caseData.getMarkPaidForAllClaimants())) {
+            caseDataBuilder.preStayState(caseData.getCcdState().toString());
             caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
             aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_STAYED.name());
         }

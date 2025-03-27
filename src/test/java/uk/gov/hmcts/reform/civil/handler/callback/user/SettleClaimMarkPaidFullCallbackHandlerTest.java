@@ -102,6 +102,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(SETTLE_CLAIM_MARKED_PAID_IN_FULL.name());
             assertThat(response.getState()).isEqualTo(CaseState.CASE_STAYED.name());
+            assertThat(updatedData.getPreStayState()).isEqualTo(CaseState.CASE_ISSUED.name());
         }
 
         @Test
