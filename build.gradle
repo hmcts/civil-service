@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "8.13"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1612'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1618'
   id "org.flywaydb.flyway" version "10.22.0"
 }
 
@@ -92,7 +92,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.4.5-jre') {
         entry 'guava'
       }
 
@@ -138,7 +138,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.20.1"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.21.0"
     }
   }
 
@@ -436,8 +436,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.2'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.2'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.4'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.4'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -449,7 +449,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.7:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.8:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
