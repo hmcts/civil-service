@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -13,7 +14,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
@@ -39,6 +47,18 @@ public class CaseQueriesUtil {
         }
     }
 
+    public static CaseQueriesCollection getCollectionByMessage(CaseData caseData, CaseMessage message) {
+        return Stream.of(
+                caseData.getQmApplicantSolicitorQueries(),
+                caseData.getQmRespondentSolicitor1Queries(),
+                caseData.getQmRespondentSolicitor2Queries()
+            )
+            .filter(collection -> nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().stream()
+                .anyMatch(messageEl -> messageEl.getValue().getCreatedOn().equals(message.getCreatedOn())))
+            .findFirst()
+            .orElse(null);
+    }
+
     public static CaseMessage getLatestQuery(CaseData caseData) {
         List<CaseMessage> latestQueries = new ArrayList<>();
         if (caseData.getQmApplicantSolicitorQueries() != null) {
@@ -52,6 +72,29 @@ public class CaseQueriesUtil {
         }
         return latestQueries.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
             .orElse(null);
+    }
+
+    public static QueryCollectionType getCollectionType(CaseQueriesCollection queriesCollection, CaseData caseData) {
+
+        if (queriesCollection.isSame(caseData.getQmApplicantSolicitorQueries())) {
+            return APPLICANT_SOLICITOR_QUERIES;
+        }
+        if (queriesCollection.isSame(caseData.getQmRespondentSolicitor1Queries())) {
+            return RESPONDENT_SOLICITOR_ONE_QUERIES;
+        }
+        if (queriesCollection.isSame(caseData.getQmRespondentSolicitor2Queries())) {
+            return RESPONDENT_SOLICITOR_TWO_QUERIES;
+        }
+
+        return null;
+    }
+
+    public static DocCategory getQueryDocumentCategory(QueryCollectionType collectionType) {
+        return switch(collectionType) {
+            case APPLICANT_SOLICITOR_QUERIES -> CLAIMANT_QUERY_DOCUMENTS;
+            case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES -> DEFENDANT_QUERY_DOCUMENTS;
+            default -> null;
+        };
     }
 
     public static List<String> getUserRoleForQuery(CaseData caseData,
