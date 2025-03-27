@@ -2,22 +2,19 @@ package uk.gov.hmcts.reform.civil.model.docmosis.querymanagement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static java.util.Objects.nonNull;
-import static java.util.Optional.ofNullable;
 
-@Getter
 @Builder
 @AllArgsConstructor
-@EqualsAndHashCode
+@Data
 public class QueryDocument implements MappableObject {
 
     private final String referenceNumber;
@@ -28,14 +25,12 @@ public class QueryDocument implements MappableObject {
             return null;
         }
 
-        // Assumes message thread is already sorted. The first message should be the initial query which will contain the
-        // requester user id. Using this we can differentiate party message from caseworker message.
-        String partyUserId = messageThread.get(0).getValue().getCreatedBy();
         return QueryDocument.builder()
             .referenceNumber(caseId)
-            .messages(messageThread.stream()
-                          .map(caseMessage -> DocumentQueryMessage.from(
-                              caseMessage.getValue(), !caseMessage.getValue().getCreatedBy().equals(partyUserId))).toList())
+            .messages(IntStream.range(0, messageThread.size())
+                          .mapToObj(i -> DocumentQueryMessage.from(
+                              messageThread.get(i).getValue(), i % 2 != 0))
+                          .toList())
             .build();
     }
 

@@ -22,6 +22,6 @@ public interface DocumentManagementService {
 
     void deleteDocument(String authorisation, UUID docId);
 
-    void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime);
+//    void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime);
 
 }

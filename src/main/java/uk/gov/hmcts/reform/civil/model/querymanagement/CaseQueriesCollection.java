@@ -54,6 +54,7 @@ public class CaseQueriesCollection {
 
     @JsonIgnore
     public boolean isSame(CaseQueriesCollection caseQueriesCollection) {
+        // purposely not overriding equals to avoid unexpected behaviour
         return nonNull(caseQueriesCollection) && caseQueriesCollection.equals(this);
     }
 

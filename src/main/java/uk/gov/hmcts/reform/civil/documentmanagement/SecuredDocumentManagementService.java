@@ -56,7 +56,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final UserService userService;
     private final DocumentManagementConfiguration documentManagementConfiguration;
     private final CaseDocumentClientApi caseDocumentClientApi;
-    private final CaseDocumentAmClient caseDocumentAmClientApi;
+//    private final CaseDocumentAmClient caseDocumentAmClientApi;
 
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
     @Override
@@ -263,10 +263,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
-    @Override
-    public void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime) {
-        caseDocumentAmClientApi.patchDocument(authorisation, authTokenGenerator.generate(), documentId, new DocumentTTLRequest(datetime));
-    }
+//    @Override
+//    public void updateDocumentTimeToLive(UUID documentId, String authorisation, LocalDateTime datetime) {
+//        caseDocumentAmClientApi.patchDocument(authorisation, authTokenGenerator.generate(), documentId, new DocumentTTLRequest(datetime));
+//    }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));

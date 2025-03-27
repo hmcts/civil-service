@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdTo
 
 @Service
 @RequiredArgsConstructor
-public class QueryDocumentGenerator implements TemplateDataGenerator<HearingForm> {
+public class QueryDocumentGenerator {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;

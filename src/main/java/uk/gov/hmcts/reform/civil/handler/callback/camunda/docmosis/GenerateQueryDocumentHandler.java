@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
-import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -67,15 +66,22 @@ public class GenerateQueryDocumentHandler extends CallbackHandler {
     private CallbackResponse handleGeneratingHearingDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
+
         CaseMessage query = getQueryById(caseData,
                 camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getQueryId());
-        String parentQueryId = nonNull(query.getParentId()) ? query.getParentId() : query.getId();
         CaseQueriesCollection workingCollection = getCollectionByMessage(caseData, query);
-        QueryCollectionType collectionType = getCollectionType(workingCollection, caseData);
-        DocCategory queryDocumentCategory = getQueryDocumentCategory(collectionType);
+        DocCategory queryDocumentCategory = getQueryDocumentCategory(getCollectionType(workingCollection, caseData));
+
+        String parentQueryId = nonNull(query.getParentId()) ? query.getParentId() : query.getId();
         List<Element<CaseMessage>> messageThread = workingCollection.messageThread(parentQueryId);
-        String userAuthToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        CaseDocument caseDocument = queryDocumentGenerator.generate(caseData.getCcdCaseReference(), messageThread, userAuthToken, queryDocumentCategory);
+
+        CaseDocument caseDocument = queryDocumentGenerator.generate(
+            caseData.getCcdCaseReference(),
+            messageThread,
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            queryDocumentCategory
+        );
+
         updateQueryDocument(messageThread.get(0).getValue().getCreatedOn(), caseDocument, builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -94,14 +100,14 @@ public class GenerateQueryDocumentHandler extends CallbackHandler {
             caseData.getQueryDocuments().remove(existingQueryDocument);
         }
 
-        camundaService.setProcessVariables(caseData.getBusinessProcess().getProcessInstanceId(),
-                QueryManagementVariables.builder()
-                        .removeDocument(queryDocumentExists)
-                        .documentToRemoveId(queryDocumentExists ? getDocumentId(existingQueryDocument.getValue()) : null)
-                        .build());
-
         caseData.getQueryDocuments().add(element(newQueryDocument));
         builder.queryDocuments(caseData.getQueryDocuments());
+
+        camundaService.setProcessVariables(caseData.getBusinessProcess().getProcessInstanceId(),
+                                           QueryManagementVariables.builder()
+                                               .removeDocument(queryDocumentExists)
+                                               .documentToRemoveId(queryDocumentExists ? getDocumentId(existingQueryDocument.getValue()) : null)
+                                               .build());
     }
 
     private String getDocumentId(CaseDocument document) {
