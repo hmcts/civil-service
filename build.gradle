@@ -92,7 +92,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.4.6-jre') {
         entry 'guava'
       }
 
@@ -138,7 +138,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.20.1"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.21.0"
     }
   }
 
@@ -289,7 +289,7 @@ sonarqube {
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
       ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java, **/utils/**, **/filters/**, **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/SettleClaimPaidInFullDefendantDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java" +
-      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java, **/handler/callback/user/RespondQueryCallbackHandler.java"
+      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
   }
@@ -428,6 +428,7 @@ dependencies {
   implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.10'
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
+
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
@@ -437,7 +438,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.4'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.2'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.4'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -449,7 +450,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.4.7:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.8:all'
   //pact contract testing
   contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
