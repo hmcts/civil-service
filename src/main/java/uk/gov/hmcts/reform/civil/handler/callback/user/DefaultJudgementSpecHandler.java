@@ -356,7 +356,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        log.info("Calculated interest: {}", interest);
         Fee claimfee = caseData.getClaimFee();
         BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
         BigDecimal fixedCost = getFixedCosts(caseData, interestCalculator);
