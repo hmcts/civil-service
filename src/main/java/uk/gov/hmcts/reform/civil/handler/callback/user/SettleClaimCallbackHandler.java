@@ -10,13 +10,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
@@ -27,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 public class SettleClaimCallbackHandler extends CallbackHandler {
 
     protected final ObjectMapper objectMapper;
-    private final DashboardApiClient dashboardApiClient;
+    private final DashboardNotificationService dashboardNotificationService;
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM);
 
@@ -47,9 +46,8 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        deleteMainCaseDashboardNotifications(caseDataBuilder, authToken);
+        deleteMainCaseDashboardNotifications(caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -57,14 +55,14 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String authToken) {
+    private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseDataBuilder.build().isApplicantLiP()) {
-            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(caseDataBuilder.build().getCcdCaseReference().toString(),
-                                                                           "CLAIMANT", authToken);
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseDataBuilder.build().getCcdCaseReference().toString(), "CLAIMANT");
         }
         if (caseDataBuilder.build().isRespondent1LiP()) {
-            dashboardApiClient.deleteNotificationsForCaseIdentifierAndRole(caseDataBuilder.build().getCcdCaseReference().toString(),
-                                                                           "DEFENDANT", authToken);
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseDataBuilder.build().getCcdCaseReference().toString(), "DEFENDANT");
         }
     }
 
