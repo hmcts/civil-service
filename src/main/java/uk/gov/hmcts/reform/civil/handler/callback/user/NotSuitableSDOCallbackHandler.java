@@ -96,8 +96,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         String reason;
 
-        if (toggleService.isSdoR2Enabled()
-            && callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION
+        if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION
             && callbackParams.getCaseData().getCcdState() == CaseState.CASE_PROGRESSION) {
             errors.add(
                 "Unable to process this request. To transfer the case to another court you need to issue a General Order.");
