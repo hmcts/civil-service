@@ -1,5 +1,5 @@
 module "servicebus-subscription-ccd-events" {
-  source              = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=DTSPO-18682"
+  source              = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=DTSPO-25025-add-status-flag"
   name                = "civil-ccd-case-events-sub-${var.env}"
   namespace_name      = "ccd-servicebus-${var.env}"
   topic_name          = "ccd-case-events-${var.env}"
