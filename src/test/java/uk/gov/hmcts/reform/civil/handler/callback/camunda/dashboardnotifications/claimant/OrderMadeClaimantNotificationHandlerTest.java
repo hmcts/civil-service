@@ -535,8 +535,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         );
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            null
+            "CLAIMANT"
         );
     }
 }

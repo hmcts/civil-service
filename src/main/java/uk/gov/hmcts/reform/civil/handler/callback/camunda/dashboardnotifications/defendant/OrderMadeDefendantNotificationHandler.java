@@ -176,8 +176,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
 
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            null
+            "DEFENDANT"
         );
     }
 }
