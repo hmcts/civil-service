@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -26,6 +27,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.util.Objects.nonNull;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent = false;
     private final RoboticsAddressMapper addressMapper;
+    private final JudgementService judgementService;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -43,6 +47,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         BigInteger claimFeeAmount = MonetaryConversions.poundsToPennies(getClaimFeeAmount(caseData));
         BigInteger totalStillOwed = MonetaryConversions.poundsToPennies(getTotalStillOwed(caseData));
         BigInteger amountAlreadyPaid = MonetaryConversions.poundsToPennies(getAmountAlreadyPaid(caseData));
+        BigInteger totalInterest = nonNull(judgementService.ccjJudgmentInterest(caseData))
+            ? MonetaryConversions.poundsToPennies(judgementService.ccjJudgmentInterest(caseData)) : BigInteger.ZERO;
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
@@ -61,11 +67,11 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
-            .orderedAmount(orderAmount.toString())
+            .orderedAmount(orderAmount.add(totalInterest).toString())
             .costs(costs.toString())
             .claimFeeAmount(claimFeeAmount.toString())
             .amountAlreadyPaid(amountAlreadyPaid.toString())
-            .totalAmount(orderAmount.add(costs).add(claimFeeAmount).toString())
+            .totalAmount(orderAmount.add(costs).add(claimFeeAmount).add(totalInterest).toString())
             .build();
 
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);

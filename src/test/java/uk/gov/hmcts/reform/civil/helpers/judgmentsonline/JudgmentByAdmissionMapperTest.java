@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
@@ -43,7 +45,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class JudgmentByAdmissionMapperTest {
 
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
+    private FeatureToggleService featureToggleService;
+    private JudgementService judgementService = new JudgementService(featureToggleService);
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService);
 
     @Test
     void testIfJudgmentByAdmission() {
@@ -59,15 +63,16 @@ class JudgmentByAdmissionMapperTest {
                                       .build())
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
             .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
             .respondent1(PartyBuilder.builder().individual().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
-        assertEquals("14000", activeJudgment.getOrderedAmount());
+        assertEquals("15000", activeJudgment.getOrderedAmount());
         assertEquals("1000", activeJudgment.getCosts());
-        assertEquals("15000", activeJudgment.getTotalAmount());
+        assertEquals("16000", activeJudgment.getTotalAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsRegisterWithRTL());
         assertEquals(JudgmentRTLStatus.ISSUED.getRtlState(), activeJudgment.getRtlState());
         assertEquals(LocalDate.now(), activeJudgment.getIssueDate());
