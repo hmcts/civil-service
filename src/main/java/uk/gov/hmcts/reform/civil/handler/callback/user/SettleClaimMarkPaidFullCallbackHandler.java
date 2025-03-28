@@ -46,7 +46,7 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
 
              The defendants will be notified.""";
     public static final String REQUEST_BEING_REVIEWED_HEADER = "### Request is being reviewed";
-    public static final String CLOSED_HEADER = "### The claim has been marked as paid in full";
+    public static final String CLOSED_HEADER = "### This claim has been marked as settled";
     private final ObjectMapper objectMapper;
 
     @Override
@@ -90,8 +90,9 @@ public class SettleClaimMarkPaidFullCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder();
 
         if (caseData.getMarkPaidForAllClaimants() == null || YES.equals(caseData.getMarkPaidForAllClaimants())) {
+            caseDataBuilder.preStayState(caseData.getCcdState().toString());
             caseDataBuilder.businessProcess(BusinessProcess.ready(SETTLE_CLAIM_MARKED_PAID_IN_FULL));
-            aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CLOSED.name());
+            aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.CASE_STAYED.name());
         }
         return aboutToStartOrSubmitCallbackResponseBuilder.data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
