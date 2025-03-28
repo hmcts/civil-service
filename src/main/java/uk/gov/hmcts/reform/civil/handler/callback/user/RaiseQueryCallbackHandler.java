@@ -46,7 +46,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final CoreCaseUserService coreCaseUserService;
     private final AssignCategoryId assignCategoryId;
 
-    public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
+    public static final String INVALID_CASE_STATE_ERROR = "If your case is assoffline, you cannot raise a query.";
 
     @Override
     protected Map<String, Callback> callbacks() {
