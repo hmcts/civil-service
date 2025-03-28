@@ -77,8 +77,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     }
 
     private boolean isBilingualForLipApplicant(CaseData caseData) {
-        return caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()
-            && caseData.isClaimantBilingual();
+        return caseData.isApplicantNotRepresented() && caseData.isClaimantBilingual();
     }
 
     @Override

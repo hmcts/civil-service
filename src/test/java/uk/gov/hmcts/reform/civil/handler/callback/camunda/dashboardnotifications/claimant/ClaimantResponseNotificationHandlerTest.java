@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,11 +73,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void before() {
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        }
 
         @ParameterizedTest
         @MethodSource("provideCaseStateAndScenarioArguments")
@@ -350,7 +344,6 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .applicant1Represented(YesOrNo.NO)

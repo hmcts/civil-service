@@ -80,7 +80,6 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("orderDocument", "url");
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder().respondent1Represented(YesOrNo.NO)
@@ -123,8 +122,6 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldRecordScenarioDefendantFinalOrder_whenInvoked() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .isFinalOrder(YesOrNo.YES)
@@ -148,8 +145,6 @@ class ConfirmOrderReviewDefendantNotificationHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)

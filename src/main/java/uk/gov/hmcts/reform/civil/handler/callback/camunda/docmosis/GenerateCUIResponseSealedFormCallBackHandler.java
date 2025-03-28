@@ -73,10 +73,10 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        log.info("stitchEnabled {}, isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", stitchEnabled,
-                 caseData.isLipvLipOneVOne(), featureToggleService.isLipVLipEnabled(), caseId);
+        log.info("stitchEnabled {}, isLipvLipOneVOne {} for case {}", stitchEnabled,
+                 caseData.isLipvLipOneVOne(), caseId);
 
-        if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+        if (stitchEnabled && caseData.isLipvLipOneVOne()) {
             log.info("if condition for case {}", caseId);
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);

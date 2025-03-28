@@ -371,7 +371,7 @@ public class EventHistoryMapper {
             .eventDetails(EventDetails.builder()
                               .miscText("")
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+                              .amountOfCosts(caseData.isApplicantLipOneVOne()
                                                  ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                                                  : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
@@ -612,7 +612,7 @@ public class EventHistoryMapper {
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                                  .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+                                  .add(caseData.isLipvLipOneVOne()
                                            ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
                                            Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
                                   .setScale(2))
