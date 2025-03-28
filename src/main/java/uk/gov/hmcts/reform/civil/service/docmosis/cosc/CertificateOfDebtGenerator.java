@@ -27,7 +27,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @Slf4j
 @Service
@@ -36,13 +36,15 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
 
     public static final String MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED = "Marked to show that the debt is satisfied.";
     public static final String REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT = "REMOVED (as payment has been made in full within one month of judgment).";
+    public static final String MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED_WELSH = "Wedi'i farcio i ddangos bod y ddyled wedi’i thalu.";
+    public static final String REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT_WELSH
+        = "DILËWYD (gan fod taliad wedi'i wneud yn llawn o fewn mis i'r dyfarniad).";
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final LocationReferenceDataService locationRefDataService;
 
-    public CaseDocument generateDoc(CaseData caseData, String authorisation) {
+    public CaseDocument generateDoc(CaseData caseData, String authorisation, DocmosisTemplates docmosisTemplate) {
         CertificateOfDebtForm templateData = getCertificateOfDebtTemplateData(caseData, authorisation);
-        DocmosisTemplates docmosisTemplate = CERTIFICATE_OF_DEBT_PAYMENT;
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
 
@@ -78,18 +80,24 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
                 caseData.getActiveJudgment().getFullyPaymentMadeDate(),
                 DateFormatHelper.DATE
             ))
-            .judgmentStatusText(getJudgmentText(caseData.getActiveJudgment()))
-            .courtLocationName(getCourtName(caseData, authorisation));
+            .judgmentStatusText(getJudgmentText(caseData.getActiveJudgment(), false))
+            .courtLocationName(getCourtName(caseData, authorisation))
+            .judgmentStatusWelshText(getJudgmentText(caseData.getActiveJudgment(), true))
+            .judgmentOrderDateWelsh(getDateInWelsh(caseData.getActiveJudgment().getIssueDate()))
+            .dateFinalPaymentMadeWelsh(getDateInWelsh(caseData.getActiveJudgment().getFullyPaymentMadeDate()))
+            .applicationIssuedDateWelsh(getDateInWelsh(LocalDate.now()));
 
         return certificateOfDebtForm.build();
     }
 
-    private String getJudgmentText(JudgmentDetails activeJudgment) {
+    private String getJudgmentText(JudgmentDetails activeJudgment, boolean isBilingual) {
 
         if (JudgmentState.SATISFIED.equals(activeJudgment.getState())) {
-            return MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED;
+            return isBilingual ? MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED_WELSH
+                : MARKED_TO_SHOW_THAT_THE_DEBT_IS_SATISFIED;
         } else if (JudgmentState.CANCELLED.equals(activeJudgment.getState())) {
-            return REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT;
+            return isBilingual ? REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT_WELSH
+                : REMOVED_AS_PAYMENT_HAS_BEEN_MADE_IN_FULL_WITHIN_ONE_MONTH_OF_JUDGMENT;
         }
         return null;
     }
@@ -113,4 +121,7 @@ public class CertificateOfDebtGenerator implements TemplateDataGenerator<Certifi
 
     }
 
+    protected String getDateInWelsh(LocalDate date) {
+        return Objects.isNull(date) ? null : formatDateInWelsh(date, false);
+    }
 }
