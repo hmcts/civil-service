@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -63,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForPa
 @Slf4j
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
+    Logger logger = LoggerFactory.getLogger(DefaultJudgementSpecHandler.class);
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
@@ -356,6 +359,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        logger.info("Calculated interest: {}", interest);
         Fee claimfee = caseData.getClaimFee();
         BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
         BigDecimal fixedCost = getFixedCosts(caseData, interestCalculator);
