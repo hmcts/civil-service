@@ -85,11 +85,14 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
-
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
+            buildLatestQuery(latestCaseMessage));
+        // this change is temporary to avoid errors in case of lip until email notifications are implemented for lip
+        if (!caseData.isLipCase()) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(queryManagementRaiseQuery));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().qmLatestQuery(
-                buildLatestQuery(latestCaseMessage))
-                      .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
+            .data(caseDataBuilder
                       .build().toMap(objectMapper))
             .build();
     }
