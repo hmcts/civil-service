@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 @RequiredArgsConstructor
 public class InterestCalculator {
 
-    Logger logger = LoggerFactory.getLogger(InterestCalculator.class);
     public static final int TO_FULL_PENNIES = 2;
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
@@ -53,12 +50,10 @@ public class InterestCalculator {
                 interestAmount = caseData.getBreakDownInterestTotal();
             }
         }
-        logger.info("ClaimInterest: {}, InterestClaimOptions: {}, Calculated interest: {}", caseData.getClaimInterest(), caseData.getInterestClaimOptions(), interestAmount);
         return interestAmount;
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
-        logger.info("InterestClaimFrom: {}", caseData.getInterestClaimFrom());
         if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)) {
             LocalDate interestFromDate = getSubmittedDate(caseData);
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
