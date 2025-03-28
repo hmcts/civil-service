@@ -106,7 +106,6 @@ class CaseQueriesUtilTest {
         assertEquals(applicantCitizenQueries, result);
     }
 
-
     @Test
     void shouldReturnRespondentSolicitor2Queries_WhenRoleIsRespondentSolicitor2() {
         CaseQueriesCollection respondentSolicitor2Queries = CaseQueriesCollection.builder()
@@ -232,7 +231,6 @@ class CaseQueriesUtilTest {
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
     }
-
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent2UploadsAttachment() {
