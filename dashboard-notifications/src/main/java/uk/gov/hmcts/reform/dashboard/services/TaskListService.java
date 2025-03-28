@@ -82,7 +82,21 @@ public class TaskListService {
     }
 
     @Transactional
-    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory) {
+    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role) {
+        makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, null);
+    }
+
+    @Transactional
+    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(String caseIdentifier, String role, String excludedCategory) {
+        makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, excludedCategory, null);
+    }
+
+    @Transactional
+    public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(String caseIdentifier, String role, String excludedTemplate) {
+        makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, excludedTemplate);
+    }
+
+    private void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory, String excludedTemplate) {
         List<TaskListEntity> tasks = new ArrayList<>();
         if (Objects.nonNull(excludedCategory)) {
             List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(excludedCategory, role);
@@ -93,10 +107,16 @@ public class TaskListService {
                                                   TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()), catIds
                 );
             }
+        } else if (Objects.nonNull(excludedTemplate)) {
+            tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameNot(
+                caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                                              TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+                ), excludedTemplate);
         } else {
             tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
                 caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                                              TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()));
+                                              TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+                ));
         }
         tasks.forEach(t -> {
             TaskListEntity task = t.toBuilder()

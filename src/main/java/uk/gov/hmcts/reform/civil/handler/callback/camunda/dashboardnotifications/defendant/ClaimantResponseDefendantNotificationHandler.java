@@ -129,8 +129,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
 
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseId,
-                "DEFENDANT",
-                null
+                "DEFENDANT"
             );
         }
     }

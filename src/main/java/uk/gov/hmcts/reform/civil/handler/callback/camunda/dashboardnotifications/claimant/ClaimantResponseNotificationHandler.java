@@ -110,8 +110,7 @@ public class ClaimantResponseNotificationHandler extends DashboardCallbackHandle
             );
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseId,
-                "CLAIMANT",
-                null
+                "CLAIMANT"
             );
         }
     }

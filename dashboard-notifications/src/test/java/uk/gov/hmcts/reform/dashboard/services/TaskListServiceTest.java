@@ -171,7 +171,7 @@ class TaskListServiceTest {
             .thenReturn(tasks);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", null);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant");
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
@@ -260,7 +260,7 @@ class TaskListServiceTest {
             .thenReturn(categories);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole("123", "Claimant", "CategoryEn");
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory("123", "Claimant", "CategoryEn");
 
         //then
         verify(taskItemTemplateRepository).findByCategoryEnAndRole(

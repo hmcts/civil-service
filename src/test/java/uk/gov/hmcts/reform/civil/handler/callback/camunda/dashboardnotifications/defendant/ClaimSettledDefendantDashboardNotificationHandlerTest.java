@@ -99,8 +99,7 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
                 "DEFENDANT");
             verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "DEFENDANT",
-                null);
+                "DEFENDANT");
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
