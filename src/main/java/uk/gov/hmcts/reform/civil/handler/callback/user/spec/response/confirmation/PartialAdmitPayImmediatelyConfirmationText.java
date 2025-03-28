@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmati
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -68,7 +69,11 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         }
 
         sb.append(" legal representative if you need details on how to pay.</p>");
-        BigDecimal claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+
+        BigDecimal claimOwingAmount = Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmountPounds())
+            .orElseGet(() -> RespondentResponseType.FULL_ADMISSION.equals(caseData.getRespondentClaimResponseTypeForSpecGeneric())
+                ? caseData.getTotalClaimAmount()
+                : null);
 
         if (isLipVLr) {
             sb.append("<h2 class=\"govuk-heading-m\">If ").append(applicantName).append(" accepts your offer of &#163;")
