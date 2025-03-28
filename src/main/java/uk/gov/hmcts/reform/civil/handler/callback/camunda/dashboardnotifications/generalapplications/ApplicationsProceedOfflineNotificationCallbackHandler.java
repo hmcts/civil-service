@@ -27,6 +27,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_APPLICATION_PROCEED_OFFLINE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
 
 @Service
@@ -75,13 +77,23 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
 
     private CallbackResponse configureScenarioForProceedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            || (caseData.getGeneralApplications() == null || caseData.getGeneralApplications().isEmpty())) {
+        if (!caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String notificationType = notificationType(callbackParams);
         if (notificationType == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+        ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+        dashboardScenariosService.recordScenarios(
+            authToken,
+            notificationType.equals(CLAIMANT)
+                ? SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario()
+                : SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            notificationParams);
+        if (caseData.getGeneralApplications() == null || caseData.getGeneralApplications().isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         if (isApplicationsExistLive(caseData, notificationType)) {
@@ -91,7 +103,7 @@ public class ApplicationsProceedOfflineNotificationCallbackHandler extends Callb
                     ? SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario()
                     : SCENARIO_AAA6_UPDATE_CASE_PROCEED_IN_CASE_MAN_DEFENDANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build());
+                notificationParams);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
