@@ -135,8 +135,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -154,8 +154,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -173,8 +173,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -213,8 +213,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -235,8 +235,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -257,8 +257,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
