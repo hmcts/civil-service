@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimDismissedNotifyParties;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -29,7 +30,6 @@ public class ClaimDismissedNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_APPLICANT_FOR_CLAIM_DISMISSED = "claim-dismissed-applicant-notification-%s";
     private static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED = "claim-dismissed-respondent-notification-%s";
-    private static final String TASK_ID = "ClaimDismissedNotifyParties";
 
     protected ClaimDismissedNotifier(NotificationService notificationService,
                                      NotificationsProperties notificationsProperties,
@@ -41,7 +41,7 @@ public class ClaimDismissedNotifier extends Notifier {
 
     @Override
     public String getTaskId() {
-        return TASK_ID;
+        return ClaimDismissedNotifyParties.toString();
     }
 
     @Override

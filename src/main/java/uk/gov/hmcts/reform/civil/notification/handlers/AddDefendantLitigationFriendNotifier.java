@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.LitigationFriendAddedNotifier;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
@@ -26,7 +27,6 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
     private static final String REFERENCE_TEMPLATE_RESPONDENT = "litigation-friend-added-respondent-notification-%s";
-    private static final String TASK_ID = "LitigationFriendAddedNotifier";
 
     public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
                                                 NotificationsProperties notificationsProperties,
@@ -38,7 +38,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
 
     @Override
     public String getTaskId() {
-        return TASK_ID;
+        return LitigationFriendAddedNotifier.toString();
     }
 
     @Override
