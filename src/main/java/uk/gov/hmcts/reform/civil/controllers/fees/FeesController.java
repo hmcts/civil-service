@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAndSettlementAmountsCalculator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
@@ -40,6 +41,7 @@ public class FeesController {
     private final FeesService feesService;
     private final GeneralAppFeesService generalAppFeesService;
     private final InterestCalculator interestCalculator;
+    private final JudgmentAndSettlementAmountsCalculator judgmentAndSettlementAmountsCalculator;
 
     @GetMapping("/ranges")
     @Operation(summary = "Gets a group of claim amount ranges and associated fees for those ranges")
@@ -69,6 +71,16 @@ public class FeesController {
     public ResponseEntity<BigDecimal> calculateClaimInterest(@RequestBody CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         return new ResponseEntity<>(interest, HttpStatus.OK);
+    }
+
+    @PostMapping("/claim/total-claim-amount")
+    @Operation(summary = "Calculates the claim interest")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+    public ResponseEntity<BigDecimal> getTotalClaimAmount(@RequestBody CaseData caseData) {
+        BigDecimal totalClaimAmount = judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(caseData);
+        return new ResponseEntity<>(totalClaimAmount, HttpStatus.OK);
     }
 
     @GetMapping("/hearing/{claimAmount}")
