@@ -48,9 +48,7 @@ public class SendAndReplyMessageService {
         entry("national-business-centre", RolePool.ADMIN),
         entry("circuit-judge", RolePool.JUDICIAL_CIRCUIT),
         entry("district-judge", RolePool.JUDICIAL_DISTRICT),
-        entry("judge", RolePool.JUDICIAL),
-        entry("allocated-judge", RolePool.JUDICIAL)
-
+        entry("judge", RolePool.JUDICIAL)
     );
 
     private static final List<String> SUPPORTED_ROLES = List.of(
@@ -64,8 +62,7 @@ public class SendAndReplyMessageService {
         "national-business-centre",
         "circuit-judge",
         "district-judge",
-        "judge",
-        "allocated-judge"
+        "judge"
     );
 
     private static final Map<RecipientOption, RolePool> ROLE_SELECTION_TO_POOL = Map.of(
@@ -133,7 +130,7 @@ public class SendAndReplyMessageService {
     }
 
     private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
-        var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
+        var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth, SUPPORTED_ROLES);
 
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
             .filter(userRole -> SUPPORTED_ROLES.contains(userRole.getRoleName()))
