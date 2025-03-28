@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -25,9 +26,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.nonNull;
 
 @Slf4j
@@ -37,6 +36,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     boolean isNonDivergent = false;
     private final RoboticsAddressMapper addressMapper;
+    private final JudgementService judgementService;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -47,8 +47,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         BigInteger claimFeeAmount = MonetaryConversions.poundsToPennies(getClaimFeeAmount(caseData));
         BigInteger totalStillOwed = MonetaryConversions.poundsToPennies(getTotalStillOwed(caseData));
         BigInteger amountAlreadyPaid = MonetaryConversions.poundsToPennies(getAmountAlreadyPaid(caseData));
-        BigInteger totalInterest = nonNull(getCCJInterest(caseData))
-            ? MonetaryConversions.poundsToPennies(getCCJInterest(caseData)) : BigInteger.ZERO;
+        BigInteger totalInterest = nonNull(judgementService.ccjJudgmentInterest(caseData))
+            ? MonetaryConversions.poundsToPennies(judgementService.ccjJudgmentInterest(caseData)) : BigInteger.ZERO;
         isNonDivergent = JudgmentsOnlineHelper.isNonDivergentForJBA(caseData);
         PaymentPlanSelection paymentPlan = getPaymentPlan(caseData);
 
@@ -205,10 +205,5 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             return PaymentPlanSelection.PAY_BY_DATE;
         }
         return PaymentPlanSelection.PAY_IMMEDIATELY;
-    }
-
-    private BigDecimal getCCJInterest(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-            Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
     }
 }
