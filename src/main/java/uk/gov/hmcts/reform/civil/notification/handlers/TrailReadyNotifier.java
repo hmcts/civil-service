@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
@@ -27,18 +28,19 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Component
 @Setter
-public class TrailReadyNotifier extends Notifier {
-
-    private String eventId;
+public abstract class TrailReadyNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE = "other-party-trial-ready-notification-%s";
+
+    protected static String TASK_ID;
 
     public TrailReadyNotifier(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
         OrganisationService organisationService,
-        SimpleStateFlowEngine stateFlowEngine) {
-        super(notificationService, notificationsProperties, organisationService, stateFlowEngine);
+        SimpleStateFlowEngine stateFlowEngine,
+        CaseTaskTrackingService caseTaskTrackingService) {
+        super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
     }
 
     @Override
@@ -63,14 +65,14 @@ public class TrailReadyNotifier extends Notifier {
     @Override
     protected Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
-        switch (CaseEvent.valueOf(eventId)) {
-            case APPLICANT_NOTIFY_OTHERS_TRIAL_READY -> {
+        switch (TASK_ID) {
+            case "ApplicantNotifyOthersTrialReadyNotifier" -> {
                 partiesToEmail.add(getRespondent(caseData, true));
                 if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
                     partiesToEmail.add(getRespondent(caseData, false));
                 }
             }
-            case RESPONDENT1_NOTIFY_OTHERS_TRIAL_READY -> {
+            case "Respondent1NotifyOthersTrialReadyNotifier" -> {
                 partiesToEmail.add(getApplicant(caseData));
                 if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
                     partiesToEmail.add(getRespondent(caseData, false));
