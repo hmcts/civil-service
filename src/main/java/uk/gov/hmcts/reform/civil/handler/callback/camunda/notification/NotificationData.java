@@ -117,6 +117,8 @@ public interface NotificationData {
 
     String QUERY_DATE = "queryDate";
 
+    String CONTACT_DETAILS_FOOTER = "contactDetails";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }

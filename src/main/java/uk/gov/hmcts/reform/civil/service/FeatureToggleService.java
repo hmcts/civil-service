@@ -160,4 +160,19 @@ public class FeatureToggleService {
     public boolean isQueryManagementLRsEnabled() {
         return featureToggleApi.isFeatureEnabled("query-management");
     }
+
+    public boolean isQueryManagementLipEnabled() {
+        return featureToggleApi.isFeatureEnabled("query-management-lips");
+    }
+
+    public boolean isQMApplicableLiPCase(CaseData caseData)  {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch;
+        if (caseData.getSubmittedDate() == null) {
+            epoch = LocalDateTime.now().atZone(zoneId).toEpochSecond();
+        } else {
+            epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        }
+        return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
 }

@@ -318,4 +318,27 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsQMForLiPs(Boolean toggleStat) {
+        var caseFlagsKey = "query-management-lips";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isQueryManagementLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenQMApplicableLiPCase(Boolean toggleStat) {
+        var caseFileKey = "cui-query-management";
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .build();
+        if (toggleStat) {
+            when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
+                .thenReturn(true);
+        }
+        assertThat(featureToggleService.isQMApplicableLiPCase(caseData)).isEqualTo(toggleStat);
+    }
 }
