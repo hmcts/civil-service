@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
@@ -28,12 +29,14 @@ public class AmendRestitchBundleNotifier extends Notifier {
     private static final String REFERENCE_TEMPLATE_APPLICANT = "amend-restitch-bundle-claimant-notification-%s";
     private static final String REFERENCE_TEMPLATE_RESPONDENT = "amend-restitch-bundle-defendant-notification-%s";
     private static final String DATE_FORMAT = "dd-MM-yyyy";
+    private static final String TASK_ID = "AmendRestitchBundleNotifier";
 
     public AmendRestitchBundleNotifier(NotificationService notificationService,
                                        NotificationsProperties notificationsProperties,
                                        OrganisationService organisationService,
-                                       SimpleStateFlowEngine stateFlowEngine) {
-        super(notificationService, notificationsProperties, organisationService, stateFlowEngine);
+                                       SimpleStateFlowEngine stateFlowEngine,
+                                       CaseTaskTrackingService caseTaskTrackingService) {
+        super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
     }
 
     @Override
@@ -44,6 +47,11 @@ public class AmendRestitchBundleNotifier extends Notifier {
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             BUNDLE_RESTITCH_DATE, LocalDate.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
         ));
+    }
+
+    @Override
+    protected String getTaskId() {
+        return TASK_ID;
     }
 
     @Override

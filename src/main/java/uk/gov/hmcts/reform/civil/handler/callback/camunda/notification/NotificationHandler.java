@@ -9,35 +9,34 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notification.handlers.AmendRestitchBundleNotifier;
+import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
+import uk.gov.hmcts.reform.civil.notification.handlers.NotifierFactory;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_AMEND_RESTITCH_BUNDLE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AmendRestitchBundleNotificationHandler extends CallbackHandler {
+public class NotificationHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_AMEND_RESTITCH_BUNDLE);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT); //Change back to generic NOTIFY_EVENT
 
-    public static final String TASK_ID = "AmendRestitchBundleNotifier";
-
-    private final AmendRestitchBundleNotifier amendRestitchBundleNotifier;
+    private final NotifierFactory  notifierFactory;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyForAmendRestitchBundle
+            callbackKey(ABOUT_TO_SUBMIT), this::sendNotifications
         );
     }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return callbackParams.getCaseData().getBusinessProcess().getActivityId();
     }
 
     @Override
@@ -45,8 +44,10 @@ public class AmendRestitchBundleNotificationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse notifyForAmendRestitchBundle(CallbackParams callbackParams) {
-        amendRestitchBundleNotifier.notifyParties(callbackParams.getCaseData(), NOTIFY_AMEND_RESTITCH_BUNDLE.toString(), TASK_ID);
+    private CallbackResponse sendNotifications(CallbackParams callbackParams) {
+        final String taskId = callbackParams.getCaseData().getBusinessProcess().getActivityId();
+        final Notifier notifier = notifierFactory.getNotifier(taskId);
+        notifier.notifyParties(callbackParams.getCaseData(), NOTIFY_EVENT.toString(), taskId);
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
