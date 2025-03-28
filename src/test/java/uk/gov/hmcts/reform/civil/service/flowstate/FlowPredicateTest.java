@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaiting
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseReadyForDismissal;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
@@ -804,6 +805,109 @@ class FlowPredicateTest {
         }
 
         @Nested
+        class ClaimReadyToBeDismissed {
+            @Test
+            void shouldReturnTrue_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotified() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .build();
+                assertTrue(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt2() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .setRequestDJDamagesFlagForWA(YES)
+                    .build();
+                assertFalse(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGaAndGaMadeByApplicant() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .getGeneralApplicationWithStrikeOut("001", YES)
+                    .build();
+                assertFalse(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGaAndGaNotMadeByApplicant() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .getGeneralApplicationWithStrikeOut("001", NO)
+                    .build();
+                assertTrue(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithNoGa() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .generalApplications()
+                    .build();
+                assertTrue(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(LocalDateTime.now())
+                    .build();
+                assertFalse(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                    .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .build();
+                assertFalse(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence_ext() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                    .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
+                    .respondent1ResponseDate(LocalDateTime.now())
+                    .respondent2ResponseDate(LocalDateTime.now())
+                    .build();
+                assertFalse(caseReadyForDismissal.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateApplicantRespondToDefence_ext1() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                    .claimDismissedDeadline(LocalDateTime.now().minusDays(2))
+                    .respondent1ResponseDate(LocalDateTime.now())
+                    .respondent2ResponseDate(LocalDateTime.now())
+                    .build();
+                assertFalse(caseReadyForDismissal.test(caseData));
+            }
+        }
+
+        @Nested
         class ClaimDismissed {
 
             @Test
@@ -813,6 +917,54 @@ class FlowPredicateTest {
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(null)
                     .takenOfflineByStaffDate(null)
+                    .build();
+                assertTrue(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedExt2() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .setRequestDJDamagesFlagForWA(YES)
+                    .build();
+                assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGaAndGaMadeByApplicant() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .getGeneralApplicationWithStrikeOut("001", YES)
+                    .build();
+                assertFalse(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithGaAndGaNotMadeByApplicant() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .getGeneralApplicationWithStrikeOut("001", NO)
+                    .build();
+                assertTrue(caseDismissedAfterDetailNotified.test(caseData));
+            }
+
+            @Test
+            void shouldReturnFalse_whenCaseDataAtStateClaimDismissedAfterClaimDetailsNotifiedWithNoGa() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDismissed()
+                    .respondent1ResponseDate(null)
+                    .respondent2ResponseDate(null)
+                    .takenOfflineByStaffDate(null)
+                    .generalApplications()
                     .build();
                 assertTrue(caseDismissedAfterDetailNotified.test(caseData));
             }
@@ -1523,7 +1675,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void isInHearingReadiness_whenHearingNoticeSubmitted() {
+        void isInHearingReadiness_whenHearingNoticeSubmitted() {
             CaseData caseData = CaseData.builder()
                 .hearingReferenceNumber("11111")
                 .listingOrRelisting(ListingOrRelisting.LISTING)
@@ -1533,7 +1685,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        public void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
+        void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
             CaseData caseData = CaseData.builder()
                 .hearingReferenceNumber("11111")
                 .listingOrRelisting(ListingOrRelisting.RELISTING)
