@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.81
+version: 0.0.82
 maintainers:
   - name: HMCTS Civil team
 
