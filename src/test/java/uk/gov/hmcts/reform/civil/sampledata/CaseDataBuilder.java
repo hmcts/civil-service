@@ -7080,6 +7080,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder specClaim1v1LrVsLip() {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
+        this.ccdCaseReference = CASE_ID;
         return this;
     }
 

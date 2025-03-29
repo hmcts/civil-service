@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -32,12 +33,35 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private DashboardNotificationService dashboardNotificationService;
+
     @Nested
     class AboutToSubmitCallback {
 
         @Test
         void should_go_to_claim_settled_state() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState()).isNotNull();
+            assertThat(response.getState()).isEqualTo(CASE_SETTLED.name());
+        }
+
+        @Test
+        void should_go_to_claim_settled_stateForLipvLr() {
+            CaseData caseData = CaseDataBuilder.builder().specClaim1v1LipvLr().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState()).isNotNull();
+            assertThat(response.getState()).isEqualTo(CASE_SETTLED.name());
+        }
+
+        @Test
+        void should_go_to_claim_settled_stateForLrvLip() {
+            CaseData caseData = CaseDataBuilder.builder().specClaim1v1LrVsLip().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
