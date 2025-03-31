@@ -280,18 +280,30 @@ public class NotificationUtils {
     }
 
     public static String buildFooter(CaseData caseData, boolean qmForLRsEnabled,
-                                     boolean qmForLiPsEnabled, boolean qmApplicableLipcase) {
+                                     boolean qmForLiPsEnabled, boolean qmApplicableLipcase, boolean isWelsh) {
         boolean queryNotAllowedCaseState = queryNotAllowedCaseStates(caseData);
         if (caseData.isLipCase()) {
             if (qmForLiPsEnabled && qmApplicableLipcase && !queryNotAllowedCaseState) {
-                return "raise a query lips";
+                if (isWelsh) {
+                    return "raise a query lips in welsh";
+                } else {
+                    return "raise a query lips";
+                }
             }
         } else {
             if (qmForLRsEnabled && !queryNotAllowedCaseState) {
-                return "raise a query ";
+                if (isWelsh) {
+                    return "raise a query in welsh";
+                } else {
+                    return "raise a query ";
+                }
             }
         }
-        return "Email: contacthisemail@contact.com";
+        if (isWelsh) {
+            return "Email: contacthiswelshemail@contact.com";
+        } else {
+            return "Email: contacthisemail@contact.com";
+        }
     }
 
     public static final Set<CaseState> qmNotAllowedStates = EnumSet.of(PENDING_CASE_ISSUED, CLOSED,

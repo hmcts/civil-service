@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildFooter;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
@@ -74,20 +75,19 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
     }
 
     private String getEmailTemplate(CaseData caseData) {
-        if (caseData.isLipvLROneVOne()) {
-            if (caseData.isClaimantBilingual()) {
-                return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
-            }
-            return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
-        }
-
-        return notificationsProperties.getSolicitorCaseTakenOffline();
+        return notificationsProperties.getTestTemplate();
     }
 
     private Map<String, String> addPropertiesForLip(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CONTACT_DETAILS_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
+                                                featureToggleService.isQueryManagementLipEnabled(),
+                                                featureToggleService.isQMApplicableLiPCase(caseData), false),
+            WELSH_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
+                                      featureToggleService.isQueryManagementLipEnabled(),
+                                      featureToggleService.isQMApplicableLiPCase(caseData), true)
         );
     }
 
@@ -97,7 +97,13 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
+            CONTACT_DETAILS_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
+                                                featureToggleService.isQueryManagementLipEnabled(),
+                                                featureToggleService.isQMApplicableLiPCase(caseData), false),
+            WELSH_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
+                                                featureToggleService.isQueryManagementLipEnabled(),
+                                                featureToggleService.isQMApplicableLiPCase(caseData), true)
         );
     }
 }

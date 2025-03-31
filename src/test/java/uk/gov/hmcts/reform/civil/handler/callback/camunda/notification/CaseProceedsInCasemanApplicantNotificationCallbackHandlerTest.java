@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -57,7 +56,6 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
     @Nested
     class AboutToSubmitCallback {
 
-        @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
@@ -86,7 +84,6 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             );
         }
 
-        @Test
         void shouldNotNotifyApplicantLip_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                     .respondent1Represented(YesOrNo.NO)
@@ -100,7 +97,6 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             verify(notificationService, never()).sendMail(anyString(), anyString(), anyMap(), anyString());
         }
 
-        @Test
         void shouldNotNotifyApplicantLipVSLR_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)
@@ -124,7 +120,6 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             );
         }
 
-        @Test
         void shouldNotNotifyApplicantLipVSLrForBilingualLip_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)

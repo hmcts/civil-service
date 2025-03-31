@@ -96,7 +96,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
             formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
             CONTACT_DETAILS_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
                                                 featureToggleService.isQueryManagementLipEnabled(),
-                                                featureToggleService.isQMApplicableLiPCase(caseData))));
+                                                featureToggleService.isQMApplicableLiPCase(caseData), false),
+            WELSH_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
+                                      featureToggleService.isQueryManagementLipEnabled(),
+                                      featureToggleService.isQMApplicableLiPCase(caseData), true)));
 
         if (caseData.getRespondent2() != null) {
             properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
