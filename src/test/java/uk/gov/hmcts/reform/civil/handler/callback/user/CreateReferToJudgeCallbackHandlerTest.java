@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -60,8 +62,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(123L).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -109,6 +111,9 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .setClaimTypeToUnspecClaim()
                 .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
                 .build();
+
+            given(helper.leadDefendantIs1(any()))
+                .willReturn(false);
 
             given(helper.getClaimantRequestedCourt(any()))
                 .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
