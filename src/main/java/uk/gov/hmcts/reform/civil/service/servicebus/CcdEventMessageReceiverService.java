@@ -78,9 +78,7 @@ public class CcdEventMessageReceiverService {
     private void updateExistingExceptionRecord(ExceptionRecordEntity existingRecord,
                                                                 Result.Error error) {
 
-        if (existingRecord.getSuccessfulActions().size() == error.exceptionRecord().successfulActions().size()
-            && existingRecord.getSuccessfulActions().containsAll(error.exceptionRecord().successfulActions())
-        && error.exceptionRecord().successfulActions().containsAll(existingRecord.getSuccessfulActions())) {
+        if (actionsListsHasSameElements(existingRecord, error)) {
             return;
         }
 
@@ -106,4 +104,9 @@ public class CcdEventMessageReceiverService {
         );
     }
 
+    private static boolean actionsListsHasSameElements(ExceptionRecordEntity existingRecord, Result.Error error) {
+        return existingRecord.getSuccessfulActions().size() == error.exceptionRecord().successfulActions().size()
+            && existingRecord.getSuccessfulActions().containsAll(error.exceptionRecord().successfulActions())
+            && error.exceptionRecord().successfulActions().containsAll(existingRecord.getSuccessfulActions());
+    }
 }

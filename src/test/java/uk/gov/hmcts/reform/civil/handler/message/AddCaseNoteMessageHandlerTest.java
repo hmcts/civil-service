@@ -11,12 +11,12 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Result;
-import uk.gov.hmcts.reform.civil.model.message.CcdEventMessage;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.RoboticsNotifier;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -64,14 +64,7 @@ class AddCaseNoteMessageHandlerTest {
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
 
-        CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
-            .caseId(CASE_ID)
-            .eventId(ADD_CASE_NOTE.name())
-            .jurisdictionId("Civil")
-            .caseTypeId("CIVIL")
-            .build();
-
-        Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
+        Result result = addCaseNoteMessageHandler.handle(CASE_ID, emptyList());
 
         verify(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
         assertThat(result).isInstanceOf(Result.Success.class);
@@ -88,19 +81,12 @@ class AddCaseNoteMessageHandlerTest {
         doThrow(new NotificationException(new RuntimeException("error")))
             .when(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
 
-        CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
-            .caseId(CASE_ID)
-            .eventId(ADD_CASE_NOTE.name())
-            .jurisdictionId("Civil")
-            .caseTypeId("CIVIL")
-            .build();
-
-        Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
+        Result result = addCaseNoteMessageHandler.handle(CASE_ID, emptyList());
 
         assertThat(result).isInstanceOf(Result.Error.class);
         Result.Error error = (Result.Error) result;
-        assertThat(error.eventName()).isEqualTo(NOTIFY_RPA_ON_CONTINUOUS_FEED.name());
-        assertThat(error.messageProps()).containsKeys("exceptionMessage", "userId");
+        assertThat(error.exceptionRecord().taskId()).isEqualTo(ADD_CASE_NOTE.name());
+        assertThat(error.exceptionRecord().successfulActions()).isEmpty();
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
