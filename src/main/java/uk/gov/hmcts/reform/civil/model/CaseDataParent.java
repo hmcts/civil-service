@@ -319,6 +319,7 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
     private final PaymentType applicant1RepaymentOptionForDefendantSpec;
+    private final DeterWithoutHearing deterWithoutHearing;
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
