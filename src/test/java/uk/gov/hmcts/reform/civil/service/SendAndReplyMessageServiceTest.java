@@ -66,6 +66,20 @@ class SendAndReplyMessageServiceTest {
 
     private Message message;
 
+    private static final List<String> SUPPORTED_ROLES = List.of(
+        "ctsc-team-leader",
+        "ctsc",
+        "hearing-centre-team-leader",
+        "hearing-centre-admin",
+        "senior-tribunal-caseworker",
+        "tribunal-caseworker",
+        "nbc-team-leader",
+        "national-business-centre",
+        "circuit-judge",
+        "district-judge",
+        "judge"
+    );
+
     @Mock
     private UserService userService;
 
@@ -105,7 +119,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "Hearing Centre Administrator";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                     RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
                         "Hearing Centre Administrator").roleCategory("ADMIN").build())
@@ -131,7 +145,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "Hearing Centre Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
@@ -164,7 +178,7 @@ class SendAndReplyMessageServiceTest {
 
             String expectedUserRoleLabel = "CTSC";
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build()
@@ -193,7 +207,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "CTSC Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("ctsc").roleLabel("CTSC").roleCategory("ADMIN").build(),
@@ -225,7 +239,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
             String expectedUserRoleLabel = "Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
@@ -256,7 +270,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.LEGAL_OPERATIONS;
             String expectedUserRoleLabel = "Senior Tribunal Caseworker";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("tribunal-caseworker").roleLabel("Tribunal Caseworker").roleCategory(
@@ -289,7 +303,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "National Business Centre";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
@@ -320,7 +334,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.ADMIN;
             String expectedUserRoleLabel = "NBC Team Leader";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("national-business-centre").roleLabel(
@@ -353,7 +367,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL_DISTRICT;
             String expectedUserRoleLabel = "District Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
@@ -385,7 +399,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL_CIRCUIT;
             String expectedUserRoleLabel = "Circuit Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build(),
@@ -417,7 +431,7 @@ class SendAndReplyMessageServiceTest {
 
             RolePool expectedSenderRoleCategory = RolePool.JUDICIAL;
             String expectedUserRoleLabel = "Judge";
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
@@ -567,7 +581,7 @@ class SendAndReplyMessageServiceTest {
 
             String originalUserRoleLabel = oldRoleLabel;
             String newUserRoleLabel = newRoleLabel;
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(roleAssignmentResponses)
             );
 
@@ -622,7 +636,7 @@ class SendAndReplyMessageServiceTest {
         @Test
         void shouldAddMessageReplyToExistingHistory_withTwoExistingReplies() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
-            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH)).thenReturn(
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
                 buildRoleAssignmentsResponse(List.of(
                     RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                     RoleAssignmentResponse.builder().roleName("hearing-centre-admin").roleLabel(
