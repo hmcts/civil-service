@@ -4,7 +4,7 @@ data "azurerm_servicebus_namespace" "ccd-servicebus" {
 }
 
 module "servicebus-subscription-ccd-events" {
-  source       = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=DTSPO-25025-add-status-flag"
+  source       = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=4.x"
   name         = "civil-ccd-case-events-sub-${var.env}"
   namespace_id = data.azurerm_servicebus_namespace.ccd-servicebus.id
   topic_name   = "ccd-case-events-${var.env}"
