@@ -76,7 +76,7 @@ public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseInteg
                 "You requested a County Court Judgment against Mr Defendant Guy"),
             jsonPath("$[0].descriptionEn").value(
                 "<p class=\"govuk-body\">You accepted the <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">repayment plan</a>. When we've processed the request, we'll send you an update by email.</p>"
-                + "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it''s paid</a></p>"),
+                + "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it's paid</a></p>"),
             jsonPath("$[0].titleCy").value(
                 "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ) yn erbyn Mr Defendant Guy"),
             jsonPath("$[0].descriptionCy").value(
