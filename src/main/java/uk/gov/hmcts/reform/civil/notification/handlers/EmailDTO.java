@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.model.NotificationParty;
 
 import java.util.Map;
 
@@ -15,7 +14,6 @@ import java.util.Map;
 public class EmailDTO {
 
     private String targetEmail;
-    private NotificationParty party;
     private String emailTemplate;
     private Map<String, String> parameters;
     private String reference;
