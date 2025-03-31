@@ -241,7 +241,6 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.JO.Claimant"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_JO_CLAIMANT("Scenario.AAA6.ClaimantIntent.RequestedCCJ.JO.Claimant");
 
-
     private final String scenario;
 
     DashboardScenarios(String scenario) {
