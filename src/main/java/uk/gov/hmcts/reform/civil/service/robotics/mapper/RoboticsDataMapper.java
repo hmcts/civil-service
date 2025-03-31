@@ -39,6 +39,8 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -86,7 +88,7 @@ public class RoboticsDataMapper {
     private ClaimDetails buildClaimDetails(CaseData caseData) {
         ClaimDetails.ClaimDetailsBuilder claimDetailsBuilder = ClaimDetails.builder();
 
-        if (!caseData.isLipvLipOneVOne()) {
+        if (!caseData.isLipvLipOneVOne() && !caseData.isLRvLipOneVOne()) {
             claimDetailsBuilder.amountClaimed(caseData.getClaimValue().toPounds());
         }
 
