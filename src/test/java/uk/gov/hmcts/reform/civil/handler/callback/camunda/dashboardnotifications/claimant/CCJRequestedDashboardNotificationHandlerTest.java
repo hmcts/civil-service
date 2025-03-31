@@ -40,8 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
 
 @ExtendWith(MockitoExtension.class)
 class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -197,9 +196,14 @@ class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
             .build();
 
         handler.handle(callbackParams);
+
+        String scenario = featureToggleService.isJudgmentOnlineLive()
+            ? SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_JO_CLAIMANT.getScenario()
+            : SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
+
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario(),
+            scenario,
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
