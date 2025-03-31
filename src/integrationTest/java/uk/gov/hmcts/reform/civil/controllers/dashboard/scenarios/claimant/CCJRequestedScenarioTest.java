@@ -155,8 +155,8 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
                 "Rydych wedi gwneud cais am Ddyfarniad Llys Sirol (CCJ) yn erbyn Mr. Sole Trader"),
             jsonPath("$[0].descriptionCy").value(
                 "<p class=\"govuk-body\">Rydych wedi derbyn y <a href=\"{VIEW_CCJ_REPAYMENT_PLAN_CLAIMANT}\" class=\"govuk-link\">cynllun ad-dalu</a>." +
-                    " Pan fyddwn wedi prosesu’r cais, byddwn yn anfon copi o’r dyfarniad drwy’r post atoch chi.</p>"
-                    + "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it''s paid</a></p>")
+                    " Pan fyddwn wedi prosesu’r cais, byddwn yn anfon diweddariad atoch trwy e-bost.</p>"
+                    + "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Dywedwch wrthym ei fod wedi’i dalu</a></p>")
         );
     }
 }
