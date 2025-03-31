@@ -139,7 +139,7 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 
         handler.handle(callbackParams(caseData));
 
