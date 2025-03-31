@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmati
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -12,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -70,10 +70,15 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
 
         sb.append(" legal representative if you need details on how to pay.</p>");
 
-        BigDecimal claimOwingAmount = Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmountPounds())
-            .orElseGet(() -> RespondentResponseType.FULL_ADMISSION.equals(caseData.getRespondentClaimResponseTypeForSpecGeneric())
-                ? caseData.getTotalClaimAmount()
-                : null);
+        BigDecimal claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+
+        boolean isFullAdmission = RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getRespondentClaimResponseTypeForSpecGeneric()
+        );
+
+        if (isNull(claimOwingAmount) && isFullAdmission) {
+            claimOwingAmount = caseData.getTotalClaimAmount();
+        }
 
         if (isLipVLr) {
             sb.append("<h2 class=\"govuk-heading-m\">If ").append(applicantName).append(" accepts your offer of &#163;")
