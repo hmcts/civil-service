@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -284,6 +285,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             try {
                 organisationService.findOrganisationById(organisationId)
                     .ifPresent(setRespondentSolicitorDetails(caseDataBuilder));
+                caseData.getSystemGeneratedCaseDocuments().removeIf(e -> e.getValue().getDocumentType().equals(
+                    DocumentType.CLAIMANT_CLAIM_FORM));
             } catch (FeignException e) {
                 log.error("Error recovering org id " + organisationId
                               + " for case id " + caseData.getLegacyCaseReference(), e);
