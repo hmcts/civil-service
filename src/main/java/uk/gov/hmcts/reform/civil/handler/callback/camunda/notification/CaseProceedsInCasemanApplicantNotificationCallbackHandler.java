@@ -15,14 +15,20 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildFooter;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -79,31 +85,65 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
     }
 
     private Map<String, String> addPropertiesForLip(CaseData caseData) {
-        return Map.of(
+
+        Map<String, String> properties = new HashMap<>();
+
+        properties.putAll(Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, "abc",
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
+            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+            formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
             CONTACT_DETAILS_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
                                                 featureToggleService.isQueryManagementLipEnabled(),
                                                 featureToggleService.isQMApplicableLiPCase(caseData), false),
             WELSH_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
                                       featureToggleService.isQueryManagementLipEnabled(),
-                                      featureToggleService.isQMApplicableLiPCase(caseData), true)
-        );
+                                      featureToggleService.isQMApplicableLiPCase(caseData), true)));
+
+        if (caseData.getRespondent2() != null) {
+            properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
+        } else {
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(RESPONSE_DEADLINE, formatLocalDateTime(
+                caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+        }
+
+        return properties;
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+
+        Map<String, String> properties = new HashMap<>();
+
+        properties.putAll(Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, "abc",
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference(),
+            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+            formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
             CONTACT_DETAILS_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
                                                 featureToggleService.isQueryManagementLipEnabled(),
                                                 featureToggleService.isQMApplicableLiPCase(caseData), false),
             WELSH_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
-                                                featureToggleService.isQueryManagementLipEnabled(),
-                                                featureToggleService.isQMApplicableLiPCase(caseData), true)
-        );
+                                      featureToggleService.isQueryManagementLipEnabled(),
+                                      featureToggleService.isQMApplicableLiPCase(caseData), true)));
+
+        if (caseData.getRespondent2() != null) {
+            properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
+        } else {
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(RESPONSE_DEADLINE, formatLocalDateTime(
+                caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+        }
+
+        return properties;
     }
 }
