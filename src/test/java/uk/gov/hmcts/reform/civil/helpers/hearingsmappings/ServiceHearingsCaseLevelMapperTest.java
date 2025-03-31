@@ -45,7 +45,7 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         String publicCaseName = ServiceHearingsCaseLevelMapper.getPublicCaseName(caseData);
 
-        assertThat(publicCaseName).isEqualTo("'John Rambo' v 'Sole Trader'");
+        assertThat(publicCaseName).isEqualTo("John Rambo v Sole Trader");
     }
 
     @Test
@@ -230,7 +230,7 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         @Test
         void shouldReturnExpectedPublicCaseName_whenCaseNamePublicExists() {
-            var expected = "'A Somebody' vs 'Somebody else'";
+            var expected = "A Somebody vs Somebody else";
             var caseData = CaseData.builder()
                 .caseNamePublic(expected)
                 .applicant1(applicant1)
@@ -244,7 +244,7 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         @Test
         void shouldReturnExpectedPublicCaseName_whenCaseNamePublicDoesNotExist() {
-            var expected = "'Applicant One' v 'Respondent One'";
+            var expected = "Applicant One v Respondent One";
             var caseData = CaseData.builder()
                 .applicant1(applicant1)
                 .respondent1(respondent1)

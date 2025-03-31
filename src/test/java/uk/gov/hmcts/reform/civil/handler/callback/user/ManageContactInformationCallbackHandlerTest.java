@@ -1407,7 +1407,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .toBuilder()
                 .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
                 .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
-                .caseNamePublic("'John Rambo' v 'Dis Guy'")
+                .caseNamePublic("John Rambo v Dis Guy")
                 .build();
 
             CaseData updated = caseDataBefore.toBuilder()
@@ -1456,8 +1456,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getCaseNameHmctsInternal())
-                .isEqualTo("'John Rambo' represented by 'Applicant Litigation Friend' (litigation friend) " +
-                               "v 'Sole Trader'");
+                .isEqualTo("John Rambo represented by Applicant Litigation Friend (litigation friend) " +
+                               "v Sole Trader");
         }
 
         @Nested
