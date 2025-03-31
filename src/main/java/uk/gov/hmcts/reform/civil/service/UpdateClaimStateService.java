@@ -76,7 +76,8 @@ public class UpdateClaimStateService {
         return isProceedOrNotSettleClaim(caseData)
             && (isClaimantOrDefendantRejectMediation(caseData)
             || caseData.isFastTrackClaim()
-            || ((MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack()) || INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
+            || ((MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            || INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack()))
             && featureToggleService.isMultiOrIntermediateTrackEnabled(caseData)));
     }
 

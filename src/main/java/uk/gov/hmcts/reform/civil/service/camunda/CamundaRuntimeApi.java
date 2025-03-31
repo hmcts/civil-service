@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import uk.gov.hmcts.reform.civil.model.ExternalTaskDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,9 +20,6 @@ public interface CamundaRuntimeApi {
         @PathVariable("processInstanceId") String processInstanceId,
         @RequestHeader("ServiceAuthorization") String serviceAuthorization
     );
-
-    @GetMapping("/external-task")
-    List<ExternalTaskDTO> getExternalTasks(@RequestParam("processInstanceId") String processInstanceId);
 
     @PostMapping("/decision-definition/key/{decisionKey}/tenant-id/{tenantId}/evaluate")
     List<Map<String, Object>> evaluateDecision(

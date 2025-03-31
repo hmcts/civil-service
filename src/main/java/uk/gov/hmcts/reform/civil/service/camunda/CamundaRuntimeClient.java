@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.community.rest.client.model.VariableValueDto;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.model.ExternalTaskDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,10 +28,6 @@ public class CamundaRuntimeClient {
         HashMap parsedResponse = new HashMap<String, Object>();
         variablesResponse.entrySet().stream().forEach(entry -> parsedResponse.put(entry.getKey(), entry.getValue().getValue()));
         return parsedResponse;
-    }
-
-    public List<ExternalTaskDTO> getTasksForProcessInstance(String processInstanceId) {
-        return camundaRestEngineApi.getExternalTasks(processInstanceId);
     }
 
     public Map<String, Object> getEvaluatedDmnCourtLocations(String courtId, String caseTrackValue) {
