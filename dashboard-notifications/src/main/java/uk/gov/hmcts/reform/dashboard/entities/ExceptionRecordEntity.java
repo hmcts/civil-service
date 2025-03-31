@@ -53,7 +53,7 @@ public class ExceptionRecordEntity implements Serializable {
     private List<String> successfulActions = new ArrayList<>();
 
     @Schema(name = "retry_count")
-    private int retryCount;
+    private int remainingRetries;
 
     @Schema(name = "created_at")
     private OffsetDateTime createdAt;

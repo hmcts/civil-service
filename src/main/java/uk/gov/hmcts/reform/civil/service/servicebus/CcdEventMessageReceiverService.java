@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.dashboard.entities.ExceptionRecordEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.ExceptionRecordRepository;
 
 import java.time.OffsetDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,13 +48,12 @@ public class CcdEventMessageReceiverService {
         validateResult(exceptionRecordEntity.getIdempotencyKey(), result);
     }
 
-    private void handleMessage(CcdEventMessage caseEventMessage,
-                               String idempotencyKey) {
+    private void handleMessage(CcdEventMessage caseEventMessage, String idempotencyKey) {
         Result result = null;
 
         for (var handler : messageHandlers) {
             if (handler.canHandle(caseEventMessage.getEventId())) {
-                result = handler.handle(caseEventMessage.getCaseId(), Collections.emptyList());
+                result = handler.handle(caseEventMessage.getCaseId(), new ArrayList<>());
                 break;
             }
         }
@@ -75,23 +74,22 @@ public class CcdEventMessageReceiverService {
         }
     }
 
-    private void updateExistingExceptionRecord(ExceptionRecordEntity existingRecord,
-                                                                Result.Error error) {
+    private void updateExistingExceptionRecord(ExceptionRecordEntity existingRecord, Result.Error error) {
 
-        if (actionsListsHasSameElements(existingRecord, error)) {
-            return;
-        }
+        int remainingRetries = existingRecord.getRemainingRetries() == 0
+            ? 0
+            : existingRecord.getRemainingRetries() - 1;
 
         exceptionRecordRepository.save(
             existingRecord.toBuilder()
                 .successfulActions(error.exceptionRecord().successfulActions())
                 .updatedOn(OffsetDateTime.now())
+                .remainingRetries(remainingRetries)
                 .build()
         );
     }
 
-    private void saveNewExceptionRecord(Result.Error error,
-                                        String idempotencyKey) {
+    private void saveNewExceptionRecord(Result.Error error, String idempotencyKey) {
         exceptionRecordRepository.save(
             ExceptionRecordEntity.builder()
                 .idempotencyKey(idempotencyKey)
@@ -100,13 +98,8 @@ public class CcdEventMessageReceiverService {
                 .successfulActions(error.exceptionRecord().successfulActions())
                 .createdAt(OffsetDateTime.now())
                 .updatedOn(OffsetDateTime.now())
+                .remainingRetries(3)
                 .build()
         );
-    }
-
-    private static boolean actionsListsHasSameElements(ExceptionRecordEntity existingRecord, Result.Error error) {
-        return existingRecord.getSuccessfulActions().size() == error.exceptionRecord().successfulActions().size()
-            && existingRecord.getSuccessfulActions().containsAll(error.exceptionRecord().successfulActions())
-            && error.exceptionRecord().successfulActions().containsAll(existingRecord.getSuccessfulActions());
     }
 }
