@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
@@ -624,9 +625,9 @@ public class EventHistoryMapper {
                                    ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
                                    : null)
             .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, repaymentPlan))
-            .installmentPeriod(isResponsePayByInstallment
+            .installmentPeriod(featureToggleService.isJOLiveFeedActive() ? getJBAInstallmentPeriod(caseData) : (isResponsePayByInstallment
                                    ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
-                                   : null)
+                                   : null))
             .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
             .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
@@ -2393,6 +2394,22 @@ public class EventHistoryMapper {
                     return null;
             }
         }).orElse(null);
+    }
+
+    private String getJBAInstallmentPeriod(CaseData caseData) {
+        if (caseData.isPayByInstallment()) {
+            PaymentFrequencyLRspec repaymentFrequency = caseData.getRespondent1RepaymentPlan().getRepaymentFrequency();
+            return switch (repaymentFrequency) {
+                case ONCE_ONE_WEEK -> "WK";
+                case ONCE_TWO_WEEKS -> "FOR";
+                case ONCE_ONE_MONTH -> "MTH";
+                default -> null;
+            };
+        } else if (caseData.isPayBySetDate()) {
+            return "FUL";
+        } else {
+            return "FW";
+        }
     }
 
     private void buildClaimTakenOfflineAfterDJ(EventHistory.EventHistoryBuilder builder,
