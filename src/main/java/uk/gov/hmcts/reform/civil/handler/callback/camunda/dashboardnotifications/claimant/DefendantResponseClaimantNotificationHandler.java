@@ -88,6 +88,7 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
             featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0
                 && ((caseData.getRespondent1ClaimResponseTypeForSpec().equals(
+                    RespondentResponseTypeSpec.COUNTER_CLAIM) && caseData.isApplicant1NotRepresented()) || caseData.nocApplyForLiPDefendant())
         );
     }
 
