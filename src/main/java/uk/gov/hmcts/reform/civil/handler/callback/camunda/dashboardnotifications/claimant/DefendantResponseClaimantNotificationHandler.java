@@ -134,7 +134,8 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
 
     private boolean isCarmApplicable(CaseData caseData) {
         return getFeatureToggleService().isCarmEnabledForCase(caseData)
-            && caseData.isSmallClaim();    }
+            && caseData.isSmallClaim();
+    }
 
     private String defendantResponseStatesPaid(CaseData caseData) {
         return caseData.isPaidFullAmount()
