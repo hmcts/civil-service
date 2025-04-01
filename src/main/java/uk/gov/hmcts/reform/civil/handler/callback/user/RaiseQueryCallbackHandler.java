@@ -10,9 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -33,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryCollectionPartyName;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 
 @Service
@@ -82,9 +85,12 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
+        CaseQueriesCollection queriesCollection = getUserQueriesByRole(caseData, roles);
+        CaseMessage latestCaseMessage = queriesCollection.latest();
+
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
+        queriesCollection.toBuilder().partyName(getQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData)));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toBuilder().qmLatestQuery(

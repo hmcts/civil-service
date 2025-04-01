@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -24,6 +26,8 @@ import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
@@ -102,6 +106,20 @@ public class CaseQueriesUtil {
         CaseMessage query = getQueryById(caseData, queryId);
         String createdBy = query.getCreatedBy();
         return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
+    }
+
+    public static String getQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario) {
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
+            return "Claimant";
+        } else if (!scenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) && isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
+            return "Defendant";
+        } else if (scenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) && isRespondentSolicitorOne(roles)) {
+            return "Defendant 1";
+        } else if (isRespondentSolicitorTwo(roles)) {
+            return "Defendant 2";
+        } else {
+            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
+        }
     }
 
     public static CaseMessage getQueryById(CaseData caseData, String queryId) {

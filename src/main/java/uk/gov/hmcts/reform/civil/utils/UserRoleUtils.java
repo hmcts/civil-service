@@ -27,6 +27,10 @@ public class UserRoleUtils {
         return hasRole(roles, RESPONDENTSOLICITORTWO);
     }
 
+    public static boolean isRespondentOneAndTwoSolicitor(List<String> roles) {
+        return isRespondentSolicitorOne(roles) && isRespondentSolicitorTwo(roles);
+    }
+
     public static boolean isLIPClaimant(List<String> roles) {
         return hasRole(roles, CLAIMANT);
     }
@@ -35,7 +39,7 @@ public class UserRoleUtils {
         return hasRole(roles, DEFENDANT);
     }
 
-    private static boolean hasRole(List<String> roles, CaseRole role) {
+    public static boolean hasRole(List<String> roles, CaseRole role) {
         return roles.stream().anyMatch(role.getFormattedName()::contains);
     }
 
