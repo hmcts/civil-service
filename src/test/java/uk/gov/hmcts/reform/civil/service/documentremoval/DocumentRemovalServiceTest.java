@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
@@ -30,10 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -265,7 +265,7 @@ class DocumentRemovalServiceTest {
                     .build());
 
             DocumentToKeep documentToKeep1 = result.get(0).getValue();
-            assertFalse(documentToKeep1.isSystemGenerated());
+            assertNotEquals(YesOrNo.YES, documentToKeep1.getSystemGenerated());
         }
 
         @Test
@@ -280,7 +280,7 @@ class DocumentRemovalServiceTest {
                     .build());
 
             DocumentToKeep documentToKeep1 = result.get(0).getValue();
-            assertTrue(documentToKeep1.isSystemGenerated());
+            assertEquals(YesOrNo.YES, documentToKeep1.getSystemGenerated());
         }
     }
 

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
@@ -105,8 +106,8 @@ public class DocumentRemovalService {
         return documentNodeUploadTimestamp;
     }
 
-    private boolean getSystemGeneratedFlag(String field) {
-        return CIVIL.equalsIgnoreCase(field);
+    private YesOrNo getSystemGeneratedFlag(String field) {
+        return CIVIL.equalsIgnoreCase(field) ? YesOrNo.YES : YesOrNo.NO;
     }
 
     private List<DocumentToKeepCollection> buildCaseDocumentList(Map<JsonNode, String> documentNodes) {
@@ -129,7 +130,7 @@ public class DocumentRemovalService {
                                             .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
                                             .build())
                                     .uploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                                    .isSystemGenerated(getSystemGeneratedFlag(documentNode.getValue()))
+                                    .systemGenerated(getSystemGeneratedFlag(documentNode.getValue()))
                                     .build())
                             .build());
         }
