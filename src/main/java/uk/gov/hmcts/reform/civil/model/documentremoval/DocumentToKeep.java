@@ -23,4 +23,23 @@ public class DocumentToKeep {
     private CaseDocumentToKeep caseDocumentToKeep;
     private LocalDateTime uploadedDate;
     private YesOrNo systemGenerated;
+
+    //overridden equals and hashcode methods to use documentId for comparison
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DocumentToKeep that = (DocumentToKeep) obj;
+        return documentId.equals(that.documentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return documentId.hashCode();
+    }
+
 }
