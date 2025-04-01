@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -26,6 +27,8 @@ public interface DQ {
     ExpertDetails getSmallClaimExperts();
 
     Experts getExperts();
+
+    DeterWithoutHearing getDeterWithoutHearing();
 
     default Experts getExperts(Experts experts) {
         if (experts != null && experts.getExpertRequired() != null
