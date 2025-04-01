@@ -10,7 +10,7 @@ plugins {
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
-  id "io.freefair.lombok" version "8.13"
+  id "io.freefair.lombok" version "8.13.1"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1618'
   id "org.flywaydb.flyway" version "10.22.0"
 }
@@ -23,7 +23,7 @@ def versions = [
   junitPlatform     : '1.11.4',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.36',
+  lombok            : '1.18.38',
   springSecurity    : '5.8.16',
   camunda           : '7.20.0',
   jackson           : '2.18.3',
@@ -336,7 +336,7 @@ dependencies {
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
-  implementation 'com.github.hmcts:civil-commons:1.1.10'
+  implementation 'com.github.hmcts:civil-commons:v1.1.11'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -355,7 +355,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.48.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -437,8 +437,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.4'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.4'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.5'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.5'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
