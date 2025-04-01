@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.String.format;
 
@@ -62,7 +63,7 @@ public class DocumentRemovalService {
         return buildCaseDocumentList(documentNodes);
     }
 
-    public CaseData removeDocuments(CaseData caseData, Long caseId, String userAuthorisation) {
+    public DocumentRemovalCaseDataDTO removeDocuments(CaseData caseData, Long caseId, String userAuthorisation) {
         List<DocumentToKeepCollection> allExistingDocumentsList = getCaseDocumentsList(caseData);
 
         ArrayList<DocumentToKeepCollection> documentsUserWantsDeletedList = new ArrayList<>(allExistingDocumentsList);
@@ -79,16 +80,18 @@ public class DocumentRemovalService {
 
         JsonNode caseDataJson = objectMapper.valueToTree(caseData);
 
-        documentsUserWantsDeletedList.forEach(documentToDeleteCollection ->
-            removeDocumentFromJson(
-                caseDataJson, documentToDeleteCollection.getValue()));
-
+        AtomicBoolean isSystemGeneratedDocumentRemoved = new AtomicBoolean(false);
+        documentsUserWantsDeletedList.forEach(documentToDeleteCollection -> {
+                isSystemGeneratedDocumentRemoved.set(documentToDeleteCollection.getValue().getSystemGenerated().equals(YesOrNo.YES));
+                removeDocumentFromJson(
+                    caseDataJson, documentToDeleteCollection.getValue());
+            }
+        );
         log.info(format("Document removal complete, removing DocumentToKeep collection "
             + "from CaseData JSON for case ID: %s", caseId));
 
         ((ObjectNode) caseDataJson).remove("documentToKeepCollection");
-
-        return buildAmendedCaseDataFromRootNode(caseDataJson, caseId);
+        return new DocumentRemovalCaseDataDTO(buildAmendedCaseDataFromRootNode(caseDataJson, caseId), isSystemGeneratedDocumentRemoved.get());
     }
 
     private LocalDateTime getUploadTimestampFromDocumentNode(JsonNode documentNode) {
@@ -120,27 +123,27 @@ public class DocumentRemovalService {
             String docId = documentUrlAsArray[documentUrlAsArray.length - 1];
 
             documentsCollection.add(
-                    DocumentToKeepCollection.builder()
-                            .value(DocumentToKeep.builder()
-                                    .documentId(docId)
-                                    .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                                            .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText())
-                                            .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())
-                                            .documentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText())
-                                            .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                                            .build())
-                                    .uploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                                    .systemGenerated(getSystemGeneratedFlag(documentNode.getValue()))
-                                    .build())
-                            .build());
+                DocumentToKeepCollection.builder()
+                    .value(DocumentToKeep.builder()
+                        .documentId(docId)
+                        .caseDocumentToKeep(CaseDocumentToKeep.builder()
+                            .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText())
+                            .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())
+                            .documentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText())
+                            .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
+                            .build())
+                        .uploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
+                        .systemGenerated(getSystemGeneratedFlag(documentNode.getValue()))
+                        .build())
+                    .build());
         }
 
         documentsCollection.sort(Comparator.comparing(
-                DocumentToKeepCollection::getValue,
-                Comparator.comparing(DocumentToKeep::getCaseDocumentToKeep,
-                        Comparator.comparing(CaseDocumentToKeep::getUploadTimestamp,
-                                Comparator.nullsLast(
-                                        Comparator.reverseOrder())))));
+            DocumentToKeepCollection::getValue,
+            Comparator.comparing(DocumentToKeep::getCaseDocumentToKeep,
+                Comparator.comparing(CaseDocumentToKeep::getUploadTimestamp,
+                    Comparator.nullsLast(
+                        Comparator.reverseOrder())))));
 
         return documentsCollection.stream().distinct().toList();
     }
@@ -173,7 +176,6 @@ public class DocumentRemovalService {
 
     private void removeDocumentFromJson(JsonNode root, DocumentToKeep documentToDelete) {
         List<String> fieldsToRemove = new ArrayList<>();
-
         if (root.isObject()) {
             Iterator<String> fieldNames = root.fieldNames();
 

@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -71,7 +72,7 @@ class DocumentRemovalServiceTest {
                 .documentBinaryUrl(binaryUrl)
                 .uploadTimestamp(uploadTimeStamp)
                 .build())
-                .createdBy(createdBy)
+            .createdBy(createdBy)
             .build();
     }
 
@@ -168,15 +169,18 @@ class DocumentRemovalServiceTest {
         void testGetCaseDocumentsList_NestedObjectWithDocumentUrl() {
             Document document1 = buildDocument(
                 "https://example1.com/123", "Form-A.pdf", "https://example1.com/binary", FIRST_DATE);
-            DocumentWithName documentWithName1 = DocumentWithName.builder().documentName("testDocument1").document(document1).createdBy("bill bob").build();
+            DocumentWithName documentWithName1 =
+                DocumentWithName.builder().documentName("testDocument1").document(document1).createdBy("bill bob").build();
 
             Document document2 = buildDocument(
                 "https://example2.com/456", "Form-B.pdf", "https://example2.com/binary", SECOND_DATE);
-            DocumentWithName documentWithName2 = DocumentWithName.builder().documentName("testDocument2").document(document2).createdBy("bill bob").build();
+            DocumentWithName documentWithName2 =
+                DocumentWithName.builder().documentName("testDocument2").document(document2).createdBy("bill bob").build();
 
             Document document3 = buildDocument(
                 "https://example3.com/789", "Form-C.pdf", "https://example3.com/binary", THIRD_DATE);
-            DocumentWithName documentWithName3 = DocumentWithName.builder().documentName("testDocument3").document(document3).createdBy("bill bob").build();
+            DocumentWithName documentWithName3 =
+                DocumentWithName.builder().documentName("testDocument3").document(document3).createdBy("bill bob").build();
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName1, documentWithName2, documentWithName3);
 
@@ -210,7 +214,8 @@ class DocumentRemovalServiceTest {
 
             Document document1 = buildDocument(
                 "https://example3.com/789", "ThirdDoc.pdf", "https://example3.com/binary", THIRD_DATE);
-            DocumentWithName documentWithName = DocumentWithName.builder().documentName("testDocument3").document(document1).createdBy("bill bob").build();
+            DocumentWithName documentWithName =
+                DocumentWithName.builder().documentName("testDocument3").document(document1).createdBy("bill bob").build();
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName);
 
@@ -257,12 +262,12 @@ class DocumentRemovalServiceTest {
         void nonSystemGeneratedFlagShouldReturnFalse() {
             List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
             claimantResponseDocuments.add(element(buildCaseDocument(
-                    "https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null, "user")));
+                "https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null, "user")));
 
             List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
-                    .ccdCaseReference(CASE_ID)
-                    .claimantResponseDocuments(claimantResponseDocuments)
-                    .build());
+                .ccdCaseReference(CASE_ID)
+                .claimantResponseDocuments(claimantResponseDocuments)
+                .build());
 
             DocumentToKeep documentToKeep1 = result.get(0).getValue();
             assertNotEquals(YesOrNo.YES, documentToKeep1.getSystemGenerated());
@@ -272,12 +277,12 @@ class DocumentRemovalServiceTest {
         void systemGeneratedFlagShouldReturnTrue() {
             List<Element<CaseDocument>> claimantResponseDocuments = new ArrayList<>();
             claimantResponseDocuments.add(element(buildCaseDocument(
-                    "https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null, "Civil")));
+                "https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null, "Civil")));
 
             List<DocumentToKeepCollection> result = documentRemovalService.getCaseDocumentsList(CaseData.builder()
-                    .ccdCaseReference(CASE_ID)
-                    .claimantResponseDocuments(claimantResponseDocuments)
-                    .build());
+                .ccdCaseReference(CASE_ID)
+                .claimantResponseDocuments(claimantResponseDocuments)
+                .build());
 
             DocumentToKeep documentToKeep1 = result.get(0).getValue();
             assertEquals(YesOrNo.YES, documentToKeep1.getSystemGenerated());
@@ -291,10 +296,10 @@ class DocumentRemovalServiceTest {
             CaseData caseData = CaseData.builder()
                 .allPartyNames("Some Name")
                 .build();
-            CaseData result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
 
-            assertEquals(caseData.getAllPartyNames(), result.getAllPartyNames());
-            assertNull(result.getDocumentToKeepCollection());
+            assertEquals(caseData.getAllPartyNames(), result.getCaseData().getAllPartyNames());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
         }
 
         @Test
@@ -314,12 +319,13 @@ class DocumentRemovalServiceTest {
                     .build()))
                 .build();
 
-            CaseData result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
 
-            assertNull(result.getDecisionOnReconsiderationDocument().getDocumentLink());
-            assertNotNull(result.getRespondent1GeneratedResponseDocument());
-            assertEquals("Respondent1 Generated Response Doc.pdf", result.getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
-            assertNull(result.getDocumentToKeepCollection());
+            assertNull(result.getCaseData().getDecisionOnReconsiderationDocument().getDocumentLink());
+            assertNotNull(result.getCaseData().getRespondent1GeneratedResponseDocument());
+            assertEquals("Respondent1 Generated Response Doc.pdf",
+                result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
         }
 
         @Test
@@ -343,15 +349,16 @@ class DocumentRemovalServiceTest {
                     DocumentToKeepCollection.builder()
                         .value(DocumentToKeep.builder()
                             .documentId("456")
-                            .caseDocumentToKeep(buildCaseDocumentToKeep("https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null))
-                                .build())
+                            .caseDocumentToKeep(
+                                buildCaseDocumentToKeep("https://example2.com/456", "Form-D.pdf", "https://example2.com/binary", null))
+                            .build())
                         .build()))
                 .build();
 
-            CaseData result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
 
-            assertEquals(2, result.getClaimantResponseDocuments().size());
-            assertNull(result.getDocumentToKeepCollection());
+            assertEquals(2, result.getCaseData().getClaimantResponseDocuments().size());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
         }
 
         @Test
@@ -369,27 +376,30 @@ class DocumentRemovalServiceTest {
                     List.of(DocumentToKeepCollection.builder()
                         .value(DocumentToKeep.builder()
                             .documentId("123")
-                            .caseDocumentToKeep(buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
+                            .caseDocumentToKeep(
+                                buildCaseDocumentToKeep("https://example1.com/123", "Form-C.pdf", "https://example1.com/binary", null))
                             .build())
                         .build()))
                 .build();
 
-            CaseData result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
 
-            assertEquals(1, result.getClaimantResponseDocuments().size());
-            assertEquals("Form-C.pdf", result.getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getDocumentFileName());
-            assertNull(result.getDocumentToKeepCollection());
+            assertEquals(1, result.getCaseData().getClaimantResponseDocuments().size());
+            assertEquals("Form-C.pdf", result.getCaseData().getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getDocumentFileName());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
         }
 
         @Test
         void testRemoveDocuments_NestedObjectInDocumentList() {
             Document document1 = buildDocument(
                 "https://example1.com/123", "Approved Order1.pdf", "https://example1.com/binary", null);
-            DocumentWithName documentWithName1 = DocumentWithName.builder().documentName("Approved Order1.pdf").document(document1).createdBy("bill bob").build();
+            DocumentWithName documentWithName1 =
+                DocumentWithName.builder().documentName("Approved Order1.pdf").document(document1).createdBy("bill bob").build();
 
             Document document2 = buildDocument(
                 "https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null);
-            DocumentWithName documentWithName2 = DocumentWithName.builder().documentName("Additional Hearing Doc.pdf").document(document2).createdBy("bill bob").build();
+            DocumentWithName documentWithName2 =
+                DocumentWithName.builder().documentName("Additional Hearing Doc.pdf").document(document2).createdBy("bill bob").build();
 
             List<Element<DocumentWithName>> documentsList = wrapElements(documentWithName1, documentWithName2);
 
@@ -399,16 +409,46 @@ class DocumentRemovalServiceTest {
                 .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
                     .value(DocumentToKeep.builder()
                         .documentId("456")
-                        .caseDocumentToKeep(buildCaseDocumentToKeep("https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null))
+                        .caseDocumentToKeep(
+                            buildCaseDocumentToKeep("https://example2.com/456", "Additional Hearing Doc.pdf", "https://example2.com/binary", null))
                         .build())
                     .build()))
                 .build();
 
-            CaseData result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
 
-            assertEquals(1, result.getDocumentAndNameToAdd().size());
-            assertEquals("Additional Hearing Doc.pdf", result.getDocumentAndNameToAdd().get(0).getValue().getDocument().getDocumentFileName());
-            assertNull(result.getDocumentToKeepCollection());
+            assertEquals(1, result.getCaseData().getDocumentAndNameToAdd().size());
+            assertEquals("Additional Hearing Doc.pdf",
+                result.getCaseData().getDocumentAndNameToAdd().get(0).getValue().getDocument().getDocumentFileName());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
         }
+
+        @Test
+        void shouldFlagSystemGeneratedRemoveDocuments_TopLevelDoc() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .decisionOnReconsiderationDocument(buildCaseDocument(
+                    "https://example1.com/123", "Decision On Reconsideration Doc.pdf", "https://example1.com/binary", null, "Civil"))
+                .respondent1GeneratedResponseDocument(buildCaseDocument(
+                    "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "user"))
+                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
+                    .value(DocumentToKeep.builder()
+                        .documentId("456")
+                        .caseDocumentToKeep(buildCaseDocumentToKeep(
+                            "https://example2.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null))
+                        .build())
+                    .build()))
+                .build();
+
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
+
+            assertTrue(result.getAreSystemGeneratedDocumentsRemoved());
+            assertNull(result.getCaseData().getDecisionOnReconsiderationDocument().getDocumentLink());
+            assertNotNull(result.getCaseData().getRespondent1GeneratedResponseDocument());
+            assertEquals("Respondent1 Generated Response Doc.pdf",
+                result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
+        }
+
     }
 }

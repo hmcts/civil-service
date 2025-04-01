@@ -12,8 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
+import uk.gov.hmcts.reform.civil.service.documentremoval.DocumentRemovalCaseDataDTO;
 import uk.gov.hmcts.reform.civil.service.documentremoval.DocumentRemovalService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,8 @@ public class DocumentRemovalHandler extends CallbackHandler {
 
     private final ObjectMapper mapper;
     private final DocumentRemovalService documentRemovalService;
+    public static final String WARNING_SYSTEM_DOCUMENT_REMOVED =
+        "Are you sure you want to remove a system generated document?";
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REMOVE_DOCUMENT);
 
@@ -70,14 +74,19 @@ public class DocumentRemovalHandler extends CallbackHandler {
     private CallbackResponse removeDocuments(CallbackParams params) {
         CaseData caseData = params.getCaseData();
         String authToken = params.getParams().get(BEARER_TOKEN).toString();
-
+        ArrayList<String> warnings = new ArrayList<>();
         log.info("Invoking event document removal about to submit callback for Case ID: {}",
             caseData.getCcdCaseReference());
 
-        CaseData updatedCaseData = documentRemovalService.removeDocuments(caseData, caseData.getCcdCaseReference(), authToken);
+        DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO =
+            documentRemovalService.removeDocuments(caseData, caseData.getCcdCaseReference(), authToken);
+        if (documentRemovalCaseDataDTO.getAreSystemGeneratedDocumentsRemoved()) {
+            warnings.add(WARNING_SYSTEM_DOCUMENT_REMOVED);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(mapper))
+            .data(documentRemovalCaseDataDTO.getCaseData().toMap(mapper))
+            .warnings(warnings)
             .build();
     }
 }
