@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 @Component
-public class Respondent2NotifyOthersTrialReadyNotifier extends TrailReadyNotifier {
+public class Respondent2NotifyOthersTrialReadyNotifier extends TrialReadyNotifier {
 
     private final static String TASK_ID = "Respondent2NotifyOthersTrialReadyNotifier";
 

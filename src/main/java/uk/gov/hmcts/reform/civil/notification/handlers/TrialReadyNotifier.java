@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -28,13 +26,13 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Component
 @Setter
-public abstract class TrailReadyNotifier extends Notifier {
+public abstract class TrialReadyNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE = "other-party-trial-ready-notification-%s";
 
     protected static String TASK_ID;
 
-    public TrailReadyNotifier(
+    public TrialReadyNotifier(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
         OrganisationService organisationService,
@@ -65,7 +63,7 @@ public abstract class TrailReadyNotifier extends Notifier {
     @Override
     protected Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
-        switch (TASK_ID) {
+        switch (getTaskId()) {
             case "ApplicantNotifyOthersTrialReadyNotifier" -> {
                 partiesToEmail.add(getRespondent(caseData, true));
                 if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
@@ -78,7 +76,7 @@ public abstract class TrailReadyNotifier extends Notifier {
                     partiesToEmail.add(getRespondent(caseData, false));
                 }
             }
-            default -> {
+            case "Respondent2NotifyOthersTrialReadyNotifier" -> {
                 partiesToEmail.add(getApplicant(caseData));
                 partiesToEmail.add(getRespondent(caseData, true));
             }

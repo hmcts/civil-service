@@ -27,9 +27,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICANT_NOTIFY_OTHERS_TRIAL_READY;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT1_NOTIFY_OTHERS_TRIAL_READY;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT2_NOTIFY_OTHERS_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
@@ -41,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @ExtendWith(MockitoExtension.class)
-public class TrailReadyNotifierTest {
+public class Respondent1NotifyOthersTrialReadyNotifierTest {
 
     public static final Long CASE_ID = 1594901956117591L;
     @Mock
@@ -55,18 +52,18 @@ public class TrailReadyNotifierTest {
     @Mock
     private StateFlow stateFlow;
     @InjectMocks
-    private TrailReadyNotifier trailReadyNotifier;
+    private Respondent1NotifyOthersTrialReadyNotifier respondent1NotifyOthersTrialReadyNotifier;
 
     @Test
-    void shouldNotifyApplicantAndRespondent1_whenRespondent2NotifyOthersIsInvoked() {
+    void shouldNotifyApplicant_whenInvoked() {
         final CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
 
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
         when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
-        trailReadyNotifier.setEventId(RESPONDENT2_NOTIFY_OTHERS_TRIAL_READY.name());
 
-        trailReadyNotifier.notifyParties(caseData);
+        respondent1NotifyOthersTrialReadyNotifier.notifyParties(caseData, "NOTIFY_EVENT", "Respondent1NotifyOthersTrialReadyNotifier");
 
         verify(notificationService).sendMail(
             "applicantsolicitor@example.com",
@@ -74,17 +71,10 @@ public class TrailReadyNotifierTest {
             getNotificationDataMap(),
             "other-party-trial-ready-notification-000DC001"
         );
-
-        verify(notificationService).sendMail(
-            "respondentsolicitor@example.com",
-            "template-id",
-            getNotificationDataMap(),
-            "other-party-trial-ready-notification-000DC001"
-        );
     }
 
     @Test
-    void shouldNotifyApplicantAndRespondent2_whenRespondent1NotifyOthersIsInvoked() {
+    void shouldNotifyApplicantAndRespondent2_whenInvoked() {
         final CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck(ONE_V_TWO_TWO_LEGAL_REP).build();
 
         when(organisationService.findOrganisationById(anyString()))
@@ -92,12 +82,11 @@ public class TrailReadyNotifierTest {
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
         when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
-        trailReadyNotifier.setEventId(RESPONDENT1_NOTIFY_OTHERS_TRIAL_READY.name());
 
-        trailReadyNotifier.notifyParties(caseData);
+        respondent1NotifyOthersTrialReadyNotifier.notifyParties(caseData, "NOTIFY_EVENT", "Respondent1NotifyOthersTrialReadyNotifier");
 
         Map<String, String> parameters = getNotificationDataMap();
-        parameters.put(PARTY_REFERENCES, "Claimant reference: 123456 - Defendant 1 reference: 123456 - Defendant 2 reference: Not provided");
+        parameters.put(PARTY_REFERENCES, "Claimant reference: 123456 - Defendant 1 reference: 123456 - Defendant 2 reference: 123456");
         parameters.put(HEARING_DATE, LocalDate.now().plusWeeks(5).plusDays(6)
             .format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK)));
 
@@ -113,107 +102,6 @@ public class TrailReadyNotifierTest {
             "template-id",
             parameters,
             "other-party-trial-ready-notification-000DC001"
-        );
-    }
-
-    @Test
-    void shouldNotifyApplicant_whenRespondent1NotifyOthersIsInvoked() {
-        final CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
-
-        when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
-        trailReadyNotifier.setEventId(RESPONDENT1_NOTIFY_OTHERS_TRIAL_READY.name());
-
-        trailReadyNotifier.notifyParties(caseData);
-
-        verify(notificationService).sendMail(
-            "applicantsolicitor@example.com",
-            "template-id",
-            getNotificationDataMap(),
-            "other-party-trial-ready-notification-000DC001"
-        );
-    }
-
-    @Test
-    void shouldNotifyRespondent1AndRespondent2_whenApplicantNotifyOthersIsInvoked() {
-        final CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck(ONE_V_TWO_TWO_LEGAL_REP).build();
-
-        when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
-        when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
-        trailReadyNotifier.setEventId(APPLICANT_NOTIFY_OTHERS_TRIAL_READY.name());
-
-        trailReadyNotifier.notifyParties(caseData);
-
-        Map<String, String> parameters = getNotificationDataMap();
-        parameters.put(PARTY_REFERENCES, "Claimant reference: 123456 - Defendant 1 reference: 123456 - Defendant 2 reference: Not provided");
-        parameters.put(HEARING_DATE, LocalDate.now().plusWeeks(5).plusDays(6)
-            .format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK)));
-
-        verify(notificationService).sendMail(
-            "respondentsolicitor@example.com",
-            "template-id",
-            parameters,
-            "other-party-trial-ready-notification-000DC001"
-        );
-
-        verify(notificationService).sendMail(
-            "respondentsolicitor2@example.com",
-            "template-id",
-            parameters,
-            "other-party-trial-ready-notification-000DC001"
-        );
-    }
-
-    @Test
-    void shouldNotifyRespondent1_whenApplicantNotifyOthersIsInvoked() {
-        final CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
-
-        when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
-        trailReadyNotifier.setEventId(APPLICANT_NOTIFY_OTHERS_TRIAL_READY.name());
-
-        trailReadyNotifier.notifyParties(caseData);
-
-        verify(notificationService).sendMail(
-            "respondentsolicitor@example.com",
-            "template-id",
-            getNotificationDataMap(),
-            "other-party-trial-ready-notification-000DC001"
-        );
-    }
-
-    @Test
-    void shouldNotifyApplicantLipAndRespondentLipNotBilingual_whenInvoked() {
-        final CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(true).build();
-
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
-
-        trailReadyNotifier.setEventId(RESPONDENT2_NOTIFY_OTHERS_TRIAL_READY.name());
-
-        trailReadyNotifier.notifyParties(caseData);
-        Map<String, String> parameters = getNotificationDataMapLip();
-
-        parameters.put(PARTY_NAME, "Mr. Sole Trader");
-        verify(notificationService).sendMail(
-            "sole.trader@email.com",
-            "template-id",
-            parameters,
-            "other-party-trial-ready-notification-000MC001"
-        );
-
-        parameters.put(PARTY_NAME, "Mr. John Rambo");
-        verify(notificationService).sendMail(
-            "rambo@email.com",
-            "template-id",
-            parameters,
-            "other-party-trial-ready-notification-000MC001"
         );
     }
 
@@ -226,9 +114,7 @@ public class TrailReadyNotifierTest {
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("template-id");
 
-        trailReadyNotifier.setEventId(RESPONDENT1_NOTIFY_OTHERS_TRIAL_READY.name());
-
-        trailReadyNotifier.notifyParties(caseData);
+        respondent1NotifyOthersTrialReadyNotifier.notifyParties(caseData, "NOTIFY_EVENT", "Respondent1NotifyOthersTrialReadyNotifier");
         Map<String, String> parameters = getNotificationDataMapLip();
 
         parameters.put(PARTY_NAME, "Mr. John Rambo");
