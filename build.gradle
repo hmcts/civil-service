@@ -23,7 +23,7 @@ def versions = [
   junitPlatform     : '1.11.4',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.36',
+  lombok            : '1.18.38',
   springSecurity    : '5.8.16',
   camunda           : '7.20.0',
   jackson           : '2.18.3',
@@ -336,7 +336,7 @@ dependencies {
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
-  implementation 'com.github.hmcts:civil-commons:1.1.10'
+  implementation 'com.github.hmcts:civil-commons:v1.1.11'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
