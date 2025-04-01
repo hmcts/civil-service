@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
@@ -16,8 +17,10 @@ import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -27,11 +30,14 @@ import static java.lang.String.format;
 @Slf4j
 public class DocumentRemovalService {
 
-    public static final String DOCUMENT_FILENAME = "document_filename";
-    static final String DOCUMENT_URL = "document_url";
-    private static final String DOCUMENT_BINARY_URL = "document_binary_url";
-    private static final String DOCUMENT_UPLOAD_TIMESTAMP = "upload_timestamp";
-    private static final String VALUE_KEY = "value";
+    protected static final String CASE_DOCUMENT = "CaseDocument";
+    protected static final String DOCUMENT_FILENAME = "document_filename";
+    protected static final String DOCUMENT_URL = "document_url";
+    protected static final String DOCUMENT_BINARY_URL = "document_binary_url";
+    protected static final String DOCUMENT_UPLOAD_TIMESTAMP = "upload_timestamp";
+    protected static final String DOCUMENT_UPLOADED_BY = "createdBy";
+    protected static final String VALUE_KEY = "value";
+    protected static final String CIVIL = "Civil";
     private final ObjectMapper objectMapper;
 
     public DocumentRemovalService(ObjectMapper objectMapper, DocumentManagementService documentManagementService,
@@ -44,15 +50,15 @@ public class DocumentRemovalService {
     private final DocumentManagementService documentManagementService;
 
     @Value("${docStore.doc.removal.enabled:false}")
-    private final Boolean docStoreRemovalEnabled;
+    private final boolean docStoreRemovalEnabled;
 
     public List<DocumentToKeepCollection> getCaseDocumentsList(CaseData caseData) {
         JsonNode root = objectMapper.valueToTree(caseData);
-        List<JsonNode> documentNodes = new ArrayList<>();
+        Map<JsonNode, String> documentNodes = new HashMap<>();
 
-        log.info(format("Retrieving document JSON nodes for case id %s", caseData.getCcdCaseReference()));
+        log.info(format("Retrieving system generated document JSON nodes for case id %s", caseData.getCcdCaseReference()));
         retrieveDocumentNodes(root, documentNodes);
-        log.info(format("Building case document list for case id %s", caseData.getCcdCaseReference()));
+        log.info(format("Building system generated case document list for case id %s", caseData.getCcdCaseReference()));
         return buildCaseDocumentList(documentNodes);
     }
 
@@ -100,47 +106,58 @@ public class DocumentRemovalService {
         return documentNodeUploadTimestamp;
     }
 
-    private List<DocumentToKeepCollection> buildCaseDocumentList(List<JsonNode> documentNodes) {
+    private YesOrNo getSystemGeneratedFlag(String field) {
+        return CIVIL.equalsIgnoreCase(field) ? YesOrNo.YES : YesOrNo.NO;
+    }
+
+    private List<DocumentToKeepCollection> buildCaseDocumentList(Map<JsonNode, String> documentNodes) {
 
         List<DocumentToKeepCollection> documentsCollection = new ArrayList<>();
 
-        for (JsonNode documentNode : documentNodes) {
-            String docUrl = documentNode.get(DOCUMENT_URL).asText();
+        for (Map.Entry<JsonNode, String> documentNode : documentNodes.entrySet()) {
+            String docUrl = documentNode.getKey().get(DOCUMENT_URL).asText();
             String[] documentUrlAsArray = docUrl.split("/");
             String docId = documentUrlAsArray[documentUrlAsArray.length - 1];
 
             documentsCollection.add(
-                DocumentToKeepCollection.builder()
-                    .value(DocumentToKeep.builder()
-                        .documentId(docId)
-                        .caseDocumentToKeep(CaseDocumentToKeep.builder()
-                            .documentFilename(documentNode.get(DOCUMENT_FILENAME).asText())
-                            .documentUrl(documentNode.get(DOCUMENT_URL).asText())
-                            .documentBinaryUrl(documentNode.get(DOCUMENT_BINARY_URL).asText())
-                            .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode))
-                            .build())
-                        .build())
-                    .build());
+                    DocumentToKeepCollection.builder()
+                            .value(DocumentToKeep.builder()
+                                    .documentId(docId)
+                                    .caseDocumentToKeep(CaseDocumentToKeep.builder()
+                                            .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText())
+                                            .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())
+                                            .documentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText())
+                                            .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
+                                            .build())
+                                    .uploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
+                                    .systemGenerated(getSystemGeneratedFlag(documentNode.getValue()))
+                                    .build())
+                            .build());
         }
 
         documentsCollection.sort(Comparator.comparing(
-            DocumentToKeepCollection::getValue,
-            Comparator.comparing(DocumentToKeep::getCaseDocumentToKeep,
-                Comparator.comparing(CaseDocumentToKeep::getUploadTimestamp,
-                    Comparator.nullsLast(
-                        Comparator.reverseOrder())))));
+                DocumentToKeepCollection::getValue,
+                Comparator.comparing(DocumentToKeep::getCaseDocumentToKeep,
+                        Comparator.comparing(CaseDocumentToKeep::getUploadTimestamp,
+                                Comparator.nullsLast(
+                                        Comparator.reverseOrder())))));
 
         return documentsCollection.stream().distinct().toList();
     }
 
-    private void retrieveDocumentNodes(JsonNode root, List<JsonNode> documentNodes) {
+    private void retrieveDocumentNodes(JsonNode root, Map<JsonNode, String> documentNodes) {
         if (root.isObject()) {
             Iterator<String> fieldNames = root.fieldNames();
             while (fieldNames.hasNext()) {
                 String fieldName = fieldNames.next();
                 JsonNode fieldValue = root.get(fieldName);
                 if (fieldValue.has(DOCUMENT_URL)) {
-                    documentNodes.add(fieldValue);
+                    JsonNode createdByNode = root.get(DOCUMENT_UPLOADED_BY);
+                    String createdBy = "null";
+                    if (Objects.nonNull(createdByNode)) {
+                        createdBy = createdByNode.asText();
+                    }
+                    documentNodes.put(fieldValue, createdBy);
                 } else {
                     retrieveDocumentNodes(fieldValue, documentNodes);
                 }
