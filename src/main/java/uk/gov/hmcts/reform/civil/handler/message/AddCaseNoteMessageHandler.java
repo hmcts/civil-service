@@ -40,7 +40,7 @@ public class AddCaseNoteMessageHandler implements CcdEventMessageHandler {
         try {
             var response = coreCaseDataService.startUpdate(caseId, NOTIFY_RPA_ON_CONTINUOUS_FEED);
             CaseData data = caseDetailsConverter.toCaseData(response.getCaseDetails());
-            if (data.getApplicant1().getIndividualFirstName().contains("fail")) {
+            if ("fail".equals(data.getApplicant1().getIndividualFirstName())) {
                 throw new RuntimeException("Simulated Failure");
             }
             roboticsNotifier.notifyRobotics(data, getSystemUserToken());

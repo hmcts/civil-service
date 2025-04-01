@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.Result;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -59,7 +60,7 @@ class AddCaseNoteMessageHandlerTest {
     @Test
     public void shouldPublishEventWhenReceivingHandleableMessage() {
         CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).build();
-        CaseData data = CaseData.builder().build();
+        CaseData data = CaseData.builder().applicant1(Party.builder().individualFirstName("Sam").build()).build();
         when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED)).thenReturn(startEventResponse(details));
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
@@ -73,7 +74,7 @@ class AddCaseNoteMessageHandlerTest {
     @Test
     public void shouldPublishCustomEventObjectToAppInsights_onFailure() {
         CaseDetails details = CaseDetails.builder().id(Long.parseLong(CASE_ID)).build();
-        CaseData data = CaseData.builder().build();
+        CaseData data = CaseData.builder().applicant1(Party.builder().individualFirstName("Sam").build()).build();
         when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RPA_ON_CONTINUOUS_FEED)).thenReturn(startEventResponse(details));
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
