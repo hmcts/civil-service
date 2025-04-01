@@ -88,11 +88,12 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen((isCarmApplicableLipCase.negate()
-                    .and(lipFullDefenceProceed)
-                    .and(CaseData::isLipvLROneVOne)), transitions).set((c, flags) -> {
-                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                    flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
-                }, transitions)
+                .and(lipFullDefenceProceed)
+                .and(CaseData::isLipvLROneVOne)), transitions)
+            .set((c, flags) -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
+            }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen(isClaimantSettleTheClaim.and(not(agreedToMediation)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
