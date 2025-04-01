@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,7 +21,6 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLega
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
-@Slf4j
 public class AddDefendantLitigationFriendNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLega
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
-@Slf4j
 public class ClaimDismissedNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_APPLICANT_FOR_CLAIM_DISMISSED = "claim-dismissed-applicant-notification-%s";
@@ -56,8 +54,6 @@ public class ClaimDismissedNotifier extends Notifier {
     @Override
     @NotNull
     protected Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
-        log.info("Building list of recipients for Claim Dismissed event. Case id - {}", caseData.getCcdCaseReference());
-
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         String stateName = stateFlowEngine.evaluate(caseData).getState().getName();
 
