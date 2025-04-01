@@ -87,15 +87,18 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
             }, transitions)
+            .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen((isCarmApplicableLipCase.negate()
+                    .and(lipFullDefenceProceed)
+                    .and(CaseData::isLipvLROneVOne)), transitions).set((c, flags) -> {
+                    flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
+                    flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
+                }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions).onlyWhen(isClaimantSettleTheClaim.and(not(agreedToMediation)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), true);
             }, transitions)
-            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed.or(isCarmApplicableLipCase.negate()
-                                                                                                 .and(lipFullDefenceProceed)
-                                                                                                 .and(CaseData::isLipvLROneVOne)),
-                                                                    transitions)
+            .moveTo(FULL_DEFENCE_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
