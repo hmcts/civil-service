@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -216,7 +215,7 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
             when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getWarnings())
                 .contains(DocumentRemovalHandler.WARNING_SYSTEM_DOCUMENT_REMOVED);
