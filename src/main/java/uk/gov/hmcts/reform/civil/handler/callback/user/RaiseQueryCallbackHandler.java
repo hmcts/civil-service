@@ -35,8 +35,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
-import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryCollectionPartyName;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +79,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?,?> builder = caseData.toBuilder();
 
         List<String> roles = retrieveUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
@@ -88,12 +89,11 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseQueriesCollection queriesCollection = getUserQueriesByRole(caseData, roles);
         CaseMessage latestCaseMessage = queriesCollection.latest();
 
-
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
-        queriesCollection.toBuilder().partyName(getQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData)));
+        updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().qmLatestQuery(
+            .data(builder.qmLatestQuery(
                 buildLatestQuery(latestCaseMessage))
                       .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
                       .build().toMap(objectMapper))

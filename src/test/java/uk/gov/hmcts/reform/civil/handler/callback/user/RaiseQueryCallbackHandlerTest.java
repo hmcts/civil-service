@@ -196,9 +196,6 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            if (caseData.getRespondent2SameLegalRepresentative().equals(YES)) {
-
-            }
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
