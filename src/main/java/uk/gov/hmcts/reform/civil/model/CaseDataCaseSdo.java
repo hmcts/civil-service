@@ -234,6 +234,7 @@ public class CaseDataCaseSdo implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> fastTrackSchedulesOfLossToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackTrialBundleToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingDisclosureOfDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingWitnessOfFactToggle;

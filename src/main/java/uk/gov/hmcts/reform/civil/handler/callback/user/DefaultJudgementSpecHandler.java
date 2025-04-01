@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForPa
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
@@ -353,7 +355,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
-
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         Fee claimfee = caseData.getClaimFee();
         BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
@@ -403,6 +404,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal.setScale(2));
+        log.info("Case {} with calculated interest: {} and Repayment Breakdown details: {}", caseData.getCcdCaseReference(), interest, repaymentBreakdown);
         return repaymentBreakdown;
     }
 
@@ -487,7 +489,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
-        } 
+        }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));

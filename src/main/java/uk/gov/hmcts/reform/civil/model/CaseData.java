@@ -1521,4 +1521,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return nonNull(this.getHearingFeePaymentDetails())
             && SUCCESS.equals(this.getHearingFeePaymentDetails().getStatus()) || this.hearingFeePaymentDoneWithHWF();
     }
+
+    @JsonIgnore
+    public boolean isCcjRequestJudgmentByAdmissionDefendantNotPaid() {
+        return getCcjPaymentDetails() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null
+            && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
+    }
 }
