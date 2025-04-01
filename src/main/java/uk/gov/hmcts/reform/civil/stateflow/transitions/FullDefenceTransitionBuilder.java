@@ -74,7 +74,8 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(fullDefenceProceed
                           .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
                 .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
-                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate().and(not(CaseData::isLipvLROneVOne))), transitions)
+                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()
+                                                                                                                       .and(not(CaseData::isLipvLROneVOne))), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
