@@ -414,6 +414,32 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
     void shouldNotThrowError_whenLipVsLrAndDefendantLiPIsNotAssigned() {
 
         CaseData caseData = CaseDataBuilder.builder()
