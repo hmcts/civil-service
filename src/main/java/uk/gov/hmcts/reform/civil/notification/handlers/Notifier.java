@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
@@ -21,7 +20,6 @@ import java.util.Set;
 
 @Component
 @AllArgsConstructor
-@Slf4j
 public abstract class Notifier implements NotificationData {
 
     protected final NotificationService notificationService;
