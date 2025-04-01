@@ -22,7 +22,7 @@ import java.util.List;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
-@Table(name = "notification_exception_record", schema = "dbs")
+@Table(name = "exception_record", schema = "dbs")
 @TypeDefs({
     @TypeDef(
         name = "list-array",
