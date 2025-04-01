@@ -87,8 +87,7 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
                 RespondentResponseTypeSpec.COUNTER_CLAIM) && caseData.isApplicant1NotRepresented(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
             featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0
-                && caseData.getRespondent1ClaimResponseTypeForSpec().equals(
-                    RespondentResponseTypeSpec.COUNTER_CLAIM) && caseData.isApplicant1NotRepresented()
+                && ((caseData.getRespondent1ClaimResponseTypeForSpec().equals(
         );
     }
 
@@ -134,8 +133,7 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
 
     private boolean isCarmApplicable(CaseData caseData) {
         return getFeatureToggleService().isCarmEnabledForCase(caseData)
-            && caseData.isSmallClaim();
-    }
+            && caseData.isSmallClaim();    }
 
     private String defendantResponseStatesPaid(CaseData caseData) {
         return caseData.isPaidFullAmount()
