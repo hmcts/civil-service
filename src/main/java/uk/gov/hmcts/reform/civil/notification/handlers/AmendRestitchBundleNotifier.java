@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.AmendRestitchBundleNotify;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
@@ -29,7 +30,6 @@ public class AmendRestitchBundleNotifier extends Notifier {
     private static final String REFERENCE_TEMPLATE_APPLICANT = "amend-restitch-bundle-claimant-notification-%s";
     private static final String REFERENCE_TEMPLATE_RESPONDENT = "amend-restitch-bundle-defendant-notification-%s";
     private static final String DATE_FORMAT = "dd-MM-yyyy";
-    private static final String TASK_ID = "AmendRestitchBundleNotifier";
 
     public AmendRestitchBundleNotifier(NotificationService notificationService,
                                        NotificationsProperties notificationsProperties,
@@ -51,7 +51,7 @@ public class AmendRestitchBundleNotifier extends Notifier {
 
     @Override
     protected String getTaskId() {
-        return TASK_ID;
+        return AmendRestitchBundleNotify.toString();
     }
 
     @Override
