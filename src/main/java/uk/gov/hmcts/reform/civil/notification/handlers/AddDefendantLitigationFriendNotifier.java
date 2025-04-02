@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -15,13 +14,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.LitigationFriendAddedNotifier;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
-@Slf4j
 public class AddDefendantLitigationFriendNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
@@ -33,6 +32,11 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
                                                 SimpleStateFlowEngine stateFlowEngine,
                                                 CaseTaskTrackingService caseTaskTrackingService) {
         super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
+    }
+
+    @Override
+    public String getTaskId() {
+        return LitigationFriendAddedNotifier.toString();
     }
 
     @Override
