@@ -30,8 +30,6 @@ public abstract class TrialReadyNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE = "other-party-trial-ready-notification-%s";
 
-    protected static String TASK_ID;
-
     public TrialReadyNotifier(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
@@ -64,19 +62,19 @@ public abstract class TrialReadyNotifier extends Notifier {
     protected Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         switch (getTaskId()) {
-            case "ApplicantNotifyOthersTrialReadyNotifier" -> {
+            case "ApplicantNotifyOthersTrialReady" -> {
                 partiesToEmail.add(getRespondent(caseData, true));
                 if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
                     partiesToEmail.add(getRespondent(caseData, false));
                 }
             }
-            case "Respondent1NotifyOthersTrialReadyNotifier" -> {
+            case "Respondent1NotifyOthersTrialReady" -> {
                 partiesToEmail.add(getApplicant(caseData));
                 if (stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)) {
                     partiesToEmail.add(getRespondent(caseData, false));
                 }
             }
-            case "Respondent2NotifyOthersTrialReadyNotifier" -> {
+            case "Respondent2NotifyOthersTrialReady" -> {
                 partiesToEmail.add(getApplicant(caseData));
                 partiesToEmail.add(getRespondent(caseData, true));
             }

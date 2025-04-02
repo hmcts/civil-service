@@ -7,10 +7,10 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.Respondent1NotifyOthersTrialReady;
+
 @Component
 public class Respondent1NotifyOthersTrialReadyNotifier extends TrialReadyNotifier {
-
-    private final static String TASK_ID = "Respondent1NotifyOthersTrialReadyNotifier";
 
     public Respondent1NotifyOthersTrialReadyNotifier(NotificationService notificationService,
                                                      NotificationsProperties notificationsProperties,
@@ -22,6 +22,6 @@ public class Respondent1NotifyOthersTrialReadyNotifier extends TrialReadyNotifie
 
     @Override
     protected String getTaskId() {
-        return TASK_ID;
+        return Respondent1NotifyOthersTrialReady.toString();
     }
 }
