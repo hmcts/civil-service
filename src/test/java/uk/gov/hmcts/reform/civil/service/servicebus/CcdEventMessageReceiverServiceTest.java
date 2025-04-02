@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 
@@ -79,8 +79,7 @@ class CcdEventMessageReceiverServiceTest {
         verify(messageHandler2, times(1)).handle(any(), any());
         verify(messageHandler1, times(0)).handle(any(), any());
 
-        verify(exceptionRecordRepository).findByIdempotencyKey(any());
-        verifyNoMoreInteractions(exceptionRecordRepository);
+        verifyNoInteractions(exceptionRecordRepository);
     }
 
     @SneakyThrows

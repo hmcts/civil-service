@@ -45,7 +45,8 @@ public class CcdEventMessageReceiverService {
             }
         }
 
-        validateResult(exceptionRecordEntity.getIdempotencyKey(), result);
+        Optional<ExceptionRecordEntity> existingRecord = exceptionRecordRepository.findByIdempotencyKey(exceptionRecordEntity.getIdempotencyKey());
+        validateResult(exceptionRecordEntity.getIdempotencyKey(), result, existingRecord);
     }
 
     private void handleMessage(CcdEventMessage caseEventMessage, String idempotencyKey) {
@@ -58,13 +59,13 @@ public class CcdEventMessageReceiverService {
             }
         }
 
-        validateResult(idempotencyKey, result);
+        validateResult(idempotencyKey, result, Optional.empty());
     }
 
-    private void validateResult(String idempotencyKey, Result result) {
-        Optional<ExceptionRecordEntity> existingRecord = exceptionRecordRepository.findByIdempotencyKey(idempotencyKey);
+    private void validateResult(String idempotencyKey, Result result, Optional<ExceptionRecordEntity> existingRecord) {
 
         if (result instanceof Result.Error error) {
+            log.info("Handling error for record {} with result {}", existingRecord, result);
             existingRecord.ifPresentOrElse(
                 record -> updateExistingExceptionRecord(record, error),
                 () -> saveNewExceptionRecord(error, idempotencyKey)
@@ -75,6 +76,8 @@ public class CcdEventMessageReceiverService {
     }
 
     private void updateExistingExceptionRecord(ExceptionRecordEntity existingRecord, Result.Error error) {
+
+        log.info("Updating existing record {} with result {}", existingRecord, error);
 
         int remainingRetries = existingRecord.getRemainingRetries() == 0
             ? 0
@@ -90,6 +93,8 @@ public class CcdEventMessageReceiverService {
     }
 
     private void saveNewExceptionRecord(Result.Error error, String idempotencyKey) {
+        log.info("Creating new record for key {} with result {}", idempotencyKey, error);
+
         exceptionRecordRepository.save(
             ExceptionRecordEntity.builder()
                 .idempotencyKey(idempotencyKey)
