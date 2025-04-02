@@ -52,7 +52,7 @@ public class ExceptionRecordEntity implements Serializable {
     @Builder.Default
     private List<String> successfulActions = new ArrayList<>();
 
-    @Schema(name = "retry_count")
+    @Schema(name = "remaining_retries")
     private int remainingRetries;
 
     @Schema(name = "created_at")
