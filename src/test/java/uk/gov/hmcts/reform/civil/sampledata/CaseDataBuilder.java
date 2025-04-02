@@ -64,6 +64,7 @@ import uk.gov.hmcts.reform.civil.model.CloseClaim;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
@@ -1363,19 +1364,19 @@ public class CaseDataBuilder {
     public CaseDataBuilder applicant1DQWithWitnesses() {
         var applicant1DQBuilder = applicant1DQ != null
             ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
-        applicant1DQBuilder.applicant1DQWitnesses(
-            Witnesses.builder()
-                .witnessesToAppear(YES)
-                .details(wrapElements(
-                    Witness.builder()
-                        .firstName("Witness")
-                        .lastName("One")
-                        .phoneNumber("01482764322")
-                        .emailAddress("witness.one@example.com")
-                        .reasonForWitness("Saw something")
-                        .build()))
-                .build());
-
+        applicant1DQBuilder
+            .deterWithoutHearing(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
+            .applicant1DQWitnesses(Witnesses.builder()
+                                       .witnessesToAppear(YES)
+                                       .details(wrapElements(
+                                           Witness.builder()
+                                               .firstName("Witness")
+                                               .lastName("One")
+                                               .phoneNumber("01482764322")
+                                               .emailAddress("witness.one@example.com")
+                                               .reasonForWitness("Saw something")
+                                               .build()))
+                                       .build());
         applicant1DQ = applicant1DQBuilder.build();
         return this;
     }

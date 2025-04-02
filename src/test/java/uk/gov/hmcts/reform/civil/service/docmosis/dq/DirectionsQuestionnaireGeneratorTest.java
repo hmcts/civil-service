@@ -1200,7 +1200,6 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-                    .deterWithoutHearing(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -1222,6 +1221,7 @@ class DirectionsQuestionnaireGeneratorTest {
                         .respondent1DQExperts(null)
                         .respondent1DQWitnesses(null)
                         .respondent1DQHearing(null)
+                        .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
                         .build())
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
@@ -1256,6 +1256,7 @@ class DirectionsQuestionnaireGeneratorTest {
                             .build())
                         .respondent1DQWitnesses(null)
                         .respondent1DQHearing(null)
+                        .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
                         .build())
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
@@ -1291,6 +1292,7 @@ class DirectionsQuestionnaireGeneratorTest {
                             .build())
                         .respondent1DQWitnesses(null)
                         .respondent1DQHearing(null)
+                        .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
                         .build())
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
