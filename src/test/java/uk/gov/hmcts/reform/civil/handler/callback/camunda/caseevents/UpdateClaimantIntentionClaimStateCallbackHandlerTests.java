@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,9 +19,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +39,13 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
     private ObjectMapper objectMapper;
     @Mock
     private ToggleConfiguration toggleConfiguration;
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+        handler = new UpdateClaimantIntentionClaimStateCallbackHandler(objectMapper, updateClaimStateService, toggleConfiguration);
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+    }
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
@@ -58,6 +68,23 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
         // then
         assertThat(response.getErrors()).isNull();
         verify(updateClaimStateService, times(1)).setUpCaseState(caseData);
+    }
+
+    @Test
+    void shouldSetTakenOfflineDateIfProceedsInHeritage() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        when(updateClaimStateService.setUpCaseState(any())).thenReturn("PROCEEDS_IN_HERITAGE_SYSTEM");
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+        assertThat(response.getErrors()).isNull();
+        assertThat(updatedData.getTakenOfflineDate()).isNotNull();
     }
 
     @Test

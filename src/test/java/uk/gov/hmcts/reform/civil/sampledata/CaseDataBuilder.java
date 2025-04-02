@@ -447,6 +447,8 @@ public class CaseDataBuilder {
     protected LocalDateTime claimNotificationDeadline;
     protected LocalDateTime claimNotificationDate;
     protected LocalDateTime claimDetailsNotificationDeadline;
+    protected LocalDateTime addLegalRepDeadlineDefendant1;
+    protected LocalDateTime addLegalRepDeadlineDefendant2;
     protected ServedDocumentFiles servedDocumentFiles;
     protected LocalDateTime claimDetailsNotificationDate;
     protected LocalDateTime respondent1ResponseDeadline;
@@ -5095,6 +5097,22 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTakenOfflineDefendant1NocDeadlinePassed() {
+        atStateClaimIssued1v1UnrepresentedDefendant();
+
+        takenOfflineDate = LocalDateTime.now().plusDays(1);
+        addLegalRepDeadlineDefendant1 = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineDefendant2NocDeadlinePassed() {
+        atStateClaimIssued1v2UnrepresentedDefendant();
+
+        takenOfflineDate = LocalDateTime.now().plusDays(1);
+        addLegalRepDeadlineDefendant2 = LocalDateTime.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateHearingFeeDueUnpaid() {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = LocalDate.now().minusDays(1);
@@ -7080,6 +7098,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder specClaim1v1LrVsLip() {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
+        this.ccdCaseReference = CASE_ID;
         return this;
     }
 
@@ -7779,6 +7798,8 @@ public class CaseDataBuilder {
             .claimDismissedDate(claimDismissedDate)
             .caseDismissedHearingFeeDueDate(caseDismissedHearingFeeDueDate)
             .addLegalRepDeadline(addLegalRepDeadline)
+            .addLegalRepDeadlineRes1(addLegalRepDeadlineDefendant1)
+            .addLegalRepDeadlineRes2(addLegalRepDeadlineDefendant2)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)
