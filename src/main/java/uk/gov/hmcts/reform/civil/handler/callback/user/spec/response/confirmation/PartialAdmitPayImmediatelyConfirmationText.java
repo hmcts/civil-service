@@ -68,8 +68,6 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             sb.append("<p>This case will now proceed offline.</p>");
         }
 
-        sb.append(" legal representative if you need details on how to pay.</p>");
-
         BigDecimal claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
 
         boolean isFullAdmission = RespondentResponseTypeSpec.FULL_ADMISSION.equals(
