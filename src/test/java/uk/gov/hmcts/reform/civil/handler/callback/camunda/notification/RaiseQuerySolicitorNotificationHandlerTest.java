@@ -75,6 +75,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             when(notificationsProperties.getQueryRaised()).thenReturn(TEMPLATE_ID);
         }
+
         @Test
         void shouldNotifyApplicantLR_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
@@ -134,8 +135,6 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                 "query-raised-notification-000DC001"
             );
         }
-
-
     }
 
     @Nested
@@ -225,7 +224,6 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             );
         }
 
-
         @Test
         void shouldNotifyDefendantLipLip_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
@@ -299,9 +297,8 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                                            .id("4")
                                            .build()))
             .build();
-
-
-        CaseQueriesCollection DefendantLipQuery = CaseQueriesCollection.builder()
+        
+        CaseQueriesCollection defendantLipQuery = CaseQueriesCollection.builder()
             .roleOnCase(CaseRole.DEFENDANT.toString())
             .caseMessages(wrapElements(CaseMessage.builder()
                                            .id("5")
@@ -317,7 +314,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .qmApplicantSolicitorQueries(applicantQuery)
             .qmApplicantCitizenQueries(claimantLipQuery)
-            .qmRespondentCitizenQueries(DefendantLipQuery)
+            .qmRespondentCitizenQueries(defendantLipQuery)
             .qmRespondentSolicitor1Queries(respondent1Query)
             .qmRespondentSolicitor2Queries(respondent2Query)
             .businessProcess(BusinessProcess.builder()
