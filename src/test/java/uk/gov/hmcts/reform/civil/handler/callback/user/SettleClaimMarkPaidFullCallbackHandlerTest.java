@@ -51,7 +51,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
 
              The defendants will be notified.""";
     public static final String REQUEST_BEING_REVIEWED_HEADER = "### Request is being reviewed";
-    public static final String CLOSED_HEADER = "### The claim has been marked as paid in full";
+    public static final String CLOSED_HEADER = "### This claim has been marked as settled";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
