@@ -71,7 +71,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
         @Test
         void shouldRecordScenario_whenInvokedForCaseEventFeatureToggle() {
             // Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
@@ -106,7 +105,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
@@ -139,8 +137,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             // Given
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .responseClaimTrack("FAST_CLAIM")
@@ -172,25 +168,6 @@ class CourtOfficerOrderClaimantNotificationHandlerTest extends BaseCallbackHandl
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
             ).build();
-            // When
-            handler.handle(params);
-
-            // Then
-            verifyNoInteractions(dashboardScenariosService);
-        }
-
-        @Test
-        void shouldNotRecordScenario_whenCaseEventsIsNotEnabled() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
-                .applicant1Represented(YesOrNo.NO)
-                .ccdCaseReference(1234L)
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_COURT_OFFICER_ORDER_CLAIMANT.name()).build()
-            ).build();
-
             // When
             handler.handle(params);
 

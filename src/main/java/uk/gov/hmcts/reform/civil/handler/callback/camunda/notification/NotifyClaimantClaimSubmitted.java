@@ -49,7 +49,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private CallbackResponse notifyApplicantForClaimSubmitted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+        if (caseData.isLipvLipOneVOne()) {
             generateEmail(caseData);
         }
 

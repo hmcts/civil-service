@@ -66,7 +66,6 @@ class MoreTimeRequestedDashboardNotificationHandlerTest extends BaseCallbackHand
 
         params.put("ccdCaseReference", "123");
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseData.builder()

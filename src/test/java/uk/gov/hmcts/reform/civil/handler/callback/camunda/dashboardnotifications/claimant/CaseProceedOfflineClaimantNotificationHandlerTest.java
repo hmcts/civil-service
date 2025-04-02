@@ -85,7 +85,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
                     .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -129,7 +128,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
                 .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -172,7 +170,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 .ccdCaseReference(1234L)
                 .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -205,7 +202,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
             ).build();
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -225,7 +221,6 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
                 .ccdCaseReference(1234L)
                 .previousCCDState(All_FINAL_ORDERS_ISSUED).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

@@ -174,7 +174,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 .thenReturn("template-id");
             when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             // Given
             CaseData caseData = getCaseData("testorg@email.com");

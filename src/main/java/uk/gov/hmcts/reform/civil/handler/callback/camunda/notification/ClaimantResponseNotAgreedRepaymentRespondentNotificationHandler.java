@@ -59,7 +59,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addTemplate(CaseData caseData) {
-        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+        return (caseData.isApplicant1NotRepresented())
             ? notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()
             : notificationsProperties.getNotifyClaimantLrTemplate();
 
@@ -72,7 +72,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+        return (caseData.isApplicant1NotRepresented())
             ? new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
@@ -86,7 +86,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String getEmail(CaseData caseData) {
-        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+        return caseData.isApplicant1NotRepresented()
             ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
