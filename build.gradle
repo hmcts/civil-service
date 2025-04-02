@@ -23,7 +23,7 @@ def versions = [
   junitPlatform     : '1.11.4',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.36',
+  lombok            : '1.18.38',
   springSecurity    : '5.8.16',
   camunda           : '7.20.0',
   jackson           : '2.18.3',
@@ -49,7 +49,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.21.4'
+    toolVersion = '10.22.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -336,7 +336,7 @@ dependencies {
   def withoutJunit4 = {
     exclude group: 'junit', module: 'junit'
   }
-  implementation 'com.github.hmcts:civil-commons:1.1.10'
+  implementation 'com.github.hmcts:civil-commons:v1.1.11'
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -438,7 +438,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.5'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.4'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.5'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
