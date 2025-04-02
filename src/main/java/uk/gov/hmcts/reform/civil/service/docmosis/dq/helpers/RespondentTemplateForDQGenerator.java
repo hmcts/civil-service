@@ -131,6 +131,7 @@ public class RespondentTemplateForDQGenerator {
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
     }
+
     public Experts getExperts(DQ dq) {
         var experts = dq.getExperts();
         if (experts == null) {

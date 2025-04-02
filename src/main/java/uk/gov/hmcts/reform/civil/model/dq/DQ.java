@@ -28,8 +28,6 @@ public interface DQ {
 
     Experts getExperts();
 
-    DeterWithoutHearing getDeterWithoutHearing();
-
     default Experts getExperts(Experts experts) {
         if (experts != null && experts.getExpertRequired() != null
             && experts.getExpertRequired().equals(NO)) {
@@ -67,6 +65,8 @@ public interface DQ {
         }
         return smallClaimHearing;
     }
+
+    DeterWithoutHearing getDeterWithoutHearing();
 
     Document getDraftDirections();
 

@@ -62,7 +62,6 @@ public class Respondent1DQ implements DQ {
     private DocumentsToBeConsidered respondent1DQClaimantDocumentsToBeConsidered;
     private DeterWithoutHearing deterWithoutHearingRespondent1;
 
-
     @Override
     @JsonProperty("deterWithoutHearingRespondent1")
     public DeterWithoutHearing getDeterWithoutHearing() {
