@@ -1201,6 +1201,11 @@ class DirectionsQuestionnaireGeneratorTest {
                     .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .build();
+                caseData = caseData.toBuilder()
+                    .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                      .deterWithoutHearing(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
+                                      .build())
+                    .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
