@@ -278,8 +278,17 @@ For that you should have such file as this:
   }
 }
 ```
+## Point CCD definitions to a specific branch
+
+Add the following label to your GitHub PR.
+
+```
+civilDefinitionBranch:????
+
+where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
+```
+
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
