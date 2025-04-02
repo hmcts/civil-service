@@ -1525,4 +1525,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null
             && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
     }
+
+    @JsonIgnore
+    public String getApplicantSolicitor1UserDetailsEmail() {
+        return applicantSolicitor1UserDetails == null ? null : applicantSolicitor1UserDetails.getEmail();
+    }
 }
