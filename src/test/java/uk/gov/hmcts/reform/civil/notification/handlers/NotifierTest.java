@@ -46,6 +46,11 @@ class NotifierTest {
 
         Notifier notifier = new Notifier(notificationService, null, null, null, null) {
             @Override
+            protected String getTaskId() {
+                return "";
+            }
+
+            @Override
             protected Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
                 return parties;
             }
