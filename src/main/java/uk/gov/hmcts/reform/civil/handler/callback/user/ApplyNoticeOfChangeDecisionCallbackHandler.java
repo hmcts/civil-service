@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.cas.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
@@ -32,6 +33,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 
 @Service
 @RequiredArgsConstructor
@@ -80,6 +84,15 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             updatedCaseDataBuilder,
             preDecisionCaseData.getChangeOrganisationRequestField()
         );
+
+        MultiPartyScenario multiPartyScenario = MultiPartyScenario.getMultiPartyScenario(updatedCaseDataBuilder.build());
+        if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+            updateQueryCollectionPartyName(
+                List.of(RESPONDENTSOLICITORONE.getFormattedName()),
+                ONE_V_TWO_TWO_LEGAL_REP,
+                updatedCaseDataBuilder
+            );
+        }
 
         updatedCaseDataBuilder
             .businessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionCaseData, caseRole)))
@@ -181,7 +194,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private String getOrgIdCopyIfExists(CaseDetails caseDetails, String caseRole) {
         if (!isApplicant(caseRole)) {
-            if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+            if (caseRole.equals(RESPONDENTSOLICITORONE.getFormattedName())) {
                 String respondent1OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
                     "respondent1OrganisationIDCopy"), String.class);
                 if (respondent1OrganisationIDCopy != null) {
@@ -199,7 +212,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private void setAddLegalRepDeadlinesToNull(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, String caseRole) {
-        if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
+        if (RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
             updatedCaseDataBuilder.addLegalRepDeadlineRes1(null);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
             updatedCaseDataBuilder.addLegalRepDeadlineRes2(null);
@@ -210,7 +223,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
             && caseData.getApplicantSolicitor1UserDetails() != null) {
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
-        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+        } else if (caseRole.equals(RESPONDENTSOLICITORONE.getFormattedName())) {
             return caseData.getRespondentSolicitor1EmailAddress();
         } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
             return caseData.getRespondentSolicitor2EmailAddress();
@@ -226,7 +239,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         if (isApplicant(caseRole)
             && postDecisionCaseData.isApplicantLiP()) {
             return APPLY_NOC_DECISION_LIP;
-        } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)
+        } else if (RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)
             && postDecisionCaseData.isRespondent1LiP()
             && featureToggleService.isLipVLipEnabled()) {
             return APPLY_NOC_DECISION_DEFENDANT_LIP;
@@ -250,7 +263,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         String caseRole = request.getCaseRoleId().getValue().getCode();
         if (request.getOrganisationToRemove() == null) {
             if (!isApplicant(caseRole)) {
-                if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+                if (caseRole.equals(RESPONDENTSOLICITORONE.getFormattedName())) {
                     String respondent1OrganisationIDCopy = caseData.getRespondent1OrganisationIDCopy();
                     if (respondent1OrganisationIDCopy != null) {
                         return respondent1OrganisationIDCopy;
@@ -267,4 +280,5 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         }
         return null;
     }
+
 }

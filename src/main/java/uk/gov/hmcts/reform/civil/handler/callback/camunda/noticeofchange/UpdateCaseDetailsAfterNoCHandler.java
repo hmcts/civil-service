@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Case;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -32,9 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -43,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 
 @Slf4j
 @Service
@@ -133,11 +138,25 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             }
         }
 
+       updateDefendantQueryCollectionPartyName(caseDataBuilder);
+
         clearLRIndividuals(replacedSolicitorCaseRole, caseDataBuilder.build(), caseDataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateDefendantQueryCollectionPartyName(CaseData.CaseDataBuilder<?,?> caseDataBuilder) {
+        CaseData caseData = caseDataBuilder.build();
+        if (nonNull(caseData.getQmRespondentSolicitor1Queries())
+            && getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+            updateQueryCollectionPartyName(
+                List.of(RESPONDENTSOLICITORONE.getFormattedName()),
+                ONE_V_TWO_TWO_LEGAL_REP,
+                caseDataBuilder
+            );
+        }
     }
 
     private Consumer<Organisation> setRespondentSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {

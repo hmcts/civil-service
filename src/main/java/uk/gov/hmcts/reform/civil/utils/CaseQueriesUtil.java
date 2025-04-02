@@ -114,7 +114,7 @@ public class CaseQueriesUtil {
 
         if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
             builder.qmApplicantSolicitorQueries(updateQueryCollectionPartyName(caseData.getQmApplicantSolicitorQueries(), partyName));
-        } else if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
+        } else if (isRespondentSolicitorOne(roles)) {
             builder.qmRespondentSolicitor1Queries(updateQueryCollectionPartyName(caseData.getQmRespondentSolicitor1Queries(), partyName));
         } else if (isRespondentSolicitorTwo(roles)) {
             builder.qmRespondentSolicitor2Queries(updateQueryCollectionPartyName(caseData.getQmRespondentSolicitor2Queries(), partyName));
@@ -128,9 +128,9 @@ public class CaseQueriesUtil {
     }
 
     public static String getQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario) {
-        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
+        if (isApplicantSolicitor(roles)) {
             return "Claimant";
-        } else if (!scenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) && isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
+        } else if (!scenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) && isRespondentSolicitorOne(roles)) {
             return "Defendant";
         } else if (scenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) && isRespondentSolicitorOne(roles)) {
             return "Defendant 1";
