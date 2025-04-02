@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_BUNDLE_CREATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -75,7 +75,7 @@ public class BundleCreationNotifierTest {
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
         when(notificationsProperties.getBundleCreationTemplate()).thenReturn("template-id");
 
-        bundleCreationNotifier.notifyParties(caseData, NOTIFY_BUNDLE_CREATION.toString(), TASK_ID);
+        bundleCreationNotifier.notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID);
 
         verify(notificationService).sendMail(
             "applicantsolicitor@example.com",
@@ -103,7 +103,7 @@ public class BundleCreationNotifierTest {
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
         when(notificationsProperties.getBundleCreationTemplate()).thenReturn("template-id");
 
-        bundleCreationNotifier.notifyParties(caseData, NOTIFY_BUNDLE_CREATION.toString(), TASK_ID);
+        bundleCreationNotifier.notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID);
 
         Map<String, String> parameters = getNotificationDataMap();
         parameters.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234");
@@ -136,7 +136,7 @@ public class BundleCreationNotifierTest {
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
 
-        bundleCreationNotifier.notifyParties(caseData, NOTIFY_BUNDLE_CREATION.toString(), TASK_ID);
+        bundleCreationNotifier.notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID);
         Map<String, String> parameters = getNotificationDataMapLip();
 
         parameters.put(PARTY_NAME, "Mr. Sole Trader");
@@ -173,7 +173,7 @@ public class BundleCreationNotifierTest {
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("template-id");
 
-        bundleCreationNotifier.notifyParties(caseData, NOTIFY_BUNDLE_CREATION.toString(), TASK_ID);
+        bundleCreationNotifier.notifyParties(caseData, NOTIFY_EVENT.toString(), TASK_ID);
         Map<String, String> parameters = getNotificationDataMapLip();
 
         parameters.put(PARTY_NAME, "Mr. Sole Trader");
