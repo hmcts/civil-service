@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.CaseProceedsInCasemanNotify;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
@@ -37,6 +38,11 @@ public class CaseProceedsInCasemanNotifier extends Notifier {
                                          FeatureToggleService featureToggleService) {
         super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
         this.featureToggleService = featureToggleService;
+    }
+
+    @Override
+    protected String getTaskId() {
+        return CaseProceedsInCasemanNotify.toString();
     }
 
     @Override
