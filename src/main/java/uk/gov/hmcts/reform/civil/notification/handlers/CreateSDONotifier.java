@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.CreateSDONotify;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
@@ -35,6 +36,11 @@ public class CreateSDONotifier extends Notifier {
                              FeatureToggleService featureToggleService) {
         super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
         this.featureToggleService = featureToggleService;
+    }
+
+    @Override
+    public String getTaskId() {
+        return CreateSDONotify.toString();
     }
 
     @Override
