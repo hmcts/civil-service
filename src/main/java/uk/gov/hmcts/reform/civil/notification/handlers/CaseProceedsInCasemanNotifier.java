@@ -84,7 +84,7 @@ public class CaseProceedsInCasemanNotifier extends Notifier {
         } else {
             properties = addProperties(caseData);
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
-            email = caseData.getApplicantSolicitor1UserDetails().getEmail();
+            email = caseData.getApplicantSolicitor1UserDetailsEmail();
         }
 
         return EmailDTO.builder()
