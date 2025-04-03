@@ -94,7 +94,7 @@ public abstract class TrialReadyNotifier extends Notifier {
         }
 
         return EmailDTO.builder()
-            .targetEmail(isLiP ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetails().getEmail())
+            .targetEmail(isLiP ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetailsEmail())
             .emailTemplate(getTemplate(caseData, isLiP, true))
             .parameters(properties)
             .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
@@ -108,10 +108,10 @@ public abstract class TrialReadyNotifier extends Notifier {
 
         if (isRespondent1) {
             isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1LiP();
-            email = isLiP ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
+            email = isLiP ? caseData.getRespondent1PartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
             isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent2LiP();
-            email = isLiP ? caseData.getRespondent2().getPartyEmail() : caseData.getRespondentSolicitor2EmailAddress();
+            email = isLiP ? caseData.getRespondent2PartyEmail() : caseData.getRespondentSolicitor2EmailAddress();
         }
 
         if (isLiP) {
