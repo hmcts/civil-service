@@ -488,10 +488,38 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
             when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
             handler.handle(params);
 
             // Then
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Claimant",
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldRecordScenarioClaimantFinalOrderFastTrackNotReadyTrial_whenInvoked_notEaRegion() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            handler.handle(params);
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdatesNotInEa(caseData);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
@@ -529,6 +557,18 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT"
+        );
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "CLAIMANT",
+            "Applications"
+        );
+    }
+
+    private void verifyDeleteNotificationsAndTaskListUpdatesNotInEa(CaseData caseData) {
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
