@@ -453,7 +453,6 @@ public class PartAdmissionTransitionBuilderTest {
         assertFalse(isCarmApplicableCase.test(caseData));
     }
 
-
     private void assertTransition(Transition transition, String sourceState, String targetState) {
         assertThat(transition.getSourceState()).isEqualTo(sourceState);
         assertThat(transition.getTargetState()).isEqualTo(targetState);
