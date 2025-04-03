@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -30,12 +31,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -73,8 +74,9 @@ public class RespondentTemplateForDQGenerator {
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .deterWithoutHearingYesNo(isSpecAndSmallClaim(caseData)  ? dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo() : null)
-            .deterWithoutHearingWhyNot(isSpecAndSmallClaim(caseData) ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq)  ? YES : null)
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+                                           ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -110,8 +112,9 @@ public class RespondentTemplateForDQGenerator {
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .deterWithoutHearingYesNo(isSpecAndSmallClaim(caseData)  ? dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo() : null)
-            .deterWithoutHearingWhyNot(isSpecAndSmallClaim(caseData) ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq)  ? YES : null)
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+                                           ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
@@ -127,9 +130,13 @@ public class RespondentTemplateForDQGenerator {
             .build();
     }
 
-    private static boolean isSpecAndSmallClaim(CaseData caseData) {
-        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
+    private static boolean getDeterWithoutHearing(CaseData caseData, DQ dq) {
+        return isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing());
+    }
+
+    private static boolean isSmallClaim(CaseData caseData) {
+        return AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+            || SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
     }
 
     public Experts getExperts(DQ dq) {

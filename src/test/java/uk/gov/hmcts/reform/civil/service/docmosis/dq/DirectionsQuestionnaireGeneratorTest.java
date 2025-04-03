@@ -46,6 +46,8 @@ import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -1136,6 +1138,7 @@ class DirectionsQuestionnaireGeneratorTest {
                         .respondent1DQHearing(uk.gov.hmcts.reform.civil.model.dq.Hearing.builder()
                             .hearingLength(null)
                             .build())
+                        .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
                         .build())
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .build();
@@ -1156,6 +1159,7 @@ class DirectionsQuestionnaireGeneratorTest {
                         .respondent1DQExperts(null)
                         .respondent1DQWitnesses(null)
                         .respondent1DQHearing(null)
+                        .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
                         .build())
                     .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                     .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
@@ -1177,6 +1181,7 @@ class DirectionsQuestionnaireGeneratorTest {
                         .respondent1DQExperts(null)
                         .respondent1DQWitnesses(null)
                         .respondent1DQHearing(null)
+                        .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
                         .build())
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
@@ -1992,9 +1997,12 @@ class DirectionsQuestionnaireGeneratorTest {
                         .legalRepHeading()
                         .build())
                     .respondent2SameLegalRepresentative(YES)
-                    .respondentResponseIsSame(YesOrNo.NO)
+                    .respondentResponseIsSame(NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .responseClaimTrack("SMALL_CLAIM")
+                    .respondent1DQ(Respondent1DQ.builder()
+                                       .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
+                                       .build())
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null) {
                     caseData = caseData.toBuilder()
@@ -2080,6 +2088,12 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .responseClaimTrack("SMALL_CLAIM")
+                    .respondent1DQ(Respondent1DQ.builder()
+                                       .deterWithoutHearingRespondent1(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
+                                       .build())
+                    .respondent2DQ(Respondent2DQ.builder()
+                                       .deterWithoutHearingRespondent2(DeterWithoutHearing.builder().deterWithoutHearingYesNo(YES).build())
+                                       .build())
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null) {
                     caseData = caseData.toBuilder()
