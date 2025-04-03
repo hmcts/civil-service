@@ -49,7 +49,10 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff)), transitions)
+        this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff))
+                                                            .and(not(partAdmitPayImmediately))
+                                                            .and(not(acceptRepaymentPlan))
+                                                            .and(not(rejectRepaymentPlan)), transitions)
             .moveTo(IN_MEDIATION, transitions).onlyWhen(isClaimantNotSettlePartAdmitClaim
                                                             .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
                                                             .and(not(takenOfflineByStaff)), transitions)

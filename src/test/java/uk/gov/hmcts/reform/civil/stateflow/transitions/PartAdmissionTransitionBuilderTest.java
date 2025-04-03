@@ -39,7 +39,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTrans
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.partAdmitPayImmediately;
 
 @ExtendWith(MockitoExtension.class)
-public class PartAdmissionTransitionBuilderTest {
+class PartAdmissionTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
