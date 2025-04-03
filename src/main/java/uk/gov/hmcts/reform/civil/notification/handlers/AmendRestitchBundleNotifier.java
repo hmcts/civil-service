@@ -118,7 +118,7 @@ public class AmendRestitchBundleNotifier extends Notifier {
 
     private String getApplicantEmail(CaseData caseData) {
         return caseData.isApplicantLiP()
-            ? caseData.getClaimantUserDetails().getEmail()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+            ? caseData.getClaimantUserDetailsEmail()
+            : caseData.getApplicantSolicitor1UserDetailsEmail();
     }
 }
