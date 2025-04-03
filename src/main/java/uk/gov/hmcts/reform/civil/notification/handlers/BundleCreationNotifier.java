@@ -101,7 +101,7 @@ public class BundleCreationNotifier extends Notifier {
         }
 
         return EmailDTO.builder()
-            .targetEmail(isLiP ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetails().getEmail())
+            .targetEmail(isLiP ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetailsEmail())
             .emailTemplate(getTemplate(isLiP, isLiPWelsh))
             .parameters(properties)
             .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
@@ -126,7 +126,7 @@ public class BundleCreationNotifier extends Notifier {
 
         if (isRespondent1) {
             isLiP = caseData.getRespondent1Represented().equals(YesOrNo.NO);
-            email = isLiP ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
+            email = isLiP ? caseData.getRespondent1PartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
             isLiP = caseData.getRespondent2Represented().equals(YesOrNo.NO);
             email = caseData.getRespondentSolicitor2EmailAddress();
