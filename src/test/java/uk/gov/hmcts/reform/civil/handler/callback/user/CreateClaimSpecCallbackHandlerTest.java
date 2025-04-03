@@ -2023,22 +2023,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class FlightDelayDetailsMidCallbacks {
 
         @Test
-        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Disabled() {
-            // Given
-            CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
-            // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(false);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
-            assertThat(response.getData()).doesNotHaveToString("claimType");
-        }
-
-        @Test
         void shouldGetAirlineList_whenRequired() {
             // Given
             List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
@@ -2052,7 +2036,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
             // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -2074,7 +2057,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -2091,7 +2073,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -2535,8 +2516,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                     .willReturn(locations);
-
-                when(toggleService.isSdoR2Enabled()).thenReturn(true);
             }
 
             @Test
