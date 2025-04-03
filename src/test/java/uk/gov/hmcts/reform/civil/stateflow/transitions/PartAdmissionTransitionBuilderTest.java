@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiP;
@@ -261,6 +262,44 @@ public class PartAdmissionTransitionBuilderTest {
     }
 
     @Test
+    void shouldReturnFalse_when1v2ClaimantLip() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(NO)
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .respondent2(Party.builder().build())
+            .respondent1Represented(YES)
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                            .isMediationContactNameCorrect(YES)
+                                                            .build())
+                             .build())
+            .build();
+
+        assertFalse(isCarmApplicableLipCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_when1v2RespondentLip() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YES)
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .respondent2(Party.builder().build())
+            .respondent1Represented(NO)
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponseCarm(MediationLiPCarm.builder()
+                                                            .isMediationContactNameCorrect(YES)
+                                                            .build())
+                             .build())
+            .build();
+
+        assertFalse(isCarmApplicableLipCase.test(caseData));
+    }
+
+    @Test
     void shouldReturnTrue_whenCarmApplicableForClaimantLip() {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1Represented(NO)
@@ -351,6 +390,38 @@ public class PartAdmissionTransitionBuilderTest {
             .build();
 
         assertTrue(isCarmApplicableCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondentLip() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .responseClaimTrack(FAST_CLAIM.name())
+            .respondent1Represented(NO)
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                           .firstName("name")
+                                           .build())
+            .build();
+
+        assertFalse(isCarmApplicableCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenApplicantLip() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .responseClaimTrack(FAST_CLAIM.name())
+            .applicant1Represented(NO)
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                           .firstName("name")
+                                           .build())
+            .build();
+
+        assertFalse(isCarmApplicableCase.test(caseData));
     }
 
     @Test
