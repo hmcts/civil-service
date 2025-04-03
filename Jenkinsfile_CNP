@@ -84,7 +84,7 @@ def getCivilCcdDefinitionBranch() {
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
     return label.minus("civilDefinitionBranch:").trim()
   }
-  return "master"
+  return "CIV-16956-Determination-without-Hearing-Questions"
 }
 
 withPipeline(type, product, component) {
