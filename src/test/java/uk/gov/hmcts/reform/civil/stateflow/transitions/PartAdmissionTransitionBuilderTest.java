@@ -398,7 +398,7 @@ public class PartAdmissionTransitionBuilderTest {
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
-            .responseClaimTrack(FAST_CLAIM.name())
+            .responseClaimTrack(SMALL_CLAIM.name())
             .respondent1Represented(NO)
             .resp1MediationContactInfo(MediationContactInformation.builder()
                                            .firstName("name")
@@ -414,7 +414,7 @@ public class PartAdmissionTransitionBuilderTest {
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
-            .responseClaimTrack(FAST_CLAIM.name())
+            .responseClaimTrack(SMALL_CLAIM.name())
             .applicant1Represented(NO)
             .resp1MediationContactInfo(MediationContactInformation.builder()
                                            .firstName("name")
@@ -438,6 +438,21 @@ public class PartAdmissionTransitionBuilderTest {
 
         assertFalse(isCarmApplicableCase.test(caseData));
     }
+
+    @Test
+    void shouldReturnFalse_whenCarmApplicableUnspecClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState2v1Applicant1NotProceedApplicant2Proceeds()
+            .build().toBuilder()
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                           .firstName("name")
+                                           .build())
+            .build();
+
+        assertFalse(isCarmApplicableCase.test(caseData));
+    }
+
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
         assertThat(transition.getSourceState()).isEqualTo(sourceState);
