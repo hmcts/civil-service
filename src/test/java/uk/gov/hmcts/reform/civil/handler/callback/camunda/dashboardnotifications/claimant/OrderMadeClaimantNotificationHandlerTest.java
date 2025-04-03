@@ -203,7 +203,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             HashMap<String, Object> scenarioParams = new HashMap<>();
-            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verifyDeleteNotificationsAndTaskListUpdatesNotInEa(caseData);
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
                 "Scenario.AAA6.Update.Claimant.TaskList.UploadDocuments.FinalOrders",

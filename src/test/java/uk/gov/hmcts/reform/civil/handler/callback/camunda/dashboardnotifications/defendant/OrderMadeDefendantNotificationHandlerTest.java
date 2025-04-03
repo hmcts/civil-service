@@ -518,14 +518,13 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .build();
-
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
 
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
-            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
-            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
 
