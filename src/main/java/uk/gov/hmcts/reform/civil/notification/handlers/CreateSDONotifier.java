@@ -82,8 +82,8 @@ public class CreateSDONotifier extends Notifier {
 
         String template = getTemplate(isLiP, isBilingual, false, caseData.getCaseAccessCategory(),
                                       caseData.getCaseManagementLocation().getBaseLocation());
-        String email = isLiP ? caseData.getClaimantUserDetails().getEmail()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+        String email = isLiP ? caseData.getClaimantUserDetailsEmail()
+            : caseData.getApplicantSolicitor1UserDetailsEmail();
 
         return EmailDTO.builder()
             .targetEmail(email)
@@ -121,7 +121,7 @@ public class CreateSDONotifier extends Notifier {
         String template = getTemplate(isLiP, isBilingual, true, caseData.getCaseAccessCategory(),
                                       caseData.getCaseManagementLocation().getBaseLocation());
         String reference = isRespondent1 ? REFERENCE_TEMPLATE_RESPONDENT_1 : REFERENCE_TEMPLATE_RESPONDENT_2;
-        String email = isRespondent1 ? caseData.getRespondent1().getPartyEmail() : caseData.getRespondent2().getPartyEmail();
+        String email = isRespondent1 ? caseData.getRespondent1PartyEmail() : caseData.getRespondent2PartyEmail();
 
         return EmailDTO.builder()
             .targetEmail(email)
