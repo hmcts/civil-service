@@ -72,7 +72,7 @@ public class ClaimDismissedNotifier extends Notifier {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
-                .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .targetEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
                 .emailTemplate(getEmailTemplateId(caseData))
                 .parameters(properties)
                 .reference(String.format(REFERENCE_TEMPLATE_APPLICANT_FOR_CLAIM_DISMISSED,

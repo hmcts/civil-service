@@ -537,6 +537,10 @@ azure:
       retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:60}
       threads: ${CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS:1}
       enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED:false}
+    application-insights:
+      instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
+
+appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:dummy}
 
 async:
   handler:
