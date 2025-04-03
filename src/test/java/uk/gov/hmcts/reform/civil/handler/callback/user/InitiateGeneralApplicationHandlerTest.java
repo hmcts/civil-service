@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -157,7 +158,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
         assertThat(response.getErrors()).containsOnly(NOT_ALLOWED_SETTLE_DISCONTINUE);
@@ -177,7 +178,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
         assertThat(response.getErrors()).containsOnly(NOT_ALLOWED_SETTLE_DISCONTINUE);
@@ -198,7 +199,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
     }
@@ -218,7 +219,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
     }
@@ -235,7 +236,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response.getErrors()).isNotNull();
     }
@@ -258,6 +259,34 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLipVsLrAndDefendantLiPIsBilingualForCosc() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION_COSC.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
@@ -283,6 +312,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
@@ -303,6 +333,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
@@ -324,6 +355,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(false);
 
@@ -345,6 +377,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
 
@@ -367,6 +400,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
@@ -387,6 +422,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
         given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
@@ -404,6 +440,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -419,6 +456,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                         .baseLocation("45678")
                                         .region("4").build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1401,7 +1439,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             );
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
+            params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();

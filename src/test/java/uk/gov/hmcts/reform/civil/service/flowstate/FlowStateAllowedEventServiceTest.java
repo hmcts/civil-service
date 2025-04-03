@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
@@ -1201,7 +1202,8 @@ class FlowStateAllowedEventServiceTest {
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
-                        SET_ASIDE_JUDGMENT
+                        SET_ASIDE_JUDGMENT,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1226,7 +1228,8 @@ class FlowStateAllowedEventServiceTest {
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
-                        SET_ASIDE_JUDGMENT
+                        SET_ASIDE_JUDGMENT,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1288,7 +1291,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         REFER_JUDGE_DEFENCE_RECEIVED,
-                        GENERATE_DIRECTIONS_ORDER
+                        GENERATE_DIRECTIONS_ORDER,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1339,7 +1343,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1371,7 +1376,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1418,7 +1424,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1453,7 +1460,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1489,7 +1497,8 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1533,7 +1542,8 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1566,7 +1576,8 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1602,7 +1613,8 @@ class FlowStateAllowedEventServiceTest {
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1706,7 +1718,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         MEDIATION_UNSUCCESSFUL,
                         MEDIATION_SUCCESSFUL,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1731,7 +1744,8 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1825,7 +1839,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1885,7 +1900,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -2003,7 +2019,8 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         AMEND_RESTITCH_BUNDLE,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -2023,7 +2040,10 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CONFIRM_ORDER_REVIEW,
                         COURT_OFFICER_ORDER,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        JUDGMENT_PAID_IN_FULL
+
                     }
                 ),
                 of(
@@ -2076,7 +2096,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -2173,7 +2194,8 @@ class FlowStateAllowedEventServiceTest {
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         JUDGMENT_PAID_IN_FULL,
                         INITIATE_GENERAL_APPLICATION,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -2204,7 +2226,8 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         INITIATE_GENERAL_APPLICATION,
-                        REFER_JUDGE_DEFENCE_RECEIVED
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
