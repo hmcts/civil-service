@@ -537,6 +537,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
@@ -550,6 +551,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .respondToClaim(RespondToClaim.builder()
                                 .howMuchWasPaid(new BigDecimal(100000))
                                 .build())
+            .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 
@@ -561,6 +563,13 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(params).build()
+        );
+
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
