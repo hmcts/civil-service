@@ -46,6 +46,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff))
                                                             .and(not(partAdmitPayImmediately))
+                                                            .and(not(acceptRepaymentPlan))
                                                             .and(not(rejectRepaymentPlan)), transitions)
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
             .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)), transitions)
