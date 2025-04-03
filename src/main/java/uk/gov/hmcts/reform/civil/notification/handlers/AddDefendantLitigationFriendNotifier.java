@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,7 +21,6 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLega
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
-@Slf4j
 public class AddDefendantLitigationFriendNotifier extends Notifier {
 
     private static final String REFERENCE_TEMPLATE_APPLICANT = "litigation-friend-added-applicant-notification-%s";
@@ -45,7 +43,8 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 
@@ -62,7 +61,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
-                .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .targetEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                 .parameters(properties)
                 .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
