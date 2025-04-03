@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim.GetAirlineListTask;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
@@ -20,7 +19,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GetAirlineListTaskTest extends BaseCallbackHandlerTest {
@@ -50,7 +48,6 @@ class GetAirlineListTaskTest extends BaseCallbackHandlerTest {
 
         CaseData caseData = CaseData.builder().build();
 
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         var response = (AboutToStartOrSubmitCallbackResponse) getAirlineListTask.getAirlineList(caseData);
 
         assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")

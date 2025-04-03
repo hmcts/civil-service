@@ -42,8 +42,6 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_SDO_ORDER;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_TRIAL;
 
@@ -99,8 +97,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_R2_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_R2_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
@@ -121,8 +119,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndTelephoneHearing() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_R2_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_R2_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
@@ -142,8 +140,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvidedAndVidoeHearing() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_R2_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_R2_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
@@ -164,8 +162,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
     @Test
     void shouldDefaultJudgementDisposalFormGenerator_HnlFieldsWhenToggled() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
-                                                               eq(DJ_SDO_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));
+                                                               eq(DJ_SDO_R2_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_R2_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
@@ -197,8 +195,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenNoticeOfChangeEnabled() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_R2_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_R2_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
@@ -224,7 +222,6 @@ class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
@@ -246,7 +243,6 @@ class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
-        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedDisposalHearing()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
