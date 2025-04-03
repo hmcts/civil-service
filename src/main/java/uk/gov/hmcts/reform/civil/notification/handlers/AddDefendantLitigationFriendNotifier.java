@@ -43,7 +43,8 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 
@@ -60,7 +61,7 @@ public class AddDefendantLitigationFriendNotifier extends Notifier {
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
-                .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .targetEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
                 .emailTemplate(notificationsProperties.getSolicitorLitigationFriendAdded())
                 .parameters(properties)
                 .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
