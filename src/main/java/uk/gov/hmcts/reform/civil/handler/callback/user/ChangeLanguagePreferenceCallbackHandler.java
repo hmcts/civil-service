@@ -94,6 +94,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
                     setRespondentResponseBilingualLanguagePreference(caseData, builder, revisedBilingualPreference);
                 }
             }
+            default -> throw new IllegalArgumentException("Unexpected user type");
         }
         builder.changeLanguagePreference(null);
         CaseData updatedCaseData = builder.build();
@@ -104,7 +105,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     }
 
     private void setRespondentResponseBilingualLanguagePreference(CaseData caseData,
-                                                                  CaseData.CaseDataBuilder<?,?> builder,
+                                                                  CaseData.CaseDataBuilder<?, ?> builder,
                                                                   String revisedBilingualPreference) {
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
         builder.caseDataLiP(caseDataLiP.toBuilder()
@@ -112,6 +113,4 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
                                                             .respondent1ResponseLanguage(revisedBilingualPreference).build())
                                 .build());
     }
-
-
 }
