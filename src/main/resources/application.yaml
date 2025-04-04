@@ -521,14 +521,12 @@ exit-survey:
 
 azure:
   service-bus:
-    connection-postfix: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
     thread-count: ${HMC_HEARINGS_TOPIC_THREAD_COUNT:4}
     hmc-to-hearings-api:
+      connection-string: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
       namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:dummyNamespace}
       topicName: ${HMC_HEARINGS_TOPIC_NAME:dummyTopicName}
       subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:dummySubscriptionName}
-      username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
-      password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
       enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
     ccd-events-topic:
       connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING:dummy}
