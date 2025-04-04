@@ -523,7 +523,7 @@ azure:
   service-bus:
     thread-count: ${HMC_HEARINGS_TOPIC_THREAD_COUNT:4}
     hmc-to-hearings-api:
-      connection-string: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
+      connection-string: ${HMC_HEARINGS_TOPIC_CONNECTION_STRING:.servicebus.windows.net}
       namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:dummyNamespace}
       topicName: ${HMC_HEARINGS_TOPIC_NAME:dummyTopicName}
       subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:dummySubscriptionName}

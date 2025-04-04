@@ -84,7 +84,7 @@ java:
         - name: ccd-shared-servicebus-connection-string
           alias: CCD_EVENTS_TOPIC_CONNECTION_STRING
         - name: hmc-servicebus-connection-string
-          alias: HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX
+          alias: HMC_HEARINGS_TOPIC_CONNECTION_STRING
   postgresql:
     enabled: true
     image:
