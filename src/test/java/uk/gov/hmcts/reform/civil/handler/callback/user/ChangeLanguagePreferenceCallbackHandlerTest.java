@@ -20,8 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH_AND_WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
@@ -37,6 +39,11 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
     void setup() {
         mapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         handler = new ChangeLanguagePreferenceCallbackHandler(mapper);
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(CHANGE_LANGUAGE_PREFERENCE);
     }
 
     @Nested
@@ -151,7 +158,26 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
         }
 
         @Test
-        void shouldChangeClaimantLanguagePreference() {
+        void shouldChangeClaimantLanguagePreferenceToEnglish() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData = caseData.toBuilder()
+                .changeLanguagePreference(ChangeLanguagePreference.builder()
+                                              .userType(CLAIMANT)
+                                              .preferredLanguage(ENGLISH).build())
+                .applicant1Represented(NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("ENGLISH");
+        }
+
+        @Test
+        void shouldChangeClaimantLanguagePreferenceToWelsh() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
             caseData = caseData.toBuilder()
                 .changeLanguagePreference(ChangeLanguagePreference.builder()
