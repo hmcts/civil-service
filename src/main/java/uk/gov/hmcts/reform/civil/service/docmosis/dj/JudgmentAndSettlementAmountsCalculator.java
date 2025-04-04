@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 
 @Component
@@ -81,10 +82,10 @@ public class JudgmentAndSettlementAmountsCalculator {
     }
 
     private BigDecimal getClaimFeePounds(CaseData caseData, Fee claimfee) {
-        BigDecimal claimFeePounds;
+        BigDecimal claimFeePounds = BigDecimal.ZERO;
         if (caseData.getOutstandingFeeInPounds() != null) {
             claimFeePounds = caseData.getOutstandingFeeInPounds();
-        } else {
+        } else if (nonNull(claimfee) && claimfee.getCalculatedAmountInPence() != null) {
             claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
         }
         return claimFeePounds;
