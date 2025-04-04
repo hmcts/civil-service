@@ -22,6 +22,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
      */
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
+
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             || !EnumSet.of(RespondentResponseTypeSpec.FULL_ADMISSION, RespondentResponseTypeSpec.PART_ADMISSION)
@@ -50,11 +51,11 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         } else {
             sb.append(" accepts your offer</h3>");
         }
-        sb.append("You should<ul>")
-            .append("<li>set up a repayment plan to begin when you said it would</li>")
-            .append("<li>keep proof of any payments you make</li>")
+        sb.append("<p>You should</p><ul>")
+            .append("<li><p class=\"govuk-!-margin-0\">set up a repayment plan to begin when you said it would</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">keep proof of any payments you make<p></li>")
             .append("</ul>")
-            .append("Contact ").append(applicantName);
+            .append("<p>Contact ").append(applicantName);
 
         if (!caseData.isApplicant1NotRepresented()) {
             if (applicantName.endsWith("s")) {
@@ -67,16 +68,16 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
             sb.append(" if you need details on how to pay</p>");
         }
 
-        sb.append("If you do not pay immediately, ").append(applicantName);
+        sb.append("<p>If you do not pay immediately, ").append(applicantName);
         if (caseData.getRespondent2() != null || caseData.getApplicant2() != null) {
-            sb.append(" can either:")
+            sb.append(" can either:</p>")
                 .append("<ul>")
-                .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>");
+                .append("<li><p class=\"govuk-!-margin-0\">ask you to sign a settlement agreement to formalise the repayment plan</p></li>");
         } else {
-            sb.append(" can:")
+            sb.append(" can:</p>")
                 .append("<ul>");
         }
-        sb.append("<li>request a county court judgment against you</li>")
+        sb.append("<li><p class=\"govuk-!-margin-0\">request a county court judgment against you</p></li>")
             .append("</ul>")
             .append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName);
@@ -94,7 +95,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
                     "<p>If the claim value is greater than £10,000 then the court will review the case for the full amount.</p>")
                 .append("<p>This case will now proceed offline.</p>");
         } else {
-            sb.append("The court will decide how you must pay");            
+            sb.append("The court will decide how you must pay");
             if (caseData.isApplicant1NotRepresented()) {
                 sb.append("<br></br>")
                     .append("<p>This case will now proceed offline.</p>");

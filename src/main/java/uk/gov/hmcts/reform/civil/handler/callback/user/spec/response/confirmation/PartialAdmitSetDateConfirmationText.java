@@ -76,9 +76,9 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             sb.append(" accepts your offer</h3>");
         }
         sb.append("<ul>")
-            .append("<li>pay ").append(applicantName).append("</li>")
-            .append("<li>make sure any cheques or bank transfers are clear in their account by the deadline</li>")
-            .append("<li>keep proof of any payments you make</li>")
+            .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName).append("</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">make sure any cheques or bank transfers are clear in their account by the deadline</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">keep proof of any payments you make</p></li>")
             .append("</ul>")
             .append("<p>Contact ")
             .append(applicantName);

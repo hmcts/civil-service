@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -95,7 +97,11 @@ class SubmitClaimTaskTest {
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().build();
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
+            .airlineList(
+                DynamicList.builder()
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                               .build()).build()).build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
             caseData,

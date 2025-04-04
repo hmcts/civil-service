@@ -67,10 +67,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
 
-    public boolean isSdoR2Enabled() {
-        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
-    }
-
     public boolean isJudgmentOnlineLive() {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }

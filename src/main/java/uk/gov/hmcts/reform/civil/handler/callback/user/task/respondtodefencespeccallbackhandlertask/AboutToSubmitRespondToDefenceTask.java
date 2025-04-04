@@ -263,7 +263,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
-        return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
+        return (caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
             &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
