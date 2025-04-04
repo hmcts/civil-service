@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.Address;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class RespondentLiPResponse {
