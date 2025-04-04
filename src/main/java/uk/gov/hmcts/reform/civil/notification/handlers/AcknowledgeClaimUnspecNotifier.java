@@ -99,22 +99,22 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
             .build();
     }
 
-    Party getAcknowledgedRespondent(CaseData caseData, boolean isRespondent1Acknowledged) {
+    private Party getAcknowledgedRespondent(CaseData caseData, boolean isRespondent1Acknowledged) {
         return isRespondent1Acknowledged ? caseData.getRespondent1()
             : caseData.getRespondent2();
     }
 
-    LocalDateTime getResponseDeadline(CaseData caseData, boolean isRespondent1Acknowledged) {
+    private LocalDateTime getResponseDeadline(CaseData caseData, boolean isRespondent1Acknowledged) {
         return isRespondent1Acknowledged ? caseData.getRespondent1ResponseDeadline()
             : caseData.getRespondent2ResponseDeadline();
     }
 
-    boolean isRespondentOneAcknowledged(CaseData caseData) {
+    private boolean isRespondentOneAcknowledged(CaseData caseData) {
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         return !(multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && isAcknowledgeUserRespondentTwo(caseData));
     }
 
-    String getRespondentSolicitorEmail(CaseData caseData, boolean isRespondent1Acknowledged) {
+    private String getRespondentSolicitorEmail(CaseData caseData, boolean isRespondent1Acknowledged) {
         return isRespondent1Acknowledged ? caseData.getRespondentSolicitor1EmailAddress()
             : caseData.getRespondentSolicitor2EmailAddress();
     }
