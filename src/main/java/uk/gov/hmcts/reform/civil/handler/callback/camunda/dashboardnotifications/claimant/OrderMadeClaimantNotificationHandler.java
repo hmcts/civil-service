@@ -48,6 +48,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
+    public static final String GA = "Applications";
 
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
@@ -104,6 +105,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     protected String getScenario(CaseData caseData, CallbackParams callbackParams) {
         if (isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)) {
+            deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         }
         if (isCarmApplicableCase(caseData)
@@ -128,6 +130,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             }
             return SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS.getScenario();
         }
+        deleteNotificationAndInactiveTasks(caseData);
         return SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
     }
 
@@ -171,11 +174,19 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
         );
-
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            null
-        );
+        if ((getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
+                                                                                    .getCaseManagementLocation().getBaseLocation()))) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                GA
+            );
+        } else {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                null
+            );
+        }
     }
 }
