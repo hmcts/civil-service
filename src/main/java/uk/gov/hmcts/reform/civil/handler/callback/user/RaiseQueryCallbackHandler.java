@@ -85,11 +85,11 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
+            buildLatestQuery(latestCaseMessage));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toBuilder().qmLatestQuery(
-                buildLatestQuery(latestCaseMessage))
-                      .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
+            .data(caseDataBuilder.businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
                       .build().toMap(objectMapper))
             .build();
     }
