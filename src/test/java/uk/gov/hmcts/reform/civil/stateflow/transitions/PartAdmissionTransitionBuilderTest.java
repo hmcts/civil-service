@@ -35,7 +35,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.isCarmApplicableLipCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.agreePartAdmitSettle;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.getCarmEnabledForCase;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.getCarmEnabledForLipCase;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isClaimantNotSettlePartAdmitClaim;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.isSpecSmallClaim;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.PartAdmissionTransitionBuilder.partAdmitPayImmediately;
 
 @ExtendWith(MockitoExtension.class)
@@ -451,6 +454,54 @@ class PartAdmissionTransitionBuilderTest {
             .build();
 
         assertFalse(isCarmApplicableCase.test(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_UnspecFastClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState2v1Applicant1NotProceedApplicant2Proceeds()
+            .build().toBuilder()
+            .responseClaimTrack(FAST_CLAIM.name())
+            .build();
+
+        assertFalse(isSpecSmallClaim(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_SpecSmallClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState2v1Applicant1NotProceedApplicant2Proceeds()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .build();
+
+        assertTrue(isSpecSmallClaim(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCarmNotEnabledOnLipClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState2v1Applicant1NotProceedApplicant2Proceeds()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1SettleClaim(YES)
+                             .build())
+            .build();
+
+        assertFalse(getCarmEnabledForLipCase(caseData));
+    }
+
+    @Test
+    void shouldReturnFalse_whenCarmNotEnabledOnLRClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState2v1Applicant1NotProceedApplicant2Proceeds()
+            .setClaimTypeToSpecClaim()
+            .build().toBuilder()
+            .build();
+
+        assertFalse(getCarmEnabledForCase(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
