@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH_AND_WELSH;
@@ -40,39 +40,76 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
     }
 
     @Nested
-    class AboutToStartCallback {
+    class MidCallback {
+
+        @Test
+        void shouldThrowException_WhenNoLanguageChangeData() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> handler.handle(params))
+                .withMessage("User type not found");
+        }
+
+        @Test
+        void shouldThrowException_WhenNoUserType() {
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
+            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
+                                                                         .preferredLanguage(WELSH).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> handler.handle(params))
+                .withMessage("User type not found");
+        }
 
         @Test
         void shouldReturnError_WhenClaimantIsNotLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
+                                                                         .userType(CLAIMANT)
+                                                                         .preferredLanguage(WELSH).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
+
             assertThat(response.getErrors()).hasSize(1);
-            assertThat(response.getErrors()).containsExactly("At least one party on the claim must be unrepresented.");
+            assertThat(response.getErrors()).containsExactly("The selected party must be unrepresented.");
         }
 
         @Test
-        void shouldNotReturnError_WhenApplicantIsLip() {
+        void shouldReturnError_WhenDefendantIsNotLip() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().applicant1Represented(NO).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
+                                                                         .userType(DEFENDANT)
+                                                                         .preferredLanguage(WELSH).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getErrors()).isEmpty();
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactly("The selected party must be unrepresented.");
         }
 
         @Test
-        void shouldNotReturnError_WhenRespondentIsLip() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().respondent1Represented(NO).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+        void shouldReturnError_WhenDefendantHasNotResponded() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            caseData = caseData.toBuilder()
+                .changeLanguagePreference(ChangeLanguagePreference.builder()
+                                              .userType(DEFENDANT)
+                                              .preferredLanguage(WELSH).build())
+                .respondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-lang-pref");
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            assertThat(response.getErrors()).isEmpty();
+
+            assertThat(response.getErrors()).hasSize(1);
+            assertThat(response.getErrors()).containsExactly("The defendant must have already responded in order to change their language preference.");
         }
     }
 
@@ -111,54 +148,6 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> handler.handle(params))
                 .withMessage("User type not found");
-        }
-
-        @Test
-        void shouldReturnError_WhenClaimantIsNotLip() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
-                                                                         .userType(CLAIMANT)
-                                                                         .preferredLanguage(WELSH).build()).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).hasSize(1);
-            assertThat(response.getErrors()).containsExactly("The selected party must be unrepresented.");
-        }
-
-        @Test
-        void shouldReturnError_WhenDefendantIsNotLip() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentRespondToClaim(FULL_DEFENCE).build();
-            caseData = caseData.toBuilder().changeLanguagePreference(ChangeLanguagePreference.builder()
-                                                                         .userType(DEFENDANT)
-                                                                         .preferredLanguage(WELSH).build()).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).hasSize(1);
-            assertThat(response.getErrors()).containsExactly("The selected party must be unrepresented.");
-        }
-
-        @Test
-        void shouldReturnError_WhenDefendantHasNotResponded() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            caseData = caseData.toBuilder()
-                .changeLanguagePreference(ChangeLanguagePreference.builder()
-                                              .userType(DEFENDANT)
-                                              .preferredLanguage(WELSH).build())
-                .respondent1Represented(NO)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getErrors()).hasSize(1);
-            assertThat(response.getErrors()).containsExactly("The defendant must have already responded in order to change their language preference.");
         }
 
         @Test

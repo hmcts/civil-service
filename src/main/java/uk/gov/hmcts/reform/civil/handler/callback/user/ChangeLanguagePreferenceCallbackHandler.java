@@ -22,22 +22,27 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.CLAIMANT;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
 public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
 
-    public static final String LIP_PARTY_REQUIRED = "At least one party on the claim must be unrepresented.";
-    public static final String SELECTED_PARTY_LIP_REQUIRED = "The selected party must be unrepresented.";
+    private static final String VALIDATE_LANGUAGE_PREFERENCE = "validate-lang-pref";
 
-    public static final String DEFENDANT_RESPONSE_REQUIRED = "The defendant must have already responded in order to change their language preference.";
+    private static final String SELECTED_PARTY_LIP_REQUIRED = "The selected party must be unrepresented.";
+    private static final String DEFENDANT_RESPONSE_REQUIRED = "The defendant must have already responded in order to change their language preference.";
+
     private static final List<CaseEvent> EVENTS = List.of(CHANGE_LANGUAGE_PREFERENCE);
 
     private final ObjectMapper objectMapper;
 
-    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::validateChangeLanguagePreference,
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+                                                             callbackKey(MID, VALIDATE_LANGUAGE_PREFERENCE), this::validateChangeLanguagePreference,
                                                              callbackKey(ABOUT_TO_SUBMIT), this::changeLanguagePreference,
                                                              callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
 
@@ -52,10 +57,15 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateChangeLanguagePreference(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
-        ArrayList<String> errors = new ArrayList<>();
-        if (!caseData.isApplicantLiP() && !caseData.isRespondent1LiP()) {
-            errors.add(LIP_PARTY_REQUIRED);
+        List<String> errors = new ArrayList<>();
+        CaseData caseData = callbackParams.getCaseData();
+        UserType userType = Optional.ofNullable(caseData.getChangeLanguagePreference())
+            .map(ChangeLanguagePreference::getUserType)
+            .orElseThrow(() -> new IllegalArgumentException("User type not found"));
+        if ((userType == CLAIMANT && !caseData.isApplicantLiP()) || (userType == DEFENDANT && !caseData.isRespondent1LiP())) {
+            errors.add(SELECTED_PARTY_LIP_REQUIRED);
+        } else if (userType == DEFENDANT && (caseData.getCaseDataLiP() == null || caseData.getCaseDataLiP().getRespondent1LiPResponse() == null)) {
+            errors.add(DEFENDANT_RESPONSE_REQUIRED);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -78,22 +88,8 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             .map(ChangeLanguagePreference::getUserType)
             .orElseThrow(() -> new IllegalArgumentException("User type not found"));
         switch (userType) {
-            case CLAIMANT -> {
-                if (!caseData.isApplicantLiP()) {
-                    errors.add(SELECTED_PARTY_LIP_REQUIRED);
-                } else {
-                    builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
-                }
-            }
-            case DEFENDANT -> {
-                if (!caseData.isRespondent1LiP()) {
-                    errors.add(SELECTED_PARTY_LIP_REQUIRED);
-                } else if (caseData.getCaseDataLiP() == null || caseData.getCaseDataLiP().getRespondent1LiPResponse() == null) {
-                    errors.add(DEFENDANT_RESPONSE_REQUIRED);
-                } else {
-                    setRespondentResponseBilingualLanguagePreference(caseData, builder, revisedBilingualPreference);
-                }
-            }
+            case CLAIMANT -> builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
+            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, builder, revisedBilingualPreference);
             default -> throw new IllegalArgumentException("Unexpected user type");
         }
         builder.changeLanguagePreference(null);
