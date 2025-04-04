@@ -64,10 +64,10 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
             "CLAIMANT"
         );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
             caseId,
             "CLAIMANT",
-            null
+            "Application.View"
         );
     }
 }

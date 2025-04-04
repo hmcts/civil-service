@@ -63,8 +63,7 @@ public class DefendantDecisionOutcomeDashboardHandler extends CaseProgressionDas
 
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseId,
-            DEFENDANT_ROLE,
-            null
+            DEFENDANT_ROLE
         );
     }
 

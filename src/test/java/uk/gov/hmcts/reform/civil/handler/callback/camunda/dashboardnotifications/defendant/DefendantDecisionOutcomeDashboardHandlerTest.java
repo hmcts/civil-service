@@ -152,8 +152,7 @@ class DefendantDecisionOutcomeDashboardHandlerTest extends BaseCallbackHandlerTe
         );
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            null
+            "DEFENDANT"
         );
     }
 }

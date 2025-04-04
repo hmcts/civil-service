@@ -100,7 +100,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             "CLAIMANT"
         );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseId,
             "CLAIMANT",
             GA

@@ -624,7 +624,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT"
         );
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
             "Applications"
@@ -638,8 +638,7 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         );
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            null
+            "DEFENDANT"
         );
     }
 }

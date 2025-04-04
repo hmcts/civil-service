@@ -247,7 +247,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
         );
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
             GA
