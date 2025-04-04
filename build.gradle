@@ -242,12 +242,23 @@ task runNonProdApiTestsByGroups(description: 'Runs Non Prod features in function
   }
 
   doLast {
-    def ftGroups = System.env.PR_FT_GROUPS ?: 'nonprod'
-    for (ftGroup in ftGroups.toLowerCase().split(",")) {
-      exec {
-        logger.info('Running FT group: ' + ftGroup)
-        commandLine '/usr/bin/yarn', 'run', 'test:api-' + ftGroup
-      }
+    def baseCommand = 'test:api-nonprod'
+    def ftGroupsEnv = System.env.PR_FT_GROUPS
+
+    if (ftGroupsEnv && !ftGroupsEnv.trim().isEmpty()) {
+        def ftGroups = ftGroupsEnv.toLowerCase().split(",")
+        def grepArgs = ftGroups.collect { "@${it.trim()}" }.join(" ")
+
+        logger.info("Running FT groups: ${ftGroups.join(', ')}")
+
+        exec {
+            commandLine '/usr/bin/yarn', 'run', baseCommand, '--grep', grepArgs
+        }
+    } else {
+        logger.info("Running default FT command with no group filters")
+        exec {
+            commandLine '/usr/bin/yarn', 'run', baseCommand
+        }
     }
   }
 }
