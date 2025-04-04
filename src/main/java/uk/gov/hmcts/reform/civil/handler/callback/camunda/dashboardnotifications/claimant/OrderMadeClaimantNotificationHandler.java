@@ -48,6 +48,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
+    public static final String GA = "Applications";
 
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
@@ -173,11 +174,19 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
         );
-
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            null
-        );
+        if ((getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
+                                                                                    .getCaseManagementLocation().getBaseLocation()))) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                GA
+            );
+        } else {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                null
+            );
+        }
     }
 }
