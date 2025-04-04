@@ -351,7 +351,7 @@ class PartAdmissionTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenCarmApplicableForClaimantFullDefenceProceed() {
+    void shouldReturnTrue_whenCarmApplicableForClaimantPartAdmitProceed() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
@@ -366,7 +366,7 @@ class PartAdmissionTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenCarmApplicableForDefendantFullDefenceProceed() {
+    void shouldReturnTrue_whenCarmApplicableForDefendantPartAdmitProceed() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
@@ -381,7 +381,7 @@ class PartAdmissionTransitionBuilderTest {
     }
 
     @Test
-    void shouldReturnTrue_whenCarmApplicableForDefendant2FullDefenceProceed() {
+    void shouldReturnTrue_whenCarmApplicableForDefendant2PartAdmitProceed() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateApplicantRespondToDefenceAndProceed()
             .setClaimTypeToSpecClaim()
@@ -502,6 +502,35 @@ class PartAdmissionTransitionBuilderTest {
             .build();
 
         assertFalse(getCarmEnabledForCase(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCarmEnabledOnLRClaimApplicantAndDefendant1() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .build().toBuilder()
+            .app1MediationContactInfo(MediationContactInformation.builder()
+                                          .firstName("name")
+                                          .build())
+            .resp1MediationContactInfo(MediationContactInformation.builder()
+                                          .firstName("name")
+                                          .build())
+            .build();
+
+        assertTrue(getCarmEnabledForCase(caseData));
+    }
+
+    @Test
+    void shouldReturnTrue_whenCarmEnabledOnLRClaimDefendant2() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .build().toBuilder()
+            .resp2MediationContactInfo(MediationContactInformation.builder()
+                                           .firstName("name")
+                                           .build())
+            .build();
+
+        assertTrue(getCarmEnabledForCase(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
