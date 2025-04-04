@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 public class SettleClaimCallbackHandler extends CallbackHandler {
 
     protected final ObjectMapper objectMapper;
+    private final DashboardNotificationService dashboardNotificationService;
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM);
     private final TaskListService taskListService;
@@ -46,6 +48,9 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
+
+        deleteMainCaseDashboardNotifications(caseDataBuilder);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(CASE_SETTLED.name())
@@ -56,16 +61,30 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.isApplicantLiP()) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                  "CLAIMANT", "Application.View");
+                                                                                                   "CLAIMANT",
+                                                                                                   "Application.View"
+            );
         }
         if (caseData.isRespondent1LiP()) {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                  "DEFENDANT", "Application.View");
+                                                                                                   "DEFENDANT",
+                                                                                                   "Application.View"
+            );
         }
-
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim marked as settled")
             .confirmationBody("<br />")
             .build();
+    }
+
+    private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (caseDataBuilder.build().isApplicantLiP()) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseDataBuilder.build().getCcdCaseReference().toString(), "CLAIMANT");
+        }
+        if (caseDataBuilder.build().isRespondent1LiP()) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseDataBuilder.build().getCcdCaseReference().toString(), "DEFENDANT");
+        }
     }
 }
