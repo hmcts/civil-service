@@ -34,7 +34,11 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
     private static final String REFERENCE_TEMPLATE_APPLICANT = "acknowledge-claim-applicant-notification-%s";
     private static final String REFERENCE_TEMPLATE_RESPONDENT = "acknowledge-claim-respondent-notification-%s";
 
-    public AcknowledgeClaimUnspecNotifier(NotificationService notificationService, NotificationsProperties notificationsProperties, OrganisationService organisationService, SimpleStateFlowEngine stateFlowEngine, CaseTaskTrackingService caseTaskTrackingService) {
+    public AcknowledgeClaimUnspecNotifier(NotificationService notificationService,
+                                          NotificationsProperties notificationsProperties,
+                                          OrganisationService organisationService,
+                                          SimpleStateFlowEngine stateFlowEngine,
+                                          CaseTaskTrackingService caseTaskTrackingService) {
         super(
             notificationService,
             notificationsProperties,
@@ -81,15 +85,16 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
 
     private EmailDTO getRespondent(CaseData caseData) {
         boolean isRespondent1Acknowledged = isRespondentOneAcknowledged(caseData);
-        LocalDateTime responseDeadline = getResponseDeadline(caseData, isRespondent1Acknowledged);
         Party respondent = getAcknowledgedRespondent(caseData, isRespondent1Acknowledged);
-        String respondentSolicitorEmailAddress = getRespondentSolicitorEmail(caseData, isRespondent1Acknowledged);
+        LocalDateTime responseDeadline = getResponseDeadline(caseData, isRespondent1Acknowledged);
 
         Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                                                                                         isRespondent1Acknowledged, organisationService));
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(respondent));
         properties.put(RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE));
+
+        String respondentSolicitorEmailAddress = getRespondentSolicitorEmail(caseData, isRespondent1Acknowledged);
 
         return EmailDTO.builder()
             .targetEmail(respondentSolicitorEmailAddress)
