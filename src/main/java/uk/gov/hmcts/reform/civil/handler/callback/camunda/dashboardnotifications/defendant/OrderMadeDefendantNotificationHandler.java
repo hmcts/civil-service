@@ -49,6 +49,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderDefendant";
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
+    public static final String GA = "Applications";
 
     public OrderMadeDefendantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                  DashboardNotificationsParamsMapper mapper,
@@ -173,11 +174,19 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT"
         );
-
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "DEFENDANT",
-            null
-        );
+        if ((getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
+                                                                            .getCaseManagementLocation().getBaseLocation()))) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                GA
+            );
+        } else {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                null
+            );
+        }
     }
 }
