@@ -26,7 +26,7 @@ public class CaseNameUtils {
 
     public static String getFormattedPartyName(Party party, boolean commaPrefix) {
         String prefix = commaPrefix ? ", " : "";
-        return party != null ? String.format("%s'%s'", prefix, party.getPartyName(true)) : "";
+        return party != null ? String.format("%s%s", prefix, party.getPartyName(true)) : "";
     }
 
     public static String getFormattedPartyName(Party party) {
@@ -35,7 +35,7 @@ public class CaseNameUtils {
 
     public static String getFormattedLitigationFriendName(LitigationFriend litigationFriend) {
         return litigationFriend != null
-            ? String.format(" represented by '%s %s' (litigation friend)",
+            ? String.format(" represented by %s %s (litigation friend)",
                             litigationFriend.getFirstName(),
                             litigationFriend.getLastName()
         ) : "";
