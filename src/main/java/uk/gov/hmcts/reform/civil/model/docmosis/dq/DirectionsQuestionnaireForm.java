@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -50,6 +51,8 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final FixedRecoverableCostsSection fixedRecoverableCosts;
     private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
     private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;
+    private final YesOrNo deterWithoutHearingYesNo;
+    private final String deterWithoutHearingWhyNot;
     private final Experts experts;
     private final Witnesses witnesses;
     private final Integer witnessesIncludingDefendants;

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
@@ -41,8 +42,15 @@ public class Applicant1DQ implements DQ {
     private FutureApplications applicant1DQFutureApplications;
     private WelshLanguageRequirements applicant1DQLanguageLRspec;
     private DocumentsToBeConsidered applicant1DQDefendantDocumentsToBeConsidered;
+    private DeterWithoutHearing deterWithoutHearing;
 
     private RemoteHearing remoteHearing;
+
+    @Override
+    @JsonProperty("deterWithoutHearing")
+    public DeterWithoutHearing getDeterWithoutHearing() {
+        return deterWithoutHearing;
+    }
 
     @JsonProperty("applicant1DQRemoteHearing")
     public RemoteHearing getRemoteHearing() {
