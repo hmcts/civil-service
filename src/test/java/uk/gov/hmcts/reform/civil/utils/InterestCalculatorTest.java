@@ -285,4 +285,27 @@ class InterestCalculatorTest {
         caseData = caseData.toBuilder().submittedDate(LocalDateTime.of(2024, 10, 28, 15, 59)).build();
         assertThat(interestCalculator.calculateInterest(caseData)).isEqualTo(BigDecimal.valueOf(78.32).setScale(2, RoundingMode.UNNECESSARY));
     }
+
+    @Test
+    void shouldReturnValidAmountWhenSettlementSignedByClaimantWhilstWaitingForDefendantResponse() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .claimInterest(YesOrNo.YES)
+            .caseReference(123456789L)
+            .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                .sameRateInterestType(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)
+                .differentRate(BigDecimal.valueOf(10)).build())
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .interestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE)
+            .interestFromSpecificDate(LocalDate.now().minusDays(6))
+            .issueDate(LocalDate.now().minusDays(20))
+            .totalClaimAmount(BigDecimal.valueOf(5000))
+            .build();
+        LocalDateTime submittedDate = LocalDateTime.now().minusDays(20);
+        caseData = caseData.toBuilder().submittedDate(submittedDate).build();
+        ;
+
+        BigDecimal actual = interestCalculator.calculateInterest(caseData);
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(27.40).setScale(2, RoundingMode.UNNECESSARY));
+    }
 }
