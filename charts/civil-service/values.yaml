@@ -155,6 +155,8 @@ java:
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
         - name: ccd-shared-servicebus-connection-string
           alias: CCD_EVENTS_TOPIC_CONNECTION_STRING
+        - name: hmc-servicebus-connection-string
+          alias: HMC_HEARINGS_TOPIC_CONNECTION_STRING
 
 wiremock:
   enabled: false
