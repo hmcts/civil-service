@@ -26,18 +26,24 @@ public enum DocmosisTemplates {
     DEFENDANT_RESPONSE_SPEC_SEALED_1V2("CV-SPC-HRN-ENG-01360.docx", "%s_response_sealed_form.pdf"),
     DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS("CV-SPC-HRN-ENG-01362.docx", "%s_response_sealed_form.pdf"),
     LIP_CLAIM_FORM("CV-UNS-CLM-ENG-01096.docx", "litigant_in_person_claim_form_%s.pdf"),
+    // SDO_DISPOSAL now legacy
     SDO_DISPOSAL("CV-UNS-STD-ENG-01381.docx", "disposal_hearing_sdo_%s.pdf"),
     SDO_R2_DISPOSAL("CV-UNS-STD-ENG-01390.docx", "disposal_hearing_sdo_%s.pdf"),
+    // DJ_SDO_DISPOSAL now legacy
     DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01329.docx", "Order_disposal_%s.pdf"),
+    // DJ_SDO_TRIAL now legacy
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01376.docx", "Order_trial_%s.pdf"),
     DJ_SDO_R2_DISPOSAL("CV-UNS-DEC-ENG-01331.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_R2_TRIAL("CV-UNS-DEC-ENG-01379.docx", "Order_trial_%s.pdf"),
+    // SMALL_CLAIM now legacy
     SDO_SMALL("CV-UNS-STD-ENG-01382.docx", "small_claims_sdo_%s.pdf"),
     SDO_SMALL_R2("CV-UNS-STD-ENG-01388.docx", "small_claims_sdo_%s.pdf"),
     SDO_SMALL_DRH("CV-UNS-STD-ENG-01389.docx", "small_claims_sdo_%s.pdf"),
+    // SDO_FAST now legacy
     SDO_FAST("CV-UNS-STD-ENG-01380.docx", "fast_track_sdo_%s.pdf"),
     SDO_FAST_R2("CV-UNS-STD-ENG-01380_13066.docx", "fast_track_sdo_%s.pdf"),
     SDO_FAST_TRACK_NIHL("CV-UNS-STD-ENG-01387.docx", "fast_track_nihl_sdo_%s.pdf"),
+    // SDO_FAST_FAST_TRACK_INT now legacy
     SDO_FAST_FAST_TRACK_INT("CV-UNS-STD-ENG-01378.docx", "fast_track_sdo_%s.pdf"),
     SDO_FAST_FAST_TRACK_INT_R2("CV-UNS-STD-ENG-01378_13066.docx", "fast_track_sdo_%s.pdf"),
     DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01065-LIP.docx", "response_sealed_form_%s.pdf"),

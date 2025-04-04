@@ -43,10 +43,10 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             .append(isLipVLr ? " We'll contact you when they respond." : "")
             .append("<h2 class=\"govuk-heading-m\">What you need to do:</h2>")
             .append("<ul>")
-            .append("<li>pay ").append(applicantName).append(" By ")
-            .append(formattedWhenBePaid).append("</li>")
-            .append("<li>keep proof of any payments you make</li>")
-            .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid").append("</li>")
+            .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName).append(" By ")
+            .append(formattedWhenBePaid).append("</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">keep proof of any payments you make</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">make sure ").append(applicantName).append(" tells the court that you've paid").append("</p></li>")
             .append("</ul>");
         if (caseData.getRespondent2() == null && caseData.getApplicant2() == null
             && !RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
@@ -65,7 +65,6 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             sb.append(" legal representative if you need details on how to pay.</p>");
         } else {
             sb.append(" if you need details on how to pay.</p>");
-            sb.append("<p>This case will now proceed offline.</p>");
         }
 
         BigDecimal claimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
@@ -82,7 +81,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             sb.append("<h2 class=\"govuk-heading-m\">If ").append(applicantName).append(" accepts your offer of &#163;")
                 .append(claimOwingAmount)
                 .append("</h2>");
-            sb.append("<p>The claim will be settled. </p>");
+            sb.append("<p>The claim will be settled.</p>");
             sb.append("<h2 class=\"govuk-heading-m\">If ")
                 .append(applicantName)
                 .append(" rejects your offer")

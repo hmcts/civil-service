@@ -1727,21 +1727,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldsetClaimTypeFromClaimTypeUnspec_when_sdoR2Enabled() {
 
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT));
             assertThat(response.getData())
                 .containsEntry("claimType", ClaimType.CLINICAL_NEGLIGENCE.name());
-        }
-
-        @Test
-        void shouldNotsetClaimTypeFromClaimTypeUnspec_when_sdoR2Disabled() {
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-            assertThat(response.getData())
-                .containsEntry("claimType", ClaimType.PERSONAL_INJURY.name());
         }
 
         @Nested
