@@ -27,12 +27,16 @@ public class DocumentToKeep {
     //Override equals and hashcode to ignore uploadedDate and systemGenerated
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DocumentToKeep)) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DocumentToKeep)) {
+            return false;
+        }
         DocumentToKeep that = (DocumentToKeep) o;
-
-        if (!documentId.equals(that.documentId)) return false;
+        if (!documentId.equals(that.documentId)) {
+            return false;
+        }
         return caseDocumentToKeep.equals(that.caseDocumentToKeep);
     }
 
