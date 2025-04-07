@@ -55,9 +55,10 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
 
     @Override
     protected Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
+        Map<String, String> properties = new HashMap<>(addProperties(caseData));
         Set<EmailDTO> partiesToEmail = new HashSet<>();
-        partiesToEmail.add(getApplicant(caseData));
-        partiesToEmail.add(getRespondent(caseData));
+        partiesToEmail.add(getRespondent(caseData, properties));
+        partiesToEmail.add(getApplicant(caseData, properties));
         return partiesToEmail;
     }
 
@@ -71,8 +72,7 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
         ));
     }
 
-    private EmailDTO getApplicant(CaseData caseData) {
-        Map<String, String> properties = addProperties(caseData);
+    private EmailDTO getApplicant(CaseData caseData, Map<String, String> properties) {
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
             .targetEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
@@ -83,12 +83,11 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
             .build();
     }
 
-    private EmailDTO getRespondent(CaseData caseData) {
+    private EmailDTO getRespondent(CaseData caseData, Map<String, String> properties) {
         boolean isRespondent1Acknowledged = isRespondentOneAcknowledged(caseData);
         Party respondent = getAcknowledgedRespondent(caseData, isRespondent1Acknowledged);
         LocalDateTime responseDeadline = getResponseDeadline(caseData, isRespondent1Acknowledged);
 
-        Map<String, String> properties = addProperties(caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                                                                                         isRespondent1Acknowledged, organisationService));
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(respondent));

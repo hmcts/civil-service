@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -59,17 +60,16 @@ class AcknowledgeClaimUnspecNotifierTest {
 
         final Set<EmailDTO> partiesToNotify = acknowledgeClaimUnspecNotifier.getPartiesToNotify(caseData);
 
+        Map<String, String> properties = new HashMap<>(getNotificationDataMapWhenResp1Acknowledged());
+
+        properties.put(RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE));
+
         final EmailDTO applicantSolicitorNotification = EmailDTO.builder()
             .targetEmail("applicantsolicitor@example.com")
             .emailTemplate("template-id")
-            .parameters(getNotificationDataMapWhenResp1Acknowledged())
+            .parameters(properties)
             .reference("acknowledge-claim-applicant-notification-000DC001")
             .build();
-
-        Map<String, String> properties = new java.util.HashMap<>(getNotificationDataMapWhenResp1Acknowledged());
-
-        properties.put(RESPONDENT_NAME, "Mr. Sole Trader");
-        properties.put(RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE));
 
         final EmailDTO respondentSolicitorNotification = EmailDTO.builder()
             .targetEmail("respondentsolicitor@example.com")
@@ -98,17 +98,16 @@ class AcknowledgeClaimUnspecNotifierTest {
 
         final Set<EmailDTO> partiesToNotify = acknowledgeClaimUnspecNotifier.getPartiesToNotify(caseData);
 
+        Map<String, String> properties = new HashMap<>(getNotificationDataMapWhenResp2Acknowledged());
+
+        properties.put(RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent2ResponseDeadline().toLocalDate(), DATE));
+
         final EmailDTO applicantSolicitorNotification = EmailDTO.builder()
             .targetEmail("applicantsolicitor@example.com")
             .emailTemplate("template-id")
-            .parameters(getNotificationDataMapWhenResp2Acknowledged())
+            .parameters(properties)
             .reference("acknowledge-claim-applicant-notification-000DC001")
             .build();
-
-        Map<String, String> properties = new java.util.HashMap<>(getNotificationDataMapWhenResp2Acknowledged());
-
-        properties.put(RESPONDENT_NAME, "Mr. John Rambo");
-        properties.put(RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent2ResponseDeadline().toLocalDate(), DATE));
 
         final EmailDTO respondentSolicitor2Notification = EmailDTO.builder()
             .targetEmail("respondentsolicitor2@example.com")
@@ -132,7 +131,8 @@ class AcknowledgeClaimUnspecNotifierTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
             CASEMAN_REF, "000DC001",
-            RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim"
+            RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim",
+            RESPONDENT_NAME, "Mr. Sole Trader"
         );
     }
 
@@ -143,7 +143,8 @@ class AcknowledgeClaimUnspecNotifierTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: 01234",
             CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
             CASEMAN_REF, "000DC001",
-            RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim"
+            RESPONSE_INTENTION, "The acknowledgement response selected: Defend all of the claim",
+            RESPONDENT_NAME, "Mr. John Rambo"
         );
     }
 }
