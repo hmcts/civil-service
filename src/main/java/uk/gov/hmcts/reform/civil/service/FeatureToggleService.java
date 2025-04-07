@@ -67,10 +67,6 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
 
-    public boolean isSdoR2Enabled() {
-        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
-    }
-
     public boolean isJudgmentOnlineLive() {
         return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
@@ -155,5 +151,13 @@ public class FeatureToggleService {
 
     public boolean isHmcForLipEnabled() {
         return featureToggleApi.isFeatureEnabled("hmc-cui-enabled");
+    }
+
+    public boolean isQueryManagementLRsEnabled() {
+        return featureToggleApi.isFeatureEnabled("query-management");
+    }
+
+    public boolean isGaForWelshEnabled() {
+        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
     }
 }
