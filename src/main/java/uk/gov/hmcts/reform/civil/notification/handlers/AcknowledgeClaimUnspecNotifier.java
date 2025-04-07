@@ -58,7 +58,9 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
         Map<String, String> properties = new HashMap<>(addProperties(caseData));
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         partiesToEmail.add(getRespondent(caseData, properties));
-        partiesToEmail.add(getApplicant(caseData, properties));
+
+        Map<String, String> applicantProperties = new HashMap<>(properties);
+        partiesToEmail.add(getApplicant(caseData, applicantProperties));
         return partiesToEmail;
     }
 
@@ -72,13 +74,13 @@ public class AcknowledgeClaimUnspecNotifier extends Notifier {
         ));
     }
 
-    private EmailDTO getApplicant(CaseData caseData, Map<String, String> properties) {
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
+    private EmailDTO getApplicant(CaseData caseData, Map<String, String> applicantProperties) {
+        applicantProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return EmailDTO.builder()
             .targetEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
             //Template is common for applicant and respondent
             .emailTemplate(notificationsProperties.getRespondentSolicitorAcknowledgeClaim())
-            .parameters(properties)
+            .parameters(applicantProperties)
             .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
             .build();
     }
