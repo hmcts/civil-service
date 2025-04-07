@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -54,18 +55,18 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends Dashboard
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
-        if(featureToggleService.isQueryManagementLRsEnabled() && ( caseData.getEaCourtLocation().equals(YesOrNo.YES))){
+        if (featureToggleService.isQueryManagementLRsEnabled() && (caseData.getEaCourtLocation().equals(YesOrNo.YES))) {
+
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
                 caseId,
                 "DEFENDANT"
             );
 
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
                 caseId,
                 "DEFENDANT",
-                null
+                "Application.View"
             );
         }
-
     }
 }
