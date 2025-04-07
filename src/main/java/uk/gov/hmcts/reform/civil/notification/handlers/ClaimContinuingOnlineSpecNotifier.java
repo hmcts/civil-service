@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimContinuingOnlineSpecNotifier;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ContinuingOnlineSpecClaimNotifier;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
@@ -40,7 +40,7 @@ public class ClaimContinuingOnlineSpecNotifier extends Notifier {
 
     @Override
     public String getTaskId() {
-        return ClaimContinuingOnlineSpecNotifier.toString();
+        return ContinuingOnlineSpecClaimNotifier.toString();
     }
 
     @Override
