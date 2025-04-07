@@ -44,14 +44,14 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             ### Next step
 
              The case will now proceed offline and your online account will not be updated for this claim. Any updates will be sent by post.""";
-    public static final String CLOSED_NEXT_STEPS = """
+    public static final String STAYED_NEXT_STEPS = """
             ### Next step
 
              Any hearing listed will be vacated.\s
 
              The defendants will be notified.""";
     public static final String REQUEST_BEING_REVIEWED_HEADER = "### Request is being reviewed";
-    public static final String CLOSED_HEADER = "### This claim has been marked as settled";
+    public static final String STAYED_HEADER = "### This claim has been marked as settled";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -91,7 +91,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
     @Nested
     class AboutToSubmitCallback {
         @Test
-        void should_move_case_to_closed_2_claimants_paid_full() {
+        void should_move_case_to_stayed_2_claimants_paid_full() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setMarkPaidForAllClaimants(YesOrNo.YES);
@@ -101,11 +101,12 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(SETTLE_CLAIM_MARKED_PAID_IN_FULL.name());
-            assertThat(response.getState()).isEqualTo(CaseState.CLOSED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_STAYED.name());
+            assertThat(updatedData.getPreStayState()).isEqualTo(CaseState.CASE_ISSUED.name());
         }
 
         @Test
-        void should_move_case_to_closed_for_1vX_case() {
+        void should_move_case_to_stayed_for_1vX_case() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setMarkPaidForAllClaimants(null);
@@ -115,7 +116,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(SETTLE_CLAIM_MARKED_PAID_IN_FULL.name());
-            assertThat(response.getState()).isEqualTo(CaseState.CLOSED.name());
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_STAYED.name());
         }
 
         @Test
@@ -135,7 +136,7 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
     @Nested
     class SubmittedCallback {
         @Test
-        void whenSubmitted_show_closed_header_if_2_claimants_paid_full() {
+        void whenSubmitted_show_stayed_header_if_2_claimants_paid_full() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setMarkPaidForAllClaimants(YesOrNo.YES);
@@ -144,12 +145,12 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             //Then
-            Assertions.assertTrue(response.getConfirmationHeader().contains(CLOSED_HEADER));
-            Assertions.assertTrue(response.getConfirmationBody().contains(CLOSED_NEXT_STEPS));
+            Assertions.assertTrue(response.getConfirmationHeader().contains(STAYED_HEADER));
+            Assertions.assertTrue(response.getConfirmationBody().contains(STAYED_NEXT_STEPS));
         }
 
         @Test
-        void whenSubmitted_show_closed_header_if_1vX_case() {
+        void whenSubmitted_show_stayed_header_if_1vX_case() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setMarkPaidForAllClaimants(null);
@@ -158,8 +159,8 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             //Then
-            Assertions.assertTrue(response.getConfirmationHeader().contains(CLOSED_HEADER));
-            Assertions.assertTrue(response.getConfirmationBody().contains(CLOSED_NEXT_STEPS));
+            Assertions.assertTrue(response.getConfirmationHeader().contains(STAYED_HEADER));
+            Assertions.assertTrue(response.getConfirmationBody().contains(STAYED_NEXT_STEPS));
         }
 
         @Test

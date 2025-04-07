@@ -156,4 +156,8 @@ public class FeatureToggleService {
     public boolean isQueryManagementLRsEnabled() {
         return featureToggleApi.isFeatureEnabled("query-management");
     }
+
+    public boolean isGaForWelshEnabled() {
+        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
+    }
 }
