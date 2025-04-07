@@ -78,7 +78,7 @@ public class FeesController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<BigDecimal> getTotalClaimAmount(@RequestBody CaseData caseData) {
+    public ResponseEntity<BigDecimal> calculateTotalClaimAmount(@RequestBody CaseData caseData) {
         BigDecimal totalClaimAmount = judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(caseData);
         return new ResponseEntity<>(totalClaimAmount, HttpStatus.OK);
     }
