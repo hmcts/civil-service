@@ -63,6 +63,7 @@ public class LIPClaimSettledCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
+            .previousCCDState(callbackParams.getCaseData().getCcdState())
             .businessProcess(BusinessProcess.ready(LIP_CLAIM_SETTLED))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
