@@ -224,7 +224,7 @@ public class DashboardController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<Void> makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+    public ResponseEntity<Void> makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
         @PathVariable("category") String category,
@@ -232,7 +232,7 @@ public class DashboardController {
     ) {
         log.info("Received UUID for making progress-able tasks inactive for case: {} and role {} and category {}",
                  ccdCaseIdentifier, roleType, category);
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(ccdCaseIdentifier, roleType, category);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(ccdCaseIdentifier, roleType, category);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -250,7 +250,7 @@ public class DashboardController {
     ) {
         log.info("Received UUID for making progress-able tasks inactive for case: {} and role {}",
                  ccdCaseIdentifier, roleType);
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(ccdCaseIdentifier, roleType, null);
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(ccdCaseIdentifier, roleType);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

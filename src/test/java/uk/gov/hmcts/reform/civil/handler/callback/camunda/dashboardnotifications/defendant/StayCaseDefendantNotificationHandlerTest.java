@@ -89,7 +89,7 @@ class StayCaseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
             "DEFENDANT"
         );
 
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
             "Applications"
