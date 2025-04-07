@@ -83,7 +83,7 @@ public class ClaimContinuingOnlineSpecNotifier extends Notifier {
                 : notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec();
 
         return EmailDTO.builder()
-                .targetEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .targetEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
                 .emailTemplate(template)
                 .parameters(properties)
                 .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
