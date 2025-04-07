@@ -238,8 +238,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_MULTI_INT_CLAIMANT_INTENT_DEFENDANT("Scenario.AAA6.ClaimantIntent.Multi.Int.Await.Defendant"),
     SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_CLAIM_REMAINS_ONLINE_CLAIMANT(
         "Scenario.AAA6.DefendantNoticeOfChange.ClaimRemainsOnline.Claimant"),
-    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.JO.Claimant"),
-    SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_JO_CLAIMANT("Scenario.AAA6.ClaimantIntent.RequestedCCJ.JO.Claimant");
+    SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.JO.Claimant");
 
     private final String scenario;
 

@@ -21,7 +21,6 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_JO_CLAIMANT;
 
 @Service
 public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackHandler {
@@ -56,9 +55,7 @@ public class CCJRequestedDashboardNotificationHandler extends DashboardCallbackH
         if (claimantSubmitsEitherCCJorDJWithoutSA(caseData)) {
             return SCENARIO_AAA6_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario();
         }
-        return featureToggleService.isJudgmentOnlineLive()
-            ? SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_JO_CLAIMANT.getScenario()
-            : SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
+        return SCENARIO_AAA6_CLAIMANT_INTENT_REQUESTED_CCJ_CLAIMANT.getScenario();
     }
 
     private boolean claimantSubmitsEitherCCJorDJWithoutSA(CaseData caseData) {
