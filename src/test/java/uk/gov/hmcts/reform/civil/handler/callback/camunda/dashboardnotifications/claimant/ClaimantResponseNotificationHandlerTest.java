@@ -122,8 +122,7 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
                 verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                     caseData.getCcdCaseReference().toString(),
-                    "CLAIMANT",
-                    null
+                    "CLAIMANT"
                 );
             }
             if (caseState.equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)) {
