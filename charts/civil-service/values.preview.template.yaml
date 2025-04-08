@@ -117,7 +117,7 @@ idam-pr:
 civil-general-applications:
   enabled: true
   java:
-    image: 'hmctspublic.azurecr.io/civil/general-applications:latest'
+    image: 'hmctspublic.azurecr.io/civil/general-applications:pr-1308'
     imagePullPolicy: Always
     ingressHost: ga-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-ga
