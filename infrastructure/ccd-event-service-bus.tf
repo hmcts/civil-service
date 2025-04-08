@@ -8,7 +8,7 @@ module "servicebus-subscription-ccd-events" {
   name         = "civil-ccd-case-events-sub-${var.env}"
   namespace_id = data.azurerm_servicebus_namespace.ccd-servicebus.id
   topic_name   = "ccd-case-events-${var.env}"
-  status       = "Disabled"
+  status       = var.ccd_service_bus_status
 }
 
 resource "azurerm_servicebus_subscription_rule" "civil_ccd_jurisdiction_rule" {
