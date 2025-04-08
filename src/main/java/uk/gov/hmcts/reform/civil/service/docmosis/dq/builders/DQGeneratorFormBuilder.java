@@ -115,8 +115,8 @@ public class DQGeneratorFormBuilder {
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(YES)  ? YES : null)
-            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
                                            ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(dq, caseData, null))
             .witnesses(witnesses)
@@ -353,8 +353,11 @@ public class DQGeneratorFormBuilder {
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
     }
 
-    private static boolean getDeterWithoutHearing(CaseData caseData, DQ dq) {
-        return isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing());
+    private static YesOrNo getDeterWithoutHearing(CaseData caseData, DQ dq) {
+        if (isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing())) {
+            return dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo();
+        }
+        return null;
     }
 
     private static boolean isSmallClaim(CaseData caseData) {

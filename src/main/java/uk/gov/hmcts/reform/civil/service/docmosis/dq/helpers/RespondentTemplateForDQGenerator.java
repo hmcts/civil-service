@@ -74,8 +74,8 @@ public class RespondentTemplateForDQGenerator {
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(YES)  ? YES : null)
-            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
                                            ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
@@ -112,8 +112,8 @@ public class RespondentTemplateForDQGenerator {
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
             .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(YES)  ? YES : null)
-            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
                                            ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(SMALL_CLAIM.equals(caseData.getResponseClaimTrack())
                          ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
@@ -130,8 +130,11 @@ public class RespondentTemplateForDQGenerator {
             .build();
     }
 
-    private static boolean getDeterWithoutHearing(CaseData caseData, DQ dq) {
-        return isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing());
+    private static YesOrNo getDeterWithoutHearing(CaseData caseData, DQ dq) {
+        if (isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing())) {
+            return dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo();
+        }
+        return null;
     }
 
     private static boolean isSmallClaim(CaseData caseData) {
