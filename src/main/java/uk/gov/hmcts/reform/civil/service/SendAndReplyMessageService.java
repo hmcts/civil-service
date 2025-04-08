@@ -130,7 +130,7 @@ public class SendAndReplyMessageService {
     }
 
     private RoleAssignmentResponse getFirstSupportedRole(String auth, String userId) {
-        var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth);
+        var roleAssignments = roleAssignmentsService.getRoleAssignmentsWithLabels(userId, auth, SUPPORTED_ROLES);
 
         RoleAssignmentResponse roleAssignment = roleAssignments.getRoleAssignmentResponse().stream()
             .filter(userRole -> SUPPORTED_ROLES.contains(userRole.getRoleName()))

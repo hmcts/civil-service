@@ -77,6 +77,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -606,6 +607,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo isGaRespondentTwoLip;
 
     private List<DocumentToKeepCollection> documentToKeepCollection;
+
+    private final ChangeLanguagePreference changeLanguagePreference;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1517,5 +1520,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isHearingFeePaid() {
         return nonNull(this.getHearingFeePaymentDetails())
             && SUCCESS.equals(this.getHearingFeePaymentDetails().getStatus()) || this.hearingFeePaymentDoneWithHWF();
+    }
+
+    @JsonIgnore
+    public boolean isCcjRequestJudgmentByAdmissionDefendantNotPaid() {
+        return getCcjPaymentDetails() != null
+            && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null
+            && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
     }
 }
