@@ -58,10 +58,10 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends Dashboard
             "DEFENDANT"
         );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
             caseId,
             "DEFENDANT",
-            null
+            "Application.View"
         );
     }
 }
