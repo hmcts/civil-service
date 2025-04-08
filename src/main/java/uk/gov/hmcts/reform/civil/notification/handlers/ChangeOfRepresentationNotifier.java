@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -163,7 +164,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
                 shouldSkipThisNotification(caseData, NOTIFY_OTHER_SOLICITOR_2)) {
             return null;
         }
-        Map<String, String> properties = addProperties(caseData);
+        Map<String, String> properties = new HashMap<>(addProperties(caseData));
         properties.put(OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, true));
         return EmailDTO.builder()
                 .targetEmail(getRecipientEmail(caseData, NOTIFY_OTHER_SOLICITOR_2))
@@ -208,7 +209,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
         return paymentDetails != null && PaymentStatus.SUCCESS.equals(paymentDetails.getStatus());
     }
 
-    private String getRecipientEmail(CaseData caseData, String notificationType) {
+    String getRecipientEmail(CaseData caseData, String notificationType) {
         return switch (notificationType) {
             case NOTIFY_FORMER_SOLICITOR -> NocNotificationUtils.getPreviousSolicitorEmail(caseData);
             case NOTIFY_OTHER_SOLICITOR_1 -> NocNotificationUtils.getOtherSolicitor1Email(caseData);
@@ -221,7 +222,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
         };
     }
 
-    private String getTemplateId(CaseData caseData, String notificationType) {
+    String getTemplateId(CaseData caseData, String notificationType) {
         return switch (notificationType) {
             case NOTIFY_FORMER_SOLICITOR -> notificationsProperties.getNoticeOfChangeFormerSolicitor();
             case NOTIFY_OTHER_SOLICITOR_1, NOTIFY_OTHER_SOLICITOR_2 -> {
@@ -241,7 +242,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
         };
     }
 
-    private boolean shouldSkipThisNotification(CaseData caseData,  String notificationType) {
+    boolean shouldSkipThisNotification(CaseData caseData, String notificationType) {
         return switch (notificationType) {
             case NOTIFY_FORMER_SOLICITOR -> caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
             case NOTIFY_OTHER_SOLICITOR_1 -> NocNotificationUtils.isOtherParty1Lip(caseData)

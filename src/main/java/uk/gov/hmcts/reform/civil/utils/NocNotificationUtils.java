@@ -33,7 +33,7 @@ public class NocNotificationUtils {
     private static RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .email(caseData.getApplicantSolicitor1UserDetailsEmail())
                 .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
                 .build();
         } else if (isApplicant1NewSolicitor(caseData)) {
@@ -133,6 +133,7 @@ public class NocNotificationUtils {
     }
 
     private static boolean isRespondent2NewSolicitor(CaseData caseData) {
+        System.out.println(caseData.getChangeOfRepresentation());
         return caseData.getChangeOfRepresentation().getCaseRole()
             .equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
     }
