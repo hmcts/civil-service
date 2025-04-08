@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RequestedCourtForTabDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -31,13 +32,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.*;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Component
@@ -130,6 +132,11 @@ public class SetApplicantResponseDeadline implements CaseTask {
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
         updateDocumentGenerationRespondent2(callbackParams, updatedData, caseData);
 
+        updateRequestCourtClaimTabRespondent1(updatedData);
+        if (isMultiPartyScenario(caseData) && caseData.getRespondent2SameLegalRepresentative().equals(NO)) {
+            updateRequestCourtClaimTabRespondent2(updatedData);
+        }
+
         if (isMultipartyScenario1v2With2LegalRep(caseData)) {
 
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -143,6 +150,21 @@ public class SetApplicantResponseDeadline implements CaseTask {
             .state("AWAITING_APPLICANT_INTENTION")
             .build();
     }
+
+//    private void updateRequestCourtClaimDetailsTab(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+//        if (isMultiPartyScenario(caseData) && caseData.getRespondent2SameLegalRepresentative().equals(NO)) {
+//            updatedData.requestedCourtForTabDetailsRes1(RequestedCourtForTabDetails.builder()
+//                                                            .requestHearingAtSpecificCourt(YES)
+//                                                            .reasonForHearingAtSpecificCourt("ggg")
+//                                                            .requestedCourt("fff")
+//                                                            .build());
+//            updatedData.requestedCourtForTabDetailsRes2(RequestedCourtForTabDetails.builder()
+//                                                            .requestHearingAtSpecificCourt(YES)
+//                                                            .reasonForHearingAtSpecificCourt("ggg")
+//                                                            .requestedCourt("fff")
+//                                                            .build());
+//        }
+//    }
 
     private boolean isMultipartyScenario1v2With2LegalRep(CaseData caseData) {
         return getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
