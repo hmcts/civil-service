@@ -73,12 +73,12 @@ public class FeesController {
         return new ResponseEntity<>(interest, HttpStatus.OK);
     }
 
-    @PostMapping("/claim/total-claim-amount")
+    @PostMapping("/claim/total-amount")
     @Operation(summary = "Calculates the claim interest")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<BigDecimal> calculateTotalClaimAmount(@RequestBody CaseData caseData) {
+    public ResponseEntity<BigDecimal> totalClaimAmount(@RequestBody CaseData caseData) {
         BigDecimal totalClaimAmount = judgmentAndSettlementAmountsCalculator.getTotalClaimAmount(caseData);
         return new ResponseEntity<>(totalClaimAmount, HttpStatus.OK);
     }
