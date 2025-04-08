@@ -115,7 +115,7 @@ public class DQGeneratorFormBuilder {
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq)  ? YES : null)
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(YES)  ? YES : null)
             .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
                                            ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(dq, caseData, null))
