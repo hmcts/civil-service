@@ -1114,7 +1114,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldUpdateCaseManagmentLocationIfAirlineNotOther() {
-                given(featureToggleService.isSdoR2Enabled()).willReturn(true);
                 LocationRefData locationA = LocationRefData.builder()
                     .regionId("regionId1").epimmsId("111000").courtLocationCode("312").siteName("Site 1")
                     .courtAddress("Lane 1").postcode("123").build();
@@ -1157,8 +1156,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldUpdateCaseManagementLocatioToClaimantCourtIfAirlineOther() {
-
-                given(featureToggleService.isSdoR2Enabled()).willReturn(true);
                 LocationRefData locationA = LocationRefData.builder()
                     .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
                     .courtAddress("Lane 1").postcode("123").build();
@@ -1929,7 +1926,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateLocation_WhenCmlIsCnbcToggleOnFlightDelayOtherSmall() {
             // Given
-            given(featureToggleService.isSdoR2Enabled()).willReturn(true);
             LocationRefData locationA = LocationRefData.builder()
                 .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
                 .courtAddress("Lane 1").postcode("123").build();
