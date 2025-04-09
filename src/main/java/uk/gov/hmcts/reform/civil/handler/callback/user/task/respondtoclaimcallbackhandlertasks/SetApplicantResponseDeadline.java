@@ -160,7 +160,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
         }
 
         updateRequestCourtClaimTabRespondent1(updatedData);
-        if (isMultiPartyScenario(caseData) && caseData.getRespondent2SameLegalRepresentative().equals(NO)) {
+        if (isMultiPartyScenario(caseData) && !isRespondent2SameLegalRep(caseData)) {
             updateRequestCourtClaimTabRespondent2(updatedData);
         }
 
@@ -270,7 +270,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
             || caseData.getRespondent2ClaimResponseType() == null;
     }
 
-    private boolean isRespondent2SameLegalRep(CaseData caseData) {
+    private static boolean isRespondent2SameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
