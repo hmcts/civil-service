@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Slf4j
@@ -104,6 +105,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 caseData.getRespondent1().getFlags()
             );
         }
+        updateRequestCourtClaimTabRespondent1(builder);
 
         return responseBuilder.build();
     }

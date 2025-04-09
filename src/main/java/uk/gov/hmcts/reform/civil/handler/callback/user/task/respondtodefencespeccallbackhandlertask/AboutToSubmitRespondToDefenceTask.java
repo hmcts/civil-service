@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedTo
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
+import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Component
@@ -117,6 +118,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
                 builder
             ));
         }
+
+        updateRequestCourtClaimTabApplicantSpec(builder);
 
         builder.previousCCDState(caseData.getCcdState());
 

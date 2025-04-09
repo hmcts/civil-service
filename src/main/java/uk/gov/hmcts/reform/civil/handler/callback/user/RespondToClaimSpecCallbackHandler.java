@@ -143,6 +143,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.MediationUnavailableDatesUtils.checkUnavailable;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1;
+import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
@@ -1473,6 +1475,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent2DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
             updatedData.respondent2DQ(dq.build());
+            updateRequestCourtClaimTabRespondent2(updatedData);
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
@@ -1509,6 +1512,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                             .build());
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
+            updateRequestCourtClaimTabRespondent1(updatedData);
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }

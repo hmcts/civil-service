@@ -151,21 +151,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
             .build();
     }
 
-//    private void updateRequestCourtClaimDetailsTab(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-//        if (isMultiPartyScenario(caseData) && caseData.getRespondent2SameLegalRepresentative().equals(NO)) {
-//            updatedData.requestedCourtForTabDetailsRes1(RequestedCourtForTabDetails.builder()
-//                                                            .requestHearingAtSpecificCourt(YES)
-//                                                            .reasonForHearingAtSpecificCourt("ggg")
-//                                                            .requestedCourt("fff")
-//                                                            .build());
-//            updatedData.requestedCourtForTabDetailsRes2(RequestedCourtForTabDetails.builder()
-//                                                            .requestHearingAtSpecificCourt(YES)
-//                                                            .reasonForHearingAtSpecificCourt("ggg")
-//                                                            .requestedCourt("fff")
-//                                                            .build());
-//        }
-//    }
-
     private boolean isMultipartyScenario1v2With2LegalRep(CaseData caseData) {
         return getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData);
@@ -176,6 +161,12 @@ public class SetApplicantResponseDeadline implements CaseTask {
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
+
+        updateRequestCourtClaimTabRespondent1(updatedData);
+        if (isMultiPartyScenario(caseData) && caseData.getRespondent2SameLegalRepresentative().equals(NO)) {
+            updateRequestCourtClaimTabRespondent2(updatedData);
+        }
+
     }
 
     private void updateDocumentGenerationRespondent2(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {

@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Slf4j
@@ -130,6 +131,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 .joIsLiveJudgmentExists(YES)
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
+        updateRequestCourtClaimTabApplicant(builder);
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =

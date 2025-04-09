@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @Builder
 public class RequestedCourtForTabDetails {
 
-    private String legalRep;
     private String requestedCourt;
-    private YesOrNo requestHearingAtSpecificCourt;
     private String reasonForHearingAtSpecificCourt;
+    private YesOrNo requestHearingHeldRemotely;
+    private String requestHearingHeldRemotelyReason;
 
 }
