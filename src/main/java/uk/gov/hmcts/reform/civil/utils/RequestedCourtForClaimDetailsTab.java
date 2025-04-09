@@ -18,23 +18,23 @@ public final class RequestedCourtForClaimDetailsTab {
     private static RequestedCourtForTabDetails createCourtDetails(DQ courtDetails) {
         return RequestedCourtForTabDetails.builder()
             .requestedCourt(
-                Optional.ofNullable(courtDetails.getRequestedCourt())
-                    .map(RequestedCourt::getResponseCourtCode)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
+                        .map(RequestedCourt::getResponseCourtCode))
                     .orElse(null)
             )
             .reasonForHearingAtSpecificCourt(
-                Optional.ofNullable(courtDetails.getRequestedCourt())
-                    .map(RequestedCourt::getReasonForHearingAtSpecificCourt)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
+                        .map(RequestedCourt::getReasonForHearingAtSpecificCourt))
                     .orElse(null)
             )
             .requestHearingHeldRemotely(
-                Optional.ofNullable(courtDetails.getRemoteHearing())
-                    .map(RemoteHearing::getRemoteHearingRequested)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearing())
+                        .map(RemoteHearing::getRemoteHearingRequested))
                     .orElse(null)
             )
             .requestHearingHeldRemotelyReason(
-                Optional.ofNullable(courtDetails.getRemoteHearing())
-                    .map(RemoteHearing::getReasonForRemoteHearing)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearing())
+                        .map(RemoteHearing::getReasonForRemoteHearing))
                     .orElse(null)
             )
             .build();
@@ -43,23 +43,23 @@ public final class RequestedCourtForClaimDetailsTab {
     private static RequestedCourtForTabDetails createCourtDetailsApplicantSpec(DQ courtDetails) {
         return RequestedCourtForTabDetails.builder()
             .requestedCourt(
-                Optional.ofNullable(courtDetails.getRequestedCourt())
-                    .map(RequestedCourt::getResponseCourtCode)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
+                        .map(RequestedCourt::getResponseCourtCode))
                     .orElse(null)
             )
             .reasonForHearingAtSpecificCourt(
-                Optional.ofNullable(courtDetails.getRequestedCourt())
-                    .map(RequestedCourt::getReasonForHearingAtSpecificCourt)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
+                        .map(RequestedCourt::getReasonForHearingAtSpecificCourt))
                     .orElse(null)
             )
             .requestHearingHeldRemotely(
-                Optional.ofNullable(courtDetails.getRemoteHearingLRspec())
-                    .map(RemoteHearingLRspec::getRemoteHearingRequested)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearingLRspec())
+                        .map(RemoteHearingLRspec::getRemoteHearingRequested))
                     .orElse(null)
             )
             .requestHearingHeldRemotelyReason(
-                Optional.ofNullable(courtDetails.getRemoteHearingLRspec())
-                    .map(RemoteHearingLRspec::getReasonForRemoteHearing)
+                Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearingLRspec())
+                        .map(RemoteHearingLRspec::getReasonForRemoteHearing))
                     .orElse(null)
             )
             .build();
