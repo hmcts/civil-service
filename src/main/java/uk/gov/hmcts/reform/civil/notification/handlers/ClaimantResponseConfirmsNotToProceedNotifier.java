@@ -113,7 +113,7 @@ public class ClaimantResponseConfirmsNotToProceedNotifier extends Notifier {
         }
 
         return EmailDTO.builder()
-            .targetEmail(isRespondent1 ? caseData.getRespondentSolicitor1EmailAddress(): caseData.getRespondentSolicitor2EmailAddress())
+            .targetEmail(isRespondent1 ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondentSolicitor2EmailAddress())
             .emailTemplate(getTemplate(caseData, false))
             .parameters(properties)
             .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))

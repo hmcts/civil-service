@@ -66,7 +66,7 @@ public class ClaimantResponseConfirmsToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorUnspecNotMultiClaim_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
         when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
@@ -91,7 +91,7 @@ public class ClaimantResponseConfirmsToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorUnspecMultiClaimNotProceed_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
             .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
             .build();
@@ -126,7 +126,7 @@ public class ClaimantResponseConfirmsToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorSpecProceedWithAction_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .caseAccessCategory(SPEC_CLAIM)
             .build().toBuilder()
@@ -157,7 +157,7 @@ public class ClaimantResponseConfirmsToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorSpecProceed_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .caseAccessCategory(SPEC_CLAIM)
             .build();
@@ -186,7 +186,7 @@ public class ClaimantResponseConfirmsToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorUnspecMultiOrIntermediateTrackEnabled_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder()
+        final CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDetailsNotified()
             .build().toBuilder()
             .allocatedTrack(MULTI_CLAIM).build();

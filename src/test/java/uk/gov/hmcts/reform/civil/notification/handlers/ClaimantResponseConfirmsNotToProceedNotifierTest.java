@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDEN
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimantResponseConfirmsNotToProceedNotifierTest {
+
     public static final Long CASE_ID = 1594901956117591L;
 
     @Mock
@@ -61,7 +62,7 @@ public class ClaimantResponseConfirmsNotToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorUnspec_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
@@ -85,7 +86,7 @@ public class ClaimantResponseConfirmsNotToProceedNotifierTest {
 
     @Test
     void shouldNotifyRespondentSolicitor2_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
@@ -116,7 +117,7 @@ public class ClaimantResponseConfirmsNotToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorSpec_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().caseAccessCategory(SPEC_CLAIM).build();
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().caseAccessCategory(SPEC_CLAIM).build();
 
         when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
         when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()).thenReturn("claimant-template-id");
@@ -143,7 +144,7 @@ public class ClaimantResponseConfirmsNotToProceedNotifierTest {
 
     @Test
     void shouldNotifyApplicantAndRespondentSolicitorSpecPayImmediatelyAccepted_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+        final CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .caseAccessCategory(SPEC_CLAIM)
             .applicant1AcceptAdmitAmountPaidSpec(YES)
             .showResponseOneVOneFlag(ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
