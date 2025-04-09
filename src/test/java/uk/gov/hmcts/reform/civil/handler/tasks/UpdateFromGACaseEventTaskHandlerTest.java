@@ -256,9 +256,25 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         }}
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isFalse();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isFalse();
+    }
+
+    @Test
+    void testCanViewWithoutNoticeGaGivenDocTypeForGARespondent() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                        false,
+                                        false,
+                                        true, true,
+                                        new HashMap<>() {{
+                                            put("1234", "Order Made");
+                                        }}
+            );
+        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "generalOrder", "1")).isTrue();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "generalOrder")).isTrue();
     }
 
     @Test
@@ -273,9 +289,9 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         }}
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isTrue();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isFalse();
     }
 
     @Test
@@ -290,9 +306,9 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         }}
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isFalse();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isTrue();
     }
 
     @Test
@@ -307,9 +323,9 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         }}
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isTrue();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isTrue();
     }
 
     @Test
