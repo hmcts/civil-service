@@ -104,6 +104,13 @@ public class NocNotificationUtils {
         return null;
     }
 
+    public static String getClaimantLipEmail(CaseData caseData) {
+        if (caseData.isApplicantLipOneVOne()) {
+            return caseData.getApplicant1Email();
+        }
+        return null;
+    }
+
     public static String getOtherSolicitor1Name(CaseData caseData) {
         RecipientData otherSolicitor1 = getOtherSolicitor1(caseData);
         if (otherSolicitor1 != null) {

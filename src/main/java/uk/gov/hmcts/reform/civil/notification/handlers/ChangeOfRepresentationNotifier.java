@@ -39,6 +39,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
     private static final String NOTIFY_FORMER_SOLICITOR = "NOTIFY_FORMER_SOLICITOR";
     private static final String NOTIFY_OTHER_SOLICITOR_1 = "NOTIFY_OTHER_SOLICITOR_1";
     private static final String NOTIFY_OTHER_SOLICITOR_2 = "NOTIFY_OTHER_SOLICITOR_2";
+    private static final String NOTIFY_CLAIMANT_LIP = "NOTIFY_CLAIMANT_LIP";
     private static final String NOTIFY_NEW_DEFENDANT_SOLICITOR = "NOTIFY_NEW_DEFENDANT_SOLICITOR";
     private static final String NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC = "NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC";
 
@@ -61,6 +62,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
                         getFormerSolicitorToNotify(caseData),
                         getOtherSolicitor1ToNotify(caseData),
                         getOtherSolicitor2ToNotify(caseData),
+                        getClaimantLipToNotify(caseData),
                         getNewDefendantSolicitor1ToNotify(caseData),
                         getClaimantSolicitorToNotifyUnpaidHearingFee(caseData)
                 )
@@ -137,26 +139,37 @@ public class ChangeOfRepresentationNotifier extends Notifier {
         }
         Map<String, String> properties = addProperties(caseData);
         return EmailDTO.builder()
-                .targetEmail(getRecipientEmail(caseData, NOTIFY_FORMER_SOLICITOR))
-                .emailTemplate(getTemplateId(caseData, NOTIFY_FORMER_SOLICITOR))
-                .parameters(properties)
-                .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
-                .build();
+            .targetEmail(getRecipientEmail(caseData, NOTIFY_FORMER_SOLICITOR))
+            .emailTemplate(getTemplateId(caseData, NOTIFY_FORMER_SOLICITOR))
+            .parameters(properties)
+            .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
+            .build();
     }
 
     private EmailDTO getOtherSolicitor1ToNotify(CaseData caseData) {
         if (shouldSkipThisNotification(caseData, NOTIFY_OTHER_SOLICITOR_1)) {
             return null;
         }
-        Map<String, String> properties = NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData)
-                ? addPropertiesClaimant(caseData)
-                : addProperties(caseData);
+        Map<String, String> properties = addProperties(caseData);
         return EmailDTO.builder()
                 .targetEmail(getRecipientEmail(caseData, NOTIFY_OTHER_SOLICITOR_1))
                 .emailTemplate(getTemplateId(caseData,NOTIFY_OTHER_SOLICITOR_1))
                 .parameters(properties)
                 .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
                 .build();
+    }
+
+    private EmailDTO getClaimantLipToNotify(CaseData caseData) {
+        if (shouldSkipThisNotification(caseData, NOTIFY_CLAIMANT_LIP)) {
+            return null;
+        }
+        Map<String, String> properties = addPropertiesClaimant(caseData);
+        return EmailDTO.builder()
+            .targetEmail(getRecipientEmail(caseData, NOTIFY_CLAIMANT_LIP))
+            .emailTemplate(getTemplateId(caseData, NOTIFY_CLAIMANT_LIP))
+            .parameters(properties)
+            .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
+            .build();
     }
 
     private EmailDTO getOtherSolicitor2ToNotify(CaseData caseData) {
@@ -214,6 +227,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
             case NOTIFY_FORMER_SOLICITOR -> NocNotificationUtils.getPreviousSolicitorEmail(caseData);
             case NOTIFY_OTHER_SOLICITOR_1 -> NocNotificationUtils.getOtherSolicitor1Email(caseData);
             case NOTIFY_OTHER_SOLICITOR_2 -> NocNotificationUtils.getOtherSolicitor2Email(caseData);
+            case NOTIFY_CLAIMANT_LIP -> NocNotificationUtils.getClaimantLipEmail(caseData);
             case NOTIFY_NEW_DEFENDANT_SOLICITOR -> caseData.getRespondentSolicitor1EmailAddress();
             case NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC ->
                     caseData.getApplicantSolicitor1UserDetailsEmail();
@@ -225,14 +239,12 @@ public class ChangeOfRepresentationNotifier extends Notifier {
     String getTemplateId(CaseData caseData, String notificationType) {
         return switch (notificationType) {
             case NOTIFY_FORMER_SOLICITOR -> notificationsProperties.getNoticeOfChangeFormerSolicitor();
-            case NOTIFY_OTHER_SOLICITOR_1, NOTIFY_OTHER_SOLICITOR_2 -> {
-                if (NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData)) {
-                    if (caseData.isClaimantBilingual()) {
-                        yield notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC();
-                    }
-                    yield notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
+            case NOTIFY_OTHER_SOLICITOR_1, NOTIFY_OTHER_SOLICITOR_2 -> notificationsProperties.getNoticeOfChangeOtherParties();
+            case NOTIFY_CLAIMANT_LIP -> {
+                if (caseData.isClaimantBilingual()) {
+                    yield notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC();
                 }
-                yield notificationsProperties.getNoticeOfChangeOtherParties();
+                yield notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
             }
             case NOTIFY_NEW_DEFENDANT_SOLICITOR -> notificationsProperties.getNotifyNewDefendantSolicitorNOC();
             case NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC ->
@@ -245,11 +257,10 @@ public class ChangeOfRepresentationNotifier extends Notifier {
     boolean shouldSkipThisNotification(CaseData caseData, String notificationType) {
         return switch (notificationType) {
             case NOTIFY_FORMER_SOLICITOR -> caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
-            case NOTIFY_OTHER_SOLICITOR_1 -> NocNotificationUtils.isOtherParty1Lip(caseData)
-                    && !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
+            case NOTIFY_OTHER_SOLICITOR_1 -> NocNotificationUtils.isOtherParty1Lip(caseData);
             case NOTIFY_OTHER_SOLICITOR_2 -> NocNotificationUtils.isOtherParty2Lip(caseData);
-            case NOTIFY_NEW_DEFENDANT_SOLICITOR ->
-                    !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
+            case NOTIFY_CLAIMANT_LIP, NOTIFY_NEW_DEFENDANT_SOLICITOR ->
+                !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
             case NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC ->
                     checkIfHearingAlreadyPaid(caseData) || nonNull(caseData.getHearingFee());
             default -> throw new CallbackException(String.format("Cannot find the event to skip %s", notificationType));
