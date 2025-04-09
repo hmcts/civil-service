@@ -77,6 +77,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -610,6 +611,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private RequestedCourtForTabDetails requestedCourtForTabDetailsApp;
     private RequestedCourtForTabDetails requestedCourtForTabDetailsRes1;
     private RequestedCourtForTabDetails requestedCourtForTabDetailsRes2;
+
+    private final ChangeLanguagePreference changeLanguagePreference;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
