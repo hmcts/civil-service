@@ -18,7 +18,7 @@ else
       if [ -n "$regex_pattern" ]; then
           regex_pattern+="|"
       fi
-      regex_pattern+="\@$ft_group"
+      regex_pattern+="@api-$ft_group"
   done
 
   command+="'$regex_pattern'"
