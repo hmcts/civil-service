@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-cd ${PWD%/*}/civil-ccd-definition
-
 echo "Running Functional tests on ${ENVIRONMENT} env"
 
 if [ "$ENVIRONMENT" = "aat" ] || [ -z "$PR_FT_GROUPS" ]; then
@@ -25,5 +23,3 @@ else
   echo "Executing: $command"
   eval "$command"
 fi
-
-echo "Current directory: $(pwd)"
