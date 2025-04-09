@@ -247,12 +247,12 @@ task runNonProdApiTestsByGroups(description: 'Runs Non Prod features in function
 
     if (ftGroupsEnv && !ftGroupsEnv.trim().isEmpty()) {
         def ftGroups = ftGroupsEnv.toLowerCase().split(",")
-        def grepArgs = ftGroups.collect { "@${it.trim()}" }.join(" ")
+        def grepArgs = ftGroups.collect { "@${it.trim()}" }.join("|")
 
         logger.info("Running FT groups: ${ftGroups.join(', ')}")
 
         exec {
-            commandLine '/usr/bin/yarn', 'run', baseCommand, '--grep', grepArgs
+            commandLine '/usr/bin/yarn', 'run', baseCommand + ' --grep ' + grepArgs
         }
     } else {
         logger.info("Running default FT command with no group filters")
