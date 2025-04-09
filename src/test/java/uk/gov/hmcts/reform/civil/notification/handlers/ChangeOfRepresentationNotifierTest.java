@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_NOC_ONLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,6 +82,9 @@ class ChangeOfRepresentationNotifierTest {
     private static final String OTHER_SOLICITOR = "Other solicitor";
     private static final String OTHER_SOLICITOR_2 = "Other solicitor2";
     private static final String OTHER_SOL_TEMPLATE = "other-sol-template-id";
+    private static final String CLAIMANT_LIP_TEMPLATE = "claimant-lip-template-id";
+    private static final String NEW_SOL_TEMPLATE = "new-sol-template-id";
+    private static final String CLAIMANT_LIP_WELSH_TEMPLATE = "claimant-lip-welsh-template-id";
 
     private static final String NOTIFY_FORMER_SOLICITOR = "NOTIFY_FORMER_SOLICITOR";
     private static final String NOTIFY_OTHER_SOLICITOR_1 = "NOTIFY_OTHER_SOLICITOR_1";
@@ -90,7 +94,7 @@ class ChangeOfRepresentationNotifierTest {
 
 
     @Nested
-    class NotifyFormerSolicitor {
+    class ProcessRespondent1NoC {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDraft()
@@ -112,24 +116,12 @@ class ChangeOfRepresentationNotifierTest {
         }
 
         @Test
-        void shouldReturnTemplateIdForFormerSolicitor() {
-            when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn("former-sol-template");
-            String result = changeOfRepresentationNotifier.getTemplateId(caseData, NOTIFY_FORMER_SOLICITOR);
-            assertEquals("former-sol-template", result);
-        }
-
-        @Test
-        void shouldReturnFormerSolicitorEmail() {
-            String result = changeOfRepresentationNotifier.getRecipientEmail(caseData, NOTIFY_FORMER_SOLICITOR);
-            assertEquals("previous-solicitor@example.com", result);
-        }
-
-        @Test
-        void shouldReturnFormerSolicitorToNotify() {
+        void shouldReturnAllRelevantSolicitorsToNotify() {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
             when(stateFlow.getState()).thenReturn(State.from("state1"));
             when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
-            when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn("former-sol-template");
+            when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(PREVIOUS_SOL_TEMPLATE);
+            when(notificationsProperties.getNoticeOfChangeOtherParties()).thenReturn(OTHER_SOL_TEMPLATE);
             when(organisationService.findOrganisationById("Previous-sol-id"))
                 .thenReturn(Optional.of(Organisation.builder().name(PREVIOUS_SOL).build()));
             when(organisationService.findOrganisationById("New-sol-id"))
@@ -139,20 +131,40 @@ class ChangeOfRepresentationNotifierTest {
             when(organisationService.findOrganisationById("QWERTY R2"))
                 .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR_2).build()));
 
-            Map<String, String> notifyProperties = new HashMap<>(getProperties(caseData));
-            notifyProperties.put(OTHER_SOL_NAME, OTHER_SOLICITOR);
+            Map<String, String> notifySolProperties = new HashMap<>(getProperties(caseData));
+            notifySolProperties.put(OTHER_SOL_NAME, OTHER_SOLICITOR);
 
-            final EmailDTO formerSolicitor = EmailDTO.builder()
+            final EmailDTO formerRespondent1Solicitor = EmailDTO.builder()
                 .targetEmail("previous-solicitor@example.com")
-                .emailTemplate("former-sol-template")
-                .parameters(notifyProperties)
+                .emailTemplate(PREVIOUS_SOL_TEMPLATE)
+                .parameters(notifySolProperties)
+                .reference(TEMPLATE_REFERENCE)
+                .build();
+
+            //Applicant solicitor in this case
+            final EmailDTO otherSolicitor = EmailDTO.builder()
+                .targetEmail("applicantsolicitor@example.com")
+                .emailTemplate(OTHER_SOL_TEMPLATE)
+                .parameters(notifySolProperties)
+                .reference(TEMPLATE_REFERENCE)
+                .build();
+
+
+            Map<String, String> notifyOtherSol2Properties = new HashMap<>(getProperties(caseData));
+            notifyOtherSol2Properties.put(OTHER_SOL_NAME, OTHER_SOLICITOR_2);
+
+            //Respondent2 solicitor in this case
+            final EmailDTO otherSolicitor2 = EmailDTO.builder()
+                .targetEmail("respondentsolicitor2@example.com")
+                .emailTemplate(OTHER_SOL_TEMPLATE)
+                .parameters(notifyOtherSol2Properties)
                 .reference(TEMPLATE_REFERENCE)
                 .build();
 
             final Set<EmailDTO> emailsToNotify = changeOfRepresentationNotifier.getPartiesToNotify(caseData);
             assertNotNull(emailsToNotify);
 
-            final Set<EmailDTO> expectedEmailDTO = Set.of(formerSolicitor);
+            final Set<EmailDTO> expectedEmailDTO = Set.of(formerRespondent1Solicitor, otherSolicitor, otherSolicitor2);
             assertThat(emailsToNotify).containsAll(expectedEmailDTO);
         }
     }
@@ -172,13 +184,81 @@ class ChangeOfRepresentationNotifierTest {
         );
     }
 
+    @Nested
+    class ProcessRespondent1LRNoCWhenClaimantIsLip {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+
+
+        @Test
+        void shouldReturnAllLipVLRRelevantSolicitorsToNotify() {
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+            when(stateFlow.getState()).thenReturn(State.from("state1"));
+            when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
+            when(stateFlow.isFlagSet(DEFENDANT_NOC_ONLINE)).thenReturn(true);
+
+            when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(
+                PREVIOUS_SOL_TEMPLATE);
+
+            when(notificationsProperties.getNotifyNewDefendantSolicitorNOC()).thenReturn(
+                NEW_SOL_TEMPLATE);
+
+            when(notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate()).thenReturn(
+                CLAIMANT_LIP_TEMPLATE);
+
+            when(organisationService.findOrganisationById("Previous-sol-id"))
+                .thenReturn(Optional.of(Organisation.builder().name(PREVIOUS_SOL).build()));
+
+            when(organisationService.findOrganisationById("New-sol-id"))
+                .thenReturn(Optional.of(Organisation.builder().name(NEW_SOLICITOR).build()));
+
+            Map<String, String> notifyClaimLipProps = new HashMap<>(getPropsForClaimantLip());
+
+            //Applicant Lip in this case
+            final EmailDTO claimantLip = EmailDTO.builder()
+                .targetEmail("rambo@email.com")
+                .emailTemplate(CLAIMANT_LIP_TEMPLATE)
+                .parameters(notifyClaimLipProps)
+                .reference(TEMPLATE_REFERENCE)
+                .build();
+
+            Map<String, String> notifySolProperties = new HashMap<>(getProperties(caseData));
+            notifySolProperties.put(OTHER_SOL_NAME, "LiP");
+            notifySolProperties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            notifySolProperties.put(CASE_NAME, "Mr. John Rambo v Mr. Sole Trader");
+
+            //Old respondent1(Lip v LR) in this case
+            final EmailDTO otherSolicitorLR = EmailDTO.builder()
+                .targetEmail("previous-solicitor@example.com")
+                .emailTemplate(PREVIOUS_SOL_TEMPLATE)
+                .parameters(notifySolProperties)
+                .reference(TEMPLATE_REFERENCE)
+                .build();
+
+            //New respondent1(Lip v LR) in this case
+            final EmailDTO newSolicitorLR = EmailDTO.builder()
+                .targetEmail("respondentsolicitor@example.com")
+                .emailTemplate(NEW_SOL_TEMPLATE)
+                .parameters(notifySolProperties)
+                .reference(TEMPLATE_REFERENCE)
+                .build();
+
+            final Set<EmailDTO> emailsToNotify = changeOfRepresentationNotifier.getPartiesToNotify(caseData);
+            assertNotNull(emailsToNotify);
+
+            final Set<EmailDTO> expectedEmailDTO = Set.of(claimantLip, otherSolicitorLR, newSolicitorLR);
+            assertThat(emailsToNotify).containsAll(expectedEmailDTO);
+        }
+    }
+
     @NotNull
     private Map<String, String> getPropsForClaimantLip() {
         return Map.of(
-            CLAIMANT_NAME, "",
+            CLAIMANT_NAME, "Mr. John Rambo",
             CLAIM_16_DIGIT_NUMBER, CASE_ID.toString(),
-            DEFENDANT_NAME_INTERIM, RESPONDENT_NAME,
-            CLAIM_NUMBER, ""
+            DEFENDANT_NAME_INTERIM, "Mr. Sole Trader",
+            CLAIM_NUMBER, "000DC001"
         );
     }
 
