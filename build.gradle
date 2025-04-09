@@ -241,9 +241,7 @@ task runNonProdApiTestsByGroups(description: 'Runs Non Prod features in function
     return System.env.ENVIRONMENT == 'preview'
   }
 
-  doLast {
-    commandLine './bin/run-functional-tests.sh'
-  }
+  commandLine './bin/run-functional-tests.sh'
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
