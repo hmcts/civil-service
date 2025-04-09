@@ -322,8 +322,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getCcjPaymentDetails() != null &&
-            YES.equals(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())) {
+        if (caseData.getCcjPaymentDetails() != null
+            && YES.equals(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
                 .build();
