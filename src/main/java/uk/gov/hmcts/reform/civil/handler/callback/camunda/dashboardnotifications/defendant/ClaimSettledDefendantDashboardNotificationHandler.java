@@ -60,11 +60,9 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends Dashboard
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
-        boolean isLIPQMEnabled = featureToggleService.isQueryManagementLipsEnabled(caseData);
         boolean isLRQMEnabled = featureToggleService.isQueryManagementLRsEnabled();
-        boolean inactiveGA = isLRQMEnabled &&
-            ((!isLIPQMEnabled && caseData.getPreviousCCDState() == null) || (isLIPQMEnabled && caseData.getEaCourtLocation().equals(YesOrNo.NO)));
-        if (!isLRQMEnabled || inactiveGA) {
+
+        if (!isLRQMEnabled || caseData.getEaCourtLocation() == null || caseData.getEaCourtLocation().equals(YesOrNo.NO)) {
 
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
                 caseId,

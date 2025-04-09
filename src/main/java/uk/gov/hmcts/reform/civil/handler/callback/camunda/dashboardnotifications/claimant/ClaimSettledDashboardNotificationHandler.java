@@ -58,16 +58,19 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
     @Override
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
+        boolean isLRQMEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(
-            caseId,
-            "CLAIMANT"
-        );
+        if (!isLRQMEnabled || caseData.getEaCourtLocation() == null || caseData.getEaCourtLocation().equals(YesOrNo.NO)) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseId,
+                "CLAIMANT"
+            );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
-            caseId,
-            "CLAIMANT",
-            "Application.View"
-        );
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseId,
+                "CLAIMANT",
+                "Application.View"
+            );
+        }
     }
 }
