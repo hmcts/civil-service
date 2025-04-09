@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -207,6 +208,9 @@ class ChangeOfRepresentationNotifierTest {
             when(notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate()).thenReturn(
                 CLAIMANT_LIP_TEMPLATE);
 
+            when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC()).thenReturn(
+                CLAIMANT_LIP_WELSH_TEMPLATE);
+
             when(organisationService.findOrganisationById("Previous-sol-id"))
                 .thenReturn(Optional.of(Organisation.builder().name(PREVIOUS_SOL).build()));
 
@@ -249,6 +253,23 @@ class ChangeOfRepresentationNotifierTest {
 
             final Set<EmailDTO> expectedEmailDTO = Set.of(claimantLip, otherSolicitorLR, newSolicitorLR);
             assertThat(emailsToNotify).containsAll(expectedEmailDTO);
+
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
+
+            //Applicant Lip in this case
+            final EmailDTO claimantLipWelsh = EmailDTO.builder()
+                .targetEmail("rambo@email.com")
+                .emailTemplate(CLAIMANT_LIP_WELSH_TEMPLATE)
+                .parameters(notifyClaimLipProps)
+                .reference(TEMPLATE_REFERENCE)
+                .build();
+
+            final Set<EmailDTO> welshEmailsToNotify = changeOfRepresentationNotifier.getPartiesToNotify(caseData);
+            assertNotNull(emailsToNotify);
+
+            final Set<EmailDTO> welshExpectedEmailDTO = Set.of(claimantLipWelsh, otherSolicitorLR, newSolicitorLR);
+            assertThat(welshEmailsToNotify).containsAll(welshExpectedEmailDTO);
+
         }
     }
 
