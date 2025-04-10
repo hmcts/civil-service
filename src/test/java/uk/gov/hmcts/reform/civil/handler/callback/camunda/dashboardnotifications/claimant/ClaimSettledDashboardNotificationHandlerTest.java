@@ -76,6 +76,7 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         }
+
         @Test
         void shouldRecordScenarioQmLrIsOff_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
@@ -168,7 +169,6 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
-
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_SETTLED_FOR_CLAIMANT1.name()).build()

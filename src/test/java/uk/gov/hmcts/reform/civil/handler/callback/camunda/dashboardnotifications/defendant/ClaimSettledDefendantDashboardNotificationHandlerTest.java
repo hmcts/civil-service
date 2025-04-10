@@ -79,7 +79,7 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldRecordScenarioWhenQMLRIsOFF_whenInvoked() {
+        void shouldRecordScenarioWhenQmLrIsOff_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                  .applicant1ClaimSettledDate(
@@ -114,7 +114,7 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldRecordScenarioWhenQMLRIsONAndIsNonOnEACourt_whenInvoked() {
+        void shouldRecordScenarioWhenQmLrIsOnAndIsNonOnEACourt_whenInvoked() {
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedSmallClaim()
@@ -152,7 +152,7 @@ class ClaimSettledDefendantDashboardNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldRecordScenarioWhenQMLRIsONAEaCourt_whenInvoked() {
+        void shouldRecordScenarioWhenQmLrIsOnEaCourt_whenInvoked() {
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
