@@ -122,4 +122,56 @@ class RequestedCourtForClaimDetailsTabTest {
         assertThat(tabDetails.getRequestHearingHeldRemotelyReason()).isEqualTo("Outside scares me");
     }
 
+    @Test
+    void shouldUpdateRequestedCourtTabDetailsForRespondent1Spec() {
+        RequestedCourt requestedCourt = RequestedCourt.builder()
+            .responseCourtCode("121")
+            .reasonForHearingAtSpecificCourt("Close to home")
+            .build();
+
+        CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder()
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(requestedCourt)
+                               .respondent1DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
+                                                               .remoteHearingRequested(YES)
+                                                               .reasonForRemoteHearing("Outside scares me")
+                                                               .build())
+                               .build());
+
+        RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(caseDataBuilder);
+        CaseData updatedCaseData = caseDataBuilder.build();
+        RequestedCourtForTabDetails tabDetails = updatedCaseData.getRequestedCourtForTabDetailsRes1();
+
+        assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
+        assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
+        assertThat(tabDetails.getRequestHearingHeldRemotely()).isEqualTo(YES);
+        assertThat(tabDetails.getRequestHearingHeldRemotelyReason()).isEqualTo("Outside scares me");
+    }
+
+    @Test
+    void shouldUpdateRequestedCourtTabDetailsForRespondent2Spec() {
+        RequestedCourt requestedCourt = RequestedCourt.builder()
+            .responseCourtCode("121")
+            .reasonForHearingAtSpecificCourt("Close to home")
+            .build();
+
+        CaseData.CaseDataBuilder caseDataBuilder = CaseData.builder()
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondent2DQRequestedCourt(requestedCourt)
+                               .respondent2DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
+                                                               .remoteHearingRequested(YES)
+                                                               .reasonForRemoteHearing("Outside scares me")
+                                                               .build())
+                               .build());
+
+        RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2Spec(caseDataBuilder);
+        CaseData updatedCaseData = caseDataBuilder.build();
+        RequestedCourtForTabDetails tabDetails = updatedCaseData.getRequestedCourtForTabDetailsRes2();
+
+        assertThat(tabDetails.getRequestedCourt()).isEqualTo("121");
+        assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo("Close to home");
+        assertThat(tabDetails.getRequestHearingHeldRemotely()).isEqualTo(YES);
+        assertThat(tabDetails.getRequestHearingHeldRemotelyReason()).isEqualTo("Outside scares me");
+    }
+
 }

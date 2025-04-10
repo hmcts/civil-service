@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -133,6 +132,13 @@ public class SetApplicantResponseDeadline implements CaseTask {
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
         updateDocumentGenerationRespondent2(callbackParams, updatedData, caseData);
 
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            updateRequestCourtClaimTabRespondent2(updatedData);
+        } else {
+            updateRequestCourtClaimTabRespondent1(updatedData);
+        }
+
         if (isMultipartyScenario1v2With2LegalRep(caseData)) {
 
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -157,12 +163,6 @@ public class SetApplicantResponseDeadline implements CaseTask {
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
-
-        updateRequestCourtClaimTabRespondent1(updatedData);
-        if (isMultiPartyScenario(caseData) && !isRespondent2SameLegalRep(caseData)) {
-            updateRequestCourtClaimTabRespondent2(updatedData);
-        }
-
     }
 
     private void updateDocumentGenerationRespondent2(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> updatedData, CaseData caseData) {
@@ -269,7 +269,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
             || caseData.getRespondent2ClaimResponseType() == null;
     }
 
-    private static boolean isRespondent2SameLegalRep(CaseData caseData) {
+    private boolean isRespondent2SameLegalRep(CaseData caseData) {
         return caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }

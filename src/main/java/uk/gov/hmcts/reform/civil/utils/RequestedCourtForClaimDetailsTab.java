@@ -40,7 +40,7 @@ public final class RequestedCourtForClaimDetailsTab {
             .build();
     }
 
-    private static RequestedCourtForTabDetails createCourtDetailsApplicantSpec(DQ courtDetails) {
+    private static RequestedCourtForTabDetails createCourtDetailsSpec(DQ courtDetails) {
         return RequestedCourtForTabDetails.builder()
             .requestedCourt(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
@@ -73,7 +73,19 @@ public final class RequestedCourtForClaimDetailsTab {
     public static void updateRequestCourtClaimTabApplicantSpec(CaseData.CaseDataBuilder<?, ?> updatedData) {
         //Applicant spec response remote hearing, stores data in different field
         DQ appRequestedCourt = updatedData.build().getApplicant1DQ();
-        updatedData.requestedCourtForTabDetailsApp(createCourtDetailsApplicantSpec(appRequestedCourt));
+        updatedData.requestedCourtForTabDetailsApp(createCourtDetailsSpec(appRequestedCourt));
+    }
+
+    public static void updateRequestCourtClaimTabRespondent1Spec(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        //Respondent1 spec response remote hearing, stores data in different field
+        DQ res1RequestedCourt = updatedData.build().getRespondent1DQ();
+        updatedData.requestedCourtForTabDetailsRes1(createCourtDetailsSpec(res1RequestedCourt));
+    }
+
+    public static void updateRequestCourtClaimTabRespondent2Spec(CaseData.CaseDataBuilder<?, ?> updatedData) {
+        //Respondent2 spec response remote hearing, stores data in different field
+        DQ res2RequestedCourt = updatedData.build().getRespondent2DQ();
+        updatedData.requestedCourtForTabDetailsRes2(createCourtDetailsSpec(res2RequestedCourt));
     }
 
     public static void updateRequestCourtClaimTabRespondent1(CaseData.CaseDataBuilder<?, ?> updatedData) {
