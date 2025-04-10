@@ -57,6 +57,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEND_APP_TO_OTHER_PARTY;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateFromGACaseEventTaskHandlerTest {
@@ -337,6 +338,30 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             List<Element<CaseDocument>> toUpdatedDocs =
                     (List<Element<CaseDocument>>)output.get("directionOrderDocStaff");
             assertThat(toUpdatedDocs).isNotNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateDocCollectionForRespondentIfMakeWithNoticeDoc() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder()
+            .requestForInformationDocument(singletonList(Element.<CaseDocument>builder()
+                                                      .id(UUID.fromString(uid))
+                                                      .value(makeWithNoticeDocument).build())).build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, "requestForInformationDocument",
+                                        caseData, "requestForInfoDocRespondentSol");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                (List<Element<CaseDocument>>)output.get("requestForInfoDocRespondentSol");
+            assertThat(toUpdatedDocs).isNull();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1433,6 +1458,19 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         .documentName("documentName")
         .documentSize(0L)
         .documentType(GENERAL_ORDER)
+        .createdDatetime(now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
+
+    public final CaseDocument makeWithNoticeDocument = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("documentName")
+        .documentSize(0L)
+        .documentType(SEND_APP_TO_OTHER_PARTY)
         .createdDatetime(now())
         .documentLink(Document.builder()
                           .documentUrl("fake-url")
