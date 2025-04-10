@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -244,7 +245,9 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
         if (gaDocs != null && !(fromGaList.equals("gaDraftDocument"))) {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element<?> gaDoc : gaDocs) {
-                if (!ids.contains(gaDoc.getId())) {
+                CaseDocument caseDocument = gaDoc.getValue() instanceof CaseDocument ? (CaseDocument) gaDoc.getValue() : null;
+                if (!ids.contains(gaDoc.getId())
+                    && (!toCivilList.contains("Respondent") || caseDocument == null || caseDocument.getDocumentType() != DocumentType.SEND_APP_TO_OTHER_PARTY)) {
                     civilDocs.add(gaDoc);
                 }
             }
