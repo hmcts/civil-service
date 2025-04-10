@@ -209,7 +209,7 @@ public class ChangeOfRepresentationNotifier extends Notifier {
                 !checkIfHearingAlreadyPaid(caseData) && nonNull(caseData.getHearingFee())) {
             return EmailDTO.builder()
                     .targetEmail(getRecipientEmail(caseData, NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC))
-                    .emailTemplate(getTemplateId(caseData,NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC))
+                    .emailTemplate(getTemplateId(caseData, NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC))
                     .parameters(addHearingFeeEmailProperties(caseData))
                     .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
                     .build();
