@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -16,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.BundleCreationNotify;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -87,7 +87,7 @@ public class BundleCreationNotifier extends Notifier {
     }
 
     private EmailDTO getApplicant(CaseData caseData) {
-        boolean isLiP = caseData.getApplicant1Represented().equals(YesOrNo.NO);
+        boolean isLiP = NO.equals(caseData.getApplicant1Represented());
         boolean isLiPWelsh = false;
         Map<String, String> properties;
 
@@ -125,10 +125,10 @@ public class BundleCreationNotifier extends Notifier {
         String email;
 
         if (isRespondent1) {
-            isLiP = caseData.getRespondent1Represented().equals(YesOrNo.NO);
+            isLiP = NO.equals(caseData.getRespondent1Represented());
             email = isLiP ? caseData.getRespondent1PartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
-            isLiP = caseData.getRespondent2Represented().equals(YesOrNo.NO);
+            isLiP = NO.equals(caseData.getRespondent2Represented());
             email = caseData.getRespondentSolicitor2EmailAddress();
         }
 
