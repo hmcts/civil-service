@@ -53,8 +53,7 @@ public class ClaimantDecisionOutcomeDashboardHandler extends CaseProgressionDash
 
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseId,
-            CLAIMANT_ROLE,
-            null
+            CLAIMANT_ROLE
         );
     }
 
