@@ -24,9 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_A
 public class ClearFormerSolicitorInfoAfterNoCHandler extends CallbackHandler {
 
     public static final String TASK_ID = "ClearFormerSolicitorInfoAfterNotifyNoC";
-
     private final ObjectMapper objectMapper;
-
     private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CASE_DETAILS_AFTER_NOC);
 
     @Override
@@ -48,10 +46,10 @@ public class ClearFormerSolicitorInfoAfterNoCHandler extends CallbackHandler {
 
     private CallbackResponse clearFormerSolicitorInfo(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        Map<String, Object> updatedCaseData = NocNotificationUtils.getCaseDataWithoutFormerSolicitorEmail(caseData)
+            .toMap(objectMapper);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(NocNotificationUtils.getCaseDataWithoutFormerSolicitorEmail(caseData)
-                      .toMap(objectMapper))
+            .data(updatedCaseData)
             .build();
     }
 }

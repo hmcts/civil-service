@@ -26,28 +26,31 @@ class ClearFormerSolicitorInfoAfterNoCHandlerTest extends BaseCallbackHandlerTes
     @Mock
     private ObjectMapper mapper;
 
+    private CaseData caseData;
+
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new ClearFormerSolicitorInfoAfterNoCHandler(mapper);
         mapper.registerModule(new JavaTimeModule());
+        handler = new ClearFormerSolicitorInfoAfterNoCHandler(mapper);
+        caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
+            .build();
     }
 
     @Test
     void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1In1v2DiffSolicitorToDiffSolicitor() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
-            .build();
+        // Ensure that the former solicitor email exists before the callback
+        assertNotNull(caseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress());
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        assertNotNull(caseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
 
         CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
+        // Assert that the former solicitor email is cleared in the updated case data
         assertNull(updatedCaseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress());
     }
 }
