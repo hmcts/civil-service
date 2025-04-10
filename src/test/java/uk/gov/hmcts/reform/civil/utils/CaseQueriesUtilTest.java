@@ -171,7 +171,6 @@ class CaseQueriesUtilTest {
         assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
-
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent1UploadsAttachment() {
         CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
@@ -190,8 +189,6 @@ class CaseQueriesUtilTest {
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
-
-
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent2UploadsAttachment() {
