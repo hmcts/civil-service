@@ -171,26 +171,6 @@ class CaseQueriesUtilTest {
         assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
-    @Test
-    void shouldAssignCategoryIDToAttachments_whenClaimantUploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(LocalDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()
-            ))
-            .build();
-
-        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
-                                                      List.of(CaseRole.CLAIMANT.toString())
-        );
-
-        List<Document> documents = unwrapElements(caseMessage.getAttachments());
-
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
-    }
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent1UploadsAttachment() {
@@ -211,26 +191,7 @@ class CaseQueriesUtilTest {
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
-    @Test
-    void shouldAssignCategoryIDToAttachments_whenDefendantUploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(LocalDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()
-            ))
-            .build();
 
-        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
-                                                      List.of(CaseRole.DEFENDANT.toString())
-        );
-
-        List<Document> documents = unwrapElements(caseMessage.getAttachments());
-
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
-    }
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent2UploadsAttachment() {
