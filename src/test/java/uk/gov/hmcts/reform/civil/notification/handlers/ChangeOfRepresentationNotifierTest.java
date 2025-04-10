@@ -30,9 +30,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CCD_REF;
@@ -112,7 +112,7 @@ class ChangeOfRepresentationNotifierTest {
         }
 
         @Test
-        void shouldReturnFormerSolAndOtherSol1AndSol2ToNotify_InCaseOfAPartyNoCForLRvLRLRClaim() {
+        void shouldReturnFormerSolandotherSol1AndSol2ToNotify_InCaseOfAPartyNoCForLrvLrLrClaim() {
             prepareMocksForSolicitors();
             when(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
             when(organisationService.findOrganisationById("QWERTY A"))
@@ -203,7 +203,6 @@ class ChangeOfRepresentationNotifierTest {
             .thenReturn(Optional.of(Organisation.builder().name(NEW_SOLICITOR).build()));
     }
 
-
     private Set<EmailDTO> createFormerAndOtherSol1ExpectedEmailDTO(CaseData caseData) {
         Map<String, String> notifySolProperties = new HashMap<>(getNoCPropertiesForLR(caseData));
         notifySolProperties.put(OTHER_SOL_NAME, OTHER_SOLICITOR);
@@ -213,7 +212,6 @@ class ChangeOfRepresentationNotifierTest {
 
         return Set.of(formerRespondent1Solicitor, otherSolicitor);
     }
-
 
     private EmailDTO getOtherSol2ExpectedEmailDTO(CaseData caseData) {
         Map<String, String> notifySolProperties = new HashMap<>(getNoCPropertiesForLR(caseData));
