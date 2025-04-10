@@ -87,22 +87,22 @@ public class BundleCreationNotifier extends Notifier {
     }
 
     private EmailDTO getApplicant(CaseData caseData) {
-        boolean isLiP = NO.equals(caseData.getApplicant1Represented());
-        boolean isLiPWelsh = false;
+        boolean isApplicantLiP = NO.equals(caseData.getApplicant1Represented());
+        boolean isApplicantWelsh = false;
         Map<String, String> properties;
 
-        if (isLiP) {
+        if (isApplicantLiP) {
             properties = addPropertiesLip(caseData);
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
-            isLiPWelsh = caseData.isClaimantBilingual();
+            isApplicantWelsh = caseData.isClaimantBilingual();
         } else {
             properties = addProperties(caseData);
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         }
 
         return EmailDTO.builder()
-            .targetEmail(isLiP ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetailsEmail())
-            .emailTemplate(getTemplate(isLiP, isLiPWelsh))
+            .targetEmail(isApplicantLiP ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetailsEmail())
+            .emailTemplate(getTemplate(isApplicantLiP, isApplicantWelsh))
             .parameters(properties)
             .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
             .build();
@@ -119,23 +119,23 @@ public class BundleCreationNotifier extends Notifier {
     }
 
     private EmailDTO getRespondent(CaseData caseData, boolean isRespondent1) {
-        boolean isLiP;
-        boolean isLiPWelsh = false;
+        boolean isRespondentLiP;
+        boolean isRespondentWelsh = false;
         Map<String, String> properties;
-        String email;
+        String respondentEmail;
 
         if (isRespondent1) {
-            isLiP = NO.equals(caseData.getRespondent1Represented());
-            email = isLiP ? caseData.getRespondent1PartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
+            isRespondentLiP = NO.equals(caseData.getRespondent1Represented());
+            respondentEmail = isRespondentLiP ? caseData.getRespondent1PartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
-            isLiP = NO.equals(caseData.getRespondent2Represented());
-            email = caseData.getRespondentSolicitor2EmailAddress();
+            isRespondentLiP = NO.equals(caseData.getRespondent2Represented());
+            respondentEmail = caseData.getRespondentSolicitor2EmailAddress();
         }
 
-        if (isLiP) {
+        if (isRespondentLiP) {
             properties = addPropertiesLip(caseData);
             properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
-            isLiPWelsh = caseData.isRespondentResponseBilingual();
+            isRespondentWelsh = caseData.isRespondentResponseBilingual();
         } else {
             properties = addProperties(caseData);
             OrganisationPolicy organisationPolicy = isRespondent1 ? caseData.getRespondent1OrganisationPolicy() : caseData.getRespondent2OrganisationPolicy();
@@ -143,8 +143,8 @@ public class BundleCreationNotifier extends Notifier {
         }
 
         return EmailDTO.builder()
-            .targetEmail(email)
-            .emailTemplate(getTemplate(isLiP, isLiPWelsh))
+            .targetEmail(respondentEmail)
+            .emailTemplate(getTemplate(isRespondentLiP, isRespondentWelsh))
             .parameters(properties)
             .reference(String.format(REFERENCE_TEMPLATE_RESPONDENT, caseData.getLegacyCaseReference()))
             .build();
