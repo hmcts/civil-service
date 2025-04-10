@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import org.apache.ibatis.annotations.Case;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -20,10 +20,11 @@ import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -38,25 +39,29 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.COURT_LOCATION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FORMER_SOL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DUE_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_FEE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_TIME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUE_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_REP_NAME_WITH_SPACE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NEW_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OTHER_SOL_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REFERENCE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_NOC_ONLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
 class ChangeOfRepresentationNotifierTest {
-
-    @Mock
-    private NotificationService notificationService;
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -86,13 +91,13 @@ class ChangeOfRepresentationNotifierTest {
     private static final String CLAIMANT_LIP_TEMPLATE = "claimant-lip-template-id";
     private static final String NEW_SOL_TEMPLATE = "new-sol-template-id";
     private static final String CLAIMANT_LIP_WELSH_TEMPLATE = "claimant-lip-welsh-template-id";
+    private static final String CLAIMANT_SOL_HEARING_FEE_UNPAID_TEMPLATE = "claimant-sol-hearing-fee-unpaid-id";
 
     private static final String NOTIFY_FORMER_SOLICITOR = "NOTIFY_FORMER_SOLICITOR";
     private static final String NOTIFY_OTHER_SOLICITOR_1 = "NOTIFY_OTHER_SOLICITOR_1";
     private static final String NOTIFY_OTHER_SOLICITOR_2 = "NOTIFY_OTHER_SOLICITOR_2";
     private static final String NOTIFY_NEW_DEFENDANT_SOLICITOR = "NOTIFY_NEW_DEFENDANT_SOLICITOR";
     private static final String NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC = "NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC";
-
 
     @Nested
     class ProcessRespondent1NoC {
@@ -132,7 +137,7 @@ class ChangeOfRepresentationNotifierTest {
             when(organisationService.findOrganisationById("QWERTY R2"))
                 .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR_2).build()));
 
-            Map<String, String> notifySolProperties = new HashMap<>(getProperties(caseData));
+            Map<String, String> notifySolProperties = new HashMap<>(getNoCPropertiesForLR(caseData));
             notifySolProperties.put(OTHER_SOL_NAME, OTHER_SOLICITOR);
 
             final EmailDTO formerRespondent1Solicitor = EmailDTO.builder()
@@ -151,7 +156,7 @@ class ChangeOfRepresentationNotifierTest {
                 .build();
 
 
-            Map<String, String> notifyOtherSol2Properties = new HashMap<>(getProperties(caseData));
+            Map<String, String> notifyOtherSol2Properties = new HashMap<>(getNoCPropertiesForLR(caseData));
             notifyOtherSol2Properties.put(OTHER_SOL_NAME, OTHER_SOLICITOR_2);
 
             //Respondent2 solicitor in this case
@@ -167,22 +172,31 @@ class ChangeOfRepresentationNotifierTest {
 
             final Set<EmailDTO> expectedEmailDTO = Set.of(formerRespondent1Solicitor, otherSolicitor, otherSolicitor2);
             assertThat(emailsToNotify).containsAll(expectedEmailDTO);
-        }
-    }
 
-    @NotNull
-    private Map<String, String> getProperties(CaseData caseData) {
-        return Map.of(
-            CASE_NAME, CASE_TITLE,
-            ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
-            CCD_REF, CASE_ID.toString(),
-            FORMER_SOL, PREVIOUS_SOL,
-            NEW_SOL, NEW_SOLICITOR,
-            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided",
-            CASEMAN_REF, "000DC001",
-            LEGAL_REP_NAME_WITH_SPACE, "New solicitor",
-            REFERENCE, CASE_ID.toString()
-        );
+            when(stateFlow.getState()).thenReturn(State.from("MAIN.IN_HEARING_READINESS"));
+            caseData = caseData.toBuilder()
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+                .hearingDate(LocalDate.of(1990, 2, 20))
+                .hearingTimeHourMinute("1215")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingDueDate(LocalDate.of(1990, 2, 20))
+                .build();
+
+            //Respondent2 solicitor in this case
+            final EmailDTO claimantSolHearingFeeUnpaid = EmailDTO.builder()
+                .targetEmail("applicantsolicitor@example.com")
+                .emailTemplate(CLAIMANT_SOL_HEARING_FEE_UNPAID_TEMPLATE)
+                .parameters(getPropsForClaimantSolicitorIfClaimIsInHR(caseData))
+                .reference(TEMPLATE_REFERENCE)
+                .build();
+
+            when(notificationsProperties.getHearingFeeUnpaidNoc()).thenReturn(CLAIMANT_SOL_HEARING_FEE_UNPAID_TEMPLATE);
+            final Set<EmailDTO> allEmailsToNotify = changeOfRepresentationNotifier.getPartiesToNotify(caseData);
+            assertNotNull(emailsToNotify);
+
+            final Set<EmailDTO> allExpectedEmailDTO = Set.of(formerRespondent1Solicitor, otherSolicitor, otherSolicitor2, claimantSolHearingFeeUnpaid);
+            assertThat(allEmailsToNotify).containsAll(allExpectedEmailDTO);
+        }
     }
 
     @Nested
@@ -227,7 +241,7 @@ class ChangeOfRepresentationNotifierTest {
                 .reference(TEMPLATE_REFERENCE)
                 .build();
 
-            Map<String, String> notifySolProperties = new HashMap<>(getProperties(caseData));
+            Map<String, String> notifySolProperties = new HashMap<>(getNoCPropertiesForLR(caseData));
             notifySolProperties.put(OTHER_SOL_NAME, "LiP");
             notifySolProperties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
             notifySolProperties.put(CASE_NAME, "Mr. John Rambo v Mr. Sole Trader");
@@ -274,6 +288,21 @@ class ChangeOfRepresentationNotifierTest {
     }
 
     @NotNull
+    private Map<String, String> getNoCPropertiesForLR(CaseData caseData) {
+        return Map.of(
+            CASE_NAME, CASE_TITLE,
+            ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
+            CCD_REF, CASE_ID.toString(),
+            FORMER_SOL, PREVIOUS_SOL,
+            NEW_SOL, NEW_SOLICITOR,
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided",
+            CASEMAN_REF, "000DC001",
+            LEGAL_REP_NAME_WITH_SPACE, "New solicitor",
+            REFERENCE, CASE_ID.toString()
+        );
+    }
+
+    @NotNull
     private Map<String, String> getPropsForClaimantLip() {
         return Map.of(
             CLAIMANT_NAME, "Mr. John Rambo",
@@ -284,9 +313,17 @@ class ChangeOfRepresentationNotifierTest {
     }
 
     @NotNull
-    private Map<String, String> getPropsForClaimantSolicitorIfClaimIsInHR() {
+    private Map<String, String> getPropsForClaimantSolicitorIfClaimIsInHR(CaseData caseData) {
         return Map.of(
-
+            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+            LEGAL_ORG_NAME, "Other solicitor",
+            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
+            COURT_LOCATION, "County Court",
+            HEARING_TIME, "1215",
+            HEARING_FEE, "£300.00",
+            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, "000DC001"
         );
     }
 }

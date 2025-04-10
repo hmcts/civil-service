@@ -140,7 +140,6 @@ public class NocNotificationUtils {
     }
 
     private static boolean isRespondent2NewSolicitor(CaseData caseData) {
-        System.out.println(caseData.getChangeOfRepresentation());
         return caseData.getChangeOfRepresentation().getCaseRole()
             .equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
     }
