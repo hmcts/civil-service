@@ -498,6 +498,7 @@ public class SdoGeneratorService {
             .smallClaimsMediationSectionToggle(
                 SdoHelper.showCarmMediationSection(caseData, carmEnabled)
             )
+            .caseAccessCategory(caseData.getCaseAccessCategory().toString())
             .carmEnabled(carmEnabled);
 
         sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
