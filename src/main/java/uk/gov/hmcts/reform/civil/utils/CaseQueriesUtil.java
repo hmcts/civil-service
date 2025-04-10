@@ -17,6 +17,8 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
@@ -35,6 +37,10 @@ public class CaseQueriesUtil {
             return caseData.getQmRespondentSolicitor1Queries();
         } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getQmRespondentSolicitor2Queries();
+        } else if (isLIPClaimant(roles)) {
+            return caseData.getQmApplicantCitizenQueries();
+        } else if (isLIPDefendant(roles)) {
+            return caseData.getQmRespondentCitizenQueries();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
