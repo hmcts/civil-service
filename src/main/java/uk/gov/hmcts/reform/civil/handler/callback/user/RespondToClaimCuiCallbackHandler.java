@@ -90,6 +90,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
             caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
+        updateRequestCourtClaimTabRespondent1(builder);
+
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
@@ -105,7 +107,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 caseData.getRespondent1().getFlags()
             );
         }
-        updateRequestCourtClaimTabRespondent1(builder);
 
         return responseBuilder.build();
     }
