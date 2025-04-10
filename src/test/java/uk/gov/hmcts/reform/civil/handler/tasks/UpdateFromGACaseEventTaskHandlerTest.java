@@ -251,9 +251,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         false,
                         false,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
@@ -268,9 +266,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                                         false,
                                         false,
                                         true, true,
-                                        new HashMap<>() {{
-                                            put("1234", "Order Made");
-                                        }}
+                                        Map.of("1234", "Order Made")
             );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "generalOrder", "1")).isTrue();
@@ -284,9 +280,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         false,
                         true,
                         false, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                         Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
@@ -301,9 +295,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         true,
                         false,
                         false, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
@@ -318,9 +310,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         true,
                         true,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
@@ -457,9 +447,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         false,
                         false,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         String uid = "f000aa01-0451-4000-b000-000000000000";
         CaseData generalAppCaseData = CaseData.builder()
@@ -474,8 +462,8 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         }
         assertThat(output.get("directionOrderDocStaff")).isNotNull();
         assertThat(output.get("directionOrderDocRespondentSolTwo")).isNotNull();
-        assertThat(output.get("directionOrderDocClaimant")).isNull();
-        assertThat(output.get("directionOrderDocRespondentSol")).isNull();
+        assertThat(output.get("directionOrderDocClaimant")).isNotNull();
+        assertThat(output.get("directionOrderDocRespondentSol")).isNotNull();
     }
 
     @Test
@@ -485,9 +473,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         true,
                         true,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         String uid = "f000aa01-0451-4000-b000-000000000000";
         CaseData generalAppCaseData = CaseData.builder()
