@@ -107,7 +107,6 @@ class SealedClaimLipResponseFormGeneratorTest {
     void shouldGenerateDocumentSuccessfully() {
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         //Given
         CaseData caseData = commonData().build();
 
@@ -140,7 +139,6 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         //Given
-        CaseData caseData = commonData().build();
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -236,6 +234,22 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
+    void admitPayByDate_Lip() {
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
+
+        CaseData caseData = financialDetails(builder).build();
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+    }
+
+    @Test
     void partAdmitPayImmediate() {
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
@@ -312,7 +326,7 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
-    public void partAdmitPayByDate() {
+    void partAdmitPayByDate() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ResponseDate(now())
@@ -415,6 +429,14 @@ class SealedClaimLipResponseFormGeneratorTest {
     @Test
     void shouldGenerateDocumentSuccessfullyForFullAdmit() {
         //Given
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = commonData()
             .respondent1(company("B"))
@@ -427,16 +449,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .build()
             )
             .build();
-        String fileName = "someName";
-        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
-        byte[] bytes = {};
-        given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
-        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
-            docmosisDocument);
-        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
-        SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(caseData);
+        generator.getTemplateData(caseData);
         //When
         CaseDocument result = generator.generate(caseData, AUTHORIZATION);
         //Then
@@ -446,6 +459,14 @@ class SealedClaimLipResponseFormGeneratorTest {
     @Test
     void shouldGenerateDocumentSuccessfullyForPartAdmit() {
         //Given
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = commonData()
             .respondent1(company("B"))
@@ -461,16 +482,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .whenWillThisAmountBePaid(whenWillPay)
                     .build()
             ).build();
-        String fileName = "someName";
-        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
-        byte[] bytes = {};
-        given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
-        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
-            docmosisDocument);
-        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
-        SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(caseData);
+        generator.getTemplateData(caseData);
         //When
         CaseDocument result = generator.generate(caseData, AUTHORIZATION);
         //Then

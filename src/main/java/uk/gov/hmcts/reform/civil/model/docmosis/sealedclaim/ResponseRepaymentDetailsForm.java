@@ -102,9 +102,14 @@ public class ResponseRepaymentDetailsForm {
     }
 
     private static void addPayBySetDate(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
-        builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-            .amountToPay(totalClaimAmount + "")
-            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        if (caseData.getRespondToClaimAdmitPartLRspec() != null && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
+            builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+                .amountToPay(totalClaimAmount + "")
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        } else {
+            builder.amountToPay(totalClaimAmount + "")
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        }
     }
 
     private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount, LocalDate responseDate) {
