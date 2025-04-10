@@ -119,7 +119,7 @@ public class BundleCreationNotifier extends Notifier {
     }
 
     private EmailDTO getRespondent(CaseData caseData, boolean isRespondent1) {
-        boolean isRespondentLiP;
+        boolean isRespondentLiP = false;
         boolean isRespondentWelsh = false;
         Map<String, String> properties;
         String respondentEmail;
@@ -128,7 +128,6 @@ public class BundleCreationNotifier extends Notifier {
             isRespondentLiP = NO.equals(caseData.getRespondent1Represented());
             respondentEmail = isRespondentLiP ? caseData.getRespondent1PartyEmail() : caseData.getRespondentSolicitor1EmailAddress();
         } else {
-            isRespondentLiP = NO.equals(caseData.getRespondent2Represented());
             respondentEmail = caseData.getRespondentSolicitor2EmailAddress();
         }
 
