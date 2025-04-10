@@ -33,15 +33,17 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @Component
 public class ChangeOfRepresentationNotifier extends Notifier {
 
-    private static final String LITIGANT_IN_PERSON = "LiP";
+    private static final String LIP = "LiP";
     private static final String REFERENCE_TEMPLATE = "notice-of-change-%s";
 
-    private static final String NOTIFY_FORMER_SOLICITOR = "NOTIFY_FORMER_SOLICITOR";
-    private static final String NOTIFY_OTHER_SOLICITOR_1 = "NOTIFY_OTHER_SOLICITOR_1";
-    private static final String NOTIFY_OTHER_SOLICITOR_2 = "NOTIFY_OTHER_SOLICITOR_2";
-    private static final String NOTIFY_CLAIMANT_LIP = "NOTIFY_CLAIMANT_LIP";
-    private static final String NOTIFY_NEW_DEFENDANT_SOLICITOR = "NOTIFY_NEW_DEFENDANT_SOLICITOR";
-    private static final String NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC = "NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC";
+    private static class NotificationType {
+        static final String FORMER_SOLICITOR = "NOTIFY_FORMER_SOLICITOR";
+        static final String OTHER_SOLICITOR_1 = "NOTIFY_OTHER_SOLICITOR_1";
+        static final String OTHER_SOLICITOR_2 = "NOTIFY_OTHER_SOLICITOR_2";
+        static final String CLAIMANT_LIP = "NOTIFY_CLAIMANT_LIP";
+        static final String NEW_DEFENDANT_SOLICITOR = "NOTIFY_NEW_DEFENDANT_SOLICITOR";
+        static final String CLAIMANT_SOLICITOR_UNPAID_HEARING = "NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC";
+    }
 
     public ChangeOfRepresentationNotifier(NotificationService notificationService,
                                           NotificationsProperties notificationsProperties,
@@ -49,6 +51,11 @@ public class ChangeOfRepresentationNotifier extends Notifier {
                                           SimpleStateFlowEngine stateFlowEngine,
                                           CaseTaskTrackingService caseTaskTrackingService) {
         super(notificationService, notificationsProperties, organisationService, stateFlowEngine, caseTaskTrackingService);
+    }
+
+    @FunctionalInterface
+    private interface PropertyBuilder {
+        Map<String, String> build(CaseData caseData);
     }
 
     @Override
@@ -59,211 +66,150 @@ public class ChangeOfRepresentationNotifier extends Notifier {
     @Override
     protected Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
         return Stream.of(
-                        getFormerSolicitorToNotify(caseData),
-                        getOtherSolicitor1ToNotify(caseData),
-                        getOtherSolicitor2ToNotify(caseData),
-                        getClaimantLipToNotify(caseData),
-                        getNewDefendantSolicitor1ToNotify(caseData),
-                        getClaimantSolicitorToNotifyUnpaidHearingFee(caseData)
-                )
+                    //In case of LR v LR/LR
+                    buildPartyEmail(caseData, NotificationType.FORMER_SOLICITOR, this::addProperties),
+                    buildPartyEmail(caseData, NotificationType.OTHER_SOLICITOR_1, this::addProperties),
+                    buildPartyEmail(caseData, NotificationType.OTHER_SOLICITOR_2, this::addOtherSolicitor2Properties),
+                    //In case of Lip v LR
+                    buildPartyEmail(caseData, NotificationType.CLAIMANT_LIP, this::addPropertiesClaimant),
+                    buildPartyEmail(caseData, NotificationType.NEW_DEFENDANT_SOLICITOR, this::addProperties),
+                    getUnpaidHearingFeeApplicantSolicitorNotification(caseData))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
-    public Map<String, String> addPropertiesClaimant(CaseData caseData) {
-        return Map.of(
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
-                CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
-                DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
-                CLAIM_NUMBER, caseData.getLegacyCaseReference()
-        );
+    private EmailDTO buildPartyEmail(CaseData caseData, String type, PropertyBuilder propertyBuilder) {
+        if (shouldSkipNotification(caseData, type)) {
+            return null;
+        }
+
+        Map<String, String> props = propertyBuilder.build(caseData);
+
+        return EmailDTO.builder()
+            .targetEmail(getRecipientEmail(caseData, type))
+            .emailTemplate(getTemplate(caseData, type))
+            .parameters(props)
+            .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
+            .build();
+    }
+
+    private EmailDTO getUnpaidHearingFeeApplicantSolicitorNotification(CaseData caseData) {
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        if (IN_HEARING_READINESS.fullName().equals(state) && !isHearingFeePaid(caseData) && nonNull(caseData.getHearingFee())) {
+            return buildPartyEmail(caseData, NotificationType.CLAIMANT_SOLICITOR_UNPAID_HEARING, this::addHearingFeeEmailProperties);
+        }
+        return null;
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-                CASE_NAME, NocNotificationUtils.getCaseName(caseData),
-                ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
-                CCD_REF, caseData.getCcdCaseReference().toString(),
-                FORMER_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()),
-                NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-                OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, false),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CASEMAN_REF, caseData.getLegacyCaseReference(),
-                LEGAL_REP_NAME_WITH_SPACE, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
-                REFERENCE, caseData.getCcdCaseReference().toString()
+            CASE_NAME, NocNotificationUtils.getCaseName(caseData),
+            ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
+            CCD_REF, caseData.getCcdCaseReference().toString(),
+            FORMER_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()),
+            NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            OTHER_SOL_NAME, getOtherSolicitorOrgName(caseData, false),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
+            LEGAL_REP_NAME_WITH_SPACE, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            REFERENCE, caseData.getCcdCaseReference().toString()
+        );
+    }
+
+    public Map<String, String> addPropertiesClaimant(CaseData caseData) {
+        return Map.of(
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
     public Map<String, String> addHearingFeeEmailProperties(CaseData caseData) {
         return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                LEGAL_ORG_NAME, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                        .getOrganisation()
-                        .getOrganisationID(), caseData),
-                HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                COURT_LOCATION, caseData.getHearingLocation().getValue().getLabel(),
-                HEARING_TIME, caseData.getHearingTimeHourMinute(),
-                HEARING_FEE, String.valueOf(caseData.getHearingFee().formData()),
-                HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CASEMAN_REF, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
+            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
+            COURT_LOCATION, caseData.getHearingLocation().getValue().getLabel(),
+            HEARING_TIME, caseData.getHearingTimeHourMinute(),
+            HEARING_FEE, String.valueOf(caseData.getHearingFee().formData()),
+            HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
-    public String getLegalOrganizationName(String id, CaseData caseData) {
-        return organisationService.findOrganisationById(id)
-                .map(Organisation::getName)
-                .orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
+    private Map<String, String> addOtherSolicitor2Properties(CaseData caseData) {
+        Map<String, String> props = new HashMap<>(addProperties(caseData));
+        props.put(OTHER_SOL_NAME, getOtherSolicitorOrgName(caseData, true));
+        return props;
     }
 
-    private String getOrganisationName(String orgToName) {
-        return Optional.ofNullable(orgToName)
-                .map(id -> organisationService.findOrganisationById(id)
-                        .orElseThrow(() -> new CallbackException("Organisation is not valid for: " + id))
-                        .getName())
-                .orElse(LITIGANT_IN_PERSON);
+    private String getLegalOrganizationName(CaseData caseData) {
+        String orgId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        return organisationService.findOrganisationById(orgId)
+            .map(Organisation::getName)
+            .orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
 
-    private String getOtherSolicitorOrganisationName(CaseData caseData, boolean isOtherSolicitor2Notification) {
-        return getOrganisationName(
-                isOtherSolicitor2Notification
-                        ? NocNotificationUtils.getOtherSolicitor2Name(caseData)
-                        : NocNotificationUtils.getOtherSolicitor1Name(caseData)
-        );
+    private String getOrganisationName(String orgId) {
+        return Optional.ofNullable(orgId)
+            .map(id -> organisationService.findOrganisationById(id)
+                .orElseThrow(() -> new CallbackException("Invalid organisation ID: " + id)).getName())
+            .orElse(LIP);
     }
 
-    private EmailDTO getFormerSolicitorToNotify(CaseData caseData) {
-        if (shouldSkipThisNotification(caseData, NOTIFY_FORMER_SOLICITOR)) {
-            return null;
-        }
-        Map<String, String> properties = addProperties(caseData);
-        return EmailDTO.builder()
-            .targetEmail(getRecipientEmail(caseData, NOTIFY_FORMER_SOLICITOR))
-            .emailTemplate(getTemplateId(caseData, NOTIFY_FORMER_SOLICITOR))
-            .parameters(properties)
-            .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
-            .build();
+    private String getOtherSolicitorOrgName(CaseData caseData, boolean isOtherSolicitor2) {
+        String orgId = isOtherSolicitor2
+            ? NocNotificationUtils.getOtherSolicitor2Name(caseData)
+            : NocNotificationUtils.getOtherSolicitor1Name(caseData);
+        return getOrganisationName(orgId);
     }
 
-    private EmailDTO getOtherSolicitor1ToNotify(CaseData caseData) {
-        if (shouldSkipThisNotification(caseData, NOTIFY_OTHER_SOLICITOR_1)) {
-            return null;
-        }
-        Map<String, String> properties = addProperties(caseData);
-        return EmailDTO.builder()
-                .targetEmail(getRecipientEmail(caseData, NOTIFY_OTHER_SOLICITOR_1))
-                .emailTemplate(getTemplateId(caseData,NOTIFY_OTHER_SOLICITOR_1))
-                .parameters(properties)
-                .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
-                .build();
+    private boolean isHearingFeePaid(CaseData caseData) {
+        PaymentDetails details = caseData.getHearingFeePaymentDetails();
+        return details != null && PaymentStatus.SUCCESS.equals(details.getStatus());
     }
 
-    private EmailDTO getClaimantLipToNotify(CaseData caseData) {
-        if (shouldSkipThisNotification(caseData, NOTIFY_CLAIMANT_LIP)) {
-            return null;
-        }
-        Map<String, String> properties = addPropertiesClaimant(caseData);
-        return EmailDTO.builder()
-            .targetEmail(getRecipientEmail(caseData, NOTIFY_CLAIMANT_LIP))
-            .emailTemplate(getTemplateId(caseData, NOTIFY_CLAIMANT_LIP))
-            .parameters(properties)
-            .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
-            .build();
-    }
-
-    private EmailDTO getOtherSolicitor2ToNotify(CaseData caseData) {
-        if (!stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES) ||
-                shouldSkipThisNotification(caseData, NOTIFY_OTHER_SOLICITOR_2)) {
-            return null;
-        }
-        Map<String, String> properties = new HashMap<>(addProperties(caseData));
-        properties.put(OTHER_SOL_NAME, getOtherSolicitorOrganisationName(caseData, true));
-        return EmailDTO.builder()
-                .targetEmail(getRecipientEmail(caseData, NOTIFY_OTHER_SOLICITOR_2))
-                .emailTemplate(getTemplateId(caseData,NOTIFY_OTHER_SOLICITOR_2))
-                .parameters(properties)
-                .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
-                .build();
-    }
-
-    //In case of Lip v LR to Lip vs new LR
-    private EmailDTO getNewDefendantSolicitor1ToNotify(CaseData caseData) {
-        Map<String, String> properties = addProperties(caseData);
-        if (!stateFlowEngine.evaluate(caseData).isFlagSet(DEFENDANT_NOC_ONLINE) ||
-                shouldSkipThisNotification(caseData, NOTIFY_NEW_DEFENDANT_SOLICITOR)) {
-            return null;
-        }
-        return EmailDTO.builder()
-                .targetEmail(getRecipientEmail(caseData, NOTIFY_NEW_DEFENDANT_SOLICITOR))
-                .emailTemplate(getTemplateId(caseData,NOTIFY_NEW_DEFENDANT_SOLICITOR))
-                .parameters(properties)
-                .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
-                .build();
-    }
-
-    private EmailDTO getClaimantSolicitorToNotifyUnpaidHearingFee(CaseData caseData) {
-        String stateName = stateFlowEngine.evaluate(caseData).getState().getName();
-
-        if (IN_HEARING_READINESS.fullName().equals(stateName) &&
-                !checkIfHearingAlreadyPaid(caseData) && nonNull(caseData.getHearingFee())) {
-            return EmailDTO.builder()
-                    .targetEmail(getRecipientEmail(caseData, NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC))
-                    .emailTemplate(getTemplateId(caseData, NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC))
-                    .parameters(addHearingFeeEmailProperties(caseData))
-                    .reference(String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()))
-                    .build();
-        }
-        return null;
-    }
-
-    private boolean checkIfHearingAlreadyPaid(CaseData caseData) {
-        PaymentDetails paymentDetails = caseData.getHearingFeePaymentDetails();
-        return paymentDetails != null && PaymentStatus.SUCCESS.equals(paymentDetails.getStatus());
-    }
-
-    String getRecipientEmail(CaseData caseData, String notificationType) {
-        return switch (notificationType) {
-            case NOTIFY_FORMER_SOLICITOR -> NocNotificationUtils.getPreviousSolicitorEmail(caseData);
-            case NOTIFY_OTHER_SOLICITOR_1 -> NocNotificationUtils.getOtherSolicitor1Email(caseData);
-            case NOTIFY_OTHER_SOLICITOR_2 -> NocNotificationUtils.getOtherSolicitor2Email(caseData);
-            case NOTIFY_CLAIMANT_LIP -> NocNotificationUtils.getClaimantLipEmail(caseData);
-            case NOTIFY_NEW_DEFENDANT_SOLICITOR -> caseData.getRespondentSolicitor1EmailAddress();
-            case NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC ->
-                    caseData.getApplicantSolicitor1UserDetailsEmail();
-            default ->
-                    throw new CallbackException(String.format("Cannot find the recipient email for %s", notificationType));
+    private String getRecipientEmail(CaseData caseData, String type) {
+        return switch (type) {
+            case NotificationType.FORMER_SOLICITOR -> NocNotificationUtils.getPreviousSolicitorEmail(caseData);
+            case NotificationType.OTHER_SOLICITOR_1 -> NocNotificationUtils.getOtherSolicitor1Email(caseData);
+            case NotificationType.OTHER_SOLICITOR_2 -> NocNotificationUtils.getOtherSolicitor2Email(caseData);
+            case NotificationType.CLAIMANT_LIP -> NocNotificationUtils.getClaimantLipEmail(caseData);
+            case NotificationType.NEW_DEFENDANT_SOLICITOR -> caseData.getRespondentSolicitor1EmailAddress();
+            case NotificationType.CLAIMANT_SOLICITOR_UNPAID_HEARING -> caseData.getApplicantSolicitor1UserDetailsEmail();
+            default -> throw new CallbackException("Unknown notification type: " + type);
         };
     }
 
-    String getTemplateId(CaseData caseData, String notificationType) {
-        return switch (notificationType) {
-            case NOTIFY_FORMER_SOLICITOR -> notificationsProperties.getNoticeOfChangeFormerSolicitor();
-            case NOTIFY_OTHER_SOLICITOR_1, NOTIFY_OTHER_SOLICITOR_2 -> notificationsProperties.getNoticeOfChangeOtherParties();
-            case NOTIFY_CLAIMANT_LIP -> {
-                if (caseData.isClaimantBilingual()) {
-                    yield notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC();
-                }
-                yield notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
-            }
-            case NOTIFY_NEW_DEFENDANT_SOLICITOR -> notificationsProperties.getNotifyNewDefendantSolicitorNOC();
-            case NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC ->
-                    notificationsProperties.getHearingFeeUnpaidNoc();
-            default ->
-                    throw new CallbackException(String.format("Cannot find the template id for %s", notificationType));
+    private String getTemplate(CaseData caseData, String type) {
+        return switch (type) {
+            case NotificationType.FORMER_SOLICITOR -> notificationsProperties.getNoticeOfChangeFormerSolicitor();
+            case NotificationType.OTHER_SOLICITOR_1, NotificationType.OTHER_SOLICITOR_2 ->
+                notificationsProperties.getNoticeOfChangeOtherParties();
+            case NotificationType.CLAIMANT_LIP -> caseData.isClaimantBilingual()
+                ? notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC()
+                : notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
+            case NotificationType.NEW_DEFENDANT_SOLICITOR -> notificationsProperties.getNotifyNewDefendantSolicitorNOC();
+            case NotificationType.CLAIMANT_SOLICITOR_UNPAID_HEARING -> notificationsProperties.getHearingFeeUnpaidNoc();
+            default -> throw new CallbackException("Unknown notification type: " + type);
         };
     }
 
-    boolean shouldSkipThisNotification(CaseData caseData, String notificationType) {
-        return switch (notificationType) {
-            case NOTIFY_FORMER_SOLICITOR -> caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
-            case NOTIFY_OTHER_SOLICITOR_1 -> NocNotificationUtils.isOtherParty1Lip(caseData);
-            case NOTIFY_OTHER_SOLICITOR_2 -> NocNotificationUtils.isOtherParty2Lip(caseData);
-            case NOTIFY_CLAIMANT_LIP, NOTIFY_NEW_DEFENDANT_SOLICITOR ->
-                !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
-            case NOTIFY_APPLICANT_SOLICITOR_FOR_HEARING_FEE_AFTER_NOC ->
-                    checkIfHearingAlreadyPaid(caseData) || nonNull(caseData.getHearingFee());
-            default -> throw new CallbackException(String.format("Cannot find the event to skip %s", notificationType));
+    private boolean shouldSkipNotification(CaseData caseData, String type) {
+        return switch (type) {
+            case NotificationType.FORMER_SOLICITOR -> caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
+            case NotificationType.OTHER_SOLICITOR_1 -> NocNotificationUtils.isOtherParty1Lip(caseData);
+            case NotificationType.OTHER_SOLICITOR_2 -> !stateFlowEngine.evaluate(caseData).isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)
+                || NocNotificationUtils.isOtherParty2Lip(caseData);
+            case NotificationType.CLAIMANT_LIP -> !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
+            case NotificationType.NEW_DEFENDANT_SOLICITOR -> !stateFlowEngine.evaluate(caseData).isFlagSet(DEFENDANT_NOC_ONLINE)
+                || !NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
+            case NotificationType.CLAIMANT_SOLICITOR_UNPAID_HEARING ->
+                isHearingFeePaid(caseData) || caseData.getHearingFee() == null;
+            default -> throw new CallbackException("Unknown skip logic for notification type: " + type);
         };
     }
 }
