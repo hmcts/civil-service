@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLEAR_FORMER_SOLICITOR_INFO_AFTER_NOTIFY_NOC;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +25,8 @@ public class ClearFormerSolicitorInfoAfterNoCHandler extends CallbackHandler {
 
     public static final String TASK_ID = "ClearFormerSolicitorInfoAfterNotifyNoC";
     private final ObjectMapper objectMapper;
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CASE_DETAILS_AFTER_NOC);
+    private static final List<CaseEvent> EVENTS = Collections
+        .singletonList(CLEAR_FORMER_SOLICITOR_INFO_AFTER_NOTIFY_NOC);
 
     @Override
     protected Map<String, Callback> callbacks() {
