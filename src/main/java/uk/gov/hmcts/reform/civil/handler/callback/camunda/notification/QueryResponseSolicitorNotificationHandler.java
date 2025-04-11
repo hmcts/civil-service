@@ -89,10 +89,10 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         LocalDate queryDate = getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery);
         properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
 
-        String template = getTemplates(caseData)
+        String template = getTemplates(caseData);
         notificationService.sendMail(
             email,
-            notificationsProperties.getQueryResponseReceived(),
+            ,
             properties,
             String.format(REFERENCE_TEMPLATE, )
         );
@@ -144,5 +144,16 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()));
+    }
+
+    private String getTemplates(CaseData caseData) {
+        if(caseData.isLipCase()){
+            //checkWelsh
+            if(caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()){
+                return notificationsProperties.getQueryLipResponseReceivedWelsh();
+            }
+            return notificationsProperties.getQueryLipResponseReceivedEnglish();
+        }
+        return notificationsProperties.getQueryResponseReceived();
     }
 }

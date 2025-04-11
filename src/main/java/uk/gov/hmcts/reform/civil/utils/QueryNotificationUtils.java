@@ -76,17 +76,6 @@ public class QueryNotificationUtils {
         return properties;
     }
 
-    public static Map<String, String> getTemplates(CaseData caseData) {
-        if(caseData.isLipCase()){
-            //checkWelsh
-            if(caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()){
-                return welsh_template;
-            } else
-            return english_template;
-        }
-        return lr_template
-    }
-
     public static List<Map<String, String>> getOtherPartyEmailDetails(
         CaseData caseData, OrganisationService organisationService,
         CoreCaseUserService coreCaseUserService, String queryId) {
