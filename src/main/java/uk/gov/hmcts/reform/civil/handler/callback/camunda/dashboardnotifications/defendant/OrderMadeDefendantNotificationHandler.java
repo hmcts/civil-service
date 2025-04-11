@@ -176,7 +176,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         );
         if ((getFeatureToggleService().isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                                             .getCaseManagementLocation().getBaseLocation()))) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
                 "DEFENDANT",
                 GA
@@ -184,8 +184,7 @@ public class OrderMadeDefendantNotificationHandler extends OrderCallbackHandler 
         } else {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "DEFENDANT",
-                null
+                "DEFENDANT"
             );
         }
     }
