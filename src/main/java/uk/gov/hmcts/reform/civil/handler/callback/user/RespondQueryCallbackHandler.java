@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -40,7 +41,7 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
 
@@ -65,5 +66,12 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
             .data(caseData.toMap(mapper))
             .build();
 
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader("# Civil query submitted")
+            .confirmationBody("<br/>Custom confirmation body configured by <strong>civil service</strong>")
+            .build();
     }
 }
