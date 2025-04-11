@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getProperties;
-import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getTemplates;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -92,9 +91,9 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         String template = getTemplates(caseData);
         notificationService.sendMail(
             email,
-            ,
+            template,
             properties,
-            String.format(REFERENCE_TEMPLATE, )
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
