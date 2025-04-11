@@ -48,13 +48,13 @@ public class ServiceBusConfiguration {
 
     private void processMessage(ServiceBusReceivedMessageContext context) {
         try {
-            log.info("HMC Message Received");
+            log.info("NEW TEST HMC Message Received");
             ServiceBusReceivedMessage message = context.getMessage();
             byte[] body = message.getBody().toBytes();
 
             HmcMessage hmcMessage = objectMapper.readValue(body, HmcMessage.class);
             log.info(
-                "HMC Message for case {}, hearing id {} with status {}",
+                "NEW TEST HMC Message for case {}, hearing id {} with status {}",
                 hmcMessage.getCaseId(),
                 hmcMessage.getHearingId(),
                 Optional.ofNullable(hmcMessage.getHearingUpdate())
@@ -65,7 +65,7 @@ public class ServiceBusConfiguration {
             handler.handleMessage(hmcMessage);
             context.complete();
         } catch (Exception e) {
-            log.error("There was a problem processing the message: {}", e.getMessage(), e);
+            log.error("NEW TEST There was a problem processing the message: {}", e.getMessage(), e);
             context.abandon();
         }
     }
