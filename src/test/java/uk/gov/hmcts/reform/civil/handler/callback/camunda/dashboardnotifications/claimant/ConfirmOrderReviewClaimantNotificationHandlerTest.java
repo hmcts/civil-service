@@ -94,7 +94,7 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
 
         handler.handle(callbackParams);
 
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
             "Applications"
@@ -172,7 +172,7 @@ class ConfirmOrderReviewClaimantNotificationHandlerTest extends BaseCallbackHand
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT",
             "Applications"

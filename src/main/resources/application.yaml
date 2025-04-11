@@ -468,6 +468,8 @@ notifications:
 
   queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
   queryResponseReceived: "4e74a2ab-376f-47e1-9670-8f97648a13a4"
+  notifyOtherPartyQueryRaised: "a911957b-fca1-402b-acc5-6502e6de93a6"
+  notifyOtherPartyQueryResponseReceived: "a27a4110-9de9-4147-8c89-85c2af2a8d30"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -530,6 +532,13 @@ azure:
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
       enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+    ccd-events-topic:
+      connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING:dummy}
+      topic-name: ${CCD_EVENTS_TOPIC_NAME:ccd-case-events-aat}
+      civil-ccd-events-subscription-name: ${CCD_EVENTS_SUBSCRIPTION_NAME:civil-ccd-case-events-sub-aat}
+      retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:60}
+      threads: ${CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS:1}
+      enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED:false}
 
 async:
   handler:

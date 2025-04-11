@@ -78,8 +78,7 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         );
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseId,
-            "DEFENDANT",
-            null
+            "DEFENDANT"
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",

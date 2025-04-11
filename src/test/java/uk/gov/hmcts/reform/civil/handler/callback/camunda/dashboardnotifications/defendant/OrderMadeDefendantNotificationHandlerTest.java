@@ -512,13 +512,12 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .build();
-
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
-            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -534,19 +533,45 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
         }
 
         @Test
+        void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvokedNotInEa() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .build();
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+
+            handler.handle(params);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdatesNotInEa(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                "Scenario.AAA6.Update.TaskList.TrialReady.FinalOrders.Defendant",
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
         void shouldRecordScenarioDefendantFinalOrderFastTrackNotReadyTrial_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .build();
-
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(toggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT.name())
                     .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
-
-            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
-            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
             handler.handle(params);
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -593,10 +618,21 @@ class OrderMadeDefendantNotificationHandlerTest extends BaseCallbackHandlerTest 
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT"
         );
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseData.getCcdCaseReference().toString(),
             "DEFENDANT",
-            null
+            "Applications"
+        );
+    }
+
+    private void verifyDeleteNotificationsAndTaskListUpdatesNotInEa(CaseData caseData) {
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT"
+        );
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseData.getCcdCaseReference().toString(),
+            "DEFENDANT"
         );
     }
 }

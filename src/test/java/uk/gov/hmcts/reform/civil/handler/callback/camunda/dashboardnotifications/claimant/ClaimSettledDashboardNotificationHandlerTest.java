@@ -91,10 +91,10 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
             verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(),
                 "CLAIMANT");
-            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
                 caseData.getCcdCaseReference().toString(),
                 "CLAIMANT",
-                null);
+                "Application.View");
 
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
