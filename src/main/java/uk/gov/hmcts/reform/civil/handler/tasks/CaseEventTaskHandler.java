@@ -111,11 +111,12 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         if (caseData.isLipvLROneVOne()) {
             return "RPA Reason: LiP vs LR - full/part admission received.";
         } else {
-            return switch (flowState) {
-                case FULL_ADMISSION -> "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION -> "RPA Reason: Defendant partial admission.";
+            if (flowState.equals(FlowState.Main.FULL_ADMISSION)) {
+                return "RPA Reason: Defendant fully admits.";
+            } else {
+                return "RPA Reason: Defendant partial admission.";
             }
-        };
+        }
     }
 
     private String getSummary(String eventId, String state, CaseData caseData) {
