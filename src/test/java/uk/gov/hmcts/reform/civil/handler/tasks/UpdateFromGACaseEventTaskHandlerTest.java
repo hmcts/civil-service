@@ -351,6 +351,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             .build();
         String uid = "f000aa01-0451-4000-b000-000000000000";
         gaCaseData = gaCaseData.toBuilder()
+            .parentClaimantIsApplicant(YesOrNo.YES)
             .requestForInformationDocument(singletonList(Element.<CaseDocument>builder()
                                                       .id(UUID.fromString(uid))
                                                       .value(makeWithNoticeDocument).build())).build();
@@ -361,6 +362,31 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                                         caseData, "requestForInfoDocRespondentSol");
             List<Element<CaseDocument>> toUpdatedDocs =
                 (List<Element<CaseDocument>>)output.get("requestForInfoDocRespondentSol");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateDocCollectionForClaimantIfMakeWithNoticeDoc() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder()
+            .parentClaimantIsApplicant(YesOrNo.NO)
+            .requestForInformationDocument(singletonList(Element.<CaseDocument>builder()
+                                                             .id(UUID.fromString(uid))
+                                                             .value(makeWithNoticeDocument).build())).build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, "requestForInformationDocument",
+                                        caseData, "requestForInfoDocClaimant");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                (List<Element<CaseDocument>>)output.get("requestForInfoDocClaimant");
             assertThat(toUpdatedDocs).isNull();
         } catch (Exception e) {
             throw new RuntimeException(e);

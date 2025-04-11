@@ -246,8 +246,9 @@ public class UpdateFromGACaseEventTaskHandler extends BaseExternalTaskHandler {
             List<UUID> ids = civilDocs.stream().map(Element::getId).toList();
             for (Element<?> gaDoc : gaDocs) {
                 CaseDocument caseDocument = gaDoc.getValue() instanceof CaseDocument ? (CaseDocument) gaDoc.getValue() : null;
+                String gaRespondentMainClaimUser = generalAppCaseData.getParentClaimantIsApplicant() == YES ? "Respondent" : "Claimant";
                 if (!ids.contains(gaDoc.getId())
-                    && (!toCivilList.contains("Respondent") || caseDocument == null || caseDocument.getDocumentType() != DocumentType.SEND_APP_TO_OTHER_PARTY)) {
+                    && (!toCivilList.contains(gaRespondentMainClaimUser) || caseDocument == null || caseDocument.getDocumentType() != DocumentType.SEND_APP_TO_OTHER_PARTY)) {
                     civilDocs.add(gaDoc);
                 }
             }
