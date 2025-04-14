@@ -88,8 +88,9 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
                                                        organisationService);
         LocalDate queryDate = getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery);
-        properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
-
+        if (queryDate != null) {
+            properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
+        }
         String template = getTemplates(caseData, roles);
         notificationService.sendMail(
             email,
