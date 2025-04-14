@@ -45,9 +45,8 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 @RequiredArgsConstructor
 public class QueryResponseSolicitorNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONSE_TO_QUERY);
-
     public static final String TASK_ID = "QueryResponseNotify";
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(NOTIFY_RESPONSE_TO_QUERY);
     private static final String REFERENCE_TEMPLATE = "response-to-query-notification-%s";
     private static final String QUERY_NOT_FOUND = "Matching parent query not found.";
 
@@ -86,7 +85,8 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
         String email = getEmail(caseData, roles);
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
-                                                       organisationService);
+                                                       organisationService
+        );
         LocalDate queryDate = getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery);
         if (queryDate != null) {
             properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
@@ -102,16 +102,20 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles, CaseMessage parentQuery) {
+    private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
+                                                  CaseMessage parentQuery) {
         if (isApplicantSolicitor(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmApplicantSolicitorQueries(),
-                                                            parentQuery, responseQuery);
+                                                            parentQuery, responseQuery
+            );
         } else if (isRespondentSolicitorOne(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmRespondentSolicitor1Queries(),
-                                                            parentQuery, responseQuery);
+                                                            parentQuery, responseQuery
+            );
         } else if (isRespondentSolicitorTwo(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmRespondentSolicitor2Queries(),
-                                                            parentQuery, responseQuery);
+                                                            parentQuery, responseQuery
+            );
         }
         return null;
     }
@@ -122,13 +126,14 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         // check if there was a follow up query
         List<CaseMessage> queriesByUserWithMatchingParentId = caseMessages.stream()
             .filter(m -> responseQuery.getParentId().equals(m.getParentId())
-            && m.getCreatedBy().equals(parentQuery.getCreatedBy())
-            && m.getCreatedOn().isBefore(responseQuery.getCreatedOn())).toList();
+                && m.getCreatedBy().equals(parentQuery.getCreatedBy())
+                && m.getCreatedOn().isBefore(responseQuery.getCreatedOn())).toList();
         CaseMessage latestQuery;
         if (queriesByUserWithMatchingParentId.size() > 0) {
             // if there was a follow up query
-            latestQuery = queriesByUserWithMatchingParentId.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
-                .orElse(null);
+            latestQuery =
+                queriesByUserWithMatchingParentId.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
+                    .orElse(null);
         } else {
             // no follow up queries
             latestQuery = parentQuery;
@@ -145,14 +150,15 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()));
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
     }
 
     private String getTemplates(CaseData caseData, List<String> roles) {
         if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
             || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {
-                return notificationsProperties.getQueryLipResponseReceivedWelsh();
-            }
+            return notificationsProperties.getQueryLipResponseReceivedWelsh();
+        }
         if (isLIPClaimant(roles) || isLIPDefendant(roles)) {
             return notificationsProperties.getQueryLipResponseReceivedEnglish();
         }
