@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.config;
 
-import com.azure.messaging.servicebus.ServiceBusClientBuilder;
-import com.azure.messaging.servicebus.ServiceBusProcessorClient;
-import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
-import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
+import com.azure.messaging.servicebus.*;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -57,7 +53,7 @@ public class ServiceBusConfiguration {
             + ";SharedAccessKeyName=" + username
             + ";SharedAccessKey=" + password;
 
-        log.info("ConditionalOnProperty  is TRUE");
+        log.info("ConditionalOnProperty  is TRUE {}, {}", topicName, subscriptionName);
         processorClient = new ServiceBusClientBuilder()
             .connectionString(connectionString)
             .processor()
@@ -65,30 +61,25 @@ public class ServiceBusConfiguration {
             .subscriptionName(subscriptionName)
             .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
             .processMessage(this::processMessage)
-            .processError(context -> log.error("Error receiving message", context.getException()))
+            .processError(this::processError)
             .buildProcessorClient();
-        return processorClient;
-    }
 
-    @PostConstruct
-    public void startProcessor() {
-        if (processorClient != null) {
-            processorClient.start();
-            log.info("HMC ServiceBusProcessorClient started successfully.");
-        } else {
-            log.error("HMC ServiceBusProcessorClient is not initialized properly.");
-        }
+        processorClient.start();
+        log.info("HMC ServiceBusProcessorClient started successfully.");
+
+        return processorClient;
     }
 
     private void processMessage(ServiceBusReceivedMessageContext context) {
         try {
-            log.info("NEW TEST HMC Message Received");
+            log.info("HMC Message Received");
             ServiceBusReceivedMessage message = context.getMessage();
-            byte[] body = message.getBody().toBytes();
 
-            HmcMessage hmcMessage = objectMapper.readValue(body, HmcMessage.class);
+            byte[] bodyBytes = message.getBody().toBytes();
+            HmcMessage hmcMessage = objectMapper.readValue(bodyBytes, HmcMessage.class);
+
             log.info(
-                "NEW TEST HMC Message for case {}, hearing id {} with status {}",
+                "HMC Message for case {}, hearing id {} with status {}",
                 hmcMessage.getCaseId(),
                 hmcMessage.getHearingId(),
                 Optional.ofNullable(hmcMessage.getHearingUpdate())
@@ -99,8 +90,12 @@ public class ServiceBusConfiguration {
             handler.handleMessage(hmcMessage);
             context.complete();
         } catch (Exception e) {
-            log.error("NEW TEST There was a problem processing the message: {}", e.getMessage(), e);
-            context.abandon();
+            log.error("There was a problem processing the message: {}", e.getMessage(), e);
         }
+    }
+
+    private void processError(ServiceBusErrorContext context) {
+        log.error("Exception occurred while processing message");
+        log.error("{} - {}", context.getErrorSource(), context.getException().getMessage(), context.getException());
     }
 }
