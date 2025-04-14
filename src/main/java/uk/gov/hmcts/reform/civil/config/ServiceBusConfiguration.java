@@ -57,7 +57,6 @@ public class ServiceBusConfiguration {
             + ";SharedAccessKeyName=" + username
             + ";SharedAccessKey=" + password;
 
-        log.info("ConditionalOnProperty  is TRUE {}, {}", topicName, subscriptionName);
         processorClient = new ServiceBusClientBuilder()
             .connectionString(connectionString)
             .processor()
@@ -92,9 +91,10 @@ public class ServiceBusConfiguration {
             );
 
             handler.handleMessage(hmcMessage);
-            context.complete();
+            context.abandon();
         } catch (Exception e) {
             log.error("There was a problem processing the message: {}", e.getMessage(), e);
+            context.abandon();
         }
     }
 
