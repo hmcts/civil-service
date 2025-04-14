@@ -91,7 +91,7 @@ public class ServiceBusConfiguration {
             );
 
             handler.handleMessage(hmcMessage);
-            context.abandon();
+            context.complete();
         } catch (Exception e) {
             log.error("There was a problem processing the message: {}", e.getMessage(), e);
             context.abandon();
