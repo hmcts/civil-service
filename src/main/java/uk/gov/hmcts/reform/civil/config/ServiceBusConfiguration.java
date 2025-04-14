@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
+import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 @Configuration
@@ -33,10 +34,12 @@ public class ServiceBusConfiguration {
     private final ObjectMapper objectMapper;
     private final HmcMessageHandler handler;
 
+    private ServiceBusProcessorClient processorClient;
+
     @Bean
     @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
     public ServiceBusProcessorClient serviceBusProcessorClient() {
-        return new ServiceBusClientBuilder()
+        processorClient = new ServiceBusClientBuilder()
             .connectionString(connectionString)
             .processor()
             .topicName(topicName)
@@ -44,6 +47,17 @@ public class ServiceBusConfiguration {
             .processMessage(this::processMessage)
             .processError(context -> log.error("Error receiving message", context.getException()))
             .buildProcessorClient();
+        return processorClient;
+    }
+
+    @PostConstruct
+    public void startProcessor() {
+        if (processorClient != null) {
+            processorClient.start();
+            log.info("HMC ServiceBusProcessorClient started successfully.");
+        } else {
+            log.error("HMC ServiceBusProcessorClient is not initialized properly.");
+        }
     }
 
     private void processMessage(ServiceBusReceivedMessageContext context) {
