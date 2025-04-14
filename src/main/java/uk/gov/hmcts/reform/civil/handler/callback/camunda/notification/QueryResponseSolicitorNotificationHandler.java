@@ -36,6 +36,8 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getProperties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
@@ -88,7 +90,7 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         LocalDate queryDate = getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery);
         properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
 
-        String template = getTemplates(caseData);
+        String template = getTemplates(caseData, roles);
         notificationService.sendMail(
             email,
             template,
@@ -145,14 +147,15 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
             CASEMAN_REF, caseData.getLegacyCaseReference()));
     }
 
-    private String getTemplates(CaseData caseData) {
-        if(caseData.isLipCase()){
-            //checkWelsh
-            if(caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()){
+    private String getTemplates(CaseData caseData, List<String> roles) {
+        if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
+            || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {
                 return notificationsProperties.getQueryLipResponseReceivedWelsh();
             }
+        if (isLIPClaimant(roles) || isLIPDefendant(roles)) {
             return notificationsProperties.getQueryLipResponseReceivedEnglish();
         }
+
         return notificationsProperties.getQueryResponseReceived();
     }
 }

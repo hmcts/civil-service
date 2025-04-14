@@ -679,4 +679,10 @@ public class NotificationsProperties {
     @NotEmpty
     private String notifyOtherPartyQueryResponseReceived;
 
+    @NotEmpty
+    private String queryLipResponseReceivedEnglish;
+
+    @NotEmpty
+    private String queryLipResponseReceivedWelsh;
+
 }
