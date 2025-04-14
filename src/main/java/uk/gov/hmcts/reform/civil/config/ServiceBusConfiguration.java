@@ -4,6 +4,7 @@ import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
+import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,7 @@ public class ServiceBusConfiguration {
             .processor()
             .topicName(topicName)
             .subscriptionName(subscriptionName)
+            .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
             .processMessage(this::processMessage)
             .processError(context -> log.error("Error receiving message", context.getException()))
             .buildProcessorClient();
