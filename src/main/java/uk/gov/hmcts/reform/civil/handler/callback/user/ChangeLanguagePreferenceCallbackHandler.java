@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
@@ -93,6 +94,7 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             default -> throw new IllegalArgumentException("Unexpected user type");
         }
         builder.changeLanguagePreference(null);
+        builder.businessProcess(BusinessProcess.ready(CHANGE_LANGUAGE_PREFERENCE)).build();
         CaseData updatedCaseData = builder.build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
