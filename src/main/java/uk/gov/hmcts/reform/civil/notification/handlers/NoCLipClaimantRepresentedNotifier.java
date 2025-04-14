@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimantLipRepresentedWithNoCNotifier;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -112,16 +113,22 @@ public class NoCLipClaimantRepresentedNotifier extends Notifier {
         return Map.of(
             CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-            LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
-                                                               .getOrganisation().getOrganisationID()),
+            LEGAL_ORG_APPLICANT1, getApplicantLegalOrganizationName(caseData),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
-    public String getLegalOrganizationName(String id) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.map(Organisation::getName).orElse(null);
+    public String getApplicantLegalOrganizationName(CaseData caseData) {
+        if (isNull(caseData.getApplicant1OrganisationPolicy())
+            || isNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())
+              || isNull(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())) {
+            return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        } else {
+            Optional<Organisation> organisation = organisationService
+                .findOrganisationById(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
+            return organisation.map(Organisation::getName).orElse(null);
+        }
     }
 }
