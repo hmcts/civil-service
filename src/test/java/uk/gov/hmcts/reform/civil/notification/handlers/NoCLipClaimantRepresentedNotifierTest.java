@@ -93,11 +93,10 @@ class NoCLipClaimantRepresentedNotifierTest {
             .thenReturn(CLAIMANT_LIP_TEMPLATE);
         Set<EmailDTO> emailsToNotify = notifier.getPartiesToNotify(caseData);
 
-        Set<EmailDTO> expectedEmailDTO = createExpectedEmailDTOForLip(caseData, false);
+        Set<EmailDTO> expectedEmailDTO = createExpectedEmailDTOForLip(false);
         assertThat(emailsToNotify.size()).isEqualTo(3);
         assertThat(emailsToNotify).containsAll(expectedEmailDTO);
     }
-
 
     @Test
     void shouldNotifyAllRelevantParties_WhenClaimantIsBilingual() {
@@ -110,12 +109,12 @@ class NoCLipClaimantRepresentedNotifierTest {
 
         Set<EmailDTO> emailsToNotify = notifier.getPartiesToNotify(caseData);
 
-        Set<EmailDTO> expectedEmailDTO = createExpectedEmailDTOForLip(caseData, true);
+        Set<EmailDTO> expectedEmailDTO = createExpectedEmailDTOForLip(true);
         assertThat(emailsToNotify.size()).isEqualTo(3);
         assertThat(emailsToNotify).containsAll(expectedEmailDTO);
     }
 
-    private Set<EmailDTO> createExpectedEmailDTOForLip(CaseData caseData, boolean isWelsh) {
+    private Set<EmailDTO> createExpectedEmailDTOForLip(boolean isWelsh) {
         Map<String, String> notifyLipProps = getPropertiesForLip();
 
         EmailDTO claimantLipWelsh = createEmailDTO(APPLICANT_EMAIL_ADDRESS,
@@ -127,7 +126,6 @@ class NoCLipClaimantRepresentedNotifierTest {
         return Set.of(claimantLipWelsh, otherSolicitorLR, newSolicitorLR);
     }
 
-
     private EmailDTO createEmailDTO(String targetEmail, String template, Map<String, String> parameters) {
         return EmailDTO.builder()
             .targetEmail(targetEmail)
@@ -136,7 +134,6 @@ class NoCLipClaimantRepresentedNotifierTest {
             .reference(TEMPLATE_REFERENCE)
             .build();
     }
-
 
     public Map<String, String> getPropertiesForLip() {
         return Map.of(
