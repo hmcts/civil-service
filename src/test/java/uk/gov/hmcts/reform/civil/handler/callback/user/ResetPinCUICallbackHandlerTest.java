@@ -33,7 +33,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PIN;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPOND_URL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
@@ -128,7 +136,6 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotNotifyDefendantLip_whenNoEmailIsEntered() {
-            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .partyEmail(null)
@@ -137,7 +144,8 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    .accessCode("TEST1234")
                                                    .expiryDate(LocalDate.now().plusDays(180))
                                                    .build())
-               .build();
+                .build();
+            // Given
             caseData.toBuilder().respondent1Represented(YesOrNo.NO).specRespondent1Represented(YesOrNo.NO).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
