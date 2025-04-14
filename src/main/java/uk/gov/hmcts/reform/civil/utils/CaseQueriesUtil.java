@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -56,6 +57,12 @@ public class CaseQueriesUtil {
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.add(caseData.getQmRespondentSolicitor2Queries().latest());
         }
+        if (caseData.getQmApplicantCitizenQueries() != null) {
+            latestQueries.add(caseData.getQmApplicantCitizenQueries().latest());
+        }
+        if (caseData.getQmRespondentCitizenQueries() != null) {
+            latestQueries.add(caseData.getQmRespondentCitizenQueries().latest());
+        }
         return latestQueries.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
             .orElse(null);
     }
@@ -78,6 +85,12 @@ public class CaseQueriesUtil {
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.addAll(unwrapElements(caseData.getQmRespondentSolicitor2Queries().getCaseMessages()));
         }
+        if (caseData.getQmApplicantCitizenQueries() != null) {
+            latestQueries.addAll(unwrapElements(caseData.getQmApplicantCitizenQueries().getCaseMessages()));
+        }
+        if (caseData.getQmRespondentCitizenQueries() != null) {
+            latestQueries.addAll(unwrapElements(caseData.getQmRespondentCitizenQueries().getCaseMessages()));
+        }
         return latestQueries.stream().filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
     }
@@ -94,7 +107,7 @@ public class CaseQueriesUtil {
     public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
                                                      AssignCategoryId assignCategoryId,
                                                      List<String> roles) {
-        String categoryId = getCategoryIdForRole(roles);
+        String categoryId = getAttachmentsCategoryIdForRole(roles);
         List<Element<Document>> attachments = latestCaseMessage.getAttachments();
         if (attachments != null && !attachments.isEmpty()) {
             for (Element<Document> attachment : attachments) {
@@ -112,10 +125,20 @@ public class CaseQueriesUtil {
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
     }
 
-    private static String getCategoryIdForRole(List<String> roles) {
+    private static String getAttachmentsCategoryIdForRole(List<String> roles) {
         if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
-            return DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue();
+            return DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
         } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles) || isLIPDefendant(roles)) {
+            return DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
+        } else {
+            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
+        }
+    }
+
+    private static String getQueryDocumentCategoryIdForRole(List<String> roles) {
+        if (isApplicantSolicitor(roles)) {
+            return CLAIMANT_QUERY_DOCUMENTS.getValue();
+        } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
             return DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
