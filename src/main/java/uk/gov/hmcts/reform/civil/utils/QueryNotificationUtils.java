@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -15,7 +14,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
@@ -58,19 +56,25 @@ public class QueryNotificationUtils {
                                                     Map<String, String> properties,
                                                     OrganisationService organisationService) {
         if (isApplicantSolicitor(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
-                           getApplicantLegalOrganizationName(caseData, organisationService));
+            properties.put(
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getApplicantLegalOrganizationName(caseData, organisationService)
+            );
         } else if (isRespondentSolicitorOne(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
-                           getLegalOrganizationNameForRespondent(caseData, true, organisationService));
+            properties.put(
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getLegalOrganizationNameForRespondent(caseData, true, organisationService)
+            );
         } else if (isRespondentSolicitorTwo(roles)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
-                           getLegalOrganizationNameForRespondent(caseData, false, organisationService));
-        } else if(isLIPClaimant(roles)) {
+            properties.put(
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+            );
+        } else if (isLIPClaimant(roles)) {
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
-        } else if(isLIPClaimant(roles)) {
-            properties.put(PARTY_NAME,caseData.getRespondent1().getPartyName());
-        }else {
+        } else if (isLIPClaimant(roles)) {
+            properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
+        } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
         return properties;
