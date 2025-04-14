@@ -39,7 +39,7 @@ public class ServiceBusConfiguration {
     @Bean
     @ConditionalOnProperty(value = "azure.service-bus.hmc-to-hearings-api.enabled", havingValue = "true")
     public ServiceBusProcessorClient serviceBusProcessorClient() {
-        log.info("ConditionalOnProperty  is TRUE" );
+        log.info("ConditionalOnProperty  is TRUE");
         processorClient = new ServiceBusClientBuilder()
             .connectionString(connectionString)
             .processor()
