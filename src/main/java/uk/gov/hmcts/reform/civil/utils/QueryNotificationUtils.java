@@ -72,7 +72,7 @@ public class QueryNotificationUtils {
             );
         } else if (isLIPClaimant(roles)) {
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
-        } else if (isLIPClaimant(roles)) {
+        } else if (isLIPDefendant(roles)) {
             properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
