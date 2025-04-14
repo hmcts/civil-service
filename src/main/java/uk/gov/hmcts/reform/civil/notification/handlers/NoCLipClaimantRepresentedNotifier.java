@@ -55,7 +55,7 @@ public class NoCLipClaimantRepresentedNotifier extends Notifier {
     @Override
     protected Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
         return Stream.of(
-                //In case of LR v LR/LR
+                //NoC - Lip v Lip to LR v Lip
                 buildPartyEmail(caseData, NotificationType.NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL, this::addProperties),
                 buildPartyEmail(caseData, NotificationType.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED, this::addProperties),
                 buildPartyEmail(caseData, NotificationType.NOTIFY_APPLICANT_LIP_SOLICITOR, this::addPropertiesApplicantSolicitor))
