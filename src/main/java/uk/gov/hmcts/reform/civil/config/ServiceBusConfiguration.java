@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
 import javax.annotation.PostConstruct;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 @Configuration
@@ -23,8 +25,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ServiceBusConfiguration {
 
-    @Value("${azure.service-bus.hmc-to-hearings-api.connection-string}")
-    private String connectionString;
+    @Value("${azure.service-bus.hmc-to-hearings-api.namespace}")
+    private String namespace;
+
+    @Value("${azure.service-bus.connection-postfix}")
+    private String connectionPostfix;
+
+    @Value("${azure.service-bus.hmc-to-hearings-api.username}")
+    private String username;
+
+    @Value("${azure.service-bus.hmc-to-hearings-api.password}")
+    private String password;
 
     @Value("${azure.service-bus.hmc-to-hearings-api.topicName}")
     private String topicName;
@@ -39,7 +50,13 @@ public class ServiceBusConfiguration {
 
     @Bean
     @ConditionalOnProperty(value = "azure.service-bus.hmc-to-hearings-api.enabled", havingValue = "true")
-    public ServiceBusProcessorClient serviceBusProcessorClient() {
+    public ServiceBusProcessorClient serviceBusProcessorClient() throws URISyntaxException {
+        URI endpoint = new URI("sb://" + namespace + connectionPostfix);
+
+        String connectionString = "Endpoint=" + endpoint + "/"
+            + ";SharedAccessKeyName=" + username
+            + ";SharedAccessKey=" + password;
+
         log.info("ConditionalOnProperty  is TRUE");
         processorClient = new ServiceBusClientBuilder()
             .connectionString(connectionString)
