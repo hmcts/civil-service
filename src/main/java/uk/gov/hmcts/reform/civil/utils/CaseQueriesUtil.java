@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -106,7 +107,7 @@ public class CaseQueriesUtil {
     public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
                                                      AssignCategoryId assignCategoryId,
                                                      List<String> roles) {
-        String categoryId = getCategoryIdForRole(roles);
+        String categoryId = getAttachmentsCategoryIdForRole(roles);
         List<Element<Document>> attachments = latestCaseMessage.getAttachments();
         if (attachments != null && !attachments.isEmpty()) {
             for (Element<Document> attachment : attachments) {
@@ -124,10 +125,20 @@ public class CaseQueriesUtil {
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
     }
 
-    private static String getCategoryIdForRole(List<String> roles) {
+    private static String getAttachmentsCategoryIdForRole(List<String> roles) {
         if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
-            return DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue();
+            return DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
         } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles) || isLIPDefendant(roles)) {
+            return DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
+        } else {
+            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
+        }
+    }
+
+    private static String getQueryDocumentCategoryIdForRole(List<String> roles) {
+        if (isApplicantSolicitor(roles)) {
+            return CLAIMANT_QUERY_DOCUMENTS.getValue();
+        } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
             return DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
