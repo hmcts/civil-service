@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +30,6 @@ public class TriggerGenAppLanguagePreferenceUpdateCallbackHandlerTest {
 
     @Mock
     private GenAppStateHelperService helperService;
-
 
     @Nested
     class AboutToSubmitCallback {
