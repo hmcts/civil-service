@@ -56,6 +56,12 @@ public class CaseQueriesUtil {
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.add(caseData.getQmRespondentSolicitor2Queries().latest());
         }
+        if (caseData.getQmApplicantCitizenQueries() != null) {
+            latestQueries.add(caseData.getQmApplicantCitizenQueries().latest());
+        }
+        if (caseData.getQmRespondentCitizenQueries() != null) {
+            latestQueries.add(caseData.getQmRespondentCitizenQueries().latest());
+        }
         return latestQueries.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
             .orElse(null);
     }
