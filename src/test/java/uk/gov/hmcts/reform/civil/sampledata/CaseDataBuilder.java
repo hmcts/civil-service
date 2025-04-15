@@ -692,6 +692,7 @@ public class CaseDataBuilder {
     private YesOrNo anyRepresented;
 
     private String partialPaymentAmount;
+    private LocalDate nextDeadline;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -7977,6 +7978,7 @@ public class CaseDataBuilder {
             .joJudgmentPaidInFull(judgmentPaidInFull)
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
+            .nextDeadline(nextDeadline)
             .build();
     }
 
@@ -7993,6 +7995,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder anyRepresented(YesOrNo anyRepresented) {
         this.anyRepresented = anyRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder nextDeadline(LocalDate nextDeadline) {
+        this.nextDeadline = nextDeadline;
         return this;
     }
 
