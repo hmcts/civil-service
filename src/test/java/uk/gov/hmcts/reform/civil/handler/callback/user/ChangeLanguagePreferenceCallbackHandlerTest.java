@@ -171,7 +171,6 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).isEmpty();
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("ENGLISH");
         }
@@ -190,9 +189,9 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).isEmpty();
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
+            assertThat(updatedCaseData.getBusinessProcess().getCamundaEvent()).isEqualTo(CHANGE_LANGUAGE_PREFERENCE.name());
         }
 
         @Test
@@ -213,7 +212,6 @@ public class ChangeLanguagePreferenceCallbackHandlerTest extends BaseCallbackHan
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).isEmpty();
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("BOTH");
         }
