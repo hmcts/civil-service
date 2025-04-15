@@ -156,7 +156,11 @@ class SubmitClaimTaskTest {
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
         when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().build();
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder()
+            .airlineList(
+                DynamicList.builder()
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                               .build()).build()).build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) submitClaimTask.submitClaim(
             caseData,
