@@ -116,7 +116,12 @@ public interface NotificationData {
     String REFERENCE = "reference";
 
     String QUERY_DATE = "queryDate";
+    String LITIGANT_IN_PERSON = "LiP";
+
+    @FunctionalInterface
+    interface PropertyBuilder {
+        Map<String, String> build(CaseData caseData);
+    }
 
     Map<String, String> addProperties(CaseData caseData);
-
 }
