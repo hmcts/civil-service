@@ -89,6 +89,9 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldResetPinExpiryDate() {
             given(defendantPinToPostLRspecService.resetPinExpiryDate(any())).willReturn(pin);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().addRespondent1PinToPostLRspec(givenPin)
+                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
+                                 .partyEmail(null)
+                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -146,7 +149,6 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
                                                    .build())
                 .build();
             // Given
-            caseData.toBuilder().respondent1Represented(YesOrNo.NO).specRespondent1Represented(YesOrNo.NO).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When

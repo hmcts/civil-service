@@ -61,8 +61,7 @@ public class ResetPinCUICallbackHandler extends CallbackHandler implements Notif
                                             .resetPinExpiryDate(caseData.getRespondent1PinToPostLRspec()))
             .build();
 
-        if (caseData.isRespondent1LiP()
-            && caseData.getRespondent1() != null
+        if (caseData.getRespondent1() != null
             && caseData.getRespondent1().getPartyEmail() != null) {
             log.info("Start PIP email notification to defendantLip for case id {}", caseData.getLegacyCaseReference());
             generateDefendantLipPIPEmail(caseData);
