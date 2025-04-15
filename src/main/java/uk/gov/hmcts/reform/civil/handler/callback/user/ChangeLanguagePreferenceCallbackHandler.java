@@ -76,7 +76,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private CallbackResponse changeLanguagePreference(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        List<String> errors = new ArrayList<>();
         PreferredLanguage preferredLanguage = Optional.ofNullable(caseData.getChangeLanguagePreference())
             .map(ChangeLanguagePreference::getPreferredLanguage)
             .orElseThrow(() -> new IllegalArgumentException("Preferred language not found"));
@@ -98,7 +97,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
         CaseData updatedCaseData = builder.build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
-            .errors(errors)
             .build();
     }
 
