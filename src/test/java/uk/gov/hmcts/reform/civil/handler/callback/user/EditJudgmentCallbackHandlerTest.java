@@ -68,7 +68,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         defaultJudgmentOnlineMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
         EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
-        handler = new EditJudgmentCallbackHandler(objectMapper, editJudgmentOnlineMapper);
+        handler = new EditJudgmentCallbackHandler(objectMapper, editJudgmentOnlineMapper, interestCalculator);
     }
 
     @Test

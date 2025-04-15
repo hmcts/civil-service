@@ -223,7 +223,7 @@ public class SubmitClaimTask {
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if (featureToggleService.isSdoR2Enabled() && isFlightDelayClaim != null && isFlightDelayClaim.equals(YES)) {
+        if (isFlightDelayClaim != null && isFlightDelayClaim.equals(YES)) {
             String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
             dataBuilder.claimType(ClaimType.FLIGHT_DELAY)
                 .flightDelayDetails(FlightDelayDetails.builder()

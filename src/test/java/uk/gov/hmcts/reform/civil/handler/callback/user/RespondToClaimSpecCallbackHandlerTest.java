@@ -2279,6 +2279,34 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void specificSummary_whenFullAdmitNotPaid() {
+            // Given
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondentClaimResponseTypeForSpecGeneric(FULL_ADMISSION)
+                .specDefenceAdmittedRequired(YesOrNo.YES)
+                .totalClaimAmount(totalClaimAmount)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(whenWillPay).build())
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondent1Represented(YES)
+                .applicant1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(caseData.getTotalClaimAmount().toString());
+        }
+
+        @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseFullDefenceFullAdmission() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
