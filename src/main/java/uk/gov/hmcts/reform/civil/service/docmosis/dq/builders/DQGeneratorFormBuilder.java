@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
@@ -114,6 +115,9 @@ public class DQGeneratorFormBuilder {
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
+            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .deterWithoutHearingWhyNot(getDeterWithoutHearing(caseData, dq) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
+                                           ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
             .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(dq, caseData, null))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
@@ -347,5 +351,17 @@ public class DQGeneratorFormBuilder {
     private boolean onlyApplicant2IsProceeding(CaseData caseData) {
         return !YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+    }
+
+    private static YesOrNo getDeterWithoutHearing(CaseData caseData, DQ dq) {
+        if (isSmallClaim(caseData) && nonNull(dq.getDeterWithoutHearing())) {
+            return dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo();
+        }
+        return null;
+    }
+
+    private static boolean isSmallClaim(CaseData caseData) {
+        return AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+            || SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
     }
 }
