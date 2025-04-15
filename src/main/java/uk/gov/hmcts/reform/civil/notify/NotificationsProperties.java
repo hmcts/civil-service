@@ -672,4 +672,11 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String queryResponseReceived;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryRaised;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryResponseReceived;
+
 }
