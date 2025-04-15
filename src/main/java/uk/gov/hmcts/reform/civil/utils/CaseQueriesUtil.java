@@ -84,6 +84,12 @@ public class CaseQueriesUtil {
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.addAll(unwrapElements(caseData.getQmRespondentSolicitor2Queries().getCaseMessages()));
         }
+        if (caseData.getQmApplicantCitizenQueries() != null) {
+            latestQueries.addAll(unwrapElements(caseData.getQmApplicantCitizenQueries().getCaseMessages()));
+        }
+        if (caseData.getQmRespondentCitizenQueries() != null) {
+            latestQueries.addAll(unwrapElements(caseData.getQmRespondentCitizenQueries().getCaseMessages()));
+        }
         return latestQueries.stream().filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
     }
