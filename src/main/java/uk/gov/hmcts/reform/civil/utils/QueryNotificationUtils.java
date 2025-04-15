@@ -40,9 +40,9 @@ public class QueryNotificationUtils {
         } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getRespondentSolicitor2EmailAddress();
         } else if (isLIPClaimant(roles)) {
-            return caseData.getApplicant1().getPartyEmail();
+            return caseData.getApplicant1Email();
         } else if (isLIPDefendant(roles)) {
-            return caseData.getRespondent1().getPartyEmail();
+            return caseData.getDefendantUserDetails().getEmail();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }

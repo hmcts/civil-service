@@ -587,6 +587,8 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID);
             LocalDateTime now = LocalDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
+            caseData = caseData.toBuilder()
+                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             handler.handle(params);
@@ -621,7 +623,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
             LocalDateTime now = LocalDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
-            caseData = caseData.toBuilder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
+            caseData = caseData.toBuilder()
+                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
                     RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
