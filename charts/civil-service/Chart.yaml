@@ -4,7 +4,7 @@ name: civil-service
 home: https://github.com/hmcts/civil-service
 version: 0.0.83
 maintainers:
-  - name: HMCTS Civil team
+  - name: HMCTS Civil team 
 
 dependencies:
   - name: java
