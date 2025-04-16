@@ -12,14 +12,14 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +48,7 @@ public class NotifyDefendantLipForResetPinHandler extends CallbackHandler implem
     private CallbackResponse notifyDefendantForResetPin(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
-                generateDefendantLipPIPEmail(caseData);
+            generateDefendantLipPIPEmail(caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
