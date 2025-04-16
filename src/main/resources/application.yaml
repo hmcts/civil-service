@@ -361,6 +361,7 @@ notifications:
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
+  notifyDefendantLRClaimantSettleTheClaimTemplate: "e3d3d41d-3ad2-411a-8de1-baa3012f1c17"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
@@ -466,7 +467,11 @@ notifications:
   notifyClaimantLRCoscApplied: "392cc0d5-51b3-4a82-8576-922424775617"
 
   queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
+  queryRaisedLip: "88ddf39b-2ad8-41f1-b862-a55f6b4ddab0"
+  queryRaisedLipBilingual: "27e8d6c1-f0a0-46b0-8cd6-b7b18c825294"
   queryResponseReceived: "4e74a2ab-376f-47e1-9670-8f97648a13a4"
+  notifyOtherPartyQueryRaised: "a911957b-fca1-402b-acc5-6502e6de93a6"
+  notifyOtherPartyQueryResponseReceived: "a27a4110-9de9-4147-8c89-85c2af2a8d30"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -529,6 +534,13 @@ azure:
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
       enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+    ccd-events-topic:
+      connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING:dummy}
+      topic-name: ${CCD_EVENTS_TOPIC_NAME:ccd-case-events-aat}
+      civil-ccd-events-subscription-name: ${CCD_EVENTS_SUBSCRIPTION_NAME:civil-ccd-case-events-sub-aat}
+      retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:60}
+      threads: ${CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS:1}
+      enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED:false}
 
 async:
   handler:

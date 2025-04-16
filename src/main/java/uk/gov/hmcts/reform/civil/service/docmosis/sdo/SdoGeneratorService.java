@@ -62,38 +62,22 @@ public class SdoGeneratorService {
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
 
-        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+        if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
             templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
-        } else if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_R2;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
-        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
-        }  else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
+        } else if (SdoHelper.isNihlFastTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_FAST_TRACK_NIHL;
             templateData = getTemplateDataFastNihl(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            /*
-             * To keep changes in sync,
-             * Please note that any changes done to SDO_FAST_FAST_TRACK_INT should be also done in R2 template: SDO_FAST_FAST_TRACK_INT_R2
-             * Please note that any changes done to SDO_FAST should be also done in R2 template: SDO_FAST_R2
-             */
-            if (featureToggleService.isSdoR2Enabled()) {
-                docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
-                    ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2 : DocmosisTemplates.SDO_FAST_R2;
-            } else {
-                docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
-                    ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
-            }
-
+            docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled() ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT_R2 : DocmosisTemplates.SDO_FAST_R2;
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
         } else {
-            docmosisTemplate = featureToggleService.isSdoR2Enabled() ? DocmosisTemplates.SDO_R2_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
+            docmosisTemplate =  DocmosisTemplates.SDO_R2_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
         }
-
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate
@@ -223,12 +207,12 @@ public class SdoGeneratorService {
                 authorisation
             ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
-        if (featureToggleService.isSdoR2Enabled()) {
-            sdoDocumentBuilder
-                .hasDisposalWelshToggle(caseData.getSdoR2DisposalHearingUseOfWelshToggle() != null)
-                .welshLanguageDescription(caseData.getSdoR2DisposalHearingUseOfWelshLanguage() != null
-                                              ? caseData.getSdoR2DisposalHearingUseOfWelshLanguage().getDescription() : null);
-        }
+
+        sdoDocumentBuilder
+            .hasDisposalWelshToggle(caseData.getSdoR2DisposalHearingUseOfWelshToggle() != null)
+            .welshLanguageDescription(caseData.getSdoR2DisposalHearingUseOfWelshLanguage() != null
+                                          ? caseData.getSdoR2DisposalHearingUseOfWelshLanguage().getDescription() : null);
+
         SdoDocumentFormDisposal sdoDocumentFormDisposal = sdoDocumentBuilder.build();
         log.info("Disposal SDO template data: {} for caseId {}", sdoDocumentFormDisposal, caseData.getCcdCaseReference());
         return sdoDocumentFormDisposal;
@@ -260,13 +244,8 @@ public class SdoGeneratorService {
             .hasClinicalNegligence(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimClinicalNegligence")
             )
-            .hasCreditHire(
-                (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
-                    && !featureToggleService.isSdoR2Enabled())
-            )
             .hasSdoR2CreditHire(
-                (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire")
-                    && featureToggleService.isSdoR2Enabled())
+                (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire"))
             )
             .hasSdoR2CreditHireDetails(
                 (nonNull(caseData.getSdoR2FastTrackCreditHire()) && (caseData.getSdoR2FastTrackCreditHire().getDetailsShowToggle() != null)
@@ -336,7 +315,7 @@ public class SdoGeneratorService {
             // SNI-5142
             .fastTrackMethodToggle(true)
             .fastTrackAllocation(getFastTrackAllocation(caseData, featureToggleService.isFastTrackUpliftsEnabled()))
-            .showBundleInfo(featureToggleService.isMultiOrIntermediateTrackEnabled(caseData));
+            .showBundleInfo(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialBundleToggle"));
 
         sdoDocumentFormBuilder
             .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
@@ -353,17 +332,14 @@ public class SdoGeneratorService {
                 authorisation
             ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
-        if (featureToggleService.isSdoR2Enabled()) {
-            sdoDocumentFormBuilder.fastTrackWelshLanguageToggle(
-                    SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
-                .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
-                                              ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
-            sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
-                .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
-        } else {
-            sdoDocumentFormBuilder.fastTrackWitnessOfFact(caseData.getFastTrackWitnessOfFact())
-                .fastTrackCreditHire(caseData.getFastTrackCreditHire());
-        }
+
+        sdoDocumentFormBuilder.fastTrackWelshLanguageToggle(
+                SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
+            .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
+                                          ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
+        sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
+            .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
+
         return sdoDocumentFormBuilder.build();
     }
 
@@ -524,20 +500,11 @@ public class SdoGeneratorService {
             )
             .carmEnabled(carmEnabled);
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(
-                    SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
-                )
-                .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
-                .smallClaimsWelshLanguageToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
-                .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null
-                                              ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
-
-                .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
-        } else {
-            sdoDocumentFormBuilder.smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement());
-        }
+        sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
+            .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
+            .smallClaimsWelshLanguageToggle(SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
+            .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
+            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
 
         sdoDocumentFormBuilder.hearingLocation(
                 locationHelper.getHearingLocation(

@@ -74,15 +74,16 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(fullDefenceProceed
                           .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate())
                 .and(allAgreedToLrMediationSpec.negate().and(agreedToMediation.negate()).or(declinedMediation))
-                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()), transitions)
+                          .and(applicantOutOfTimeNotBeingTakenOffline.negate()).and(demageMultiClaim.negate()).and(isLipCase.negate()
+                                                                                                                       .and(not(CaseData::isLipvLROneVOne))), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
             }, transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim))
-                .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase), transitions)
+            .onlyWhen((fullDefenceProceed.or(isClaimantNotSettleFullDefenceClaim).or(isDefendantNotPaidFullDefenceClaim).or(lipFullDefenceProceed))
+                .and(not(agreedToMediation)).and(isCarmApplicableLipCase.negate()).and(isLipCase.or(CaseData::isLipvLROneVOne)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                 flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
