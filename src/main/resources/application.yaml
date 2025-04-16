@@ -160,6 +160,15 @@ idam:
     id: civil-service
     secret: ${CIVIL_CLIENT_SECRET:AAAAAAA}
 
+auth:
+  idam:
+    client:
+      baseUrl: ${IDAM_API_URL:http://localhost:5000}
+  provider:
+    service:
+      client:
+        baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
+
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
 
