@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,8 @@ public abstract class Notifier implements NotificationData {
 
     public void notifyParties(CaseData caseData, String eventId, String taskId) {
         final Set<EmailDTO> partiesToEmail = getPartiesToNotify(caseData);
-        final List<String> errors = sendNotification(partiesToEmail);
+        Map<String, String> commonProps = getCommonEmailProperties(caseData);
+        final List<String> errors = sendNotification(partiesToEmail, commonProps);
         if (!errors.isEmpty()) {
             final HashMap<String, String> additionalProperties = new HashMap<>();
             additionalProperties.put("Errors", errors.toString());
@@ -42,12 +44,28 @@ public abstract class Notifier implements NotificationData {
         }
     }
 
-    private List<String> sendNotification(Set<EmailDTO> recipients) {
+    private Map<String, String> buildEmailProperties(Map<String, String> templateSpecificProps,
+                                                     Map<String, String> commonEmailProperties) {
+        Map<String, String> allEmailProperties = new HashMap<>(commonEmailProperties);
+        allEmailProperties.putAll(templateSpecificProps);
+        return allEmailProperties;
+    }
+
+    private Map<String, String> getCommonEmailProperties(CaseData caseData) {
+        return Map.of(
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        );
+    }
+
+    private List<String> sendNotification(Set<EmailDTO> recipients, Map<String, String> commonEmailProperties) {
         List<String> errorMessages = new ArrayList<>();
         for (EmailDTO recipient : recipients) {
             try {
                 notificationService.sendMail(
-                    recipient.getTargetEmail(), recipient.getEmailTemplate(), recipient.getParameters(),
+                    recipient.getTargetEmail(), recipient.getEmailTemplate(),
+                    Collections.unmodifiableMap(
+                        buildEmailProperties(recipient.getParameters(), commonEmailProperties)
+                    ),
                     recipient.getReference()
                 );
             } catch (NotificationException e) {
