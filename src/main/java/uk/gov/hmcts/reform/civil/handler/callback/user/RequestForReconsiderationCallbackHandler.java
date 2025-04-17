@@ -60,7 +60,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
-    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
+    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND = "You can only request a reconsideration for claims of £10,000 or less.";
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
     private static final String CONFIRMATION_HEADER = "# Your request has been submitted";
@@ -82,8 +82,8 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRequestEligibilityAndGetPartyDetails(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
-        if (callbackParams.getCaseData().getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) > 0) {
-            errors.add(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND);
+        if (callbackParams.getCaseData().getTotalClaimAmount().compareTo(BigDecimal.valueOf(10000)) > 0) {
+            errors.add(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_TEN_THOUSAND);
         } else {
             Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
                 .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
