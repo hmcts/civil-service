@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -108,6 +109,39 @@ public class CaseQueriesUtil {
         CaseMessage query = getQueryById(caseData, queryId);
         String createdBy = query.getCreatedBy();
         return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
+    }
+
+    public static void updateQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario, CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        String partyName = getQueryCollectionPartyName(roles, scenario);
+
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
+            builder.qmApplicantSolicitorQueries(updateQueryCollectionPartyName(caseData.getQmApplicantSolicitorQueries(), partyName));
+        } else if (isRespondentSolicitorOne(roles)) {
+            builder.qmRespondentSolicitor1Queries(updateQueryCollectionPartyName(caseData.getQmRespondentSolicitor1Queries(), partyName));
+        } else if (isRespondentSolicitorTwo(roles)) {
+            builder.qmRespondentSolicitor2Queries(updateQueryCollectionPartyName(caseData.getQmRespondentSolicitor2Queries(), partyName));
+        } else {
+            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
+        }
+    }
+
+    private static CaseQueriesCollection updateQueryCollectionPartyName(CaseQueriesCollection collection, String partyName) {
+        return nonNull(collection) && nonNull(partyName) ? collection.toBuilder().partyName(partyName).build() : collection;
+    }
+
+    public static String getQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario) {
+        if (isApplicantSolicitor(roles)) {
+            return "Claimant";
+        } else if (!scenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) && isRespondentSolicitorOne(roles)) {
+            return "Defendant";
+        } else if (scenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) && isRespondentSolicitorOne(roles)) {
+            return "Defendant 1";
+        } else if (isRespondentSolicitorTwo(roles)) {
+            return "Defendant 2";
+        } else {
+            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
+        }
     }
 
     public static CaseMessage getQueryById(CaseData caseData, String queryId) {
