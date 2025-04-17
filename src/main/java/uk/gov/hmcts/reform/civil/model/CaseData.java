@@ -78,6 +78,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -609,6 +610,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DocumentToKeepCollection> documentToKeepCollection;
 
     private final ChangeLanguagePreference changeLanguagePreference;
+    private final PreferredLanguage claimantLanguagePreferenceDisplay;
+    private final PreferredLanguage defendantLanguagePreferenceDisplay;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

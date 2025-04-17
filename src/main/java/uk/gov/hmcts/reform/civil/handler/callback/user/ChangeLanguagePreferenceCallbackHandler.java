@@ -88,8 +88,8 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             .map(ChangeLanguagePreference::getUserType)
             .orElseThrow(() -> new IllegalArgumentException("User type not found"));
         switch (userType) {
-            case CLAIMANT -> builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
-            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, builder, revisedBilingualPreference);
+            case CLAIMANT -> setClaimantBilingualLanguagePreference(builder, preferredLanguage, revisedBilingualPreference);
+            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, builder, preferredLanguage, revisedBilingualPreference);
             default -> throw new IllegalArgumentException("Unexpected user type");
         }
         builder.changeLanguagePreference(null);
@@ -100,13 +100,22 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private void setClaimantBilingualLanguagePreference(CaseData.CaseDataBuilder<?, ?> builder,
+                                                        PreferredLanguage preferredLanguage,
+                                                        String revisedBilingualPreference) {
+        builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
+        builder.claimantLanguagePreferenceDisplay(preferredLanguage);
+    }
+
     private void setRespondentResponseBilingualLanguagePreference(CaseData caseData,
                                                                   CaseData.CaseDataBuilder<?, ?> builder,
+                                                                  PreferredLanguage preferredLanguage,
                                                                   String revisedBilingualPreference) {
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
         builder.caseDataLiP(caseDataLiP.toBuilder()
                                 .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
                                                             .respondent1ResponseLanguage(revisedBilingualPreference).build())
                                 .build());
+        builder.defendantLanguagePreferenceDisplay(preferredLanguage);
     }
 }
