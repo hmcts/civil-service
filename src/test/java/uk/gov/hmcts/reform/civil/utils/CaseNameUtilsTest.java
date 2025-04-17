@@ -26,7 +26,7 @@ class CaseNameUtilsTest {
 
             var actual = CaseNameUtils.getFormattedPartyName(party);
 
-            assertEquals("'Applicant One'", actual);
+            assertEquals("Applicant One", actual);
         }
 
         @Test
@@ -46,7 +46,7 @@ class CaseNameUtilsTest {
 
             var actual = CaseNameUtils.getFormattedLitigationFriendName(litigationFriend);
 
-            assertEquals(" represented by 'Litigation Friend' (litigation friend)", actual);
+            assertEquals(" represented by Litigation Friend (litigation friend)", actual);
         }
 
         @Test
@@ -124,7 +124,7 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One' v 'Respondent One'");
+            assertThat(actual).isEqualTo("Applicant One v Respondent One");
         }
 
         @Test
@@ -138,7 +138,7 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend) v 'Respondent One'");
+                "Applicant One represented by ApplicantOne LitigationFriend (litigation friend) v Respondent One");
         }
 
         @Test
@@ -151,7 +151,7 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend)");
+                "John Rambo v Sole Trader represented by Litigation Friend (litigation friend)");
         }
 
         @Test
@@ -164,7 +164,7 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One' v 'Respondent One', 'Respondent Two'");
+            assertThat(actual).isEqualTo("Applicant One v Respondent One, Respondent Two");
         }
 
         @Test
@@ -179,7 +179,7 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend) v 'Respondent One', 'Respondent Two'");
+                "Applicant One represented by ApplicantOne LitigationFriend (litigation friend) v Respondent One, Respondent Two");
         }
 
         @Test
@@ -194,7 +194,7 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'Applicant One' v 'Respondent One' represented by 'RespondentOne LitigationFriend' (litigation friend), 'Respondent Two'");
+                "Applicant One v Respondent One represented by RespondentOne LitigationFriend (litigation friend), Respondent Two");
         }
 
         @Test
@@ -209,7 +209,7 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'Applicant One' v 'Respondent One', 'Respondent Two' represented by 'RespondentTwo LitigationFriend' (litigation friend)");
+                "Applicant One v Respondent One, Respondent Two represented by RespondentTwo LitigationFriend (litigation friend)");
         }
 
         @Test
@@ -225,8 +225,8 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend)" +
-                    " v 'Respondent One' represented by 'RespondentOne LitigationFriend' (litigation friend), 'Respondent Two'");
+                "Applicant One represented by ApplicantOne LitigationFriend (litigation friend)" +
+                    " v Respondent One represented by RespondentOne LitigationFriend (litigation friend), Respondent Two");
         }
 
         @Test
@@ -242,8 +242,8 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend)" +
-                    " v 'Respondent One', 'Respondent Two' represented by 'RespondentTwo LitigationFriend' (litigation friend)");
+                "Applicant One represented by ApplicantOne LitigationFriend (litigation friend)" +
+                    " v Respondent One, Respondent Two represented by RespondentTwo LitigationFriend (litigation friend)");
         }
 
         @Test
@@ -258,8 +258,8 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One' v 'Respondent One' represented by 'RespondentOne LitigationFriend'" +
-                                             " (litigation friend), 'Respondent Two' represented by 'RespondentTwo LitigationFriend' (litigation friend)");
+            assertThat(actual).isEqualTo("Applicant One v Respondent One represented by RespondentOne LitigationFriend" +
+                                             " (litigation friend), Respondent Two represented by RespondentTwo LitigationFriend (litigation friend)");
         }
 
         @Test
@@ -276,8 +276,8 @@ class CaseNameUtilsTest {
             String actual = buildCaseName(caseData);
 
             assertThat(actual).isEqualTo(
-                "'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend) v 'Respondent One' represented by" +
-                    " 'RespondentOne LitigationFriend' (litigation friend), 'Respondent Two' represented by 'RespondentTwo LitigationFriend' (litigation friend)");
+                "Applicant One represented by ApplicantOne LitigationFriend (litigation friend) v Respondent One represented by" +
+                    " RespondentOne LitigationFriend (litigation friend), Respondent Two represented by RespondentTwo LitigationFriend (litigation friend)");
         }
 
         @Test
@@ -290,7 +290,7 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One', 'Applicant Two' v 'Respondent One'");
+            assertThat(actual).isEqualTo("Applicant One, Applicant Two v Respondent One");
         }
 
         @Test
@@ -304,7 +304,7 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend), 'Applicant Two' v 'Respondent One'");
+            assertThat(actual).isEqualTo("Applicant One represented by ApplicantOne LitigationFriend (litigation friend), Applicant Two v Respondent One");
         }
 
         @Test
@@ -318,7 +318,7 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One', 'Applicant Two' represented by 'ApplicantTwo LitigationFriend' (litigation friend) v 'Respondent One'");
+            assertThat(actual).isEqualTo("Applicant One, Applicant Two represented by ApplicantTwo LitigationFriend (litigation friend) v Respondent One");
         }
 
         @Test
@@ -332,7 +332,7 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One', 'Applicant Two' v 'Respondent One' represented by 'RespondentOne LitigationFriend' (litigation friend)");
+            assertThat(actual).isEqualTo("Applicant One, Applicant Two v Respondent One represented by RespondentOne LitigationFriend (litigation friend)");
         }
 
         @Test
@@ -347,8 +347,8 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend)," +
-                                             " 'Applicant Two' represented by 'ApplicantTwo LitigationFriend' (litigation friend) v 'Respondent One'");
+            assertThat(actual).isEqualTo("Applicant One represented by ApplicantOne LitigationFriend (litigation friend)," +
+                                             " Applicant Two represented by ApplicantTwo LitigationFriend (litigation friend) v Respondent One");
         }
 
         @Test
@@ -363,8 +363,8 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend)," +
-                                             " 'Applicant Two' v 'Respondent One' represented by 'RespondentOne LitigationFriend' (litigation friend)");
+            assertThat(actual).isEqualTo("Applicant One represented by ApplicantOne LitigationFriend (litigation friend)," +
+                                             " Applicant Two v Respondent One represented by RespondentOne LitigationFriend (litigation friend)");
         }
 
         @Test
@@ -379,8 +379,8 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One', 'Applicant Two' represented by 'ApplicantTwo LitigationFriend' (litigation friend)" +
-                                             " v 'Respondent One' represented by 'RespondentOne LitigationFriend' (litigation friend)");
+            assertThat(actual).isEqualTo("Applicant One, Applicant Two represented by ApplicantTwo LitigationFriend (litigation friend)" +
+                                             " v Respondent One represented by RespondentOne LitigationFriend (litigation friend)");
         }
 
         @Test
@@ -396,9 +396,9 @@ class CaseNameUtilsTest {
 
             String actual = buildCaseName(caseData);
 
-            assertThat(actual).isEqualTo("'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend)," +
-                                             " 'Applicant Two' represented by 'ApplicantTwo LitigationFriend' (litigation friend) " +
-                                             "v 'Respondent One' represented by 'RespondentOne LitigationFriend' (litigation friend)");
+            assertThat(actual).isEqualTo("Applicant One represented by ApplicantOne LitigationFriend (litigation friend)," +
+                                             " Applicant Two represented by ApplicantTwo LitigationFriend (litigation friend) " +
+                                             "v Respondent One represented by RespondentOne LitigationFriend (litigation friend)");
         }
     }
 }
