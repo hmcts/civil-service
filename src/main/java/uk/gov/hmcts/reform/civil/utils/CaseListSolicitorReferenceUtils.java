@@ -31,6 +31,19 @@ public class CaseListSolicitorReferenceUtils {
         return getCommaSeparatedString(Arrays.asList(solicitor1Reference, solicitor2Reference));
     }
 
+    public static String getAllDefendantSolicitorReferencesSpec(CaseData caseData) {
+        return getCommaSeparatedString(
+            Arrays.asList(
+                caseData.getSolicitorReferences() != null
+                    ? ofNullable(caseData.getSolicitorReferences().getRespondentSolicitor1Reference())
+                    .map(Object::toString).orElse(null) : null,
+                caseData.getSolicitorReferences() != null
+                    && YES.equals(caseData.getAddRespondent2())
+                    && NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                    ? ofNullable(caseData.getSolicitorReferences().getRespondentSolicitor2Reference())
+                    .map(Object::toString).orElse(null) : null));
+    }
+
     public static String getAllOrganisationPolicyReferences(CaseData caseData) {
         return getCommaSeparatedString(
             Arrays.asList(

@@ -120,15 +120,17 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
+        LocalDateTime applicantDeadline = deadlinesCalculator.calculateApplicantResponseDeadline(
+            responseDate
+        );
         return caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
             .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
-            .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
-                responseDate
-            ))
+            .applicant1ResponseDeadline(applicantDeadline)
+            .nextDeadline(applicantDeadline.toLocalDate())
             .build();
     }
 }

@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
@@ -107,10 +108,12 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         caseDataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
         caseDataBuilder.caseNamePublic(buildCaseName(caseData));
+        caseDataBuilder
+            .allPartyNames(getAllPartyNames(caseData));
         populateWithPartyIds(caseDataBuilder);
 
         caseDataBuilder.anyRepresented(NO);
-        
+
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
             caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
         }
