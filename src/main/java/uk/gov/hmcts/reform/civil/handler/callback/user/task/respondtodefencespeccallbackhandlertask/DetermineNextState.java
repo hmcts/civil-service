@@ -113,8 +113,7 @@ public class DetermineNextState  {
     }
 
     private boolean isLipVLipOneVOne(CaseData caseData) {
-        return featureToggleService.isLipVLipEnabled()
-            && caseData.isLRvLipOneVOne()
+        return caseData.isLRvLipOneVOne()
             && caseData.isClaimantDontWantToProceedWithFulLDefenceFD();
     }
 

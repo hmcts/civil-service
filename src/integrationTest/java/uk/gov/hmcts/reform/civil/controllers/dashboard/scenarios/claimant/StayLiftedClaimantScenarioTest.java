@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDateTime;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,7 +35,6 @@ public class StayLiftedClaimantScenarioTest extends DashboardBaseIntegrationTest
             .applicant1Represented(YesOrNo.NO)
             .build();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         handler.handle(callbackParams(caseData));
 
         //Verify Notification is created

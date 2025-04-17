@@ -130,7 +130,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         @Test
         void shouldSendNotificationToClaimantLip_whenEventIsCalled() {
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                 .partyEmail(CLAIMANT_EMAIL_ADDRESS)
@@ -160,7 +159,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         @Test
         void shouldSendNotificationToClaimantLip_whenEventIsCalledClaimIssueInBilingual() {
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                 .partyEmail(CLAIMANT_EMAIL_ADDRESS)

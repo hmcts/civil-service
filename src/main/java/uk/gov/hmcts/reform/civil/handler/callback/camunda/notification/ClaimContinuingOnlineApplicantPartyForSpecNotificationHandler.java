@@ -81,8 +81,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
     }
 
     private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-            && caseData.isClaimantBilingual();
+        return caseData.isLipvLipOneVOne() && caseData.isClaimantBilingual();
     }
 
     private String getEmailTemplate(CaseData caseData) {

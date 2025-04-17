@@ -76,7 +76,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
     private String getTemplate(CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()) {
             return notificationsProperties.getNotifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec();
-        } else if (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
+        } else if (caseData.isClaimantDontWantToProceedWithFulLDefenceFD()) {
             return caseData.isRespondentResponseBilingual()
                 ? notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()
                 : notificationsProperties.getRespondent1LipClaimUpdatedTemplate();
@@ -88,7 +88,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()
-            || (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD())) {
+            || (caseData.isClaimantDontWantToProceedWithFulLDefenceFD())) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
