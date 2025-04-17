@@ -78,7 +78,6 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         List<String> roles = retrieveUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
@@ -88,11 +87,13 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
-        updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), builder);
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
+            buildLatestQuery(latestCaseMessage));
+
+        updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.qmLatestQuery(
-                buildLatestQuery(latestCaseMessage))
+            .data(caseDataBuilder
                       .businessProcess(BusinessProcess.ready(queryManagementRaiseQuery))
                       .build().toMap(objectMapper))
             .build();

@@ -19,6 +19,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
@@ -37,6 +38,10 @@ public class CaseQueriesUtil {
             return caseData.getQmRespondentSolicitor1Queries();
         } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getQmRespondentSolicitor2Queries();
+        } else if (isLIPClaimant(roles)) {
+            return caseData.getQmApplicantCitizenQueries();
+        } else if (isLIPDefendant(roles)) {
+            return caseData.getQmRespondentCitizenQueries();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
@@ -108,6 +113,12 @@ public class CaseQueriesUtil {
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.addAll(unwrapElements(caseData.getQmRespondentSolicitor2Queries().getCaseMessages()));
         }
+        if (caseData.getQmApplicantCitizenQueries() != null) {
+            latestQueries.addAll(unwrapElements(caseData.getQmApplicantCitizenQueries().getCaseMessages()));
+        }
+        if (caseData.getQmRespondentCitizenQueries() != null) {
+            latestQueries.addAll(unwrapElements(caseData.getQmRespondentCitizenQueries().getCaseMessages()));
+        }
         return latestQueries.stream().filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
     }
@@ -143,9 +154,9 @@ public class CaseQueriesUtil {
     }
 
     private static String getCategoryIdForRole(List<String> roles) {
-        if (isApplicantSolicitor(roles)) {
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
             return DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue();
-        } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
+        } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles) || isLIPDefendant(roles)) {
             return DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
