@@ -1,16 +1,11 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,22 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Component
 @AllArgsConstructor
-public abstract class Notifier implements NotificationData {
+public abstract class Notifier {
 
     protected final NotificationService notificationService;
-    protected final NotificationsProperties notificationsProperties;
-    protected final OrganisationService organisationService;
-    protected final SimpleStateFlowEngine stateFlowEngine;
     protected final CaseTaskTrackingService caseTaskTrackingService;
-
-    protected abstract String getTaskId();
-
-    protected abstract Set<EmailDTO> getPartiesToNotify(final CaseData caseData);
+    protected final PartiesEmailGenerator partiesNotifier;
 
     public void notifyParties(CaseData caseData, String eventId, String taskId) {
-        final Set<EmailDTO> partiesToEmail = getPartiesToNotify(caseData);
+        final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData);
         final List<String> errors = sendNotification(partiesToEmail);
         if (!errors.isEmpty()) {
             final HashMap<String, String> additionalProperties = new HashMap<>();
@@ -68,4 +56,6 @@ public abstract class Notifier implements NotificationData {
             additionalProperties
         );
     }
+
+    protected abstract String getTaskId();
 }
