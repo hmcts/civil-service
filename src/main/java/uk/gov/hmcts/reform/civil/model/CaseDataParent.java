@@ -487,6 +487,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private YesOrNo showOldDJFixedCostsScreen;
     private YesOrNo claimFixedCostsOnEntryDJ;
 
+    private YesOrNo mediationFileSentToMmt;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES

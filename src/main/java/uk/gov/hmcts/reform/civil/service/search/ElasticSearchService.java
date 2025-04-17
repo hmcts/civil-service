@@ -51,7 +51,7 @@ public abstract class ElasticSearchService {
     public List<CaseDetails> getInMediationCases(LocalDate claimMovedDate, boolean carmEnabled) {
 
         if (claimMovedDate == null) {
-            claimMovedDate = LocalDate.now().minusDays(1);
+            claimMovedDate = LocalDate.now().minusDays(7);
         }
         if (carmEnabled) {
             SearchResult searchResult = coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDate,

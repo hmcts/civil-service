@@ -71,7 +71,7 @@ class GenerateCsvAndTransferHandlerTest {
     private CaseData caseDataInMediationNotToProcess;
     private static final String SENDER = "sender@gmail.com";
     private static final String RECIPIENT = "recipient@gmail.com";
-    private final LocalDate claimToBeProcessed = LocalDate.now().minusDays(1);
+    private final LocalDate claimToBeProcessed = LocalDate.now().minusDays(7);
     private final LocalDate claimNotToBeProcessed = LocalDate.now();
 
     @BeforeEach

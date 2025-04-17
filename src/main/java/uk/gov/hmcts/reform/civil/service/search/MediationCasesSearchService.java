@@ -21,7 +21,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 public class MediationCasesSearchService extends ElasticSearchService {
 
     private static final LocalDateTime CARM_DATE = LocalDateTime.of(2024, 11, 5,
-                                                                    7, 28, 35);
+                                                                    7, 28, 35
+    );
 
     public MediationCasesSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
@@ -49,7 +50,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
 
     @Override
     Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
+                                    String searchAfterValue) {
         String targetDateString =
             claimMovedDate.format(DateTimeFormatter.ISO_DATE);
         if (carmEnabled) {
@@ -58,7 +59,8 @@ public class MediationCasesSearchService extends ElasticSearchService {
                     .must(matchAllQuery())
                     .must(beState(IN_MEDIATION))
                     .must(submittedDate(carmEnabled))
-                    .must(matchQuery("data.claimMovedToMediationOn", targetDateString)),
+                    .must(matchQuery("data.claimMovedToMediationOn", targetDateString))
+                    .mustNot(matchQuery("data.mediationJsonEmailSent", "Yes")),
                 emptyList(),
                 startIndex,
                 initialSearch,
@@ -71,7 +73,8 @@ public class MediationCasesSearchService extends ElasticSearchService {
                 .should(boolQuery()
                             .must(beState(IN_MEDIATION))
                             .must(submittedDate(carmEnabled))
-                            .must(matchQuery("data.claimMovedToMediationOn", targetDateString))),
+                            .must(matchQuery("data.claimMovedToMediationOn", targetDateString)))
+                .mustNot(matchQuery("data.mediationJsonEmailSent", "Yes")),
             emptyList(),
             startIndex
         );

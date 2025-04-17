@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCase;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCases;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationDTO;
@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.mediation.MediationJsonService;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,18 +27,32 @@ import static java.util.List.of;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
-public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTaskHandler {
+public class GenerateMediationJsonAndTransferTaskHandler extends GenerateMediationFileAndTransferTaskHandler {
 
-    private final MediationCasesSearchService caseSearchService;
-    private final CaseDetailsConverter caseDetailsConverter;
     private final MediationJsonService mediationJsonService;
-    private final SendGridClient sendGridClient;
+
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
-    private static final String SUBJECT = "OCMC Mediation Data";
+
     private static final String FILENAME = "ocmc_mediation_data.json";
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    protected GenerateMediationJsonAndTransferTaskHandler(MediationCasesSearchService caseSearchService,
+                                                          CoreCaseDataService coreCaseDataService,
+                                                          CaseDetailsConverter caseDetailsConverter,
+                                                          SendGridClient sendGridClient,
+                                                          MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
+                                                          MediationJsonService mediationJsonService,
+                                                          MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
+        super(
+            caseSearchService,
+            coreCaseDataService,
+            caseDetailsConverter,
+            sendGridClient,
+            mediationCSVEmailConfiguration
+        );
+        this.mediationJsonService = mediationJsonService;
+        this.mediationCSVEmailConfiguration = mediationCSVEmailConfiguration1;
+    }
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -47,7 +60,7 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
         } else {
-            claimMovedDate = LocalDate.now().minusDays(1);
+            claimMovedDate = LocalDate.now().minusDays(7);
         }
         List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, true);
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
@@ -75,11 +88,10 @@ public class GenerateMediationJsonAndTransferTaskHandler extends BaseExternalTas
                 Optional<EmailData> emailData = prepareEmail(mediationDTO);
 
                 if (externalTask.getVariable("dontSendEmail") == null) {
-                    emailData.ifPresent(data -> sendGridClient.sendEmail(
-                        mediationCSVEmailConfiguration.getSender(),
-                        data
-                    ));
+                    emailData.ifPresent(data -> sendMediationFileEmail(data));
                 }
+
+                inMediationCases.stream().forEach(this::setMediationFileSent);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
