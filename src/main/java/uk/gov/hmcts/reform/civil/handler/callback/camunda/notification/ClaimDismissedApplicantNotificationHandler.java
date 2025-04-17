@@ -8,13 +8,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedEmailTemplater;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +38,7 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler 
     private final NotificationsProperties notificationsProperties;
     private final IStateFlowEngine stateFlowEngine;
     private final OrganisationService organisationService;
+    private final ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -82,7 +83,7 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler 
     }
 
     private String getSolicitorClaimDismissedProperty(CaseData caseData) {
-        return NotificationUtils.getSolicitorClaimDismissedProperty(
+        return claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(
             stateFlowEngine.evaluate(caseData)
                 .getStateHistory()
                 .stream()
