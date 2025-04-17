@@ -482,6 +482,91 @@ class CaseQueriesUtilTest {
     }
 
     @Test
+    void shouldReturnClaimantLipQuery_whenQueryFoundForId() {
+        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(
+                CaseMessage.builder()
+                    .id("1")
+                    .build(),
+                CaseMessage.builder()
+                    .id("4")
+                    .build()
+            ))
+            .build();
+
+        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("2")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("3")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection claimantLip = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("4")
+                                           .build()))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQuery)
+            .qmRespondentSolicitor1Queries(respondent1Query)
+            .qmRespondentSolicitor2Queries(respondent2Query).qmApplicantCitizenQueries(claimantLip)
+            .build();
+
+        CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "4");
+
+        assertThat(latestQuery).isEqualTo(claimantLip.getCaseMessages().get(0).getValue());
+    }
+
+    @Test
+    void shouldReturnDefendantLipQuery_whenQueryFoundForId() {
+        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(
+                CaseMessage.builder()
+                    .id("1")
+                    .build(),
+                CaseMessage.builder()
+                    .id("4")
+                    .build()
+            ))
+            .build();
+
+        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("2")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("3")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection defendantLip = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("4")
+                                           .build()))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQuery)
+            .qmRespondentSolicitor1Queries(respondent1Query)
+            .qmRespondentSolicitor2Queries(respondent2Query)
+            .qmRespondentCitizenQueries(defendantLip)
+            .build();
+
+        CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "4");
+
+        assertThat(latestQuery).isEqualTo(defendantLip.getCaseMessages().get(0).getValue());
+    }
+
+    @Test
     void shouldReturnRespondent1Query_whenQueryFoundForId() {
         CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()

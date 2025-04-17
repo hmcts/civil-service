@@ -160,6 +160,15 @@ idam:
     id: civil-service
     secret: ${CIVIL_CLIENT_SECRET:AAAAAAA}
 
+auth:
+  idam:
+    client:
+      baseUrl: ${IDAM_API_URL:http://localhost:5000}
+  provider:
+    service:
+      client:
+        baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
+
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
 
@@ -467,6 +476,8 @@ notifications:
   notifyClaimantLRCoscApplied: "392cc0d5-51b3-4a82-8576-922424775617"
 
   queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
+  queryRaisedLip: "88ddf39b-2ad8-41f1-b862-a55f6b4ddab0"
+  queryRaisedLipBilingual: "27e8d6c1-f0a0-46b0-8cd6-b7b18c825294"
   queryResponseReceived: "4e74a2ab-376f-47e1-9670-8f97648a13a4"
   notifyOtherPartyQueryRaised: "a911957b-fca1-402b-acc5-6502e6de93a6"
   notifyOtherPartyQueryResponseReceived: "a27a4110-9de9-4147-8c89-85c2af2a8d30"
