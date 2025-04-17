@@ -27,6 +27,8 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuer
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getProperties;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +62,9 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String queryId = processVariables.getQueryId();
-
+        if (queryId == null) {
+            queryId = caseData.getQmLatestQuery().getQueryId();
+        }
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         String email = getEmail(caseData, roles);
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
@@ -68,7 +72,7 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
 
         notificationService.sendMail(
             email,
-            notificationsProperties.getQueryRaised(),
+            getEmailTemplate(caseData, roles),
             properties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -76,9 +80,19 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private String getEmailTemplate(CaseData caseData, List<String> roles) {
+        if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
+            || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {
+            return notificationsProperties.getQueryRaisedLipBilingual();
+        }
+        if (isLIPClaimant(roles) || isLIPDefendant(roles)) {
+            return notificationsProperties.getQueryRaisedLip();
+        }
+        return notificationsProperties.getQueryRaised();
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
