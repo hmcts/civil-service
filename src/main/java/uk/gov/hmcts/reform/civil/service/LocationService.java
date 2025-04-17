@@ -45,8 +45,10 @@ public class LocationService {
 
     public Pair<CaseLocationCivil, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData)) {
+            log.info("WorkAllocation Location If for caseId {}", caseData.getCcdCaseReference());
             return Pair.of(assignCaseManagementLocationToMainCaseLocation(caseData, authToken), false);
         } else {
+            log.info("WorkAllocation Location Else for caseId {}", caseData.getCcdCaseReference());
             return getWorkAllocationLocationBeforeSdo(caseData, authToken);
         }
     }
@@ -73,11 +75,13 @@ public class LocationService {
 
     private boolean hasSDOBeenMade(CaseData caseData) {
         if (featureToggleService.isQueryManagementLRsEnabled()) {
+            log.info("hasSDOBeenMade If for caseId {}", caseData.getCcdCaseReference());
             return (!statesBeforeSDO.contains(caseData.getCcdState())
                 && !settleDiscontinueStates.contains(caseData.getCcdState()))
                 || (!statesBeforeSDO.contains(caseData.getPreviousCCDState())
                 && settleDiscontinueStates.contains(caseData.getCcdState()));
         } else {
+            log.info("hasSDOBeenMade Else for caseId {}", caseData.getCcdCaseReference());
             return !statesBeforeSDO.contains(caseData.getCcdState());
         }
     }
@@ -92,14 +96,21 @@ public class LocationService {
     }
 
     private CaseLocationCivil assignCaseManagementLocationToMainCaseLocation(CaseData caseData, String authToken) {
-        LocationRefData caseManagementLocationDetails;
         List<LocationRefData>  locationRefDataList = locationRefDataService.getHearingCourtLocations(authToken);
+        log.info("Hearing court locations found : {} for caseId {}", locationRefDataList, caseData.getCcdCaseReference());
+        log.info("Case managementLocation region {} and  base Location {} caseId {}",
+                 caseData.getCaseManagementLocation().getRegion(),
+                 caseData.getCaseManagementLocation().getBaseLocation(), caseData.getCcdCaseReference());
         var foundLocations = locationRefDataList.stream()
             .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
+
+        log.info("Filtered hearing court locations found : {} for caseId {}", foundLocations, caseData.getCcdCaseReference());
+        LocationRefData caseManagementLocationDetails;
         if (!foundLocations.isEmpty()) {
             caseManagementLocationDetails = foundLocations.get(0);
         } else {
-            throw new IllegalArgumentException("Base Court Location for General applications not found, in location data");
+            throw new IllegalArgumentException(String.format("Base Court Location for General applications not found, in location data for caseId %s",
+                                                             caseData.getCcdCaseReference()));
         }
         CaseLocationCivil courtLocation;
         courtLocation = CaseLocationCivil.builder()
