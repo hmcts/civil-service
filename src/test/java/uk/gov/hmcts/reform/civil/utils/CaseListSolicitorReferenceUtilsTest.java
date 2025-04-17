@@ -7,8 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
-import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.*;
 
 class CaseListSolicitorReferenceUtilsTest {
 
@@ -114,6 +113,15 @@ class CaseListSolicitorReferenceUtilsTest {
                 assertThat(getAllDefendantSolicitorReferences(caseData))
                     .isEqualTo("6789");
             }
+
+            @Test
+            void shouldReturnAllDefendantSolicitorReferenceSpec() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimSubmitted().build();
+
+                assertThat(getAllDefendantSolicitorReferencesSpec(caseData))
+                    .isEqualTo("6789");
+            }
         }
 
         @Nested
@@ -129,6 +137,17 @@ class CaseListSolicitorReferenceUtilsTest {
             }
 
             @Test
+            void shouldReturnAllDefendantSolicitorReferenceSpec() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimSubmitted()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                assertThat(getAllDefendantSolicitorReferencesSpec(caseData))
+                    .isEqualTo("6789, 01234");
+            }
+
+            @Test
             void shouldReturnAllDefendantSolicitorReference_whenNoReferencesExists() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimSubmitted()
@@ -136,6 +155,17 @@ class CaseListSolicitorReferenceUtilsTest {
                     .removeSolicitorReferences().build();
 
                 assertThat(getAllDefendantSolicitorReferences(caseData))
+                    .isEqualTo("");
+            }
+
+            @Test
+            void shouldReturnAllDefendantSolicitorReference_whenNoReferencesExistsSpec() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimSubmitted()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .removeSolicitorReferences().build();
+
+                assertThat(getAllDefendantSolicitorReferencesSpec(caseData))
                     .isEqualTo("");
             }
 

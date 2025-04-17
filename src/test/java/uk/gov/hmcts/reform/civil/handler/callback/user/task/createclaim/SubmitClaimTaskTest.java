@@ -149,8 +149,8 @@ class SubmitClaimTaskTest {
             .respondent2SameLegalRepresentative(NO)
             .solicitorReferences(SolicitorReferences.builder()
                                      .respondentSolicitor1Reference("1234")
+                                     .respondentSolicitor2Reference("5678")
                                      .build())
-            .respondentSolicitor2Reference("5678")
             .build();
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
