@@ -99,6 +99,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -180,7 +181,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     AssignCategoryId.class,
     FrcDocumentsUtils.class,
     RoboticsAddressMapper.class,
-    AddressLinesMapper.class
+    AddressLinesMapper.class,
+    InterestCalculator.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -242,6 +244,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private AddressLinesMapper linesMapper;
     @MockBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    @Autowired
+    private InterestCalculator interestCalculator;
 
     @Nested
     class AboutToStart {
