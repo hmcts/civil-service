@@ -66,10 +66,8 @@ public class QueryNotificationUtils {
                 getLegalOrganizationNameForRespondent(caseData, true, organisationService)
             );
         } else if (isRespondentSolicitorTwo(roles)) {
-            properties.put(
-                CLAIM_LEGAL_ORG_NAME_SPEC,
-                getLegalOrganizationNameForRespondent(caseData, false, organisationService)
-            );
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
+                           getLegalOrganizationNameForRespondent(caseData, false, organisationService));
         } else if (isLIPClaimant(roles)) {
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
         } else if (isLIPDefendant(roles)) {
