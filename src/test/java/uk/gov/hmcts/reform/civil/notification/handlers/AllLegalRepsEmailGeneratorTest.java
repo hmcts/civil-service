@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
-class AllLegalRepsEmailGeneratorTest {
+abstract class AllLegalRepsEmailGeneratorTest {
 
     @Mock
     private AppSolOneEmailDTOGenerator appSolOneEmailGenerator;

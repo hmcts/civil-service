@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 @AllArgsConstructor
+@Slf4j
 public abstract class Notifier {
 
     protected final NotificationService notificationService;
@@ -21,6 +23,7 @@ public abstract class Notifier {
     protected final PartiesEmailGenerator partiesNotifier;
 
     public void notifyParties(CaseData caseData, String eventId, String taskId) {
+        log.info("Notifying parties for case ID: {} and eventId: {} and taskId: {} ", caseData.getCcdCaseReference(), eventId, taskId);
         final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData);
         final List<String> errors = sendNotification(partiesToEmail);
         if (!errors.isEmpty()) {

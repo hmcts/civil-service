@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
 @AllArgsConstructor
+@Slf4j
 public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator {
 
     private final AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
@@ -20,8 +22,10 @@ public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator {
     @Override
     public Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
+        log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
         partiesToEmail.add(appSolOneEmailGenerator.buildEmailDTO(caseData));
         if (shouldNotifyRespondents(caseData)) {
+            log.info("Generating email for respondents for case ID: {}", caseData.getCcdCaseReference());
             partiesToEmail.addAll(getRespondents(caseData));
         }
         return partiesToEmail;
