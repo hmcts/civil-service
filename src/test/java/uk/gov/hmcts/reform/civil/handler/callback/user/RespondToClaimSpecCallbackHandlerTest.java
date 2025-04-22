@@ -976,6 +976,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build().toBuilder()
                 .build().toBuilder()
                 .respondent2ResponseDate(null)
+                .respondent1ResponseDeadline(dateTime.plusDays(1))
                 .respondent1ResponseDate(dateTime).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -991,7 +992,54 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
             // Then
-            assertThat(response.getData()).extracting("nextDeadline").isNull();
+            assertThat(response.getData()).extracting("nextDeadline")
+                .isEqualTo(dateTime.plusDays(1).toLocalDate().toString());
+
+        }
+
+        @Test
+        void defendantResponseDoesNotPopulateNextDeadline1vs2DSSolicitor1BeforeSolicitor2ExtendedDeadline() {
+            // Given
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1DQ()
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .addRespondent2(YES)
+                .respondent2ResponseDeadline(dateTime.plusDays(2))
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .build().toBuilder()
+                .respondent2ResponseDate(null)
+                .respondent1ResponseDeadline(dateTime)
+                .respondent1ResponseDate(dateTime).build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+            // Then
+            assertThat(response.getData()).extracting("nextDeadline")
+                .isEqualTo(dateTime.plusDays(2).toLocalDate().toString());
 
         }
 
@@ -1013,6 +1061,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(PartyBuilder.builder().individual().build())
                 .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
                 .addRespondent2(NO)
+                .respondent1ResponseDeadline(dateTime)
                 .atSpecAoSRespondent2HomeAddressRequired(NO)
                 .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
                 .build().toBuilder()
@@ -1435,6 +1484,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccdCaseReference(354L)
                 .respondent1(defendant1)
                 .respondent1Copy(defendant1)
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .respondent1DQ(
                     Respondent1DQ.builder()
                         .respondToCourtLocation(
@@ -1512,6 +1562,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccdCaseReference(354L)
                 .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
                 .respondent2ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .respondent1(defendant1)
                 .respondent1Copy(defendant1)
                 .respondent1DQ(
@@ -1600,6 +1651,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccdCaseReference(354L)
                 .respondent1(defendant1)
                 .respondent1Copy(defendant1)
+                .respondent1ResponseDeadline(LocalDateTime.now())
                 .respondent1DQ(
                     Respondent1DQ.builder()
                         .respondToCourtLocation(
@@ -1936,6 +1988,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent1(YesOrNo.YES)
@@ -1982,6 +2035,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent1(YesOrNo.YES)

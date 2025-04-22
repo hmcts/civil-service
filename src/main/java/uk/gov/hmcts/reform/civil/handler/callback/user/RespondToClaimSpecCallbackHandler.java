@@ -89,6 +89,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -1481,13 +1482,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
-            boolean nextDeadlineRequired = !NO.equals(caseData.getRespondent2SameLegalRepresentative())
-                || caseData.getRespondent2ResponseDate() != null;
+            boolean nextDeadlineRespondent2 = NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                && isNull(caseData.getRespondent2ResponseDate());
             LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
+            LocalDate respondent2Deadline = nonNull(caseData.getRespondent2ResponseDeadline())
+                ? caseData.getRespondent2ResponseDeadline().toLocalDate()
+                : caseData.getRespondent1ResponseDeadline().toLocalDate();
+
+            LocalDate nextDeadline = nextDeadlineRespondent2
+                ? respondent2Deadline
+                : applicant1ResponseDeadline.toLocalDate();
+
             updatedData
                 .respondent1ResponseDate(responseDate)
                 .applicant1ResponseDeadline(applicant1ResponseDeadline)
-                .nextDeadline(nextDeadlineRequired ? applicant1ResponseDeadline.toLocalDate() : null)
+                .nextDeadline(nextDeadline)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
