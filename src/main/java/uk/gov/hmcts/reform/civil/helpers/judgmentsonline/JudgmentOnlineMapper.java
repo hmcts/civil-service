@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,7 +97,7 @@ public abstract class JudgmentOnlineMapper {
         }
     }
 
-    public void updateJudgmentTabDataWithActiveJudgment(JudgmentDetails activeJudgment, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    public void updateJudgmentTabDataWithActiveJudgment(JudgmentDetails activeJudgment, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, BigDecimal interest) {
         caseDataBuilder.joIsLiveJudgmentExists(YesOrNo.YES);
         caseDataBuilder.joIsDisplayInJudgmentTab(YesOrNo.YES);
         caseDataBuilder.joDefendantName1(activeJudgment.getDefendant1Name());
@@ -119,7 +120,7 @@ public abstract class JudgmentOnlineMapper {
             caseDataBuilder.joIssueDate(activeJudgment.getIssueDate());
             caseDataBuilder.joFullyPaymentMadeDate(activeJudgment.getFullyPaymentMadeDate());
         }
-        caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment))
+        caseDataBuilder.joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest))
             .joJudgementByAdmissionIssueDate(LocalDateTime.now());
     }
 

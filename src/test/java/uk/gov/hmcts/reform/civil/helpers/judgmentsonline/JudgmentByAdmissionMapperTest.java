@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -47,7 +48,8 @@ class JudgmentByAdmissionMapperTest {
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private FeatureToggleService featureToggleService;
     private JudgementService judgementService = new JudgementService(featureToggleService);
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService);
+    private InterestCalculator interestCalculator = new InterestCalculator();
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
 
     @Test
     void testIfJudgmentByAdmission() {
