@@ -53,8 +53,7 @@ public class FullDefenceTransitionBuilder extends MidTransitionBuilder {
             // for carm LR cases
             .onlyWhen(isCarmApplicableCase.and(fullDefenceProceed), transitions)
             .moveTo(FULL_DEFENCE_PROCEED, transitions)
-            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate())
-                          .and(isCarmApplicableLipCase.negate()).and(isCarmApplicableCase.negate()), transitions)
+            .onlyWhen(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
                 flags.put(FlowFlag.MINTI_ENABLED.name(), featureToggleService.isMultiOrIntermediateTrackEnabled(c));
