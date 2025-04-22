@@ -1481,11 +1481,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
+            boolean nextDeadlineRequired = !NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                || caseData.getRespondent2ResponseDate() != null;
             LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
             updatedData
                 .respondent1ResponseDate(responseDate)
                 .applicant1ResponseDeadline(applicant1ResponseDeadline)
-                .nextDeadline(applicant1ResponseDeadline.toLocalDate())
+                .nextDeadline(nextDeadlineRequired ? applicant1ResponseDeadline.toLocalDate() : null)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {

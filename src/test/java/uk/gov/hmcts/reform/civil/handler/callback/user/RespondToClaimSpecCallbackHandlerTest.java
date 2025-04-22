@@ -31,9 +31,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
@@ -821,6 +822,220 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("nextDeadline").isEqualTo(localDateTime.toLocalDate().toString());
         }
 
+        @Test
+        void defendantResponseDoesNotPopulateNextDeadline1vs2DSSolicitor2Only() {
+            // Given
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .addRespondent2(YES)
+                .respondent2DQ()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .build().toBuilder()
+                .respondent2ResponseDate(dateTime)
+                .respondent1ResponseDate(null).build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+            // Then
+            assertThat(response.getData()).extracting("nextDeadline").isNull();
+
+        }
+
+        @Test
+        void defendantResponseDoesPopulateNextDeadline1vs2DSSolicitor2AfterSolicitor1() {
+            // Given
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .addRespondent2(YES)
+                .respondent2DQ()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .build().toBuilder()
+                .respondent2ResponseDate(dateTime)
+                .respondent1ResponseDate(dateTime).build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+            // Then
+            assertThat(response.getData()).extracting("nextDeadline").isEqualTo(dateTime.toLocalDate().toString());
+
+        }
+
+        @Test
+        void defendantResponseDoesPopulateNextDeadline1vs2DSSolicitor1AfterSolicitor2() {
+            // Given
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1DQ()
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .addRespondent2(YES)
+                .respondent2DQ()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .build().toBuilder()
+                .respondent2ResponseDate(dateTime)
+                .respondent1ResponseDate(dateTime).build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+            // Then
+            assertThat(response.getData()).extracting("nextDeadline").isEqualTo(dateTime.toLocalDate().toString());
+
+        }
+
+        @Test
+        void defendantResponseDoesNotPopulateNextDeadline1vs2DSSolicitor1BeforeSolicitor2() {
+            // Given
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1DQ()
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .build().toBuilder()
+                .respondent2ResponseDate(null)
+                .respondent1ResponseDate(dateTime).build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+            // Then
+            assertThat(response.getData()).extracting("nextDeadline").isNull();
+
+        }
+
+        @Test
+        void defendantResponseDoesPopulateNextDeadline1vs1Solicitor1() {
+            // Given
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v1FullDefenceSpec()
+                .ccdCaseReference(123456789)
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1DQ()
+                .respondent1(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .addRespondent2(NO)
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .build().toBuilder()
+                .respondent1ResponseDate(dateTime).build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            var objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+            // Then
+            assertThat(response.getData()).extracting("nextDeadline").isEqualTo(dateTime.toLocalDate().toString());
+
+        }
+
         @Nested
         class UpdateExperts {
             @Test
@@ -1142,6 +1357,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent2DQ()
             .respondent1Copy(PartyBuilder.builder().individual().build())
             .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+            .respondent2SameLegalRepresentative(NO)
             .addRespondent2(YES)
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2Copy(PartyBuilder.builder().individual().build())
