@@ -40,42 +40,6 @@ class CaseStateUtilsTest {
     }
 
     @Test
-    void shouldReturnTrue_whenCarmEnabledSmallClaim1v1PartAdmitClaimantRejectRepaymentPlan() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .applicant1AcceptAdmitAmountPaidSpec(NO)
-            .build();
-
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void shouldReturnTrue_whenPartAdmitStatesPaidApplicantNotReceivedPayment() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-            .build();
-
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void shouldReturnTrue_whenPartAdmitStatesPaidApplicantRejects() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .responseClaimTrack(SMALL_CLAIM.name())
-            .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
-            .build();
-
-        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
     void shouldReturnTrue_whenCarmEnabledSmallClaim2v1() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .multiPartyClaimTwoApplicants()

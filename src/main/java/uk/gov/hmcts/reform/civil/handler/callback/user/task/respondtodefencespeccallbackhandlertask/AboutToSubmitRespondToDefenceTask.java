@@ -133,7 +133,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             && caseData.hasClaimantAgreedToFreeMediation())
             || (featureToggleService.isCarmEnabledForCase(caseData)
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && caseData.hasApplicantProceededWithClaim())) {
+            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
