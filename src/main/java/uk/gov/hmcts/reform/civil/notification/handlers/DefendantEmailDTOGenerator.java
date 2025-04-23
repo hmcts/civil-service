@@ -11,8 +11,6 @@ public abstract class DefendantEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
     public String getEmailAddress(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondent1())
-            .map(Party::getPartyEmail)
-            .orElse("");
+        return caseData.getRespondent1PartyEmail();
     }
 }
