@@ -36,6 +36,8 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdTo
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 
 @Service
 @RequiredArgsConstructor
@@ -90,7 +92,9 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
             buildLatestQuery(latestCaseMessage));
 
-        updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
+        if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+            updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder

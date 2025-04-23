@@ -80,7 +80,7 @@ public class CaseQueriesUtil {
         CaseData caseData = builder.build();
         String partyName = getQueryCollectionPartyName(roles, scenario);
 
-        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
+        if (isApplicantSolicitor(roles)) {
             builder.qmApplicantSolicitorQueries(updateQueryCollectionPartyName(caseData.getQmApplicantSolicitorQueries(), partyName));
         } else if (isRespondentSolicitorOne(roles)) {
             builder.qmRespondentSolicitor1Queries(updateQueryCollectionPartyName(caseData.getQmRespondentSolicitor1Queries(), partyName));
