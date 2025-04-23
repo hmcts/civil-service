@@ -7,6 +7,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -21,13 +22,14 @@ class AppSolOneEmailGeneratorTest {
     protected static final String APPLICANT_LEGAL_ORG_NAME = "applicant-legal-org-name";
 
     private OrganisationService organisationService;
+    private NotificationsProperties notificationsProperties;
     private AppSolOneEmailDTOGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         organisationService = Mockito.mock(OrganisationService.class);
-        emailGenerator = new AppSolOneEmailDTOGenerator(organisationService) {
+        emailGenerator = new AppSolOneEmailDTOGenerator(notificationsProperties, organisationService) {
             @Override
             public String getEmailTemplateId(CaseData caseData) {
                 return "template-id";

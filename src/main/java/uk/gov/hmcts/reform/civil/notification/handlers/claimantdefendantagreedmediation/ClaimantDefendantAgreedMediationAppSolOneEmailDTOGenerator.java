@@ -15,13 +15,11 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class ClaimantDefendantAgreedMediationAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    private final NotificationsProperties notificationsProperties;
     private final FeatureToggleService featureToggleService;
 
     public ClaimantDefendantAgreedMediationAppSolOneEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties,
                                                                       FeatureToggleService featureToggleService) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
+        super(notificationsProperties, organisationService);
         this.featureToggleService = featureToggleService;
     }
 

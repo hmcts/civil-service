@@ -26,7 +26,7 @@ class RespSolOneEmailGeneratorTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         organisationService = Mockito.mock(OrganisationService.class);
-        emailGenerator = new RespSolOneEmailDTOGenerator(organisationService) {
+        emailGenerator = new RespSolOneEmailDTOGenerator(organisationService, organisationService) {
             @Override
             public String getEmailTemplateId(CaseData caseData) {
                 return "template-id";

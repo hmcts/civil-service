@@ -13,7 +13,7 @@ public class ClaimDismissedRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
 
     public ClaimDismissedRespSolOneEmailDTOGenerator(OrganisationService organisationService,
                                                      ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
-        super(organisationService);
+        super(organisationService, organisationService);
         this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
     }
 

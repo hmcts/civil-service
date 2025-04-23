@@ -6,6 +6,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -20,13 +21,14 @@ class RespSolTwoEmailGeneratorTest {
     protected static final String RESPONDENT_LEGAL_ORG_NAME = "respondent-legal-org-name";
 
     private OrganisationService organisationService;
+    private NotificationsProperties notificationsProperties;
     private RespSolTwoEmailDTOGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         organisationService = Mockito.mock(OrganisationService.class);
-        emailGenerator = new RespSolTwoEmailDTOGenerator(organisationService) {
+        emailGenerator = new RespSolTwoEmailDTOGenerator(notificationsProperties, organisationService) {
             @Override
             public String getEmailTemplateId(CaseData caseData) {
                 return "template-id";

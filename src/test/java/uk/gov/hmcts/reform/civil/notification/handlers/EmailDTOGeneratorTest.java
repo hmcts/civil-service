@@ -33,7 +33,7 @@ class EmailDTOGeneratorTest {
         MockitoAnnotations.openMocks(this);
 
         // Create a concrete implementation of the abstract class for testing
-        emailDTOGenerator = new EmailDTOGenerator() {
+        emailDTOGenerator = new EmailDTOGenerator(notificationsProperties) {
             @Override
             protected String getEmailAddress(CaseData caseData) {
                 return TEST_EMAIL;

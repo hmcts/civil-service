@@ -7,16 +7,18 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+
 @Component
 public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private final NotificationsProperties notificationsProperties;
     private final FeatureToggleService featureToggleService;
 
     public ClaimantDefendantAgreedMediationRespSolOneEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties,
                                                                        FeatureToggleService featureToggleService) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
+        super(notificationsProperties, organisationService);
         this.featureToggleService = featureToggleService;
     }
 
@@ -29,5 +31,11 @@ public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGenerator extends
     @Override
     protected String getReferenceTemplate() {
         return "mediation-agreement-respondent-notification-%s";
+    }
+
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+        return properties;
     }
 }
