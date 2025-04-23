@@ -23,4 +23,8 @@ public abstract class AppSolOneEmailDTOGenerator extends EmailDTOGenerator {
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         return properties;
     }
+
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return caseData.isApplicantLiP() ? Boolean.FALSE : Boolean.TRUE;
+    }
 }

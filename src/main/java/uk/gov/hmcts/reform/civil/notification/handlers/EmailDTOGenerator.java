@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import lombok.Data;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -8,7 +9,12 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
+@Data
 public abstract class EmailDTOGenerator implements NotificationData {
+
+    private Boolean shouldNotify = Boolean.TRUE;
+
+    protected abstract Boolean getShouldNotify(CaseData caseData);
 
     public EmailDTO buildEmailDTO(CaseData caseData) {
         Map<String, String> properties = addProperties(caseData);
