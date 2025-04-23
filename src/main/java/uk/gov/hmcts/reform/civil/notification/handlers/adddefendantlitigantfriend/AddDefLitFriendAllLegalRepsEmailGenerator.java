@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.adddefendantlitigantfrie
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllLegalRepsEmailGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 @Component
 public class AddDefLitFriendAllLegalRepsEmailGenerator extends AllLegalRepsEmailGenerator {
@@ -10,13 +9,11 @@ public class AddDefLitFriendAllLegalRepsEmailGenerator extends AllLegalRepsEmail
     public AddDefLitFriendAllLegalRepsEmailGenerator(
         AddDefLitFriendAppSolOneEmailDTOGenerator appSolOneAddDefLitFriendEmailGenerator,
         AddDefLitFriendRespSolOneEmailDTOGenerator addDefLitFriendRespSolOneEmailGenerator,
-        AddDefLitFriendRespSolTwoEmailDTOGenerator addDefLitFriendRespSolTwoEmailGenerator,
-        SimpleStateFlowEngine stateFlowEngine
+        AddDefLitFriendRespSolTwoEmailDTOGenerator addDefLitFriendRespSolTwoEmailGenerator
     ) {
         super(appSolOneAddDefLitFriendEmailGenerator,
             addDefLitFriendRespSolOneEmailGenerator,
-            addDefLitFriendRespSolTwoEmailGenerator,
-            stateFlowEngine);
+            addDefLitFriendRespSolTwoEmailGenerator);
     }
 
 }
