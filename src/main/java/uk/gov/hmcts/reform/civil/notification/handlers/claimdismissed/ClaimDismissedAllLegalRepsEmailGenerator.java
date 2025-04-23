@@ -4,33 +4,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllLegalRepsEmailGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 
 @Component
 @Slf4j
 public class ClaimDismissedAllLegalRepsEmailGenerator extends AllLegalRepsEmailGenerator {
 
-    private final SimpleStateFlowEngine stateFlowEngine;
-
     public ClaimDismissedAllLegalRepsEmailGenerator(
         ClaimDismissedAppSolOneEmailDTOGenerator claimDismissedAppSolOneEmailGenerator,
         ClaimDismissedRespSolOneEmailDTOGenerator claimDismissedRespSolOneEmailGenerator,
-        ClaimDismissedRespSolTwoEmailDTOGenerator claimDismissedRespSolTwoEmailGenerator,
-        SimpleStateFlowEngine stateFlowEngine
+        ClaimDismissedRespSolTwoEmailDTOGenerator claimDismissedRespSolTwoEmailGenerator
     ) {
         super(claimDismissedAppSolOneEmailGenerator,
             claimDismissedRespSolOneEmailGenerator,
-            claimDismissedRespSolTwoEmailGenerator,
-            stateFlowEngine);
-        this.stateFlowEngine = stateFlowEngine;
+            claimDismissedRespSolTwoEmailGenerator);
     }
 
     @Override
     protected boolean shouldNotifyRespondents(CaseData caseData) {
-        String stateName = stateFlowEngine.evaluate(caseData).getState().getName();
-        log.info("State name: {} for caseId: {}", stateName, caseData.getCcdCaseReference());
-        return CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName().equals(stateName);
+        return caseData.getClaimDismissedDate() != null;
     }
 }
