@@ -1,0 +1,21 @@
+package uk.gov.hmcts.reform.civil.notification.handlers.courtofficerorder;
+
+import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateOrderNotifyPartiesCourtOfficerOrder;
+
+public class CourtOfficerOrderNotifier extends Notifier {
+
+    public CourtOfficerOrderNotifier(NotificationService notificationService,
+                                     CaseTaskTrackingService caseTaskTrackingService,
+                                     CourtOfficerOrderAllPartiesEmailGenerator courtOfficeOrderAllPartiesEmailGenerator) {
+        super(notificationService, caseTaskTrackingService, courtOfficeOrderAllPartiesEmailGenerator);
+    }
+
+    @Override
+    protected String getTaskId() {
+        return GenerateOrderNotifyPartiesCourtOfficerOrder.toString();
+    }
+}
