@@ -157,11 +157,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             caseDataBuilder.applicant1ProceedWithClaim(YES);
         }
-        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
-            || NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec())
-            || NO.equals(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())) {
-            caseDataBuilder.applicant1ProceedWithClaim(YES);
-        }
     }
 
     private CallbackResponse validateMediationUnavailableDates(CallbackParams callbackParams) {
@@ -215,7 +210,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         setMediationConditionFlag(caseData, caseDataBuilder);
-        setApplicant1ProceedFlagToYes(caseData, caseDataBuilder);
         setApplicantDefenceResponseDocFlag(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
