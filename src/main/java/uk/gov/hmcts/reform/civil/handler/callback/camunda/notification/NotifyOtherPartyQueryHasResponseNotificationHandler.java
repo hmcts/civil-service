@@ -69,9 +69,6 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
 
     private CallbackResponse notifyOtherPartyForResponseToQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isLipCase()) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String responseQueryId = processVariables.getQueryId();
