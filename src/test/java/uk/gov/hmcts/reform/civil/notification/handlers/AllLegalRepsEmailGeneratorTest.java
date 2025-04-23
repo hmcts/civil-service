@@ -62,7 +62,6 @@ class AllLegalRepsEmailGeneratorTest {
         when(respSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
         when(respSolTwoEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolTwoEmail);
 
-
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail, respSolTwoEmail);
