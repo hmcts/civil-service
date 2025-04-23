@@ -23,7 +23,7 @@ abstract class LRvLipEmailGeneratorTest {
     private DefendantEmailDTOGenerator defendantEmailDTOGenerator;
 
     @InjectMocks
-    private LRvLipEmailGenerator lRvLipEmailGenerator;
+    private LRvLipEmailGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
@@ -38,7 +38,7 @@ abstract class LRvLipEmailGeneratorTest {
         when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
         when(defendantEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(defendantEmail);
 
-        Set<EmailDTO> partiesToNotify = lRvLipEmailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, defendantEmail);
         verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
