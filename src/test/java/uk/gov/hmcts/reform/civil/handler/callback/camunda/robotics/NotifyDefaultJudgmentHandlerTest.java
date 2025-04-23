@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -139,14 +140,14 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().respondent1Represented(YesOrNo.NO).build();
+                .toBuilder().respondent1Represented(YesOrNo.NO).caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             //When
             handler.handle(params);
 
             //Then
-            verify(roboticsNotificationService).notifyJudgementLip(caseData, BEARER_TOKEN);
+            verify(roboticsNotificationService).notifyRobotics(caseData, false, BEARER_TOKEN);
         }
     }
 
