@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.claimantLipHelpWithFees;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantliphelpwithfees;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

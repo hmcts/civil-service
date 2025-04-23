@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.claimantLipHelpWithFees;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantliphelpwithfees;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,6 @@ public class NotifyClaimantLipHelpWithFeesEmailDTOGenerator extends EmailDTOGene
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
     }
-
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
