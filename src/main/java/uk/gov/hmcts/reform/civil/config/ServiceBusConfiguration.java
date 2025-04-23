@@ -1,27 +1,14 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import com.azure.messaging.servicebus.ServiceBusClientBuilder;
+import com.azure.messaging.servicebus.ServiceBusErrorContext;
+import com.azure.messaging.servicebus.ServiceBusProcessorClient;
+import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
+import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
+import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.azure.servicebus.ExceptionPhase;
-import com.microsoft.azure.servicebus.IMessage;
-import com.microsoft.azure.servicebus.IMessageHandler;
-import com.microsoft.azure.servicebus.MessageHandlerOptions;
-import com.microsoft.azure.servicebus.ReceiveMode;
-import com.microsoft.azure.servicebus.SubscriptionClient;
-import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
-import com.microsoft.azure.servicebus.primitives.ServiceBusException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +16,9 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
-import static java.util.Optional.ofNullable;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
 
 @Configuration
 @Slf4j
@@ -54,76 +43,63 @@ public class ServiceBusConfiguration {
     @Value("${azure.service-bus.hmc-to-hearings-api.subscriptionName}")
     private String subscriptionName;
 
-    @Value("${azure.service-bus.thread-count}")
-    private int threadCount;
-
     private final ObjectMapper objectMapper;
     private final HmcMessageHandler handler;
 
+    private ServiceBusProcessorClient processorClient;
+
     @Bean
-    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
-    public SubscriptionClient receiveClient()
-        throws URISyntaxException, ServiceBusException, InterruptedException {
+    @ConditionalOnProperty(value = "azure.service-bus.hmc-to-hearings-api.enabled", havingValue = "true")
+    public ServiceBusProcessorClient serviceBusProcessorClient() throws URISyntaxException {
         URI endpoint = new URI("sb://" + namespace + connectionPostfix);
 
-        String destination = topicName.concat("/subscriptions/").concat(subscriptionName);
-        ConnectionStringBuilder connectionStringBuilder =
-            new ConnectionStringBuilder(endpoint, destination, username, password);
+        String connectionString = "Endpoint=" + endpoint + "/"
+            + ";SharedAccessKeyName=" + username
+            + ";SharedAccessKey=" + password;
 
-        connectionStringBuilder.setOperationTimeout(Duration.ofMinutes(10));
+        processorClient = new ServiceBusClientBuilder()
+            .connectionString(connectionString)
+            .processor()
+            .topicName(topicName)
+            .subscriptionName(subscriptionName)
+            .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+            .processMessage(this::processMessage)
+            .processError(this::processError)
+            .buildProcessorClient();
 
-        return new SubscriptionClient(connectionStringBuilder, ReceiveMode.PEEKLOCK);
+        processorClient.start();
+        log.info("HMC ServiceBusProcessorClient started successfully.");
+
+        return processorClient;
     }
 
-    @Bean
-    @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
-    CompletableFuture<Void> registerMessageHandlerOnClient(
-        @Autowired SubscriptionClient receiveClient)
-        throws ServiceBusException, InterruptedException {
-        IMessageHandler messageHandler =
-            new IMessageHandler() {
+    private void processMessage(ServiceBusReceivedMessageContext context) {
+        try {
+            log.info("HMC Message Received");
+            ServiceBusReceivedMessage message = context.getMessage();
 
-                @SneakyThrows
-                @Override
-                public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                    log.info("HMC Message Received");
-                    List<byte[]> body = message.getMessageBody().getBinaryData();
+            byte[] bodyBytes = message.getBody().toBytes();
+            HmcMessage hmcMessage = objectMapper.readValue(bodyBytes, HmcMessage.class);
 
-                    HmcMessage hmcMessage = objectMapper.readValue(body.get(0), HmcMessage.class);
-                    log.info(
-                        "HMC Message for case {}, hearing id {} with status {}",
-                        hmcMessage.getCaseId(),
-                        hmcMessage.getHearingId(),
-                        ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
-                            .orElse("-")
-                    );
+            log.info(
+                "HMC Message for case {}, hearing id {} with status {}",
+                hmcMessage.getCaseId(),
+                hmcMessage.getHearingId(),
+                Optional.ofNullable(hmcMessage.getHearingUpdate())
+                    .map(update -> update.getHmcStatus().name())
+                    .orElse("-")
+            );
 
-                    try {
-                        handler.handleMessage(hmcMessage);
-                        return receiveClient.completeAsync(message.getLockToken());
-                    } catch (Exception e) {
-                        log.error("These was a problem processing the message: {}", e.getMessage());
-                        return receiveClient.abandonAsync(message.getLockToken());
-                    }
-                }
+            handler.handleMessage(hmcMessage);
+            context.complete();
+        } catch (Exception e) {
+            log.error("There was a problem processing the message: {}", e.getMessage(), e);
+            context.abandon();
+        }
+    }
 
-                @Override
-                public void notifyException(
-                    Throwable throwable, ExceptionPhase exceptionPhase) {
-                    log.error("Exception occurred.");
-                    log.error(exceptionPhase + "-" + throwable.getMessage());
-                }
-            };
-
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-        receiveClient.registerMessageHandler(
-            messageHandler,
-            new MessageHandlerOptions(
-                4, false,
-                Duration.ofHours(1), Duration.ofMinutes(5)
-            ),
-            executorService
-        );
-        return null;
+    private void processError(ServiceBusErrorContext context) {
+        log.error("Exception occurred while processing message");
+        log.error("{} - {}", context.getErrorSource(), context.getException().getMessage(), context.getException());
     }
 }
