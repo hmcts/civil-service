@@ -1,8 +1,10 @@
-package uk.gov.hmcts.reform.civil.notification.handlers;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantdefendantagreedmediation;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
@@ -62,23 +64,6 @@ public class ClaimantDefendantAgreedMediationNotifier extends Notifier {
         partiesToEmail.add(getApplicant(caseData));
         partiesToEmail.addAll(getRespondents(caseData));
         return partiesToEmail;
-    }
-
-    private EmailDTO getApplicant(CaseData caseData) {
-        String template =  featureToggleService.isCarmEnabledForCase(caseData)
-            ? notificationsProperties.getNotifyApplicantLRMediationTemplate()
-            : notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate();
-
-        Map<String, String> properties = addProperties(caseData);
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
-        properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-
-        return EmailDTO.builder()
-            .targetEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
-            .emailTemplate(template)
-            .parameters(properties)
-            .reference(String.format(REFERENCE_TEMPLATE_APPLICANT, caseData.getLegacyCaseReference()))
-            .build();
     }
 
     private Set<EmailDTO> getRespondents(CaseData caseData) {

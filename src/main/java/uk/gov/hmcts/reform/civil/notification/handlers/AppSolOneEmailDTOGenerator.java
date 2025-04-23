@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLega
 @AllArgsConstructor
 public abstract class AppSolOneEmailDTOGenerator extends EmailDTOGenerator {
 
-    private final OrganisationService organisationService;
+    protected final OrganisationService organisationService;
 
     @Override
     public String getEmailAddress(CaseData caseData) {
