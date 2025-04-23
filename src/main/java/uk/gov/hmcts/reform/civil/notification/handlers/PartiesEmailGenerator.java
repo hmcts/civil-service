@@ -7,4 +7,5 @@ import java.util.Set;
 public interface PartiesEmailGenerator {
 
     Set<EmailDTO> getPartiesToNotify(CaseData caseData);
+
 }

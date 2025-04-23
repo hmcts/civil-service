@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 
 @Nested
-class ClaimDismissedAllLegalRepsEmailGeneratorTest {
+class ClaimDismissedAllPartiesEmailGeneratorTest {
 
     @Mock
     private ClaimDismissedAppSolOneEmailDTOGenerator appSolOneEmailGenerator;
@@ -32,7 +32,7 @@ class ClaimDismissedAllLegalRepsEmailGeneratorTest {
     private SimpleStateFlowEngine stateFlowEngine;
 
     @InjectMocks
-    private ClaimDismissedAllLegalRepsEmailGenerator emailGenerator;
+    private ClaimDismissedAllPartiesEmailGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {

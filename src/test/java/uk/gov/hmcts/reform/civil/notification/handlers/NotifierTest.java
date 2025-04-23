@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllLegalRepsEmailGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedAllPartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
@@ -35,7 +35,7 @@ class NotifierTest {
 
     private CaseTaskTrackingService caseTaskTrackingService;
 
-    private AllLegalRepsEmailGenerator emailGenerator;
+    private AllPartiesEmailGenerator emailGenerator;
 
     private TestNotifier notifier;
     EmailDTO party1;
@@ -47,7 +47,7 @@ class NotifierTest {
     private class TestNotifier extends Notifier {
         public TestNotifier(NotificationService notificationService,
                             CaseTaskTrackingService caseTaskTrackingService,
-                            AllLegalRepsEmailGenerator emailGenerator) {
+                            AllPartiesEmailGenerator emailGenerator) {
             super(notificationService, caseTaskTrackingService, emailGenerator);
         }
 
@@ -61,7 +61,7 @@ class NotifierTest {
     void setUp() {
         notificationService = mock(NotificationService.class);
         caseTaskTrackingService = mock(CaseTaskTrackingService.class);
-        emailGenerator = mock(ClaimDismissedAllLegalRepsEmailGenerator.class);
+        emailGenerator = mock(ClaimDismissedAllPartiesEmailGenerator.class);
 
         notifier = new TestNotifier(notificationService, caseTaskTrackingService, emailGenerator);
         caseData = mock(CaseData.class);

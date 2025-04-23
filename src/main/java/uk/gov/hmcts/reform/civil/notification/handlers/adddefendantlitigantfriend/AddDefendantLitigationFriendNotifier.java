@@ -13,8 +13,8 @@ public class AddDefendantLitigationFriendNotifier
 
     public AddDefendantLitigationFriendNotifier(NotificationService notificationService,
                                                 CaseTaskTrackingService caseTaskTrackingService,
-                                                AddDefLitFriendAllLegalRepsEmailGenerator allLegalRepsEmailGenerator) {
-        super(notificationService, caseTaskTrackingService, allLegalRepsEmailGenerator);
+                                                AddDefLitFriendAllPartiesEmailGenerator allPartiesEmailGenerator) {
+        super(notificationService, caseTaskTrackingService, allPartiesEmailGenerator);
     }
 
     @Override

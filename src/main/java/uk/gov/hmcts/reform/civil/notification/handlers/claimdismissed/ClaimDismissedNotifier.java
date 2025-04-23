@@ -13,7 +13,7 @@ public class ClaimDismissedNotifier
 
     public ClaimDismissedNotifier(NotificationService notificationService,
                                   CaseTaskTrackingService caseTaskTrackingService,
-                                  ClaimDismissedAllLegalRepsEmailGenerator allLegalRepsEmailGenerator) {
+                                  ClaimDismissedAllPartiesEmailGenerator allLegalRepsEmailGenerator) {
         super(notificationService, caseTaskTrackingService, allLegalRepsEmailGenerator);
     }
 

@@ -15,7 +15,7 @@ public abstract class NotifierTestBase {
     protected CaseTaskTrackingService caseTaskTrackingService;
 
     @Mock
-    protected AllLegalRepsEmailGenerator emailGenerator;
+    protected AllPartiesEmailGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
