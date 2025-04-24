@@ -106,12 +106,12 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             "NO, YES",
             "NO, NO"
         })
-        void shouldNotNotifyOtherParty_AndCaseHasLip(String AppRepresented, String ResRepresented) {
+        void shouldNotNotifyOtherParty_AndCaseHasLip(String appRepresented, String resRepresented) {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
-                .applicant1Represented(YesOrNo.valueOf(AppRepresented))
-                .specRespondent1Represented(YesOrNo.valueOf(ResRepresented))
-                .respondent1Represented(YesOrNo.valueOf(ResRepresented))
+                .applicant1Represented(YesOrNo.valueOf(appRepresented))
+                .specRespondent1Represented(YesOrNo.valueOf(resRepresented))
+                .respondent1Represented(YesOrNo.valueOf(resRepresented))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             handler.handle(params);
