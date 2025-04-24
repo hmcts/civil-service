@@ -21,7 +21,7 @@ public abstract class DefendantEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
+        properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
         properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
         return properties;
     }
