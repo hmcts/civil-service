@@ -523,7 +523,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-            .filter(Language.BOTH.toString()::equals)
+            .filter(language -> language.equals(Language.BOTH.toString())
+                || language.equals(Language.WELSH.toString()))
             .isPresent();
     }
 
