@@ -44,8 +44,9 @@ public abstract class ElasticSearchService {
      * For carm applicable cases, the returned query is sorted by ascending value of case reference. Since the
      * queries are paginated, the value of the last case is used for the search_after property in the query to
      * ensure that cases are returned in the right order of pages to prevent duplication.
+     *
      * @param claimMovedDate claimMovedDate
-     * @param carmEnabled carmEnabled
+     * @param carmEnabled    carmEnabled
      * @return caseDetails
      */
     public List<CaseDetails> getInMediationCases(LocalDate claimMovedDate, boolean carmEnabled) {
@@ -54,32 +55,49 @@ public abstract class ElasticSearchService {
             claimMovedDate = LocalDate.now().minusDays(7);
         }
         if (carmEnabled) {
-            SearchResult searchResult = coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDate,
-                                                                                                       carmEnabled, true, null));
+            SearchResult searchResult =
+                coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDate,
+                                                                               carmEnabled, true,
+                                                                               null
+                ));
             log.info("mediation total found: {}", searchResult.getTotal());
             int pages = calculatePages(searchResult);
             List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
-            logMediationCaseIds(caseDetails, null);
-            // find the last case from that list
-            String searchAfterValue = searchResult.getCases().get(searchResult.getCases().size() - 1).getId().toString();
-            for (int i = 1; i < pages; i++) {
-                // use the query again passing in the search after value
-                SearchResult result = coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDate,
-                                                                                            carmEnabled, false, searchAfterValue));
-                logMediationCaseIds(caseDetails, String.valueOf(i));
-                caseDetails.addAll(result.getCases());
-                // update the value from the new result
-                searchAfterValue = result.getCases().get(result.getCases().size() - 1).getId().toString();
+            if (caseDetails != null && !caseDetails.isEmpty()) {
+                logMediationCaseIds(caseDetails, null);
+                // find the last case from that list
+                String searchAfterValue = searchResult.getCases().get(searchResult.getCases().size() - 1).getId().toString();
+                for (int i = 1; i < pages; i++) {
+                    // use the query again passing in the search after value
+                    SearchResult result = coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX,
+                                                                                                         claimMovedDate,
+                                                                                                         carmEnabled,
+                                                                                                         false,
+                                                                                                         searchAfterValue
+                    ));
+                    logMediationCaseIds(caseDetails, String.valueOf(i));
+                    caseDetails.addAll(result.getCases());
+                    // update the value from the new result
+                    searchAfterValue = result.getCases().get(result.getCases().size() - 1).getId().toString();
+                }
             }
             return caseDetails;
         } else {
-            SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX, claimMovedDate,
-                                                                                              carmEnabled, false, null));
+            SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX,
+                                                                                              claimMovedDate,
+                                                                                              carmEnabled,
+                                                                                              false,
+                                                                                              null
+            ));
             int pages = calculatePages(searchResult);
             List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
             for (int i = 1; i < pages; i++) {
-                SearchResult result = coreCaseDataService.searchCases(queryInMediationCases(i * ES_DEFAULT_SEARCH_LIMIT, claimMovedDate,
-                                                                                            carmEnabled, false, null));
+                SearchResult result = coreCaseDataService.searchCases(queryInMediationCases(i * ES_DEFAULT_SEARCH_LIMIT,
+                                                                                            claimMovedDate,
+                                                                                            carmEnabled,
+                                                                                            false,
+                                                                                            null
+                ));
                 caseDetails.addAll(result.getCases());
             }
 
