@@ -43,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_PARTY_QUERY_HAS_RESPONSE;
@@ -98,6 +99,25 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
     @Nested
     class AboutToSubmitCallback {
+
+        @ParameterizedTest
+        @CsvSource({
+            "YES, NO",
+            "NO, YES",
+            "NO, NO"
+        })
+        void shouldNotNotifyOtherParty_AndCaseHasLip(String AppRepresented, String ResRepresented) {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                .toBuilder()
+                .applicant1Represented(YesOrNo.valueOf(AppRepresented))
+                .specRespondent1Represented(YesOrNo.valueOf(ResRepresented))
+                .respondent1Represented(YesOrNo.valueOf(ResRepresented))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
 
         @ParameterizedTest
         @CsvSource({
