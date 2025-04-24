@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -69,7 +70,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
-import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -94,6 +94,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final FrcDocumentsUtils frcDocumentsUtils;
     @Value("${court-location.unspecified-claim.epimms-id}") String ccmccEpimsId;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -311,7 +312,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             ));
         }
 
-        updateRequestCourtClaimTabApplicant(builder);
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

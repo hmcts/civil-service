@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.math.BigDecimal;
@@ -35,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
-import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Slf4j
@@ -53,6 +53,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -90,8 +91,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
             caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
-        updateRequestCourtClaimTabRespondent1(builder);
-
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, builder);
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));

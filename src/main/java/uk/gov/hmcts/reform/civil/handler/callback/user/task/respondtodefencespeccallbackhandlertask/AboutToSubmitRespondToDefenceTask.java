@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -54,7 +55,6 @@ import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedTo
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
-import static uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Component
@@ -74,6 +74,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
     @Value("${court-location.specified-claim.region-id}") String cnbcRegionId;
 
@@ -119,7 +120,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             ));
         }
 
-        updateRequestCourtClaimTabApplicantSpec(builder);
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
 
         builder.previousCCDState(caseData.getCcdState());
 

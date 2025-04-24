@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 public class RequestedCourtForTabDetails {
 
     private String requestedCourt;
+    private String requestedCourtName;
     private String reasonForHearingAtSpecificCourt;
     private YesOrNo requestHearingHeldRemotely;
     private String requestHearingHeldRemotelyReason;
