@@ -22,12 +22,11 @@ public class AllPartiesEmailGenerator implements PartiesEmailGenerator {
     public Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         addIfPartyNeedsNotification(caseData, appSolOneEmailGenerator, partiesToEmail);
+        addIfPartyNeedsNotification(caseData, claimantEmailDTOGenerator, partiesToEmail);
         if (shouldNotifyRespondents(caseData)) {
-            log.info("Generating email for respondent LR for case ID: {}", caseData.getCcdCaseReference());
+            log.info("Generating email for respondents for case ID: {}", caseData.getCcdCaseReference());
             partiesToEmail.addAll(getRespondents(caseData));
         }
-        addIfPartyNeedsNotification(caseData, claimantEmailDTOGenerator, partiesToEmail);
-        addIfPartyNeedsNotification(caseData, defendantEmailDTOGenerator, partiesToEmail);
         return partiesToEmail;
     }
 
@@ -35,13 +34,14 @@ public class AllPartiesEmailGenerator implements PartiesEmailGenerator {
         Set<EmailDTO> recipients = new HashSet<>();
         addIfPartyNeedsNotification(caseData, respSolOneEmailGenerator, recipients);
         addIfPartyNeedsNotification(caseData, respSolTwoEmailGenerator, recipients);
+        addIfPartyNeedsNotification(caseData, defendantEmailDTOGenerator, recipients);
         return recipients;
     }
 
     private void addIfPartyNeedsNotification(CaseData caseData,
                                              EmailDTOGenerator generator,
                                              Set<EmailDTO> partiesToEmail) {
-        if ((generator != null) && generator.getShouldNotify()) {
+        if ((generator != null) && generator.getShouldNotify(caseData)) {
             log.info("Generating email for party [{}] for case ID: {}", generator.getClass().getSimpleName(), caseData.getCcdCaseReference());
             partiesToEmail.add(generator.buildEmailDTO(caseData));
         }
