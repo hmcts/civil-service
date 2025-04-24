@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 @Component
 public class COOResp1EmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private static final String COURT_OFFICE_ORDER_REFERENCE_TEMPLATE = "generate-order-notification-%s";
+    protected static final String COO_RESP_SOL_ONE_REFERENCE_TEMPLATE = "generate-order-notification-%s";
 
     NotificationsProperties notificationsProperties;
 
@@ -21,11 +21,11 @@ public class COOResp1EmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyLipUpdateTemplate();
+        return notificationsProperties.getGenerateOrderNotificationTemplate();
     }
 
     @Override
     protected String getReferenceTemplate() {
-        return COURT_OFFICE_ORDER_REFERENCE_TEMPLATE;
+        return COO_RESP_SOL_ONE_REFERENCE_TEMPLATE;
     }
 }

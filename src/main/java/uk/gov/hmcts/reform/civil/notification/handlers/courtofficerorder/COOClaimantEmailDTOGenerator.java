@@ -12,22 +12,18 @@ public class COOClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     NotificationsProperties notificationsProperties;
 
-    private static final String COURT_OFFICE_ORDER_REFERENCE_TEMPLATE = "generate-order-notification-%s";
+    protected static final String COO_CLAIMANT_REFERENCE_TEMPLATE = "generate-order-notification-%s";
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        if (caseData.isApplicantLiP()) {
-            if (caseData.isClaimantBilingual()) {
-                return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
-            }
-            return notificationsProperties.getNotifyLipUpdateTemplate();
-        } else {
-            return notificationsProperties.getGenerateOrderNotificationTemplate();
+        if (caseData.isClaimantBilingual()) {
+            return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
         }
+        return notificationsProperties.getNotifyLipUpdateTemplate();
     }
 
     @Override
     protected String getReferenceTemplate() {
-        return COURT_OFFICE_ORDER_REFERENCE_TEMPLATE;
+        return COO_CLAIMANT_REFERENCE_TEMPLATE;
     }
 }
