@@ -482,7 +482,7 @@ notifications:
   notifyOtherPartyQueryRaised: "a911957b-fca1-402b-acc5-6502e6de93a6"
   notifyOtherPartyQueryResponseReceived: "a27a4110-9de9-4147-8c89-85c2af2a8d30"
   queryLipResponseReceivedEnglish: "b097eb54-3e00-4272-9b77-426b23a71ce1"
-  queryLipResponseReceivedWelsh: "1ff72f3-db0e-44c9-83e9-5c6a43681d69"
+  queryLipResponseReceivedWelsh: "d1ff72f3-db0e-44c9-83e9-5c6a43681d69"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
