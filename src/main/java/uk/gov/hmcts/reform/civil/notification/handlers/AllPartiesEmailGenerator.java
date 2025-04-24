@@ -42,7 +42,8 @@ public class AllPartiesEmailGenerator implements PartiesEmailGenerator {
                                              EmailDTOGenerator generator,
                                              Set<EmailDTO> partiesToEmail) {
         if ((generator != null) && generator.getShouldNotify(caseData)) {
-            log.info("Generating email for party [{}] for case ID: {}", generator.getClass().getSimpleName(), caseData.getCcdCaseReference());
+            log.info("Generating email for party [{}] for case ID: {}",
+                     generator.getClass().getSimpleName(), caseData.getCcdCaseReference());
             partiesToEmail.add(generator.buildEmailDTO(caseData));
         }
     }

@@ -6,6 +6,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 
 class RespSolTwoEmailGeneratorTest {
@@ -61,5 +63,23 @@ class RespSolTwoEmailGeneratorTest {
 
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, RESPONDENT_LEGAL_ORG_NAME);
         notificationUtilsMockedStatic.close();
+    }
+
+    @Test
+    void shouldReturnNotifyAsFalse_WhenTwoLRsAreInvolved() {
+        CaseData caseData = CaseData.builder()
+            .build();
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldReturnNotifyAsTrue_WhenTwoLRsAreNotInvolved() {
+        CaseData caseData = CaseData.builder()
+            .respondent2(Party.builder().build())
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        assertThat(shouldNotify).isTrue();
     }
 }
