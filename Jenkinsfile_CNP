@@ -85,7 +85,7 @@ def getCivilCcdDefinitionBranch() {
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
     return label.minus("civilDefinitionBranch:").trim()
   }
-  return "master"
+  return "DTSCCI-650-cml-location-update"
 }
 
 withPipeline(type, product, component) {
