@@ -93,7 +93,8 @@ public class RequestedCourtForClaimDetailsTab {
         if (!foundLocations.isEmpty()) {
             courtLocationDetails = foundLocations.get(0);
         } else {
-            throw new IllegalArgumentException("Requested Court Location not found, in location data");
+            log.info("Requested Court Location not found, in location data");
+            return null;
         }
         return courtLocationDetails.getSiteName();
     }
