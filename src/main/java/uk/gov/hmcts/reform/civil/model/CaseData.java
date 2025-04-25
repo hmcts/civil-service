@@ -833,7 +833,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean hasApplicantProceededWithClaim() {
         return YES == getApplicant1ProceedWithClaim()
-            || YES == getApplicant1ProceedWithClaimSpec2v1();
+            || YES == getApplicant1ProceedWithClaimSpec2v1()
+            || NO.equals(getApplicant1AcceptAdmitAmountPaidSpec())
+            || NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec())
+            || NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
     }
 
     @JsonIgnore
