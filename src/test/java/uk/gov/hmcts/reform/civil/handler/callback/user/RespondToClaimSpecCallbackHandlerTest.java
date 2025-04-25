@@ -95,6 +95,7 @@ import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -159,7 +160,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     AssignCategoryId.class,
-    FrcDocumentsUtils.class
+    FrcDocumentsUtils.class,
+    RequestedCourtForClaimDetailsTab.class
 })
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
