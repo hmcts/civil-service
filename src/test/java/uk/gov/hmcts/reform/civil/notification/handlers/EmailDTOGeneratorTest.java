@@ -36,7 +36,9 @@ class EmailDTOGeneratorTest {
         emailDTOGenerator = new EmailDTOGenerator() {
 
             @Override
-            protected Boolean getShouldNotify(CaseData caseData) { return Boolean.TRUE; }
+            protected Boolean getShouldNotify(CaseData caseData) {
+                return Boolean.TRUE;
+            }
 
             @Override
             protected String getEmailAddress(CaseData caseData) {
