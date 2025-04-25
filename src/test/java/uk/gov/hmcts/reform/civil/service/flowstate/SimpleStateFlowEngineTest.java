@@ -3887,7 +3887,7 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(10).contains(
+                assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
@@ -4057,7 +4057,7 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(10).contains(
+                assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
@@ -4352,7 +4352,7 @@ class SimpleStateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CONTACT_DETAILS_CHANGE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(10).contains(
+            assertThat(stateFlow.getFlags()).hasSize(12).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
@@ -4538,7 +4538,7 @@ class SimpleStateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), IN_HEARING_READINESS.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(9).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
