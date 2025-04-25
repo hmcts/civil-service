@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
