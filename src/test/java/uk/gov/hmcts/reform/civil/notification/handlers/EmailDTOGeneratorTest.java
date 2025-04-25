@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import org.apache.ibatis.annotations.Case;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -75,9 +74,9 @@ class EmailDTOGeneratorTest {
         assertThat(emailDTO.getEmailTemplate()).isEqualTo(TEST_TEMPLATE_ID);
         assertThat(emailDTO.getReference()).isEqualTo(String.format(TEST_REFERENCE_TEMPLATE, LEGACY_CASE_REFERENCE));
         assertThat(emailDTO.getParameters())
-            .containsEntry(CLAIM_REFERENCE_NUMBER, "1234567890123456")
-            .containsEntry(CASEMAN_REF, LEGACY_CASE_REFERENCE)
-            .containsEntry(CUSTOM_KEY, CUSTOM_VALUE)
-            .containsEntry(PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided");
+                .containsEntry(CLAIM_REFERENCE_NUMBER, "1234567890123456")
+                .containsEntry(CASEMAN_REF, LEGACY_CASE_REFERENCE)
+                .containsEntry(CUSTOM_KEY, CUSTOM_VALUE)
+                .containsEntry(PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided");
     }
 }
