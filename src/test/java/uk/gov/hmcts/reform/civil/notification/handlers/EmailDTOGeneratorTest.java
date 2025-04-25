@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import org.apache.ibatis.annotations.Case;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
