@@ -61,7 +61,8 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
             RESPONDENT_NAME, "Resp1 name",
             RESPONSE_DEADLINE, "2029-01-01"
         );
-        when(acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData)).thenReturn(addedProperties);
+        when(acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData))
+            .thenReturn(new HashMap<>(addedProperties));
         properties = emailGenerator.addCustomProperties(properties, caseData);
         assertThat(properties)
             .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "TestOrg")

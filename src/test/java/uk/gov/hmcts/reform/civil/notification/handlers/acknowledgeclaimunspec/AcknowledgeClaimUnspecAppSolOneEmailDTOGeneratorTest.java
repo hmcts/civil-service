@@ -68,7 +68,8 @@ class AcknowledgeClaimUnspecAppSolOneEmailDTOGeneratorTest {
             RESPONDENT_NAME, "Resp1 name",
             RESPONSE_DEADLINE, "2029-01-01"
         );
-        when(acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData)).thenReturn(addedProperties);
+        when(acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData))
+            .thenReturn(new HashMap<>(addedProperties));
         try (MockedStatic<NotificationUtils> notificationUtilsMock = mockStatic(NotificationUtils.class);
              MockedStatic<PartyUtils> partyUtilsMock = mockStatic(PartyUtils.class)) {
 
