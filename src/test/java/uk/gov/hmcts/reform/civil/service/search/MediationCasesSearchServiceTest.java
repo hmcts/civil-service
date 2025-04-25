@@ -40,7 +40,7 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
                 .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                 .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
                 .must(rangeQuery("data.claimMovedToMediationOn").gte(targetDateString))
-                .mustNot(matchQuery("data.mediationJsonEmailSent", "Yes"));
+                .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
             return new Query(query, Collections.emptyList(), fromValue, initialSearch, searchAfterValue);
         } else {
             BoolQueryBuilder query = boolQuery()
@@ -49,7 +49,7 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
                             .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                             .must(boolQuery().must(rangeQuery("data.submittedDate").lt(CARM_DATE)))
                             .must(rangeQuery("data.claimMovedToMediationOn").gte(targetDateString)))
-                .mustNot(matchQuery("data.mediationJsonEmailSent", "Yes"));
+                .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
 
             return new Query(query, Collections.emptyList(), fromValue);
         }

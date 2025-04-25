@@ -60,7 +60,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
                     .must(beState(IN_MEDIATION))
                     .must(submittedDate(carmEnabled))
                     .must(rangeQuery("data.claimMovedToMediationOn").gte(targetDateString))
-                    .mustNot(matchQuery("data.mediationJsonEmailSent", "Yes")),
+                    .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
                 emptyList(),
                 startIndex,
                 initialSearch,
@@ -74,7 +74,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
                             .must(beState(IN_MEDIATION))
                             .must(submittedDate(carmEnabled))
                             .must(rangeQuery("data.claimMovedToMediationOn").gte(targetDateString)))
-                .mustNot(matchQuery("data.mediationJsonEmailSent", "Yes")),
+                .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
             emptyList(),
             startIndex
         );
