@@ -25,4 +25,8 @@ public abstract class RespSolOneEmailDTOGenerator extends EmailDTOGenerator {
             isRespondent1, organisationService));
         return properties;
     }
+
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return caseData.isRespondent1LiP() ? Boolean.FALSE : Boolean.TRUE;
+    }
 }

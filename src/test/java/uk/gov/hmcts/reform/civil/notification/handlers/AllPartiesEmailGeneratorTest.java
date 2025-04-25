@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -14,21 +15,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 
-class RespSolTwoEmailGeneratorTest {
+class AppSolOneEmailGeneratorTest {
 
-    protected static final String RESPONDENT_LEGAL_ORG_NAME = "respondent-legal-org-name";
+    protected static final String APPLICANT_LEGAL_ORG_NAME = "applicant-legal-org-name";
 
     private OrganisationService organisationService;
-    private RespSolTwoEmailDTOGenerator emailGenerator;
+    private AppSolOneEmailDTOGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         organisationService = Mockito.mock(OrganisationService.class);
-        emailGenerator = new RespSolTwoEmailDTOGenerator(organisationService) {
+        emailGenerator = new AppSolOneEmailDTOGenerator(organisationService) {
             @Override
             public String getEmailTemplateId(CaseData caseData) {
                 return "template-id";
@@ -44,7 +44,8 @@ class RespSolTwoEmailGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         CaseData caseData = CaseData.builder()
-            .respondentSolicitor2EmailAddress("test@example.com").build();
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@example.com").build())
+            .build();
 
         String emailAddress = emailGenerator.getEmailAddress(caseData);
 
@@ -55,31 +56,31 @@ class RespSolTwoEmailGeneratorTest {
     void shouldAddCustomProperties() {
         CaseData caseData = CaseData.builder().build();
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.FALSE, organisationService))
-            .thenReturn(RESPONDENT_LEGAL_ORG_NAME);
+        notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+            .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
         Map<String, String> properties = new HashMap<>();
         Map<String, String> updatedProperties = emailGenerator.addCustomProperties(properties, caseData);
 
-        assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, RESPONDENT_LEGAL_ORG_NAME);
+        assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, APPLICANT_LEGAL_ORG_NAME);
         notificationUtilsMockedStatic.close();
     }
 
     @Test
-    void shouldReturnNotifyAsFalse_WhenTwoLRsAreInvolved() {
+    void shouldReturnNotifyAsTrue_WhenApplicantRepresented() {
         CaseData caseData = CaseData.builder()
-            .build();
-        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
-        assertThat(shouldNotify).isFalse();
-    }
-
-    @Test
-    void shouldReturnNotifyAsTrue_WhenTwoLRsAreNotInvolved() {
-        CaseData caseData = CaseData.builder()
-            .respondent2(Party.builder().build())
-            .respondent2SameLegalRepresentative(NO)
+            .applicant1Represented(YesOrNo.YES)
             .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
         assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnNotifyAsFalse_WhenApplicantIsLip() {
+        CaseData caseData = CaseData.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        assertThat(shouldNotify).isFalse();
     }
 }
