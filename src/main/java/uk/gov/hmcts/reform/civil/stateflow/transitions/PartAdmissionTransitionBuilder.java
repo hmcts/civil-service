@@ -54,6 +54,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
                                                             .and(not(acceptRepaymentPlan))
                                                             .and(not(rejectRepaymentPlan)), transitions)
             .moveTo(IN_MEDIATION, transitions).onlyWhen(isClaimantNotSettlePartAdmitClaim
+                                                            .and(agreedToMediation.negate())
                                                             .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
                                                             .and(not(takenOfflineByStaff)), transitions)
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
