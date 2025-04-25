@@ -57,6 +57,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEND_APP_TO_OTHER_PARTY;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateFromGACaseEventTaskHandlerTest {
@@ -251,14 +252,26 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         false,
                         false,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isFalse();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isFalse();
+    }
+
+    @Test
+    void testCanViewWithoutNoticeGaGivenDocTypeForGARespondent() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                        false,
+                                        false,
+                                        true, true,
+                                        Map.of("1234", "Order Made")
+            );
+        CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "generalOrder", "1")).isTrue();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "generalOrder")).isTrue();
     }
 
     @Test
@@ -268,14 +281,12 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         false,
                         true,
                         false, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                         Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isTrue();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isFalse();
     }
 
     @Test
@@ -285,14 +296,12 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         true,
                         false,
                         false, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isFalse();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isFalse();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isFalse();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isTrue();
     }
 
     @Test
@@ -302,14 +311,12 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         true,
                         true,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         CaseData generalAppCaseData = CaseData.builder().ccdCaseReference(1234L).build();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "2")).isTrue();
-        assertThat(handler.canViewResp(caseData, generalAppCaseData, "1")).isTrue();
-        assertThat(handler.canViewClaimant(caseData, generalAppCaseData)).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
+        assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "1")).isTrue();
+        assertThat(handler.canViewClaimant(caseData, generalAppCaseData, "")).isTrue();
     }
 
     @Test
@@ -331,6 +338,56 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             List<Element<CaseDocument>> toUpdatedDocs =
                     (List<Element<CaseDocument>>)output.get("directionOrderDocStaff");
             assertThat(toUpdatedDocs).isNotNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateDocCollectionForRespondentIfMakeWithNoticeDoc() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder()
+            .parentClaimantIsApplicant(YesOrNo.YES)
+            .requestForInformationDocument(singletonList(Element.<CaseDocument>builder()
+                                                      .id(UUID.fromString(uid))
+                                                      .value(makeWithNoticeDocument).build())).build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, "requestForInformationDocument",
+                                        caseData, "requestForInfoDocRespondentSol");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                (List<Element<CaseDocument>>)output.get("requestForInfoDocRespondentSol");
+            assertThat(toUpdatedDocs).isNull();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldNotUpdateDocCollectionForClaimantIfMakeWithNoticeDoc() {
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        gaCaseData = gaCaseData.toBuilder()
+            .parentClaimantIsApplicant(YesOrNo.NO)
+            .requestForInformationDocument(singletonList(Element.<CaseDocument>builder()
+                                                             .id(UUID.fromString(uid))
+                                                             .value(makeWithNoticeDocument).build())).build();
+        Map<String, Object> output = new HashMap<>();
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        try {
+            handler.updateDocCollection(output, gaCaseData, "requestForInformationDocument",
+                                        caseData, "requestForInfoDocClaimant");
+            List<Element<CaseDocument>> toUpdatedDocs =
+                (List<Element<CaseDocument>>)output.get("requestForInfoDocClaimant");
+            assertThat(toUpdatedDocs).isNull();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -441,9 +498,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         false,
                         false,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         String uid = "f000aa01-0451-4000-b000-000000000000";
         CaseData generalAppCaseData = CaseData.builder()
@@ -458,8 +513,8 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         }
         assertThat(output.get("directionOrderDocStaff")).isNotNull();
         assertThat(output.get("directionOrderDocRespondentSolTwo")).isNotNull();
-        assertThat(output.get("directionOrderDocClaimant")).isNull();
-        assertThat(output.get("directionOrderDocRespondentSol")).isNull();
+        assertThat(output.get("directionOrderDocClaimant")).isNotNull();
+        assertThat(output.get("directionOrderDocRespondentSol")).isNotNull();
     }
 
     @Test
@@ -469,9 +524,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                         true,
                         true,
                         true, true,
-                        new HashMap<>() {{
-                            put("1234", "Order Made");
-                        }}
+                                            Map.of("1234", "Order Made")
                 );
         String uid = "f000aa01-0451-4000-b000-000000000000";
         CaseData generalAppCaseData = CaseData.builder()
@@ -1431,6 +1484,19 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         .documentName("documentName")
         .documentSize(0L)
         .documentType(GENERAL_ORDER)
+        .createdDatetime(now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
+
+    public final CaseDocument makeWithNoticeDocument = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("documentName")
+        .documentSize(0L)
+        .documentType(SEND_APP_TO_OTHER_PARTY)
         .createdDatetime(now())
         .documentLink(Document.builder()
                           .documentUrl("fake-url")
