@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateOrderNotifyParties;
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateOrderNotifyPartiesCourtOfficerOrder;
 
 @Component
 public class GeneratorOrderNotifier extends Notifier {
