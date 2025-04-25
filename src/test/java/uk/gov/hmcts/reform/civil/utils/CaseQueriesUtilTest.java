@@ -13,9 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -167,48 +165,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
-    }
-
-    @Test
-    void shouldAssignCategoryIDToAttachments_whenClaimantUploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(LocalDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()
-            ))
-            .build();
-
-        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
-                                                      List.of(CaseRole.CLAIMANT.toString())
-        );
-
-        List<Document> documents = unwrapElements(caseMessage.getAttachments());
-
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
-    }
-
-    @Test
-    void shouldAssignCategoryIDToAttachments_whenRespondent1UploadsAttachment() {
-        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
-            .toBuilder()
-            .createdOn(LocalDateTime.now())
-            .attachments(wrapElements(
-                Document.builder().documentFileName("a").build(),
-                Document.builder().documentFileName("b").build()))
-            .build();
-
-        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
-                                                      List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-
-        List<Document> documents = unwrapElements(caseMessage.getAttachments());
-
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -228,8 +186,48 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenClaimantUploadsAttachment() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(LocalDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()
+            ))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                      List.of(CaseRole.CLAIMANT.toString())
+        );
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenRespondent1UploadsAttachment() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(LocalDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                      List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -247,8 +245,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -287,8 +285,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -309,8 +307,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -331,8 +329,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -524,6 +522,91 @@ class CaseQueriesUtilTest {
     }
 
     @Test
+    void shouldReturnClaimantLipQuery_whenQueryFoundForId() {
+        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(
+                CaseMessage.builder()
+                    .id("1")
+                    .build(),
+                CaseMessage.builder()
+                    .id("4")
+                    .build()
+            ))
+            .build();
+
+        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("2")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("3")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection claimantLip = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("4")
+                                           .build()))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQuery)
+            .qmRespondentSolicitor1Queries(respondent1Query)
+            .qmRespondentSolicitor2Queries(respondent2Query).qmApplicantCitizenQueries(claimantLip)
+            .build();
+
+        CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "4");
+
+        assertThat(latestQuery).isEqualTo(claimantLip.getCaseMessages().get(0).getValue());
+    }
+
+    @Test
+    void shouldReturnDefendantLipQuery_whenQueryFoundForId() {
+        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(
+                CaseMessage.builder()
+                    .id("1")
+                    .build(),
+                CaseMessage.builder()
+                    .id("4")
+                    .build()
+            ))
+            .build();
+
+        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("2")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("3")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection defendantLip = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("4")
+                                           .build()))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQuery)
+            .qmRespondentSolicitor1Queries(respondent1Query)
+            .qmRespondentSolicitor2Queries(respondent2Query)
+            .qmRespondentCitizenQueries(defendantLip)
+            .build();
+
+        CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "4");
+
+        assertThat(latestQuery).isEqualTo(defendantLip.getCaseMessages().get(0).getValue());
+    }
+
+    @Test
     void shouldReturnRespondent1Query_whenQueryFoundForId() {
         CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
@@ -688,6 +771,84 @@ class CaseQueriesUtilTest {
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "3");
 
         assertThat(roles).containsOnly(CaseRole.RESPONDENTSOLICITORTWO.toString());
+    }
+
+    @Test
+    void shouldUpdateApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
+        List<String> roles = List.of("APPLICANTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Claimant", updatedCaseData.getQmApplicantSolicitorQueries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1() {
+        List<String> roles = List.of("RESPONDENTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Diff() {
+        List<String> roles = List.of("RESPONDENTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant 1", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor2Queries_WhenRoleIsRespondentSolicitor2() {
+        List<String> roles = List.of("RESPONDENTSOLICITORTWO");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant 2", updatedCaseData.getQmRespondentSolicitor2Queries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Same() {
+        List<String> roles = List.of("RESPONDENTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+    }
+
+    @Test
+    void shouldThrowException_WhenRoleIsUnsupported() {
+        List<String> roles = List.of("UNSUPPORTEDROLE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
+        CaseData.CaseDataBuilder builder = CaseData.builder();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder)
+        );
+
+        assertEquals("Unsupported case role for query management.", exception.getMessage());
     }
 
     private CaseMessage buildCaseMessageAt(String id, String subject, LocalDateTime createdDate) {
