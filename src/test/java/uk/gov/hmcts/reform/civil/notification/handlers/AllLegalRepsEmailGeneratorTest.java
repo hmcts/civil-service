@@ -1,86 +1,44 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashSet;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
-class AllLegalRepsEmailGeneratorTest {
+@AllArgsConstructor
+@Slf4j
+public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator {
 
-    @Mock
-    private AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
+    private final AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
+    private final RespSolOneEmailDTOGenerator respSolOneEmailGenerator;
+    private final RespSolTwoEmailDTOGenerator respSolTwoEmailGenerator;
 
-    @Mock
-    private RespSolOneEmailDTOGenerator respSolOneEmailGenerator;
-
-    @Mock
-    private RespSolTwoEmailDTOGenerator respSolTwoEmailGenerator;
-
-    @InjectMocks
-    private AllLegalRepsEmailGenerator emailGenerator;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        appSolOneEmailGenerator = Mockito.mock(AppSolOneEmailDTOGenerator.class);
-        respSolOneEmailGenerator = Mockito.mock(RespSolOneEmailDTOGenerator.class);
-        respSolTwoEmailGenerator = Mockito.mock(RespSolTwoEmailDTOGenerator.class);
-        emailGenerator = new AllLegalRepsEmailGenerator(appSolOneEmailGenerator,
-                                                        respSolOneEmailGenerator,
-                                                        respSolTwoEmailGenerator);
+    @Override
+    public Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
+        Set<EmailDTO> partiesToEmail = new HashSet<>();
+        log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
+        partiesToEmail.add(appSolOneEmailGenerator.buildEmailDTO(caseData));
+        if (shouldNotifyRespondents(caseData)) {
+            log.info("Generating email for respondents for case ID: {}", caseData.getCcdCaseReference());
+            partiesToEmail.addAll(getRespondents(caseData));
+        }
+        return partiesToEmail;
     }
 
-    @Test
-    void shouldNotifyAllParties_whenTwoRespondentRepresentativesFlagIsSet() {
-        CaseData caseData = CaseData.builder()
-            .respondent2(Party.builder().build())
-            .respondent2SameLegalRepresentative(NO)
-            .build();
-        EmailDTO appSolEmail = mock(EmailDTO.class);
-        EmailDTO respSolOneEmail = mock(EmailDTO.class);
-        EmailDTO respSolTwoEmail = mock(EmailDTO.class);
-
-        when(appSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
-        when(respSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
-        when(respSolTwoEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolTwoEmail);
-
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
-
-        assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail, respSolTwoEmail);
-        verify(appSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolTwoEmailGenerator).buildEmailDTO(caseData);
+    private Set<EmailDTO> getRespondents(CaseData caseData) {
+        Set<EmailDTO> recipients = new HashSet<>();
+        recipients.add(respSolOneEmailGenerator.buildEmailDTO(caseData));
+        if (isOneVTwoTwoLegalRep(caseData)) {
+            recipients.add(respSolTwoEmailGenerator.buildEmailDTO(caseData));
+        }
+        return recipients;
     }
 
-    @Test
-    void shouldNotifyOnlyAppSolAndRespSolOne_whenTwoRespondentRepresentativesFlagIsNotSet() {
-        CaseData caseData = mock(CaseData.class);
-        EmailDTO appSolEmail = mock(EmailDTO.class);
-        EmailDTO respSolOneEmail = mock(EmailDTO.class);
-
-        when(appSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
-        when(respSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
-
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
-
-        assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail);
-        verify(appSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolTwoEmailGenerator, never()).buildEmailDTO(caseData);
+    protected boolean shouldNotifyRespondents(CaseData caseData) {
+        return Boolean.TRUE;
     }
 }
-

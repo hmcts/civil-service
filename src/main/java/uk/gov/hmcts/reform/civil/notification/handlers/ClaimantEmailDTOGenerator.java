@@ -1,4 +1,3 @@
-
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
 import lombok.AllArgsConstructor;

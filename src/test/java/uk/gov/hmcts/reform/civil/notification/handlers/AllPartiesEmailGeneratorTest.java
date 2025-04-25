@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 class AllPartiesEmailGeneratorTest {
+
     @Mock
     private AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
 

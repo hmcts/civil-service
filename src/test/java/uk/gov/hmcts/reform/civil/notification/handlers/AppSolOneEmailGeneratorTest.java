@@ -69,8 +69,8 @@ class AppSolOneEmailGeneratorTest {
     @Test
     void shouldReturnNotifyAsTrue_WhenApplicantRepresented() {
         CaseData caseData = CaseData.builder()
-            .applicant1Represented(YesOrNo.YES)
-            .build();
+                .applicant1Represented(YesOrNo.YES)
+                .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
         assertThat(shouldNotify).isTrue();
     }
@@ -78,8 +78,8 @@ class AppSolOneEmailGeneratorTest {
     @Test
     void shouldReturnNotifyAsFalse_WhenApplicantIsLip() {
         CaseData caseData = CaseData.builder()
-            .applicant1Represented(YesOrNo.NO)
-            .build();
+                .applicant1Represented(YesOrNo.NO)
+                .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
         assertThat(shouldNotify).isFalse();
     }
