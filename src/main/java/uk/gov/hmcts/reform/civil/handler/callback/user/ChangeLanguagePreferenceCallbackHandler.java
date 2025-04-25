@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
@@ -75,7 +76,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private CallbackResponse changeLanguagePreference(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        List<String> errors = new ArrayList<>();
         PreferredLanguage preferredLanguage = Optional.ofNullable(caseData.getChangeLanguagePreference())
             .map(ChangeLanguagePreference::getPreferredLanguage)
             .orElseThrow(() -> new IllegalArgumentException("Preferred language not found"));
@@ -93,10 +93,10 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             default -> throw new IllegalArgumentException("Unexpected user type");
         }
         builder.changeLanguagePreference(null);
+        builder.businessProcess(BusinessProcess.ready(CHANGE_LANGUAGE_PREFERENCE)).build();
         CaseData updatedCaseData = builder.build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
-            .errors(errors)
             .build();
     }
 
