@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -74,6 +75,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     OrganisationService organisationService;
     @MockBean
     UpdateCaseManagementDetailsService updateCaseManagementDetailsService;
+    @MockBean
+    RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
     @Autowired
