@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.courtofficerorder;
+package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,5 +17,4 @@ class CourtOfficerOrderNotifierTest extends NotifierTestBase {
         String taskId = notifier.getTaskId();
         assertThat(taskId).isEqualTo(GenerateOrderNotifyPartiesCourtOfficerOrder.toString());
     }
-
 }

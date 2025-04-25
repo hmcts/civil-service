@@ -1,20 +1,20 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.courtofficerorder;
+package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Component
-public class COOResp2EmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
+public class GenerateOrderCOOAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    protected static final String COO_RESP_SOL_TWO_REFERENCE_TEMPLATE = "generate-order-notification-%s";
+    protected static final String COO_APP_SOL_REFERENCE_TEMPLATE = "generate-order-notification-%s";
 
     NotificationsProperties notificationsProperties;
 
-    public COOResp2EmailDTOGenerator(OrganisationService organisationService,
-                                      NotificationsProperties notificationsProperties) {
+    public GenerateOrderCOOAppSolEmailDTOGenerator(OrganisationService organisationService,
+                                                   NotificationsProperties notificationsProperties) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }
@@ -26,6 +26,6 @@ public class COOResp2EmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     @Override
     protected String getReferenceTemplate() {
-        return COO_RESP_SOL_TWO_REFERENCE_TEMPLATE;
+        return COO_APP_SOL_REFERENCE_TEMPLATE;
     }
 }

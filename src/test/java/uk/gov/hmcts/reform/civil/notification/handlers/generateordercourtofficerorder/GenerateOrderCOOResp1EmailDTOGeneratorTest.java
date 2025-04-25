@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.courtofficerorder;
+package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,15 +10,15 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.notification.handlers.courtofficerorder.COOResp1EmailDTOGenerator.COO_RESP_SOL_ONE_REFERENCE_TEMPLATE;
+import static uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder.GenerateOrderCOOResp1EmailDTOGenerator.COO_RESP_SOL_ONE_REFERENCE_TEMPLATE;
 
-class COOResp1EmailDTOGeneratorTest {
+class GenerateOrderCOOResp1EmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
 
     @InjectMocks
-    COOResp1EmailDTOGenerator emailGenerator;
+    GenerateOrderCOOResp1EmailDTOGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {

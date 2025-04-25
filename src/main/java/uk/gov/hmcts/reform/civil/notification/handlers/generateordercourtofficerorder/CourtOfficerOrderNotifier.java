@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.courtofficerorder;
+package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
@@ -12,7 +12,7 @@ public class CourtOfficerOrderNotifier extends Notifier {
 
     public CourtOfficerOrderNotifier(NotificationService notificationService,
                                      CaseTaskTrackingService caseTaskTrackingService,
-                                     COOAllPartiesEmailGenerator courtOfficeOrderAllPartiesEmailGenerator) {
+                                     GenerateOrderCOOAllPartiesEmailGenerator courtOfficeOrderAllPartiesEmailGenerator) {
         super(notificationService, caseTaskTrackingService, courtOfficeOrderAllPartiesEmailGenerator);
     }
 
