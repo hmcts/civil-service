@@ -57,11 +57,11 @@ class AcknowledgeClaimUnspecRespSolTwoEmailDTOGeneratorTest {
     void shouldReturnAppSolTemplateProperties_whenCustomPropsCalled() {
         CaseData caseData = CaseData.builder().build();
         Map<String, String> properties = new HashMap<>();
-        Map<String, String> addedProperties = new HashMap<>() {{
-            put(CLAIM_LEGAL_ORG_NAME_SPEC, "Test1Org");
-            put(RESPONDENT_NAME, "Resp2 name");
-            put(RESPONSE_DEADLINE, "2028-01-01");
-        }};
+        Map<String, String> addedProperties = Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Test1Org",
+                RESPONDENT_NAME, "Resp2 name",
+                RESPONSE_DEADLINE, "2028-01-01"
+        );
         when(acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData)).thenReturn(addedProperties);
         properties = emailGenerator.addCustomProperties(properties, caseData);
         assertThat(properties)
