@@ -61,7 +61,7 @@ public class ClaimantResponseConfirmsToProceedPartiesEmailGenerator implements P
         }
 
         if (isOneVTwoTwoLegalRep(caseData)) {
-            if (claimantResponseConfirmsToProceedEmailHelper.isMultiPartyNotProceed(caseData, false)) {
+            if (claimantResponseConfirmsToProceedEmailHelper.isMultiPartyNotProceed(caseData, true)) {
                 recipients.add(respSolTwoEmailDTOGeneratorNTP.buildEmailDTO(caseData));
             } else {
                 recipients.add(respSolTwoEmailDTOGenerator.buildEmailDTO(caseData));
