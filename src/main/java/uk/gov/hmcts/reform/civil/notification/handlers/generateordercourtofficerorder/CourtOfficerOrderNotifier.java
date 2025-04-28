@@ -10,17 +10,17 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 @Component
 public class CourtOfficerOrderNotifier extends Notifier {
 
-    private static final String taskId = GenerateOrderNotifyPartiesCourtOfficerOrder.toString();
+    private static final String TASK_ID = GenerateOrderNotifyPartiesCourtOfficerOrder.toString();
 
     public CourtOfficerOrderNotifier(NotificationService notificationService,
                                      CaseTaskTrackingService caseTaskTrackingService,
                                      GenerateOrderCOOAllPartiesEmailGenerator courtOfficeOrderAllPartiesEmailGenerator) {
         super(notificationService, caseTaskTrackingService, courtOfficeOrderAllPartiesEmailGenerator);
-        courtOfficeOrderAllPartiesEmailGenerator.setTaskInfo(taskId);
+        courtOfficeOrderAllPartiesEmailGenerator.setTaskInfo(TASK_ID);
     }
 
     @Override
     protected String getTaskId() {
-        return taskId;
+        return TASK_ID;
     }
 }

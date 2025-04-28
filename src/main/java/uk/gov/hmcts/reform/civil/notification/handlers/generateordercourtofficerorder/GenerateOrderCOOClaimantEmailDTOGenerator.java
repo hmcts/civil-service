@@ -16,7 +16,7 @@ public class GenerateOrderCOOClaimantEmailDTOGenerator extends ClaimantEmailDTOG
     @Setter
     private String taskInfo;
 
-    NotificationsProperties notificationsProperties;
+    private final NotificationsProperties notificationsProperties;
 
     protected static final String COO_CLAIMANT_REFERENCE_TEMPLATE = "generate-order-notification-%s";
 
