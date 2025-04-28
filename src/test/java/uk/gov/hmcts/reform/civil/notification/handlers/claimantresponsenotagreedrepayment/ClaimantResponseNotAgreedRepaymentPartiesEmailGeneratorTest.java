@@ -12,6 +12,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +55,8 @@ public class ClaimantResponseNotAgreedRepaymentPartiesEmailGeneratorTest {
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail);
         verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
         verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(claimantEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
     }
 
     @Test
@@ -73,5 +76,7 @@ public class ClaimantResponseNotAgreedRepaymentPartiesEmailGeneratorTest {
         assertThat(partiesToNotify).containsExactlyInAnyOrder(claimantEmail, defendantEmail);
         verify(claimantEmailDTOGenerator).buildEmailDTO(caseData);
         verify(defendantEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(appSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
     }
 }

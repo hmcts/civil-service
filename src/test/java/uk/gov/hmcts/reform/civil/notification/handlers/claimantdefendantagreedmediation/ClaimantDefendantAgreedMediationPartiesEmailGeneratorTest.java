@@ -17,6 +17,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -67,6 +68,8 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail);
         verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
         verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
     }
 
     @Test
@@ -96,6 +99,7 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
         verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
         verify(respSolTwoEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
     }
 
     @Test
@@ -119,5 +123,7 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, defendantEmail);
         verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
         verify(defendantEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
     }
 }
