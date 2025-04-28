@@ -88,9 +88,7 @@ public class DefendantResponseApplicantForCuiNotificationHandler
         properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData));
         properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
-        if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-        }
+        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         return properties;
     }
 
