@@ -330,6 +330,6 @@ class FeatureToggleServiceTest {
             when(featureToggleApi.isFeatureEnabledForDate(eq(caseFileKey), anyLong(), eq(false)))
                 .thenReturn(true);
         }
-        assertThat(featureToggleService.isQMApplicableLiPCase(caseData)).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isLipQueryManagementEnabled(caseData)).isEqualTo(toggleStat);
     }
 }
