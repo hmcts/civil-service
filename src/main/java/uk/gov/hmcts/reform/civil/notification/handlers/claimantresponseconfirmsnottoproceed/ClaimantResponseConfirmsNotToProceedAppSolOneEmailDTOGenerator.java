@@ -22,8 +22,9 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGenerator exte
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM) && caseData.isPartAdmitPayImmediatelyAccepted()) {
-            return notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec();
+        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            return caseData.isPartAdmitPayImmediatelyAccepted() ? notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec()
+                : notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec();
         }
 
         return notificationsProperties.getClaimantSolicitorConfirmsNotToProceed();
@@ -36,8 +37,9 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGenerator exte
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
+
         if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
 
             if (caseData.isPartAdmitPayImmediatelyAccepted()) {
                 OrganisationPolicy organisationPolicy = caseData.getRespondent1OrganisationPolicy();

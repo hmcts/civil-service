@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
@@ -24,6 +25,7 @@ class EmailDTOGeneratorTest {
     protected static final String CUSTOM_VALUE = "customValue";
 
     private EmailDTOGenerator emailDTOGenerator;
+    private NotificationsProperties notificationsProperties;
 
     @Mock
     private CaseData caseData;

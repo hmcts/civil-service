@@ -37,11 +37,12 @@ public class ClaimantResponseConfirmsNotToProceedRespSolTwoEmailDTOGenerator ext
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData, false, organisationService));
+        OrganisationPolicy organisationPolicy = caseData.getRespondent2OrganisationPolicy();
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService));
 
+        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             if (caseData.isPartAdmitPayImmediatelyAccepted()) {
-                OrganisationPolicy organisationPolicy = caseData.getRespondent1OrganisationPolicy();
+                organisationPolicy = caseData.getRespondent1OrganisationPolicy();
                 properties.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService));
             } else {
                 properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
