@@ -27,6 +27,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -95,12 +97,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,
-            formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
-            HMCTS_SIGNATURE, configuration.getHmctsSignature(),
-            PHONE_CONTACT, configuration.getPhoneContact(),
-            OPENING_HOURS, configuration.getOpeningHours(),
-            SPEC_UNSPEC_CONTACT, buildSpecAndUnspecContact(configuration.getSpecContact(),
-                                                           configuration.getUnspecContact())));
+            formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)));
 
         if (caseData.getRespondent2() != null) {
             properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -110,7 +107,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
             properties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
         }
-
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(properties, configuration);
         return properties;
     }
 
