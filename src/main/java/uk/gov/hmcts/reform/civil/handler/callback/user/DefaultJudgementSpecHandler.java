@@ -493,7 +493,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (featureToggleService.isJudgmentOnlineLive()) {
             JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgment);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
         }

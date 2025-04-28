@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
@@ -94,6 +95,11 @@ public class Applicant2DQ implements DQ {
     @JsonProperty("applicant2DQExperts")
     public Experts getExperts() {
         return getExperts(applicant2DQExperts);
+    }
+
+    @Override
+    public DeterWithoutHearing getDeterWithoutHearing() {
+        return null;
     }
 
     @JsonProperty("applicant2RespondToClaimExperts")
