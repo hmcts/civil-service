@@ -10,13 +10,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
+public class ClaimantResponseConfirmsToProceedRespSolOneEmailDTOGeneratorTest {
 
     @Mock
     private ClaimantResponseConfirmsToProceedEmailHelper helper;
 
     @InjectMocks
-    private ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator emailDTOGenerator;
+    private ClaimantResponseConfirmsToProceedRespSolOneEmailDTOGenerator emailDTOGenerator;
 
     @BeforeEach
     void setUp() {
@@ -29,7 +29,7 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
 
         String expectedTemplateId = "template-id";
         when(helper.isMultiPartyNotProceed(caseData, false)).thenReturn(false);
-        when(helper.getTemplate(caseData, true, false)).thenReturn(expectedTemplateId);
+        when(helper.getTemplate(caseData, false, false)).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -42,5 +42,4 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
 
         assertThat(referenceTemplate).isEqualTo("claimant-confirms-to-proceed-respondent-notification-%s");
     }
-
 }

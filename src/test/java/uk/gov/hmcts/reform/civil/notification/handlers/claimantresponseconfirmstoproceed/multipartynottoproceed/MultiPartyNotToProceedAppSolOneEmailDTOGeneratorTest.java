@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,17 +6,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
+public class MultiPartyNotToProceedAppSolOneEmailDTOGeneratorTest {
 
     @Mock
-    private ClaimantResponseConfirmsToProceedEmailHelper helper;
+    private NotificationsProperties notificationsProperties;
 
     @InjectMocks
-    private ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator emailDTOGenerator;
+    private MultiPartyNotToProceedAppSolOneEmailDTOGenerator emailDTOGenerator;
 
     @BeforeEach
     void setUp() {
@@ -24,12 +25,10 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldGetEmailTemplateId() {
+    void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
-
         String expectedTemplateId = "template-id";
-        when(helper.isMultiPartyNotProceed(caseData, false)).thenReturn(false);
-        when(helper.getTemplate(caseData, true, false)).thenReturn(expectedTemplateId);
+        when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -40,7 +39,6 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
     void shouldReturnCorrectReferenceTemplate() {
         String referenceTemplate = emailDTOGenerator.getReferenceTemplate();
 
-        assertThat(referenceTemplate).isEqualTo("claimant-confirms-to-proceed-respondent-notification-%s");
+        assertThat(referenceTemplate).isEqualTo("claimant-confirms-not-to-proceed-respondent-notification-%s");
     }
-
 }
