@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
@@ -75,7 +76,6 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
     private CallbackResponse changeLanguagePreference(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        List<String> errors = new ArrayList<>();
         PreferredLanguage preferredLanguage = Optional.ofNullable(caseData.getChangeLanguagePreference())
             .map(ChangeLanguagePreference::getPreferredLanguage)
             .orElseThrow(() -> new IllegalArgumentException("Preferred language not found"));
@@ -88,25 +88,34 @@ public class ChangeLanguagePreferenceCallbackHandler extends CallbackHandler {
             .map(ChangeLanguagePreference::getUserType)
             .orElseThrow(() -> new IllegalArgumentException("User type not found"));
         switch (userType) {
-            case CLAIMANT -> builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
-            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, builder, revisedBilingualPreference);
+            case CLAIMANT -> setClaimantBilingualLanguagePreference(builder, preferredLanguage, revisedBilingualPreference);
+            case DEFENDANT -> setRespondentResponseBilingualLanguagePreference(caseData, builder, preferredLanguage, revisedBilingualPreference);
             default -> throw new IllegalArgumentException("Unexpected user type");
         }
         builder.changeLanguagePreference(null);
+        builder.businessProcess(BusinessProcess.ready(CHANGE_LANGUAGE_PREFERENCE)).build();
         CaseData updatedCaseData = builder.build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
-            .errors(errors)
             .build();
+    }
+
+    private void setClaimantBilingualLanguagePreference(CaseData.CaseDataBuilder<?, ?> builder,
+                                                        PreferredLanguage preferredLanguage,
+                                                        String revisedBilingualPreference) {
+        builder.claimantBilingualLanguagePreference(revisedBilingualPreference);
+        builder.claimantLanguagePreferenceDisplay(preferredLanguage);
     }
 
     private void setRespondentResponseBilingualLanguagePreference(CaseData caseData,
                                                                   CaseData.CaseDataBuilder<?, ?> builder,
+                                                                  PreferredLanguage preferredLanguage,
                                                                   String revisedBilingualPreference) {
         CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
         builder.caseDataLiP(caseDataLiP.toBuilder()
                                 .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
                                                             .respondent1ResponseLanguage(revisedBilingualPreference).build())
                                 .build());
+        builder.defendantLanguagePreferenceDisplay(preferredLanguage);
     }
 }
