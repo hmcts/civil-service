@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -52,9 +54,9 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
-
+        when(userRequestAuthorizerMock.authorise(any())).thenReturn(null);
         doDelete("", null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isForbidden());
     }
 
     @Test

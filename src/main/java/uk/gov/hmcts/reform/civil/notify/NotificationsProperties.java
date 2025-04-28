@@ -671,7 +671,20 @@ public class NotificationsProperties {
     private String queryRaised;
 
     @NotEmpty
+    private String queryRaisedLip;
+
+    @NotEmpty
+    private String queryRaisedLipBilingual;
+
+    @NotEmpty
     private String queryResponseReceived;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryRaised;
+
+    @NotEmpty
+    private String notifyOtherPartyQueryResponseReceived;
+
 
     @NotEmpty
     private String testTemplate;

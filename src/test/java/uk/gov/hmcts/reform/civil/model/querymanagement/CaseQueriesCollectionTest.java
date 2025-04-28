@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.querymanagement;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -73,4 +75,51 @@ class CaseQueriesCollectionTest {
 
         assertNull(latest);
     }
+
+    @Test
+    void shouldReturnTrue_whenCaseQueriesCollectionIsSame() {
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        CaseQueriesCollection sameCaseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        boolean result = caseQueries.isSame(sameCaseQueries);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseQueriesCollectionIsNull() {
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        boolean result = caseQueries.isSame(null);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseQueriesCollectionIsDifferent() {
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        CaseQueriesCollection differentCaseQueries = CaseQueriesCollection.builder()
+            .partyName("Jane Doe")
+            .roleOnCase("respondent-solicitor")
+            .build();
+
+        boolean result = caseQueries.isSame(differentCaseQueries);
+
+        assertFalse(result);
+    }
+
 }
