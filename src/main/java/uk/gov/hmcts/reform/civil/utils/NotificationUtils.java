@@ -312,4 +312,8 @@ public class NotificationUtils {
     private static boolean queryNotAllowedCaseStates(CaseData caseData) {
         return qmNotAllowedStates.contains(caseData.getCcdState());
     }
+
+    public static String buildSpecAndUnspecContact(String specContact, String unspecContact) {
+        return specContact + " \n" + unspecContact;
+    }
 }

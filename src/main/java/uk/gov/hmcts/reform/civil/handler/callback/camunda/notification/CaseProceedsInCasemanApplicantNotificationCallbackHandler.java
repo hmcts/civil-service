@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -25,9 +26,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildFooter;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -46,6 +46,7 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -96,12 +97,11 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,
             formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
-            CONTACT_DETAILS_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
-                                                featureToggleService.isQueryManagementLipEnabled(),
-                                                featureToggleService.isQMApplicableLiPCase(caseData), false),
-            WELSH_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
-                                      featureToggleService.isQueryManagementLipEnabled(),
-                                      featureToggleService.isQMApplicableLiPCase(caseData), true)));
+            HMCTS_SIGNATURE, configuration.getHmctsSignature(),
+            PHONE_CONTACT, configuration.getPhoneContact(),
+            OPENING_HOURS, configuration.getOpeningHours(),
+            SPEC_UNSPEC_CONTACT, buildSpecAndUnspecContact(configuration.getSpecContact(),
+                                                           configuration.getUnspecContact())));
 
         if (caseData.getRespondent2() != null) {
             properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -128,12 +128,11 @@ public class CaseProceedsInCasemanApplicantNotificationCallbackHandler extends C
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,
             formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
-            CONTACT_DETAILS_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
-                                                featureToggleService.isQueryManagementLipEnabled(),
-                                                featureToggleService.isQMApplicableLiPCase(caseData), false),
-            WELSH_FOOTER, buildFooter(caseData, featureToggleService.isQueryManagementLRsEnabled(),
-                                      featureToggleService.isQueryManagementLipEnabled(),
-                                      featureToggleService.isQMApplicableLiPCase(caseData), true)));
+            HMCTS_SIGNATURE, configuration.getHmctsSignature(),
+            PHONE_CONTACT, configuration.getPhoneContact(),
+            OPENING_HOURS, configuration.getOpeningHours(),
+            SPEC_UNSPEC_CONTACT, buildSpecAndUnspecContact(configuration.getSpecContact(),
+                                                           configuration.getUnspecContact())));
 
         if (caseData.getRespondent2() != null) {
             properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));

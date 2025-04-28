@@ -119,6 +119,10 @@ public interface NotificationData {
 
     String CONTACT_DETAILS_FOOTER = "contactDetails";
     String WELSH_FOOTER = "welshContactDetails";
+    String HMCTS_SIGNATURE = "hmctsSignature";
+    String PHONE_CONTACT = "phoneContact";
+    String OPENING_HOURS = "openingHours";
+    String SPEC_UNSPEC_CONTACT = "specAndUnspecContact";
 
     Map<String, String> addProperties(CaseData caseData);
 
