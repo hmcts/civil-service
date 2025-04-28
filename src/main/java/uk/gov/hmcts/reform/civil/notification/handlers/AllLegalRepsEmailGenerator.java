@@ -13,9 +13,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLeg
 @Slf4j
 public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator {
 
-    private final AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
-    private final RespSolOneEmailDTOGenerator respSolOneEmailGenerator;
-    private final RespSolTwoEmailDTOGenerator respSolTwoEmailGenerator;
+    protected final AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
+    protected final RespSolOneEmailDTOGenerator respSolOneEmailGenerator;
+    protected final RespSolTwoEmailDTOGenerator respSolTwoEmailGenerator;
 
     @Override
     public Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
@@ -29,7 +29,7 @@ public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator {
         return partiesToEmail;
     }
 
-    private Set<EmailDTO> getRespondents(CaseData caseData) {
+    protected Set<EmailDTO> getRespondents(CaseData caseData) {
         Set<EmailDTO> recipients = new HashSet<>();
         recipients.add(respSolOneEmailGenerator.buildEmailDTO(caseData));
         if (isOneVTwoTwoLegalRep(caseData)) {
