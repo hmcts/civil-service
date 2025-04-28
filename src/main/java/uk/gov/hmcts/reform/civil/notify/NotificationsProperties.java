@@ -685,4 +685,6 @@ public class NotificationsProperties {
     @NotEmpty
     private String notifyOtherPartyQueryResponseReceived;
 
+    @NotEmpty
+    private String testTemplate;
 }

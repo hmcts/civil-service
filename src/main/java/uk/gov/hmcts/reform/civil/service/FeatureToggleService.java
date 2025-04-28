@@ -161,6 +161,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
     }
 
+    public boolean isQueryManagementLipEnabled() {
+        return featureToggleApi.isFeatureEnabled("query-management-lips");
+    }
+
     public boolean isLipQueryManagementEnabled(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();

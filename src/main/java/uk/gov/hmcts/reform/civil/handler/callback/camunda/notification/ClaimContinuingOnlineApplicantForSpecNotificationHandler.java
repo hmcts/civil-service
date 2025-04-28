@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -25,6 +27,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -40,6 +44,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -66,9 +72,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        String emailTemplateID = caseData.getRespondent2() != null
-            ? notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()
-            : notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec();
+        String emailTemplateID = notificationsProperties.getTestTemplate();
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
@@ -102,7 +106,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
             properties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
         }
-
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(properties, configuration);
         return properties;
     }
 
