@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -36,6 +37,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RES_SOLICITOR2
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -67,6 +70,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
+    private final NotificationsSignatureConfiguration configuration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -210,32 +214,44 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return new HashMap<>(Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData,
                                                  String legalOrganisationName) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, legalOrganisationName,
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     public Map<String, String> addPropertiesLRvLip(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     private boolean isCcNotification(CallbackParams callbackParams) {

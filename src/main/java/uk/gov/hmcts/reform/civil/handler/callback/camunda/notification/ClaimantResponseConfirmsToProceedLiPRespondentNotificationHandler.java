@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -45,6 +49,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     private final NotificationService notificationService;
     private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
     private final FeatureToggleService featureToggleService;
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
@@ -112,30 +117,37 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     public Map<String, String> addProperties(CaseData caseData) {
 
         if (caseData.isLipvLROneVOne()) {
-            return Map.of(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                          CLAIM_REFERENCE_NUMBER,
-                          caseData.getCcdCaseReference().toString(),
-                          CLAIM_LEGAL_ORG_NAME_SPEC,
-                          getRespondentLegalOrganizationName(
-                              caseData.getRespondent1OrganisationPolicy(),
-                              organisationService
-                          ),
-                          APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                          CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
+            HashMap<String, String> properties = new HashMap<>(Map.of(
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_REFERENCE_NUMBER,
+                caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                getRespondentLegalOrganizationName(
+                    caseData.getRespondent1OrganisationPolicy(), organisationService),
+                APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
+            ));
+            addCommonFooterSignature(properties, configuration);
+            addSpecAndUnspecContact(caseData, properties, configuration,
+                                    featureToggleService.isQueryManagementLRsEnabled());
+            return properties;
         }
         if (shouldSendMediationNotificationDefendant1LRCarm(
             caseData,
             featureToggleService.isCarmEnabledForCase(caseData)
         )) {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(),
                                                                               organisationService),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CASEMAN_REF, caseData.getLegacyCaseReference(),
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
-            );
+            ));
+            addCommonFooterSignature(properties, configuration);
+            addSpecAndUnspecContact(caseData, properties, configuration,
+                                    featureToggleService.isQueryManagementLRsEnabled());
+            return properties;
         }
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),

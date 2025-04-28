@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
@@ -28,6 +30,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
@@ -50,6 +54,8 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -118,7 +124,7 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             }
         }
 
-        return new HashMap<>(Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(respondent),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
@@ -126,6 +132,10 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             RESPONSE_INTENTION, getResponseIntentionForEmail(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     private boolean isCcNotification(CallbackParams callbackParams) {

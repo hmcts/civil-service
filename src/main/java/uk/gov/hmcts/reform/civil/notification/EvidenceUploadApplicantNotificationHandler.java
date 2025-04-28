@@ -8,11 +8,16 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Notificat
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
@@ -24,6 +29,8 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
     private final NotificationService notificationService;
     private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     public void notifyApplicantEvidenceUpload(CaseData caseData) throws NotificationException {
 
@@ -65,7 +72,7 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, YesOrNo.NO.equals(caseData.getApplicant1Represented())
                 ? caseData.getLegacyCaseReference()
                 : caseData.getCcdCaseReference().toString(),
@@ -75,6 +82,10 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
             ? caseData.getApplicant1().getPartyName()
                 : getApplicantLegalOrganizationName(caseData, organisationService),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 }

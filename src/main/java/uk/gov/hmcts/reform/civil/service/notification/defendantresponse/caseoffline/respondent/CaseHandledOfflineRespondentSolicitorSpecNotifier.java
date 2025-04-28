@@ -7,14 +7,19 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Component
@@ -24,6 +29,8 @@ public class CaseHandledOfflineRespondentSolicitorSpecNotifier extends CaseHandl
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData,
@@ -68,22 +75,30 @@ public class CaseHandledOfflineRespondentSolicitorSpecNotifier extends CaseHandl
 
     public Map<String, String> addPropertiesSpec(CaseData caseData,
                                                  CaseHandledOfflineRecipient recipientType) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             DEFENDANT_NAME_SPEC, getLegalOrganisationName(caseData, recipientType),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData,
                                                            CaseHandledOfflineRecipient recipientType) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, recipientType),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     private String getLegalOrganisationName(CaseData caseData,

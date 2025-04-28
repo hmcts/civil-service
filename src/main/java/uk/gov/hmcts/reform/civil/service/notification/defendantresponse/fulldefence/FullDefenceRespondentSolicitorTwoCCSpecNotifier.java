@@ -6,13 +6,18 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -26,8 +31,9 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
 
     @Autowired
     public FullDefenceRespondentSolicitorTwoCCSpecNotifier(NotificationsProperties notificationsProperties, NotificationService notificationService,
-                                                           OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+                                                           OrganisationService organisationService, NotificationsSignatureConfiguration configuration,
+                                                           FeatureToggleService featureToggleService) {
+        super(notificationsProperties, organisationService, configuration, featureToggleService);
         this.notificationsProperties = notificationsProperties;
         this.notificationService = notificationService;
         this.organisationService = organisationService;
@@ -54,14 +60,17 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
-
+        ));
+        addCommonFooterSignature(properties, getConfiguration());
+        addSpecAndUnspecContact(caseData, properties, getConfiguration(),
+                                getFeatureToggleService().isQueryManagementLRsEnabled());
+        return properties;
     }
 
     @Override
