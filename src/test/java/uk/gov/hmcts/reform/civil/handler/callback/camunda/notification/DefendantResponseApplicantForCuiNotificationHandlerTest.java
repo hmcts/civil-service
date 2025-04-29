@@ -53,13 +53,13 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
     @Nested
     class AboutToSubmitCallback {
 
-        private static final String APPLICANT_SOLICITOR_EMAIl = "applicantsolicitor@example.com";
+        private static final String APPLICANT_SOLICITOR_EMAIL = "applicantsolicitor@example.com";
         private static final String REFERENCE = "defendant-response-applicant-notification-000DC001";
         private static final String APPLICANT_EMAIL = "rambo@email.com";
         private static final String TEMPLATE_ID = "template-id";
         private static final String TEMPLATE_ID_MEDIATION = "template-id-mediation";
         private static final String TEMPLATE_ID_NO_MEDIATION = "template-id-no-mediation";
-        private static final String TEMPLATE_ID_LiP_CLAIMANT = "template-id-lip-claimant";
+        private static final String TEMPLATE_ID_LIP_CLAIMANT = "template-id-lip-claimant";
         private static final String CLAIM_LEGAL_ORG_NAME = "Signer Name";
 
         @Test
@@ -76,7 +76,7 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                APPLICANT_SOLICITOR_EMAIl,
+                APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
                 REFERENCE
@@ -98,7 +98,7 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                APPLICANT_SOLICITOR_EMAIl,
+                APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_ID_MEDIATION,
                 getNotificationFullDefenceDataMap(caseData),
                 REFERENCE
@@ -120,7 +120,7 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                APPLICANT_SOLICITOR_EMAIl,
+                APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_ID_NO_MEDIATION,
                 getNotificationFullDefenceDataMap(caseData),
                 REFERENCE
@@ -129,7 +129,7 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
 
         @Test
         void shouldNotifyLiPClaimant_whenInvoked() {
-            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(TEMPLATE_ID_LiP_CLAIMANT);
+            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(TEMPLATE_ID_LIP_CLAIMANT);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -142,7 +142,7 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
 
             verify(notificationService).sendMail(
                 APPLICANT_EMAIL,
-                TEMPLATE_ID_LiP_CLAIMANT,
+                TEMPLATE_ID_LIP_CLAIMANT,
                 getNotificationDataMapForLiPClaimant(caseData),
                 REFERENCE
             );
@@ -154,7 +154,8 @@ class DefendantResponseApplicantForCuiNotificationHandlerTest extends BaseCallba
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, CLAIM_LEGAL_ORG_NAME,
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CASEMAN_REF, "000DC001"
+                CASEMAN_REF, "000DC001",
+                "defendantName", "Mr. Sole Trader"
             );
         }
 
