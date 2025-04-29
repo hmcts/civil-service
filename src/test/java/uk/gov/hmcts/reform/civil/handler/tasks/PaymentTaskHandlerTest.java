@@ -88,16 +88,18 @@ class PaymentTaskHandlerTest {
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
-            variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
-                                                  FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                                                  FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
-                                                  FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
-                                                  FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-                                                  FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
-                                                  FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
-                                                  FlowFlag.DEFENDANT_NOC_ONLINE.name(), false,
-                                                  FlowFlag.CLAIM_STATE_DURING_NOC.name(), false)
-            );
+            variables.putValue(FLOW_FLAGS, Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                                                         Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.CLAIMANT_ENGLISH_TO_WELSH.name(), false),
+                                                         Map.entry(FlowFlag.DEFENDANT_ENGLISH_TO_WELSH.name(), false),
+                                                         Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+                                                         Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
+                                                         Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false)
+            ));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
