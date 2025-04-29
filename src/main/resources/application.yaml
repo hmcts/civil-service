@@ -486,6 +486,8 @@ notifications:
   queryResponseReceived: "9ca248ee-f34a-44e9-b20f-f5c41b69c068"
   notifyOtherPartyQueryRaised: "0162e149-3bb7-461c-a3ff-b5c631245014"
   notifyOtherPartyQueryResponseReceived: "bbb1c567-b5a1-4910-bf00-871163e7f318"
+  queryLipResponseReceivedEnglish: "b097eb54-3e00-4272-9b77-426b23a71ce1"
+  queryLipResponseReceivedWelsh: "d1ff72f3-db0e-44c9-83e9-5c6a43681d69"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -555,6 +557,10 @@ azure:
       retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:60}
       threads: ${CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS:1}
       enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED:false}
+    application-insights:
+      instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
+
+appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:dummy}
 
 async:
   handler:
