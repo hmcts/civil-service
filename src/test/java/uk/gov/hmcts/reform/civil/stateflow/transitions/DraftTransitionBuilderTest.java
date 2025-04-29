@@ -1,11 +1,20 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
@@ -34,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBui
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedTwoRegisteredRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class DraftTransitionBuilderTest {
 
@@ -69,13 +79,15 @@ public class DraftTransitionBuilderTest {
     void shouldReturnTrue_whenCaseDataAtClaimSubmittedState() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
-        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(9).contains(
+        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.DEFENDANT_ENGLISH_TO_WELSH.name(), false),
+            entry(FlowFlag.CLAIMANT_ENGLISH_TO_WELSH.name(), false),
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false)
         );
@@ -87,13 +99,15 @@ public class DraftTransitionBuilderTest {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
 
         assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
-        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(9).contains(
+        assertThat(getCaseFlags(result.get(0), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.DEFENDANT_ENGLISH_TO_WELSH.name(), false),
+            entry(FlowFlag.CLAIMANT_ENGLISH_TO_WELSH.name(), false),
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false)
         );
@@ -162,13 +176,15 @@ public class DraftTransitionBuilderTest {
 
         assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
         assertTrue(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
-        assertThat(getCaseFlags(result.get(1), caseData)).hasSize(10).contains(
+        assertThat(getCaseFlags(result.get(1), caseData)).hasSize(12).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.DEFENDANT_ENGLISH_TO_WELSH.name(), false),
+            entry(FlowFlag.CLAIMANT_ENGLISH_TO_WELSH.name(), false),
             entry("ONE_RESPONDENT_REPRESENTATIVE", false),
             entry("TWO_RESPONDENT_REPRESENTATIVES", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false)
@@ -199,13 +215,15 @@ public class DraftTransitionBuilderTest {
         assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
-        assertThat(getCaseFlags(result.get(5), caseData)).hasSize(10).contains(
+        assertThat(getCaseFlags(result.get(5), caseData)).hasSize(12).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.DEFENDANT_ENGLISH_TO_WELSH.name(), false),
+            entry(FlowFlag.CLAIMANT_ENGLISH_TO_WELSH.name(), false),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry("UNREPRESENTED_DEFENDANT_TWO", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true)
@@ -247,13 +265,15 @@ public class DraftTransitionBuilderTest {
 
         assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
-        assertThat(getCaseFlags(result.get(2), caseData)).hasSize(9).contains(
+        assertThat(getCaseFlags(result.get(2), caseData)).hasSize(11).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.DEFENDANT_ENGLISH_TO_WELSH.name(), false),
+            entry(FlowFlag.CLAIMANT_ENGLISH_TO_WELSH.name(), false),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true)
         );
@@ -277,13 +297,15 @@ public class DraftTransitionBuilderTest {
 
         assertFalse(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
-        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(10).contains(
+        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(12).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
             entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry(FlowFlag.DEFENDANT_ENGLISH_TO_WELSH.name(), false),
+            entry(FlowFlag.CLAIMANT_ENGLISH_TO_WELSH.name(), false),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry("UNREPRESENTED_DEFENDANT_TWO", false),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false)
@@ -299,6 +321,76 @@ public class DraftTransitionBuilderTest {
 
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "WELSH, WELSH, ENGLISH, ENGLISH, false, true, true",
+        "WELSH, BOTH, ENGLISH, ENGLISH, false, true, true",
+        "WELSH, ENGLISH, ENGLISH, ENGLISH, false, true, true",
+        "WELSH, WELSH, ENGLISH, WELSH, false, false, true",
+        "WELSH, WELSH, WELSH, ENGLISH, false, false, true",
+        "WELSH, WELSH, ENGLISH, BOTH, false, false, true",
+        "ENGLISH, WELSH, ENGLISH, ENGLISH, false, false, true",
+        "ENGLISH, ENGLISH, ENGLISH, ENGLISH, false, false, true",
+        "ENGLISH, BOTH, WELSH, ENGLISH, false, false, true",
+        "ENGLISH, ENGLISH, WELSH, ENGLISH, true, false, true",
+        "ENGLISH, ENGLISH, WELSH, BOTH, true, false, true",
+        "ENGLISH, ENGLISH, WELSH, WELSH, true, false, true",
+        "WELSH, WELSH, ENGLISH, ENGLISH, false, false, false",
+        "WELSH, BOTH, ENGLISH, ENGLISH, false, false, false",
+        "WELSH, ENGLISH, ENGLISH, ENGLISH, false, false, false",
+        "WELSH, WELSH, ENGLISH, WELSH, false, false, false",
+        "WELSH, WELSH, WELSH, ENGLISH, false, false, false",
+        "WELSH, WELSH, ENGLISH, BOTH, false, false, false",
+        "ENGLISH, WELSH, ENGLISH, ENGLISH, false, false, false",
+        "ENGLISH, ENGLISH, ENGLISH, ENGLISH, false, false, false",
+        "ENGLISH, BOTH, WELSH, ENGLISH, false, false, false",
+        "ENGLISH, ENGLISH, WELSH, ENGLISH, false, false, false",
+        "ENGLISH, ENGLISH, WELSH, BOTH, false, false, false",
+        "ENGLISH, ENGLISH, WELSH, WELSH, false, false, false",
+
+    })
+    void shouldResolve_whenDefendantEnglishToWelsh(String claimantBilingualPreference, String claimantDocumentLanguage,
+                                                   String defendantBilingualPreference, String defendantDocumentLanguage,
+                                                   boolean claimantEnglishToWelsh, boolean defendantEnglishToWelsh,
+                                                   boolean isToggleEnabled) {
+
+        when(mockFeatureToggleService.isGaForWelshEnabled()).thenReturn(isToggleEnabled);
+        DraftTransitionBuilder draftTransitionBuilder = new DraftTransitionBuilder(
+            FlowState.Main.DRAFT,
+            mockFeatureToggleService
+        ) {
+        };
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQLanguage(WelshLanguageRequirements.builder()
+                                                          .documents(Language.valueOf(defendantDocumentLanguage))
+                                                          .build())
+                               .build())
+            .claimantBilingualLanguagePreference(claimantBilingualPreference)
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQLanguage(WelshLanguageRequirements.builder()
+                                                        .documents(Language.valueOf(claimantDocumentLanguage))
+                                                        .build())
+                              .build())
+            .caseDataLip(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1ResponseLanguage(defendantBilingualPreference)
+                                                         .build())
+                             .build())
+            .build();
+        if (defendantEnglishToWelsh) {
+            assertTrue(draftTransitionBuilder.isDefendantEnglishToWelshForCase(caseData));
+        } else {
+            assertFalse(draftTransitionBuilder.isDefendantEnglishToWelshForCase(caseData));
+        }
+        if (claimantEnglishToWelsh) {
+            assertTrue(draftTransitionBuilder.isClaimantEnglishToWelshForCase(caseData));
+        } else {
+            assertFalse(draftTransitionBuilder.isClaimantEnglishToWelshForCase(caseData));
+        }
+
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
