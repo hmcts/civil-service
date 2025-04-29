@@ -80,6 +80,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -611,6 +612,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DocumentToKeepCollection> documentToKeepCollection;
 
     private final ChangeLanguagePreference changeLanguagePreference;
+    private final PreferredLanguage claimantLanguagePreferenceDisplay;
+    private final PreferredLanguage defendantLanguagePreferenceDisplay;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1550,5 +1556,28 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(WelshLanguageRequirements::getDocuments)
             .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
             .orElse(false);
+    }
+
+    @JsonIgnore
+    public String getApplicantSolicitor1UserDetailsEmail() {
+        return applicantSolicitor1UserDetails == null ? null : applicantSolicitor1UserDetails.getEmail();
+    }
+
+    @JsonIgnore
+    public String getClaimantUserDetailsEmail() {
+        final IdamUserDetails claimantUserDetails = getClaimantUserDetails();
+        return claimantUserDetails == null ? null : claimantUserDetails.getEmail();
+    }
+
+    @JsonIgnore
+    public String getRespondent1PartyEmail() {
+        final Party party = getRespondent1();
+        return party == null ? null : party.getPartyEmail();
+    }
+
+    @JsonIgnore
+    public String getRespondent2PartyEmail() {
+        final Party party = getRespondent2();
+        return party == null ? null : party.getPartyEmail();
     }
 }

@@ -1589,6 +1589,68 @@ class CaseDataTest {
             assertThat(result).isTrue();
         }
     }
+
+    @Test
+    void shouldReturnNullWhenApplicantSolicitor1UserDetailsEmailIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getApplicantSolicitor1UserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnApplicantSolicitor1UserDetailsEmail() {
+        CaseData caseData = CaseData.builder().applicantSolicitor1UserDetails(
+            IdamUserDetails.builder().email("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getApplicantSolicitor1UserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenApplicantSolicitor1UserDetailsIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getApplicantSolicitor1UserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnClaimantUserDetailsEmail() {
+        CaseData caseData = CaseData.builder().claimantUserDetails(
+            IdamUserDetails.builder().email("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getClaimantUserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenClaimantUserDetailsIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getClaimantUserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnRespondent1PartyEmail() {
+        CaseData caseData = CaseData.builder().respondent1(
+            Party.builder().partyEmail("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getRespondent1PartyEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenRespondent1PartyIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getRespondent1PartyEmail());
+    }
+
+    @Test
+    void shouldReturnRespondent2PartyEmail() {
+        CaseData caseData = CaseData.builder().respondent1(
+            Party.builder().partyEmail("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getRespondent1PartyEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenRespondent2PartyIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getRespondent1PartyEmail());
+    }
 }
 
 

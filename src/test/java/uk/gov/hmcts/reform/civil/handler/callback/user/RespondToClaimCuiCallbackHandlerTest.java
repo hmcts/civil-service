@@ -58,6 +58,8 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.WELSH;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -109,7 +111,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             1,
             0,
             0,
-            0);
+            0
+        );
 
         @BeforeEach
         void setup() {
@@ -124,7 +127,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "ENGLISH").build()).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -149,7 +153,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(150000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "ENGLISH").build()).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -219,7 +224,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "BOTH").build()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -250,25 +256,25 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .partyName("CLAIMANT_NAME")
                                  .build())
                 .respondent1DQ(Respondent1DQ.builder()
-                                  .respondent1DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .details(wrapElements(Expert.builder()
-                                                                                     .name(
-                                                                                         "John Smith")
-                                                                                     .firstName("Jane")
-                                                                                     .lastName("Smith")
-
-                                                                                     .build()))
-                                                           .build())
-                                  .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
-                                                             .details(wrapElements(Witness.builder()
+                                   .respondent1DQExperts(Experts.builder()
+                                                             .expertRequired(YES)
+                                                             .details(wrapElements(Expert.builder()
                                                                                        .name(
                                                                                            "John Smith")
                                                                                        .firstName("Jane")
                                                                                        .lastName("Smith")
 
-                                                                                       .build())).build())
-                                  .build())
+                                                                                       .build()))
+                                                             .build())
+                                   .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
+                                                               .details(wrapElements(Witness.builder()
+                                                                                         .name(
+                                                                                             "John Smith")
+                                                                                         .firstName("Jane")
+                                                                                         .lastName("Smith")
+
+                                                                                         .build())).build())
+                                   .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -336,11 +342,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             "ENGLISH, WELSH, ENGLISH, false, false",
             "WELSH, WELSH, WELSH, false, false"
         })
-        void shouldMoveToAwaitingApplicantResponse_whenNoTranslations(String claimantBilingualPreference,
-                                                                      String defendantBilingualPreference,
-                                                                      String defendantDocumentLanguage,
-                                                                      boolean toggleEnabled,
-                                                                      boolean changeState) {
+            void shouldMoveToAwaitingApplicantResponse_whenNoTranslations(String claimantBilingualPreference,
+                                                                          String defendantBilingualPreference,
+                                                                          String defendantDocumentLanguage,
+                                                                          boolean toggleEnabled,
+                                                                          boolean changeState) {
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(toggleEnabled);
             CaseData caseData = CaseDataBuilder.builder()
                 .totalClaimAmount(BigDecimal.valueOf(1000))
@@ -359,6 +365,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
             String newState = response.getState();
 
             if (changeState) {
@@ -366,7 +373,48 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             } else {
                 assertThat(newState).isNull();
             }
+        }
 
+        @Test
+        void shouldNotSetDefendantResponseLanguageDisplayIfWelshNotEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
+        }
+
+        @Test
+        void shouldSetDefendantResponseLanguageDisplayToEnglishIfNotSpecified() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(ENGLISH);
+        }
+
+        @Test
+        void shouldSetDefendantResponseLanguageDisplayToWelshIfSpecified() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
         }
     }
 }
