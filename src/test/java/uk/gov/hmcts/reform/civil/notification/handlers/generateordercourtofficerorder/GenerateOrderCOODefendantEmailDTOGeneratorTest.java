@@ -21,8 +21,7 @@ class GenerateOrderCOODefendantEmailDTOGeneratorTest {
     @BeforeEach
     void setUp() {
         NotificationsProperties notificationsProperties = mock(NotificationsProperties.class);
-        generator = new GenerateOrderCOODefendantEmailDTOGenerator();
-        generator.notificationsProperties = notificationsProperties; // manually inject the mock
+        generator = new GenerateOrderCOODefendantEmailDTOGenerator(notificationsProperties);
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID_BILINGUAL);

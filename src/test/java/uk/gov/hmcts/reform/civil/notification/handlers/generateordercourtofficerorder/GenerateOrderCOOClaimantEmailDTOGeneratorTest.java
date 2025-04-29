@@ -17,13 +17,11 @@ class GenerateOrderCOOClaimantEmailDTOGeneratorTest {
     private static final String TEMPLATE_ID_WELSH_TRANSLATION = "template-id-welsh-translation";
 
     private GenerateOrderCOOClaimantEmailDTOGenerator generator;
-    private NotificationsProperties notificationsProperties;
 
     @BeforeEach
     void setUp() {
-        notificationsProperties = mock(NotificationsProperties.class);
-        generator = new GenerateOrderCOOClaimantEmailDTOGenerator();
-        generator.notificationsProperties = notificationsProperties; // manually inject the mock
+        NotificationsProperties notificationsProperties = mock(NotificationsProperties.class);
+        generator = new GenerateOrderCOOClaimantEmailDTOGenerator(notificationsProperties);
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID_BILINGUAL);

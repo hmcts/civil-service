@@ -36,6 +36,9 @@ public abstract class EmailDTOGenerator implements NotificationData {
 
     protected abstract String getEmailTemplateId(CaseData caseData);
 
+    /***
+     *  In some cases, the TaskId is required to determine the appropriate template.
+     */
     protected String getEmailTemplateId(CaseData caseData, String taskId) {
         return getEmailTemplateId(caseData);
     }
