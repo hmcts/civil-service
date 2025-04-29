@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 
 class AllLegalRepsEmailGeneratorTest {
 
+    String taskId = "someTaskId";
+
     @Mock
     private AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
 
@@ -58,16 +60,16 @@ class AllLegalRepsEmailGeneratorTest {
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(any()))
             .thenReturn(Boolean.TRUE);
 
-        when(appSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
-        when(respSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
-        when(respSolTwoEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolTwoEmail);
+        when(appSolOneEmailGenerator.buildEmailDTO(caseData, taskId)).thenReturn(appSolEmail);
+        when(respSolOneEmailGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolOneEmail);
+        when(respSolTwoEmailGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolTwoEmail);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail, respSolTwoEmail);
-        verify(appSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolTwoEmailGenerator).buildEmailDTO(caseData);
+        verify(appSolOneEmailGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailGenerator).buildEmailDTO(caseData, taskId);
     }
 
     @Test
@@ -76,17 +78,17 @@ class AllLegalRepsEmailGeneratorTest {
         EmailDTO appSolEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
 
-        when(appSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
-        when(respSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
+        when(appSolOneEmailGenerator.buildEmailDTO(caseData, taskId)).thenReturn(appSolEmail);
+        when(respSolOneEmailGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolOneEmail);
 
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(any()))
             .thenReturn(Boolean.FALSE);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail);
-        verify(appSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailGenerator).buildEmailDTO(caseData);
-        verify(respSolTwoEmailGenerator, never()).buildEmailDTO(caseData);
+        verify(appSolOneEmailGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 }

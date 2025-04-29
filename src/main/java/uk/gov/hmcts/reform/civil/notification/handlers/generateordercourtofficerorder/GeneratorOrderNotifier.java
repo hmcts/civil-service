@@ -16,7 +16,6 @@ public class GeneratorOrderNotifier extends Notifier {
                                   CaseTaskTrackingService caseTaskTrackingService,
                                   GenerateOrderCOOAllPartiesEmailGenerator generateOrderAllPartiesEmailGenerator) {
         super(notificationService, caseTaskTrackingService, generateOrderAllPartiesEmailGenerator);
-        generateOrderAllPartiesEmailGenerator.setTaskInfo(TASK_ID);
     }
 
     @Override

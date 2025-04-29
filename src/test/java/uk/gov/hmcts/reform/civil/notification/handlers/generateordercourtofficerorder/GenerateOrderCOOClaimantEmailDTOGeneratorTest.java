@@ -2,84 +2,77 @@ package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtoffice
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateOrderNotifyPartiesCourtOfficerOrder;
-import static uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder.GenerateOrderCOOClaimantEmailDTOGenerator.COO_CLAIMANT_REFERENCE_TEMPLATE;
 
 class GenerateOrderCOOClaimantEmailDTOGeneratorTest {
 
-    @Mock
+    private static final String TEMPLATE_ID = "template-id";
+    private static final String TEMPLATE_ID_BILINGUAL = "template-id-bilingual";
+    private static final String TEMPLATE_ID_WELSH_TRANSLATION = "template-id-welsh-translation";
+
+    private GenerateOrderCOOClaimantEmailDTOGenerator generator;
     private NotificationsProperties notificationsProperties;
-
-    @Mock
-    private CaseData caseData;
-
-    @InjectMocks
-    GenerateOrderCOOClaimantEmailDTOGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        notificationsProperties = mock(NotificationsProperties.class);
+        generator = new GenerateOrderCOOClaimantEmailDTOGenerator();
+        generator.notificationsProperties = notificationsProperties; // manually inject the mock
+
+        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID_BILINGUAL);
+        when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh()).thenReturn(TEMPLATE_ID_WELSH_TRANSLATION);
     }
 
     @Test
-    void shouldReturnBilingualTemplateWhenClaimantIsBilingualAndTaskInfoMatches() {
-        // Setup
-        String expectedTemplateId = "bilingualTemplate";
-        when(caseData.isClaimantBilingual()).thenReturn(true);
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(expectedTemplateId);
-        when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh()).thenReturn("welshTranslateTemplate");
+    void shouldReturnNotifyLipUpdateTemplate_whenGetEmailTemplateId_withoutTaskId() {
+        CaseData caseData = CaseData.builder().build();
 
-        // Set taskInfo for matching task
-        emailGenerator.setTaskInfo(GenerateOrderNotifyPartiesCourtOfficerOrder.toString());
+        String result = generator.getEmailTemplateId(caseData);
 
-        // Verify that the correct template is selected for bilingual claimant
-        String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
-    void shouldReturnWelshTranslateTemplateWhenClaimantIsBilingualAndTaskInfoDoesNotMatch() {
-        // Setup
-        String expectedTemplateId = "welshTranslateTemplate";
-        when(caseData.isClaimantBilingual()).thenReturn(true);
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingualTemplate");
-        when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh()).thenReturn(expectedTemplateId);
-
-        // Set taskInfo for non-matching task
-        emailGenerator.setTaskInfo("SomeOtherTask");
-
-        // Verify that the Welsh template is selected
-        String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnDefaultTemplateWhenClaimantIsNotBilingual() {
-        // Setup
-        String expectedTemplateId = "defaultTemplate";
+    void shouldReturnNotifyLipUpdateTemplate_whenGetEmailTemplateId_withTaskId_andNonBilingualCase() {
+        CaseData caseData = mock(CaseData.class);
         when(caseData.isClaimantBilingual()).thenReturn(false);
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(expectedTemplateId);
 
-        // Set taskInfo for matching task
-        emailGenerator.setTaskInfo(GenerateOrderNotifyPartiesCourtOfficerOrder.toString());
+        String result = generator.getEmailTemplateId(caseData, "someTaskId");
 
-        // Verify that the default template is selected for non-bilingual claimant
-        String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
-    void shouldReturnCorrectReferenceTemplate() {
-        String referenceTemplate = emailGenerator.getReferenceTemplate();
+    void shouldReturnBilingualTemplate_whenGetEmailTemplateId_withBilingualCase_andCorrectTaskId() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isClaimantBilingual()).thenReturn(true);
 
-        assertThat(referenceTemplate).isEqualTo(COO_CLAIMANT_REFERENCE_TEMPLATE);
+        String result = generator.getEmailTemplateId(caseData, GenerateOrderNotifyPartiesCourtOfficerOrder.toString());
+
+        assertThat(result).isEqualTo(TEMPLATE_ID_BILINGUAL);
+    }
+
+    @Test
+    void shouldReturnWelshTranslationTemplate_whenGetEmailTemplateId_withBilingualCase_andIncorrectTaskId() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isClaimantBilingual()).thenReturn(true);
+
+        String result = generator.getEmailTemplateId(caseData, "differentTaskId");
+
+        assertThat(result).isEqualTo(TEMPLATE_ID_WELSH_TRANSLATION);
+    }
+
+    @Test
+    void shouldReturnReferenceTemplate() {
+        String result = generator.getReferenceTemplate();
+
+        assertThat(result).isEqualTo("generate-order-notification-%s");
     }
 }

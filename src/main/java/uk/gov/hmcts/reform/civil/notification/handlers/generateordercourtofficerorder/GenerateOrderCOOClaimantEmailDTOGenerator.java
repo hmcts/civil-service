@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder;
 
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
@@ -10,20 +8,21 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateOrderNotifyPartiesCourtOfficerOrder;
 
 @Component
-@RequiredArgsConstructor
 public class GenerateOrderCOOClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
-    @Setter
-    private String taskInfo;
-
-    private final NotificationsProperties notificationsProperties;
+    NotificationsProperties notificationsProperties;
 
     protected static final String COO_CLAIMANT_REFERENCE_TEMPLATE = "generate-order-notification-%s";
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getNotifyLipUpdateTemplate();
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData, String taskId) {
         if (caseData.isClaimantBilingual()) {
-            if (GenerateOrderNotifyPartiesCourtOfficerOrder.toString().equals(taskInfo)) {
+            if (GenerateOrderNotifyPartiesCourtOfficerOrder.toString().equals(taskId)) {
                 return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
             } else {
                 return notificationsProperties.getOrderBeingTranslatedTemplateWelsh();

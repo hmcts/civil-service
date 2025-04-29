@@ -2,85 +2,76 @@ package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtoffice
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateOrderNotifyPartiesCourtOfficerOrder;
-import static uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder.GenerateOrderCOODefendantEmailDTOGenerator.COO_DEFENDANT_REFERENCE_TEMPLATE;
 
 class GenerateOrderCOODefendantEmailDTOGeneratorTest {
 
-    @Mock
-    private NotificationsProperties notificationsProperties;
+    private static final String TEMPLATE_ID = "template-id";
+    private static final String TEMPLATE_ID_BILINGUAL = "template-id-bilingual";
+    private static final String TEMPLATE_ID_WELSH_TRANSLATION = "template-id-welsh-translation";
 
-    @Mock
-    private CaseData caseData;
-
-    @InjectMocks
-    GenerateOrderCOODefendantEmailDTOGenerator emailGenerator;
+    private GenerateOrderCOODefendantEmailDTOGenerator generator;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        NotificationsProperties notificationsProperties = mock(NotificationsProperties.class);
+        generator = new GenerateOrderCOODefendantEmailDTOGenerator();
+        generator.notificationsProperties = notificationsProperties; // manually inject the mock
+
+        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID_BILINGUAL);
+        when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh()).thenReturn(TEMPLATE_ID_WELSH_TRANSLATION);
     }
 
     @Test
-    void shouldReturnBilingualTemplateWhenRespondentIsBilingualAndTaskInfoMatches() {
-        // Setup the caseData and mock behavior
-        when(caseData.isRespondentResponseBilingual()).thenReturn(true);
+    void shouldReturnNotifyLipUpdateTemplate_whenGetEmailTemplateId_withoutTaskId() {
+        CaseData caseData = CaseData.builder().build();
 
-        String expectedTemplateId = "bilingualTemplateId";
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(expectedTemplateId);
+        String result = generator.getEmailTemplateId(caseData);
 
-        // Set taskInfo for matching task
-        emailGenerator.setTaskInfo(GenerateOrderNotifyPartiesCourtOfficerOrder.toString());
-
-        // Verify the template returned is the bilingual one
-        String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
-    void shouldReturnWelshTranslateTemplateWhenRespondentIsBilingualAndTaskInfoDoesNotMatch() {
-        // Setup the caseData and mock behavior
-        when(caseData.isRespondentResponseBilingual()).thenReturn(true);
-
-        String expectedTemplateId = "welshTranslateTemplateId";
-        when(notificationsProperties.getOrderBeingTranslatedTemplateWelsh()).thenReturn(expectedTemplateId);
-
-        // Set taskInfo for a non-matching task
-        emailGenerator.setTaskInfo("SomeOtherTask");
-
-        // Verify the Welsh template is selected
-        String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnDefaultTemplateWhenRespondentIsNotBilingual() {
-        // Setup the caseData and mock behavior
+    void shouldReturnNotifyLipUpdateTemplate_whenGetEmailTemplateId_withTaskId_andNonBilingualResponse() {
+        CaseData caseData = mock(CaseData.class);
         when(caseData.isRespondentResponseBilingual()).thenReturn(false);
 
-        String expectedTemplateId = "defaultTemplateId";
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(expectedTemplateId);
+        String result = generator.getEmailTemplateId(caseData, "someTaskId");
 
-        // Set taskInfo for matching task
-        emailGenerator.setTaskInfo(GenerateOrderNotifyPartiesCourtOfficerOrder.toString());
-
-        // Verify the default template is selected
-        String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
-    void shouldReturnCorrectReferenceTemplate() {
-        String referenceTemplate = emailGenerator.getReferenceTemplate();
+    void shouldReturnBilingualTemplate_whenGetEmailTemplateId_withBilingualResponse_andCorrectTaskId() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isRespondentResponseBilingual()).thenReturn(true);
 
-        assertThat(referenceTemplate).isEqualTo(COO_DEFENDANT_REFERENCE_TEMPLATE);
+        String result = generator.getEmailTemplateId(caseData, GenerateOrderNotifyPartiesCourtOfficerOrder.toString());
+
+        assertThat(result).isEqualTo(TEMPLATE_ID_BILINGUAL);
+    }
+
+    @Test
+    void shouldReturnWelshTranslationTemplate_whenGetEmailTemplateId_withBilingualResponse_andIncorrectTaskId() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isRespondentResponseBilingual()).thenReturn(true);
+
+        String result = generator.getEmailTemplateId(caseData, "differentTaskId");
+
+        assertThat(result).isEqualTo(TEMPLATE_ID_WELSH_TRANSLATION);
+    }
+
+    @Test
+    void shouldReturnReferenceTemplate() {
+        String result = generator.getReferenceTemplate();
+
+        assertThat(result).isEqualTo("generate-order-notification-%s");
     }
 }

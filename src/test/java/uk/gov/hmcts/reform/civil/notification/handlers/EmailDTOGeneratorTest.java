@@ -24,6 +24,7 @@ class EmailDTOGeneratorTest {
     protected static final String CUSTOM_VALUE = "customValue";
 
     private EmailDTOGenerator emailDTOGenerator;
+    String taskId = "someTaskId";
 
     @Mock
     private CaseData caseData;
@@ -68,7 +69,7 @@ class EmailDTOGeneratorTest {
         when(caseData.getLegacyCaseReference()).thenReturn(LEGACY_CASE_REFERENCE);
         when(caseData.getCcdCaseReference()).thenReturn(1234567890123456L);
 
-        EmailDTO emailDTO = emailDTOGenerator.buildEmailDTO(caseData);
+        EmailDTO emailDTO = emailDTOGenerator.buildEmailDTO(caseData, taskId);
 
         assertThat(emailDTO.getTargetEmail()).isEqualTo(TEST_EMAIL);
         assertThat(emailDTO.getEmailTemplate()).isEqualTo(TEST_TEMPLATE_ID);

@@ -16,7 +16,6 @@ public class CourtOfficerOrderNotifier extends Notifier {
                                      CaseTaskTrackingService caseTaskTrackingService,
                                      GenerateOrderCOOAllPartiesEmailGenerator courtOfficeOrderAllPartiesEmailGenerator) {
         super(notificationService, caseTaskTrackingService, courtOfficeOrderAllPartiesEmailGenerator);
-        courtOfficeOrderAllPartiesEmailGenerator.setTaskInfo(TASK_ID);
     }
 
     @Override
