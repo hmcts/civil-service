@@ -81,7 +81,6 @@ public class ClaimantDefendantAgreedMediationAppSolOneEmailDTOGeneratorTest {
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
         partyUtilsMockedStatic.when(() -> getPartyNameBasedOnType(any())).thenReturn(partyName);
 
-
         String legalOrg = "legal org";
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
