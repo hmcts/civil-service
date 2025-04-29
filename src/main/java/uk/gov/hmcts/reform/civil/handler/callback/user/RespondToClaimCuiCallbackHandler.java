@@ -135,8 +135,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
             .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
             .applicant1ResponseDeadline(applicantDeadline)
-            .nextDeadline(applicantDeadline.toLocalDate())
-            .build();
+            .nextDeadline(applicantDeadline.toLocalDate());
 
         if (featureToggleService.isGaForWelshEnabled()) {
             String respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
