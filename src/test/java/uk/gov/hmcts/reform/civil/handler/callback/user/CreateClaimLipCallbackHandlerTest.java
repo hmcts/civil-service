@@ -250,5 +250,38 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData().get("anyRepresented")).isEqualTo("No");
         }
+
+        @Test
+        void shouldNotSetLanguageDisplayIfWelshDisabled() {
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isNull();
+        }
+
+        @Test
+        void shouldSetLanguageDisplayToEnglishIfNotSpecified() {
+            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isEqualTo("ENGLISH");
+        }
+
+        @Test
+        void shouldSetLanguageDisplayToEnglishAndWelshIfSpecified() {
+            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isEqualTo("ENGLISH_AND_WELSH");
+        }
     }
 }
