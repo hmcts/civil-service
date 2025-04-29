@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -21,8 +23,9 @@ public class NotifyDefendantStayUpdateRequestedHandler extends AbstractNotifyMan
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED,
                                                           NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED);
 
-    public NotifyDefendantStayUpdateRequestedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public NotifyDefendantStayUpdateRequestedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                                     NotificationsSignatureConfiguration configuration, FeatureToggleService featureToggleService) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override

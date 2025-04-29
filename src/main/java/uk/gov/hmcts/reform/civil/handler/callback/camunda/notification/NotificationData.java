@@ -122,6 +122,7 @@ public interface NotificationData {
     String PHONE_CONTACT = "phoneContact";
     String OPENING_HOURS = "openingHours";
     String SPEC_UNSPEC_CONTACT = "specAndUnspecContact";
+    String CNBC_CONTACT = "cnbcContact";
 
     Map<String, String> addProperties(CaseData caseData);
 

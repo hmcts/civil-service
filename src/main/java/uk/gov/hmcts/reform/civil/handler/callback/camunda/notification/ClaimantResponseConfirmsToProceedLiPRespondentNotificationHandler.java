@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -128,6 +129,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
             addCommonFooterSignature(properties, configuration);
+            addCnbcContact(caseData, properties, configuration,
+                           featureToggleService.isQueryManagementLRsEnabled());
             addSpecAndUnspecContact(caseData, properties, configuration,
                                     featureToggleService.isQueryManagementLRsEnabled());
             return properties;
@@ -145,6 +148,8 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ));
             addCommonFooterSignature(properties, configuration);
+            addCnbcContact(caseData, properties, configuration,
+                           featureToggleService.isQueryManagementLRsEnabled());
             addSpecAndUnspecContact(caseData, properties, configuration,
                                     featureToggleService.isQueryManagementLRsEnabled());
             return properties;

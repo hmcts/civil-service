@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -322,6 +323,16 @@ public class NotificationUtils {
             properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
         }
         properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        return properties;
+    }
+
+    public static Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties,
+                                                              NotificationsSignatureConfiguration configuration,
+                                                              boolean isLRQmEnabled) {
+        if (isLRQmEnabled && !queryNotAllowedCaseStates(caseData) && !caseData.isLipCase()) {
+            properties.put(CNBC_CONTACT, RAISE_QUERY_LR);
+        }
+        properties.put(CNBC_CONTACT, configuration.getSpecUnspecContact());
         return properties;
     }
 }
