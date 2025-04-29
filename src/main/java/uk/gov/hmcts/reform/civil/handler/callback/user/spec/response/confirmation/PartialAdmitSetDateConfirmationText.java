@@ -82,15 +82,18 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             .append("</ul>")
             .append("<p>Contact ")
             .append(applicantName);
-        if (applicantName.endsWith("s")) {
-            sb.append("'");
+        if (!caseData.isApplicant1NotRepresented()) {
+            if (applicantName.endsWith("s")) {
+                sb.append("'");
+            } else {
+                sb.append("'s");
+            }
+            sb.append(" legal representative if you need details on how to pay.</p>");
         } else {
-            sb.append("'s");
+            sb.append(" if you need details on how to pay.</p>");
         }
         final String P_TAG = ".</p>";
-        sb.append(" legal representative if you need details on how to pay.</p>")
-
-            .append("<p>Because you've said you will not pay immediately, ")
+        sb.append("<p>Because you've said you will not pay immediately, ")
             .append(applicantName)
             .append(" can request a county court judgment against you for &#163;")
             .append(admitOwed).append(P_TAG)

@@ -36,6 +36,12 @@ class EmailDTOGeneratorTest {
 
         // Create a concrete implementation of the abstract class for testing
         emailDTOGenerator = new EmailDTOGenerator(notificationsProperties) {
+
+            @Override
+            protected Boolean getShouldNotify(CaseData caseData) {
+                return Boolean.TRUE;
+            }
+
             @Override
             protected String getEmailAddress(CaseData caseData) {
                 return TEST_EMAIL;

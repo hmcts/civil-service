@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -63,5 +64,41 @@ class RespSolOneEmailGeneratorTest {
 
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, RESPONDENT_LEGAL_ORG_NAME);
         notificationUtilsMockedStatic.close();
+    }
+
+    @Test
+    void shouldReturnNotifyAsTrue_WhenApplicantRepresented() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnNotifyAsTrue_WhenSpecApplicantRepresented() {
+        CaseData caseData = CaseData.builder()
+            .specRespondent1Represented(YesOrNo.YES)
+            .build();
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnNotifyAsFalse_WhenApplicantIsLip() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldReturnNotifyAsTrue_WhenSpecApplicantIsLip() {
+        CaseData caseData = CaseData.builder()
+            .specRespondent1Represented(YesOrNo.YES)
+            .build();
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        assertThat(shouldNotify).isTrue();
     }
 }

@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
@@ -28,5 +29,9 @@ public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
             isRespondent1, organisationService));
         return properties;
+    }
+
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return isOneVTwoTwoLegalRep(caseData) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

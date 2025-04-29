@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 
 public abstract class EmailDTOGenerator implements NotificationData {
 
+    protected abstract Boolean getShouldNotify(CaseData caseData);
+
     protected final NotificationsProperties notificationsProperties;
 
     protected EmailDTOGenerator(NotificationsProperties notificationsProperties) {

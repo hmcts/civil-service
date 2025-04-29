@@ -179,11 +179,15 @@ public class NotificationUtils {
             if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            } else if (caseData.getRespondent1OrganisationIDCopy() != null) {
+                id = caseData.getRespondent1OrganisationIDCopy();
             }
         } else {
             if (caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            } else if (caseData.getRespondent2OrganisationIDCopy() != null) {
+                id = caseData.getRespondent2OrganisationIDCopy();
             }
         }
         if (id != null) {
