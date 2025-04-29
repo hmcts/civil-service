@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -18,8 +20,10 @@ public class CaseDismissDefendantNotificationHandler extends AbstractCaseDismiss
         CaseEvent.NOTIFY_DEFENDANT_TWO_DISMISS_CASE
     );
 
-    public CaseDismissDefendantNotificationHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public CaseDismissDefendantNotificationHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                                   FeatureToggleService featureToggleService,
+                                                   NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override

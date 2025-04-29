@@ -47,7 +47,6 @@ public class NotifyDefendantJudgmentVariedDeterminationOfMeansNotificationHandle
     private final NotificationsSignatureConfiguration configuration;
     private final FeatureToggleService featureToggleService;
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(

@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -24,8 +26,10 @@ public class NotifyDefendantCaseStayedHandler extends AbstractNotifyCaseStayedHa
     private static final String REFERENCE_TEMPLATE = "case-stayed-defendant-notification-%s";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_DEFENDANT_STAY_CASE, NOTIFY_DEFENDANT_TWO_STAY_CASE);
 
-    public NotifyDefendantCaseStayedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public NotifyDefendantCaseStayedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                            FeatureToggleService featureToggleService,
+                                            NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override

@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -17,8 +19,10 @@ public class NotifyClaimantStayLiftedHandler extends AbstractNotifyManageStayCla
     private static final String REFERENCE_TEMPLATE = "stay-lifted-claimant-notification-%s";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_STAY_LIFTED);
 
-    public NotifyClaimantStayLiftedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public NotifyClaimantStayLiftedHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                           FeatureToggleService featureToggleService,
+                                           NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override

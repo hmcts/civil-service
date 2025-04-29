@@ -41,7 +41,6 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
     private final NotificationsSignatureConfiguration configuration;
     private final FeatureToggleService featureToggleService;
 
-
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL,
         NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP,
