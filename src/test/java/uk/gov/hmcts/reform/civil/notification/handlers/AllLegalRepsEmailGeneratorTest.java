@@ -1,24 +1,26 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
-abstract class AllLegalRepsEmailGeneratorTest {
+class AllLegalRepsEmailGeneratorTest {
 
     @Mock
     private AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
@@ -29,15 +31,21 @@ abstract class AllLegalRepsEmailGeneratorTest {
     @Mock
     private RespSolTwoEmailDTOGenerator respSolTwoEmailGenerator;
 
-    @Mock
-    private SimpleStateFlowEngine stateFlowEngine;
+    private MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic;
 
     @InjectMocks
     private AllLegalRepsEmailGenerator emailGenerator;
 
     @BeforeEach
     void setUp() {
+
         MockitoAnnotations.openMocks(this);
+        multiPartyScenarioMockedStatic = Mockito.mockStatic(MultiPartyScenario.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        multiPartyScenarioMockedStatic.close();
     }
 
     @Test
@@ -46,14 +54,13 @@ abstract class AllLegalRepsEmailGeneratorTest {
         EmailDTO appSolEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolTwoEmail = mock(EmailDTO.class);
-        StateFlow stateFlow = mock(StateFlow.class);
+
+        multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(any()))
+            .thenReturn(Boolean.TRUE);
 
         when(appSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
         when(respSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
         when(respSolTwoEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolTwoEmail);
-        when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
-        when(stateFlowEngine.evaluate(caseData)
-            .isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
 
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
 
@@ -68,13 +75,12 @@ abstract class AllLegalRepsEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         EmailDTO appSolEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
-        StateFlow stateFlow = mock(StateFlow.class);
 
         when(appSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
         when(respSolOneEmailGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
-        when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
-        when(stateFlowEngine.evaluate(caseData)
-            .isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
+
+        multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(any()))
+            .thenReturn(Boolean.FALSE);
 
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
 
