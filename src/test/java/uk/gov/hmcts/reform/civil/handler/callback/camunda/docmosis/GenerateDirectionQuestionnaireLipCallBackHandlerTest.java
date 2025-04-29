@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,12 +27,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -59,7 +59,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
 
     private static final CaseDocument FORM = CaseDocument.builder()
         .createdBy("John")
-        .documentName("document name")
+        .documentName("claimant_document_name")
         .documentSize(0L)
         .documentType(DIRECTIONS_QUESTIONNAIRE)
         .createdDatetime(LocalDateTime.now())
@@ -93,6 +93,18 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_APP1.getValue()));
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.APP1_DQ.getValue()));
+    }
+
+    @Test
+    void shouldGenerateFormAndStoreItIntoPreTranslationCollection_whenAboutToSubmitCalledAndMainClaimHasBilingualParty() {
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
+        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .claimantBilingualLanguagePreference("BOTH").build();
+
+        handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
     }
 
     @Test
