@@ -18,10 +18,10 @@ import static org.mockito.Mockito.when;
 class NotifyClaimantLipHelpWithFeesPartiesEmailGeneratorTest {
 
     @Mock
-    private NotifyClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator;
+    private ClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator;
 
     @InjectMocks
-    private NotifyClaimantLipHelpWithFeesPartiesEmailGenerator partiesGenerator;
+    private ClaimantLipHelpWithFeesPartiesEmailGenerator partiesGenerator;
 
     private CaseData caseData;
 

@@ -4,22 +4,21 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
-
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimantLipHelpWithFeesNotifier;
+import uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier;
 
 @Component
-public class NotifyClaimantLipHelpWithFeesNotifier extends Notifier {
+public class ClaimantLipHelpWithFeesNotifier extends Notifier {
 
-    public NotifyClaimantLipHelpWithFeesNotifier(
+    public ClaimantLipHelpWithFeesNotifier(
             NotificationService notificationService,
             CaseTaskTrackingService caseTaskTrackingService,
-            NotifyClaimantLipHelpWithFeesPartiesEmailGenerator partiesGenerator
+            ClaimantLipHelpWithFeesPartiesEmailGenerator partiesGenerator
     ) {
         super(notificationService, caseTaskTrackingService, partiesGenerator);
     }
 
     @Override
     protected String getTaskId() {
-        return ClaimantLipHelpWithFeesNotifier.toString();
+        return CamundaProcessIdentifier.ClaimantLipHelpWithFeesNotifier.toString();
     }
 }

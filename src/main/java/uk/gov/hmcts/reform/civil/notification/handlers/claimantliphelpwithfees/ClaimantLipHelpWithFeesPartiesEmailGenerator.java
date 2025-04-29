@@ -8,13 +8,12 @@ import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
 import java.util.Set;
 
 @Component
-public class NotifyClaimantLipHelpWithFeesPartiesEmailGenerator
-        implements PartiesEmailGenerator {
+public class ClaimantLipHelpWithFeesPartiesEmailGenerator implements PartiesEmailGenerator {
 
-    private final NotifyClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator;
+    private final ClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator;
 
-    public NotifyClaimantLipHelpWithFeesPartiesEmailGenerator(
-            NotifyClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator
+    public ClaimantLipHelpWithFeesPartiesEmailGenerator(
+            ClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator
     ) {
         this.dtoGenerator = dtoGenerator;
     }

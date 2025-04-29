@@ -13,7 +13,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 class NotifyClaimantLipHelpWithFeesNotifierTest extends NotifierTestBase {
 
     @InjectMocks
-    private NotifyClaimantLipHelpWithFeesNotifier notifier;
+    private ClaimantLipHelpWithFeesNotifier notifier;
 
     @Test
     void shouldReturnCorrectTaskId() {

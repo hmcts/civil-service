@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.claimantliphelpwithfees;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
@@ -12,12 +12,16 @@ import java.util.Map;
 
 @Component
 @AllArgsConstructor
-public class NotifyClaimantLipHelpWithFeesEmailDTOGenerator extends EmailDTOGenerator {
+public class ClaimantLipHelpWithFeesEmailDTOGenerator extends EmailDTOGenerator {
+
+    private static final String REFERENCE_TEMPLATE = "notify-claimant-lip-help-with-fees-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
-    private static final String REFERENCE_TEMPLATE =
-            "notify-claimant-lip-help-with-fees-notification-%s";
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return true;
+    }
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
@@ -39,9 +43,9 @@ public class NotifyClaimantLipHelpWithFeesEmailDTOGenerator extends EmailDTOGene
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return new HashMap<>(Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_NAME,        caseData.getApplicant1().getPartyName(),
-                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
+                CLAIM_REFERENCE_NUMBER,  caseData.getLegacyCaseReference(),
+                CLAIMANT_NAME,           caseData.getApplicant1().getPartyName(),
+                CLAIMANT_V_DEFENDANT,    PartyUtils.getAllPartyNames(caseData)
         ));
     }
 

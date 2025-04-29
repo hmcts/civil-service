@@ -23,11 +23,19 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 @ExtendWith(MockitoExtension.class)
 class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
 
+    public static final String EMAIL = "claimant@hmcts.net";
+    public static final String ENGLISH_TEMPLATE = "english-template";
+    public static final String WELSH_TEMPLATE = "welsh-template";
+    public static final String NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION = "notify-claimant-lip-help-with-fees-notification-%s";
+    public static final String LEGACY_REFERENCE = "000DC001";
+    public static final String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
+    public static final String CLAIMANT_NAME = "claimantName";
+
     @Mock
     private NotificationsProperties notificationsProperties;
 
     @InjectMocks
-    private NotifyClaimantLipHelpWithFeesEmailDTOGenerator generator;
+    private ClaimantLipHelpWithFeesEmailDTOGenerator generator;
 
     private CaseData caseData;
 
@@ -38,7 +46,7 @@ class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
                 .build()
                 .toBuilder()
                 .claimantUserDetails(
-                        IdamUserDetails.builder().email("claimant@hmcts.net").build()
+                        IdamUserDetails.builder().email(EMAIL).build()
                 )
                 .applicant1(
                         Party.builder()
@@ -58,35 +66,40 @@ class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
     }
 
     @Test
+    void shouldAlwaysReturnTrueForGetShouldNotify() {
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
     void shouldReturnEnglishTemplateAndCorrectParams() {
         when(notificationsProperties.getNotifyClaimantLipHelpWithFees())
-                .thenReturn("english-template");
+                .thenReturn(ENGLISH_TEMPLATE);
 
         EmailDTO dto = generator.buildEmailDTO(caseData);
 
         Map<String, String> params = dto.getParameters();
         assertThat(params)
-                .containsEntry("claimReferenceNumber", "000DC001")
-                .containsEntry("claimantName", "John Doe")
+                .containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_REFERENCE)
+                .containsEntry(CLAIMANT_NAME, "John Doe")
                 .containsKey(CLAIMANT_V_DEFENDANT);
     }
 
     @Test
     void shouldReturnWelshTemplateWhenBilingual() {
         when(notificationsProperties.getNotifyClaimantLipHelpWithFeesWelsh())
-                .thenReturn("welsh-template");
+                .thenReturn(WELSH_TEMPLATE);
 
         caseData = caseData.toBuilder()
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
 
         EmailDTO dto = generator.buildEmailDTO(caseData);
-        assertThat(dto.getEmailTemplate()).isEqualTo("welsh-template");
+        assertThat(dto.getEmailTemplate()).isEqualTo(WELSH_TEMPLATE);
     }
 
     @Test
     void shouldExposeCorrectReferenceTemplate() {
         assertThat(generator.getReferenceTemplate())
-                .isEqualTo("notify-claimant-lip-help-with-fees-notification-%s");
+                .isEqualTo(NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION);
     }
 }
