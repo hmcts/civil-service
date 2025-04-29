@@ -90,6 +90,9 @@ public class ClaimantDefendantAgreedMediationAppSolOneEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
+        partyUtilsMockedStatic.close();
+        notificationUtilsMockedStatic.close();
+
         assertThat(updatedProperties.size()).isEqualTo(2);
         assertThat(updatedProperties).containsEntry(DEFENDANT_NAME, partyName);
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrg);

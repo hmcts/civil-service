@@ -62,6 +62,8 @@ public class ClaimantResponseConfirmsToProceedDefendantEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
+        partyUtilsMockedStatic.close();
+
         assertThat(updatedProperties.size()).isEqualTo(1);
         assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, partyName);
     }

@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
-import uk.gov.hmcts.reform.civil.notification.handlers.LipvLipEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
 
 import java.util.HashSet;

@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 public class MultiPartyNotToProceedRespSolTwoEmailDTOGeneratorTest {
+
     @Mock
     private NotificationsProperties notificationsProperties;
 

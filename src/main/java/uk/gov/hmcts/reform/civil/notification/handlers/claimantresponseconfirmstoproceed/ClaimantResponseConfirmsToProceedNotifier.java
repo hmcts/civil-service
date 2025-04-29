@@ -10,7 +10,8 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 @Component
 public class ClaimantResponseConfirmsToProceedNotifier extends Notifier {
 
-    public ClaimantResponseConfirmsToProceedNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService, ClaimantResponseConfirmsToProceedPartiesEmailGenerator partiesNotifier) {
+    public ClaimantResponseConfirmsToProceedNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
+                                                     ClaimantResponseConfirmsToProceedPartiesEmailGenerator partiesNotifier) {
         super(notificationService, caseTaskTrackingService, partiesNotifier);
     }
 

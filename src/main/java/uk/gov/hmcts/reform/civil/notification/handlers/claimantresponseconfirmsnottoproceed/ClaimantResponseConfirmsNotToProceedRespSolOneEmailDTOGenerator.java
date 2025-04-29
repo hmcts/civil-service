@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class ClaimantResponseConfirmsNotToProceedRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+
     protected ClaimantResponseConfirmsNotToProceedRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
         super(notificationsProperties, organisationService);
     }

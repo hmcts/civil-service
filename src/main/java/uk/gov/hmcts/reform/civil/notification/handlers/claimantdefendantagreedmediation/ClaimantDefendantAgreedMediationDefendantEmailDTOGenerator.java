@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Component
 public class ClaimantDefendantAgreedMediationDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
+
     protected ClaimantDefendantAgreedMediationDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         super(notificationsProperties);
     }

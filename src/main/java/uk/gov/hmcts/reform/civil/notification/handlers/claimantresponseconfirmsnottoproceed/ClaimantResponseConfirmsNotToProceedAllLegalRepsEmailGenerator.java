@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllLegalRepsEmailGenerato
 
 @Component
 public class ClaimantResponseConfirmsNotToProceedAllLegalRepsEmailGenerator extends AllLegalRepsEmailGenerator {
+
     public ClaimantResponseConfirmsNotToProceedAllLegalRepsEmailGenerator(
         ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGenerator appSolOneEmailGenerator,
         ClaimantResponseConfirmsNotToProceedRespSolOneEmailDTOGenerator respSolOneEmailGenerator,

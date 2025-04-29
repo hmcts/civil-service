@@ -62,6 +62,8 @@ public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
+        partyUtilsMockedStatic.close();
+
         assertThat(updatedProperties.size()).isEqualTo(1);
         updatedProperties.put(CLAIMANT_NAME, partyName);
     }

@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Component
 public class ClaimantResponseConfirmsToProceedDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
+
     protected ClaimantResponseConfirmsToProceedDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         super(notificationsProperties);
     }

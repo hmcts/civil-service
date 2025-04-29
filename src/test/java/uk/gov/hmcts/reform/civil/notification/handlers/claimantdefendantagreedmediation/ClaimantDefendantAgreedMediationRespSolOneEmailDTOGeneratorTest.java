@@ -81,7 +81,6 @@ public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGeneratorTest {
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
         partyUtilsMockedStatic.when(() -> getPartyNameBasedOnType(any())).thenReturn(partyName);
 
-
         String legalOrg = "legal org";
         MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, true, organisationService))
@@ -89,6 +88,9 @@ public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGeneratorTest {
 
         Map<String, String> properties = new HashMap<>();
         Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
+
+        partyUtilsMockedStatic.close();
+        notificationUtilsMockedStatic.close();
 
         assertThat(updatedProperties.size()).isEqualTo(2);
         assertThat(updatedProperties).containsEntry(CLAIMANT_NAME, partyName);

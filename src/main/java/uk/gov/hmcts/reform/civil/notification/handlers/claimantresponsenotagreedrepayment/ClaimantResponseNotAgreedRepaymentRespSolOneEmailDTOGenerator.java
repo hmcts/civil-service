@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Component
 public class ClaimantResponseNotAgreedRepaymentRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+
     protected ClaimantResponseNotAgreedRepaymentRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
         super(notificationsProperties, organisationService);
     }

@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.NotifierTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClaimantResponseNotAgreedRepaymentNotifierTest extends NotifierTestBase {
+
     @InjectMocks
     private ClaimantResponseNotAgreedRepaymentNotifier notifier;
 

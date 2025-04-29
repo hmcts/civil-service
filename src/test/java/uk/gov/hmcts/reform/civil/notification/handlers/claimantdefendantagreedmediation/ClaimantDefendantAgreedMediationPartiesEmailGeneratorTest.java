@@ -95,6 +95,8 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
 
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
 
+        multiPartyScenarioMockedStatic.close();
+
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail, respSolTwoEmail);
         verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
         verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);

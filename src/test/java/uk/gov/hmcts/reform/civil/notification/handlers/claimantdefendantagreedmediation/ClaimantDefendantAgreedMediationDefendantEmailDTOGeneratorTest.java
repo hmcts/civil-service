@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 public class ClaimantDefendantAgreedMediationDefendantEmailDTOGeneratorTest {
+
     @Mock
     private NotificationsProperties notificationsProperties;
 
@@ -84,6 +85,8 @@ public class ClaimantDefendantAgreedMediationDefendantEmailDTOGeneratorTest {
 
         Map<String, String> properties = new HashMap<>();
         Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
+
+        partyUtilsMockedStatic.close();
 
         assertThat(updatedProperties.size()).isEqualTo(1);
         assertThat(updatedProperties).containsEntry(DEFENDANT_NAME, partyName);

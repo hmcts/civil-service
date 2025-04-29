@@ -11,7 +11,8 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator extends
 
     private final ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper;
 
-    protected ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService, ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper) {
+    protected ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService,
+                                                                          ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper) {
         super(notificationsProperties, organisationService);
         this.claimantResponseConfirmsToProceedEmailHelper = claimantResponseConfirmsToProceedEmailHelper;
     }

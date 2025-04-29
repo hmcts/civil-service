@@ -11,7 +11,8 @@ public class ClaimantResponseConfirmsToProceedRespSolTwoEmailDTOGenerator extend
 
     private final ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper;
 
-    protected ClaimantResponseConfirmsToProceedRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService, ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper) {
+    protected ClaimantResponseConfirmsToProceedRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService,
+                                                                           ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper) {
         super(notificationsProperties, organisationService);
         this.claimantResponseConfirmsToProceedEmailHelper = claimantResponseConfirmsToProceedEmailHelper;
     }

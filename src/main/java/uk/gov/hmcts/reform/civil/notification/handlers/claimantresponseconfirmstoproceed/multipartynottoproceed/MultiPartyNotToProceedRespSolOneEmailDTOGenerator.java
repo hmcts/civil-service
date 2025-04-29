@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Component
 public class MultiPartyNotToProceedRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+
     protected MultiPartyNotToProceedRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
         super(notificationsProperties, organisationService);
     }
