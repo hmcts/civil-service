@@ -35,7 +35,6 @@ public class DefRespCaseOfflineAppSolOneEmailDTOGenerator extends AppSolOneEmail
         if (is1v1Or2v1Case(caseData)) {
             return notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
-
             return notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
         }
     }

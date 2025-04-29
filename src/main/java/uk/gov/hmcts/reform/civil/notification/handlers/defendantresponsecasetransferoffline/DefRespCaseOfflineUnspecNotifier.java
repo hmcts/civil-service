@@ -22,5 +22,4 @@ public class DefRespCaseOfflineUnspecNotifier
     public String getTaskId() {
         return DefendantResponseUnspecFullDefenceNotifyParties.toString();
     }
-
 }
