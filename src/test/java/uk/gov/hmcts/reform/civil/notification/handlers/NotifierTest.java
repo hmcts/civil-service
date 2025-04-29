@@ -43,6 +43,7 @@ class NotifierTest {
     EmailDTO party3;
     Set<EmailDTO> expected;
     CaseData caseData;
+    String taskId = "taskId";
 
     private class TestNotifier extends Notifier {
         public TestNotifier(NotificationService notificationService,
@@ -95,11 +96,11 @@ class NotifierTest {
     void shouldNotifyPartiesSuccessfully() {
         final Set<EmailDTO> expected = getEmailDTOS();
 
-        when(emailGenerator.getPartiesToNotify(caseData)).thenReturn(expected);
+        when(emailGenerator.getPartiesToNotify(caseData, taskId)).thenReturn(expected);
 
         notifier.notifyParties(caseData, "eventId", "taskId");
 
-        verify(emailGenerator, times(1)).getPartiesToNotify(caseData);
+        verify(emailGenerator, times(1)).getPartiesToNotify(caseData, taskId);
         verify(notificationService, times(3)).sendMail(anyString(), anyString(), anyMap(), anyString());
     }
 
@@ -107,7 +108,7 @@ class NotifierTest {
     void shouldHandleErrorsWhenNotifyPartiesAndContinueToNextEmail() {
         final Set<EmailDTO> expected = getEmailDTOS();
 
-        when(emailGenerator.getPartiesToNotify(caseData)).thenReturn(expected);
+        when(emailGenerator.getPartiesToNotify(caseData, taskId)).thenReturn(expected);
         doThrow(new NotificationException(new Exception("Notification Service error null"))).when(notificationService)
             .sendMail(party2.getTargetEmail(), party2.getEmailTemplate(), party2.getParameters(), party2.getReference());
 
@@ -120,7 +121,7 @@ class NotifierTest {
                 "taskId",
                 Map.of("Errors", "[java.lang.Exception: Notification Service error null]")
             );
-        verify(emailGenerator, times(1)).getPartiesToNotify(caseData);
+        verify(emailGenerator, times(1)).getPartiesToNotify(caseData, taskId);
         verify(notificationService, times(3)).sendMail(anyString(), anyString(), anyMap(), anyString());
     }
 
