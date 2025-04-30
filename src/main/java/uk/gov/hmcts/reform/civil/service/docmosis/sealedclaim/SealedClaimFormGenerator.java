@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCc
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<SealedClaimForm> {
 
     private final DocumentManagementService documentManagementService;
@@ -43,7 +45,8 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimForm templateData = getTemplateData(caseData, authorisation);
-
+        log.info("templateData for caseId {} and Template data == {} ==", caseData.getCcdCaseReference(),
+                 templateData.toString());
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
