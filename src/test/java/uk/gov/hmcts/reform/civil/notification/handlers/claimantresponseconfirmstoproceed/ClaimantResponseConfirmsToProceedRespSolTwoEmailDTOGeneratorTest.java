@@ -28,7 +28,7 @@ public class ClaimantResponseConfirmsToProceedRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().build();
 
         String expectedTemplateId = "template-id";
-        when(helper.isMultiPartyNotProceed(caseData, true)).thenReturn(false);
+        when(helper.getTemplate(caseData, false)).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
