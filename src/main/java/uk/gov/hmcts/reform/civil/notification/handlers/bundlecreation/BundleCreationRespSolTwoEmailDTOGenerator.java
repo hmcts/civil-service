@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 
 @Component
 public class BundleCreationRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
+
     protected BundleCreationRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
         super(notificationsProperties, organisationService);
     }

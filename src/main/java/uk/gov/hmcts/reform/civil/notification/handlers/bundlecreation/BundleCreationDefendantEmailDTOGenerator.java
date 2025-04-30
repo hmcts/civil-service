@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 @Component
 public class BundleCreationDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
+
     protected BundleCreationDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         super(notificationsProperties);
     }
