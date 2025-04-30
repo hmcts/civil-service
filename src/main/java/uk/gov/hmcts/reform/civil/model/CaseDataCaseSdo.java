@@ -248,6 +248,8 @@ public class CaseDataCaseSdo implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
     private CaseDocument sdoOrderDocument;
+    @Builder.Default
+    private final List<Element<CaseDocument>> preTranslationSdoOrderDocuments = new ArrayList<>();
     private final YesOrNo eaCourtLocation;
     private final YesOrNo hmcEaCourtLocation;
 
