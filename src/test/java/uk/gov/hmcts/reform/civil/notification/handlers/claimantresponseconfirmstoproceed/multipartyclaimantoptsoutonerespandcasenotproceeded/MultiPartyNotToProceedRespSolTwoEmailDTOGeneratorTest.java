@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multiPartyClaimantOptsOutOneRespAndCaseNotProceeded;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartyclaimantoptsoutonerespandcasenotproceeded;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
