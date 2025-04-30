@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -1539,6 +1540,22 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return getCcjPaymentDetails() != null
             && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null
             && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
+    }
+
+    @JsonIgnore
+    public boolean isLipClaimantSpecifiedBilingualDocuments() {
+        return isApplicant1NotRepresented()
+            && getApplicant1DQ() != null
+            && getApplicant1DQ().getApplicant1DQLanguage() != null
+            && (getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.BOTH || getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.WELSH);
+    }
+
+    @JsonIgnore
+    public boolean isLipDefendantSpecifiedBilingualDocuments() {
+        return isRespondent1NotRepresented()
+            && getRespondent1DQ() != null
+            && getRespondent1DQ().getRespondent1DQLanguage() != null
+            && (getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.BOTH || getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.WELSH);
     }
 
     @JsonIgnore
