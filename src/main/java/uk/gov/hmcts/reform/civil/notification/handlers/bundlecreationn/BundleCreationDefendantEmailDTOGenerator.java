@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.bundlecreationnotifier;
+package uk.gov.hmcts.reform.civil.notification.handlers.bundlecreationn;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;

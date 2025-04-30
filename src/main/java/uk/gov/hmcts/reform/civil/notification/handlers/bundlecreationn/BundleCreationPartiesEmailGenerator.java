@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.bundlecreationnotifier;
+package uk.gov.hmcts.reform.civil.notification.handlers.bundlecreationn;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
