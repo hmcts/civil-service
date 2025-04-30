@@ -4,5 +4,6 @@ public enum TranslatedDocumentType {
     DEFENDANT_RESPONSE,
     CLAIM_ISSUE,
     CLAIMANT_INTENTION,
-    ORDER_NOTICE;
+    ORDER_NOTICE,
+    STANDARD_DIRECTION_ORDER;
 }
