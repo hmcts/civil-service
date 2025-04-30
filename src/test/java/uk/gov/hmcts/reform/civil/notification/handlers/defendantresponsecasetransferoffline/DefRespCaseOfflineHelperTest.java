@@ -32,11 +32,13 @@ class DefRespCaseOfflineHelperTest {
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .partyName("Applicant One")
+                            .individualFirstName("Applicant")
+                            .individualLastName("One")
                             .build())
             .applicant2(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .partyName("Applicant Two")
+                            .individualFirstName("Applicant")
+                            .individualLastName("Two")
                             .build())
             .addApplicant2(YesOrNo.YES)
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
@@ -46,19 +48,20 @@ class DefRespCaseOfflineHelperTest {
         Map<String, String> result = caseOfflineNotificationProperties(caseData);
 
         assertThat(result.get("reason")).contains("admits part of the claim")
-            .contains("admits part of the claim against Applicant Two");
+            .contains("Applicant One and FULL_ADMISSION against Applicant Two");
     }
 
     @Test
     void shouldReturnSpecReasonFor2v1() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .addApplicant2(YesOrNo.YES)
             .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
 
         Map<String, String> result = caseOfflineNotificationProperties(caseData);
 
-        assertThat(result).containsEntry("reason", "Full defence");
+        assertThat(result).containsEntry("reason", "Defends all of the claim");
     }
 
     @Test

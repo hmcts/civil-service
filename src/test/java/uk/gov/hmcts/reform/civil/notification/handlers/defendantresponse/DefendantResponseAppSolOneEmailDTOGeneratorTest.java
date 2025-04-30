@@ -15,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 class DefendantResponseAppSolOneEmailDTOGeneratorTest {
 
@@ -30,24 +32,21 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddRespondentNameAndAllocatedTrack_OneVOneScenario() {
-        // Given
-        Party respondent = Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("John").individualLastName("Doe").build();
+        Party respondent = Party.builder().type(Party.Type.INDIVIDUAL)
+            .individualFirstName("John").individualLastName("Doe").build();
         CaseData caseData = CaseData.builder()
             .respondent1(respondent)
             .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .build();
 
-        // When
         Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
-        // Then
-        assertThat(result.get("respondentName")).isEqualTo("John Doe");
-        assertThat(result.get("allocatedTrack")).isEqualTo("Fast Track");
+        assertThat(result.get(RESPONDENT_NAME)).isEqualTo("John Doe");
+        assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Fast Track");
     }
 
     @Test
     void shouldAddCombinedRespondentNames_OneVTwoScenario() {
-        // Given
         Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("Alice").individualLastName("Smith").build();
         Party respondent2 = Party.builder().type(Party.Type.COMPANY).companyName("Beta Ltd").build();
 
@@ -57,12 +56,10 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .build();
 
-        // When
         Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
-        // Then
-        assertThat(result.get("respondentName")).isEqualTo("Alice Smith and Beta Ltd");
-        assertThat(result.get("allocatedTrack")).isEqualTo("Multi Track");
+        assertThat(result.get(RESPONDENT_NAME)).isEqualTo("Alice Smith and Beta Ltd");
+        assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Multi Track");
     }
 
     @Test

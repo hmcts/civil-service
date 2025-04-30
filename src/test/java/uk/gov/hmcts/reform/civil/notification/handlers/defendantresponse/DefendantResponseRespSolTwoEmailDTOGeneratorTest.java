@@ -14,6 +14,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 class DefendantResponseRespSolTwoEmailDTOGeneratorTest {
 
@@ -64,7 +66,7 @@ class DefendantResponseRespSolTwoEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-        assertThat(result.get("respondentName")).isEqualTo("Alice Smith and Beta Corp");
-        assertThat(result.get("allocatedTrack")).isEqualTo("Fast Track");
+        assertThat(result.get(RESPONDENT_NAME)).isEqualTo("Alice Smith and Beta Corp");
+        assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Fast Track");
     }
 }

@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetra
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -16,7 +19,6 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetransferoffline.DefRespCaseOfflineHelper.caseOfflineNotificationProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 class DefRespCaseOfflineRespSolOneEmailDTOGeneratorTest {
 
@@ -37,8 +39,10 @@ class DefRespCaseOfflineRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTemplateIdFor1v1Or2v1Case() {
-        CaseData caseData = mock(CaseData.class);
-        when(is1v1Or2v1Case(caseData)).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .addApplicant2(YesOrNo.YES)
+            .build();
+
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn(TEMPLATE_1V1);
 
         String templateId = generator.getEmailTemplateId(caseData);
@@ -48,8 +52,9 @@ class DefRespCaseOfflineRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTemplateIdForMultipartyCase() {
-        CaseData caseData = mock(CaseData.class);
-        when(is1v1Or2v1Case(caseData)).thenReturn(false);
+        CaseData caseData = CaseData.builder()
+            .respondent2(Party.builder().build())
+            .build();
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty()).thenReturn(TEMPLATE_MULTIPARTY);
 
         String templateId = generator.getEmailTemplateId(caseData);
@@ -78,7 +83,7 @@ class DefRespCaseOfflineRespSolOneEmailDTOGeneratorTest {
 
             Map<String, String> result = generator.addCustomProperties(inputProps, caseData);
 
-            assertThat(result).containsEntry("claimLegalOrgNameSpec", LEGAL_ORG_NAME)
+            assertThat(result).containsEntry(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC, LEGAL_ORG_NAME)
                 .containsEntry("caseKey", "offlineVal");
         }
     }

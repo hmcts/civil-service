@@ -15,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 class DefendantResponseRespSolOneEmailDTOGeneratorTest {
 
@@ -59,8 +61,8 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-        assertThat(result.get("respondentName")).isEqualTo("John Doe");
-        assertThat(result.get("allocatedTrack")).isEqualTo("Small Claims Track");
+        assertThat(result.get(RESPONDENT_NAME)).isEqualTo("John Doe");
+        assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Small Claim Track");
     }
 
     @Test
@@ -84,20 +86,17 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
 
         Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
-        assertThat(result.get("respondentName")).isEqualTo("Alice Brown and Beta Ltd");
-        assertThat(result.get("allocatedTrack")).isEqualTo("Multi Track");
+        assertThat(result.get(RESPONDENT_NAME)).isEqualTo("Alice Brown and Beta Ltd");
+        assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Multi Track");
     }
 
     @Test
     void shouldReturnCorrectTemplateIdFromProperties() {
-        // Given
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn(expectedTemplateId);
 
-        // When
         String result = generator.getEmailTemplateId(CaseData.builder().build());
 
-        // Then
         assertThat(result).isEqualTo(expectedTemplateId);
         verify(notificationsProperties).getClaimantSolicitorDefendantResponseFullDefence();
     }
