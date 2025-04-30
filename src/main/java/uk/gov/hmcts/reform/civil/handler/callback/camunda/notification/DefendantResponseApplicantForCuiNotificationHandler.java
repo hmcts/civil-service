@@ -99,8 +99,8 @@ public class DefendantResponseApplicantForCuiNotificationHandler
         if (isLiPClaimant) {
             emailTemplate = notificationsProperties.getNotifyLiPClaimantDefendantResponded();
         } else {
-            if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                if (caseData.getResponseClaimMediationSpecRequired().equals(YES)) {
+            if (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                if (YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
                     emailTemplate = notificationsProperties.getRespondentLipFullDefenceWithMediationTemplate();
                 } else {
                     emailTemplate = notificationsProperties.getRespondentLipFullDefenceNoMediationTemplate();
