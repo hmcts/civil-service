@@ -1554,4 +1554,27 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && getRespondent1DQ().getRespondent1DQLanguage() != null
             && (getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.BOTH || getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.WELSH);
     }
+
+    @JsonIgnore
+    public String getApplicantSolicitor1UserDetailsEmail() {
+        return applicantSolicitor1UserDetails == null ? null : applicantSolicitor1UserDetails.getEmail();
+    }
+
+    @JsonIgnore
+    public String getClaimantUserDetailsEmail() {
+        final IdamUserDetails claimantUserDetails = getClaimantUserDetails();
+        return claimantUserDetails == null ? null : claimantUserDetails.getEmail();
+    }
+
+    @JsonIgnore
+    public String getRespondent1PartyEmail() {
+        final Party party = getRespondent1();
+        return party == null ? null : party.getPartyEmail();
+    }
+
+    @JsonIgnore
+    public String getRespondent2PartyEmail() {
+        final Party party = getRespondent2();
+        return party == null ? null : party.getPartyEmail();
+    }
 }
