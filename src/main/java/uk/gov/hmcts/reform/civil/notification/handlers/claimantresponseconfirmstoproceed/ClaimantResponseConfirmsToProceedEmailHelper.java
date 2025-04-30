@@ -27,10 +27,8 @@ public class ClaimantResponseConfirmsToProceedEmailHelper {
         this.featureToggleService = featureToggleService;
     }
 
-    public String getTemplate(CaseData caseData, boolean isApplicant, boolean isMultiPartyNotProceed) {
-        if (isMultiPartyNotProceed) {
-            return notificationsProperties.getClaimantSolicitorConfirmsNotToProceed(); // TODO - remove if integrate with not to proceed
-        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+    public String getTemplate(CaseData caseData, boolean isApplicant) {
+        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             boolean proceedsWithAction = rejectedAll(caseData) && mediationRejected(caseData);
             if (isApplicant) {
                 return  proceedsWithAction ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()

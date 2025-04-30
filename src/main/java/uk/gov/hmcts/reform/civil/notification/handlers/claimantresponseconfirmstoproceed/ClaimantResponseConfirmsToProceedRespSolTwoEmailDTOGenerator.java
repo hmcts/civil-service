@@ -19,8 +19,7 @@ public class ClaimantResponseConfirmsToProceedRespSolTwoEmailDTOGenerator extend
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        boolean isMultiPartyNotProceed = claimantResponseConfirmsToProceedEmailHelper.isMultiPartyNotProceed(caseData, true);
-        return claimantResponseConfirmsToProceedEmailHelper.getTemplate(caseData, false, isMultiPartyNotProceed);
+        return claimantResponseConfirmsToProceedEmailHelper.getTemplate(caseData, false);
     }
 
     @Override

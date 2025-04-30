@@ -10,9 +10,9 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed.MultiPartyNotToProceedAppSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed.MultiPartyNotToProceedRespSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed.MultiPartyNotToProceedRespSolTwoEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartyclaimantoptsoutonerespandcasenotproceeded.MultiPartyNotToProceedAppSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartyclaimantoptsoutonerespandcasenotproceeded.MultiPartyNotToProceedRespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartyclaimantoptsoutonerespandcasenotproceeded.MultiPartyNotToProceedRespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
