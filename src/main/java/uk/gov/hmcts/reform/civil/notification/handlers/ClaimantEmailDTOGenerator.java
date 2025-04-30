@@ -19,13 +19,6 @@ public abstract class ClaimantEmailDTOGenerator extends EmailDTOGenerator {
         return caseData.getApplicant1Email();
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-        ));
-    }
-
     protected Boolean getShouldNotify(CaseData caseData) {
         return caseData.isApplicantLiP() ? Boolean.TRUE : Boolean.FALSE;
     }
