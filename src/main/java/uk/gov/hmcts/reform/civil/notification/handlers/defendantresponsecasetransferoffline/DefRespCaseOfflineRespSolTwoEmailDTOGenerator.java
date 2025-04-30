@@ -39,7 +39,6 @@ public class DefRespCaseOfflineRespSolTwoEmailDTOGenerator extends RespSolTwoEma
         return REFERENCE_TEMPLATE;
     }
 
-
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         boolean isRespondent1 = false;

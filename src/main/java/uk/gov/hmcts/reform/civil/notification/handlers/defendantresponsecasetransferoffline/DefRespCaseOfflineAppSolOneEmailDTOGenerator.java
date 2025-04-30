@@ -40,7 +40,8 @@ public class DefRespCaseOfflineAppSolOneEmailDTOGenerator extends AppSolOneEmail
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+    protected Map<String, String> addCustomProperties(Map<String, String> properties,
+                                                      CaseData caseData) {
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.putAll(caseOfflineNotificationProperties(caseData));
         return properties;
