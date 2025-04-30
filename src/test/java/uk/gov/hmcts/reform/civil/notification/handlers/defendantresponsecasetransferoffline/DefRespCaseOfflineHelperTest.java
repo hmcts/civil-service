@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 
@@ -29,16 +30,23 @@ class DefRespCaseOfflineHelperTest {
     void shouldReturnConcatenatedReasonFor2v1LiP() {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-            .applicant1(Party.builder().partyName("Applicant One").build())
-            .applicant2(Party.builder().partyName("Applicant Two").build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Applicant One")
+                            .build())
+            .applicant2(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Applicant Two")
+                            .build())
+            .addApplicant2(YesOrNo.YES)
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .respondent1ClaimResponseTypeToApplicant2(RespondentResponseType.FULL_ADMISSION)
             .build();
 
         Map<String, String> result = caseOfflineNotificationProperties(caseData);
 
-        assertThat(result.get("reason")).contains("Part admission against Applicant One")
-            .contains("Full admission against Applicant Two");
+        assertThat(result.get("reason")).contains("admits part of the claim")
+            .contains("admits part of the claim against Applicant Two");
     }
 
     @Test
@@ -65,10 +73,10 @@ class DefRespCaseOfflineHelperTest {
 
         Map<String, String> result = caseOfflineNotificationProperties(caseData);
 
-        assertThat(result).containsEntry("respondent1Name", "John Smith")
-            .containsEntry("respondent2Name", "ABC Ltd")
-            .containsEntry("respondent1Response", "Full admission")
-            .containsEntry("respondent2Response", "Part admission");
+        assertThat(result).containsEntry("defendantOneName", "John Smith")
+            .containsEntry("defendantTwoName", "ABC Ltd")
+            .containsEntry("defendantOneResponse", "admits all of the claim")
+            .containsEntry("defendantTwoResponse", "admits part of the claim");
     }
 
     @Test
@@ -83,9 +91,9 @@ class DefRespCaseOfflineHelperTest {
 
         Map<String, String> result = caseOfflineNotificationProperties(caseData);
 
-        assertThat(result).containsEntry("respondent1Name", "Jane Doe")
-            .containsEntry("respondent2Name", "XYZ Org")
-            .containsEntry("respondent1Response", "Counter claim")
-            .containsEntry("respondent2Response", "Full defence");
+        assertThat(result).containsEntry("defendantOneName", "Jane Doe")
+            .containsEntry("defendantTwoName", "XYZ Org")
+            .containsEntry("defendantOneResponse", "Reject all of the claim and wants to counterclaim")
+            .containsEntry("defendantTwoResponse", "Defends all of the claim");
     }
 }

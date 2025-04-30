@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetransferoffline;
 
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;

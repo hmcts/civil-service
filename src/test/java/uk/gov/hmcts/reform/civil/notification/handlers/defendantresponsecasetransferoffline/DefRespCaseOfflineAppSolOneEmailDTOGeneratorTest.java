@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 
 class DefRespCaseOfflineAppSolOneEmailDTOGeneratorTest {
 
@@ -82,7 +83,7 @@ class DefRespCaseOfflineAppSolOneEmailDTOGeneratorTest {
 
             Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
-            assertThat(result).containsEntry("CLAIM_LEGAL_ORG_NAME_SPEC", "OrgName Ltd");
+            assertThat(result).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "OrgName Ltd");
             assertThat(result).containsEntry("someKey", "someValue");
         }
     }
