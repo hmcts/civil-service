@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed.MultiPartyNotToProceedAppSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed.MultiPartyNotToProceedRespSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed.MultiPartyNotToProceedRespSolTwoEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multiPartyClaimantOptsOutOneRespAndCaseNotProceeded.MultiPartyNotToProceedAppSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multiPartyClaimantOptsOutOneRespAndCaseNotProceeded.MultiPartyNotToProceedRespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multiPartyClaimantOptsOutOneRespAndCaseNotProceeded.MultiPartyNotToProceedRespSolTwoEmailDTOGenerator;
 
 import java.util.HashSet;
 import java.util.Set;

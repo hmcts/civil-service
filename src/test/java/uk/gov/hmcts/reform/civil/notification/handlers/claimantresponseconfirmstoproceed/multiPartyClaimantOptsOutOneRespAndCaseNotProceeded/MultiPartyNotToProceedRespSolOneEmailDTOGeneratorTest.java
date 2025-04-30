@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multiPartyClaimantOptsOutOneRespAndCaseNotProceeded;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,13 +11,13 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class MultiPartyNotToProceedAppSolOneEmailDTOGeneratorTest {
+public class MultiPartyNotToProceedRespSolOneEmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
 
     @InjectMocks
-    private MultiPartyNotToProceedAppSolOneEmailDTOGenerator emailDTOGenerator;
+    private MultiPartyNotToProceedRespSolOneEmailDTOGenerator emailDTOGenerator;
 
     @BeforeEach
     void setUp() {

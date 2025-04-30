@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multipartynottoproceed;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirmstoproceed.multiPartyClaimantOptsOutOneRespAndCaseNotProceeded;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
