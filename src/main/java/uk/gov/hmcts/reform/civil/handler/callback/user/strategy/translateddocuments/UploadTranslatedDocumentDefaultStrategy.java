@@ -20,8 +20,7 @@ import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.*;
 
 @Component
 @RequiredArgsConstructor
@@ -58,15 +57,17 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private void updateSystemGeneratedDocumentsWithOriginalDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        List<Element<CaseDocument>> preTranslatedDocuments = caseData.getPreTranslationDocuments();
         List<Element<CaseDocument>> sdoOrderDocuments = caseData.getPreTranslationSdoOrderDocuments();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
-                if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
-                    if (Objects.nonNull(sdoOrderDocuments) && sdoOrderDocuments.size() > 0) {
-                        Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
-                        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-                        systemGeneratedDocuments.add(originalSdo);
-                    }
+                if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()
+                    || (Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
+                    Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
+                    Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
+                    List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+                    systemGeneratedDocuments.add(originalSdo);
+                    systemGeneratedDocuments.add(originalDocument);
                 }
             });
         }
