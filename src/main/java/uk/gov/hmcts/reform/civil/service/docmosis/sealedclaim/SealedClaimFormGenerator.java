@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,8 +47,15 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimForm templateData = getTemplateData(caseData, authorisation);
-        log.info("templateData for caseId {} and Template data == {} ==", caseData.getCcdCaseReference(),
-                 templateData.toString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String jacksonData = objectMapper.writeValueAsString(templateData.toMap(objectMapper));
+            log.info("templateData for caseId {} and Template data == {} ==", caseData.getCcdCaseReference(),
+                     jacksonData);
+        }  catch (JsonProcessingException ignored) {
+            log.info("Error in parse data {}", caseData.getCcdCaseReference());
+        }
+
         DocmosisTemplates docmosisTemplate = getDocmosisTemplate(caseData);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
