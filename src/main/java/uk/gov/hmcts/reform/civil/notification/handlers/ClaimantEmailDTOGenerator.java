@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
