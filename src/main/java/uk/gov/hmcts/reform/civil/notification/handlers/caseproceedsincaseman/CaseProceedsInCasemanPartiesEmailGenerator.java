@@ -28,7 +28,12 @@ public class CaseProceedsInCasemanPartiesEmailGenerator implements PartiesEmailG
     public Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
-        partiesToEmail.add(getApplicant(caseData));
+
+        EmailDTO applicantEmailDTO = getApplicant(caseData);
+        if (applicantEmailDTO != null) {
+            partiesToEmail.add(getApplicant(caseData));
+        }
+
         partiesToEmail.addAll(getRespondents(caseData));
 
         return partiesToEmail;
