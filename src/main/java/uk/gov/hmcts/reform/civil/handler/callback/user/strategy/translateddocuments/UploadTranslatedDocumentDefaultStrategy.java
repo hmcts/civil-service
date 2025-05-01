@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
@@ -74,7 +73,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
                     Element<CaseDocument> originalDocumentCopy = preTranslatedDocumentsCopy.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-                    if (originalDocumentCopy.getValue().getDocumentName().contains("claimant")){
+                    if (originalDocumentCopy.getValue().getDocumentName().contains("claimant")) {
                         originalDocumentCopy.getValue().getDocumentLink().setCategoryID(DocCategory.APP1_DQ.getValue());
                     }
                     systemGeneratedDocuments.add(originalDocument);
