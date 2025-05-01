@@ -1,0 +1,3 @@
+<configuration>
+    <logger name="uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter" level="OFF"/>
+</configuration>
