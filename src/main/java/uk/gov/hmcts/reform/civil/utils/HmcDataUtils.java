@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
@@ -437,11 +441,27 @@ public class HmcDataUtils {
         return isWelshHearingTemplateClaimant(caseData) || isWelshHearingTemplateDefendant(caseData);
     }
 
+    public static boolean isClaimantDQDocumentsWelsh(CaseData caseData) {
+        return Optional.ofNullable(caseData.getApplicant1DQ())
+            .map(Applicant1DQ::getApplicant1DQLanguage)
+            .map(WelshLanguageRequirements::getDocuments)
+            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
+            .orElse(false);
+    }
+
+    public static boolean isDefendantDQDocumentsWelsh(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQLanguage)
+            .map(WelshLanguageRequirements::getDocuments)
+            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
+            .orElse(false);
+    }
+
     public static boolean isWelshHearingTemplateClaimant(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getApplicant1Represented()) && (caseData.isClaimantBilingual() || caseData.isClaimantDQDocumentsWelsh());
+        return YesOrNo.NO.equals(caseData.getApplicant1Represented()) && (caseData.isClaimantBilingual() || isClaimantDQDocumentsWelsh(caseData));
     }
 
     public static boolean isWelshHearingTemplateDefendant(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getRespondent1Represented()) && (caseData.isRespondentResponseBilingual() || caseData.isDefendantDQDocumentsWelsh());
+        return YesOrNo.NO.equals(caseData.getRespondent1Represented()) && (caseData.isRespondentResponseBilingual() || isDefendantDQDocumentsWelsh(caseData));
     }
 }

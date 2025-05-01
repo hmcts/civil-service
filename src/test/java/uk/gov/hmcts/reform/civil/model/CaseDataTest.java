@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
@@ -26,11 +25,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -1400,197 +1397,7 @@ class CaseDataTest {
         assertEquals(expectedFlag, obligationWAFlag);
     }
 
-    @Nested
-    class IsClaimantDQDocumentsWelshTests {
-
-        @Test
-        void shouldReturnFalse_whenApplicant1DQIsNull() {
-            // Given
-            CaseData caseData = CaseData.builder()
-                .applicant1DQ(null)
-                .build();
-
-            // When
-            boolean result = caseData.isClaimantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnFalse_whenApplicant1DQLanguageIsNull() {
-            // Given
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(null)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .applicant1DQ(applicant1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isClaimantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnFalse_whenDocumentsIsEnglish() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.ENGLISH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .applicant1DQ(applicant1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isClaimantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnTrue_whenDocumentsIsWelsh() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .applicant1DQ(applicant1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isClaimantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnTrue_whenDocumentsIsBoth() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .applicant1DQ(applicant1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isClaimantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isTrue();
-        }
-    }
-
-    @Nested
-    class IsDefendantDQDocumentsWelshTests {
-
-        @Test
-        void shouldReturnFalse_whenRespondent1DQIsNull() {
-            // Given
-            CaseData caseData = CaseData.builder()
-                .respondent1DQ(null)
-                .build();
-
-            // When
-            boolean result = caseData.isDefendantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnFalse_whenRespondent1DQLanguageIsNull() {
-            // Given
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(null)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .respondent1DQ(respondent1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isDefendantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnFalse_whenDocumentsIsEnglish() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.ENGLISH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .respondent1DQ(respondent1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isDefendantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnTrue_whenDocumentsIsWelsh() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .respondent1DQ(respondent1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isDefendantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnTrue_whenDocumentsIsBoth() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
-            CaseData caseData = CaseData.builder()
-                .respondent1DQ(respondent1DQ)
-                .build();
-
-            // When
-            boolean result = caseData.isDefendantDQDocumentsWelsh();
-
-            // Then
-            assertThat(result).isTrue();
-        }
-    }
-
-    @Test
+   @Test
     void shouldReturnNullWhenApplicantSolicitor1UserDetailsEmailIsNull() {
         CaseData caseData = CaseData.builder().build();
         assertNull(caseData.getApplicantSolicitor1UserDetailsEmail());

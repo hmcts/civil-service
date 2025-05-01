@@ -332,7 +332,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @CsvSource({
             "WELSH, ENGLISH, ENGLISH, true, false",
             "ENGLISH, ENGLISH, ENGLISH, true, true",
-            "WELSH, ENGLISH, WELSH, true, true",
+            "WELSH, ENGLISH, WELSH, true, false",
             "WELSH, WELSH, ENGLISH, true, false",
             "ENGLISH, WELSH, WELSH, true, false",
             "WELSH, WELSH, WELSH, true, false",

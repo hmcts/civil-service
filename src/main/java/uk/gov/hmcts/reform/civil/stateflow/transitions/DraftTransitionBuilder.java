@@ -17,9 +17,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BILINGUAL_DOCS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESSION_ENABLED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CLAIMANT_ENGLISH_TO_WELSH;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DASHBOARD_SERVICE_ENABLED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_ENGLISH_TO_WELSH;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIVE_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.IS_JO_LIVE_FEED_ACTIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_NOC_ONLINE;
@@ -45,8 +43,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(DEFENDANT_ENGLISH_TO_WELSH.name(), isDefendantEnglishToWelshForCase(c)),
-                    Map.entry(CLAIMANT_ENGLISH_TO_WELSH.name(), isClaimantEnglishToWelshForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
@@ -68,8 +64,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(DEFENDANT_ENGLISH_TO_WELSH.name(), isDefendantEnglishToWelshForCase(c)),
-                    Map.entry(CLAIMANT_ENGLISH_TO_WELSH.name(), isClaimantEnglishToWelshForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
@@ -87,8 +81,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(DEFENDANT_ENGLISH_TO_WELSH.name(), isDefendantEnglishToWelshForCase(c)),
-                    Map.entry(CLAIMANT_ENGLISH_TO_WELSH.name(), isClaimantEnglishToWelshForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
@@ -109,8 +101,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(DEFENDANT_ENGLISH_TO_WELSH.name(), isDefendantEnglishToWelshForCase(c)),
-                    Map.entry(CLAIMANT_ENGLISH_TO_WELSH.name(), isClaimantEnglishToWelshForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
@@ -130,8 +120,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(DEFENDANT_ENGLISH_TO_WELSH.name(), isDefendantEnglishToWelshForCase(c)),
-                    Map.entry(CLAIMANT_ENGLISH_TO_WELSH.name(), isClaimantEnglishToWelshForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
@@ -151,8 +139,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     Map.entry(GENERAL_APPLICATION_ENABLED.name(), switchTheGAFlagIfLipExists(c)),
                     Map.entry(DASHBOARD_SERVICE_ENABLED.name(), isDashBoardEnabledForCase(c)),
-                    Map.entry(DEFENDANT_ENGLISH_TO_WELSH.name(), isDefendantEnglishToWelshForCase(c)),
-                    Map.entry(CLAIMANT_ENGLISH_TO_WELSH.name(), isClaimantEnglishToWelshForCase(c)),
                     Map.entry(CASE_PROGRESSION_ENABLED.name(), featureToggleService.isCaseProgressionEnabled()),
                     Map.entry(BULK_CLAIM_ENABLED.name(), featureToggleService.isBulkClaimEnabled()),
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
@@ -223,20 +209,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
 
     public boolean isDashBoardEnabledForCase(CaseData caseData) {
         return featureToggleService.isDashboardEnabledForCase(caseData) && caseContainsLiP.test(caseData);
-    }
-
-    public boolean isDefendantEnglishToWelshForCase(CaseData caseData) {
-        return featureToggleService.isGaForWelshEnabled()
-            && !caseData.isRespondentResponseBilingual()
-            && !caseData.isDefendantDQDocumentsWelsh()
-            && caseData.isClaimantBilingual();
-    }
-
-    public boolean isClaimantEnglishToWelshForCase(CaseData caseData) {
-        return featureToggleService.isGaForWelshEnabled()
-            && !caseData.isClaimantBilingual()
-            && !caseData.isClaimantDQDocumentsWelsh()
-            && caseData.isRespondentResponseBilingual();
     }
 
     public boolean switchTheGAFlagIfLipExists(CaseData caseData) {

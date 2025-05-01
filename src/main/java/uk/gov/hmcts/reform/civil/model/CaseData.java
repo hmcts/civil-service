@@ -58,7 +58,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
-import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
@@ -1540,24 +1539,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
     }
 
-    @JsonIgnore
-    public boolean isClaimantDQDocumentsWelsh() {
-        return Optional.ofNullable(getApplicant1DQ())
-            .map(Applicant1DQ::getApplicant1DQLanguage)
-            .map(WelshLanguageRequirements::getDocuments)
-            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
-            .orElse(false);
-    }
-
-    @JsonIgnore
-    public boolean isDefendantDQDocumentsWelsh() {
-        return Optional.ofNullable(getRespondent1DQ())
-            .map(Respondent1DQ::getRespondent1DQLanguage)
-            .map(WelshLanguageRequirements::getDocuments)
-            .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
-            .orElse(false);
-    }
-  
     @JsonIgnore
     public boolean isLipClaimantSpecifiedBilingualDocuments() {
         return isApplicant1NotRepresented()

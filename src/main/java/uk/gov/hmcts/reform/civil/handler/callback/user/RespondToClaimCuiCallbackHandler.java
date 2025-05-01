@@ -98,9 +98,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
         boolean needsTranslating = featureToggleService.isGaForWelshEnabled()
-            ? (caseData.isRespondentResponseBilingual() || (!caseData.isRespondentResponseBilingual()
-            && !caseData.isDefendantDQDocumentsWelsh()
-            && caseData.isClaimantBilingual()))
+            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments())
             : caseData.isRespondentResponseBilingual();
 
         if (!needsTranslating) {
