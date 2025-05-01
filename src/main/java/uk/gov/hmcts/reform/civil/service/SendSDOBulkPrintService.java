@@ -38,14 +38,15 @@ public class SendSDOBulkPrintService {
                     caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
                     caseData.getTranslatedSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
                 }
-                default -> {}
+                default -> { }
             }
 
             if (!caseDocuments.isEmpty()) {
                 byte[] letterContent;
                 Party recipientDetails = getPartyDetails(taskId, caseData);
 
-                letterContent = sdoCoverLetterAppendService.makeSdoDocumentMailable(caseData, authorisation, recipientDetails, SDO_ORDER, caseDocuments.toArray(new CaseDocument[0]));
+                letterContent = sdoCoverLetterAppendService.makeSdoDocumentMailable(caseData, authorisation, recipientDetails, SDO_ORDER,
+                                                                                    caseDocuments.toArray(new CaseDocument[0]));
 
                 List<String> recipients = getRecipientsList(caseData, taskId);
                 bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
