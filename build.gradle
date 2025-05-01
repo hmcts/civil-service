@@ -240,7 +240,8 @@ task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-QM'
+  commandLine './bin/run-api-tests.sh'
+  
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
