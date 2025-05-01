@@ -33,7 +33,6 @@ public class DefendantResponseRespSolTwoEmailDTOGenerator extends RespSolTwoEmai
         return REFERENCE_TEMPLATE;
     }
 
-
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()) +
