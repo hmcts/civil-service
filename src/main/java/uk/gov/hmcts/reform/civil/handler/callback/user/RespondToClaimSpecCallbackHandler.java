@@ -152,7 +152,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
     private static final String DEF2 = "Defendant 2";
-    public static final String ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED = "There is a problem \n You have already submitted the defendant's response";
+    public static final String ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED =
+        "There is a problem \n You have already submitted the defendant's response";
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
