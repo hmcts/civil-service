@@ -527,6 +527,14 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     }
 
     @JsonIgnore
+    public String getDefendantBilingualLanguagePreference() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+            .orElse(null);
+    }
+
+    @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
         Optional<CaseDataLiP> caseDataLiP1 = Optional.ofNullable(getCaseDataLiP());
         return caseDataLiP1.map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
