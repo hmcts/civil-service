@@ -8,6 +8,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 @Component
 public class BundleCreationDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
+    private static final String REFERENCE_TEMPLATE = "bundle-created-respondent-notification-%s";
+
     protected BundleCreationDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         super(notificationsProperties);
     }
@@ -20,6 +22,6 @@ public class BundleCreationDefendantEmailDTOGenerator extends DefendantEmailDTOG
 
     @Override
     protected String getReferenceTemplate() {
-        return "bundle-created-respondent-notification-%s";
+        return REFERENCE_TEMPLATE;
     }
 }

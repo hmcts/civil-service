@@ -14,6 +14,8 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Component
 public class BundleCreationRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
+    private static final String REFERENCE_TEMPLATE = "bundle-created-respondent-notification-%s";
+
     protected BundleCreationRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
         super(notificationsProperties, organisationService);
     }
@@ -25,7 +27,7 @@ public class BundleCreationRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
 
     @Override
     protected String getReferenceTemplate() {
-        return "bundle-created-respondent-notification-%s";
+        return REFERENCE_TEMPLATE;
     }
 
     @Override
