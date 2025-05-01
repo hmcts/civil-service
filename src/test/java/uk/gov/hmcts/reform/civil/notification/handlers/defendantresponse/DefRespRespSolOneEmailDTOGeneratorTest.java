@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
-class DefendantResponseRespSolOneEmailDTOGeneratorTest {
+class DefRespRespSolOneEmailDTOGeneratorTest {
 
     private DefendantResponseRespSolOneEmailDTOGenerator generator;
     private NotificationsProperties notificationsProperties;
