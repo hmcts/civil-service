@@ -34,18 +34,30 @@ public class GenerateDJFormRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
                     : notificationsProperties.getInterimJudgmentRequestedDefendant();
             }
         }
-        if (isMultiPartyScenario(caseData)) {
+        if (isOneVTwoTwoLegalRep(caseData)) {
             if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
                 || checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())) {
-                return notificationsProperties.getInterimJudgmentRequestedClaimant();
+                return notificationsProperties.getInterimJudgmentRequestedDefendant();
             }
         }
         return notificationsProperties.getInterimJudgmentApprovalDefendant();
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        //Add rest of code from notes app here
+    protected String getReferenceTemplate(CaseData caseData) {
+        if (caseData.isRespondent1LiP() && YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            if (!caseData.isRespondent2LiP()) {
+                return checkIfBothDefendants(caseData)
+                    ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                    : REFERENCE_TEMPLATE_REQUEST_DEF;
+            }
+        }
+        if (isOneVTwoTwoLegalRep(caseData)) {
+            if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
+                || checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())) {
+                return REFERENCE_TEMPLATE_REQUEST_DEF;
+            }
+        }
         return REFERENCE_TEMPLATE_APPROVAL_DEF;
     }
 

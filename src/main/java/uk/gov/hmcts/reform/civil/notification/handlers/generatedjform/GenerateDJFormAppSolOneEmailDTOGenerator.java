@@ -34,8 +34,12 @@ public class GenerateDJFormAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOG
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        //Add rest of code from notes app here
+    protected String getReferenceTemplate(CaseData caseData) {
+        if (isOneVTwoTwoLegalRep(caseData)) {
+            if(checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName()) || checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())) {
+                return REFERENCE_TEMPLATE_REQUEST_CLAIMANT;
+            }
+        }
         return REFERENCE_TEMPLATE_APPROVAL_CLAIMANT;
     }
 
