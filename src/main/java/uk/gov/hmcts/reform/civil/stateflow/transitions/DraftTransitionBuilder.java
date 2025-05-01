@@ -52,7 +52,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c))
+                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
                     Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
                 )), transitions)
@@ -75,7 +75,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(JO_ONLINE_LIVE_ENABLED.name(), featureToggleService.isJudgmentOnlineLive()),
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
-                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c))
+                    Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
                     Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
                 )), transitions)
