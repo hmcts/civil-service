@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.adddefendantlitigantfrien
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantResponseUnspecFullDefenceNotifyParties;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantResponseUnspecCaseHandedOfflineNotifyParties;
 
 @Component
 public class DefRespCaseOfflineUnspecNotifier
@@ -20,6 +20,6 @@ public class DefRespCaseOfflineUnspecNotifier
 
     @Override
     public String getTaskId() {
-        return DefendantResponseUnspecFullDefenceNotifyParties.toString();
+        return DefendantResponseUnspecCaseHandedOfflineNotifyParties.toString();
     }
 }

@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantResponseUnspecFullDefenceNotifyParties;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantResponseUnspecCaseHandedOfflineNotifyParties;
 
 class DefRespCaseOfflineUnspecNotifierTest {
 
@@ -26,6 +26,6 @@ class DefRespCaseOfflineUnspecNotifierTest {
     @Test
     void shouldReturnCorrectTaskId() {
         assertThat(notifier.getTaskId())
-            .isEqualTo(DefendantResponseUnspecFullDefenceNotifyParties.toString());
+            .isEqualTo(DefendantResponseUnspecCaseHandedOfflineNotifyParties.toString());
     }
 }
