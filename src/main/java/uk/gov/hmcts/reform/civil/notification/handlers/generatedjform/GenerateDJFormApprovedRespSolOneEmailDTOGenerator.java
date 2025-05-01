@@ -15,15 +15,12 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLeg
 public class GenerateDJFormApprovedRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
-    private final GenerateDJFormHelper generateDJFormHelper;
     private static final String REFERENCE_TEMPLATE_APPROVAL_DEF = "interim-judgment-approval-notification-def-%s";
 
     public GenerateDJFormApprovedRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
-                                                             OrganisationService organisationService,
-                                                             GenerateDJFormHelper generateDJFormHelper) {
+                                                             OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.generateDJFormHelper = generateDJFormHelper;
     }
 
     @Override
@@ -41,11 +38,6 @@ public class GenerateDJFormApprovedRespSolOneEmailDTOGenerator extends RespSolOn
         properties.put(LEGAL_ORG_DEF, properties.get(CLAIM_LEGAL_ORG_NAME_SPEC));
         properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName());
-        if (isOneVTwoTwoLegalRep(caseData)) {
-            if (generateDJFormHelper.checkDefendantRequested(caseData, false)) {
-                properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName());
-            }
-        }
         return properties;
     }
 }
