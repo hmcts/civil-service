@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBui
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedTwoRegisteredRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 
-@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class DraftTransitionBuilderTest {
 

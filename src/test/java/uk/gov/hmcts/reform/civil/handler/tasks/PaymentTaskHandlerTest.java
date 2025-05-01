@@ -100,6 +100,7 @@ class PaymentTaskHandlerTest {
                                                          Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
                                                          Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false))
             );
+
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, MAKE_PBA_PAYMENT))

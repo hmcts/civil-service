@@ -656,17 +656,17 @@ class CaseEventTaskHandlerTest {
                 || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)) {
                 return Map.ofEntries(Map.entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                                     Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                                     Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
-                                     Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
-                                     Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
-                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+                             Map.entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                             Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                             Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
+                             Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
+                             Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                             Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                             Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+                             Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
+                             Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
+                             Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                             Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false)
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)) {
@@ -715,24 +715,23 @@ class CaseEventTaskHandlerTest {
 
             } else if (state.equals(FULL_DEFENCE_PROCEED)) {
                 return Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                              Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                              Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
-                              Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-                              Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                              Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
-                              Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
-                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
-                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
-                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
-                              Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                              Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+                                     Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.MINTI_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+                                     Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
+                                     Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false)
                 );
             }
             return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                           FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
                           FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
                           FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-
                           FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
                           FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
                           FlowFlag.DEFENDANT_NOC_ONLINE.name(), false

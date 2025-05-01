@@ -1397,7 +1397,7 @@ class CaseDataTest {
         assertEquals(expectedFlag, obligationWAFlag);
     }
 
-   @Test
+    @Test
     void shouldReturnNullWhenApplicantSolicitor1UserDetailsEmailIsNull() {
         CaseData caseData = CaseData.builder().build();
         assertNull(caseData.getApplicantSolicitor1UserDetailsEmail());

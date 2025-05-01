@@ -106,13 +106,13 @@ class HmcDataUtilsTest {
             .serviceData(PartiesNotifiedServiceData.builder()
                              .days(List.of(
                                  HearingDay.builder()
-                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                               .build(),
+                                     .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                     .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                     .build(),
                                  HearingDay.builder()
-                                               .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
-                                               .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
-                                               .build()))
+                                     .hearingStartDateTime(LocalDateTime.of(2023, 12, 23, 10, 0))
+                                     .hearingEndDateTime(LocalDateTime.of(2023, 12, 23, 11, 0))
+                                     .build()))
                              .hearingLocation("Venue A")
                              .build()).build();
 
@@ -1555,9 +1555,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnOneAttendee() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
-                            HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
+                List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                        HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
@@ -1567,12 +1567,12 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnMultipleAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
-                            HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingInPerson("Michael", "Carver"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
-                            HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
-                    ));
+                List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
+                        HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingInPerson("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
+                ));
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
@@ -1582,9 +1582,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnNullForZeroAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
-                    ));
+                List.of(HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
+                ));
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
@@ -1605,7 +1605,7 @@ class HmcDataUtilsTest {
                                              .cftOrganisationID("ID")
                                              .name("Misplaced Org")
                                              .build()).build()
-                );
+            );
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
@@ -1620,9 +1620,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnOneAttendee() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
+                List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")));
 
             String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
 
@@ -1632,12 +1632,12 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnMultipleAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByPhone("Michael", "Carver"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
-                            HearingIndividual.attendingHearingByPhone("Jack", "Crawley")
-                    ));
+                List.of(HearingIndividual.attendingHearingByPhone("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByPhone("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingByPhone("Jack", "Crawley")
+                ));
 
             String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
 
@@ -1647,9 +1647,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnNull() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
-                    ));
+                List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Jenny", "Harper")
+                ));
 
             String actual = HmcDataUtils.getPhoneAttendeeNames(hearing);
 
@@ -1664,9 +1664,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnOneAttendee() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper")));
+                List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByPhone("Jenny", "Harper")));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
@@ -1676,12 +1676,12 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnMultipleAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
-                            HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
-                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
-                            HearingIndividual.attendingHearingByVideo("Jack", "Crawley")
-                    ));
+                List.of(HearingIndividual.attendingHearingByVideo("Jason", "Wells"),
+                        HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByVideo("Michael", "Carver"),
+                        HearingIndividual.attendingHearingByPhone("Jenny", "Harper"),
+                        HearingIndividual.attendingHearingByVideo("Jack", "Crawley")
+                ));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
@@ -1691,9 +1691,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnNullForZeroAttendees() {
             HearingGetResponse hearing = buildHearing(
-                    List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
-                            HearingIndividual.attendingHearingByPhone("Jenny", "Harper")
-                    ));
+                List.of(HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),
+                        HearingIndividual.attendingHearingByPhone("Jenny", "Harper")
+                ));
 
             String actual = HmcDataUtils.getVideoAttendeesNames(hearing);
 
@@ -1704,12 +1704,12 @@ class HmcDataUtilsTest {
 
     private HearingGetResponse buildHearing(List<HearingIndividual> testIndividuals) {
         return HearingGetResponse.builder()
-                .partyDetails(testIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
-                .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
-                        HearingDaySchedule.builder()
-                                .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
-                                .build())).build())
-                .build();
+            .partyDetails(testIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
+                HearingDaySchedule.builder()
+                    .attendees(testIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                    .build())).build())
+            .build();
     }
 
     private HearingGetResponse buildHearing(String hearingType) {
@@ -1742,144 +1742,6 @@ class HmcDataUtilsTest {
                 startTime).build()).collect(
                 Collectors.toList()))
             .build();
-    }
-
-    @Nested
-    class IsWelshHearingTemplateTests {
-
-        @Test
-        void shouldReturnTrue_whenApplicantNoRepAndClaimantBilingual() {
-            // Given
-            CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.NO)
-                // -> isClaimantBilingual() = true
-                .claimantBilingualLanguagePreference(Language.WELSH.toString())
-                .respondent1Represented(YesOrNo.YES)
-                .build();
-
-            // When
-            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
-
-            // Then
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnTrue_whenApplicantNoRepAndClaimantDQDocumentsWelsh() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Applicant1DQ dq = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
-
-            CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.NO)
-                // -> isClaimantBilingual() = false (ej: ENGLISH)
-                .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
-                .applicant1DQ(dq)
-                .respondent1Represented(YesOrNo.YES)
-                .build();
-
-            // When
-            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
-
-            // Then
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnTrue_whenRespondentNoRepAndRespondentResponseBilingual() {
-            // Given
-            // -> isRespondentResponseBilingual() = true si "BOTH" o "WELSH"
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("BOTH") // => true
-                                            .build())
-                .build();
-
-            CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(caseDataLiP)
-                .build();
-
-            // When
-            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
-
-            // Then
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnTrue_whenRespondentNoRepAndDefendantDQDocumentsWelsh() {
-            // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
-
-            // -> isRespondentResponseBilingual() = false (ej: "ENGLISH")
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
-
-            CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.NO)
-                .respondent1DQ(respondent1DQ)
-                .caseDataLiP(caseDataLiP)
-                .build();
-
-            // When
-            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
-
-            // Then
-            assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnFalse_whenApplicantYesRepAndRespondentYesRep() {
-            // Given
-            // Ninguno es NO => toda la expresión OR se evalúa a false
-            CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.YES)
-                .build();
-
-            // When
-            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
-
-            // Then
-            assertThat(result).isFalse();
-        }
-
-        @Test
-        void shouldReturnFalse_whenApplicantNoRepButNotBilingualNotDQ_andRespondentNoRepButNotBilingualNotDQ() {
-            // Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
-
-            CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.NO)
-                .claimantBilingualLanguagePreference(Language.ENGLISH.toString()) // => false
-                .respondent1Represented(YesOrNo.NO)
-                .caseDataLiP(caseDataLiP)
-                // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
-                .build();
-
-            // When
-            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
-
-            // Then
-            assertThat(result).isFalse();
-        }
     }
 
     @Nested
@@ -2069,6 +1931,144 @@ class HmcDataUtilsTest {
 
             // Then
             assertThat(result).isTrue();
+        }
+    }
+
+    @Nested
+    class IsWelshHearingTemplateTests {
+
+        @Test
+        void shouldReturnTrue_whenApplicantNoRepAndClaimantBilingual() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                // -> isClaimantBilingual() = true
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenApplicantNoRepAndClaimantDQDocumentsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.BOTH)
+                .build();
+            Applicant1DQ dq = Applicant1DQ.builder()
+                .applicant1DQLanguage(req)
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                // -> isClaimantBilingual() = false (ej: ENGLISH)
+                .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
+                .applicant1DQ(dq)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentNoRepAndRespondentResponseBilingual() {
+            // Given
+            // -> isRespondentResponseBilingual() = true si "BOTH" o "WELSH"
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("BOTH") // => true
+                                            .build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(caseDataLiP)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentNoRepAndDefendantDQDocumentsWelsh() {
+            // Given
+            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
+                .documents(Language.WELSH)
+                .build();
+            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
+                .respondent1DQLanguage(req)
+                .build();
+
+            // -> isRespondentResponseBilingual() = false (ej: "ENGLISH")
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("ENGLISH").build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.NO)
+                .respondent1DQ(respondent1DQ)
+                .caseDataLiP(caseDataLiP)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicantYesRepAndRespondentYesRep() {
+            // Given
+            // Ninguno es NO => toda la expresión OR se evalúa a false
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1Represented(YesOrNo.YES)
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalse_whenApplicantNoRepButNotBilingualNotDQ_andRespondentNoRepButNotBilingualNotDQ() {
+            // Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                            .respondent1ResponseLanguage("ENGLISH").build())
+                .build();
+
+            CaseData caseData = CaseData.builder()
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.ENGLISH.toString()) // => false
+                .respondent1Represented(YesOrNo.NO)
+                .caseDataLiP(caseDataLiP)
+                // Sin Applicant1DQ ni Respondent1DQ que establezcan WELSH o BOTH
+                .build();
+
+            // When
+            boolean result = HmcDataUtils.isWelshHearingTemplate(caseData);
+
+            // Then
+            assertThat(result).isFalse();
         }
     }
 }
