@@ -31,6 +31,9 @@ spring:
     username: ${CMC_DB_USERNAME:-}
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
+  logging:
+      level:
+        uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter: OFF
 
   servlet:
     multipart:
@@ -589,10 +592,6 @@ docStore:
   doc:
     removal:
       enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
-
-logging:
-  level:
-    uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter: ERROR
 
 ---
 
