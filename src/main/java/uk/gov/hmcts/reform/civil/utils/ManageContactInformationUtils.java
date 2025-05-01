@@ -2,16 +2,28 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.createPartyId;
 
 public class ManageContactInformationUtils {
 
@@ -34,34 +46,36 @@ public class ManageContactInformationUtils {
     private static final String ORG_INDIVIDUALS = "Individuals attending for the organisation";
     private static final String LEGAL_REP_INDIVIDUALS = "Individuals attending for the legal representative";
 
-    private static final String CLAIMANT_ONE_ID = "CLAIMANT_1";
-    private static final String CLAIMANT_ONE_LITIGATION_FRIEND_ID = "CLAIMANT_1_LITIGATIONFRIEND";
-    private static final String CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "CLAIMANT_1_INDIVIDUALSSOLICITORORG";
-    private static final String CLAIMANT_ONE_ORG_INDIVIDUALS_ID = "CLAIMANT_1_INDIVIDUALSORG";
-    private static final String CLAIMANT_ONE_WITNESSES_ID = "CLAIMANT_1_WITNESSES";
-    private static final String CLAIMANT_ONE_EXPERTS_ID = "CLAIMANT_1_EXPERTS";
+    public static final String CLAIMANT_ONE_ID = "CLAIMANT_1";
+    public static final String CLAIMANT_ONE_LITIGATION_FRIEND_ID = "CLAIMANT_1_LITIGATION_FRIEND";
+    public static final String CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "CLAIMANT_1_LR_INDIVIDUALS";
+    public static final String CLAIMANT_ONE_ORG_INDIVIDUALS_ID = "CLAIMANT_1_ORGANISATION_INDIVIDUALS";
+    public static final String CLAIMANT_ONE_WITNESSES_ID = "CLAIMANT_1_WITNESSES";
+    public static final String CLAIMANT_ONE_EXPERTS_ID = "CLAIMANT_1_EXPERTS";
 
-    private static final String CLAIMANT_TWO_ID = "CLAIMANT_2";
-    private static final String CLAIMANT_TWO_LITIGATION_FRIEND_ID = "CLAIMANT_2_LITIGATIONFRIEND";
-    private static final String CLAIMANT_TWO_ORG_INDIVIDUALS_ID = "CLAIMANT_1_INDIVIDUALSORG";
+    public static final String CLAIMANT_TWO_ID = "CLAIMANT_2";
+    public static final String CLAIMANT_TWO_LITIGATION_FRIEND_ID = "CLAIMANT_2_LITIGATION_FRIEND";
+    public static final String CLAIMANT_TWO_ORG_INDIVIDUALS_ID = "CLAIMANT_2_ORGANISATION_INDIVIDUALS";
 
-    private static final String DEFENDANT_ONE_ID = "DEFENDANT_1";
-    private static final String DEFENDANT_ONE_LITIGATION_FRIEND_ID = "DEFENDANT_1_LITIGATIONFRIEND";
-    private static final String DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_1_INDIVIDUALSSOLICITORORG";
-    private static final String DEFENDANT_ONE_ORG_INDIVIDUALS_ID = "DEFENDANT_1_INDIVIDUALSORG";
-    private static final String DEFENDANT_ONE_WITNESSES_ID = "DEFENDANT_1_WITNESSES";
-    private static final String DEFENDANT_ONE_EXPERTS_ID = "DEFENDANT_1_EXPERTS";
+    public static final String DEFENDANT_ONE_ID = "DEFENDANT_1";
+    public static final String DEFENDANT_ONE_LITIGATION_FRIEND_ID = "DEFENDANT_1_LITIGATION_FRIEND";
+    public static final String DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_1_LR_INDIVIDUALS";
+    public static final String DEFENDANT_ONE_ORG_INDIVIDUALS_ID = "DEFENDANT_1_ORGANISATION_INDIVIDUALS";
+    public static final String DEFENDANT_ONE_WITNESSES_ID = "DEFENDANT_1_WITNESSES";
+    public static final String DEFENDANT_ONE_EXPERTS_ID = "DEFENDANT_1_EXPERTS";
 
-    private static final String DEFENDANT_TWO_ID = "DEFENDANT_2";
-    private static final String DEFENDANT_TWO_LITIGATION_FRIEND_ID = "DEFENDANT_2_LITIGATIONFRIEND";
-    private static final String DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_2_INDIVIDUALSSOLICITORORG";
-    private static final String DEFENDANT_TWO_ORG_INDIVIDUALS_ID = "DEFENDANT_2_INDIVIDUALSORG";
-    private static final String DEFENDANT_TWO_WITNESSES_ID = "DEFENDANT_2_WITNESSES";
-    private static final String DEFENDANT_TWO_EXPERTS_ID = "DEFENDANT_2_EXPERTS";
+    public static final String DEFENDANT_TWO_ID = "DEFENDANT_2";
+    public static final String DEFENDANT_TWO_LITIGATION_FRIEND_ID = "DEFENDANT_2_LITIGATION_FRIEND";
+    public static final String DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID = "DEFENDANT_2_LR_INDIVIDUALS";
+    public static final String DEFENDANT_TWO_ORG_INDIVIDUALS_ID = "DEFENDANT_2_ORGANISATION_INDIVIDUALS";
+    public static final String DEFENDANT_TWO_WITNESSES_ID = "DEFENDANT_2_WITNESSES";
+    public static final String DEFENDANT_TWO_EXPERTS_ID = "DEFENDANT_2_EXPERTS";
 
     public static void addApplicant1Options(List<DynamicListElement> list, CaseData caseData, boolean isAdmin) {
         addApplicant1PartyOptions(list, caseData);
-        addApplicantLegalRepIndividuals(list, false);
+        if (!NO.equals(caseData.getApplicant1Represented())) {
+            addApplicantLegalRepIndividuals(list, false);
+        }
         addApplicant1ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
@@ -95,10 +109,217 @@ public class ManageContactInformationUtils {
         addDefendant2ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
+    public static String appendUserAndType(String partyChosen, CaseData caseData, boolean isAdmin) {
+        String user = isAdmin ? "ADMIN" : "LR";
+
+        switch (partyChosen) {
+            case (CLAIMANT_ONE_ID): {
+                return formatId(partyChosen, user, caseData.getApplicant1());
+            }
+            case(CLAIMANT_TWO_ID): {
+                return formatId(partyChosen, user, caseData.getApplicant2());
+            }
+            case (DEFENDANT_ONE_ID): {
+                return formatId(partyChosen, user, caseData.getRespondent1());
+            }
+            case(DEFENDANT_TWO_ID): {
+                return formatId(partyChosen, user, caseData.getRespondent2());
+            }
+            case(CLAIMANT_ONE_LITIGATION_FRIEND_ID), (CLAIMANT_TWO_LITIGATION_FRIEND_ID),
+                (DEFENDANT_ONE_LITIGATION_FRIEND_ID), (DEFENDANT_TWO_LITIGATION_FRIEND_ID): {
+                return formatId(partyChosen, user);
+            }
+            default: {
+                throw new IllegalArgumentException("Manage Contact Information party chosen ID does not exist");
+            }
+        }
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(Experts dqExperts) {
+        List<Element<UpdatePartyDetailsForm>> newExperts = new ArrayList<>();
+
+        if (dqExperts != null && dqExperts.getDetails() != null) {
+            for (Element<Expert> party : dqExperts.getDetails()) {
+                Expert expert = party.getValue();
+                newExperts.addAll(wrapElements(UpdatePartyDetailsForm.builder()
+                                                   .firstName(expert.getFirstName())
+                                                   .lastName(expert.getLastName())
+                                                   .emailAddress(expert.getEmailAddress())
+                                                   .phoneNumber(expert.getPhoneNumber())
+                                                   .fieldOfExpertise(expert.getFieldOfExpertise())
+                                                   .partyId(expert.getPartyID()) //this will need to be added in new ticket
+                                                   .build()));
+            }
+        }
+        return newExperts;
+    }
+
+    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(Experts existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
+        List<Element<Expert>> newExperts = new ArrayList<>();
+        List<Expert> experts = new ArrayList<>();
+
+        if (existingDQExperts != null && existingDQExperts.getDetails() != null) {
+            experts = unwrapElements(existingDQExperts.getDetails());
+        }
+
+        if (formExperts != null) {
+            for (Element<UpdatePartyDetailsForm> form : formExperts) {
+                UpdatePartyDetailsForm formExpert = form.getValue();
+
+                Expert dqExpert = experts.stream()
+                    .filter(e -> e.getPartyID().equals(formExpert.getPartyId()))
+                    .findFirst()
+                    .orElse(null);
+
+                if (dqExpert != null && dqExpert.getPartyID() != null) {
+                    // if id already exists in dq
+                    newExperts.addAll(wrapElements(dqExpert.toBuilder()
+                                                       .firstName(formExpert.getFirstName())
+                                                       .lastName(formExpert.getLastName())
+                                                       .emailAddress(formExpert.getEmailAddress())
+                                                       .phoneNumber(formExpert.getPhoneNumber())
+                                                       .fieldOfExpertise(formExpert.getFieldOfExpertise())
+                                                       .build()));
+                } else {
+                    // if id doesn't exist in dq means it is a newly added expert
+                    newExperts.addAll(wrapElements(Expert.builder()
+                                                       .firstName(formExpert.getFirstName())
+                                                       .lastName(formExpert.getLastName())
+                                                       .emailAddress(formExpert.getEmailAddress())
+                                                       .phoneNumber(formExpert.getPhoneNumber())
+                                                       .fieldOfExpertise(formExpert.getFieldOfExpertise())
+                                                       .dateAdded(LocalDate.now())
+                                                       .eventAdded("Manage Contact Information Event")
+                                                       .partyID(createPartyId())
+                                                       .build()));
+                }
+            }
+        }
+
+        return newExperts;
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(Witnesses dqWitnesses) {
+        List<Element<UpdatePartyDetailsForm>> newWitnesses = new ArrayList<>();
+
+        if (dqWitnesses != null && dqWitnesses.getDetails() != null) {
+            for (Element<Witness> party : dqWitnesses.getDetails()) {
+                Witness witness = party.getValue();
+                newWitnesses.addAll(wrapElements(UpdatePartyDetailsForm.builder()
+                                                   .firstName(witness.getFirstName())
+                                                   .lastName(witness.getLastName())
+                                                   .emailAddress(witness.getEmailAddress())
+                                                   .phoneNumber(witness.getPhoneNumber())
+                                                   .partyId(witness.getPartyID())
+                                                   .build()));
+            }
+        }
+        return newWitnesses;
+    }
+
+    public static List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(Witnesses existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
+        List<Element<Witness>> newWitnesses = new ArrayList<>();
+        List<Witness> witnesses = new ArrayList<>();
+
+        if (existingDQWitnesses != null && existingDQWitnesses.getDetails() != null) {
+            witnesses = unwrapElements(existingDQWitnesses.getDetails());
+        }
+
+        if (formWitnesses != null) {
+            for (Element<UpdatePartyDetailsForm> form : formWitnesses) {
+                UpdatePartyDetailsForm formWitness = form.getValue();
+
+                Witness dqWitness = witnesses.stream()
+                    .filter(w -> w.getPartyID().equals(formWitness.getPartyId()))
+                    .findFirst()
+                    .orElse(null);
+
+                // if id already exists in dq
+                if (dqWitness != null && dqWitness.getPartyID() != null) {
+                    newWitnesses.addAll(wrapElements(dqWitness.toBuilder()
+                                                       .firstName(formWitness.getFirstName())
+                                                       .lastName(formWitness.getLastName())
+                                                       .emailAddress(formWitness.getEmailAddress())
+                                                       .phoneNumber(formWitness.getPhoneNumber())
+                                                       .build()));
+                } else {
+                    // if id doesn't exist in dq means it is a newly added witness
+                    newWitnesses.addAll(wrapElements(Witness.builder()
+                                                       .firstName(formWitness.getFirstName())
+                                                       .lastName(formWitness.getLastName())
+                                                       .emailAddress(formWitness.getEmailAddress())
+                                                       .phoneNumber(formWitness.getPhoneNumber())
+                                                       .dateAdded(LocalDate.now())
+                                                       .eventAdded("Manage Contact Information Event")
+                                                       .partyID(createPartyId())
+                                                       .build()));
+                }
+            }
+        }
+
+        return newWitnesses;
+    }
+
+    public static List<Element<PartyFlagStructure>> updatePartyDQWitnesses(List<PartyFlagStructure> existingParties, List<Witness> witnesses) {
+        List<PartyFlagStructure> updatedPartyWitnesses = new ArrayList<>();
+        if (witnesses == null || witnesses.isEmpty()) {
+            return null;
+        }
+        for (Witness witness : witnesses) {
+            updatedPartyWitnesses.add(updateTopLevelPartyInfo(witness.getPartyID(),
+                                                              witness.getFirstName(), witness.getLastName(),
+                                                              witness.getPhoneNumber(), witness.getEmailAddress(),
+                                                              existingParties));
+        }
+        return wrapElements(updatedPartyWitnesses);
+    }
+
+    public static List<Element<PartyFlagStructure>> updatePartyDQExperts(List<PartyFlagStructure> existingParties, List<Expert> experts) {
+        List<PartyFlagStructure> updatedPartyExperts = new ArrayList<>();
+        if (experts == null || experts.isEmpty()) {
+            return null;
+        }
+        for (Expert expert : experts) {
+            updatedPartyExperts.add(updateTopLevelPartyInfo(expert.getPartyID(),
+                                                            expert.getFirstName(), expert.getLastName(),
+                                                            expert.getPhoneNumber(), expert.getEmailAddress(),
+                                                            existingParties));
+        }
+        return wrapElements(updatedPartyExperts);
+    }
+
+    private static PartyFlagStructure updateTopLevelPartyInfo(String partyId, String firstName, String lastName, String phoneNumber, String email,
+                                                              List<PartyFlagStructure> existingParties) {
+        return existingParties.stream().filter(p -> p.getPartyID().equals(partyId)).findFirst()
+            .map(p -> (p.toBuilder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .phone(phoneNumber)
+                .email(email)
+                .build()))
+            .orElse(PartyFlagStructure.builder()
+                .partyID(partyId)
+                .firstName(firstName)
+                .lastName(lastName)
+                .phone(phoneNumber)
+                .email(email)
+                .build());
+    }
+
+    private static String formatId(String partyChosen, String isAdmin, Party party) {
+        return String.format("%s_%s_%s", partyChosen, isAdmin, party.getType().toString());
+    }
+
+    private static String formatId(String partyChosen, String isAdmin) {
+        return String.format("%s_%s", partyChosen, isAdmin);
+    }
+
+    static final String SPACE_FORMAT = "%s %s";
+
     private static void addApplicant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // applicant 1 party name
         list.add(dynamicElementFromCode(CLAIMANT_ONE_ID,
-                                        String.format("%s %s", CLAIMANT_ONE, caseData.getApplicant1().getPartyName())));
+                                        String.format(SPACE_FORMAT, CLAIMANT_ONE, caseData.getApplicant1().getPartyName())));
         // applicant 1 litigation friend
         if (shouldAddLitigationFriend(caseData.getApplicant1().getType())) {
             if (caseData.getApplicant1LitigationFriend() != null) {
@@ -114,7 +335,7 @@ public class ManageContactInformationUtils {
 
     private static void addApplicant2PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // applicant 2 party name
-        list.add(dynamicElementFromCode(CLAIMANT_TWO_ID, String.format("%s %s", CLAIMANT_TWO, caseData.getApplicant2().getPartyName())));
+        list.add(dynamicElementFromCode(CLAIMANT_TWO_ID, String.format(SPACE_FORMAT, CLAIMANT_TWO, caseData.getApplicant2().getPartyName())));
         // applicant 2 litigation friend
         if (shouldAddLitigationFriend(caseData.getApplicant2().getType())) {
             if (caseData.getApplicant2LitigationFriend() != null) {
@@ -124,13 +345,13 @@ public class ManageContactInformationUtils {
             }
         } else {
             // applicant 2 org individuals
-            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_ONE);
+            addOrganisationIndividuals(list, CLAIMANT_TWO_ORG_INDIVIDUALS_ID, CLAIMANT_TWO);
         }
     }
 
     private static void addDefendant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // defendant 1 party name
-        list.add(dynamicElementFromCode(DEFENDANT_ONE_ID, String.format("%s %s", DEFENDANT_ONE, caseData.getRespondent1().getPartyName())));
+        list.add(dynamicElementFromCode(DEFENDANT_ONE_ID, String.format(SPACE_FORMAT, DEFENDANT_ONE, caseData.getRespondent1().getPartyName())));
         // defendant 1 litigation friend
         if (shouldAddLitigationFriend(caseData.getRespondent1().getType())) {
             if (caseData.getRespondent1LitigationFriend() != null) {
@@ -146,7 +367,7 @@ public class ManageContactInformationUtils {
 
     private static void addDefendant2PartyOptions(List<DynamicListElement> list, CaseData caseData) {
         // defendant 2 party name
-        list.add(dynamicElementFromCode(DEFENDANT_TWO_ID, String.format("%s %s", DEFENDANT_TWO, caseData.getRespondent2().getPartyName())));
+        list.add(dynamicElementFromCode(DEFENDANT_TWO_ID, String.format(SPACE_FORMAT, DEFENDANT_TWO, caseData.getRespondent2().getPartyName())));
         // defendant 2 litigation friend
         if (shouldAddLitigationFriend(caseData.getRespondent2().getType())) {
             if (caseData.getRespondent2LitigationFriend() != null) {
@@ -241,13 +462,13 @@ public class ManageContactInformationUtils {
     }
 
     private static boolean shouldAddExperts(Experts experts) {
-        return YES.equals(experts.getExpertRequired())
+        return experts != null && YES.equals(experts.getExpertRequired())
             && experts.getDetails() != null
             && !experts.getDetails().isEmpty();
     }
 
     private static boolean shouldAddWitnesses(Witnesses witnesses) {
-        return YES.equals(witnesses.getWitnessesToAppear())
+        return witnesses != null && YES.equals(witnesses.getWitnessesToAppear())
             && witnesses.getDetails() != null
             && !witnesses.getDetails().isEmpty();
     }
@@ -261,18 +482,82 @@ public class ManageContactInformationUtils {
     }
 
     private static void addOrganisationIndividuals(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, ORG_INDIVIDUALS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, ORG_INDIVIDUALS)));
     }
 
     private static void addLegalRepIndividuals(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, LEGAL_REP_INDIVIDUALS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, LEGAL_REP_INDIVIDUALS)));
     }
 
     private static void addWitnesses(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, WITNESSES)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, WITNESSES)));
     }
 
     private static void addExperts(List<DynamicListElement> list, String id, String party) {
-        list.add(dynamicElementFromCode(id, String.format("%s %s", party, EXPERTS)));
+        list.add(dynamicElementFromCode(id, String.format(SPACE_FORMAT, party, EXPERTS)));
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> mapPartyFieldsToPartyFormData(List<Element<PartyFlagStructure>> partyFields) {
+        return ofNullable(partyFields).orElse(new ArrayList<>()).stream().map(partyElement ->
+                        Element.<UpdatePartyDetailsForm>builder()
+                                .id(partyElement.getId())
+                                .value(UpdatePartyDetailsForm.builder()
+                                        .firstName(partyElement.getValue().getFirstName())
+                                        .lastName(partyElement.getValue().getLastName())
+                                        .emailAddress(partyElement.getValue().getEmail())
+                                        .phoneNumber(partyElement.getValue().getPhone())
+                                        .build())
+                                .build())
+                .toList();
+    }
+
+    public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,
+                                                                           List<Element<UpdatePartyDetailsForm>> updatedData) {
+        return updatedData.stream().map(updatedParty -> Element.<PartyFlagStructure>builder()
+                        .id(updatedParty.getId())
+                        .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
+                                .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
+                                .map(Element::getValue)
+                                .findFirst().orElse(PartyFlagStructure.builder().build()), updatedParty.getValue()))
+                        .build())
+                .toList();
+    }
+
+    private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {
+        return  individual.toBuilder()
+                .firstName(form.getFirstName())
+                .lastName(form.getLastName())
+                .email(form.getEmailAddress())
+                .phone(form.getPhoneNumber())
+                .build();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareOrgIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1OrgIndividuals());
+        }
+        if (CLAIMANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant2OrgIndividuals());
+        }
+        if (DEFENDANT_ONE_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1OrgIndividuals());
+        }
+        if (DEFENDANT_TWO_ORG_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2OrgIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2OrgIndividuals());
+        }
+        return new ArrayList<>();
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> prepareLRIndividuals(String partyId, CaseData caseData) {
+        if (CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getApplicant1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getApplicant1LRIndividuals());
+        }
+        if (DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent1LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent1LRIndividuals());
+        }
+        if (DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID.equals(partyId) && nonNull(caseData.getRespondent2LRIndividuals())) {
+            return mapPartyFieldsToPartyFormData(caseData.getRespondent2LRIndividuals());
+        }
+        return new ArrayList<>();
     }
 }

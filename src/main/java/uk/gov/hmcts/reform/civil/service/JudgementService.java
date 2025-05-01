@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -19,6 +20,8 @@ public class JudgementService {
 
     private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
         + " this case will proceed offline, you will receive any further updates by post.";
+    private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
+        + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private final FeatureToggleService featureToggleService;
 
@@ -29,10 +32,14 @@ public class JudgementService {
             .ccjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData))
             .ccjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData))
             .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
+            .ccjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount())
             .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
             .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
-            .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())
+            .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails()
+                                            .getCcjJudgmentFixedCostOption())
             .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
+            .ccjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())
+            .ccjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest())
             .build();
     }
 
@@ -44,7 +51,7 @@ public class JudgementService {
         return errors;
     }
 
-    private BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
+    public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (caseData.isPartAdmitClaimSpec()) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
@@ -52,11 +59,16 @@ public class JudgementService {
         return claimAmount;
     }
 
-    private BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
-        return MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+    public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            return caseData.getOutstandingFeeInPounds();
+        }
+        return caseData.isLipvLipOneVOne()
+            ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
+            : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
-    private BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
+    public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
         return (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
             ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
     }
@@ -65,18 +77,19 @@ public class JudgementService {
         return caseData.getUpFixedCostAmount(ccjJudgmentClaimAmount(caseData));
     }
 
-    private BigDecimal ccjJudgmentInterest(CaseData caseData) {
-        return caseData.getTotalInterest();
+    public BigDecimal ccjJudgmentInterest(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
+            Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
     }
 
-    private BigDecimal ccjJudgementSubTotal(CaseData caseData) {
+    public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
         return ccjJudgmentClaimAmount(caseData)
             .add(ccjJudgmentClaimFee(caseData))
-            .add(caseData.getTotalInterest())
+            .add(ccjJudgmentInterest(caseData))
             .add(ccjJudgmentFixedCost(caseData));
     }
 
-    private BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
+    public BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
         return ccjJudgementSubTotal(caseData)
             .subtract(ccjJudgmentPaidAmount(caseData));
     }
@@ -84,6 +97,10 @@ public class JudgementService {
     private String ccjJudgmentStatement(CaseData caseData) {
         if (caseData.isLRvLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
+            if (featureToggleService.isJudgmentOnlineLive()
+                && (caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
+                return JUDGEMENT_BY_COURT_NOT_OFFLINE;
+            }
             return JUDGEMENT_BY_COURT;
         } else {
             return String.format(JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));

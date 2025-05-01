@@ -95,8 +95,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
     @Test
     void shouldAssignCategoryId_whenInvokedAnd1v2DifferentSol() {
         //Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-        //AcknowledgeClaimCallbackHandler.defendantFlag = "userRespondent2";
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .respondent2DocumentGeneration("userRespondent2")
@@ -109,13 +107,11 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
     }
 
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAnd1v2DifferentSolButWrongFlag() {
         //Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
@@ -127,13 +123,11 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondent");
     }
 
     @Test
     void shouldAssignCategoryId_whenInvokedAnd1v1Or1v2SameSol() {
         //Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
             .build();
@@ -145,7 +139,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondent");
     }
 
     @Test

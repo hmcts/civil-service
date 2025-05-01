@@ -8,9 +8,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -72,9 +74,22 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
     private void generateEmail(CaseData caseData) {
         notificationService.sendMail(
             caseData.getApplicant1Email(),
-            notificationsProperties.getClaimantClaimContinuingOnlineForSpec(),
+            getEmailTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
+    }
+
+    private boolean isBilingualForLipvsLip(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+            && caseData.isClaimantBilingual();
+    }
+
+    private String getEmailTemplate(CaseData caseData) {
+        if (isBilingualForLipvsLip(caseData)) {
+            return notificationsProperties.getBilingualClaimantClaimContinuingOnlineForSpec();
+        }
+
+        return notificationsProperties.getClaimantClaimContinuingOnlineForSpec();
     }
 }

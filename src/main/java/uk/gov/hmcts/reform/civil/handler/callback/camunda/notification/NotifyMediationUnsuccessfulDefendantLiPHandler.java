@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,14 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
-    private static final String LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "notification-mediation-unsuccessful-defenant-LIP-%s";
+    private static final String LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "notification-mediation-unsuccessful-defendant-LIP-%s";
     private static final String TASK_ID_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "SendMediationUnsuccessfulDefendantLIP";
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP);
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLiPForMediationUnsuccessful
     );
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -51,6 +53,12 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
         );
     }
 
+    public Map<String, String> addPropertiesCARM(CaseData caseData) {
+        return Map.of(PARTY_NAME, caseData.getRespondent1().getPartyName(),
+                      CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+        );
+    }
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP;
@@ -63,14 +71,26 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
     }
 
     private void sendEmail(final CaseData caseData) {
-        if (caseData.getRespondent1().getPartyEmail() != null) {
+        if (caseData.getRespondent1().getPartyEmail() != null
+            && caseData.getRespondentSolicitor1EmailAddress() == null) {
             String recipient = caseData.getRespondent1().getPartyEmail();
-            notificationService.sendMail(
-                recipient,
-                addTemplate(caseData),
-                addProperties(caseData),
-                String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP, caseData.getLegacyCaseReference())
-            );
+
+            if (featureToggleService.isCarmEnabledForCase(caseData)) {
+                notificationService.sendMail(
+                    caseData.getRespondent1().getPartyEmail(),
+                    caseData.isRespondentResponseBilingual()
+                        ? notificationsProperties.getMediationUnsuccessfulLIPTemplateWelsh()
+                        : notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
+                    addPropertiesCARM(caseData),
+                    String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP, caseData.getLegacyCaseReference()));
+            } else {
+                notificationService.sendMail(
+                    recipient,
+                    addTemplate(caseData),
+                    addProperties(caseData),
+                    String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP, caseData.getLegacyCaseReference())
+                );
+            }
         }
     }
 

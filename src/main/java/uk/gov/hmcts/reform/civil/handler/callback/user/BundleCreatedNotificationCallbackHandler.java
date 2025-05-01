@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -25,13 +26,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIF
 public class BundleCreatedNotificationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(BUNDLE_CREATION_NOTIFICATION);
+    private static final String BUNDLE_CREATED_NOTIFICATION_EVENT = "BUNDLE_CREATED_NOTIFICATION";
 
     private final ObjectMapper mapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
             callbackKey(ABOUT_TO_SUBMIT), this::startBundleCreatedNotification,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
@@ -44,9 +46,17 @@ public class BundleCreatedNotificationCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse startBundleCreatedNotification(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(BUNDLE_CREATION_NOTIFICATION))
-            .build();
+        CaseData caseData = callbackParams.getCaseData();
+
+        if (featureToggleService.isAmendBundleEnabled()) {
+            caseData = caseData.toBuilder()
+                .bundleEvent(BUNDLE_CREATED_NOTIFICATION_EVENT)
+                .build();
+        } else {
+            caseData = caseData.toBuilder()
+                .businessProcess(BusinessProcess.ready(BUNDLE_CREATION_NOTIFICATION))
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))

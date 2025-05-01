@@ -41,7 +41,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_BULK_CLAIM_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
     private static final String TASK_ID = "makeBulkClaimPayment";
-    public static final String DUPLICATE_BULK_PAYMENT_MESSAGE = "You attempted to retry the payment to soon. Try again later.";
+    public static final String DUPLICATE_BULK_PAYMENT_MESSAGE = "You attempted to retry the payment too soon. Try again later.";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
@@ -104,7 +104,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
                 log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                         caseData.getCcdCaseReference(), exception.getMessage()
                 ));
-                caseData = updateWithDuplicatePaymentError(caseData, exception);
+                caseData = updateWithDuplicatePaymentError(caseData);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -137,7 +137,7 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
+    private CaseData updateWithDuplicatePaymentError(CaseData caseData) {
         var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
             .map(PaymentDetails::toBuilder)
             .orElse(PaymentDetails.builder())

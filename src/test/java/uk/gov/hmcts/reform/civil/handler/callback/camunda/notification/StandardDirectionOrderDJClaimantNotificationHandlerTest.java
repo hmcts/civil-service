@@ -1,21 +1,22 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -24,21 +25,26 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
-@SpringBootTest(classes = {
-    StandardDirectionOrderDJClaimantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class StandardDirectionOrderDJClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private NotificationService notificationService;
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-    @MockBean
-    private OrganisationService organisationService;
-    @Autowired
+    @InjectMocks
     private StandardDirectionOrderDJClaimantNotificationHandler handler;
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationService organisationService;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Nested
     class AboutToSubmitCallback {
@@ -66,7 +72,9 @@ public class StandardDirectionOrderDJClaimantNotificationHandlerTest extends Bas
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 "legalOrgName", "Test Org Name",
-                "claimReferenceNumber", "000DC001"
+                "claimReferenceNumber", "1594901956117591",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
     }

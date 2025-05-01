@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -84,23 +85,23 @@ class BundleCreationTriggerHandlerTest {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
         Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
-        when(coreCaseDataService.getCase(anyLong())).thenReturn(caseDetails.get(0));
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
+        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
+        when(coreCaseDataService.getCase(anyLong())).thenReturn(caseDetails.iterator().next());
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
         verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
+        verify(externalTaskService).complete(mockTask, null);
     }
 
     @Test
     void shouldNotEmitBundleCreationEvent_WhenNoCasesFound() {
-        when(searchService.getCases()).thenReturn(List.of());
+        when(searchService.getCases()).thenReturn(Set.of());
 
         handler.execute(mockTask, externalTaskService);
 
@@ -124,7 +125,7 @@ class BundleCreationTriggerHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(1000L)
+            eq(300000L)
         );
     }
 
@@ -146,7 +147,7 @@ class BundleCreationTriggerHandlerTest {
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
-        List<CaseDetails> caseDetails = List.of(
+        Set<CaseDetails> caseDetails = Set.of(
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 

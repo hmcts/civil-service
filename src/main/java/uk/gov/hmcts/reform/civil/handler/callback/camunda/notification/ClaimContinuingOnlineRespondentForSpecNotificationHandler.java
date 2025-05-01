@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -127,7 +128,9 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         Map<String, String> map = new HashMap<>();
-        map.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        map.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        map.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        map.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         map.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                                          .toLocalDate(), DATE));
         return map;

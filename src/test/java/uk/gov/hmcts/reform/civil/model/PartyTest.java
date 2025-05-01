@@ -61,4 +61,28 @@ class PartyTest {
         assertThat(party.getPartyName(true)).isEqualTo("James Carver");
     }
 
+    @Test
+    void shouldReturnTrueWhenPartyIsCompany() {
+        Party party = Party.builder().type(Party.Type.COMPANY)
+            .build();
+
+        assertThat(party.isCompanyOROrganisation()).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueWhenPartyIsOrganisation() {
+        Party party = Party.builder().type(Party.Type.ORGANISATION)
+            .build();
+
+        assertThat(party.isCompanyOROrganisation()).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueWhenPartyIsNOTOrganisationOrCompany() {
+        Party party = Party.builder().type(Party.Type.INDIVIDUAL)
+            .build();
+
+        assertThat(party.isCompanyOROrganisation()).isFalse();
+    }
+
 }

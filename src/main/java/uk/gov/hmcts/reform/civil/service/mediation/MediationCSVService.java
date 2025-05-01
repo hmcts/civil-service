@@ -20,30 +20,28 @@ public abstract class MediationCSVService {
     }
 
     private String getCSVContent(MediationParams params) {
-        String[] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         CaseData data = params.getCaseData();
         ApplicantContactDetails applicantContactDetails = getApplicantContactDetails();
         DefendantContactDetails defendantContactDetails = getDefendantContactDetails();
         String totalClaimAmount = data.getTotalClaimAmount().toString();
         String[] claimantData = {
-            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
-            CLAIMANT, getCsvCompanyName(data.getApplicant1()),
-            applicantContactDetails.getApplicantContactName(params), applicantContactDetails.getApplicantContactNumber(params),
-            CHECK_LIST, PARTY_STATUS, applicantContactDetails.getApplicantContactEmail(params),
-            isPilot(data.getTotalClaimAmount())
+            SITE_ID, CASE_TYPE, CHECK_LIST, PARTY_STATUS, data.getLegacyCaseReference(), totalClaimAmount, CLAIMANT,
+            getCsvCompanyName(data.getApplicant1()), applicantContactDetails.getApplicantContactName(params),
+            applicantContactDetails.getApplicantContactNumber(params),
+            applicantContactDetails.getApplicantContactEmail(params),
+            isPilot(data.getTotalClaimAmount()),
+            data.getCaseNamePublic()
         };
 
         String[] respondentData = {
-            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
-            RESPONDENT, getCsvCompanyName(data.getRespondent1()),
-            defendantContactDetails.getDefendantContactName(params), defendantContactDetails.getDefendantContactNumber(params),
-            CHECK_LIST, PARTY_STATUS, defendantContactDetails.getDefendantContactEmail(params),
-            isPilot(data.getTotalClaimAmount())
+            SITE_ID, CASE_TYPE, CHECK_LIST, PARTY_STATUS, data.getLegacyCaseReference(), totalClaimAmount, RESPONDENT,
+            getCsvCompanyName(data.getRespondent1()), defendantContactDetails.getDefendantContactName(params),
+            defendantContactDetails.getDefendantContactNumber(params),
+            defendantContactDetails.getDefendantContactEmail(params),
+            isPilot(data.getTotalClaimAmount()),
+            data.getCaseNamePublic()
         };
-
-        return generateCSVRow(headers)
-            + generateCSVRow(claimantData)
+        return generateCSVRow(claimantData)
             + generateCSVRow(respondentData);
     }
 
@@ -60,10 +58,11 @@ public abstract class MediationCSVService {
     private String generateCSVRow(String[] row) {
         StringBuilder builder = new StringBuilder();
 
-        for (String s : row) {
-            builder.append(s).append(",");
+        for (String rowValue : row) {
+            builder.append(rowValue).append(",");
         }
-        builder.append("\n");
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("\r\n");
 
         return builder.toString();
     }
@@ -71,5 +70,4 @@ public abstract class MediationCSVService {
     protected String getCsvCompanyName(Party party) {
         return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
     }
-
 }

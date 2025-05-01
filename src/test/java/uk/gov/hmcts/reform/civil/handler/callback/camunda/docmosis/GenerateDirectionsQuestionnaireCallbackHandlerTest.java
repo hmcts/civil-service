@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -42,11 +43,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_Q
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenerateDirectionsQuestionnaireCallbackHandler.class,
+    DirectionsQuestionnairePreparer.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     AssignCategoryId.class
@@ -226,7 +229,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(1);
         }
     }
 
@@ -253,7 +256,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(1);
         }
     }
 
@@ -281,7 +284,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(1);
         }
     }
 
@@ -313,7 +316,6 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAssignDefendantCategoryId_whenInvokedUnspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument defendantDocument = CaseDocument.builder()
             .createdBy("John")
             .documentName("defendant")
@@ -336,34 +338,41 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-            "defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-                "DQRespondent");
+            "DQRespondent");
     }
 
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAndClaimantUnspecified() {
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseDocument claimantDocument = CaseDocument.builder()
+            .createdBy("John")
+            .documentName("claimant")
+            .documentSize(0L)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("claimant")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(claimantDocument);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .systemGeneratedCaseDocuments(wrapElements(claimantDocument))
+            .caseAccessCategory(UNSPEC_CLAIM)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
+        assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "DQApplicant");
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-            "directionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-                "DQApplicant");
+                "directionsQuestionnaire");
     }
 
     @Test
     void shouldAssignDefendantCategoryId_when1v1or1v2SameSolicitorUnspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument defendantDocument = CaseDocument.builder()
             .createdBy("John")
             .documentName("defendant")
@@ -386,15 +395,12 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-            "defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-                "DQRespondent");
+            "DQRespondent");
     }
 
     @Test
     void shouldAssignDefendantCategoryId_whenInvokedAnd1v2DiffSolicitorUnspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
             .respondent2DocumentGeneration("userRespondent2")
@@ -405,53 +411,68 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-            "defendant2DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-                "DQRespondentTwo");
+            "DQRespondentTwo");
+    }
+
+    @Test
+    void shouldAssignClaimantCategoryId_whenInvokedAnd1v2DiffSolicitorUnspecified() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
+                .respondent2DocumentGeneration("userRespondent2")
+                .build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(getDoc("claimant"));
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "DQApplicant");
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
     }
 
     @Test
     void shouldAssignClaimantCategoryId_whenFlagNotUserRespondent2Unspecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
             .build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(getDoc("claimant"));
         // When
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
+        assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "DQApplicant");
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-            "directionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-                "DQApplicant");
+                "directionsQuestionnaire");
     }
 
     @Test
     void shouldAssignClaimantCategoryId_whenInvokedAndClaimantSpecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .caseAccessCategory(SPEC_CLAIM)
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
             .build();
         // When
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(getDoc("claimant"));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
             "directionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-                "DQApplicant");
+        assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+            "DQApplicant");
     }
 
     @Test
     void shouldAssignDefendantCategoryId_whenInvokedSpecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument defendantDocument = CaseDocument.builder()
             .createdBy("John")
             .documentName("defendant")
@@ -460,7 +481,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             .createdDatetime(LocalDateTime.now())
             .documentLink(Document.builder()
                               .documentUrl("fake-url")
-                              .documentFileName("file-name")
+                              .documentFileName("defendant")
                               .documentBinaryUrl("binary-url")
                               .build())
             .build();
@@ -475,15 +496,12 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-            "defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
                 "DQRespondent");
     }
 
     @Test
     void shouldAssignDefendantCategoryId_1v2SameSolicitorNotSameResponseSpecified() {
         // Given
-        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
             .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
             .caseAccessCategory(SPEC_CLAIM)
@@ -500,14 +518,27 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-            "defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
-                "DQRespondent");
+            "DQRespondent");
     }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).containsOnly(GENERATE_DIRECTIONS_QUESTIONNAIRE);
+    }
+
+    private CaseDocument getDoc(String prefix) {
+        return  CaseDocument.builder()
+                .createdBy("John")
+                .documentName(prefix + "document name")
+                .documentSize(0L)
+                .documentType(DIRECTIONS_QUESTIONNAIRE)
+                .createdDatetime(LocalDateTime.now())
+                .documentLink(Document.builder()
+                        .documentUrl("fake-url")
+                        .documentFileName("file-name")
+                        .documentBinaryUrl("binary-url")
+                        .build())
+                .build();
     }
 
 }

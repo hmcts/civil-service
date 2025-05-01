@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
-import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -20,127 +20,58 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
-import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
-import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
-import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
-import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
-import uk.gov.hmcts.reform.civil.model.caseprogression.HearingOtherComments;
-import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesForTab;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialEmployersLiability;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
-import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
-import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
-import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
-import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
-import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
-import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddNewDirection;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsMediation;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 
@@ -155,12 +86,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@Jacksonized
 @SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class CaseDataParent implements MappableObject {
+public class CaseDataParent extends CaseDataCaseProgression implements MappableObject {
 
     private final SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
     private final YesOrNo applicantMPClaimExpertSpecRequired;
@@ -212,110 +144,80 @@ public class CaseDataParent implements MappableObject {
     @JsonUnwrapped
     private final Mediation mediation;
 
-    // sdo fields
-    private final JudgementSum drawDirectionsOrder;
-    private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
-    private DisposalHearingJudgementDeductionValue disposalHearingJudgementDeductionValue;
-    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocuments;
-    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFact;
-    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidence;
-    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExperts;
-    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
-    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
-    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
-    private DisposalHearingHearingTime disposalHearingHearingTime;
-    private DisposalHearingBundle disposalHearingBundle;
-    private DisposalHearingBundleDJ disposalHearingBundleDJ;
-    private DisposalHearingNotes disposalHearingNotes;
-    private String disposalHearingHearingNotes;
-    private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
-    private final DisposalHearingMethod disposalHearingMethod;
-    private final DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
-    private final DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
-    private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
-
-    private final DynamicList disposalHearingMethodInPerson;
-    private final DynamicList fastTrackMethodInPerson;
-    private final DynamicList hearingMethodValuesFastTrack;
-    private final DynamicList hearingMethodValuesDisposalHearing;
-    private final DynamicList hearingMethodValuesSmallClaims;
-    private final DynamicList smallClaimsMethodInPerson;
-    private final DynamicList hearingMethod;
-    private final YesOrNo drawDirectionsOrderRequired;
-    private final YesOrNo drawDirectionsOrderSmallClaims;
-    private final ClaimsTrack claimsTrack;
-    private final OrderType orderType;
-    private FastTrackBuildingDispute fastTrackBuildingDispute;
-    private FastTrackClinicalNegligence fastTrackClinicalNegligence;
-    private FastTrackCreditHire fastTrackCreditHire;
-    private FastTrackHousingDisrepair fastTrackHousingDisrepair;
-    private FastTrackPersonalInjury fastTrackPersonalInjury;
-    private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
-    private FastTrackJudgesRecital fastTrackJudgesRecital;
-    private FastTrackJudgementDeductionValue fastTrackJudgementDeductionValue;
-    private FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
-    private FastTrackWitnessOfFact fastTrackWitnessOfFact;
-    private FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
-    private FastTrackTrial fastTrackTrial;
-    private FastTrackHearingTime fastTrackHearingTime;
-    private FastTrackNotes fastTrackNotes;
-    private FastTrackHearingNotes fastTrackHearingNotes;
-    private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
-    private final List<FastTrack> fastClaims;
-    private final List<FastTrack> trialAdditionalDirectionsForFastTrack;
-    private final FastTrackMethod fastTrackMethod;
-    private final FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
-    private final FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;
-    private final List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
-    private SmallClaimsCreditHire smallClaimsCreditHire;
-    private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
-    private SmallClaimsDocuments smallClaimsDocuments;
-    private SmallClaimsHearing smallClaimsHearing;
-    private SmallClaimsJudgementDeductionValue smallClaimsJudgementDeductionValue;
-    private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
-    private SmallClaimsNotes smallClaimsNotes;
-    private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
-    private SDOHearingNotes sdoHearingNotes;
-    private ReasonNotSuitableSDO reasonNotSuitableSDO;
-    private final List<SmallTrack> smallClaims;
-    private final List<SmallTrack> drawDirectionsOrderSmallClaimsAdditionalDirections;
-    private final SmallClaimsMethod smallClaimsMethod;
-    private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
-    private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
-    private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackAltDisputeResolutionToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackVariationOfDirectionsToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackSettlementToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackDisclosureOfDocumentsToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackWitnessOfFactToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackSchedulesOfLossToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
-    private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingDisclosureOfDocumentsToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingWitnessOfFactToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingMedicalEvidenceToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingQuestionsToExpertsToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingSchedulesOfLossToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingFinalDisposalHearingToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingMethodToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
-    private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
+    /**
+     * SNI-5142 made mandatory SHOW.
+     */
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsFlightDelayToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsMediationSectionToggle;
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
-    private CaseDocument sdoOrderDocument;
-
-    // sdo ui flags
-    private final YesOrNo setSmallClaimsFlag;
-    private final YesOrNo setFastTrackFlag;
-    private final String eventDescriptionRTJ;
-    private final String additionalInformationRTJ;
+    //SDOR2
+    private YesOrNo isSdoR2NewScreen;
+    private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
+    private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
+    private SdoR2VariationOfDirections sdoVariationOfDirections;
+    private SdoR2Settlement sdoR2Settlement;
+    private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
+    private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
+    private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
+    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private SdoR2WitnessOfFact sdoR2FastTrackWitnessOfFact;
+    private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
+    private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
+    private List<Element<SdoR2AddNewDirection>> sdoR2AddNewDirection;
+    private List<IncludeInOrderToggle> sdoR2TrialToggle;
+    private SdoR2Trial sdoR2Trial;
+    private String sdoR2ImportantNotesTxt;
+    private LocalDate sdoR2ImportantNotesDate;
+    private List<IncludeInOrderToggle> sdoR2SeparatorExpertEvidenceToggle;
+    private SdoR2ExpertEvidence sdoR2ExpertEvidence;
+    private List<IncludeInOrderToggle> sdoR2SeparatorAddendumReportToggle;
+    private SdoR2AddendumReport sdoR2AddendumReport;
+    private List<IncludeInOrderToggle> sdoR2SeparatorFurtherAudiogramToggle;
+    private SdoR2FurtherAudiogram sdoR2FurtherAudiogram;
+    private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsClaimantExpertToggle;
+    private SdoR2QuestionsClaimantExpert sdoR2QuestionsClaimantExpert;
+    private List<IncludeInOrderToggle> sdoR2SeparatorPermissionToRelyOnExpertToggle;
+    private SdoR2PermissionToRelyOnExpert sdoR2PermissionToRelyOnExpert;
+    private List<IncludeInOrderToggle> sdoR2SeparatorEvidenceAcousticEngineerToggle;
+    private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
+    private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsToEntExpertToggle;
+    private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
+    private List<IncludeInOrderToggle> sdoR2SeparatorUploadOfDocumentsToggle;
+    private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
+    private SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsPPIToggle;
+    private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsWitnessStatementsToggle;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatementOther;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsUploadDocToggle;
+    private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
+    private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private SdoR2SmallClaimsMediation sdoR2SmallClaimsMediationSectionStatement;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsMediationSectionToggle;
+    private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
+    private List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2FastTrackUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2FastTrackUseOfWelshLanguage;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2SmallClaimsUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2SmallClaimsUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2NihlUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2NihlUseOfWelshLanguage;
+    private List<IncludeInOrderToggle> sdoR2DrhUseOfWelshIncludeInOrderToggle;
+    private SdoR2WelshLanguageUsage sdoR2DrhUseOfWelshLanguage;
+    private List<OrderDetailsPagesSectionsToggle> sdoR2DisposalHearingUseOfWelshToggle;
+    private SdoR2WelshLanguageUsage sdoR2DisposalHearingUseOfWelshLanguage;
+    private SdoR2WelshLanguageUsage sdoR2DisposalHearingWelshLanguageDJ;
+    private List<DisposalAndTrialHearingDJToggle> sdoR2DisposalHearingUseOfWelshLangToggleDJ;
+    private SdoR2WelshLanguageUsage sdoR2TrialWelshLanguageDJ;
+    private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
+    private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
@@ -358,15 +260,9 @@ public class CaseDataParent implements MappableObject {
     private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
     private final YesOrNo respondent2DQCarerAllowanceCredit;
 
-    /**
-     * This field is not used.
-     *
-     * @deprecated this field is not used and it was in a screen no longer presented to the user.
-     *     It is kept here to devote a single jira to its removal, to ensure said removal won't cause
-     *     any problem when bringing info from db.
-     */
     @Deprecated
     private final YesOrNo respondent2DQCarerAllowanceCreditFullAdmission;
+    @Deprecated
     private final String responseToClaimAdmitPartWhyNotPayLRspec2;
     private final YesOrNo neitherCompanyNorOrganisation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
@@ -394,16 +290,18 @@ public class CaseDataParent implements MappableObject {
      */
     private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
 
-    private final ScheduledHearing nextHearingDetails;
+    private final NextHearingDetails nextHearingDetails;
 
     private final String respondent1EmailAddress;
     private final YesOrNo applicant1Represented;
+    private final YesOrNo anyRepresented;
 
     /**
      * Adding for LR ITP Update.
      */
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1FullDefenceConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -416,6 +314,7 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final LocalDate applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
     @JsonUnwrapped
     private final CCJPaymentDetails ccjPaymentDetails;
@@ -423,12 +322,21 @@ public class CaseDataParent implements MappableObject {
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
+    private final HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue;
+    private final HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
+    private final HelpWithFeesForTab claimIssuedHwfForTab;
+    private final HelpWithFeesForTab hearingHwfForTab;
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == NO;
+    }
+
+    @JsonIgnore
+    public boolean isApplicantRepresented() {
+        return this.applicant1Represented == YES;
     }
 
     /**
@@ -441,89 +349,7 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
-    private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
-    private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidence;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaim;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
-    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
-    private final List<EvidenceUploadExpert> expertSelectionEvidenceRes;
-    private final List<EvidenceUploadExpert> expertSelectionEvidence;
-    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaim;
-    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
-    private final List<EvidenceUploadTrial> trialSelectionEvidence;
-    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
-    private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
-    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
-    //applicant
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatement;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummary;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNotice;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatement;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReport;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatement;
-    private final List<Element<UploadEvidenceExpert>> documentQuestions;
-    private final List<Element<UploadEvidenceExpert>> documentAnswers;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummary;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgument;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
-    private final List<Element<UploadEvidenceDocumentType>> documentCosts;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
-    //applicant2
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementApp2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryApp2;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementApp2;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReportApp2;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatementApp2;
-    private final List<Element<UploadEvidenceExpert>> documentQuestionsApp2;
-    private final List<Element<UploadEvidenceExpert>> documentAnswersApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCostsApp2;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialApp2;
-    private final LocalDateTime caseDocumentUploadDate;
-    //respondent
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReportRes;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatementRes;
-    private final List<Element<UploadEvidenceExpert>> documentQuestionsRes;
-    private final List<Element<UploadEvidenceExpert>> documentAnswersRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes;
-    //these fields are shown if the solicitor is for respondent 2 and respondents have different solicitors
-    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes2;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes2;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes2;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReportRes2;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatementRes2;
-    private final List<Element<UploadEvidenceExpert>> documentQuestionsRes2;
-    private final List<Element<UploadEvidenceExpert>> documentAnswersRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
-    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
-    private final LocalDateTime caseDocumentUploadDateRes;
-    private final HearingNotes hearingNotes;
-    private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
-    private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+    //Top level structure objects used for Hearings + Case Flags
     private final Flags caseFlags;
     private final List<Element<PartyFlagStructure>> applicantExperts;
     private final List<Element<PartyFlagStructure>> respondent1Experts;
@@ -531,9 +357,15 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> applicantWitnesses;
     private final List<Element<PartyFlagStructure>> respondent1Witnesses;
     private final List<Element<PartyFlagStructure>> respondent2Witnesses;
-    private final List<Element<PartyFlagStructure>> applicantSolOrgIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent1SolOrgIndividuals;
-    private final List<Element<PartyFlagStructure>> applicant1SolOrgIndividuals;
+    //Individuals attending from parties that are Org/Company
+    private final List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
+    private final List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
+    //Individuals attending from Legal Representative Firms
+    private final List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
@@ -609,93 +441,6 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<Document>> gaRespDocRespondentSol;
     private final List<Element<Document>> gaRespDocRespondentSolTwo;
 
-    private final List<Element<CaseDocument>> gaDraftDocument;
-    private final List<Element<CaseDocument>> gaDraftDocStaff;
-    private final List<Element<CaseDocument>> gaDraftDocClaimant;
-    private final List<Element<CaseDocument>> gaDraftDocRespondentSol;
-    private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
-
-    /* Final Orders */
-
-    private YesOrNo finalOrderMadeSelection;
-    private OrderMade finalOrderDateHeardComplex;
-    private List<FinalOrdersJudgePapers> finalOrderJudgePapers;
-    private List<FinalOrderToggle> finalOrderJudgeHeardFrom;
-    private FinalOrderRepresentation finalOrderRepresentation;
-    private List<FinalOrderToggle> finalOrderRecitals;
-    private FinalOrderRecitalsRecorded finalOrderRecitalsRecorded;
-    private String finalOrderOrderedThatText;
-    private AssistedCostTypesList assistedOrderCostList;
-    private AssistedOrderCostDetails assistedOrderCostsReserved;
-    private AssistedOrderCostDetails assistedOrderCostsBespoke;
-    private AssistedOrderCostDetails assistedOrderMakeAnOrderForCosts;
-    private YesOrNo publicFundingCostsProtection;
-    private List<FinalOrderToggle> finalOrderFurtherHearingToggle;
-    private FinalOrderFurtherHearing finalOrderFurtherHearingComplex;
-    private HearingLengthFinalOrderList lengthList;
-    private List<FinalOrderToggle> finalOrderAppealToggle;
-    private FinalOrderAppeal finalOrderAppealComplex;
-    private OrderMadeOnTypes orderMadeOnDetailsList;
-    private OrderMadeOnDetails orderMadeOnDetailsOrderCourt;
-    private OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice;
-    private YesOrNo finalOrderGiveReasonsYesNo;
-    private AssistedOrderReasons finalOrderGiveReasonsComplex;
-
-    //Hearing Scheduled
-    private DynamicList hearingLocation;
-    private LocalDate dateOfApplication;
-    private LocalDate hearingDate;
-    private LocalDate hearingDueDate;
-    private String hearingTimeHourMinute;
-    private String hearingReferenceNumber;
-    private ListingOrRelisting listingOrRelisting;
-    private HearingNoticeList hearingNoticeList;
-    private Fee hearingFee;
-    private HearingChannel channel;
-    private HearingDuration hearingDuration;
-    private String information;
-    private String hearingNoticeListOther;
-    private LocalDateTime caseDismissedHearingFeeDueDate;
-
-    //Trial Readiness
-    private YesOrNo trialReadyNotified;
-    private YesOrNo trialReadyChecked;
-
-    private YesOrNo trialReadyApplicant;
-    private YesOrNo trialReadyRespondent1;
-    private YesOrNo trialReadyRespondent2;
-
-    private RevisedHearingRequirements applicantRevisedHearingRequirements;
-    private RevisedHearingRequirements respondent1RevisedHearingRequirements;
-    private RevisedHearingRequirements respondent2RevisedHearingRequirements;
-
-    private HearingOtherComments applicantHearingOtherComments;
-    private HearingOtherComments respondent1HearingOtherComments;
-    private HearingOtherComments respondent2HearingOtherComments;
-
-    @Builder.Default
-    private final List<Element<CaseDocument>> trialReadyDocuments = new ArrayList<>();
-
-    //default judgement SDO fields for trial/fast track
-    private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
-    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
-    private TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
-    private TrialHearingTrial trialHearingTrialDJ;
-    private TrialHearingTimeDJ trialHearingTimeDJ;
-    private TrialHearingNotes trialHearingNotesDJ;
-    private TrialHearingHearingNotesDJ trialHearingHearingNotesDJ;
-    private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
-    private TrialBuildingDispute trialBuildingDispute;
-    private TrialClinicalNegligence trialClinicalNegligence;
-    private TrialCreditHire trialCreditHire;
-    private TrialPersonalInjury trialPersonalInjury;
-    private TrialRoadTrafficAccident trialRoadTrafficAccident;
-    private TrialEmployersLiability trialEmployersLiability;
-    private TrialHousingDisrepair trialHousingDisrepair;
-    private DisposalHearingMethodDJ trialHearingMethodDJ;
-    private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
-    private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
     private final Address specRespondent2CorrespondenceAddressdetails;
     private final YesOrNo specRespondent2CorrespondenceAddressRequired;
 
@@ -704,15 +449,43 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
     private String pcqId;
+    private String respondentResponsePcqId;
 
-    // TOC
+    // Transfer a Case Online
+    private String reasonForTransfer;
+    private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocTransferCaseReason tocTransferCaseReason;
+    private String claimantBilingualLanguagePreference;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
 
     private FastTrackAllocation fastTrackAllocation;
+
+    private YesOrNo showCarmFields;
+
+    @JsonUnwrapped
+    private UploadMediationDocumentsForm uploadMediationDocumentsForm;
+
+    private List<Element<MediationNonAttendanceStatement>> app1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> app2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app2MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
+
+    private SmallClaimsMediation smallClaimsMediationSectionStatement;
+
+    private FixedCosts fixedCosts;
+    private YesOrNo showDJFixedCostsScreen;
+    private YesOrNo showOldDJFixedCostsScreen;
+    private YesOrNo claimFixedCostsOnEntryDJ;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
@@ -725,6 +498,7 @@ public class CaseDataParent implements MappableObject {
     private final IdamUserDetails defendantUserDetails;
 
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
+    private final ResponseDocument applicant1DefenceResponseDocumentSpec;
 
     @JsonIgnore
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
@@ -747,15 +521,32 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-            .filter(Language.BOTH.toString()::equals)
+            .filter(language -> language.equals(Language.BOTH.toString())
+                || language.equals(Language.WELSH.toString()))
             .isPresent();
     }
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
-        return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
-            .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent();
+        Optional<CaseDataLiP> caseDataLiP1 = Optional.ofNullable(getCaseDataLiP());
+        return caseDataLiP1.map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
+            .filter(ClaimantMediationLip::hasClaimantAgreedToFreeMediation).isPresent()
+            || isCorrectEmailPresent(caseDataLiP1)
+            || isCorrectPhonePresent(caseDataLiP1);
+    }
+
+    private static boolean isCorrectPhonePresent(Optional<CaseDataLiP> caseDataLiP1) {
+        return (caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getIsMediationPhoneCorrect() == YES).isPresent()
+            || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getAlternativeMediationTelephone() != null).isPresent());
+    }
+
+    private static boolean isCorrectEmailPresent(Optional<CaseDataLiP> caseDataLiP1) {
+        return (caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getIsMediationEmailCorrect() == YES).isPresent()
+            || caseDataLiP1.map(CaseDataLiP::getApplicant1LiPResponseCarm)
+            .filter(carm -> carm.getAlternativeMediationEmail() != null).isPresent());
     }
 
     @JsonIgnore
@@ -770,5 +561,32 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isClaimantBilingual() {
+        return null != claimantBilingualLanguagePreference
+            && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
+    }
+
+    @JsonIgnore
+    public boolean isFullDefenceNotPaid() {
+        return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayImmediately() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.IMMEDIATELY;
+    }
+
+    @JsonIgnore
+    public boolean applicant1SuggestedPayBySetDate() {
+        return applicant1RepaymentOptionForDefendantSpec == PaymentType.SET_DATE;
+    }
+
+    @JsonIgnore
+    public boolean hasClaimantAgreedClaimSettled() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .filter(CaseDataLiP::hasClaimantAgreedClaimSettled).isPresent();
     }
 }

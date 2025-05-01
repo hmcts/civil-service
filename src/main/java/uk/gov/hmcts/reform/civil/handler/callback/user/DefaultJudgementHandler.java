@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -18,9 +19,10 @@ import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -29,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -41,25 +43,22 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
+    public static final String NOT_VALID_DJ = "The Claim is not eligible for Default Judgment until %s";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
         + "%n%n Judgment has been entered and your case will be referred to a judge for directions.";
     public static final String JUDGMENT_REFERRED = "Your request will be referred to a judge and we will contact you "
         + "and tell you what happens next.";
-    public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
-    public static final String TRIAL_TEXT = "will be trial hearing provided text";
     public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested ";
     public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
 
     @Override
@@ -97,10 +96,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetails().getValue()
             .getLabel().startsWith("Both")) {
-            return format(JUDGMENT_REQUESTED, caseData.getLegacyCaseReference());
+            return format(JUDGMENT_REQUESTED);
 
         } else {
-            return format(JUDGMENT_GRANTED_HEADER, caseData.getLegacyCaseReference());
+            return format(JUDGMENT_GRANTED_HEADER);
         }
     }
 
@@ -213,12 +212,16 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
-            LocalDateTime.now())) {
-            String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
-            errors.add(format(NOT_VALID_DJ, formattedDeadline));
+        if (nonNull(caseData.getRespondent1ResponseDeadline())) {
+            // CIV-11985 restrict this event until 5 pm
+            LocalDateTime deadlineToUse = caseData.getRespondent1ResponseDeadline()
+                .toLocalDate().atTime(17, 0);
+            if (deadlineToUse.isAfter(LocalDateTime.now())) {
+                String formattedDeadline = formatLocalDateTime(deadlineToUse, DATE_TIME_AT);
+                errors.add(format(NOT_VALID_DJ, formattedDeadline));
+            }
         }
         List<String> listData = new ArrayList<>();
         listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
@@ -231,12 +234,13 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
+            .data(errors.isEmpty()
                       ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
@@ -246,11 +250,22 @@ public class DefaultJudgementHandler extends CallbackHandler {
                 .toBuilder().hearingTemporaryLocation(list).build();
             caseDataBuilder
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
+            String code = list.getValue().getCode();
+            final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
+            List<LocationRefData> locations = (locationRefDataService
+                .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimId));
+
+            if (!locations.isEmpty()) {
+                LocationRefData locationRefData = locations.get(0);
+                caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder()
+                                                           .region(locationRefData.getRegionId())
+                                                           .baseLocation(locationRefData.getEpimmsId())
+                                                           .build());
+            }
         }
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder,
-                                                                         featureToggleService.isUpdateContactDetailsEnabled());
-
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder);
+        caseDataBuilder.setRequestDJDamagesFlagForWA(YesOrNo.YES).build();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -259,12 +274,17 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        return fromList(locations.stream()
-                            .map(location -> location.getSiteName()
-                                + " - " + location.getCourtAddress()
-                                + " - " + location.getPostcode())
-                            .sorted()
-                            .collect(Collectors.toList()));
+        List<DynamicListElement> list = locations.stream()
+            .map(location ->
+                     DynamicListElement.dynamicElementFromCode(
+                         UUID.randomUUID() + "-" + location.getEpimmsId(),
+                         location.getSiteName()
+                             + " - " + location.getCourtAddress()
+                             + " - " + location.getPostcode()
+                     )
+            ).sorted((object1, object2) -> object1.getLabel().compareTo(object2.getLabel()))
+            .toList();
+        return DynamicList.fromDynamicListElementList(list);
     }
 
     private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
@@ -283,7 +303,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return preferredLocation.orElse(null);
     }
 
-    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
+    public static Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
         String locationLabel = location.getSiteName()
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
@@ -293,8 +313,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private DynamicList formatLocationList(DynamicList locationList) {
         List<DynamicListElement> list = locationList.getListItems()
             .stream()
-            .filter(element -> checkLocationItemValue(element, locationList.getValue())).collect(
-                Collectors.toList());
+            .filter(element -> checkLocationItemValue(element, locationList.getValue())).toList();
         return DynamicList.builder().value(locationList.getValue()).listItems(list).build();
     }
 

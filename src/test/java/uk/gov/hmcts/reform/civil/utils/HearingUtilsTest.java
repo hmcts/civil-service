@@ -22,9 +22,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class HearingUtilsTest {
+class HearingUtilsTest {
 
     @Test
     void shouldThrowNullException_whenGivenNullDate() {
@@ -60,6 +61,12 @@ public class HearingUtilsTest {
     @EnumSource(HearingDuration.class)
     void shouldReturnHearingDuration_whenGivenAnyHearingDuration(HearingDuration hearingDuration) {
         assertThat(HearingUtils.formatHearingDuration(hearingDuration)).isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnHearingDuration_whenGivenAnyHearingDuration_extended() {
+        HearingDuration hearingDuration = null;
+        assertNull(HearingUtils.formatHearingDuration(hearingDuration));
     }
 
     @ParameterizedTest
@@ -173,12 +180,25 @@ public class HearingUtilsTest {
     void shouldReturnClaimantVDefendant_whenIs1v1Claim() {
         // Given
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().companyName("Company").type(Party.Type.COMPANY).build())
-            .build();
+                .applicant1(Party.builder().individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().companyName("Company").type(Party.Type.COMPANY).build())
+                .build();
         // When
         String claimantVDefendant = HearingUtils.getClaimantVDefendant(caseData);
         // Then
         assertThat(claimantVDefendant).isEqualTo("Doe v Company");
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "AAA7-DIS,false",
+        "AAA7-DRH,false",
+        "AAA7-TRI,true"
+    })
+    void shouldReturnCorrectValue_whenHearingTypeIs(String hearingType, boolean expected) {
+        boolean hearingFeeRequired = HearingUtils.hearingFeeRequired(hearingType);
+
+        assertThat(hearingFeeRequired).isEqualTo(expected);
+    }
+
 }

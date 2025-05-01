@@ -78,6 +78,7 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
 
     private final DisposalHearingNotes disposalHearingNotes;
+    private final String welshLanguageDescription;
 
     private final boolean disposalHearingDisclosureOfDocumentsToggle;
     private final boolean disposalHearingWitnessOfFactToggle;
@@ -90,4 +91,11 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final boolean disposalHearingClaimSettlingToggle;
     private final boolean disposalHearingCostsToggle;
     private final boolean writtenByJudge;
+    private final boolean hasDisposalWelshToggle;
+
+    @SuppressWarnings("unused")
+    public boolean getDisposalHearingMethodToggle() {
+        // SNI-5142
+        return true;
+    }
 }

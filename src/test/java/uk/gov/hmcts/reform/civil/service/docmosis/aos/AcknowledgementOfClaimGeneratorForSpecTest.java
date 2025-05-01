@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 
 import java.time.LocalDate;
 
@@ -50,7 +50,7 @@ class AcknowledgementOfClaimGeneratorForSpecTest {
     private final Representative representative = Representative.builder().organisationName("test org").build();
 
     @Mock
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @Mock
     private DocumentGeneratorService documentGeneratorService;

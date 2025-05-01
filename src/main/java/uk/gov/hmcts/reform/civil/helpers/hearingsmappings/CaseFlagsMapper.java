@@ -44,6 +44,8 @@ public class CaseFlagsMapper {
                     .flagId(flagDetail.getValue().getFlagCode())
                     .flagDescription(flagDetail.getValue().getName())
                     .flagStatus(ACTIVE_STATUS)
+                    .dateTimeCreated(flagDetail.getValue().getDateTimeCreated())
+                    .dateTimeModified(flagDetail.getValue().getDateTimeModified())
                     .build();
                 partyFlagsModelList.add(partyFlagModel);
             }

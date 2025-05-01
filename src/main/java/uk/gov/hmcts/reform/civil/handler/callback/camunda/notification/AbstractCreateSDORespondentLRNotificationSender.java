@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Optional;
@@ -14,11 +15,12 @@ public abstract class AbstractCreateSDORespondentLRNotificationSender extends Ab
 
     private final OrganisationService organisationService;
 
-    public AbstractCreateSDORespondentLRNotificationSender(
+    protected AbstractCreateSDORespondentLRNotificationSender(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
-        OrganisationService organisationService) {
-        super(notificationService, notificationsProperties);
+        OrganisationService organisationService,
+        FeatureToggleService featureToggleService) {
+        super(notificationService, notificationsProperties, featureToggleService);
         this.organisationService = organisationService;
     }
 

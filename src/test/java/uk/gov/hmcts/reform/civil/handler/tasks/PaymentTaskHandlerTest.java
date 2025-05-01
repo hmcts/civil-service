@@ -20,14 +20,16 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.util.Map;
 
@@ -41,14 +43,15 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
-import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 
 @SpringBootTest(classes = {
     PaymentTaskHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class
-})
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class})
 @ExtendWith(SpringExtension.class)
 class PaymentTaskHandlerTest {
 
@@ -85,11 +88,18 @@ class PaymentTaskHandlerTest {
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.CLAIM_SUBMITTED");
-            variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
-                                                  FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                                                  FlowFlag.NOTICE_OF_CHANGE.name(), false,
-                                                  FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-                                                  FlowFlag.CERTIFICATE_OF_SERVICE.name(), false));
+            variables.putValue(FLOW_FLAGS, Map.ofEntries(Map.entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                                                         Map.entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+                                                         Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
+                                                         Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
+                                                         Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false))
+            );
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 

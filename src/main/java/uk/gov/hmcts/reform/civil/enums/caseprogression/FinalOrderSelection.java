@@ -4,5 +4,5 @@ public enum FinalOrderSelection {
 
     ASSISTED_ORDER,
     FREE_FORM_ORDER,
-
+    DOWNLOAD_ORDER_TEMPLATE,
 }

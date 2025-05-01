@@ -8,8 +8,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Notificat
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +22,7 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
 
     private static final String REFERENCE_TEMPLATE = "evidence-upload-notification-%s";
     private final NotificationService notificationService;
+    private final OrganisationService organisationService;
     private final NotificationsProperties notificationsProperties;
 
     public void notifyApplicantEvidenceUpload(CaseData caseData) throws NotificationException {
@@ -24,12 +30,14 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
         boolean isApplicantLip = isApplicantLip(caseData);
 
         //Send email to Applicant
-        notificationService.sendMail(
-            getEmail(caseData, isApplicantLip),
-            getTemplate(caseData, isApplicantLip),
-            addProperties(caseData),
-            getReference(caseData)
-        );
+        if (nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
+            notificationService.sendMail(
+                getEmail(caseData, isApplicantLip),
+                getTemplate(caseData, isApplicantLip),
+                addProperties(caseData),
+                getReference(caseData)
+            );
+        }
     }
 
     private static String getReference(CaseData caseData) {
@@ -37,8 +45,13 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
     }
 
     private String getTemplate(CaseData caseData, boolean isApplicantLip) {
-        return isApplicantLip ? notificationsProperties.getEvidenceUploadLipTemplate()
-            : notificationsProperties.getEvidenceUploadTemplate();
+        if (isApplicantLip && caseData.isClaimantBilingual()) {
+            return notificationsProperties.getEvidenceUploadLipTemplateWelsh();
+        } else if (isApplicantLip) {
+            return notificationsProperties.getEvidenceUploadLipTemplate();
+        } else {
+            return notificationsProperties.getEvidenceUploadTemplate();
+        }
     }
 
     private String getEmail(CaseData caseData, boolean isApplicantLip) {
@@ -53,7 +66,15 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, YesOrNo.NO.equals(caseData.getApplicant1Represented())
+                ? caseData.getLegacyCaseReference()
+                : caseData.getCcdCaseReference().toString(),
+            UPLOADED_DOCUMENTS, caseData.getNotificationText(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CLAIM_LEGAL_ORG_NAME_SPEC, YesOrNo.NO.equals(caseData.getApplicant1Represented())
+            ? caseData.getApplicant1().getPartyName()
+                : getApplicantLegalOrganizationName(caseData, organisationService),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }

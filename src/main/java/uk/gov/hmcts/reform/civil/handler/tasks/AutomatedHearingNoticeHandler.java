@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.UnNotifiedHearingResponse;
@@ -22,34 +22,22 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Optional.ofNullable;
-
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
+public class AutomatedHearingNoticeHandler extends BaseExternalTaskHandler {
 
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
     private final HearingsService hearingsService;
     private final RuntimeService runtimeService;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper mapper;
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @SuppressWarnings("unchecked")
-    public void handleTask(ExternalTask externalTask) {
-        if (!featureToggleService.isAutomatedHearingNoticeEnabled()) {
-            runtimeService.setVariables(
-                externalTask.getProcessInstanceId(),
-                HearingNoticeSchedulerVars.builder()
-                    .totalNumberOfUnnotifiedHearings(0)
-                    .build().toMap(mapper)
-            );
-            return;
-        }
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
 
         HearingNoticeSchedulerVars schedulerVars = mapper.convertValue(externalTask.getAllVariables(), HearingNoticeSchedulerVars.class);
         List<String> dispatchedHearingIds = getDispatchedHearingIds(schedulerVars);
@@ -72,18 +60,17 @@ public class AutomatedHearingNoticeHandler implements BaseExternalTaskHandler {
                 .totalNumberOfUnnotifiedHearings(unnotifiedHearings.getTotalFound().intValue())
                 .build().toMap(mapper)
         );
+        return ExternalTaskData.builder().build();
     }
 
     @Override
-    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService, ExternalTaskData data) {
         String topicName = externalTask.getTopicName();
         String processInstanceId = externalTask.getProcessInstanceId();
 
         try {
-            ofNullable(getVariableMap()).ifPresentOrElse(
-                variableMap -> externalTaskService.complete(externalTask, variableMap),
-                () -> externalTaskService.complete(externalTask)
-            );
+            externalTaskService.complete(externalTask, getVariableMap(data));
+
             log.info("External task '{}' finished with processInstanceId '{}'",
                      topicName, processInstanceId
             );

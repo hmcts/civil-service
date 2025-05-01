@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -63,7 +63,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
     private final CoreCaseUserService coreCaseUserService;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final UserService userService;
     private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
@@ -73,6 +73,8 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         "You can no longer request an 'Inform Agreed Extension Date' as the deadline has passed";
     public static final String  ERROR_DEADLINE_CANT_BE_MORE_THAN_56 =
         "Date must be from claim issue date plus a maximum of between 29 and 56 days.";
+    private static final List<String> ADMIN_ROLES = List.of(
+        "caseworker-civil-admin", "caseworker-civil-staff");
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -102,7 +104,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDate issueDate = caseData.getIssueDate();
 
-        if (LocalDate.now().isAfter(issueDate.plusDays(28))) {
+        if (LocalDate.now().isAfter(issueDate.plusDays(28))  && !isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_EXTENSION_DEADLINE_BEEN_PASSED))
                 .build();
@@ -226,5 +228,10 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
             userInfo.getUid(),
             RESPONDENTSOLICITORTWO
         );
+    }
+
+    private boolean isAdmin(String userAuthToken) {
+        return userService.getUserInfo(userAuthToken).getRoles()
+            .stream().anyMatch(ADMIN_ROLES::contains);
     }
 }

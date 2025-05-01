@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
@@ -45,7 +46,7 @@ public class RoboticsDataUtil {
                 getLatestChange(caseData.getRespondent2OrganisationPolicy(), RESPONDENT2_ID)
             )
             .stream()
-            .filter(litigantChange -> litigantChange != null)
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
         return latestChanges.size() > 0 ? latestChanges : null;
     }

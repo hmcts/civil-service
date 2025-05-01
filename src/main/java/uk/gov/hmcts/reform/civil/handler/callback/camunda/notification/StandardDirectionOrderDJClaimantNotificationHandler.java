@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DIRECTION_ORDER_DJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +54,9 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     private CallbackResponse notifyClaimantSDOrderDj(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            caseData.isApplicant1NotRepresented()
+                ? caseData.getClaimantUserDetails().getEmail()
+                : caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getStandardDirectionOrderDJTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE_SDO_DJ, caseData.getLegacyCaseReference()));
@@ -70,16 +74,20 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     public Map<String, String> addProperties(final CaseData caseData) {
         return new HashMap<>(Map.of(
             LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
+        if (nonNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())) {
+            Optional<Organisation> organisation = organisationService
+                .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
+                                          .getOrganisation().getOrganisationID());
+            if (organisation.isPresent()) {
+                return organisation.get().getName();
+            }
         }
         return caseData.getApplicant1().getPartyName();
     }

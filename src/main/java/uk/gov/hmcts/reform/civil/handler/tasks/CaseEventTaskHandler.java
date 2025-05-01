@@ -17,13 +17,14 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -35,25 +36,22 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDA
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @RequiredArgsConstructor
 @Component
-public class CaseEventTaskHandler implements BaseExternalTaskHandler {
+public class CaseEventTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
 
-    private CaseData data;
-
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
@@ -63,8 +61,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(externalTask.getActivityId());
 
-            if (featureToggleService.isAutomatedHearingNoticeEnabled()
-                && !businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+            if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
                 businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
             }
 
@@ -75,14 +72,16 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 flowState,
                 startEventData
             );
-            data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
+            var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
+            return ExternalTaskData.builder().caseData(data).build();
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
     }
 
     @Override
-    public VariableMap getVariableMap() {
+    public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
+        var data = externalTaskData.caseData().orElseThrow();
         VariableMap variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(data);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
@@ -100,21 +99,34 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                       .summary(getSummary(startEventResponse.getEventId(), flowState))
+                       .summary(getSummary(startEventResponse.getEventId(), flowState, caseData))
                        .description(getDescription(startEventResponse.getEventId(), data, flowState, caseData))
                        .build())
             .data(data)
             .build();
     }
 
-    private String getSummary(String eventId, String state) {
+    private String getFullOrPartAdmission(CaseData caseData, String state) {
+        FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+        if (caseData.isLipvLROneVOne()) {
+            return "RPA Reason: LiP vs LR - full/part admission received.";
+        } else {
+            if (flowState.equals(FlowState.Main.FULL_ADMISSION)) {
+                return "RPA Reason: Defendant fully admits.";
+            } else {
+                return "RPA Reason: Defendant partial admission.";
+            }
+        }
+    }
+
+    private String getSummary(String eventId, String state, CaseData caseData) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             return switch (flowState) {
                 case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE ->
                     "RPA Reason: Divergent respond.";
-                case FULL_ADMISSION -> "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION -> "RPA Reason: Defendant partial admission.";
+                case FULL_ADMISSION -> getFullOrPartAdmission(caseData, state);
+                case PART_ADMISSION -> getFullOrPartAdmission(caseData, state);
                 case COUNTER_CLAIM -> "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
                     "RPA Reason: Unrepresented defendant(s).";
@@ -135,8 +147,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     "RPA Reason: Not suitable for SDO.";
                 case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
                     "RPA Reason: Judgement by Admission requested and claim moved offline.";
+                case SPEC_DEFENDANT_NOC -> "RPA Reason: Notice of Change filed.";
                 default -> {
-                    log.info("Unexpected flow state " + flowState.fullName());
+                    log.info("Unexpected flow state {}", flowState.fullName());
                     yield null;
                 }
             };
@@ -171,29 +184,27 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 }
             }
 
+            final String and = " and ";
             switch (flowState) {
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return format("Unrepresented defendant: %s",
                                       StringUtils.join(
-                                          getDefendantNames(UNREPRESENTED, caseData), " and "
+                                          getDefendantNames(UNREPRESENTED, caseData), and
                                       ));
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
                     return format("Unregistered defendant solicitor firm: %s",
                                      StringUtils.join(
-                                         getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                               ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
-                                                           caseData), " and "
+                                         getDefendantNames(UNREGISTERED,
+                                                           caseData), and
                                      ));
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return format("Unrepresented defendant and unregistered defendant solicitor firm. "
                                       + "Unrepresented defendant: %s. "
                                       + "Unregistered defendant solicitor firm: %s.",
-                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
+                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), and),
                                         StringUtils.join(
-                                            getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                                  ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
-                                                              caseData), " and "
+                                            getDefendantNames(UNREGISTERED,
+                                                              caseData), and
                                         ));
                 case FULL_DEFENCE_PROCEED:
                     return !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -205,17 +216,19 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
         return null;
     }
 
+    static final String PROCEED = "proceed";
+    static final String NOT_PROCEED = "not proceed";
+
     private String getDescriptionFullDefenceProceed(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP: {
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP: {
                 return format(
                     "Claimant has provided intention: %s against defendant: %s and %s against defendant: %s",
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? "proceed" : "not proceed",
+                        ? PROCEED : NOT_PROCEED,
                     caseData.getRespondent1().getPartyName(),
                     YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? "proceed" : "not proceed",
+                        ? PROCEED : NOT_PROCEED,
                     caseData.getRespondent2().getPartyName()
                 );
             }
@@ -223,9 +236,9 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 return format(
                     "Claimant: %s has provided intention: %s. Claimant: %s has provided intention: %s.",
                     caseData.getApplicant1().getPartyName(),
-                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? "proceed" : "not proceed",
+                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED,
                     caseData.getApplicant2().getPartyName(),
-                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? "proceed" : "not proceed"
+                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()) ? PROCEED : NOT_PROCEED
                 );
             }
             default: {

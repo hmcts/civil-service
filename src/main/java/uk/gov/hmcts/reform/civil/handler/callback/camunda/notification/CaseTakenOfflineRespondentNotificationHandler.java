@@ -12,14 +12,17 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_TAKEN_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_TAKEN_OFFLINE;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -64,10 +68,14 @@ public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandl
             respondentEmail = caseData.getRespondentSolicitor1EmailAddress();
         }
 
+        Map<String, String> notificationProperties = addProperties(caseData);
+        notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC,
+                                   getLegalOrganizationNameForRespondent(caseData, isForRespondentSolicitor1(callbackParams), organisationService));
+
         notificationService.sendMail(
             respondentEmail,
             notificationsProperties.getSolicitorCaseTakenOffline(),
-            addProperties(caseData),
+            notificationProperties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -75,10 +83,11 @@ public class CaseTakenOfflineRespondentNotificationHandler extends CallbackHandl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
-        );
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
     }
 
     private boolean isForRespondentSolicitor1(CallbackParams callbackParams) {

@@ -12,12 +12,11 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.List;
 
 import static java.lang.String.format;
-import static java.lang.String.valueOf;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @Slf4j
@@ -30,8 +29,7 @@ public class NoOngoingBusinessProcessAspect {
         + "You do not need to do anything. Please come back later.";
 
     private final FlowStateAllowedEventService flowStateAllowedEventService;
-
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
 
     @Around("execution(* *(*)) && @annotation(NoOngoingBusinessProcess) && args(callbackParams))")
     public Object checkOngoingBusinessProcess(
@@ -44,7 +42,6 @@ public class NoOngoingBusinessProcessAspect {
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
-            || generalAppsOrSDOOrReferToJudge(callbackParams)
             || caseEvent.equals(CaseEvent.migrateCase)
         ) {
             return joinPoint.proceed();
@@ -65,11 +62,5 @@ public class NoOngoingBusinessProcessAspect {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))
             .build();
-    }
-
-    private boolean generalAppsOrSDOOrReferToJudge(CallbackParams callbackParams) {
-        return (valueOf(CaseEvent.INITIATE_GENERAL_APPLICATION).equals(callbackParams.getRequest().getEventId())
-            || valueOf(CaseEvent.CREATE_SDO).equals(callbackParams.getRequest().getEventId())
-            || valueOf(CaseEvent.REFER_TO_JUDGE).equals(callbackParams.getRequest().getEventId()));
     }
 }

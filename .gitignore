@@ -19,6 +19,7 @@ bin/main/application.yaml
 *.iws
 *.iml
 *.ipr
+.mirrord
 
 .DS_Store
 
@@ -36,3 +37,7 @@ smokeTest/
 infrastructure/.terraform/**
 infrastructure/.terraform.lock.hcl
 infrastructure/override.tf
+
+### aat env file ###
+.aat-env
+/java_pid*.hprof

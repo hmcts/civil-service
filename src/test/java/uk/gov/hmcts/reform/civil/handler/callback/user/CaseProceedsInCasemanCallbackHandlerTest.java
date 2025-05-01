@@ -1,24 +1,31 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.cosc.CoscApplicationStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -30,18 +37,30 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 
-@SpringBootTest(classes = {
-    CaseProceedsInCasemanCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @Autowired
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private CaseProceedsInCasemanCallbackHandler handler;
+
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+            .configure()
+            .messageInterpolator(new ParameterMessageInterpolator())
+            .buildValidatorFactory();
+
+        Validator validator = validatorFactory.getValidator();
+        handler = new CaseProceedsInCasemanCallbackHandler(validator, time, objectMapper, featureToggleService);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -97,6 +116,7 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(takenOfflineByStaffDate);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         }
 
         @Test
@@ -119,6 +139,71 @@ class CaseProceedsInCasemanCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+        }
+
+        @Test
+        void shouldAddPreviousCaseState_whenInvokedForLipVLipOrLrVLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent1Represented(YesOrNo.NO)
+                    .build();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+
+            AboutToStartOrSubmitCallbackResponse response =
+                    (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                    .extracting("previousCCDState").isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+        }
+
+        @Test
+        void shouldNotAddPreviousCaseState_whenInvokedForLipVLipOrLrVLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .build();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().getCaseDetailsBefore().setState(null);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                    (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                    .extracting("previousCCDState").isNull();
+        }
+
+        @Test
+        void shouldUpdateCoScApplicationStatusValue_whenInvoked() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .coSCApplicationStatus(CoscApplicationStatus.ACTIVE)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("coSCApplicationStatus")
+                .isEqualTo(CoscApplicationStatus.INACTIVE.toString());
+        }
+
+        @Test
+        void shouldNotUpdateCoScApplicationStatusValue_whenInvoked() {
+            CaseData caseData = CaseData.builder()
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("coSCApplicationStatus").isNull();
         }
     }
 }

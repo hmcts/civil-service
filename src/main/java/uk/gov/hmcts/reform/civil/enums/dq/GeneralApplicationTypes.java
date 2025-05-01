@@ -12,13 +12,15 @@ public enum GeneralApplicationTypes {
     EXTEND_TIME("Extend time"),
     AMEND_A_STMT_OF_CASE("Amend a statement of case"),
     RELIEF_FROM_SANCTIONS("Relief from sanctions"),
+    PROCEEDS_IN_HERITAGE("Proceeds In Heritage"),
     SET_ASIDE_JUDGEMENT("Set aside judgment"),
     SETTLE_BY_CONSENT("Settle by consent"),
     VARY_ORDER("Vary order"),
     ADJOURN_HEARING("Adjourn a hearing"),
     UNLESS_ORDER("Unless order"),
     OTHER("Other"),
-    VARY_JUDGEMENT("Vary judgment");
+    VARY_PAYMENT_TERMS_OF_JUDGMENT("Vary payment terms of judgment"),
+    CONFIRM_CCJ_DEBT_PAID("Confirm you've paid a judgment debt");
 
     private final String displayedValue;
 }

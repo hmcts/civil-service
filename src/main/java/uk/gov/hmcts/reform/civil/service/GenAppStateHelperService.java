@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -31,6 +33,8 @@ public class GenAppStateHelperService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final InitiateGeneralApplicationService genAppService;
+    private final LocationService locationService;
 
     private final ObjectMapper objectMapper;
 
@@ -39,10 +43,10 @@ public class GenAppStateHelperService {
     public enum RequiredState {
         APPLICATION_CLOSED("APPLICATION_CLOSED"),
         APPLICATION_PROCEEDS_OFFLINE("PROCEEDS_IN_HERITAGE");
-        private final String requiredState;
+        private final String state;
 
         public String getRequiredState() {
-            return this.requiredState;
+            return this.state;
         }
     }
 
@@ -61,6 +65,9 @@ public class GenAppStateHelperService {
     }
 
     public boolean triggerEvent(CaseData caseData, CaseEvent event) {
+        if (Objects.isNull(caseData.getGeneralApplications())) {
+            return false;
+        }
         caseData.getGeneralApplications()
                 .forEach(application ->
                         triggerEvent(
@@ -69,16 +76,19 @@ public class GenAppStateHelperService {
         return true;
     }
 
-    public CaseData updateApplicationLocationDetailsInClaim(CaseData caseData) {
+    public CaseData updateApplicationLocationDetailsInClaim(CaseData caseData, String authToken) {
 
         if (!Collections.isEmpty(caseData.getGeneralApplications())) {
             List<GeneralApplication> genApps = new ArrayList<>();
             CaseData finalCaseData = caseData;
+            LocationRefData locationDetails = locationService.getWorkAllocationLocationDetails(finalCaseData.getCaseManagementLocation().getBaseLocation(), authToken);
             caseData.getGeneralApplications().forEach(generalApplicationElement -> {
                 GeneralApplication generalApplication = generalApplicationElement.getValue();
                 generalApplication.getCaseManagementLocation().setBaseLocation(finalCaseData.getCaseManagementLocation().getBaseLocation());
                 generalApplication.getCaseManagementLocation().setRegion(finalCaseData.getCaseManagementLocation().getRegion());
-                generalApplication.getCaseManagementLocation().setSiteName(finalCaseData.getLocationName());
+                generalApplication.getCaseManagementLocation().setSiteName(locationDetails.getSiteName());
+                generalApplication.getCaseManagementLocation().setAddress(locationDetails.getCourtAddress());
+                generalApplication.getCaseManagementLocation().setPostcode(locationDetails.getPostcode());
                 Map<String, Object> genAppMap = generalApplication.toMap(objectMapper);
                 genAppMap.put("isCcmccLocation", YesOrNo.NO);
                 generalApplication = objectMapper.convertValue(genAppMap, GeneralApplication.class);

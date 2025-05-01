@@ -13,6 +13,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
 @Service
@@ -23,6 +24,9 @@ public class TrialReadyCheckSearchService extends ElasticSearchService {
     }
 
     public Query query(int startIndex) {
+        String allocatedTrackPath = "data.allocatedTrack";
+        String responseTrackPath = "data.responseClaimTrack";
+
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
@@ -30,12 +34,26 @@ public class TrialReadyCheckSearchService extends ElasticSearchService {
                             .must(rangeQuery("data.hearingDate").lt(LocalDate.now()
                                                                             .atTime(LocalTime.MIN).plusWeeks(3)
                                                                             .toString()))
-                            .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
-                            .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
+                            .must(boolQuery()
+                                      .minimumShouldMatch(1)
+                                      .should(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
+                                      .should(beState(HEARING_READINESS)))
+                            .mustNot(matchQuery(allocatedTrackPath, "SMALL_CLAIM"))
+                            .mustNot(matchQuery(responseTrackPath, "SMALL_CLAIM"))
+                            .mustNot(matchQuery(allocatedTrackPath, "MULTI_CLAIM"))
+                            .mustNot(matchQuery(responseTrackPath, "MULTI_CLAIM"))
+                            .mustNot(matchQuery(allocatedTrackPath, "INTERMEDIATE_CLAIM"))
+                            .mustNot(matchQuery(responseTrackPath, "INTERMEDIATE_CLAIM"))
                             .mustNot(matchQuery("data.trialReadyChecked", "Yes"))),
             List.of("reference"),
             startIndex
         );
+    }
+
+    @Override
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
+                                String searchAfterValue) {
+        return null;
     }
 
     private QueryBuilder beState(CaseState caseState) {

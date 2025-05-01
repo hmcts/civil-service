@@ -18,6 +18,7 @@ public class GeneralAppFeesConfiguration {
     private final String withNoticeKeyword;
     private final String consentedOrWithoutNoticeKeyword;
     private final String appnToVaryOrSuspend;
+    private final String certificateOfSatisfaction;
 
     public GeneralAppFeesConfiguration(
             @Value("${fees.api.url}") String url,
@@ -29,7 +30,8 @@ public class GeneralAppFeesConfiguration {
             @Value("${genApp.fee.event}") String event,
             @Value("${genApp.fee.keywords.withNotice}") String withNoticeKeyword,
             @Value("${genApp.fee.keywords.consentedOrWithoutNotice}") String consentedOrWithoutNoticeKeyword,
-            @Value("${genApp.fee.keywords.appnToVaryOrSuspend}") String appnToVaryOrSuspend) {
+            @Value("${genApp.fee.keywords.appnToVaryOrSuspend}") String appnToVaryOrSuspend,
+            @Value("${genApp.fee.keywords.certificateOfSatisfaction}") String certificateOfSatisfaction) {
         this.url = url;
         this.endpoint = endpoint;
         this.service = service;
@@ -40,5 +42,6 @@ public class GeneralAppFeesConfiguration {
         this.withNoticeKeyword = withNoticeKeyword;
         this.consentedOrWithoutNoticeKeyword = consentedOrWithoutNoticeKeyword;
         this.appnToVaryOrSuspend = appnToVaryOrSuspend;
+        this.certificateOfSatisfaction = certificateOfSatisfaction;
     }
 }

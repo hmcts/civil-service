@@ -38,7 +38,6 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
         BigDecimal admitOwed = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
-
         if (Stream.of(admitOwed, whenWillYouPay, totalClaimAmount)
             .anyMatch(Objects::isNull)) {
             return Optional.empty();
@@ -48,6 +47,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             applicantName += " and " + caseData.getApplicant2().getPartyName();
         }
 
+        final String headingThreeText = "<h3 class=\"govuk-heading-m\">If ";
         StringBuilder sb = new StringBuilder();
         sb.append("<br>You believe you owe &#163;").append(admitOwed).append(
                 ". We've emailed ").append(applicantName)
@@ -68,7 +68,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
 
         sb.append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
 
-            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(headingThreeText)
             .append(applicantName);
         if (caseData.getApplicant2() != null) {
             sb.append(" accept your offer</h3>");
@@ -76,25 +76,29 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             sb.append(" accepts your offer</h3>");
         }
         sb.append("<ul>")
-            .append("<li>pay ").append(applicantName).append("</li>")
-            .append("<li>make sure any cheques or bank transfers are clear in their account by the deadline</li>")
-            .append("<li>keep proof of any payments you make</li>")
+            .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName).append("</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">make sure any cheques or bank transfers are clear in their account by the deadline</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">keep proof of any payments you make</p></li>")
             .append("</ul>")
             .append("<p>Contact ")
             .append(applicantName);
-        if (applicantName.endsWith("s")) {
-            sb.append("'");
+        if (!caseData.isApplicant1NotRepresented()) {
+            if (applicantName.endsWith("s")) {
+                sb.append("'");
+            } else {
+                sb.append("'s");
+            }
+            sb.append(" legal representative if you need details on how to pay.</p>");
         } else {
-            sb.append("'s");
+            sb.append(" if you need details on how to pay.</p>");
         }
-        sb.append(" legal representative if you need details on how to pay.</p>")
-
-            .append("<p>Because you've said you will not pay immediately, ")
+        final String P_TAG = ".</p>";
+        sb.append("<p>Because you've said you will not pay immediately, ")
             .append(applicantName)
             .append(" can request a county court judgment against you for &#163;")
-            .append(admitOwed).append(".</p>")
+            .append(admitOwed).append(P_TAG)
 
-            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append(headingThreeText)
             .append(applicantName)
             .append(" disagrees that you only owe &#163;")
             .append(admitOwed)
@@ -104,17 +108,27 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
               .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
               .append(
                         "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
-                    .append(totalClaimAmount).append(".</p>");
+                    .append(totalClaimAmount).append(P_TAG);
         } else {
             sb.append("<p>The court will review the case for the full amount of &#163;")
-              .append(totalClaimAmount).append(".</p>");
+              .append(totalClaimAmount).append(P_TAG);
         }
-        sb.append("<h3 class=\"govuk-heading-m\">If ")
+        sb.append(headingThreeText)
             .append(applicantName)
             .append(" rejects your offer to pay by ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
-            .append("</h3>")
-            .append("<p>The court will decide how you must pay</p>");
+            .append("</h3>");
+        Boolean isLipVLR = caseData.isLipvLROneVOne();
+
+        if (isLipVLR) {
+            sb.append("<p>If the claim value is below £10,000 then the next step will be mediation. ")
+                .append("The mediation service will contact you to give you a date for your appointment. ")
+                .append("If you can not reach an agreement at mediation, the court will review your claim.</p>")
+                .append("<p>If the claim value is greater than £10,000 then the court will review the case for the full amount.</p>")
+                .append("<p>This case will now proceed offline.</p>");
+        } else {
+            sb.append("<p>The court will decide how you must pay</p>");
+        }
         return Optional.of(sb.toString());
     }
 }

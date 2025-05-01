@@ -1,21 +1,19 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -25,8 +23,8 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,23 +42,27 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    DefaultJudgementHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    private ObjectMapper mapper;
+
     private DefaultJudgementHandler handler;
-    @MockBean
-    private LocationRefDataService locationRefDataService;
-    @MockBean
+
+    @Mock
+    private LocationReferenceDataService locationRefDataService;
+
+    // ApplicationContext requirement
+    @SuppressWarnings("unused")
+    @Mock
     private FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void setUp() {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        handler = new DefaultJudgementHandler(mapper, locationRefDataService, featureToggleService);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -73,6 +75,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getErrors()).isNotEmpty();
+            Assertions.assertTrue(
+                response.getErrors().stream()
+                    .anyMatch(errorMessage ->
+                                  errorMessage.contains(
+                                      "The Claim is not eligible for Default Judgment until 5:00pm on ")
+                    ));
         }
 
         @Test
@@ -125,7 +133,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("bothDefendants")).isEqualTo("Both");
+            assertThat(response.getData()).containsEntry("bothDefendants", "Both");
         }
 
         @Test
@@ -144,7 +152,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("bothDefendants")).isEqualTo("One");
+            assertThat(response.getData()).containsEntry("bothDefendants", "One");
         }
 
         @Nested
@@ -337,18 +345,23 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("123456").build());
+                when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(locations);
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .addRespondent2(NO)
                     .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                     .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingTemporaryLocation(
-                        DynamicList.builder().value(DynamicListElement.builder().label("loc1").code("loc1").build())
-                            .listItems(List.of(DynamicListElement.builder().label("loc1").code("loc1").build()))
+                        DynamicList.builder().value(DynamicListElement.builder().label("loc1").code("loc1-123456").build())
+                            .listItems(List.of(DynamicListElement.builder().label("loc1").code("loc1-123456").build()))
                             .build()).build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getCaseManagementLocation().getRegion()).isEqualTo("2");
+                assertThat(updatedData.getCaseManagementLocation().getBaseLocation()).isEqualTo("123456");
                 assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
             }
         }

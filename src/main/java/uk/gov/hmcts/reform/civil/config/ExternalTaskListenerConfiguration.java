@@ -20,7 +20,7 @@ public class ExternalTaskListenerConfiguration {
     private final AuthTokenGenerator authTokenGenerator;
 
     @Autowired
-    public ExternalTaskListenerConfiguration(@Value("${feign.client.config.remoteRuntimeService.url}") String baseUrl,
+    public ExternalTaskListenerConfiguration(@Value("${feign.client.config.processInstance.url}") String baseUrl,
                                              AuthTokenGenerator authTokenGenerator) {
         this.baseUrl = baseUrl;
         this.authTokenGenerator = authTokenGenerator;
@@ -31,8 +31,9 @@ public class ExternalTaskListenerConfiguration {
         return ExternalTaskClient.create()
             .addInterceptor(new ServiceAuthProvider())
             .asyncResponseTimeout(29000)
+            .maxTasks(1)
             .backoffStrategy(new ExponentialBackoffStrategy(0, 0, 0))
-            .lockDuration(60000) //wait for 60 sec to finish task before it gets picked by other client
+            .lockDuration(33L * 60L * 1000L) //wait for 33min to finish task before it gets picked by other client
             .baseUrl(baseUrl)
             .build();
     }

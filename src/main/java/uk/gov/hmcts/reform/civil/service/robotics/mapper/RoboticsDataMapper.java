@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -69,11 +70,10 @@ public class RoboticsDataMapper {
             .litigiousParties(buildLitigiousParties(caseData))
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
-            .events(eventHistoryMapper.buildEvents(caseData));
+            .events(eventHistoryMapper.buildEvents(caseData, authToken));
 
-        if (featureToggleService.isNoticeOfChangeEnabled()
-            && (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
-            || caseData.getCcdState() == CASE_DISMISSED)) {
+        if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
+            || caseData.getCcdState() == CASE_DISMISSED) {
             roboticsBuilder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
 
@@ -98,23 +98,27 @@ public class RoboticsDataMapper {
             .caseNumber(caseData.getLegacyCaseReference())
             .owningCourtCode("807")
             .owningCourtName("CCMCC")
-            .caseType("PERSONAL INJURY")
+            .caseType(getCaseType(caseData))
             .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
     }
 
-    private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
-        switch (allocatedTrack) {
-            case FAST_CLAIM:
-                return "FAST TRACK";
-            case MULTI_CLAIM:
-                return "MULTI TRACK";
-            case SMALL_CLAIM:
-                return "SMALL CLAIM TRACK";
-            default:
-                return "";
+    private String getCaseType(CaseData caseData) {
+        if (ClaimTypeUnspec.PERSONAL_INJURY.equals(caseData.getClaimTypeUnSpec())) {
+            return "PERSONAL INJURY";
         }
+        return "CLAIM - UNSPEC ONLY";
+    }
+
+    private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
+        return switch (allocatedTrack) {
+            case FAST_CLAIM -> "FAST TRACK";
+            case MULTI_CLAIM -> "MULTI TRACK";
+            case SMALL_CLAIM -> "SMALL CLAIM TRACK";
+            case INTERMEDIATE_CLAIM -> "INTERMEDIATE TRACK";
+            default -> "";
+        };
     }
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
@@ -244,13 +248,6 @@ public class RoboticsDataMapper {
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
         String respondent1SolicitorId = caseData.getRespondent1Represented() == YES
             ? RESPONDENT_SOLICITOR_ID : null;
-
-        /*LocalDateTime dateOfService = null;
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            dateOfService = caseData.getIssueDate().atStartOfDay();
-        } else {
-            dateOfService = caseData.getClaimDetailsNotificationDate();
-        }*/
 
         var respondentParties = new ArrayList<>(List.of(
             buildLitigiousParty(

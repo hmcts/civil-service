@@ -4,6 +4,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -26,5 +27,12 @@ class DecisionOutcomeSearchServiceTest extends ElasticSearchServiceTest {
                 .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
 
         return new Query(query, List.of("reference"), fromValue);
+    }
+
+    @Override
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
+        return null;
     }
 }

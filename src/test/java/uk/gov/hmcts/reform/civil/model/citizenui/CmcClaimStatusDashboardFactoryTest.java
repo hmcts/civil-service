@@ -85,14 +85,14 @@ public class CmcClaimStatusDashboardFactoryTest {
     void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnAdmitPayBySetDate() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.BY_SPECIFIED_DATE);
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
-        assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTED_PAYMENT_PLAN);
     }
 
     @Test
     void given_responseAdmitPayByInstallments_whenGetStatus_thenReturnAdmitPayByInstallments() {
         CmcClaim claim = getFullAdmitClaim(PaymentOption.INSTALMENTS);
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
-        assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTED_PAYMENT_PLAN);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class CmcClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_settlementBreachedAndCCJRaised_whenGetStatus_thenReturnRequestCCJByRedetermination() {
+    void given_settlementBreachedAndCCJRaised_whenGetStatus_thenReturnRequestCCJ() {
         CmcClaim claim = CmcClaim.builder()
             .responseDeadline(LocalDate.now().plusDays(10))
             .response(Response.builder().build())
@@ -190,7 +190,7 @@ public class CmcClaimStatusDashboardFactoryTest {
                                                          .build())).build())
             .build();
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
-        assertThat(status).isEqualTo(DashboardClaimStatus.REQUESTED_CCJ_BY_REDETERMINATION);
+        assertThat(status).isEqualTo(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
     }
 
     @Test

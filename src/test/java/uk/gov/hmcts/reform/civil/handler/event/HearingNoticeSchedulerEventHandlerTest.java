@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.event.HearingNoticeSchedulerTaskEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeMessageVars;
 import uk.gov.hmcts.reform.civil.handler.tasks.variables.HearingNoticeSchedulerVars;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.hmc.exception.HmcException;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
@@ -68,9 +68,6 @@ class HearingNoticeSchedulerEventHandlerTest {
     @Mock
     private SystemUpdateUserConfiguration userConfig;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private HearingNoticeSchedulerEventHandler handler;
 
@@ -87,7 +84,6 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @BeforeEach
     void init() {
-        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
         when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.setVariables(any())).thenReturn(messageCorrelationBuilder);
         when(mockTask.getVariable(SERVICE_ID_KEY)).thenReturn(SERVICE_ID);
@@ -270,6 +266,16 @@ class HearingNoticeSchedulerEventHandlerTest {
         );
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
         verifyNoInteractions(messageCorrelationBuilder);
+    }
+
+    @Test
+    void shouldAttemptToCallHmcApiThreeTimes_whenGetHearingThrowsException() {
+        when(hearingsService.getHearingResponse(anyString(), anyString())).thenThrow(HmcException.class);
+
+        handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
+
+        verify(hearingsService, times(3)).getHearingResponse(anyString(), anyString());
+        verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
     }
 
     private HearingGetResponse createHearing(String caseId, ListAssistCaseStatus hearingStatus) {

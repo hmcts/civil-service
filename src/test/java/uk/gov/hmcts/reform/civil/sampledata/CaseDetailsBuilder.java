@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -20,12 +22,14 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 
 @SuppressWarnings("unchecked")
 public class CaseDetailsBuilder {
 
     private final ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        .registerModules(new Jdk8Module(), new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private String state;
     private Map<String, Object> data;
@@ -163,6 +167,13 @@ public class CaseDetailsBuilder {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = PROCEEDS_IN_HERITAGE_SYSTEM.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateMediationUnsuccessful() {
+        CaseData caseData = CaseDataBuilder.builder().atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE).build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = IN_MEDIATION.name();
         return this;
     }
 

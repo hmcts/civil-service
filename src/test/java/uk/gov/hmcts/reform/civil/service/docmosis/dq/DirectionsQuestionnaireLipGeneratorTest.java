@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -15,18 +15,25 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertReportLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.dq.RequirementsLip;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.GetRespondentsForDQGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.SetApplicantsForDQGenerator;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,7 +49,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DirectionsQuestionnaireGenerator.class,
     DirectionsQuestionnaireLipGenerator.class,
     JacksonAutoConfiguration.class,
-    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
+    DQGeneratorFormBuilder.class,
+    GetRespondentsForDQGenerator.class,
+    RespondentTemplateForDQGenerator.class,
+    SetApplicantsForDQGenerator.class,
     CaseDetailsConverter.class
 })
 class DirectionsQuestionnaireLipGeneratorTest {
@@ -50,7 +63,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
 
     @MockBean
-    private UnsecuredDocumentManagementService documentManagementService;
+    private SecuredDocumentManagementService documentManagementService;
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
@@ -62,7 +75,7 @@ class DirectionsQuestionnaireLipGeneratorTest {
     private FeatureToggleService featureToggleService;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
 
     @Autowired
     private DirectionsQuestionnaireLipGenerator generator;
@@ -72,19 +85,19 @@ class DirectionsQuestionnaireLipGeneratorTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .applicant1(Party.builder()
-                            .partyEmail("email")
-                            .companyName("company")
-                            .type(Party.Type.COMPANY)
-                            .partyID("0808")
-                            .primaryAddress(Address.builder().build())
-                            .build())
+                .partyEmail("email")
+                .companyName("company")
+                .type(Party.Type.COMPANY)
+                .partyID("0808")
+                .primaryAddress(Address.builder().build())
+                .build())
             .respondent1(Party.builder()
-                             .partyEmail("email")
-                             .companyName("company")
-                             .type(Party.Type.COMPANY)
-                             .partyPhone("0808")
-                             .primaryAddress(Address.builder().build())
-                             .build())
+                .partyEmail("email")
+                .companyName("company")
+                .type(Party.Type.COMPANY)
+                .partyPhone("0808")
+                .primaryAddress(Address.builder().build())
+                .build())
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -102,10 +115,10 @@ class DirectionsQuestionnaireLipGeneratorTest {
             .build();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1LiPCorrespondenceAddress(correspondenceAddress)
-                                                         .build())
-                             .build())
+                .respondent1LiPResponse(RespondentLiPResponse.builder()
+                    .respondent1LiPCorrespondenceAddress(correspondenceAddress)
+                    .build())
+                .build())
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -130,27 +143,27 @@ class DirectionsQuestionnaireLipGeneratorTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .respondent1LiPResponse(
-                                 RespondentLiPResponse
-                                     .builder()
-                                     .respondent1DQHearingSupportLip(
-                                         HearingSupportLip
-                                             .builder()
-                                             .requirementsLip(wrapElements(List.of(
-                                                 RequirementsLip
-                                                     .builder()
-                                                     .name("Name")
-                                                     .requirements(
-                                                         List.of(
-                                                             DISABLED_ACCESS
-                                                         )
-                                                     )
-                                                     .build()
-                                             )))
-                                             .build())
-                                     .build())
-                             .build())
+                .builder()
+                .respondent1LiPResponse(
+                    RespondentLiPResponse
+                        .builder()
+                        .respondent1DQHearingSupportLip(
+                            HearingSupportLip
+                                .builder()
+                                .requirementsLip(wrapElements(List.of(
+                                    RequirementsLip
+                                        .builder()
+                                        .name("Name")
+                                        .requirements(
+                                            List.of(
+                                                DISABLED_ACCESS
+                                            )
+                                        )
+                                        .build()
+                                )))
+                                .build())
+                        .build())
+                .build())
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -174,21 +187,51 @@ class DirectionsQuestionnaireLipGeneratorTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .caseDataLiP(CaseDataLiP
+                .builder()
+                .respondent1LiPResponse(
+                    RespondentLiPResponse
+                        .builder()
+                        .respondent1DQExtraDetails(
+                            DQExtraDetailsLip.builder()
+                                .requestExtra4weeks(YesOrNo.YES)
+                                .build()
+                        ).build())
+                .build())
+            .build();
+        //When
+        DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
+        //Then
+        assertNotNull(form.getLipExtraDQ());
+    }
+
+    @Test
+    void shouldGenerateLipGiveEvidenceYourselfConfirmDetails_whenTheyExist() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            .caseDataLiP(CaseDataLiP
                              .builder()
                              .respondent1LiPResponse(
                                  RespondentLiPResponse
                                      .builder()
                                      .respondent1DQExtraDetails(
                                          DQExtraDetailsLip.builder()
-                                             .requestExtra4weeks(YesOrNo.YES)
-                                             .build()
-                                     ).build())
+                                             .giveEvidenceYourSelf(YesOrNo.YES)
+                                             .build())
+                                     .respondent1DQEvidenceConfirmDetails(EvidenceConfirmDetails
+                                                                              .builder()
+                                                                              .firstName("Sam")
+                                                                              .lastName("Wise")
+                                                                              .phone("07788994455")
+                                                                              .email("sam@wise.come")
+                                                                              .jobTitle("wise man")
+                                                                              .build())
+                                     .build())
                              .build())
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
         //Then
-        assertNotNull(form.getLipExtraDQ());
+        assertNotNull(form.getLipExtraDQ().getGiveEvidenceConfirmDetails());
     }
 
     @Test
@@ -206,29 +249,29 @@ class DirectionsQuestionnaireLipGeneratorTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .respondent1LiPResponse(
-                                 RespondentLiPResponse
-                                     .builder()
-                                     .respondent1DQExtraDetails(
-                                         DQExtraDetailsLip.builder()
-                                             .respondent1DQLiPExpert(
-                                                 ExpertLiP
-                                                     .builder()
-                                                     .caseNeedsAnExpert(YesOrNo.YES)
-                                                     .expertReportRequired(YesOrNo.YES)
-                                                     .expertCanStillExamineDetails("details")
-                                                     .details(
-                                                         wrapElements(List.of(
-                                                             ExpertReportLiP.builder()
-                                                                 .expertName("Name")
-                                                                 .reportDate(LocalDate.now())
-                                                                 .build()))
-                                                     )
-                                                     .build())
-                                             .build())
-                                     .build())
-                             .build())
+                .builder()
+                .respondent1LiPResponse(
+                    RespondentLiPResponse
+                        .builder()
+                        .respondent1DQExtraDetails(
+                            DQExtraDetailsLip.builder()
+                                .respondent1DQLiPExpert(
+                                    ExpertLiP
+                                        .builder()
+                                        .caseNeedsAnExpert(YesOrNo.YES)
+                                        .expertReportRequired(YesOrNo.YES)
+                                        .expertCanStillExamineDetails("details")
+                                        .details(
+                                            wrapElements(List.of(
+                                                ExpertReportLiP.builder()
+                                                    .expertName("Name")
+                                                    .reportDate(LocalDate.now())
+                                                    .build()))
+                                        )
+                                        .build())
+                                .build())
+                        .build())
+                .build())
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);
@@ -244,14 +287,14 @@ class DirectionsQuestionnaireLipGeneratorTest {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
             .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .respondent1LiPResponse(
-                                 RespondentLiPResponse
-                                     .builder()
-                                     .respondent1DQExtraDetails(
-                                         DQExtraDetailsLip.builder().build())
-                                     .build())
-                             .build())
+                .builder()
+                .respondent1LiPResponse(
+                    RespondentLiPResponse
+                        .builder()
+                        .respondent1DQExtraDetails(
+                            DQExtraDetailsLip.builder().build())
+                        .build())
+                .build())
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);

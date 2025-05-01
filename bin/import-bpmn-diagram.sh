@@ -4,12 +4,12 @@ set -eu
 workspace=${1}
 
 serviceToken=$($(realpath $workspace)/bin/utils/idam-lease-service-token.sh civil_service \
-  $(docker run --rm toolbelt/oathtool --totp -b ${S2S_SECRET:-AABBCCDDEEFFGGHH}))
+  $(docker run --rm hmctspublic.azurecr.io/imported/toolbelt/oathtool --totp -b ${S2S_SECRET:-AABBCCDDEEFFGGHH}))
 filepath="$(realpath $workspace)/camunda"
 
 for file in $(find ${filepath} -name '*.bpmn')
 do
-  uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error -X POST \
+  uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
     ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
     -H "Accept: application/json" \
     -H "ServiceAuthorization: Bearer ${serviceToken}" \

@@ -23,6 +23,7 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_DJ_RECEIVED;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -58,16 +59,16 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     private String identifyTemplate(CaseData caseData) {
         String template = null;
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested();
             templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
@@ -77,7 +78,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         }
         if (caseData.isLipvLipOneVOne()
             && toggleService.isLipVLipEnabled()) {
-            template = notificationsProperties.getApplicantLiPDefaultJudgmentRequested();
+            template = getLipEmailTemplate(caseData.isClaimantBilingual());
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         return template;
@@ -87,9 +88,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         CaseData caseData = callbackParams.getCaseData();
 
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
@@ -104,9 +105,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             );
         }
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ((ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
             && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-            "Both")))) {
+            "Both"))) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
@@ -114,7 +115,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty() && !caseData.isLipvLipOneVOne()) {
+        if (ofNullable(caseData.getRespondent2()).isEmpty() && !caseData.isApplicantLipOneVOne()) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
@@ -143,8 +144,10 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                                .getOrganisation()
                                                                .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -161,8 +164,10 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel()
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, caseData.getDefendantDetailsSpec().getValue().getLabel(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -171,8 +176,10 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -181,8 +188,10 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                               .getOrganisation()
                                                               .getOrganisationID(), caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -196,4 +205,10 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
+    private String getLipEmailTemplate(boolean isBilingual) {
+        if (isBilingual) {
+            return notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate();
+        }
+        return notificationsProperties.getApplicantLiPDefaultJudgmentRequested();
+    }
 }

@@ -1,27 +1,23 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -30,32 +26,32 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.EXTERNAL_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    DefendantChangeOfAddressApplicantForCuiNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private DefendantChangeOfAddressApplicantForCuiNotificationHandler handler;
-    @MockBean
-    private FeatureToggleService toggleService;
-    @MockBean
+
+    @Mock
     private PinInPostConfiguration pinInPostConfiguration;
 
     @Nested
@@ -70,17 +66,12 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
         public static final String TEMPLATE_ID = "template-id";
         public static final String REFERENCE = "defendant-contact-details-change-applicant-notification-000DC001";
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondentChangeOfAddressNotificationTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLiPClaimantDefendantChangedContactDetails()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-            when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
-        }
-
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
+            when(notificationsProperties.getRespondentChangeOfAddressNotificationTemplate()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -96,6 +87,9 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
 
         @Test
         void shouldNotifyLiPClaimant_whenInvoked() {
+            when(notificationsProperties.getNotifyLiPClaimantDefendantChangedContactDetails()).thenReturn(TEMPLATE_ID);
+            when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(FRONTEND_CUI_URL);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .applicant1Represented(YesOrNo.NO)
                 .build();
@@ -114,9 +108,11 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 

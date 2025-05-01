@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
@@ -31,7 +30,7 @@ import java.util.List;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 
 @ExtendWith(SpringExtension.class)
-public class RoboticsDataMapperForSpecTest {
+class RoboticsDataMapperForSpecTest {
 
     @InjectMocks
     private RoboticsDataMapperForSpec mapper;
@@ -44,9 +43,10 @@ public class RoboticsDataMapperForSpecTest {
     private OrganisationService organisationService;
     @Mock
     private FeatureToggleService featureToggleService;
+    private static final String BEARER_TOKEN = "Bearer Token";
 
     @Test
-    public void whenSpecEnabled_includeBS() {
+    void whenSpecEnabled_includeBS() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .submittedDate(LocalDateTime.now().minusDays(14))
@@ -71,7 +71,7 @@ public class RoboticsDataMapperForSpecTest {
                            .build())
             .build();
 
-        RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(mapped.getHeader().getCaseNumber(), caseData.getLegacyCaseReference());
         Assertions.assertTrue(mapped.getLitigiousParties().stream()
@@ -81,8 +81,7 @@ public class RoboticsDataMapperForSpecTest {
     }
 
     @Test
-    public void shouldMapExpectedNoticeOfChangeData_whenCaseGoesOffline() {
-        Mockito.when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+    void shouldMapExpectedNoticeOfChangeData_whenCaseGoesOffline() {
 
         var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
@@ -128,7 +127,7 @@ public class RoboticsDataMapperForSpecTest {
                     .build())
             .build();
 
-        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(
             List.of(
@@ -141,9 +140,7 @@ public class RoboticsDataMapperForSpecTest {
     }
 
     @Test
-    public void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
-        Mockito.when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-
+    void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
         var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
@@ -188,7 +185,7 @@ public class RoboticsDataMapperForSpecTest {
                     .build())
             .build();
 
-        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(
             List.of(
@@ -201,9 +198,7 @@ public class RoboticsDataMapperForSpecTest {
     }
 
     @Test
-    public void shouldNotPopulateNoticeOfChangeSection_whenCaseIsStillOnline() {
-        Mockito.when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-
+    void shouldNotPopulateNoticeOfChangeSection_whenCaseIsStillOnline() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .submittedDate(LocalDateTime.now().minusDays(14))
@@ -229,7 +224,7 @@ public class RoboticsDataMapperForSpecTest {
             .ccdState(CaseState.CASE_ISSUED)
             .build();
 
-        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertNull(roboticsCaseData.getNoticeOfChange());
     }

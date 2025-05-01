@@ -11,11 +11,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
 import uk.gov.hmcts.reform.civil.service.FeesService;
-import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
+import uk.gov.hmcts.reform.civil.model.Fee2Dto;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,6 +38,8 @@ import java.util.List;
 public class FeesController {
 
     private final FeesService feesService;
+    private final GeneralAppFeesService generalAppFeesService;
+    private final InterestCalculator interestCalculator;
 
     @GetMapping("/ranges")
     @Operation(summary = "Gets a group of claim amount ranges and associated fees for those ranges")
@@ -53,6 +61,16 @@ public class FeesController {
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 
+    @PostMapping("/claim/calculate-interest")
+    @Operation(summary = "Calculates the claim interest")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")})
+    public ResponseEntity<BigDecimal> calculateClaimInterest(@RequestBody CaseData caseData) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        return new ResponseEntity<>(interest, HttpStatus.OK);
+    }
+
     @GetMapping("/hearing/{claimAmount}")
     @Operation(summary = "Gets the hearing fee associated with an amount")
     @ApiResponses(value = {
@@ -60,6 +78,24 @@ public class FeesController {
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
     public ResponseEntity<Fee> getHearingFee(@PathVariable("claimAmount") BigDecimal claimAmount) {
         Fee fee = feesService.getHearingFeeDataByTotalClaimAmount(claimAmount);
+        return new ResponseEntity<>(fee, HttpStatus.OK);
+    }
+
+    @PostMapping("/general-application")
+    @Operation(summary = "Gets the general app fee associated with an application type")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized")
+    })
+    public ResponseEntity<Fee> getGeneralApplicationFee(
+        @RequestBody GeneralApplicationFeeRequest request
+    ) {
+        Fee fee = generalAppFeesService.getFeeForGALiP(
+            request.getApplicationTypes(),
+            request.getWithConsent(),
+            request.getWithNotice(),
+            request.getHearingDate()
+        );
         return new ResponseEntity<>(fee, HttpStatus.OK);
     }
 }

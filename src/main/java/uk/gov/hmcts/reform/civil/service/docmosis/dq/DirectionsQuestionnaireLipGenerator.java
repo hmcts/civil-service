@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
@@ -13,14 +13,14 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
+import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQEvidenceConfirmDetails;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.builders.DQGeneratorFormBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.helpers.RespondentTemplateForDQGenerator;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,76 +35,72 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LR
 @Service
 public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaireGenerator {
 
-    private ObjectMapper mapper;
-
     public DirectionsQuestionnaireLipGenerator(DocumentManagementService documentManagementService,
                                                DocumentGeneratorService documentGeneratorService,
-                                               StateFlowEngine stateFlowEngine,
-                                               RepresentativeService representativeService,
                                                FeatureToggleService featureToggleService,
-                                               LocationRefDataService locationRefDataService) {
+                                               DQGeneratorFormBuilder dqGeneratorFormBuilder,
+                                               RespondentTemplateForDQGenerator respondentTemplateForDQGenerator
+    ) {
+
         super(
             documentManagementService,
             documentGeneratorService,
-            stateFlowEngine,
-            representativeService,
             featureToggleService,
-            locationRefDataService
+            dqGeneratorFormBuilder,
+            respondentTemplateForDQGenerator
         );
     }
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData, String authorisation) {
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = getDirectionsQuestionnaireFormBuilder(
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(
             caseData,
             authorisation
         );
-        builder.respondent1LiPCorrespondenceAddress(Optional.ofNullable(caseData.getCaseDataLiP())
-                                                        .map(CaseDataLiP::getRespondent1LiPResponse)
-                                                        .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
-                                                        .orElse(null))
+        builder.respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
             .hearingLipSupportRequirements(Optional.ofNullable(
                     caseData.getCaseDataLiP())
-                                               .map(
-                                                   CaseDataLiP::getRespondent1LiPResponse)
-                                               .map(
-                                                   RespondentLiPResponse::getRespondent1DQHearingSupportLip)
-                                               .map(HearingSupportLip::getUnwrappedRequirementsLip)
-                                               .map(Collection::stream)
-                                               .map(items -> items.map(item -> toHearingSupportRequirements(item))
-                                                   .toList())
-                                               .orElse(Collections.emptyList()));
+                .map(
+                    CaseDataLiP::getRespondent1LiPResponse)
+                .map(
+                    RespondentLiPResponse::getRespondent1DQHearingSupportLip)
+                .map(HearingSupportLip::getUnwrappedRequirementsLip)
+                .map(Collection::stream)
+                .map(items -> items.map(item -> toHearingSupportRequirements(item))
+                    .toList())
+                .orElse(Collections.emptyList()));
         var respondent1DQExtraDetails = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1DQExtraDetails)
             .orElse(null);
         if (respondent1DQExtraDetails != null) {
             builder.lipExtraDQ(LipExtraDQ.builder().triedToSettle(respondent1DQExtraDetails.getTriedToSettle())
-                                   .requestExtra4weeks(respondent1DQExtraDetails.getRequestExtra4weeks())
-                                   .considerClaimantDocuments(respondent1DQExtraDetails.getConsiderClaimantDocuments())
-                                   .considerClaimantDocumentsDetails(respondent1DQExtraDetails.getConsiderClaimantDocumentsDetails())
-                                   .determinationWithoutHearingRequired(respondent1DQExtraDetails.getDeterminationWithoutHearingRequired())
-                                   .determinationWithoutHearingReason(respondent1DQExtraDetails.getDeterminationWithoutHearingReason())
-                                   .giveEvidenceYourSelf(respondent1DQExtraDetails.getGiveEvidenceYourSelf())
-                                   .whyPhoneOrVideoHearing(respondent1DQExtraDetails.getWhyPhoneOrVideoHearing())
-                                   .wantPhoneOrVideoHearing(respondent1DQExtraDetails.getWantPhoneOrVideoHearing())
-                                   .build())
+                    .requestExtra4weeks(respondent1DQExtraDetails.getRequestExtra4weeks())
+                    .considerClaimantDocuments(respondent1DQExtraDetails.getConsiderClaimantDocuments())
+                    .considerClaimantDocumentsDetails(respondent1DQExtraDetails.getConsiderClaimantDocumentsDetails())
+                    .determinationWithoutHearingRequired(respondent1DQExtraDetails.getDeterminationWithoutHearingRequired())
+                    .determinationWithoutHearingReason(respondent1DQExtraDetails.getDeterminationWithoutHearingReason())
+                    .giveEvidenceYourSelf(respondent1DQExtraDetails.getGiveEvidenceYourSelf())
+                    .whyPhoneOrVideoHearing(respondent1DQExtraDetails.getWhyPhoneOrVideoHearing())
+                    .wantPhoneOrVideoHearing(respondent1DQExtraDetails.getWantPhoneOrVideoHearing())
+                    .giveEvidenceConfirmDetails(getDetails(caseData.getCaseDataLiP().getRespondent1LiPResponse()))
+                    .build())
                 .lipExperts(LipExperts.builder()
-                                .details(respondent1DQExtraDetails
-                                             .getReportExpertDetails()
-                                             .stream()
-                                             .map(ExpertReportTemplate::toExpertReportTemplate)
-                                             .toList())
-                                .caseNeedsAnExpert(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
-                                                       .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
-                                .expertCanStillExamineDetails(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
-                                                                  .map(ExpertLiP::getExpertCanStillExamineDetails)
-                                                                  .orElse(null))
-                                .expertReportRequired(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
-                                                          .map(ExpertLiP::getExpertReportRequired)
-                                                          .orElse(null))
+                    .details(respondent1DQExtraDetails
+                        .getReportExpertDetails()
+                        .stream()
+                        .map(ExpertReportTemplate::toExpertReportTemplate)
+                        .toList())
+                    .caseNeedsAnExpert(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
+                        .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
+                    .expertCanStillExamineDetails(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
+                        .map(ExpertLiP::getExpertCanStillExamineDetails)
+                        .orElse(null))
+                    .expertReportRequired(Optional.ofNullable(respondent1DQExtraDetails.getRespondent1DQLiPExpert())
+                        .map(ExpertLiP::getExpertReportRequired)
+                        .orElse(null))
 
-                                .build());
+                    .build());
 
         }
         return builder.build();
@@ -112,23 +108,21 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
 
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        if (caseData.isRespondent1NotRepresented() && getFeatureToggleService().isPinInPostEnabled()) {
+        if (caseData.isRespondent1NotRepresented() && featureToggleService.isPinInPostEnabled()) {
             return DQ_LR_V_LIP_RESPONSE;
         }
         return super.getTemplateId(caseData);
     }
 
-    @Override
     protected List<Party> getRespondents(CaseData caseData, String defendantIdentifier) {
         return List.of(Party.builder()
-                           .name(caseData.getRespondent1().getPartyName())
-                           .emailAddress(caseData.getRespondent1().getPartyEmail())
-                           .phoneNumber(caseData.getRespondent1().getPartyPhone())
-                           .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                           .build());
+            .name(caseData.getRespondent1().getPartyName())
+            .emailAddress(caseData.getRespondent1().getPartyEmail())
+            .phoneNumber(caseData.getRespondent1().getPartyPhone())
+            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+            .build());
     }
 
-    @Override
     protected RequestedCourt getRequestedCourt(DQ dq, String authorisation) {
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc != null && null != rc.getCaseLocation()) {
@@ -142,5 +136,19 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
                 .requestHearingAtSpecificCourt(NO)
                 .build();
         }
+    }
+
+    private LipExtraDQEvidenceConfirmDetails getDetails(RespondentLiPResponse respondentLiPResponse) {
+        EvidenceConfirmDetails confirmDetails = respondentLiPResponse.getRespondent1DQEvidenceConfirmDetails();
+        if (confirmDetails != null) {
+            return LipExtraDQEvidenceConfirmDetails.builder()
+                .firstName(confirmDetails.getFirstName())
+                .lastName(confirmDetails.getLastName())
+                .email(confirmDetails.getEmail())
+                .phone(confirmDetails.getPhone())
+                .jobTitle(confirmDetails.getJobTitle())
+                .build();
+        }
+        return null;
     }
 }

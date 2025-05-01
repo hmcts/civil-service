@@ -1,29 +1,27 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,46 +31,37 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseAgreedRepaymentRespondentNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseAgreedRepaymentRespondentNotificationHandler.TASK_ID_JUDGEMENT_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    ClaimantResponseAgreedRepaymentRespondentNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
-    private PinInPostConfiguration pipInPostConfiguration;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @InjectMocks
     private ClaimantResponseAgreedRepaymentRespondentNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondentCcjNotificationTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getRespondentCcjNotificationWelshTemplate()).thenReturn("template-welsh-id");
-            when(notificationsProperties.getRespondentSolicitorCcjNotificationTemplate()).thenReturn("template-id");
-            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("test.url");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
-        }
-
         @Test
         void shouldNotifyRespondentParty_whenInvoked() {
+            when(notificationsProperties.getRespondentCcjNotificationTemplate()).thenReturn("template-id");
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -99,6 +88,8 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
 
         @Test
         void shouldNotifyRespondentPartyInWelsh_whenInvoked() {
+            when(notificationsProperties.getRespondentCcjNotificationWelshTemplate()).thenReturn("template-welsh-id");
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -127,6 +118,10 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
+            when(notificationsProperties.getRespondentSolicitorCcjNotificationTemplate()).thenReturn("template-id");
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1OrgRegistered(YesOrNo.YES)
                 .build();
@@ -146,6 +141,8 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
 
         @Test
         void shouldNotifyRespondentParty_whenInvokedWithJudgementByAdmission() {
+            when(notificationsProperties.getRespondentCcjNotificationTemplate()).thenReturn("template-id");
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -183,7 +180,9 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
     public Map<String, String> getNotificationDataMapSolicitorSpec(CaseData caseData) {
         return Map.of(
             CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, "test solicitor",
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
         );
     }
 

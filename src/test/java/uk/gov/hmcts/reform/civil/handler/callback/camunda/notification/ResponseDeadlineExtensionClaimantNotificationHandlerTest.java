@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -29,11 +28,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -46,23 +48,20 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Re
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
-@SpringBootTest(classes = {
-    ResponseDeadlineExtensionClaimantNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
-    @MockBean
+    @Mock
     private PinInPostConfiguration pipInPostConfiguration;
-    @Autowired
+    @InjectMocks
     private ResponseDeadlineExtensionClaimantNotificationHandler handler;
 
     @Nested
@@ -72,18 +71,8 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         private final String claimantEmail = "applicantsolicitor@example.com";
         private final String claimantLipEmail = "rambo@email.com";
         private final String emailLipTemplate = "emailTemplateLip";
+        private final String emailLipWelshTemplate = "emailTemplateWelshLip";
         private final String legacyReference = "000DC001";
-
-        @BeforeEach
-        void setUp() {
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-            given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
-            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
-            when(toggleService.isLipVLipEnabled()).thenReturn(false);
-            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
-
-        }
 
         @Test
         void shouldSendEmailToClaimantLR() {
@@ -94,6 +83,9 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -116,14 +108,19 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             return Map.of(
                 RESPONDENT_NAME, "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
         @Test
         void shouldSendEmailToClaimantLip() {
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -143,10 +140,63 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             );
         }
 
+        @Test
+        void shouldSendEmailToClaimantLipInWelsh() {
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).willReturn(emailLipWelshTemplate);
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                claimantLipEmail,
+                emailLipWelshTemplate,
+                getNotificationDataMapForLip(caseData),
+                "claimant-deadline-extension-notification-" + legacyReference
+            );
+        }
+
+        @Test
+        void shouldSendEmailToClaimantLipInEngish_ifPreLiPvLRReleaseDate() {
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+            when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                claimantLipEmail,
+                emailLipTemplate,
+                getNotificationDataMapForLip(caseData),
+                "claimant-deadline-extension-notification-" + legacyReference
+            );
+        }
+
         @NotNull
         private Map<String, String> getNotificationDataMapForLip(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, "Mr. John Rambo",
                 DEFENDANT_NAME, "Mr. Sole Trader",
                 FRONTEND_URL, "url",

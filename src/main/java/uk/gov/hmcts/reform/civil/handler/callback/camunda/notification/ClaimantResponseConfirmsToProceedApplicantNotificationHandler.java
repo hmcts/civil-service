@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED;
@@ -31,6 +32,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
@@ -58,7 +60,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
         if (caseData.getApplicant1Email() != null) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                notificationsProperties.getClaimantLipClaimUpdatedTemplate(),
+                getEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -67,10 +69,22 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private String getEmailTemplate(CaseData caseData) {
+        if (isBilingualForLipApplicant(caseData)) {
+            return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
+        }
+        return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+    }
+
+    private boolean isBilingualForLipApplicant(CaseData caseData) {
+        return caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()
+            && caseData.isClaimantBilingual();
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         );
     }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -30,8 +31,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.List.of;
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
@@ -53,12 +54,16 @@ public class RoboticsNotificationService {
         log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
         Optional<EmailData> emailData = prepareEmailData(RoboticsEmailParams.builder().caseData(caseData).authToken(
             authToken).isMultiParty(isMultiParty).build());
-        emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
+
+        emailData.ifPresent(data -> {
+            log.info(String.format("Sending email via client to %s", data.getTo()));
+            sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data);
+        });
     }
 
-    public void notifyJudgementLip(@NotNull CaseData caseData) {
+    public void notifyJudgementLip(@NotNull CaseData caseData, String authToken) {
         Optional<EmailData> emailData = prepareJudgementLipEmail(RoboticsEmailParams.builder()
-                                                              .caseData(caseData)
+                                                              .caseData(caseData).authToken(authToken)
                                                               .isMultiParty(false).build());
         log.info(String.format("Start notifyDefaultJudgementLip and case data is not null %s", caseData.getLegacyCaseReference()));
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
@@ -104,7 +109,7 @@ public class RoboticsNotificationService {
     private RoboticsCaseDataDTO getRoboticsCaseDataDTO(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData);
+            roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken);
         } else {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
             roboticsCaseDataDTO = RoboticsCaseDataDTO.builder().jsonRawData(roboticsCaseData.toJsonString().getBytes())
@@ -114,9 +119,9 @@ public class RoboticsNotificationService {
         return roboticsCaseDataDTO;
     }
 
-    private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData) throws JsonProcessingException {
+    private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
-        RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+        RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
         roboticsCaseDataDTO = RoboticsCaseDataDTO.builder().jsonRawData(roboticsCaseDataSpec.toJsonString().getBytes())
             .events(roboticsCaseDataSpec.getEvents())
             .build();
@@ -145,7 +150,6 @@ public class RoboticsNotificationService {
                 caseData.getLegacyCaseReference()
             );
         }
-        log.info(String.format("Subject-------- %s", subject));
         return subject;
     }
 
@@ -153,7 +157,8 @@ public class RoboticsNotificationService {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-                if (nonNull(caseData.getPaymentTypeSelection())) {
+                if (nonNull(caseData.getPaymentTypeSelection())
+                    && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.DEFAULT_JUDGEMENT_SPEC.name())) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
                         caseData.getLegacyCaseReference()
@@ -193,6 +198,16 @@ public class RoboticsNotificationService {
                                     caseData.getLegacyCaseReference(),
                                     caseData.getCcdState(), triggerEvent
             );
+        } else if (nonNull(caseData.getPaymentTypeSelection()) && caseData.isLipvLROneVOne()) {
+            subject = String.format(
+                "LIP v LR Default Judgment Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
+        } else if (caseData.isLipvLROneVOne()) {
+            subject = String.format(
+                "LIP v LR Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
         } else {
             subject = String.format(
                 "LR v LR Case Data for %s",
@@ -204,19 +219,16 @@ public class RoboticsNotificationService {
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
         if (isSpecClaim) {
-            log.info(String.format("EMAIl:--------- %s", roboticsEmailConfiguration.getSpecRecipient()));
             return roboticsEmailConfiguration.getSpecRecipient();
         }
-        String recipient = isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
-        log.info(String.format("EMAIl:--------- %s", recipient));
-        return recipient;
+        return isMultiParty ? roboticsEmailConfiguration
+            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
 
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
         try {
-            RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData());
+            RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData(), params.getAuthToken());
             String triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
@@ -261,7 +273,9 @@ public class RoboticsNotificationService {
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
             eventHistory.getBreathingSpaceMentalHealthLifted(),
-            eventHistory.getJudgmentByAdmission()
+            eventHistory.getJudgmentByAdmission(),
+            eventHistory.getGeneralFormOfApplication(),
+            eventHistory.getDefenceStruckOut()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
@@ -288,7 +302,8 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthLifted(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getJudgmentByAdmission(), triggerReason);
-
+        triggerReason = updateTriggerReason(eventHistory.getGeneralFormOfApplication(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceStruckOut(), triggerReason);
         return triggerReason;
     }
 

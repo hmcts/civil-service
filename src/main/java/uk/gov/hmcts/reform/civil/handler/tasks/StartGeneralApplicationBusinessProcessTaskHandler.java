@@ -20,38 +20,38 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static java.util.Optional.ofNullable;
 
 @Component
 @RequiredArgsConstructor
-public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseExternalTaskHandler {
+public class StartGeneralApplicationBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     public static final String BUSINESS_PROCESS = "businessProcess";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
-    private final StateFlowEngine stateFlowEngine;
-
-    private VariableMap variables;
+    private final IStateFlowEngine stateFlowEngine;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         CaseData caseData = startGeneralApplicationBusinessProcess(externalTask);
-        variables = Variables.createVariables();
+        var variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        return ExternalTaskData.builder().variables(variables).build();
     }
 
     @Override
-    public VariableMap getVariableMap() {
-        return variables;
+    public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
+        return externalTaskData.getVariables();
     }
 
     private CaseData startGeneralApplicationBusinessProcess(ExternalTask externalTask) {
@@ -77,15 +77,16 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
 
         if (firstGA.isPresent()) {
             GeneralApplication ga = firstGA.get().getValue();
-            switch (ga.getBusinessProcess().getStatusOrDefault()) {
-                case READY:
-                case DISPATCHED:
-                    ga.getBusinessProcess().updateProcessInstanceId(externalTask.getProcessInstanceId());
-                    return updateBusinessProcess(caseId, startEventResponse, generalApplications);
-                default:
-                    throw new BpmnError("ABORT");
+            String status = String.valueOf(ga.getBusinessProcess().getStatusOrDefault());
+
+            if (status.equals("READY") || status.equals("DISPATCHED")) {
+                ga.getBusinessProcess().updateProcessInstanceId(externalTask.getProcessInstanceId());
+                return updateBusinessProcess(caseId, startEventResponse, generalApplications);
+            } else {
+                throw new BpmnError("ABORT");
             }
         }
+
         return data;
     }
 

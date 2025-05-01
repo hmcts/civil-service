@@ -22,14 +22,24 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
+import uk.gov.hmcts.reform.auth.checker.core.user.User;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,11 +66,20 @@ public abstract class BaseIntegrationTest {
         + "k02vLJDY9fLCsFYy5iWGCjb8lD1aX1NTv7jz2ttNNv7-smqp6L3LSSD_LCZMpf0h_3n5RXiv-N3vNpWe4ZC9u0AWQdHEE9QlKTZlsqwKSog"
         + "3yJWhyxAamdMepgW7Z8jQ";
 
+    protected static final String DASHBOARD_CREATE_SCENARIO_URL
+        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
+    protected static final String GET_NOTIFICATIONS_URL
+        = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
+    protected static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
+
     protected static final UserInfo USER_INFO = UserInfo.builder()
         .sub("solicitor@example.com")
         .roles(of("caseworker-civil-solicitor"))
         .build();
 
+    protected static final String s2sToken = "s2s AuthToken";
+    @MockBean
+    private ServiceAuthorisationApi serviceAuthorisationApi;
     @MockBean
     protected UserService userService;
     @MockBean
@@ -69,6 +88,13 @@ public abstract class BaseIntegrationTest {
     protected SecurityContext securityContext;
     @MockBean
     protected JwtDecoder jwtDecoder;
+    @MockBean
+    public AuthorisationService authorisationService;
+    @MockBean
+    public IdamApi idamApi;
+
+    @MockBean
+    public RequestAuthorizer<User> userRequestAuthorizerMock;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -78,12 +104,17 @@ public abstract class BaseIntegrationTest {
 
     @BeforeEach
     public void setUpBase() {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(userService.getUserInfo(anyString())).thenReturn(USER_INFO);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         setSecurityAuthorities(authentication);
+        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
         when(jwtDecoder.decode(anyString())).thenReturn(getJwt());
+        when(idamApi.retrieveUserDetails(anyString()))
+            .thenReturn(UserDetails.builder().forename("Claimant").surname("test").build());
+        when(userRequestAuthorizerMock.authorise(any())).thenReturn(new User("1", Set.of("caseworker-civil-solicitor")));
     }
 
     protected void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
@@ -135,6 +166,23 @@ public abstract class BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON));
     }
 
+    @SneakyThrows
+    protected <T> ResultActions doPut(String auth, T content, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.put(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @SneakyThrows
+    protected <T> ResultActions doDelete(String auth, T content, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.delete(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(content)));
+    }
+
     protected String toJson(Object input) {
         try {
             return objectMapper.writeValueAsString(input);
@@ -144,4 +192,15 @@ public abstract class BaseIntegrationTest {
             );
         }
     }
+
+    protected List<TaskList> toTaskList(String input) {
+        try {
+            return Arrays.asList(objectMapper.readValue(input, TaskList[].class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(
+                String.format("Failed to serialize '%s' to JSON", input.getClass().getSimpleName()), e
+            );
+        }
+    }
+
 }

@@ -14,6 +14,8 @@ properties([
       description: 'The URL of service auth provider'),
     string(name: 'CCD_DATA_STORE_URL', defaultValue: 'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
       description: 'The URL of ccd data store'),
+    string(name: 'AAC_API_URL', defaultValue: 'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
+      description: 'The URL of AAC service'),
     string(name: 'CIVIL_SERVICE_URL', defaultValue: 'http://civil-service-aat.service.core-compute-aat.internal',
       description: 'The URL of civil service'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
@@ -31,6 +33,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
+def ccdBranch = "master"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -42,7 +45,11 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 
 def secrets = [
   'civil-${env}': [
-    secret('microservicekey-civil-service', 'S2S_SECRET')
+    secret('microservicekey-civil-service', 'S2S_SECRET'),
+    secret('default-password', 'DEFAULT_PASSWORD'),
+    secret('judge-default-password', 'JUDGE_DEFAULT_PASSWORD'),
+    secret('iac-default-password', 'IAC_DEFAULT_PASSWORD'),
+    secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS')
   ]
 ]
 
@@ -57,6 +64,7 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
+  env.AAC_API_URL = params.AAC_API_URL
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
   ])
@@ -69,19 +77,17 @@ withNightlyPipeline(type, product, component) {
   enableFullFunctionalTest(200)
 
   before('fullFunctionalTest') {
+    sh """
+      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+    """
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
+    yarnBuilder.yarn('playwright install')
   }
 
   afterAlways('fullFunctionalTest') {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
     env.TESTS_FOR_ACCESSIBILITY = false
-  }
-
-  enableCrossBrowserTest()
-
-  afterAlways('crossBrowserTest') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
   afterAlways('fortify-scan') {

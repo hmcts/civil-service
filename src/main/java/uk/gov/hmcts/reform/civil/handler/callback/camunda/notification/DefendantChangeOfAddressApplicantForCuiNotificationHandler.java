@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CONTACT_DETAILS_CHANGE;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -63,7 +64,7 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
 
         notificationService.sendMail(
             isLiPClaimant ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            getEmailTemplate(caseData, isLiPClaimant),
+            getEmailTemplate(isLiPClaimant),
             isLiPClaimant ? addPropertiesForLiPClaimant(caseData) : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -84,9 +85,11 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData)
+            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -97,7 +100,7 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
-    public String getEmailTemplate(CaseData caseData, boolean isLiPClaimant) {
+    public String getEmailTemplate(boolean isLiPClaimant) {
         String emailTemplate;
         if (isLiPClaimant) {
             emailTemplate = notificationsProperties.getNotifyLiPClaimantDefendantChangedContactDetails();

@@ -191,8 +191,9 @@ class BundleCreationTriggerEventHandlerTest {
         // Given: Case details with all type of documents require for bundles
         BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
-            .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
+        StartEventResponse response = StartEventResponse.builder()
+            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
+        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
         when(bundleCreationService.createBundle(event)).thenReturn(bundleCreateResponse);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
 
@@ -219,7 +220,6 @@ class BundleCreationTriggerEventHandlerTest {
                                 generatedBundle.getValue().getStitchedDocument().get().getDocumentFileName());
         Assertions.assertEquals(caseData.getHearingDate(), generatedBundle.getValue().getBundleHearingDate().get());
         Assertions.assertNotNull(generatedBundle.getValue().getCreatedOn());
-        Assertions.assertEquals("bundles", generatedBundle.getValue().getStitchedDocument().get().getCategoryID());
     }
 
     @Test
@@ -242,7 +242,7 @@ class BundleCreationTriggerEventHandlerTest {
         Object caseBundlesObj = (((HashMap<String, Object>)caseDataContent.getData()).get("caseBundles"));
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundlesList = (List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>>) caseBundlesObj;
         Assertions.assertEquals(caseBundles.get(0).getValue().getTitle(), caseBundlesList.get(0).getValue().getTitle()
-                                );
+        );
     }
 
     private List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> prepareCaseBundles() {
@@ -280,8 +280,9 @@ class BundleCreationTriggerEventHandlerTest {
         // Given: Case details with all type of documents require for bundles
         BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
-            .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
+        StartEventResponse response = StartEventResponse.builder()
+            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
+        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
         when(bundleCreationService.createBundle(event)).thenReturn(bundleCreateResponse);
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
 
@@ -297,8 +298,9 @@ class BundleCreationTriggerEventHandlerTest {
         // createBundle service
         BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
-            .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
+        StartEventResponse response = StartEventResponse.builder()
+            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
+        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
         when(bundleCreationService.createBundle(event)).thenThrow(new RuntimeException("Runtime Exception"));
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
 

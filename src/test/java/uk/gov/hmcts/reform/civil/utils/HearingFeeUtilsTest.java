@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
@@ -35,7 +37,7 @@ class HearingFeeUtilsTest {
     @CsvSource({
         // current date,hearing date,expected
         "2022-10-27,2022-11-04,2022-11-03",   // based on bug report: on the boundary of exactly 7 days
-        "2022-10-01,2022-11-14,2022-10-29",   // hearing date more than 36 days away -> expect in 28 straight days time
+        "2022-10-01,2022-11-14,2022-10-17",   // hearing date more than 36 days away -> expect in 28 straight days time
         "2022-10-01,2022-10-14,2022-10-08",   // hearing date less than 36 days away -> expect in 7 straight days
         "2022-10-01,2022-10-10,2022-10-08"    // should never happen. If it does the deadline is the hearing day
     })
@@ -61,6 +63,7 @@ class HearingFeeUtilsTest {
         "SMALL_CLAIM,34600",
         "FAST_CLAIM,54500",
         "MULTI_CLAIM,117500",
+        "INTERMEDIATE_CLAIM,117500",
     })
     void shouldCalculateAndApplyFee_whenClaimTrackIsSet(String track, String expectedFee) {
         AllocatedTrack allocatedTrack = getAllocatedTrack(track);
@@ -79,8 +82,17 @@ class HearingFeeUtilsTest {
         when(hearingFeesService.getFeeForHearingFastTrackClaims(any())).thenReturn(expected);
         when(hearingFeesService.getFeeForHearingMultiClaims(any())).thenReturn(expected);
 
-        assertThat(calculateAndApplyFee(hearingFeesService, caseData, allocatedTrack))
+        assertThat(calculateAndApplyFee(hearingFeesService, caseData, allocatedTrack.name()))
             .isEqualTo(expected);
+    }
+
+    @Test
+    void shouldThrowException_whenInvalidClaimTrack() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .build().toBuilder()
+            .build();
+
+        assertThrows(IllegalArgumentException.class, () -> calculateAndApplyFee(hearingFeesService, caseData, "bananas"));
     }
 
     private AllocatedTrack getAllocatedTrack(String allocatedTrack) {
@@ -88,6 +100,7 @@ class HearingFeeUtilsTest {
             case "SMALL_CLAIM" -> AllocatedTrack.SMALL_CLAIM;
             case "FAST_CLAIM" -> AllocatedTrack.FAST_CLAIM;
             case "MULTI_CLAIM" -> AllocatedTrack.MULTI_CLAIM;
+            case "INTERMEDIATE_CLAIM" -> AllocatedTrack.INTERMEDIATE_CLAIM;
             default -> null;
         };
     }

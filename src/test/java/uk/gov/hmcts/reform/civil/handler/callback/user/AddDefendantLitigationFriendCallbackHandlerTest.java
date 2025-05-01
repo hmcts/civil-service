@@ -14,31 +14,39 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -49,7 +57,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class
 })
 class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -73,6 +83,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
     @Autowired
     private UserService userService;
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     @Nested
     class AboutToStartCallback {
@@ -132,7 +144,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertTrue(response.getData().get("isRespondent1").equals("Yes"));
+            assertEquals("Yes", response.getData().get("isRespondent1"));
         }
 
         @Test
@@ -150,7 +162,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertTrue(response.getData().get("isRespondent1").equals("No"));
+            assertEquals("No", response.getData().get("isRespondent1"));
         }
     }
 
@@ -212,7 +224,40 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
+            assertThat(response.getData()).extracting("caseNameHmctsInternal")
+                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+            assertThat(response.getData()).extracting("caseNamePublic")
+                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
 
+        }
+
+        @Test
+        void shouldSetRespondent1LF_WhenRespondentOneSelected_WithMultiParty_1v2_SameSolicitor_Also_Update_GaCaseName() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateAddRespondent1LitigationFriend_1v2_SameSolicitor()
+                .selectLitigationFriend("Defendant One: Mr. Def One")
+                .build();
+
+            CaseData caseDataWithGa = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseData(caseData);
+
+            CallbackParams params = callbackParamsOf(caseDataWithGa, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
+
+            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
+            assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
+            assertThat(response.getData()).extracting("caseNameHmctsInternal")
+                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+            assertThat(response.getData()).extracting("caseNamePublic")
+                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+            verify(coreCaseDataService).triggerGeneralApplicationEvent(eq(1234L), eq(UPDATE_GA_CASE_DATA), anyMap());
         }
 
         @Test
@@ -233,7 +278,10 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
-
+            assertThat(response.getData()).extracting("caseNameHmctsInternal")
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by 'Litigation Friend' (litigation friend)");
+            assertThat(response.getData()).extracting("caseNamePublic")
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by 'Litigation Friend' (litigation friend)");
         }
 
         @Test
@@ -257,7 +305,6 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
-
         }
 
         @Test
@@ -277,7 +324,12 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
             assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
-
+            assertThat(response.getData()).extracting("caseNameHmctsInternal")
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by "
+                    + "'Litigation Friend' (litigation friend)");
+            assertThat(response.getData()).extracting("caseNamePublic")
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by "
+                    + "'Litigation Friend' (litigation friend)");
         }
 
         @Test
@@ -297,6 +349,10 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
+            assertThat(response.getData()).extracting("caseNameHmctsInternal")
+                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+            assertThat(response.getData()).extracting("caseNamePublic")
+                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
 
         }
 
@@ -317,7 +373,6 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
-
         }
 
         @Test
@@ -336,7 +391,6 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
-
         }
 
         @Test
@@ -375,6 +429,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
+            assertThat(response.getData()).extracting("caseNameHmctsInternal")
+                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
         }
 
         @Test
@@ -398,6 +454,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
+            assertThat(response.getData()).extracting("caseNameHmctsInternal")
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by 'Litigation Friend' (litigation friend)");
         }
 
     }

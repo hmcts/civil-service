@@ -11,18 +11,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -32,25 +35,24 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 
 @SpringBootTest(classes = {
     NotifyDefaultJudgmentHandler.class,
-    JsonSchemaValidationService.class,
+    DefaultJudgmentRoboticsNotifier.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
@@ -58,12 +60,15 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
     EventHistoryMapper.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class,
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class,
     OrganisationService.class
 })
 @ExtendWith(SpringExtension.class)
 public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
 
+    private static final String BEARER_TOKEN = "BEARER_TOKEN";
     @MockBean
     private RoboticsNotificationService roboticsNotificationService;
 
@@ -76,7 +81,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
-    LocationRefDataService locationRefDataService;
+    LocationReferenceDataService locationRefDataService;
     @MockBean
     RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     @MockBean
@@ -100,15 +105,14 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
             handler.handle(params);
 
-            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario,
-                                                               params.getParams().get(BEARER_TOKEN).toString());
+            verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
         }
 
         @Test
         void shouldNotNotifyRobotics_whenLrDisabled() {
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .toBuilder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
         }
@@ -118,7 +122,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .toBuilder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
 
@@ -127,8 +131,7 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             verify(roboticsNotificationService, times(0)).notifyRobotics(caseData, multiPartyScenario,
-                                                                         params.getParams().get(BEARER_TOKEN).toString()
-            );
+                                                                         BEARER_TOKEN);
         }
 
         @Test
@@ -137,14 +140,14 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).respondent1Represented(YesOrNo.NO).build();
+                .toBuilder().respondent1Represented(YesOrNo.NO).caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             //When
             handler.handle(params);
 
             //Then
-            verify(roboticsNotificationService).notifyJudgementLip(caseData);
+            verify(roboticsNotificationService).notifyRobotics(caseData, false, BEARER_TOKEN);
         }
     }
 

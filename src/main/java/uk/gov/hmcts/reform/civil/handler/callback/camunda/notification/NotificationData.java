@@ -7,6 +7,7 @@ import java.util.Map;
 public interface NotificationData {
 
     String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
+    String CLAIM_16_DIGIT_NUMBER = "claim16DigitNumber";
     String RESPONDENT_NAME = "defendantName";
     String ISSUED_ON = "issuedOn";
     String CLAIM_NOTIFICATION_DEADLINE = "claimNotificationDeadline";
@@ -16,6 +17,7 @@ public interface NotificationData {
     String NOTIFICATION_DEADLINE = "notificationDeadline";
     String AGREED_EXTENSION_DATE = "agreedExtensionDate";
     String REASON = "reason";
+    String REASON_FROM_CASEWORKER = "reason from caseworker";
     String PARTY_REFERENCES = "partyReferences";
     String ALLOCATED_TRACK = "allocatedTrack";
     String RECIPIENT_PARTY_NAME = "recipientPartyName";
@@ -73,7 +75,9 @@ public interface NotificationData {
     String CLAIMANT_V_DEFENDANT = "claimantvdefendant";
     String COURT_LOCATION = "courtlocation";
     String LEGAL_ORG_NAME = "LegalOrgName";
+    String LEGAL_ORG = "legal Org";
     String PARTY_NAME = "name";
+    String BUNDLE_RESTITCH_DATE = "bundleRestitchDate";
 
     //NoC
     String CASE_NAME = "case name";
@@ -83,6 +87,35 @@ public interface NotificationData {
     String FORMER_SOL = "former solicitor";
     String OTHER_SOL_NAME = "other solicitor name";
     String EXTERNAL_ID = "externalId";
+
+    // evidence upload
+    String UPLOADED_DOCUMENTS = "uploaded documents";
+    String HWF_MORE_INFO_DATE = "date";
+    String HWF_MORE_INFO_DOCUMENTS = "documents";
+    String HWF_MORE_INFO_DOCUMENTS_WELSH  = "documentsWelsh";
+
+    // hwf outcome
+    String REASONS = "reasons";
+    String REASONS_WELSH = "reasonsWelsh";
+    String TYPE_OF_FEE = "typeOfFee";
+    String TYPE_OF_FEE_WELSH = "typeOfFeeWelsh";
+    String HWF_REFERENCE_NUMBER = "hwFReferenceNumber";
+    String AMOUNT = "amount";
+    String PART_AMOUNT = "partAmount";
+    String REMAINING_AMOUNT = "remainingAmount";
+    String DEFENDANT_NAME_ONE = "defendantName1";
+    String DEFENDANT_NAME_TWO = "defendantName2";
+    String CLAIMANT_NAME_ONE = "claimant1Name";
+    String CLAIMANT_NAME_TWO = "claimant2Name";
+    String LEGAL_REP_NAME = "legalrepname";
+    String CLAIM_NUMBER_CASE = "ClaimNumber";
+    String CLAIM_NAME = "ClaimName";
+
+    String CASEMAN_REF = "casemanRef";
+    String LEGAL_REP_NAME_WITH_SPACE = "legal rep name";
+    String REFERENCE = "reference";
+
+    String QUERY_DATE = "queryDate";
 
     Map<String, String> addProperties(CaseData caseData);
 

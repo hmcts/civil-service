@@ -2,15 +2,15 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.FeignException;
 import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -37,32 +37,36 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT_SPEC
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
-@SpringBootTest(classes = {
-    PaymentsForSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private PaymentsForSpecCallbackHandler handler;
-
-    @MockBean
+    @Mock
     private PaymentsService paymentsService;
-    @MockBean
+
+    @Mock
     private Time time;
-    @Autowired
+
+    private PaymentsForSpecCallbackHandler handler;
     private ObjectMapper objectMapper;
     private CallbackParams params;
     private CaseData caseData;
+
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
     private static final String PAYMENT_ERROR_CODE = "CA-E0004";
 
+    @BeforeEach
+    public void setUp() {
+        objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        handler = new PaymentsForSpecCallbackHandler(paymentsService, objectMapper, time);
+    }
+
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CaseData localCaseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
 
-        assertThat(handler.camundaActivityId(params)).isEqualTo("CreateClaimMakePaymentForSpec");
+        assertThat(handler.camundaActivityId(localParams)).isEqualTo("CreateClaimMakePaymentForSpec");
     }
 
     @Nested
@@ -71,11 +75,11 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         public void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-            when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
         }
 
         @Test
         void testAboutToSubmit_handler() {
+            when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
             PaymentDto paymentDto = PaymentDto.builder().paymentReference("123").build();
             when(paymentsService.createCreditAccountPayment(any(), anyString())).thenReturn(paymentDto);
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -104,7 +108,7 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void testAboutToSubmit_handlerWith500Error() throws JsonProcessingException {
+        void testAboutToSubmit_handlerWith500Error() {
             when(paymentsService.createCreditAccountPayment(any(), anyString())).thenThrow((buildFeignExceptionWithInvalidResponse(500, "Internal server error")));
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

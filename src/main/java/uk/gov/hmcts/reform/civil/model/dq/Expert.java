@@ -1,28 +1,32 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Expert {
 
-    private final String partyID;
-    private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final String phoneNumber;
-    private final String emailAddress;
-    private final String fieldOfExpertise;
-    private final String whyRequired;
+    private String partyID;
+    private String name;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String emailAddress;
+    private String fieldOfExpertise;
+    private String whyRequired;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal estimatedCost;
-    private final String eventAdded;
-    private final LocalDate dateAdded;
+    private BigDecimal estimatedCost;
+    private String eventAdded;
+    private LocalDate dateAdded;
 
     public static Expert fromSmallClaimExpertDetails(ExpertDetails expertDetails) {
         return Expert.builder()

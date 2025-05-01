@@ -7,8 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 
@@ -22,6 +26,7 @@ import java.util.List;
 public class SealedClaimResponseFormForSpec implements MappableObject {
 
     private final String referenceNumber;
+    private final String ccdCaseReference;
     private final String caseName;
     private final SolicitorReferences solicitorReferences;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -44,4 +49,15 @@ public class SealedClaimResponseFormForSpec implements MappableObject {
     private final StatementOfTruth statementOfTruth;
     //repayment details for repayment plan that are common between LR and LiP
     private final ResponseRepaymentDetailsForm commonDetails;
+    // CARM defendant mediation fields
+    private final String mediationFirstName;
+    private final String mediationLastName;
+    private final String mediationContactNumber;
+    private final String mediationEmail;
+    private final boolean mediationUnavailableDatesExists;
+    private final List<Element<UnavailableDate>> mediationUnavailableDatesList;
+    private final boolean checkCarmToggle;
+    private final String allocatedTrack;
+    private final RespondentResponseTypeSpec responseType;
+    private final YesOrNo mediation;
 }

@@ -1,19 +1,36 @@
+import uk.gov.hmcts.rse.AuthMode
+
 plugins {
   id 'application'
   id 'checkstyle'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.1.0'
-  id 'org.springframework.boot' version '2.7.11'
-  id 'org.owasp.dependencycheck' version '8.1.2'
-  id 'com.github.ben-manes.versions' version '0.47.0'
-  id 'org.sonarqube' version '3.4.0.2513'
+  id 'io.spring.dependency-management' version '1.1.7'
+  id 'org.springframework.boot' version '2.7.18'
+  id 'org.owasp.dependencycheck' version '12.1.0'
+  id 'com.github.ben-manes.versions' version '0.51.0'
+  id 'org.sonarqube' version '5.1.0.4882'
   id 'au.com.dius.pact' version '4.2.14'
-  id "io.freefair.lombok" version "6.6.3"
-  id "org.flywaydb.flyway" version "9.21.0"
+  id "io.freefair.lombok" version "8.13.1"
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.1618'
+  id "org.flywaydb.flyway" version "10.22.0"
 }
 
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
+
+def versions = [
+  junit             : '5.11.4',
+  junitPlatform     : '1.11.4',
+  springBoot        : springBoot.class.package.implementationVersion,
+  springStatemachine: '4.0.0',
+  lombok            : '1.18.38',
+  springSecurity    : '5.8.16',
+  camunda           : '7.20.0',
+  jackson           : '2.18.3',
+  testcontainers    : '1.20.6',
+  pdfbox            : '3.0.4',
+  tika              : '2.9.3'
+]
 
 allprojects {
   java {
@@ -32,7 +49,7 @@ allprojects {
 
   checkstyle {
     maxWarnings = 0
-    toolVersion = '10.4'
+    toolVersion = '10.22.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
   }
 
@@ -59,7 +76,6 @@ allprojects {
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
-    cveValidForHours = 24
 
     analyzers {
       // Disable scanning of .NET related binaries
@@ -75,104 +91,54 @@ allprojects {
 
   dependencyManagement {
     dependencies {
-      //CVE-2023-44487
-      dependencySet(group: 'io.netty', version: '4.1.100.Final') {
-        entry 'netty-handler'
-        entry 'netty-handler-proxy'
-        entry 'netty-transport-native-epoll'
-        entry 'netty-transport-native-kqueue'
-        entry 'netty-codec-http'
-        entry 'netty-codec-http2'
-        entry 'netty-codec'
-        entry 'netty-codec-dns'
-        entry 'netty-transport'
-        entry 'netty-transport-native-unix-common'
-        entry 'netty-transport-classes-epoll'
-        entry 'netty-transport-classes-kqueue'
-        entry 'netty-buffer'
-        entry 'netty-resolver'
-        entry 'netty-resolver-dns-classes-macos'
-        entry 'netty-resolver-dns-native-macos'
-        entry 'netty-resolver-dns'
-        entry 'netty-common'
-        entry 'netty-codec-socks'
-      }
-      //CVE-2022-40152
-      dependencySet(group: 'com.fasterxml.woodstox', version: '6.5.0') {
-        entry 'woodstox-core'
-      }
-      //CVE-2023-3635
-      dependencySet(group: 'com.squareup.okio', version: '3.4.0') {
-        entry 'okio-jvm'
-      }
-
-      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
-      // CVE-2018-10237 - Unbounded memory allocation
-      dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
-      // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '32.1.1-jre') {
+      //CVE-2018-10237 - Unbounded memory allocation
+      dependencySet(group: 'com.google.guava', version: '33.4.6-jre') {
         entry 'guava'
       }
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.8.20'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.8.20'
-      // CVE-2020-29582
 
-      // CVE-2021-29425
-      dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.5'
 
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
-      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.9.25'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.9.25'
+
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
+
+      //Solves CVE-2023-34034
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.4'
+
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
 
       // To prevent other libraries using conflicting versions
-      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.5'
+      dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
 
       // solves CVE-2022-25857
       dependencySet(
         group: 'org.yaml',
-        version: '2.0'
+        version: '2.4'
       ) {
         entry 'snakeyaml'
       }
-      // Solves CVE-2022-25647
-      dependencySet(
-        group: 'org.camunda.bpm',
-        version: '7.17.0'
-      ) {
-        entry 'camunda-engine'
-      }
-      // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
-      dependencySet(
-        group: 'com.amazonaws',
-        version: '1.12.513'
-      ) {
-        entry 'aws-java-sdk-core'
-        entry 'aws-java-sdk-kms'
-        entry 'aws-java-sdk-s3'
-      }
-      // Solves CVE-2020-17521
-      dependencySet(
-        group: 'org.codehaus.groovy',
-        version: '2.4.21'
-      ) {
-        entry 'groovy-all'
-      }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.80') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.39') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
       }
-      // Solves CVE-2023-24998
-      dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+
+      //Solves CVE-2023-6481
+      dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+        entry 'logback-core'
+        entry 'logback-classic'
+      }
+
     }
     imports {
-      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.3'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.3.0"
+      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.21.0"
     }
   }
 
@@ -186,10 +152,6 @@ allprojects {
     maven {
       url "https://jitpack.io"
     }
-    maven {
-      url "https://jitpack.io"
-    }
-    jcenter()
   }
 }
 
@@ -219,7 +181,7 @@ tasks.withType(JavaCompile) {
 
 tasks.withType(Test) {
   useJUnitPlatform()
-
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
   testLogging {
     exceptionFormat = 'full'
   }
@@ -229,28 +191,30 @@ test {
   failFast = true
 }
 
+tasks.withType(Copy) {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 task integration(type: Test) {
+  maxHeapSize = '3G'
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
+
 }
 
 task contract(type: Test) {
-  useJUnitPlatform()
-  description = "Runs pact contract tests"
-  group = "Delivery pipeline"
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
+  group = 'Delivery pipeline'
+  description = 'Runs the consumer Pact tests'
+  setTestClassesDirs(sourceSets.contractTest.output.classesDirs)
+  setClasspath(sourceSets.contractTest.runtimeClasspath)
+  systemProperty 'pact.rootDir', "pacts"
 }
 
-task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
-  commandLine './bin/pull-latest-ccd-files.sh', 'Fix-nightly-civil-service'
-}
-
-task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
+task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
   getMainClass().set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
@@ -266,14 +230,17 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
 }
 
 task runProdApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'aat'
+  }
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
 }
 
-task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in functional tests.') {
+task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features in functional tests.') {
   onlyIf {
     return System.env.ENVIRONMENT == 'preview'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
+  commandLine './bin/run-api-tests.sh'
 }
 
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
@@ -281,10 +248,6 @@ task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nig
     return System.env.NIGHTLY_RUN == 'true'
   }
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nightly-prod'
-}
-
-task runCrossBrowserTests(type: Exec, description: 'Runs cross browser tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:crossbrowser'
 }
 
 def inStrictOrder(Task... tasks) {
@@ -300,24 +263,26 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runProdApiTests, runNonProdApiTests, runNightlyApiTests))
+    runNightlyApiTests, runProdApiTests, runNonProdApiTestsByGroups))
 }
 
-task crossbrowser(description: 'Runs the crossbrowser tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, runCrossBrowserTests))
-}
+project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
+// excluding controllers from Sonar due to https://tools.hmcts.net/jira/browse/DTSCCI-254
+// https://tools.hmcts.net/jira/browse/DTSCCI-311 ticket to write unit test for each controller
 
 sonarqube {
   properties {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
-    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/request/servlet/** , **/controllers/**, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java, **/DashboardWithParamsCallbackHandler.java, **/PaymentRequestUpdateCallbackService.java, **/advice/**, **/dashboard/cache/**"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java, **/*CcdDashboardDefendantClaimMatcher.java"
+    property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**, **/handler/callback/camunda/dashboardnotifications/claimant/CCJRequestedDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantCCJResponseNotificationHandler.java" +
+      ", **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantResponseNotificationHandler.java, **/utils/**, **/filters/**, **/handler/callback/camunda/dashboardnotifications/defendant/MoreTimeRequestedDashboardNotificationDefendantHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimantMediationSuccessfulDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/ClaimSettledDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/claimant/HearingScheduledClaimantNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/SettleClaimPaidInFullDefendantDashboardNotificationHandler.java, **/handler/callback/camunda/dashboardnotifications/defendant/DefendantNotifyDiscontinuanceDashboardNotificationHandler.java" +
+      ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
+    property "sonar.web.javaOpts", "-Xmx2G"
   }
 }
 
@@ -338,17 +303,6 @@ jacocoTestReport.dependsOn {
   subprojects*.test
 }
 
-def versions = [
-  junit              : '5.10.0',
-  junitPlatform      : '1.10.0',
-  reformLogging      : '5.1.7',
-  springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '3.2.0',
-  lombok             : '1.18.26',
-  pact               : '3.5.24',
-  springSecurity     : '5.8.5'
-]
-
 ext.libraries = [
   junit5: [
     "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
@@ -366,10 +320,16 @@ configurations.all {
     }
   }
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
+  exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.29'
+  def withoutJunit4 = {
+    exclude group: 'junit', module: 'junit'
+  }
+  implementation 'com.github.hmcts:civil-commons:v1.1.11'
+  implementation project(':dashboard-notifications')
+  implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -382,94 +342,95 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
 
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
+  implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.39.1'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
-  implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
-
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
+  implementation group: 'org.apache.tika', name: 'tika-core', version: versions.tika
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.1.8'
 
-  implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
-  implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
+  implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.5-SPRING2'
+  implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
+  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
+  implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
   implementation('com.github.hmcts:fees-java-client:0.0.6') {
-    exclude group: 'java-logging', module: ' java-logging'
+    exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
   }
-
-  implementation('com.github.hmcts:payments-java-client:1.5.2') {
-    exclude group: 'java-logging', module: ' java-logging'
+  implementation('com.github.hmcts:payments-java-client:1.6.7') {
+    exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
+    exclude group: 'uk.gov.hmcts.reform', module: 'service-auth-provider-client'
   }
-  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
-  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.9.3'
+  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.3'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
-  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.1.7'
+  implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.2.0'
 
   implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
-  // CVE-2021-22112 - Privilege Escalation
   implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.31'
-  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
-  implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.48'
+  implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.102'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.39'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.20.0'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.20.0'
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.82'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.14'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.9'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
+  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
+  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
-  implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.14.2'
-  implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: versions.camunda
+  implementation group: 'org.camunda.community.rest', name: 'camunda-platform-7-rest-client-spring-boot-starter', version: versions.camunda
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: versions.camunda
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
-  implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
-
-  implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.1'
+  implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.0'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.2'
+  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
-  implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.10'
 
+  implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
+  implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
+
+  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
+
+  testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
+  testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.4'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.4'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.5'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.5'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -478,24 +439,35 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
-  testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
+  testImplementation 'com.github.hmcts:fortify-client:1.4.8:all'
   //pact contract testing
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
-  contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
+  contractTestImplementation 'au.com.dius.pact.consumer:junit5:4.6.5'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.0')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.0')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.4')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.4')
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.11.4')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.11.4')
+
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
+  // dashboard specific changes ends
+
+
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
+  // https://mvnrepository.com/artifact/com.opencsv/opencsv
+  implementation group: 'com.opencsv', name: 'opencsv', version: '5.10', {
+    exclude group: 'commons-collections', module: 'commons-collections'
+  }
 }
 
 mainClassName = 'uk.gov.hmcts.reform.civil.Application'
@@ -514,16 +486,69 @@ wrapper {
   distributionType = Wrapper.DistributionType.ALL
 }
 
-task runAndPublishConsumerPactTests(type: Test){
-  logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
+task buildCCDXlsx(type: Exec) {
+  group 'ccd tasks'
+
+  environment 'CCD_DEF_CASE_SERVICE_BASE_URL', 'http://localhost:4000'
+  environment 'CCD_DEF_GEN_APP_SERVICE_BASE_URL', 'http://localhost:9999'
+  environment 'CCD_DEF_AAC_URL', 'http://localhost:4502'
+  commandLine './bin/build-civil-xlsx-definitions.sh'
+}
+
+task runOtherServices(type: Exec) {
+  group 'ccd tasks'
+
+  environment 'ADDITIONAL_COMPOSE_FILES', 'cftlib-additional-services.yml'
+  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
+
+  commandLine './bin/add-services.sh'
+  doLast() {
+    importBpmnDiagrams
+  }
+}
+
+task importBpmnDiagrams(type: Exec) {
+  group 'ccd tasks'
+
+  dependsOn(runOtherServices)
+
+  environment 'CAMUNDA_BASE_URL', 'http://localhost:9404'
+  environment 'SERVICE_AUTH_PROVIDER_API_BASE_URL', 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+
+  commandLine './bin/import-bpmn-diagram-cftlib.sh'
+}
+
+bootWithCCD {
+  group 'ccd tasks'
+
+  dependsOn(buildCCDXlsx)
+  dependsOn(runOtherServices)
+  dependsOn(importBpmnDiagrams)
+
+  //AAT or Local (IDAM and S2S Simulators)
+  authMode = AuthMode.AAT
+
+  environment 'BASE_COMPOSE_FILES_PATH', './src/cftlib/resources/docker/'
+  environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
+
+  doFirst() {
+    project.file('./.aat-env').readLines().each() {
+      def index = it.indexOf("=")
+      def key = it.substring(0, index)
+      def value = it.substring(index + 1)
+      environment(key, value)
+    }
+  }
 
 }
 
-runAndPublishConsumerPactTests.dependsOn contract
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
+task runAndPublishConsumerPactTests(type: Test) {
+  dependsOn(contract)
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  finalizedBy(pactPublish)
+}
 
 project.ext {
   pactVersion = getCheckedOutGitCommitHash()
@@ -531,13 +556,9 @@ project.ext {
 
 pact {
   publish {
-    pactDirectory = 'target/pacts'
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'https://pact-broker.platform.hmcts.net/'
-    if(pactBrokerUrl == 'https://civil-claims.pactflow.io/') {
-      excludes = ['civil_service-Idam_api']
-      pactBrokerToken = System.getenv("PACT_BROKER_TOKEN")
-    }
-    tags = [System.getenv("PACT_BRANCH_NAME") ?: getCheckedOutGitCommitHash(), 'latest']
+    pactDirectory = 'pacts'
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pactVersion
   }
 }
@@ -545,3 +566,29 @@ pact {
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
+
+task loadEnvSecrets() {
+  doLast {
+    new ByteArrayOutputStream().withStream { os ->
+      exec {
+        commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'civil-aat', '-o', 'tsv', '--query', 'value', '--name', 'civil-service-dot-env'
+        standardOutput = os
+      }
+      project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+    }
+  }
+}
+
+bootRun {
+  doFirst() {
+    if (project.file('./.aat-env').exists()) {
+      project.file('./.aat-env').readLines().each() {
+        def index = it.indexOf("=")
+        def key = it.substring(0, index)
+        def value = it.substring(index + 1)
+        environment key, value
+      }
+    }
+  }
+}
+

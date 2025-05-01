@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,19 +21,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    ValidateFeeCallbackHandler.class,
-    FeesService.class
-})
+@ExtendWith(MockitoExtension.class)
 class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String ERROR_MESSAGE = "Fee has changed since claim submitted. It needs to be validated again";
 
-    @Autowired
+    @InjectMocks
     private ValidateFeeCallbackHandler handler;
 
-    @MockBean
+    @Mock
     private FeesService feesService;
 
     @Test

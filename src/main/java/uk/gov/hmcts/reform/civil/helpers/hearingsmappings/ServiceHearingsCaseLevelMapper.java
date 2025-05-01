@@ -15,7 +15,7 @@ public class ServiceHearingsCaseLevelMapper {
 
     public static final String CASE_DETAILS_URL = "%s/cases/case-details/%s";
     public static final String EMPTY_STRING = "";
-    private static String DATE_FORMAT = "yyyy-MM-dd";
+    private static String dateFormat = "yyyy-MM-dd";
 
     private ServiceHearingsCaseLevelMapper() {
         //NO-OP
@@ -27,7 +27,7 @@ public class ServiceHearingsCaseLevelMapper {
 
     public static String getPublicCaseName(CaseData caseData) {
         return caseData.getCaseNamePublic() != null ? caseData.getCaseNamePublic()
-            : CaseNameUtils.buildCaseNamePublic(caseData);
+            : CaseNameUtils.buildCaseName(caseData);
     }
 
     public static String getCaseDeepLink(Long caseId,
@@ -53,9 +53,9 @@ public class ServiceHearingsCaseLevelMapper {
 
     public static String getCaseSLAStartDate(CaseData caseData) {
         if (caseData.getIssueDate() != null) {
-            return caseData.getIssueDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT));
+            return caseData.getIssueDate().format(DateTimeFormatter.ofPattern(dateFormat));
         }
-        return caseData.getSubmittedDate().format(DateTimeFormatter.ofPattern(DATE_FORMAT));
+        return caseData.getSubmittedDate().format(DateTimeFormatter.ofPattern(dateFormat));
     }
 
     public static boolean getCaseAdditionalSecurityFlag(CaseData caseData) {

@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Service
 @RequiredArgsConstructor
@@ -66,15 +67,17 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         String hearingCourtLocation = locationRefDataUtil.getPreferredCourtData(
             caseData, authorisation, false);
+        List<Party> applicants = getApplicants(caseData, multiPartyScenario);
 
         SealedClaimForm.SealedClaimFormBuilder sealedClaimFormBuilder = SealedClaimForm.builder()
-            .applicants(getApplicants(caseData, multiPartyScenario))
+            .applicants(applicants)
             .respondents(getRespondents(caseData, multiPartyScenario))
             .claimValue(caseData.getClaimValue().formData())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
             .hearingCourtLocation(hearingCourtLocation)
             .referenceNumber(caseData.getLegacyCaseReference())
+            .ccdCaseReference(formatCcdCaseReference(caseData))
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())
             .applicantExternalReference(solicitorReferences
@@ -84,6 +87,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                                               .map(SolicitorReferences::getRespondentSolicitor1Reference)
                                               .orElse(""))
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .applicantRepresentativeOrganisationName(applicants.get(0).getRepresentative().getOrganisationName())
             .courtFee(caseData.getClaimFee().formData());
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
@@ -95,11 +99,9 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_ONE:
-            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP:
                 return N1;
-            case TWO_V_ONE:
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP:
                 return N1_MULTIPARTY_SAME_SOL;
             default:
                 throw new IllegalArgumentException("Multiparty scenario doesn't exist");

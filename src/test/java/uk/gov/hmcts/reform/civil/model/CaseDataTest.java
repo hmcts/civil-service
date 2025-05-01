@@ -1,47 +1,72 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
-import java.util.Optional;
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
+import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-public class CaseDataTest {
+class CaseDataTest {
 
-    private static final String FILE_NAME_1 = "Some file 1";
+    private static final BigDecimal CLAIM_FEE = new BigDecimal(2000);
 
     @Test
-    public void applicant1Proceed_when1v1() {
+    void applicant1Proceed_when1v1() {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .build();
@@ -49,7 +74,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void applicant1Proceed_when2v1() {
+    void applicant1Proceed_when2v1() {
         CaseData caseData = CaseData.builder()
             .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
             .build();
@@ -229,7 +254,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRespondentUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenTrue() {
+    void givenRespondentUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
@@ -242,7 +267,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRespondentRepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
+    void givenRespondentRepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.YES)
@@ -255,7 +280,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenApplicantUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
+    void givenApplicantUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
@@ -268,7 +293,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRespondentUnrepresentedAndApplicantUnrepresentedAndOnevOne_whenIsLipvLipOneVOne_thenTrue() {
+    void givenRespondentUnrepresentedAndApplicantUnrepresentedAndOnevOne_whenIsLipvLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
@@ -281,7 +306,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenApplicantUnrepresented_whenIsApplicant1NotRepresented_thenTrue() {
+    void givenApplicantUnrepresented_whenIsApplicant1NotRepresented_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.NO)
@@ -292,7 +317,7 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenApplicantRepresented_whenIsApplicant1NotRepresented_thenFalse() {
+    void givenApplicantRepresented_whenIsApplicant1NotRepresented_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.YES)
@@ -426,7 +451,7 @@ public class CaseDataTest {
     void isSmallClaim_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+            .responseClaimTrack(FAST_CLAIM.name())
             .build();
         //When
         //Then
@@ -511,7 +536,23 @@ public class CaseDataTest {
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
-        assertEquals(caseDocument.get().getValue().getDocumentType(), SDO_ORDER);
+        assertEquals(SDO_ORDER, caseDocument.get().getValue().getDocumentType());
+    }
+
+    @Test
+    void getSDOOrderDocument_shouldReturnLatest_WhenItPresent() {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(wrapElements(
+                CaseDocument.builder().documentType(SDO_ORDER)
+                    .createdDatetime(LocalDateTime.now().minusDays(2)).documentName("Doc1").build(),
+                CaseDocument.builder().documentType(SDO_ORDER)
+                    .createdDatetime(LocalDateTime.now().minusDays(1)).documentName("Doc2").build()
+            )).build();
+        //When
+        Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
+        //Then
+        assertEquals(SDO_ORDER, caseDocument.get().getValue().getDocumentType());
+        assertEquals("Doc2", caseDocument.get().getValue().getDocumentName());
     }
 
     @Test
@@ -667,6 +708,755 @@ public class CaseDataTest {
         assertThat(caseData.getManageDocumentsList()).isNotNull();
         assertThat(caseData.getManageDocumentsList()).isEmpty();
 
+    }
+
+    @Test
+    void shouldReturnTrueWhenBilingual() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+
+        //When
+        boolean result = caseData.isClaimantBilingual();
+
+        //Then
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+            .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
+
+        //Then
+        assertTrue(isRespondentSignSettlementAgreement);
+    }
+
+    @Test
+    void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseDataLip(CaseDataLiP.builder().build())
+            .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
+
+        //Then
+        assertFalse(isRespondentSignSettlementAgreement);
+    }
+
+    @Test
+    void isSignSettlementAgreementDeadlineNotExpired_thenFalse() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePriorToRespondToSettlementAgreementDeadline().build();
+        //When
+        //Then
+        assertThat(caseData.isSettlementAgreementDeadlineExpired()).isFalse();
+    }
+
+    @Test
+    void isSignSettlementAgreementDeadlineExpired_thenTrue() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePastRespondToSettlementAgreementDeadline().build();
+        //When
+        //Then
+        assertThat(caseData.isSettlementAgreementDeadlineExpired()).isTrue();
+    }
+
+    @Test
+    void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .build();
+        //When
+        BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
+        //Then
+        assertThat(fee).isEqualTo(CLAIM_FEE);
+    }
+
+    @Test
+    void shouldReturnClaimAmountBreakupDetails_whenExists() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimAmountBreakup(List.of(ClaimAmountBreakup.builder()
+                                            .id("1").value(ClaimAmountBreakupDetails.builder()
+                                                               .claimAmount(new BigDecimal("122"))
+                                                               .claimReason("Reason")
+                                                               .build())
+                                            .build()))
+            .build();
+        //When
+        List<ClaimAmountBreakupDetails> result = caseData.getClaimAmountBreakupDetails();
+        //Then
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnZero_whenClaimFeeIsNull() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
+        //Then
+        assertThat(fee).isEqualTo(ZERO);
+    }
+
+    @Test
+    void shouldReturnNull_whenNoClaimFeePresent() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isNull();
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenClaimValuePresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimValue(ClaimValue
+                            .builder()
+                            .statementOfValueInPennies(new BigDecimal(1000))
+                            .build())
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(10).setScale(2));
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenTotalClaimAmountPresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .totalClaimAmount(new BigDecimal(1000))
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(1000).setScale(2));
+    }
+
+    @Test
+    void shouldReturnClaimValueInPounds_whenTotalClaimAmountAndInterestPresent() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .totalClaimAmount(new BigDecimal(1000))
+            .totalInterest(new BigDecimal(10))
+            .build();
+        //When
+        BigDecimal claimAmount = caseData.getClaimAmountInPounds();
+        //Then
+        assertThat(claimAmount).isEqualTo(new BigDecimal(1010).setScale(2));
+    }
+
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullSpec() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Nested
+    class GetHearingLocationText {
+
+        @Test
+        void shouldReturnNull_whenHearingLocationIsNull() {
+            CaseData caseData = CaseData.builder().build();
+            String actual = caseData.getHearingLocationText();
+
+            assertNull(actual);
+        }
+
+        @Test
+        void shouldReturnNull_whenHearingLocationValueIsNull() {
+            CaseData caseData = CaseData.builder()
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
+            String actual = caseData.getHearingLocationText();
+
+            assertNull(actual);
+        }
+
+        @Test
+        void shouldExpectedString_whenHearingLocationValueLabelIsNotNull() {
+            CaseData caseData = CaseData.builder()
+                .hearingLocation(DynamicList.builder().value(
+                    DynamicListElement.dynamicElement("label")).build()).build();
+            String actual = caseData.getHearingLocationText();
+
+            assertEquals("label", actual);
+        }
+
+        @Test
+        void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
+
+            //Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+                .build();
+
+            //When
+            boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
+
+            //Then
+            assertTrue(isRespondentSignSettlementAgreement);
+        }
+    }
+
+    @Nested
+    class JudgementByAdmissionConditions {
+
+        @Test
+        void shouldReturnTrueWhenWillThisAmountBePaidIsAfterCurrentDateAndFAPayImmediately() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenFirstRepaymentDateIsAfterCurrentDateAndDefendantAcceptsSettlementAgreement() {
+            //Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondentSignSettlementAgreement(YesOrNo.YES).build();
+
+            CaseData caseData = CaseData.builder()
+                .caseDataLiP(caseDataLiP)
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenSignSettlementAgreementDeadlineIsAfterCurrentDate() {
+            //Given
+
+            CaseData caseData = CaseData.builder()
+                .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().plusDays(1))
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now().plusDays(3)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnFalseWhenSignSettlementAgreementDeadlineIsBeforeCurrentDate() {
+            //Given
+
+            CaseData caseData = CaseData.builder()
+                .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now().plusDays(3)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertFalse(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnFalseWhenSignSettlementAgreementIsRejectedByDefendant() {
+            //Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondentSignSettlementAgreement(YesOrNo.NO).build();
+
+            CaseData caseData = CaseData.builder()
+                .caseDataLiP(caseDataLiP)
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertFalse(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnFalseWhenFirstRepaymentDateIsBeforeCurrentDateAndDefendantAcceptsSettlementAgreement() {
+            //Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondentSignSettlementAgreement(YesOrNo.YES).build();
+
+            CaseData caseData = CaseData.builder()
+                .caseDataLiP(caseDataLiP)
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now().minusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertFalse(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnFalseWhenWillThisAmountBePaidIsBeforeCurrentDateAndDefendantAcceptsSettlementAgreement() {
+            //Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondentSignSettlementAgreement(YesOrNo.YES).build();
+
+            CaseData caseData = CaseData.builder()
+                .caseDataLiP(caseDataLiP)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertFalse(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenBothDatesAreNull() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenCourtFavoursClaimantAndSetDateIsAfterCurrentDateAndSettlementAgreementSigned() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+                .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder()
+                                                                    .paymentSetDate(LocalDate.now().plusDays(1)).build())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).build())
+                                 .respondentSignSettlementAgreement(YES).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenCourtFavoursClaimantAndPayImmediatelyDateIsAfterCurrentDateAndSettlementAgreementSigned() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(LocalDate.now().plusDays(1))
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).build())
+                                 .respondentSignSettlementAgreement(YES).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+    }
+
+    @Nested
+    class GetAssignedTrack {
+
+        @Test
+        void shouldReturnExpectedAssignedTrack_whenAllocatedTrackIsDefined() {
+            CaseData caseData = CaseData.builder().allocatedTrack(FAST_CLAIM).build();
+            assertEquals(FAST_CLAIM.name(), caseData.getAssignedTrack());
+        }
+
+        @Test
+        void shouldReturnExpectedAssignedTrack_whenResponseClaimTrackIsDefined() {
+            CaseData caseData = CaseData.builder().responseClaimTrack(MULTI_CLAIM.name()).build();
+            assertEquals(MULTI_CLAIM.name(), caseData.getAssignedTrack());
+        }
+    }
+
+    @Nested
+    class HWFType {
+        @Test
+        void shouldReturnTrueIfHWFTypeIsHearing() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertTrue(isHWFTypeHearing);
+        }
+
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNull() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .build();
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertFalse(isHWFTypeHearing);
+        }
+
+        @Test
+        void shouldReturnTrueIfHWFTypeIsClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertTrue(isHWFTypeClaimIssued);
+        }
+
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNotClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertFalse(isHWFTypeClaimIssued);
+        }
+    }
+
+    @Nested
+    class CoSC {
+        @Test
+        void shouldReturnTrue_CoscCertExists() {
+            CaseDocument caseDocument = CaseDocument.builder()
+                .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
+                .build();
+            CaseData caseData = CaseData.builder()
+                .systemGeneratedCaseDocuments(wrapElements(caseDocument))
+                .build();
+            assertTrue(caseData.hasCoscCert());
+        }
+
+        @Test
+        void shouldReturnFalse_CoscCertDoesntExists() {
+            CaseData caseData = CaseData.builder().build();
+            assertFalse(caseData.hasCoscCert());
+        }
+    }
+
+    @Nested
+    class AlreadyPaidAmountCheck {
+        @Test
+        void shouldReturnTrueIfPaidLessFullDefence() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+                .respondToClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(new BigDecimal(1000))
+                                    .build())
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertTrue(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnTrueIfPaidLessPartAdmit() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .respondToAdmittedClaim(RespondToClaim.builder()
+                                            .howMuchWasPaid(new BigDecimal(1000))
+                                            .build())
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertTrue(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnFalseIfFullAdmission() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            //When
+            boolean isPaidLessThanClaimAmount = caseData.isPaidLessThanClaimAmount();
+            //Then
+            assertFalse(isPaidLessThanClaimAmount);
+        }
+
+        @Test
+        void shouldReturnTrueIfHearingFeePaymentStatusSuccess() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertTrue(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnTrueIfHearingFeePaidWithHWF() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingHelpFeesReferenceNumber("hwf-ref")
+                .feePaymentOutcomeDetails(
+                    FeePaymentOutcomeDetails.builder()
+                        .hwfFullRemissionGrantedForHearingFee(YES)
+                        .build())
+                .applicant1Represented(NO)
+                .respondent1Represented(NO)
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertTrue(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingPaymentIsNotSuccess() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
+                .build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertFalse(isHearingFeePaid);
+        }
+
+        @Test
+        void shouldReturnFalseIfHearingPaymentIsNullAndNoHWF() {
+            //Given
+            CaseData caseData = CaseData.builder().build();
+            //When
+            boolean isHearingFeePaid = caseData.isHearingFeePaid();
+            //Then
+            assertFalse(isHearingFeePaid);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDocumentListTestData")
+    void shouldReturnExpectedDocumentList(DocumentType documentType, List<Element<CaseDocument>> documentCollection, Optional<List<CaseDocument>> expected) {
+        CaseData caseData = CaseData.builder()
+            .systemGeneratedCaseDocuments(documentCollection)
+            .finalOrderDocumentCollection(documentCollection)
+            .build();
+
+        List<Element<CaseDocument>> documents = DocumentType.SDO_ORDER.equals(documentType)
+            ? caseData.getSystemGeneratedCaseDocuments()
+            : caseData.getFinalOrderDocumentCollection();
+
+        Optional<List<CaseDocument>> result = caseData.getDocumentListByType(documents, documentType);
+        assertThat(result).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> provideDocumentListTestData() {
+        return Stream.of(
+            Arguments.of(DocumentType.SDO_ORDER, new ArrayList<>(), Optional.empty()),
+            Arguments.of(DocumentType.SDO_ORDER,
+                         List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
+                         Optional.empty()
+            ),
+            Arguments.of(DocumentType.SDO_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()),
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()))
+            ),
+            Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+            ),
+            Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
+                         List.of(
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()),
+                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                         ),
+                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+            )
+        );
+    }
+
+    @Test
+    void shouldReturnNullForDefaultObligationWAFlag() {
+        // Given
+        CaseData caseData = CaseData.builder().build();
+
+        // When
+        ObligationWAFlag obligationWAFlag = caseData.getObligationWAFlag();
+
+        // Then
+        assertNull(obligationWAFlag);
+    }
+
+    @Test
+    void shouldSetAndReturnObligationWAFlag() {
+        // Given
+        ObligationWAFlag expectedFlag = new ObligationWAFlag("Test", "Test", "1 January 2024");
+        CaseData caseData = CaseData.builder().obligationWAFlag(expectedFlag).build();
+
+        // When
+        ObligationWAFlag obligationWAFlag = caseData.getObligationWAFlag();
+
+        // Then
+        assertEquals(expectedFlag, obligationWAFlag);
+    }
+
+    @Test
+    void shouldReturnNullWhenApplicantSolicitor1UserDetailsEmailIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getApplicantSolicitor1UserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnApplicantSolicitor1UserDetailsEmail() {
+        CaseData caseData = CaseData.builder().applicantSolicitor1UserDetails(
+            IdamUserDetails.builder().email("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getApplicantSolicitor1UserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenApplicantSolicitor1UserDetailsIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getApplicantSolicitor1UserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnClaimantUserDetailsEmail() {
+        CaseData caseData = CaseData.builder().claimantUserDetails(
+            IdamUserDetails.builder().email("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getClaimantUserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenClaimantUserDetailsIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getClaimantUserDetailsEmail());
+    }
+
+    @Test
+    void shouldReturnRespondent1PartyEmail() {
+        CaseData caseData = CaseData.builder().respondent1(
+            Party.builder().partyEmail("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getRespondent1PartyEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenRespondent1PartyIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getRespondent1PartyEmail());
+    }
+
+    @Test
+    void shouldReturnRespondent2PartyEmail() {
+        CaseData caseData = CaseData.builder().respondent1(
+            Party.builder().partyEmail("test@test.com").build()
+        ).build();
+        assertEquals("test@test.com", caseData.getRespondent1PartyEmail());
+    }
+
+    @Test
+    void shouldReturnNullEmailWhenRespondent2PartyIsNull() {
+        CaseData caseData = CaseData.builder().build();
+        assertNull(caseData.getRespondent1PartyEmail());
     }
 }
 

@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,8 +34,9 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
     );
 
     private final ObjectMapper objectMapper;
-    private final DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
+    private final DirectionQuestionnaireLipGeneratorFactory directionQuestionnaireLipGeneratorFactory;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -47,21 +50,28 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isFullAdmitClaimSpec()) {
+        if (caseData.isFullAdmitClaimSpec()
+            || caseData.isClaimantAcceptedClaimAmount()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        CaseDocument sealedDQForm = directionsQuestionnaireLipGenerator.generate(
-            caseData,
-            callbackParams.getParams().get(
-                BEARER_TOKEN).toString()
-        );
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-            sealedDQForm,
-            caseData
-        ));
-
+        CaseDocument sealedDQForm = directionQuestionnaireLipGeneratorFactory
+            .getDirectionQuestionnaire()
+            .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder
+            .systemGeneratedCaseDocuments(systemGeneratedDocumentService
+                                              .getSystemGeneratedDocumentsWithAddedDocument(sealedDQForm, caseData));
+        if (sealedDQForm.getDocumentName().contains("defendant")) {
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_DEF1.getValue());
+        } else {
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_APP1.getValue());
+            CaseDocument sealedDQFormCopy = sealedDQForm.toBuilder()
+                .documentLink(sealedDQForm.getDocumentLink().toBuilder().build()).build();
+            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
+                                                             .getSystemGeneratedDocumentsWithAddedDocument(sealedDQFormCopy, caseData));
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQFormCopy, DocCategory.APP1_DQ.getValue());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

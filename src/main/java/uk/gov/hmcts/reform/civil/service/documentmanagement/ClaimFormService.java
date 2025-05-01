@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.documentmanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ public class ClaimFormService {
 
     private final DocumentDownloadService documentDownloadService;
 
-    @Autowired
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
     public CaseDocument uploadSealedDocument(

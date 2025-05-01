@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
@@ -67,6 +69,8 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean hasPersonalInjury;
     private final boolean hasRoadTrafficAccident;
     private final boolean writtenByJudge;
+    private final boolean hasSdoR2CreditHire;
+    private final boolean hasSdoR2CreditHireDetails;
 
     private final FastTrackJudgesRecital fastTrackJudgesRecital;
     private final FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
@@ -90,6 +94,8 @@ public class SdoDocumentFormFast implements MappableObject {
     private final FastTrackHousingDisrepair fastTrackHousingDisrepair;
     private final FastTrackPersonalInjury fastTrackPersonalInjury;
     private final FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
+    private final SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private final SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
     private final boolean hasNewDirections;
     private final List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
@@ -107,6 +113,14 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean fastTrackTrialDateToToggle;
     private final boolean fastTrackTrialToggle;
     private final boolean fastTrackMethodToggle;
-
+    private final boolean fastTrackWelshLanguageToggle;
     private final String fastTrackAllocation;
+    private final String welshLanguageDescription;
+    private boolean showBundleInfo;
+
+    @SuppressWarnings("unused")
+    public boolean getFastTrackMethodToggle() {
+        // made mandatory in SNI-5142
+        return true;
+    }
 }

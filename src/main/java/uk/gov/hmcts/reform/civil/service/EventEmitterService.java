@@ -3,13 +3,15 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.extension.rest.exception.RemoteProcessEngineException;
+import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,12 +30,23 @@ public class EventEmitterService {
 
         boolean nullTenantAttempt = false;
         try {
-            runtimeService.createMessageCorrelation(camundaEvent)
-                .tenantId(TENANT_ID)
-                .setVariable("caseId", caseId)
-                .correlateStartMessage();
             if (dispatchProcess) {
                 applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
+            }
+            if (camundaEvent.equals("queryManagementRaiseQuery")
+                || camundaEvent.equals("queryManagementRespondQuery")) {
+                CaseMessage latestQuery = getLatestQuery(caseData);
+                String queryId = latestQuery != null ? latestQuery.getId() : null;
+                runtimeService.createMessageCorrelation(camundaEvent)
+                    .tenantId(TENANT_ID)
+                    .setVariable("caseId", caseId)
+                    .setVariable("queryId", queryId)
+                    .correlateStartMessage();
+            } else {
+                runtimeService.createMessageCorrelation(camundaEvent)
+                    .tenantId(TENANT_ID)
+                    .setVariable("caseId", caseId)
+                    .correlateStartMessage();
             }
             log.info("Camunda event emitted successfully with tenant");
         } catch (RemoteProcessEngineException ex) {
@@ -46,13 +59,13 @@ public class EventEmitterService {
 
         if (nullTenantAttempt) {
             try {
+                if (dispatchProcess) {
+                    applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
+                }
                 runtimeService.createMessageCorrelation(camundaEvent)
                     .setVariable("caseId", caseId)
                     .withoutTenantId()
                     .correlateStartMessage();
-                if (dispatchProcess) {
-                    applicationEventPublisher.publishEvent(new DispatchBusinessProcessEvent(caseId, businessProcess));
-                }
                 log.info("Camunda event emitted successfully without tenant");
             } catch (Exception e) {
                 log.error(format("Emitting %s camunda event failed for case: %d, message: %s",

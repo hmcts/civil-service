@@ -30,7 +30,8 @@ public class SystemGeneratedDocumentService {
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
         if (Objects.nonNull(translatedDocuments)) {
             for (Element<TranslatedDocument> translateDocument : translatedDocuments) {
-                CaseDocument caseDocument = CaseDocument.toCaseDocument(translateDocument.getValue().getFile(), translateDocument.getValue().getCorrespondingDocumentType());
+                CaseDocument caseDocument = CaseDocument.toCaseDocument(translateDocument.getValue().getFile(),
+                        translateDocument.getValue().getCorrespondingDocumentType(translateDocument.getValue().getDocumentType()));
                 systemGeneratedDocuments.add(element(caseDocument));
             }
         }

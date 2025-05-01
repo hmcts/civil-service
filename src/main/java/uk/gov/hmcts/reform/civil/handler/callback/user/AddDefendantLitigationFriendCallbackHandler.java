@@ -14,13 +14,15 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
@@ -37,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_CASE_DATA;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -53,12 +56,11 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
     private final ObjectMapper objectMapper;
     private final ExitSurveyContentService exitSurveyContentService;
     private final UserService userService;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
-
     private final CaseFlagsInitialiser caseFlagsInitialiser;
-
     private final FeatureToggleService featureToggleService;
+    private final CoreCaseDataService coreCaseDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -133,13 +135,23 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         caseFlagsInitialiser.initialiseCaseFlags(ADD_DEFENDANT_LITIGATION_FRIEND, caseDataUpdated);
         caseDataUpdated.isRespondent1(null);
 
-        if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(caseDataUpdated);
-        }
+        populateWithPartyIds(caseDataUpdated);
 
+        caseDataUpdated.caseNameHmctsInternal(CaseNameUtils.buildCaseName(caseDataUpdated.build()));
+        caseDataUpdated.caseNamePublic(CaseNameUtils.buildCaseName(caseDataUpdated.build()));
+        updateGaCaseName(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateGaCaseName(CaseData caseData) {
+        if (ofNullable(caseData.getGeneralApplications()).isPresent()) {
+            caseData.getGeneralApplications().forEach(app -> coreCaseDataService
+                .triggerGeneralApplicationEvent(Long.parseLong(app.getValue().getCaseLink().getCaseReference()),
+                                                UPDATE_GA_CASE_DATA,
+                                                Map.of("caseNameGaInternal", CaseNameUtils.buildCaseName(caseData))));
+        }
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

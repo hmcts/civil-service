@@ -4,36 +4,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.service.camunda.CamundaRuntimeClient;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    HearingNoticeCamundaService.class
-})
+@ExtendWith(MockitoExtension.class)
 public class HearingNoticeCamundaServiceTest {
 
-    @Autowired
+    @Mock
     private ObjectMapper mapper;
-    @MockBean
+
+    @Mock
     private RuntimeService runtimeService;
-    @Autowired
+
+    @Mock
+    private CamundaRuntimeClient runtimeClient;
+
+    @InjectMocks
     private HearingNoticeCamundaService hearingNoticeCamundaService;
 
-    private static String PROCESS_INSTANCE_ID = "process-instance-id";
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    private static final String PROCESS_INSTANCE_ID = "process-instance-id";
 
     @Test
     void shouldReturnExpectedProcessVariables() {
@@ -41,6 +48,7 @@ public class HearingNoticeCamundaServiceTest {
             .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
             .build();
+
         HearingNoticeVariables expected = HearingNoticeVariables.builder()
             .caseId(1L)
             .hearingId("hearing-id")
@@ -52,7 +60,10 @@ public class HearingNoticeCamundaServiceTest {
             .days(List.of(hearingDay))
             .build();
 
-        when(runtimeService.getVariables(PROCESS_INSTANCE_ID)).thenReturn(expected.toMap(mapper));
+        Map<String, Object> expectedVariablesMap = expected.toMap(mapper);
+        when(runtimeClient.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(expectedVariablesMap);
+        when(mapper.convertValue(any(), eq(HearingNoticeVariables.class))).thenReturn(expected);
+
         HearingNoticeVariables actual = hearingNoticeCamundaService.getProcessVariables(PROCESS_INSTANCE_ID);
 
         assertEquals(expected, actual);

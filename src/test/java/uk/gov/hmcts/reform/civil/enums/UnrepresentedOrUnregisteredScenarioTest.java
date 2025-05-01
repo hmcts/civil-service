@@ -9,7 +9,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 
@@ -84,7 +83,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
             // To be changed to UNREGISTERED when NOC is merged
             // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent1().getPartyName(),
                     caseData.getRespondent2().getPartyName()
@@ -98,7 +97,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
             // To be changed to UNREGISTERED when NOC is merged
             // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent1().getPartyName()
                 )
@@ -111,7 +110,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
             // To be changed to UNREGISTERED when NOC is merged
             // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent2().getPartyName()
                 )
@@ -125,7 +124,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
             // To be changed to UNREGISTERED when NOC is merged
             // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent2().getPartyName()
                 )
@@ -139,85 +138,6 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
             // To be changed to UNREGISTERED when NOC is merged
             // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
-                List.of(
-                    caseData.getRespondent1().getPartyName()
-                )
-            );
-        }
-    }
-
-    @Nested
-    class ToBeRemovedAfterNocUnregistered {
-        @Test
-        void shouldReturnUnregisteredDefendantNames_WhenBothDefendantsUnregisteredScenario() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateProceedsOfflineUnregisteredDefendants()
-                .respondent1OrganisationPolicy(null)
-                .respondent2OrganisationPolicy(null)
-                .build();
-
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-                List.of(
-                    caseData.getRespondent1().getPartyName(),
-                    caseData.getRespondent2().getPartyName()
-                )
-            );
-        }
-
-        @Test
-        void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant1Scenario() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateProceedsOfflineUnregisteredDefendant1()
-                .respondent1OrganisationPolicy(null)
-                .respondent2OrganisationPolicy(null)
-                .build();
-
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-                List.of(
-                    caseData.getRespondent1().getPartyName()
-                )
-            );
-        }
-
-        @Test
-        void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant2Scenario() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateProceedsOfflineUnregisteredDefendant2()
-                .respondent1OrganisationPolicy(null)
-                .respondent2OrganisationPolicy(null)
-                .build();
-
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-                List.of(
-                    caseData.getRespondent2().getPartyName()
-                )
-            );
-        }
-
-        @Test
-        void shouldReturnUnregisteredDefendantNames_WhenUnrepresentedDefendant1UnregisteredDefendant2Scenario() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2()
-                .respondent1OrganisationPolicy(null)
-                .respondent2OrganisationPolicy(null)
-                .build();
-
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
-                List.of(
-                    caseData.getRespondent2().getPartyName()
-                )
-            );
-        }
-
-        @Test
-        void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant1UnrepresentedDefendant2Scenario() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2()
-                .respondent1OrganisationPolicy(null)
-                .respondent2OrganisationPolicy(null)
-                .build();
-
             assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent1().getPartyName()
@@ -225,5 +145,4 @@ class UnrepresentedOrUnregisteredScenarioTest {
             );
         }
     }
-
 }

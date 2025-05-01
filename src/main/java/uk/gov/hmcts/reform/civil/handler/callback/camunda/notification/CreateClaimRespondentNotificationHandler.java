@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -23,9 +24,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateClaimRespondentNotificationHandler extends CallbackHandler implements NotificationData {
@@ -37,7 +39,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     );
 
     public static final String TASK_ID_EMAIL_FIRST_SOL = "NotifyDefendantSolicitor1";
-    public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyApplicantSolicitor1CC";
+    public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyApplicantSolicitorCC";
     public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifyDefendantSolicitor2";
     private static final String REFERENCE_TEMPLATE = "create-claim-respondent-notification-%s";
 
@@ -109,7 +111,15 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
 
-        sendNotificationToSolicitor(caseData, recipient);
+        if (recipient != null) {
+            sendNotificationToSolicitor(caseData, recipient);
+        } else {
+            log.info(String.format(
+                "Email address is null for caseEvent: %s for: %s",
+                caseEvent,
+                caseData.getLegacyCaseReference()
+            ));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -134,13 +144,14 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,
             formatLocalDate(caseData
                                 .getClaimDetailsNotificationDeadline()
                                 .toLocalDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 }

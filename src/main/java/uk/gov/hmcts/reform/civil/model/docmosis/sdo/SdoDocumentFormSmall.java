@@ -14,9 +14,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
@@ -65,19 +67,36 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final String smallClaimsMethodTelephoneHearing;
     private final String smallClaimsMethodVideoConferenceHearing;
     private final SmallClaimsDocuments smallClaimsDocuments;
+    private final SmallClaimsFlightDelay smallClaimsFlightDelay;
     private final SmallClaimsWitnessStatement smallClaimsWitnessStatement;
     private final LocationRefData hearingLocation;
     private final LocationRefData caseManagementLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
     private final SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
+    private final SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
 
+    private final String welshLanguageDescription;
     private final boolean hasNewDirections;
     private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
 
     private final SmallClaimsNotes smallClaimsNotes;
     private final boolean smallClaimsHearingToggle;
+    /**
+     * SNI-5142 made mandatory.
+     */
     private final boolean smallClaimsMethodToggle;
     private final boolean smallClaimsDocumentsToggle;
     private final boolean smallClaimsWitnessStatementToggle;
     private final boolean smallClaimsNumberOfWitnessesToggle;
+    private final boolean smallClaimsFlightDelayToggle;
+    private final boolean smallClaimsMediationSectionToggle;
+    private final boolean carmEnabled;
+    private final String smallClaimMediationSectionInput;
+    private final boolean smallClaimsWelshLanguageToggle;
+
+    @SuppressWarnings("unused")
+    public boolean getSmallClaimsMethodToggle() {
+        // SNI-5142
+        return true;
+    }
 }

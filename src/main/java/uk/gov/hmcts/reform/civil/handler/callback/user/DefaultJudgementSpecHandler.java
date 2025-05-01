@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -12,15 +13,20 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.DefaultJudgmentOnlineMapper;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -40,17 +46,21 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
+import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCostsOnEntry;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
@@ -66,12 +76,14 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         "<br>The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
+    public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
-    private final FeesService feesService;
     private final FeatureToggleService toggleService;
+    private final DefaultJudgmentOnlineMapper djOnlineMapper;
+    private final CaseDetailsConverter caseDetailsConverter;
     BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
@@ -108,7 +120,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_GRANTED_HEADER);
+        } else if (caseData.isLRvLipOneVOne()
             || (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both"))) {
@@ -120,7 +134,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (caseData.isLRvLipOneVOne()) {
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            return format(JUDGMENT_GRANTED, format(
+                "/cases/case-details/%s#Claim documents",
+                caseData.getCcdCaseReference()
+            ));
+        } else if (caseData.isLRvLipOneVOne()) {
             return format(JUDGMENT_REQUESTED_LIP_CASE);
         } else if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetailsSpec().getValue()
@@ -144,7 +163,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
 
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        final var caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (featureToggleService.isPinInPostEnabled() && caseData.isRespondentResponseBilingual()) {
             errors.add(DJ_NOT_VALID_FOR_THIS_LIP_CLAIM);
@@ -165,19 +184,22 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         List<String> listData = new ArrayList<>();
-
-        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
+        String respondent1Name = getPartyNameBasedOnType(caseData.getRespondent1());
+        listData.add(respondent1Name);
         if (nonNull(caseData.getRespondent2())) {
             listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
             listData.add("Both Defendants");
             caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         }
 
-        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
+        caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData,
+                                                                  null,
+                                                                  this::getPartNameForLabel, respondent1Name, false
+        ));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
-                      ? caseDataBuilder.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty()
+                ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -229,7 +251,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                               + "- if they do not apply, close this page and apply for default judgment when they do");
+                + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -237,25 +259,73 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
 
-        var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
-            + caseData.getTotalInterest().doubleValue();
+        if (YesOrNo.YES.equals(caseData.getPartialPayment())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
+                .build();
+        }
+
+        BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
+        BigDecimal totalIncludeInterestAndFeeAndCosts = caseData.getTotalClaimAmount()
+            .add(interestCalculator.calculateInterest(caseData))
+            .add(claimFeeAmount)
+            .add(JudgmentsOnlineHelper.getFixedCostsOnCommencement(caseData));
+
         List<String> errors = new ArrayList<>();
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
-            var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
-            var partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue();
-            if (partialPaymentPounds >= totalIncludeInterest) {
+            BigDecimal partialPaymentPounds = MonetaryConversions.penniesToPounds(new BigDecimal(caseData.getPartialPaymentAmount()));
+
+            if (partialPaymentPounds.compareTo(totalIncludeInterestAndFeeAndCosts) > 0) {
                 errors.add("The amount already paid exceeds the full claim amount");
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // show old fixed costs screen if claim was created before new fixed
+        // costs screen at claim issue was released
+        if (caseData.getFixedCosts() == null) {
+            caseDataBuilder.showOldDJFixedCostsScreen(YesOrNo.YES);
+        }
+
+        // otherwise show new dj fixed costs screen if judgment amount is more
+        // than 25. judgment amount = claim amount + interest - partial amount
+        if (caseData.getFixedCosts() != null) {
+            BigDecimal judgmentAmount = JudgmentsOnlineHelper.getDebtAmount(caseData, interestCalculator);
+            if (YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                if (judgmentAmount.compareTo(BigDecimal.valueOf(25)) > 0) {
+                    caseDataBuilder.showDJFixedCostsScreen(YesOrNo.YES);
+                } else {
+                    caseDataBuilder.showDJFixedCostsScreen(YesOrNo.NO);
+                }
+            }
+            // if case is applicable to new fixed costs but new screen will not
+            // be shown due to the above conditions, then skip straight to
+            // repayment breakdown screen
+            if (caseDataBuilder.build().getShowDJFixedCostsScreen() == null
+                || YesOrNo.NO.equals(caseDataBuilder.build().getShowDJFixedCostsScreen())) {
+                // calculate repayment breakdown
+                StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
+                    caseData,
+                    callbackParams);
+
+                caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
             }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-
     }
 
     private CallbackResponse validatePaymentDateDeadline(CallbackParams callbackParams) {
@@ -279,17 +349,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
-        var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
-        BigDecimal fixedCost = calculateFixedCosts(caseData);
+
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
-            interest,
-            claimFeePounds,
-            fixedCost,
-            callbackParams
-        );
+            callbackParams);
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -298,26 +361,23 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     @NotNull
-    private StringBuilder buildRepaymentBreakdown(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds,
-                                                  BigDecimal fixedCost, CallbackParams callbackParams) {
-
+    private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        Fee claimfee = caseData.getClaimFee();
+        BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
+        BigDecimal fixedCost = getFixedCosts(caseData, interestCalculator);
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         //calculate the relevant total, total claim value + interest if any, claim fee for case,
         // and subtract any partial payment
-        var subTotal = caseData.getTotalClaimAmount()
-            .add(interest)
-            .add(claimFeePounds);
-        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
-            subTotal = subTotal.add(fixedCost);
-        }
-        theOverallTotal = subTotal.subtract(partialPaymentPounds);
+        BigDecimal subTotal = getSubTotal(caseData, interest, claimFeePounds, fixedCost);
+        theOverallTotal = calculateOverallTotal(partialPaymentPounds, subTotal);
         //creates  the text on the page, based on calculated values
         StringBuilder repaymentBreakdown = new StringBuilder();
         if (caseData.isLRvLipOneVOne()
             && toggleService.isPinInPostEnabled()
             && V_1.equals(callbackParams.getVersion())) {
             repaymentBreakdown.append(
-                "The Judgement request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
+                "The Judgment request will be reviewed by the court, this case will proceed offline, you will receive any further updates by post.");
         } else {
             if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
                 repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
@@ -336,7 +396,9 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
         }
 
-        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
+        if ((caseData.getFixedCosts() != null
+            && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
+            || caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES) {
             repaymentBreakdown.append("\n ### Fixed cost amount \n").append("£").append(fixedCost.setScale(2));
         }
         repaymentBreakdown.append("\n").append("### Claim fee amount \n £").append(claimFeePounds.setScale(2)).append(
@@ -349,7 +411,32 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal.setScale(2));
+        log.info("Case {} with calculated interest: {} and Repayment Breakdown details: {}", caseData.getCcdCaseReference(), interest, repaymentBreakdown);
         return repaymentBreakdown;
+    }
+
+    private BigDecimal getFixedCosts(CaseData caseData, InterestCalculator interestCalculator) {
+        BigDecimal fixedCost = BigDecimal.valueOf(0);
+        if (caseData.getFixedCosts() == null) {
+            fixedCost = calculateFixedCosts(caseData);
+        } else if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
+            fixedCost = calculateFixedCostsOnEntry(caseData, JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator));
+        }
+
+        return fixedCost;
+    }
+
+    @NotNull
+    private BigDecimal getSubTotal(CaseData caseData, BigDecimal interest, BigDecimal claimFeePounds, BigDecimal fixedCost) {
+        var subTotal = caseData.getTotalClaimAmount()
+            .add(interest)
+            .add(claimFeePounds);
+        if (caseData.getPaymentConfirmationDecisionSpec() == YesOrNo.YES
+            || (caseData.getFixedCosts() != null
+            && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))) {
+            subTotal = subTotal.add(fixedCost);
+        }
+        return subTotal;
     }
 
     private BigDecimal getPartialPayment(CaseData caseData) {
@@ -391,8 +478,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.add("Regular payment cannot exceed the full claim amount");
         }
 
-        LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        LocalDate eligibleDate = LocalDate.now().plusDays(30);
+        formatLocalDate(eligibleDate, DATE);
         if (caseData.getRepaymentDate().isBefore(eligibleDate.plusDays(1))) {
             errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
         }
@@ -403,12 +490,51 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
+        if (featureToggleService.isJudgmentOnlineLive()) {
+            JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
+            caseData.setActiveJudgment(activeJudgment);
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest));
+            caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
+            caseData.setJoDJCreatedDate(LocalDateTime.now());
+        }
 
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
+        String nextState;
+
+        if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
+            nextState = CaseState.All_FINAL_ORDERS_ISSUED.name();
+            caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
+        } else {
+            nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+            caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
+        }
+
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .state(nextState)
             .build();
+    }
+
+    private BigDecimal calculateOverallTotal(BigDecimal partialPaymentPounds, BigDecimal subTotal) {
+        return subTotal.subtract(partialPaymentPounds);
+    }
+
+    private BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
+        BigDecimal partialPaymentPounds = getPartialPayment(caseData);
+        return calculateOverallTotal(partialPaymentPounds, subTotal);
+    }
+
+    private String getPartNameForLabel(String name) {
+        return name;
     }
 }
 

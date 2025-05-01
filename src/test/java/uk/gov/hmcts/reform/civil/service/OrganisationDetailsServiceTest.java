@@ -44,7 +44,7 @@ public class OrganisationDetailsServiceTest {
 
         caseData.getApplicantSolicitor1ClaimStatementOfTruth().setName("OrgClaimName");
         //When
-        String organisationID = organisationDetailsService.getApplicantLegalOrganizationName(caseData);
+        String organisationID = organisationDetailsService.getApplicantLegalOrganisationName(caseData);
         //Then
         assertThat(organisationID).isEqualTo("test org");
     }
@@ -65,7 +65,7 @@ public class OrganisationDetailsServiceTest {
         caseData.getApplicantSolicitor1ClaimStatementOfTruth().setName("OrgClaimName");
 
         //When
-        String organisationID = organisationDetailsService.getApplicantLegalOrganizationName(caseData);
+        String organisationID = organisationDetailsService.getApplicantLegalOrganisationName(caseData);
 
         //Then
         assertThat(organisationID).isEqualTo("OrgClaimName");
@@ -84,7 +84,7 @@ public class OrganisationDetailsServiceTest {
                                               .build())
             .build();
         //When
-        String organisationID = organisationDetailsService.getRespondentLegalOrganizationName(caseData);
+        String organisationID = organisationDetailsService.getRespondent1LegalOrganisationName(caseData);
         //Then
         assertThat(organisationID).isEqualTo("test org");
     }
@@ -102,7 +102,7 @@ public class OrganisationDetailsServiceTest {
                                               .build())
             .build();
         //When
-        String organisationID = organisationDetailsService.getRespondentLegalOrganizationName(caseData);
+        String organisationID = organisationDetailsService.getRespondent1LegalOrganisationName(caseData);
         //Then
         assertNull(organisationID);
     }

@@ -9,11 +9,15 @@ import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
+import uk.gov.hmcts.reform.civil.exceptions.NotEarlyAdopterCourtException;
+import uk.gov.hmcts.reform.civil.exceptions.IncludesLitigantInPersonException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.EarlyAdoptersService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
@@ -52,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMappe
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWitnessAndExpertsPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.copyDatesIntoListingTabFields;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateApplicant1UnavailableDates;
@@ -74,10 +79,14 @@ public class HearingValuesService {
     private final OrganisationService organisationService;
     private final ObjectMapper mapper;
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final EarlyAdoptersService earlyAdoptersService;
+    private final FeatureToggleService featuretoggleService;
 
-    public ServiceHearingValuesModel getValues(Long caseId, String hearingId, String authToken) throws Exception {
+    public ServiceHearingValuesModel getValues(Long caseId, String authToken) throws Exception {
         CaseData caseData = retrieveCaseData(caseId);
         populateMissingFields(caseId, caseData);
+
+        isLrVLr(caseData);
 
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
@@ -85,7 +94,7 @@ public class HearingValuesService {
         return ServiceHearingValuesModel.builder()
             .hmctsServiceID(hmctsServiceID)
             .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
-            .publicCaseName(getPublicCaseName(caseData)) //todo civ-7030
+            .publicCaseName(getPublicCaseName(caseData))
             .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
             .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
             .caseDeepLink(getCaseDeepLink(caseId, baseUrl))
@@ -101,7 +110,7 @@ public class HearingValuesService {
             .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
             .hearingInWelshFlag(getHearingInWelshFlag(caseData))
             .hearingLocations(getHearingLocations(caseData))
-            .facilitiesRequired(getFacilitiesRequired(caseData)) // todo civ-6888
+            .facilitiesRequired(getFacilitiesRequired(caseData))
             .listingComments(getListingComments(caseData))
             .hearingRequester(getHearingRequester())
             .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
@@ -110,11 +119,11 @@ public class HearingValuesService {
             .leadJudgeContractType(getLeadJudgeContractType())
             .judiciary(getJudiciary())
             .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(buildPartyObjectForHearingPayload(caseData, organisationService)) //todo civ-7690
+            .parties(buildPartyObjectForHearingPayload(caseData, organisationService))
             .screenFlow(getScreenFlow())
             .vocabulary(getVocabulary())
             .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
-            .caseFlags(getCaseFlags(caseData)) // todo civ-7690 for party id
+            .caseFlags(getCaseFlags(caseData))
             .build();
     }
 
@@ -124,6 +133,22 @@ public class HearingValuesService {
         } catch (Exception ex) {
             log.error(String.format("No case found for %d", caseId));
             throw new CaseNotFoundException();
+        }
+    }
+
+    private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
+        if (!earlyAdoptersService.isPartOfHmcLipEarlyAdoptersRollout(caseData)) {
+            throw new NotEarlyAdopterCourtException();
+        }
+    }
+
+    private void isLrVLr(CaseData caseData) throws IncludesLitigantInPersonException {
+        if (caseData.isApplicantLiP() || caseData.isRespondent1LiP() || caseData.isRespondent2LiP()) {
+            if (featuretoggleService.isHmcForLipEnabled()) {
+                isEarlyAdopter(caseData);
+            } else {
+                throw new IncludesLitigantInPersonException();
+            }
         }
     }
 
@@ -165,6 +190,7 @@ public class HearingValuesService {
             // as it was created to not overwrite partyId fields if they exist.
             populateWithPartyIds(builder);
             populateDQPartyIds(builder);
+            populateWitnessAndExpertsPartyIds(builder);
             return true;
         }
         return false;
@@ -185,8 +211,8 @@ public class HearingValuesService {
             || shouldUpdateApplicant2UnavailableDates(caseData)
             || shouldUpdateRespondent1UnavailableDates(caseData)
             || shouldUpdateRespondent2UnavailableDates(caseData)) {
-            updateMissingUnavailableDatesForApplicants(caseData, builder, true);
-            rollUpUnavailabilityDatesForRespondent(builder, true);
+            updateMissingUnavailableDatesForApplicants(caseData, builder);
+            rollUpUnavailabilityDatesForRespondent(builder);
             copyDatesIntoListingTabFields(builder.build(), builder);
             return true;
         }

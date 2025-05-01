@@ -29,4 +29,5 @@ public class IndividualDetailsModel {
     private List<String> hearingChannelPhone;
     private List<RelatedPartiesModel> relatedParties;
     private String custodyStatus;
+    private String otherReasonableAdjustmentDetails;
 }

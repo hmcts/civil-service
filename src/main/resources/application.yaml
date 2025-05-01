@@ -16,6 +16,8 @@ management:
     case-document-am-api:
       enabled: true
 spring:
+  config:
+    import: "optional:configtree:/mnt/secrets/civil/"
   application:
     name: civil-service
   main:
@@ -47,6 +49,10 @@ spring:
             client-secret: internal
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
+    placeholder-replacement: false
+    table: schema_version
+    baseline-on-migrate: true
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -54,15 +60,19 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+docmosis:
+  tornado:
+    url: ${DOCMOSIS_TORNADO_URL:http://localhost:6666}
+
 hmc:
   api:
     url: ${HMC_API_URL:http://localhost:8765}
 
 serviceRequest:
   api:
-    callback-url : ${SERVICE_REQUEST_UPDATE:}
-    site_id : AAA7
-    service : CIVIL
+    callback-url: ${SERVICE_REQUEST_UPDATE:}
+    site_id: AAA7
+    service: CIVIL
 
 serviceRequestClaimIssued:
   api:
@@ -78,6 +88,8 @@ send-letter:
 
 fees:
   api:
+    url: ${FEES_API_URL:http://localhost:6666}
+    endpoint: /fees-register/fees/lookup
     service: civil money claims
     jurisdiction1: civil
     jurisdiction2: county court
@@ -85,6 +97,15 @@ fees:
     channel: default
     event: issue
     hearingEvent: hearing
+    jurisdiction2Hearing: civil
+    keywords:
+      fastTrackHrg: FastTrackHrg
+      multiTrackHrg: MultiTrackHrg
+      smallClaimHrg: HearingSmallClaims
+
+location:
+  api:
+    baseUrl: ${GENAPP_LRD_URL:http://localhost:6669}
 
 genApp:
   fee:
@@ -98,6 +119,7 @@ genApp:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
       appnToVaryOrSuspend: AppnToVaryOrSuspend
+      certificateOfSatisfaction: CoS
   lrd:
     endpoint: /refdata/location/court-venues
     ccmcc:
@@ -114,6 +136,11 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
+ocmc:
+  client:
+    id: ${OCMC_CLIENT_ID:cmc_citizen}
+    url: ${OCMC_CLIENT_URL:http://localhost:3001}
+
 manage-case-ui:
   baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
 
@@ -123,15 +150,27 @@ payments:
     service: CIVIL
     spec_site_id: AAA6
     spec_service: SPEC
-    url: http://localhost:8765
+    url: ${PAYMENTS_API_URL:http://localhost:8765}
 
 idam:
   s2s-auth:
     microservice: civil_service
+    totp_secret: ${CIVIL_CLIENT_TOTP_SECRET}
+  client:
+    id: civil-service
+    secret: ${CIVIL_CLIENT_SECRET:AAAAAAA}
+
+auth:
+  idam:
+    client:
+      baseUrl: ${IDAM_API_URL:http://localhost:5000}
+  provider:
+    service:
+      client:
+        baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
-  secured: ${DOCUMENT_MANAGEMENT_SECURED:true}
 
 bankHolidays:
   api:
@@ -158,13 +197,14 @@ civil:
   test-user:
     username: ${TEST_USERNAME:test@example.com}
     password: ${TEST_PASSWORD:Password12!}
+  authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:payment_app,ccd_data,civil_service,civil-citizen-ui}
 
 core_case_data:
   api:
-    url: http://localhost:4452
+    url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
 role-assignment-service:
   api:
-    url: http://localhost:4096
+    url: ${ROLE_ASSIGNMENT_URL:http://localhost:4096}
 case_document_am:
   url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 reference:
@@ -176,140 +216,274 @@ aca:
   api:
     baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
 
+rtl:
+  api:
+    url: http://localhost:4000
+
+dashboard:
+  api:
+    url: http://localhost:4000
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
-  breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
-  breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
-  breathingSpaceLiftedApplicantEmailTemplate: "bd717149-5cba-40e8-ba93-1257033e5e86"
-  breathingSpaceLiftedRespondentEmailTemplate: "a9975259-be57-482f-8a31-0c5583ad0779"
-  respondentSolicitorClaimIssueMultipartyEmailTemplate: "6e63242f-a26a-442e-ad2c-f201072195e2"
-  respondentSolicitorClaimDetailsEmailTemplate: "f6cfc731-e891-4fe2-b974-31e8fabd4d28"
-  solicitorDefendantResponseCaseTakenOffline: "d67b7c10-8cde-4bfe-946b-7e99867694cd"
-  claimantSolicitorDefendantResponseFullDefence: "84f0955b-a542-42d0-9825-a845c4f9799e"
-  solicitorDefendantResponseCaseTakenOfflineMultiparty: "19bd6722-7c58-484e-b5a0-264ba66ad55e"
-  respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
-  failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
-  solicitorClaimDismissedWithin4Months: "5f415268-b48c-49b1-9dd0-3784a62b64aa"
-  solicitorClaimDismissedWithin14Days: "1bd4b095-e812-4677-a0f4-0f91ed9f6515"
-  solicitorClaimDismissedWithinDeadline: "7da39b72-f772-46a7-8296-35bef9521f43"
-  claimantSolicitorCaseWillProgressOffline: "d004304d-a7f4-4440-a13b-753cb2d57a74"
-  claimantSolicitorAgreedExtensionDate: "0b731d97-bba5-4994-944b-10dfbed2ce6b"
-  claimantSolicitorConfirmsToProceed: "bf16b060-17b6-4d06-8367-e26a538a4911"
-  claimantSolicitorConfirmsNotToProceed: "25988b85-dafc-40be-970f-45fbb7d0f860"
-  claimantSolicitorClaimContinuingOnline: "d6c71e08-a9c3-405c-8873-4370d4bdcca3"
-  claimantSolicitorSpecCaseWillProgressOffline: "cf44ff15-4958-4c0d-b0d4-fed9a7692d00"
-  claimantSolicitorClaimContinuingOnlineCos: "4825eb5d-4678-496e-8d19-203288dd598f"
-  solicitorCaseTakenOffline: "5f1f497e-e1e0-40e0-8296-a0a1341f1e8c"
-  solicitorLitigationFriendAdded: "bad02653-df70-4a33-9b02-d42d30c5022c"
-  claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
-  claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
+  breathingSpaceEnterApplicantEmailTemplate: "75f2f3cb-28a2-4ad9-819e-18a31f6d5666"
+  breathingSpaceEnterDefendantEmailTemplate: "a3faa9d4-7b63-4f84-89c6-8c1ba8a5328a"
+  breathingSpaceLiftedApplicantEmailTemplate: "c4c03b85-e97a-4fc8-8f47-9e6a6bc8cdc0"
+  breathingSpaceLiftedRespondentEmailTemplate: "357f703a-f0bb-496d-b8c5-e829f13507e5"
+  respondentSolicitorClaimIssueMultipartyEmailTemplate: "4a577b55-b120-4189-b1eb-65c49fdece84"
+  respondentSolicitorClaimDetailsEmailTemplate: "1cc61c92-4614-4046-8da9-c5bbff6a62d4"
+  solicitorDefendantResponseCaseTakenOffline: "55519a6c-aa43-46c4-8529-c9125a6af7c0"
+  claimantSolicitorDefendantResponseFullDefence: "534c925d-a167-43d6-98e9-52761f7bb053"
+  solicitorDefendantResponseCaseTakenOfflineMultiparty: "ffe0fa13-9d65-4b60-ba8b-b6f97b765110"
+  respondentSolicitorAcknowledgeClaim: "9228b073-3ce4-4e2b-bd6b-4e6427942f4f"
+  failedPayment: "82b8b1f4-7ab9-4813-b9c3-298df16b52d3"
+  solicitorClaimDismissedWithin4Months: "9602abcc-cea1-400c-acca-b159955f8e23"
+  solicitorClaimDismissedWithin14Days: "e37bf604-a433-4f5e-9dcd-c5a0d19e42cb"
+  solicitorClaimDismissedWithinDeadline: "609978a6-9403-4017-9bc1-55548761c588"
+  claimantSolicitorCaseWillProgressOffline: "afb678ce-01a8-4f8a-a7f9-6d188829f3b9"
+  claimantSolicitorAgreedExtensionDate: "ca068fae-b2b8-46a7-80fc-0536f2b6f6d2"
+  claimantSolicitorConfirmsToProceed: "0530f2ea-2950-429a-a97d-64d2c1729e82"
+  claimantSolicitorConfirmsNotToProceed: "e46246da-161e-4b3b-a6b1-0bc236c30a51"
+  claimantSolicitorClaimContinuingOnline: "884c00c1-eaf3-4ab7-8fdb-90a60b01b8af"
+  claimantSolicitorSpecCaseWillProgressOffline: "e3d12512-6547-4731-bb34-41d92990a29c"
+  claimantSolicitorClaimContinuingOnlineCos: "de06695c-cdac-45fa-a765-e5106585c44e"
+  solicitorCaseTakenOffline: "6238c432-0d14-4677-8251-9f78e7c2e9ac"
+  solicitorCaseTakenOfflineNoApplicantResponse: "e5f60499-7c29-4ac3-adbe-fe62a61244e4"
+  solicitorLitigationFriendAdded: "56644f68-a8dc-4f3d-9ce9-2f1f6c9780cc"
+  claimantSolicitorClaimContinuingOnlineForSpec: "696f580d-5f40-4f9c-9f76-a55a77999719"
+  claimantSolicitorClaimContinuingOnline1v2ForSpec: "81aaaa06-cbcf-4f4d-8aca-0a20e2e3c4ab"
   claimantClaimContinuingOnlineForSpec: "1fbb9833-8181-4438-acdf-9dd6bd0a47fb"
-  respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
-  failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
-  solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
-  applicantSolicitorAcknowledgeClaimForSpec: "a33e1b0a-42d8-46b2-8773-6fd84a9b8b01"
-  respondentSolicitorAcknowledgeClaimForSpec: "16b86d3b-f370-4dc1-b25b-871e7470ebf1"
-  claimantSolicitorAgreedExtensionDateForSpec: "5b6d65ea-a3b5-4e40-94e0-69dc7100c982"
-  respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
-  claimantSolicitorDefendantResponse1v2DSForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
-  claimantSolicitorDefendantResponseForSpec: "28ea1d53-93b1-4e48-a7e5-7a876f910f86"
-  claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
-  respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
-  respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
-  sdoOrdered: "90667080-6b20-48f2-b9ea-349fa8ec78e4"
-  sdoOrderedSpec: "1c1a200c-b3c1-45eb-9768-aeea56857420"
+  respondentSolicitorClaimContinuingOnlineForSpec: "0329e958-bf1a-47bb-9d9e-7844ea7ba422"
+  failedPaymentForSpec: "8e272a2f-765c-4502-a5ae-d22f7967587b"
+  solicitorCaseTakenOfflineForSpec: "f00ee6cd-777f-4639-a268-42857d1a604b"
+  applicantSolicitorAcknowledgeClaimForSpec: "0c9a782f-9038-4f88-a9b0-b5bb85d3c2b0"
+  respondentSolicitorAcknowledgeClaimForSpec: "8bb7eecd-cb39-4447-a0ac-06b49da223df"
+  claimantSolicitorAgreedExtensionDateForSpec: "468e9698-fadc-4bfd-811c-0ce826804a04"
+  respondentSolicitorAgreedExtensionDateForSpec: "04c87e66-3433-4f39-9a96-806ff6bec366"
+  claimantSolicitorDefendantResponse1v2DSForSpec: "47061750-29f2-4ef3-878a-b8877606b3f6"
+  claimantSolicitorDefendantResponseForSpec: "f50c7238-c972-401b-93d5-ca00bbbb800c"
+  claimantSolicitorImmediatelyDefendantResponseForSpec: "fcfefe3d-f2df-4679-8811-87c371a6981c"
+  respondentSolicitorDefendantResponseForSpec: "19616010-7bdb-490b-95aa-0f97e1effe10"
+  respondentSolicitorDefResponseSpecWithClaimantAction: "5c6fb660-723b-4f64-b21f-4ddaa95e5d12"
+  respondentDefendantResponseForSpec: "2c4435ae-af57-4988-9e79-cb28db4bba49"
+  sdoOrdered: "4847cf11-8f5f-4b51-aca4-d29b88389ee5"
+  sdoOrderedSpec: "0cf6bb95-f3f7-4072-b07f-c752af03b490"
+  sdoOrderedSpecEa: "dcc059b3-8a91-4088-9948-583a1bc5cf26"
   sdoOrderedSpecBilingual: "0ae860e7-80b5-46f8-95b7-8f19d6f974cf"
-  claimantSolicitorConfirmsNotToProceedSpec: "156b71f5-30ac-4398-aad2-72dfd424c6f2"
-  claimantSolicitorConfirmsNotToProceedSpecLip: "25988b85-dafc-40be-970f-45fbb7d0f860"
+  claimantSolicitorConfirmsNotToProceedSpec: "e7ca03a7-fc90-4d9f-babc-2b016e6ad758"
+  claimantSolicitorConfirmsNotToProceedSpecLip: "57fa7156-3af0-4c78-8677-ee1cf6aaed43"
   notifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
-  notifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
-  respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
-  claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
-  respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
-  applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
-  claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
-  respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
-  respondentSolicitor1DefaultJudgmentReceived: "3f09399e-b76b-4ea4-8084-c27693e6fd28"
-  respondentSolicitor1DefaultJudgmentRequested: "9a974b63-6d0f-4714-8e5d-488554fdc8a0"
-  applicantSolicitor1DefaultJudgmentRequested: "cd0486ac-cc6a-4429-865a-7746f64bf4dd"
-  interimJudgmentRequestedClaimant: "7c6d0840-3f38-4fc5-a26b-676f27bb8fe2"
-  interimJudgmentApprovalClaimant: "d0deee08-edc8-4a25-8b04-6a5ba52267b8"
-  standardDirectionOrderDJTemplate: "90667080-6b20-48f2-b9ea-349fa8ec78e4"
-  interimJudgmentRequestedDefendant: "0a926106-b8cf-4d07-be6b-1b451c7895e9"
-  interimJudgmentApprovalDefendant: "184567ca-9013-4685-adae-18b8d329f72e"
-  caseworkerDefaultJudgmentRequested: "b20f34f4-39c3-4488-9961-f6d4ae7247f4"
+  notifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec: "048da530-8fd0-41a3-b9c7-2d7b0e1225b8"
+  respondentSolicitorNotifyNotToProceedSpec: "9aa20c5e-e35b-4dc2-b159-a6468667c348"
+  claimantSolicitorConfirmsToProceedSpec: "969c8ba2-8732-43c4-9a3c-24ade158f3ef"
+  respondentSolicitorNotifyToProceedSpec: "fad116e6-ea5e-4ff4-a07c-e9156dbb7f84"
+  claimantSolicitorConfirmsToProceedSpecWithAction: "16d84581-e5e8-417d-9ade-a7c94d500138"
+  respondentSolicitorNotifyToProceedSpecWithAction: "7ec2ac5f-b12e-4b3a-a4da-cdd54c393917"
+  respondentSolicitorNotifyToProceedInMediation: "e231e271-93b9-49e8-99d3-5b3ceac4b3af"
+  applicantSolicitor1DefaultJudgmentReceived: "bceecea2-b70e-4288-be31-0a4203b31f3e"
+  claimantSolicitorCounterClaimForSpec: "082c6017-9bcf-4227-bc0a-bcfec2b8ebf4"
+  respondentSolicitorCounterClaimForSpec: "cb31a195-2a9f-4229-9abf-7f4935260ee1"
+  respondentSolicitor1DefaultJudgmentReceived: "8cb8ecbc-2fbe-4c8f-9c65-c481b572acca"
+  respondentSolicitor1DefaultJudgmentReceivedForLipVSLR: "79f39a83-667a-4639-8501-1f387b31da22"
+  respondentSolicitor1DefaultJudgmentRequested: "24581b50-9818-48cb-9a26-746513fcb44c"
+  applicantSolicitor1DefaultJudgmentRequested: "7a990a28-1970-41ab-a366-87ba21d0a651"
+  interimJudgmentRequestedClaimant: "0164fc6f-b40e-4afa-a895-90e02c05fd97"
+  interimJudgmentApprovalClaimant: "c88fc581-9563-4089-a7ba-e2a71176d3ba"
+  standardDirectionOrderDJTemplate: "027acc0f-e2e5-464d-9434-7df51096a858"
+  interimJudgmentRequestedDefendant: "5ee10d40-31cb-429f-a109-b63f64a1629b"
+  interimJudgmentApprovalDefendant: "f0e15654-c0cf-48ee-aa09-3cfbf2a076dc"
+  caseworkerDefaultJudgmentRequested: "040e9a68-75aa-4801-aa78-2e2ab6df4697"
   respondentDeadlineExtension: "13514e8a-8621-4d3a-a317-8fd0ba7a184f"
   respondentDeadlineExtensionWelsh: "5fb6d574-e1b8-42bc-9d97-fcd8042f36d3"
-  claimantDeadlineExtension: "74e33576-487f-4c63-bdef-fe12c4279faa"
+  claimantDeadlineExtension: "f4313f23-e3a5-4a27-ad3b-bbef691489d8"
   claimantLipDeadlineExtension: "77cc47b1-4a9a-4baf-9313-98542698d32a"
-  respondentChangeOfAddressNotificationTemplate: "174a9566-6ce2-4df5-9ffd-265bbd4787cc"
-  respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
-  respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
-  respondentLipFullDefenceNoMediationTemplate: "8825e67e-44a2-444d-afd0-3fa6c34af373"
-  applicantHearingFeeUnpaid: "e732acf5-7ac8-49f5-8e20-cc8fa86aeef8"
-  respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
+  claimantLipDeadlineExtensionWelsh: "4ad7ff45-d139-4e30-8251-729a7320ebb8"
+  respondentChangeOfAddressNotificationTemplate: "c78090fa-f86c-4231-b808-470dab9abf31"
+  respondentLipFullAdmitOrPartAdmitTemplate: "81caadd5-40ef-4c4c-8fb4-0d2af0e2a8e1"
+  respondentLipFullDefenceWithMediationTemplate: "31ac1f84-8c40-4636-862b-47cc8ef64716"
+  respondentLipFullDefenceNoMediationTemplate: "b5185fe6-e74e-47cf-b5c4-6e2d98e85de2"
+  applicantHearingFeeUnpaid: "75ce0501-dde6-4389-9e01-591a8f862341"
+  respondentHearingFeeUnpaid: "a04b8e51-6a90-4207-a875-91d73bdf7a2a"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
   respondentLipResponseSubmissionBilingualTemplate: "37da53f4-2453-4d45-9910-b33d28274aa5"
-  hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
-  hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
-  hearingListedFeeClaimantLrTemplateHMC: "2c7862fb-230f-4e8e-912c-07d265c8dd86"
-  hearingListedNoFeeClaimantLrTemplateHMC: "b68825c4-fcca-48eb-85ce-2f5d7c2e6428"
-  hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
-  hearingListedNoFeeDefendantLrTemplateHMC: "aecaafde-fdf0-471f-8eca-a75534ac36aa"
-  solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
-  otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
+  hearingListedFeeClaimantLrTemplate: "9158c3b5-5655-425e-97aa-ad646aa07857"
+  hearingListedNoFeeClaimantLrTemplate: "c977755d-2afe-4b56-98f0-44388a9deb03"
+  hearingListedFeeClaimantLrTemplateHMC: "a0545161-5068-4e92-9721-10a14c4ad1bc"
+  hearingListedNoFeeClaimantLrTemplateHMC: "7f4ade27-f6e4-43c8-ad08-b7944cc67b56"
+  hearingListedNoFeeDefendantLrTemplate: "f54e90da-61c9-4e31-87b9-c31215edcac1"
+  hearingListedNoFeeDefendantLrTemplateHMC: "8f98ae4b-6f4a-41c9-a11e-725177857fc0"
+  solicitorTrialReady: "0660089f-9dc6-4535-a625-cd4e3dbaa985"
+  otherPartyTrialReady: "686abb5a-dbe0-45a8-8784-c24391a9e096"
   respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
   respondentCcjNotificationWelshTemplate: "8ad1530a-70fe-407c-8f8b-81264a055c82"
-  respondentSolicitorCcjNotificationTemplate: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
+  respondentSolicitorCcjNotificationTemplate: "048da530-8fd0-41a3-b9c7-2d7b0e1225b8"
 
-  noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
-  noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
-  evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
+  noticeOfChangeFormerSolicitor: "339249f0-ce25-493b-81e7-70c4a30afedc"
+  noticeOfChangeOtherParties: "b5090cca-1b86-45a4-ab03-7f1d0fce4588"
+  evidenceUploadTemplate: "072a26cf-9c71-43e6-b860-a09dd6468c54"
   evidenceUploadLipTemplate: "3495a863-338f-49cf-99e8-b94bc457a9d4"
-  bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
-  generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
+  evidenceUploadLipTemplateWelsh: "b1697ce8-1318-44c3-895d-4714124eb6dd"
+  bundleCreationTemplate: "9ebd3fe5-4d67-4e9b-a3b3-4b796a66c8cc"
+  generateOrderNotificationTemplate: "1ec83dff-4a4b-4202-af86-c9cd267c3493"
 
-  notifyClaimantLrTemplate: "adcf4c5f-2b9c-482d-8311-a4b8ffe7ef45"
-  notifyDefendantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
+  notifyClaimantLrTemplate: "599fd968-9ec7-4ef5-a606-b7644c7f1cbe"
+  notifyClaimantLipTemplateManualDetermination: "bdc1b126-4137-43b0-a637-6d3874053ac0"
+  notifyClaimantAfterClaimIssue: "1fbb9833-8181-4438-acdf-9dd6bd0a47fb"
+  notifyDefendantLrTemplate: "e18e7860-0593-4b70-bb23-91fcf2f77e58"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
   notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
 
-  notifyApplicantLRMediationAgreementTemplate: "d5e927f6-3fde-42cf-b30f-6b833c66bf70"
+  notifyApplicantLRMediationAgreementTemplate: "73b79b0a-2258-484b-b29e-806a5fca0984"
   notifyRespondentLiPMediationAgreementTemplate: "a623c1df-2187-4663-b9eb-31d4ace175d6"
   notifyRespondentLiPMediationAgreementTemplateWelsh: "07a98d47-91a3-4806-a6e2-9e75366556af"
-  notifyRespondentLRMediationAgreementTemplate: "998d0355-7aa8-4bd3-87b2-537eb31c9db5"
+  notifyRespondentLRMediationAgreementTemplate: "ad7f8e29-6eb1-4abf-897b-a396805ba952"
   respondentLipPartAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
-  respondentLrPartAdmitSettleClaimTemplate: "6a1f4ef9-5334-4f2c-9e43-b292753929fb"
+  respondentLrPartAdmitSettleClaimTemplate: "9e3114f7-db30-4344-b7b7-68766e0d3fdd"
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
   claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
+  claimantLipClaimUpdatedBilingualTemplate: "e880dc43-dc4e-440d-8c34-d0feec70e196"
   applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
+  applicantLiPDefaultJudgmentRequestedBilingualTemplate: "cad66be4-ee96-4114-b2a7-489690cd6ebf"
 
-  hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
+  hearingFeeUnpaidNoc: "e2b0118b-15cc-41c0-918c-fbbd042f8019"
 
-  mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
+  mediationUnsuccessfulClaimantLRTemplate: "698c3d4c-bd58-4725-aaba-4146730bbe10"
+  mediationUnsuccessfulClaimantLIPTemplate: "159112bd-0026-4ac4-901b-e7fc1614069f"
+  mediationUnsuccessfulClaimantLIPWelshTemplate: "338f07e4-f06d-40ad-9d68-65d8d25ae3ea"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
+  mediationUnsuccessfulLRTemplate: "023204af-032f-42b9-82a3-d107254c4a7f"
+  mediationUnsuccessfulLRTemplateForLipVLr: "df9f1bb5-d3bc-4fa1-a5a8-60980df99394"
+  mediationUnsuccessfulLIPTemplate: "a986a00b-83f6-459e-a2cb-5bc76ba39164"
+  mediationUnsuccessfulLIPTemplateWelsh: "b3200be6-1b21-48b8-938d-5428a6fa6f8f"
+  mediationUnsuccessfulNoAttendanceLRTemplate: "01d057e5-a28b-465f-a6a0-ef43aa97a20c"
+
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
-  notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
+  notifyClaimantTranslatedDocumentUploaded: "f76562b8-26b4-486d-a98d-b48bc04508a3"
   notifyDefendantTranslatedDocumentUploaded: "279b6997-2a04-4428-921b-c699c190f558"
 
-  notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
+  notifyApplicantLRMediationSuccessfulTemplate: "c5651496-8de5-4e16-9bd7-1c10d53a2ded"
+  notifyApplicantLiPMediationSuccessfulTemplate: "17495b1f-7afa-4b43-a5ca-0a60ae950423"
+  notifyApplicantLiPMediationSuccessfulWelshTemplate: "abb3d4d1-5ced-4af6-b577-a692a5e289b7"
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
+  notifyDefendantLRClaimantSettleTheClaimTemplate: "e3d3d41d-3ad2-411a-8de1-baa3012f1c17"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyLipUpdateTemplateBilingual: "bfc3ee2d-61c7-47f3-b857-7d59838e58e7"
+  notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyClaimReconsiderationLRTemplate: "2eb06df8-8dd9-401d-8116-9e76550050ef"
+  notifySetAsideJudgmentTemplate: "f4f7f07a-05bc-4ecf-866b-d349a747c788"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "a9c1ccba-eb72-414d-8dc7-d75f33c79b28"
   notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
   notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
 
   notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
   notifyEnteredBreathingSpaceForDefendantLip: "e551a04f-9da1-4654-a7be-2040e02925aa"
+
+  notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
+  notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
+
+  notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "d6625ee3-f794-4a87-b0a3-bef7dd0663b9"
+  notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "6ced7f9c-b0fd-4fad-a76c-745873b9a3a2"
+
+  notifyClaimantLipHelpWithFees: "242171a6-98c8-4fe3-b6d2-1748b39d2c9b"
+  notifyClaimantLipHelpWithFeesWelsh: "f5f78e20-f80b-419d-9bd3-3cc41c2ecd00"
+
+  notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
+  notifyApplicantForNotAgreedSignSettlement: "b775583b-7964-41f8-8b3b-d767557cffb2"
+
+  notifyApplicantLipForSignedSettlementAgreementInBilingual: "cac93c5f-599d-417b-af0c-74a249bd2681"
+  notifyApplicantLipForNotAgreedSignSettlementInBilingual: "da141be5-ba22-43c1-8fe3-ba36cc3fbb47"
+
+  notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
+  notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
+
+  notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
+  noticeOfChangeApplicantLipSolicitorTemplate: "1acd4a91-15dd-4a69-a869-acbc5a623cf7"
+  notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
+  notifyClaimantLipForNoLongerAccessWelshTemplate: "4186a193-3135-41dc-b4d3-a0f31911e46f"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
+  notifyClaimantLipForClaimSubmissionTemplate: "16bb1a39-96f8-4091-8d11-8375a2cc5905"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "f2080ac4-2585-47fd-ac18-5f94148adc07"
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "1f6006bb-6726-48c4-ac5f-a456d043f1b7"
+  bilingualClaimantClaimContinuingOnlineForSpec: "461b4ce6-3783-409d-be47-ea1230170833"
+
+  notifyApplicantForHwfNoRemission: "3008a18a-07ec-445b-a226-62ffa19132ce"
+  notifyApplicantForHwfNoRemissionWelsh: "f9d2f0db-2ae4-4691-8076-bfbb82548846"
+  notifyApplicantForHwFMoreInformationNeeded: "02956398-fffb-4461-93a0-3713788363a8"
+  notifyApplicantForHwFMoreInformationNeededWelsh: "65b3524b-b58c-4cdb-b8b5-5fc2cec505a5"
+  notifyApplicantForHwfUpdateRefNumber: "7f87e629-6473-4732-8d80-4174d06696d5"
+  notifyApplicantForHwfUpdateRefNumberBilingual: "a7c206b5-8a27-4419-83ff-61351cbc69fb"
+  notifyApplicantForHwfPartialRemission: "2c5c5cae-f1b1-41b5-afe5-0ce2e68f8d3c"
+  notifyApplicantForHwfPartialRemissionBilingual: "5bbd4518-5501-4737-8a1e-a6adacd5e679"
+  notifyApplicantForHwfInvalidRefNumber: "8d7cb08f-96ae-4469-944d-c92650f45fb6"
+  notifyApplicantForHwfInvalidRefNumberBilingual: "8950e206-6d15-4575-9d99-734908389fa7"
+  notifyApplicantForHwfFeePaymentOutcome: "0abdcb29-edd3-418a-aeab-a102da4ad441"
+  notifyApplicantForHwfFeePaymentOutcomeInBilingual: "ca84e76e-f178-4c63-9eca-96b491cc538c"
+
+  notifyDefendantLRForMediation: "e231e271-93b9-49e8-99d3-5b3ceac4b3af"
+  notifyApplicantLRMediationTemplate: "774f34ff-eb67-4e6c-a9fe-19719890894c"
+
+  notifyClaimantJudgmentVariedDeterminationOfMeansTemplate: "d3779d98-d08f-434d-8670-b814b0b18f6c"
+  notifyDefendantJudgmentVariedDeterminationOfMeansTemplate: "8627ff01-fa16-4dbf-88c1-2c3f4967eea2"
+
+  notifyLipSuccessfulMediation: "ed3810ae-3c12-4cc1-bc3f-8aff560fa6b2"
+  notifyLipSuccessfulMediationWelsh: "806d08f3-a1e8-48ed-877f-af98f05183ca"
+  notifyOneVTwoClaimantSuccessfulMediation: "9e1ce84e-fecc-4c10-956a-badbe697a832"
+  notifyLrClaimantSuccessfulMediation:  "ffa06628-9648-41d2-8599-712e11212728"
+  notifyTwoVOneDefendantSuccessfulMediation: "dbb1a890-618b-4d00-8eaa-6cb185553372"
+  notifyLrDefendantSuccessfulMediation: "c2d79828-38bc-43ab-aff1-491d697dd28e"
+  notifyLrDefendantSuccessfulMediationForLipVLrClaim: "1bdeafc1-ac20-46e8-857e-6f6ff35a12aa"
+
+  notifyLrRecordJudgmentDeterminationMeansTemplate: "a0c83c52-8d82-40e2-8483-f61044497175"
+  notifyClaimantLipForDefendantRepresentedTemplate: "54e7d60b-6319-4852-a9e2-711478401eb5"
+  notifyDefendantLipForNoLongerAccessTemplate: "e9c3426a-7888-420f-816e-c74217264111"
+  notifyDefendantLrAfterNoticeOfChangeTemplate: "323c0bc9-5c7f-4099-8e2e-7cd2741d764e"
+  notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
+  notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
+  notifyNewDefendantSolicitorNOC: "b6eebb9d-ee0c-4ae4-88bf-49bd98be3f5f"
+
+  notifyDJNonDivergentSpecClaimantTemplate: "350cf089-f524-48e4-982e-c260d815ece5"
+  notifyDJNonDivergentSpecDefendantTemplate: "7aa3a346-20d2-44aa-bd16-c03a7acf1830"
+  hearingNotificationLipDefendantTemplateWelsh: "b70a2965-2a98-43e0-b484-0d28cd99e787"
+  notifySettleClaimMarkedPaidInFullDefendantTemplate: "7e606574-ce40-4b76-ae9b-0dc86a9ce112"
+  orderBeingTranslatedTemplateWelsh: "8349f32b-7635-41ce-a887-02e65d85df00"
+
+  notifyClaimantLRJudgmentByAdmissionTemplate: "92a0b5aa-00a2-4167-abfe-a9354cd40544"
+  notifyDefendantLIPJudgmentByAdmissionTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyLiPOrderTranslatedTemplate: "d81749f7-cef5-4159-8d99-146eb572a690"
+  notifyClaimDiscontinuedLRTemplate: "4833e47a-36b6-46a9-9b23-6b2bd92fdf88"
+  notifyClaimDiscontinuedLipTemplate: "7081688e-9736-4fc5-8f0b-b69c43fa659c"
+
+  notifyClaimantLrValidationDiscontinuanceFailureTemplate: "717f67da-5a0d-491d-80d4-d13a5d855efd"
+
+  notifyLRBundleRestitched: "b7eb7e1a-a66c-44b4-8cee-b4ab94ca0830"
+  notifyLRCaseStayed: "660fc639-774c-4211-acdf-f2cb87fad8c2"
+  notifyLRCaseDismissed: "68694cf5-efa3-4335-8a3a-6d88a74f2d2c"
+  notifyLRStayLifted: "1714328f-4add-4e3c-ab97-b505bbf3ddf6"
+  notifyLRStayUpdateRequested: "c2ed99e9-5f11-490e-bfe7-e3115bfe9250"
+  notifyLipStayUpdateRequested: "a08532c7-67f5-4c4f-a30d-81c4c0508ffc"
+  notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
+  notifyClaimantLRCoscApplied: "392cc0d5-51b3-4a82-8576-922424775617"
+
+  queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
+  queryRaisedLip: "88ddf39b-2ad8-41f1-b862-a55f6b4ddab0"
+  queryRaisedLipBilingual: "27e8d6c1-f0a0-46b0-8cd6-b7b18c825294"
+  queryResponseReceived: "4e74a2ab-376f-47e1-9670-8f97648a13a4"
+  notifyOtherPartyQueryRaised: "a911957b-fca1-402b-acc5-6502e6de93a6"
+  notifyOtherPartyQueryResponseReceived: "a27a4110-9de9-4147-8c89-85c2af2a8d30"
+  queryLipResponseReceivedEnglish: "b097eb54-3e00-4272-9b77-426b23a71ce1"
+  queryLipResponseReceivedWelsh: "d1ff72f3-db0e-44c9-83e9-5c6a43681d69"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
@@ -322,6 +496,10 @@ stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
   enabled: ${STITCHING_API_ENABLED:true}
+
+case-flags:
+  logging:
+    enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
 
 bundle:
   api:
@@ -339,6 +517,9 @@ court-location:
   unspecified-claim:
     region-id: "4"
     epimms-id: "192280"
+
+role-initialisation:
+  enabled: ${ASSIGN_ROLES_ON_STARTUP:false}
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
@@ -364,12 +545,55 @@ azure:
       username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
       enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+    ccd-events-topic:
+      connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING:dummy}
+      topic-name: ${CCD_EVENTS_TOPIC_NAME:ccd-case-events-aat}
+      civil-ccd-events-subscription-name: ${CCD_EVENTS_SUBSCRIPTION_NAME:civil-ccd-case-events-sub-aat}
+      retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:60}
+      threads: ${CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS:1}
+      enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED:false}
+    application-insights:
+      instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
+
+appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:dummy}
 
 async:
   handler:
     corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:7}
     maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:42}
     queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:10}
+
+feign:
+  client:
+    config:
+      processInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      historicProcessInstance:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      processDefinition:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      message:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      incident:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      externalTask:
+        url: ${CAMUNDA_URL:http://localhost:9404/engine-rest/}
+      idam-api:
+        loggerLevel: full
+      core-case-data-api:
+        loggerLevel: full
+      document-management-metadata-download-api:
+        loggerLevel: full
+
+docStore:
+  doc:
+    removal:
+      enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
+
+logging:
+  level:
+    uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter: ERROR
+
 ---
 
 spring:
@@ -383,24 +607,9 @@ spring:
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
 
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://localhost:9404/engine-rest/
-      remoteRepositoryService:
-        url: http://localhost:9404/engine-rest/
-      remoteExternalTaskService:
-        url: http://localhost:9404/engine-rest/
-      idam-api:
-        loggerLevel: full
-      core-case-data-api:
-        loggerLevel: full
-      document-management-metadata-download-api:
-        loggerLevel: full
 fees:
   api:
-    url: http://localhost:8765
+    url: ${FEES_API_URL:http://localhost:8765}
 
 genApp:
   lrd:
@@ -410,39 +619,40 @@ genApp:
 
 payments:
   api:
-    url: http://localhost:8765
+    url: ${FEES_API_URL:http://localhost:8765}
 
 serviceRequest:
   api:
-    callback-url : http://localhost:4000/service-request-update
+    callback-url : ${SERVICE_REQUEST_UPDATE:http://localhost:4000/service-request-update}
     site_id : AAA7
     service : CIVIL
 
 serviceRequestClaimIssued:
   api:
-    callback-url: http://localhost:4000/service-request-update-claim-issued
+    callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:http://localhost:4000/service-request-update-claim-issued}
     site_id: AAA7
     service: CIVIL
 
 idam:
   web:
-    url: http://localhost:9002
+    url: ${IDAM_WEB_URL:http://localhost:9002}
   api:
-    url: http://localhost:5000
+    url: ${IDAM_API_URL:http://localhost:5000}
   s2s-auth:
-    url: http://localhost:4502
-    totp_secret: AABBCCDDEEFFGGHH
+    url: ${IDAM_S2S_AUTH_URL:http://localhost:4502}
+    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
   client:
-    id: civil
-    redirect_uri: https://localhost:9000/oauth2/callback
-    secret: OOOOOOOOOOOOOOOO
+    id: civil-service
+    redirect_uri: https://localhost:3000/oauth2/callback
+    secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
 
 document_management:
-  url: http://localhost:3453
+  url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:3453}
 
 docmosis:
   tornado:
-    url: http://localhost:5433
+    url: ${DOCMOSIS_TORNADO_URL:http://localhost:8080}
+    key: ${DOCMOSIS_TORNADO_KEY:fake-key}
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -456,11 +666,11 @@ testing:
 
 rd_professional:
   api:
-    url: http://localhost:8765
+    url: ${RD_PROFESSIONAL_API_URL:http://localhost:8765}
 
 rd_commondata:
   api:
-    url: http://localhost:8765
+    url: ${RD_COMMONDATA_API_URL:http://localhost:8765}
 
 robotics:
   notification:
@@ -479,6 +689,7 @@ mediation:
   emails:
     sender: hmcts.civil@gmail.com
     recipient: civilmoneyclaimsdemo@gmail.com
+    jsonRecipient: civilmoneyclaimsdemo@gmail.com
 
 
 ---
@@ -487,6 +698,29 @@ spring:
   config:
     activate:
       on-profile: integration-test
+  datasource:
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:15://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:15://localhost/cmc
+    hikari:
+      minimum-idle: 1
+      connectionTimeout: 10000
+      idleTimeout: 30000
+      maxLifetime: 60000
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      naming:
+        physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    placeholder-replacement: false
 
   main:
     lazy-initialization: true
@@ -495,57 +729,55 @@ management:
   endpoints:
     enabled-by-default: false
 
+cmc-claim-store:
+  api:
+    url: http://localhost:8765
+
 fees:
   api:
-    url: http://fake-fees-register-api
+    url: ${FEES_API_URL:http://localhost:6661}
 
 genApp:
   lrd:
-    url: http://fake-rd-location-ref-api
+    url: ${GENAPP_LRD_URL:http://fake-rd-location-ref-api}
   jrd:
-    url: http://fake-rd-judicial-api
+    url: ${GENAPP_JRD_URL:http://fake-rd-judicial-api}
+
+bundle:
+  api:
+    url: http://localhost:8084
 
 payments:
   api:
-    url: http://fake-payment-register-api
+    url: ${PAYMENTS_API_URL:http://localhost:8765}
 
 idam:
   web:
-    url: http://fake-idam-web
+    url: ${IDAM_WEB_URL:http://fake-idam-web}
   api:
-    url: http://fake-idam-api
+    url: ${IDAM_API_URL:http://fake-idam-api}
   s2s-auth:
-    url: http://fake-service-auth-provider-api
-    totp_secret: AABBCCDDEEFFGGHH
+    url: ${IDAM_S2S_AUTH_URL:http://fake-service-auth-provider-api}
+    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
 
 core_case_data:
   api:
-    url: http://fake-ccd-data-store-api
+    url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
 
 reference:
   database:
     enabled: false
 
 document_management:
-  url: http://fake-document-management-api
+  url: ${DOCUMENT_MANAGEMENT_URL:http://fake-document-management-api}
 
 docmosis:
   tornado:
-    url: http://fake-docmosis-api
-    key: fake-key
-
-feign:
-  client:
-    config:
-      remoteRuntimeService:
-        url: http://fake/engine-rest/
-      remoteRepositoryService:
-        url: http://fake/engine-rest/
-      remoteExternalTaskService:
-        url: http://fake/engine-rest/
+    url: ${DOCMOSIS_TORNADO_URL:http://localhost:6660}
+    key: ${DOCMOSIS_TORNADO_KEY:fake-key}
 
 notifications:
-  govNotifyApiKey: some-gov-uk-notify-api-key
+  govNotifyApiKey: ${GOV_NOTIFY_API_KEY:some-gov-uk-notify-api-key}
 
 testing:
   support:
@@ -553,14 +785,14 @@ testing:
 
 rd_professional:
   api:
-    url: http://fake-prd-api
+    url: ${RD_PROFESSIONAL_API_URL:http://fake-prd-api}
 
 rd_commondata:
   api:
-    url: http://fake-prd-api
+    url: ${RD_COMMONDATA_API_URL:http://fake-prd-api}
 
 sendgrid:
-  api-key: fake-key
+  api-key: ${SENDGRID_API_KEY:fake-key}
 ---
 
 spring:
@@ -570,6 +802,21 @@ spring:
 
 idam:
   web:
-    url: http://ccd-test-stubs-service:5555
+    url: ${IDAM_WEB_URL:http://localhost:9002}
   api:
-    url: http://ccd-test-stubs-service:5555
+    url: ${IDAM_API_URL:http://ccd-test-stubs-service:5555}
+  s2s-auth:
+    url: ${IDAM_S2S_AUTH_URL:http://localhost:4502}
+    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
+  client:
+    id: civil-service
+    redirect_uri: https://localhost:3000/oauth2/callback
+    secret: ${CIVIL_CLIENT_SECRET:OOOOOOOOOOOOOOOO}
+
+caseFlags:
+  logging:
+    enabled: ${CASE_FLAGS_LOGGING_ENABLED:false}
+---
+
+court_location_dmn:
+  enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}

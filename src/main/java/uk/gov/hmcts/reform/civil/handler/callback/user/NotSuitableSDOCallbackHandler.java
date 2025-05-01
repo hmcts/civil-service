@@ -11,12 +11,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -37,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NotSuitable_SDO);
-    public static final String NotSuitableSDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
+    public static final String NOT_SUITABLE_SDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
         + "a notification will be sent to the listing officer to look at this case offline."
         + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
@@ -73,10 +74,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         if (toggleService.isTransferOnlineCaseEnabled()) {
             if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
-                TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
-                    .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
+                TransferCaseDetails transferCaseDetails = TransferCaseDetails.builder()
+                    .reasonForTransferCaseTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                     .build();
-                dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
+                dataBuilder.transferCaseDetails(transferCaseDetails).build();
             } else {
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
                 tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
@@ -91,19 +92,28 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateNotSuitableReason(CallbackParams callbackParams) {
-        final int lengthAllowed = 150;
+        final int lengthAllowed = 4000;
         List<String> errors = new ArrayList<>();
         String reason;
+
+        if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION
+            && callbackParams.getCaseData().getCcdState() == CaseState.CASE_PROGRESSION) {
+            errors.add(
+                "Unable to process this request. To transfer the case to another court you need to issue a General Order.");
+        }
+
         if (isTransferOnlineCase(callbackParams.getCaseData())) {
-            reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
+            reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
         }
+
         if (reason.length() > lengthAllowed) {
             errors.add("Character Limit Reached: "
-                + "Reason for not drawing Standard Directions order cannot exceed "
-                + lengthAllowed + " characters.");
+                           + "Reason for not drawing Standard Directions order cannot exceed "
+                           + lengthAllowed + " characters.");
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -150,15 +160,12 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        return format(NotSuitableSDO_CONFIRMATION_BODY);
+        return format(NOT_SUITABLE_SDO_CONFIRMATION_BODY);
     }
 
     private boolean isTransferOnlineCase(CaseData caseData) {
-        if (toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
-            return true;
-        } else {
-            return false;
-        }
+        return toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions()
+            == NotSuitableSdoOptions.CHANGE_LOCATION;
     }
 
     private String getHeaderTOC(CaseData caseData) {

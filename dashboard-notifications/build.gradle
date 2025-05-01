@@ -1,0 +1,59 @@
+
+def versions = [
+  junit              : '5.11.4',
+  junitPlatform      : '1.11.4',
+  testcontainers: '1.17.6',
+  lombok             : '1.18.26'
+]
+
+ext.libraries = [
+  junit5: [
+    "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
+    "org.junit.platform:junit-platform-commons:${versions.junitPlatform}",
+    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
+  ]
+]
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.6.15.Final'
+  implementation group: 'org.hibernate', name: 'hibernate-validator', version: '7.0.5.Final'
+  implementation group: 'javax.persistence', name: 'javax.persistence-api', version: 2.2
+  implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
+  implementation 'javax.validation:validation-api:2.0.1.Final'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.7.18'
+  implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.21.1'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
+  implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.29'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
+
+  runtimeOnly 'org.postgresql:postgresql:42.7.5'
+  compileOnly 'org.projectlombok:lombok'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  annotationProcessor 'org.projectlombok:lombok'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
+  testImplementation libraries.junit5
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+}
+bootJar.enabled = false
+group = 'uk.gov.hmcts.reform.dashboard'
+version = '0.0.1'
+
+repositories {
+  mavenCentral()
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
+
+test {
+  failFast = true
+}

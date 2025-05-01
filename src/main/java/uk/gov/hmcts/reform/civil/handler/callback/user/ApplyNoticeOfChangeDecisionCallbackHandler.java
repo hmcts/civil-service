@@ -21,8 +21,8 @@ import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,16 +30,20 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
 
 @Service
 @RequiredArgsConstructor
 public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(APPLY_NOC_DECISION);
+    private static final List<CaseEvent> EVENTS =
+        List.of(APPLY_NOC_DECISION, APPLY_NOC_DECISION_LIP);
 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     private static final String CHANGE_ORGANISATION_REQUEST = "changeOrganisationRequestField";
     private static final String ORG_ID_FOR_AUTO_APPROVAL =
@@ -57,6 +61,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData preDecisionCaseData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String caseRole = callbackParams.getCaseData().getChangeOrganisationRequestField().getCaseRoleId().getValue().getCode();
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
 
@@ -69,15 +74,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         CaseData postDecisionCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = postDecisionCaseData.toBuilder();
 
+        setAddLegalRepDeadlinesToNull(updatedCaseDataBuilder, caseRole);
+
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
             updatedCaseDataBuilder,
             preDecisionCaseData.getChangeOrganisationRequestField()
         );
 
         updatedCaseDataBuilder
-            .businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
+            .businessProcess(BusinessProcess.ready(getBusinessProcessEvent(postDecisionCaseData, caseRole)))
             .changeOfRepresentation(getChangeOfRepresentation(
-                    callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
+                callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
@@ -191,8 +198,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         return null;
     }
 
+    private void setAddLegalRepDeadlinesToNull(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, String caseRole) {
+        if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            updatedCaseDataBuilder.addLegalRepDeadlineRes1(null);
+        } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
+            updatedCaseDataBuilder.addLegalRepDeadlineRes2(null);
+        }
+    }
+
     private String getFormerEmail(String caseRole, CaseData caseData) {
-        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+            && caseData.getApplicantSolicitor1UserDetails() != null) {
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
             return caseData.getRespondentSolicitor1EmailAddress();
@@ -204,6 +220,18 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private boolean isApplicant(String caseRole) {
         return caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+    }
+
+    private CaseEvent getBusinessProcessEvent(CaseData postDecisionCaseData, String caseRole) {
+        if (isApplicant(caseRole)
+            && postDecisionCaseData.isApplicantLiP()) {
+            return APPLY_NOC_DECISION_LIP;
+        } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)
+            && postDecisionCaseData.isRespondent1LiP()
+            && featureToggleService.isLipVLipEnabled()) {
+            return APPLY_NOC_DECISION_DEFENDANT_LIP;
+        }
+        return APPLY_NOC_DECISION;
     }
 
     @Override

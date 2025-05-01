@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilderSpec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,12 +43,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    StateFlowEngine.class
-})
+    SimpleStateFlowEngine.class,
+    SimpleStateFlowBuilder.class,
+    TransitionsTestConfiguration.class})
 class StateFlowEngineSpecTest {
 
     @Autowired
-    private StateFlowEngine stateFlowEngine;
+    private IStateFlowEngine stateFlowEngine;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -55,8 +57,6 @@ class StateFlowEngineSpecTest {
     @BeforeEach
     void setup() {
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
-        given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
-        given(featureToggleService.isNoticeOfChangeEnabled()).willReturn(false);
     }
 
     static Stream<Arguments> caseDataStream() {
@@ -198,12 +198,9 @@ class StateFlowEngineSpecTest {
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-        // Then Claim will have NOTICE_OF_CHANGE, GENERAL_APPLICATION_ENABLED, CERTIFICATE_OF_SERVICE and RPA_CONTINUOUS_FEED
+        // Then Claim will have GENERAL_APPLICATION_ENABLED and RPA_CONTINUOUS_FEED
         assertThat(stateFlow.getFlags()).contains(
-            entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-            entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-        );
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
     }
 
     @ParameterizedTest(name = "{index}: The state flow flag ONE_RESPONDENT_REPRESENTATIVE is set to true (for appropriate cases)")
@@ -216,7 +213,7 @@ class StateFlowEngineSpecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(5);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(11);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and " +
@@ -231,7 +228,7 @@ class StateFlowEngineSpecTest {
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(6);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(12);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
@@ -239,12 +236,8 @@ class StateFlowEngineSpecTest {
 
     static Stream<Arguments> commonFlagNames() {
         return Stream.of(
-            arguments(FlowFlag.NOTICE_OF_CHANGE.name(), (StubbingFn)(featureToggleService)
-                -> when(featureToggleService.isNoticeOfChangeEnabled())),
             arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), (StubbingFn)(featureToggleService)
-                -> when(featureToggleService.isGeneralApplicationsEnabled())),
-            arguments(FlowFlag.CERTIFICATE_OF_SERVICE.name(), (StubbingFn)(featureToggleService)
-                -> when(featureToggleService.isCertificateOfServiceEnabled()))
+                -> when(featureToggleService.isGeneralApplicationsEnabled()))
         );
     }
 
@@ -432,7 +425,7 @@ class StateFlowEngineSpecTest {
     // Specified 1V2 both unrepresented with state transition from PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
     // TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT
     @Test()
-    void shouldGoOffline_1v2_whenBothUnrepresented() {
+    void shouldNotGoOffline_1v2_whenBothUnrepresented() {
         //Given
         CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineUnrepresentedDefendantSameSolicitor()
             .build();

@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API_HMC;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Slf4j
@@ -45,6 +48,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
     private final HearingFeesService hearingFeesService;
+    private final HearingNoticeCamundaService camundaService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -69,14 +73,18 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         if (isEvent(callbackParams, CREATE_SERVICE_REQUEST_API_HMC)) {
+            String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
+            HearingNoticeVariables camundaVars = camundaService.getProcessVariables(processInstanceId);
+            boolean requiresHearingFee = hearingFeeRequired(camundaVars.getHearingType());
+
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails())) {
+            if (isServiceRequestNotRequested(caseData.getHearingFeePBADetails()) && requiresHearingFee) {
                 try {
                     SRPbaDetails.SRPbaDetailsBuilder paymentDetails = prepareCommonPaymentDetails(caseData, authToken)
                         .fee(calculateAndApplyFee(
                             hearingFeesService,
                             caseData,
-                            caseData.getAllocatedTrack()));
+                            caseData.getAssignedTrack()));
                     caseDataBuilder.hearingFeePBADetails(paymentDetails.build());
                 } catch (FeignException e) {
                     log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",

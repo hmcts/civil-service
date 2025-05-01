@@ -23,15 +23,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -54,9 +51,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     @MockBean
-    private IdamClient idamClient;
-
-    @MockBean
     private FeatureToggleService toggleService;
 
     @Autowired
@@ -77,9 +71,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_START);
             String userId = UUID.randomUUID().toString();
-
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(LocalDateTime.now());
 
@@ -122,7 +113,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateReasonMoreThan150_whenInvokedA() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             final String PAGE_ID = "not-suitable-reason";
-            final int lengthALlowed = 150;
+            final int lengthALlowed = 4000;
 
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawnOverLimit().build();
             params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -153,7 +144,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldValidateReasonMoreThan150_whenInvokedAndTOCEnabledOtherReasons() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
-            final int lengthALlowed = 150;
+            final int lengthALlowed = 4000;
 
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawnOverLimit().build();
             params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -167,7 +158,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldValidateTOCReason_whenInvokedAndTOCEnabledTransferCase() {
+        void shouldValidateTOCReasonLessThan150_whenInvokedAndTOCEnabledTransferCase() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
 
@@ -177,6 +168,23 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+
+        }
+
+        @Test
+        void shouldValidateTOCReasonMoreThan150_whenInvokedAndTOCEnabledTransferCase() {
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
+            final String PAGE_ID = "not-suitable-reason";
+            final int lengthALlowed = 4000;
+
+            caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawnOverLimit().build();
+            params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().get(0)).isEqualTo("Character Limit Reached: "
+                                                                  + "Reason for not drawing Standard Directions order cannot exceed "
+                                                                  + lengthALlowed + " characters.");
 
         }
     }
@@ -191,8 +199,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             String userId = UUID.randomUUID().toString();
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(LocalDateTime.now());
 
@@ -258,10 +264,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .isNull();
-
+            assertThat(response.getData()).doesNotContainKey("businessProcess");
         }
 
         @Test
@@ -273,8 +276,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("notSuitableSdoOptions").isEqualTo("CHANGE_LOCATION");
             assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
-            assertThat(response.getData()).extracting("tocTransferCaseReason").extracting("reasonForCaseTransferJudgeTxt").isEqualTo("unforeseen complexities");
-
+            assertThat(response.getData()).extracting("transferCaseDetails").extracting("reasonForTransferCaseTxt").isEqualTo("unforeseen complexities");
         }
     }
 

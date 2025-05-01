@@ -1,47 +1,57 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.invocation.InvocationOnMock;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypesLR;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationTypeLR;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
-import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +64,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
@@ -64,52 +77,56 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_DATE_RANGE_MISSING;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_CANNOT_BE_IN_PAST;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_REQUIRED;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.InitiateGeneralApplicationHandler.NOT_ALLOWED_SETTLE_DISCONTINUE;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_SETTLE_BY_CONSENT;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceConstants.INVALID_UNAVAILABILITY_RANGE;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.INVALID_TRIAL_DATE_RANGE;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.TRIAL_DATE_FROM_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.UNAVAILABLE_DATE_RANGE_MISSING;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.UNAVAILABLE_FROM_MUST_BE_PROVIDED;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.URGENCY_DATE_CANNOT_BE_IN_PAST;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.URGENCY_DATE_REQUIRED;
+import static uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator.URGENCY_DATE_SHOULD_NOT_BE_PROVIDED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    InitiateGeneralApplicationHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private InitiateGeneralApplicationHandler handler;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @Mock
     private InitiateGeneralApplicationService initiateGeneralAppService;
 
-    @MockBean
-    private InitiateGeneralApplicationServiceHelper helper;
+    @Mock
+    private GeneralApplicationValidator generalApplicationValidator;
 
-    @MockBean
-    private OrganisationService organisationService;
-
-    @MockBean
-    protected IdamClient idamClient;
-
-    @MockBean
+    @Mock
     protected GeneralAppFeesService feesService;
 
-    @MockBean
-    protected LocationRefDataService locationRefDataService;
+    @Mock
+    protected LocationReferenceDataService locationRefDataService;
+
+    @Mock
+    private UserService theUserService;
+
+    @Mock
+    private WorkingDayIndicator workingDayIndicator;
+
+    @Mock
+    protected UserRoleCaching userRoleCaching;
+
+    @Mock
+    protected FeatureToggleService featureToggleService;
+
+    @Mock
+    protected CoreCaseUserService coreCaseUserService;
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
-    public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private final BigDecimal fee108 = new BigDecimal("10800");
@@ -117,6 +134,388 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        handler = new InitiateGeneralApplicationHandler(initiateGeneralAppService, generalApplicationValidator, objectMapper, theUserService,
+                                                        feesService, locationRefDataService,
+                                                        featureToggleService, coreCaseUserService);
+    }
+
+    @Test
+    void shouldThrowError_whenDiscontinuedQMOnNoPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_DISCONTINUED)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors()).containsOnly(NOT_ALLOWED_SETTLE_DISCONTINUE);
+    }
+
+    @Test
+    void shouldThrowError_whenSettledQMOnNoPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_SETTLED)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors()).containsOnly(NOT_ALLOWED_SETTLE_DISCONTINUE);
+    }
+
+    @Test
+    void shouldNotThrowError_whenSettledQMOnPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_SETTLED)
+            .previousCCDState(CaseState.JUDICIAL_REFERRAL)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenDiscontinuedQMOnPreviousCcdState() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_DISCONTINUED)
+            .previousCCDState(CaseState.JUDICIAL_REFERRAL)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowError_whenLRVsLiP() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLipVsLrAndDefendantLiPIsBilingual() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLipVsLrAndDefendantLiPIsBilingualForCosc() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION_COSC.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldThrowError_whenLipVsLrAndClaimantLiPIsBilingual() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .claimantBilingualLanguagePreference(Language.BOTH.toString())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLipVsLrAndClaimantLiPIsBilingualAndWelshGaToggleEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .claimantBilingualLanguagePreference(Language.BOTH.toString())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldThrowError_whenLRVsLiPCourtIsNotWhitelisted() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1LiP()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder()
+                        .baseLocation("45678")
+                        .region("4").build())
+                .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(false);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowError_whenLRVsLiPAndLipsNotEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowError_whenLRVsLiPAndLiPIsBilingual() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLRVsLiPAndLiPIsBilingualGaForWelshEnabled() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .defendantUserDetails(IdamUserDetails.builder().email("abc@defendant").build())
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(
+                RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowError_whenLipVsLrAndDefendantLiPIsNotAssigned() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(NO)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldThrowError_whenLRVsLiPAndLipsNotEnabledAndWhiteListed() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1LiP()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
+        given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenEpimsIdIsValidRegionPreSdoNationalRollout() {
+        // National rollout applies to all courts pre sdo
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .ccdState(AWAITING_APPLICANT_INTENTION)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldNotThrowError_whenEpimsIdIsValidRegionPostSdoNationalRollout() {
+        // National rollout applies to all courts  post sdo, except Birmingham
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .ccdState(CASE_PROGRESSION)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("45678")
+                                        .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+        given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getErrors()).isEmpty();
+    }
 
     @Nested
     class MidEventForUrgencyCheck extends LocationRefSampleDataBuilder {
@@ -127,7 +526,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotCauseAnyErrors_whenApplicationDetailsNotProvided() {
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -141,7 +539,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         true, null);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -156,13 +554,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         false, LocalDate.now());
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
             assertThat(response.getErrors()).contains(
-                    URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
+                URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
         }
 
         @Test
@@ -172,7 +570,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         true, LocalDate.now().minusDays(1));
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -187,7 +585,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         true, LocalDate.now());
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -201,7 +599,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                         false, null);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
-            when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateUrgencyDates(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -223,7 +621,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
-                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+                .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
 
@@ -237,9 +635,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsVaryJudgement() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
-                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+                .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
 
@@ -253,9 +651,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithVaryJudgement() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
-                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+                .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
 
@@ -265,7 +663,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
             assertThat(response.getErrors().size()).isEqualTo(1);
-            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary judgment"));
+            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary payment terms of judgment"));
         }
 
         @Test
@@ -273,7 +671,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT,
                     SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+                    .builder().ccdCaseReference(1234L).generalAppType(GAApplicationType.builder().types(types).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
 
@@ -296,9 +694,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowErrorsWhenHearingDateIsPast() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
+
             CaseData caseData = CaseDataBuilder
                 .builder()
+                .ccdCaseReference(1234L)
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
                                            .hearingScheduledDate(LocalDate.now().minusDays(3))
                                            .build())
@@ -315,13 +715,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenHearingDateIsPresent() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
 
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
                                            .hearingScheduledDate(LocalDate.now())
                                            .build())
+                .ccdCaseReference(1234L)
                 .generalAppType(GAApplicationType.builder().types(types).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_DATE);
@@ -333,10 +734,11 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenHearingDateIsFuture() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
 
             CaseData caseData = CaseDataBuilder
                 .builder()
+                .ccdCaseReference(1234L)
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
                                            .hearingScheduledDate(LocalDate.now().plusDays(4))
                                            .build())
@@ -360,16 +762,16 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
-                    .build().toBuilder()
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement
-                            .builder().hasAgreed(NO).build())
-                    .build();
+                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             assertThat(response.getErrors()).isEmpty();
         }
 
@@ -378,11 +780,56 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
-                    .build().toBuilder()
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement
-                            .builder().hasAgreed(YES).build())
-                    .build();
+                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(YES).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
+
+            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNotEmpty();
+            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT.getValue());
+        }
+
+        @Test
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentCoscEnabled() {
+
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.STRIKE_OUT, GeneralApplicationTypesLR.SUMMARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .build().toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .applicant1Represented(YES)
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
@@ -392,22 +839,56 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYesCoscEnabled() {
 
-            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
-                    .build().toBuilder()
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement
-                            .builder().hasAgreed(NO).build())
-                    .build();
+                .builder()
+                .ccdCaseReference(1234L)
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(YES).build())
+                .applicant1Represented(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNoCoscEnabled() {
+
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.SETTLE_BY_CONSENT);
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .ccdCaseReference(1234L)
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .build().toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement
+                                                   .builder().hasAgreed(NO).build())
+                .applicant1Represented(YES)
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_CONSENT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT);
+            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT.getValue());
         }
     }
 
@@ -420,7 +901,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrors_whenHearingDataIsNotPresent() {
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -433,7 +913,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     null, null, true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -446,7 +926,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), LocalDate.now().minusDays(1), true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -459,7 +939,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -471,7 +951,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), LocalDate.now().plusDays(1), true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -483,7 +963,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), LocalDate.now(), true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -495,7 +975,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, true, getValidUnavailableDateList());
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -508,7 +988,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, null);
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -526,7 +1006,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -544,12 +1024,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), true,
                     LocalDate.now(), null, true, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE);
+            assertThat(response.getErrors()).contains(INVALID_UNAVAILABILITY_RANGE.getValue());
         }
 
         @Test
@@ -557,7 +1037,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, null);
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -574,7 +1054,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -591,7 +1071,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -608,7 +1088,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = getTestCaseDataForHearingMidEvent(CaseDataBuilder.builder().build(), false,
                     null, null, false, wrapElements(range1));
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_PAGE);
-            when(initiateGeneralAppService.validateHearingScreen(any())).thenCallRealMethod();
+            when(generalApplicationValidator.validateHearingScreen(any())).thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -619,17 +1099,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventForSettingFeeAndPBA extends LocationRefSampleDataBuilder {
 
-        private final Organisation organisation = Organisation.builder()
-                .paymentAccount(List.of("12345", "98765"))
-                .build();
-
         @Test
         void shouldSetAddPbaNumbers_whenCalledAndOrgExistsInPrd() {
-            given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).atStateClaimDraft().build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -639,14 +1114,16 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotResultInErrors_whenCalledAndOrgDoesNotExistInPrd() {
-            given(organisationService.findOrganisation(any())).willReturn(Optional.empty());
             given(feesService.getFeeForGA(any()))
                     .willReturn(Fee.builder()
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
 
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccdCaseReference(1234L)
+                .atStateClaimDraft()
+                .build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -661,7 +1138,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -677,7 +1154,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee108)
                             .version(FEE_VERSION).build());
-
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                     CaseDataBuilder.builder().build(), true, false);
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
@@ -732,13 +1208,46 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
                             .version(FEE_VERSION).build());
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
-                    .builder().generalAppType(GAApplicationType.builder().types(types).build())
-                    .build()
-                    .toBuilder()
-                    .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                    .build();
+                .builder().generalAppType(GAApplicationType.builder().types(types).build())
+                .build()
+                .toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                .ccdCaseReference(1234L)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("27500");
+        }
+
+        @Test
+        void shouldSet275Fees_whenVaryApplicationIsUnConsentedCoscEnabled() {
+            //Add cosc tests
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee275)
+                                .version(FEE_VERSION).build());
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build())
+                .ccdCaseReference(1234L)
+                .build()
+                .toBuilder()
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                .applicant1Represented(YES)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -757,10 +1266,38 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
-            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.generalAppType(GAApplicationType.builder()
                                                .types(singletonList(VARY_ORDER))
                                                .build());
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+        }
+
+        @Test
+        void shouldSet14Fees_whenApplicationIsVaryOrderCoscEnabled() {
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee14)
+                                .build());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), false, false);
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER);
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
+            caseDataBuilder.applicant1Represented(YES);
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -778,11 +1315,37 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                 .calculatedAmountInPence(fee14).build());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
                 CaseDataBuilder.builder().build(), false, false);
-            CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             List<GeneralApplicationTypes> types = List.of(VARY_ORDER, STAY_THE_CLAIM);
             caseDataBuilder.generalAppType(GAApplicationType.builder()
                                                .types(types)
                                                .build());
+            CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(getPBADetails(response).getFee()).isNotNull();
+            assertThat(getPBADetails(response).getFee().getCalculatedAmountInPence()).isEqualTo("1400");
+        }
+
+        @Test
+        void shouldSet14Fees_whenApplicationIsVaryOrderWithMultipleTypesCoscEnabled() {
+            given(feesService.getFeeForGA(any()))
+                .willReturn(Fee.builder()
+                                .code(FEE_CODE)
+                                .calculatedAmountInPence(fee14).build());
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), false, false);
+
+            when(featureToggleService.isCoSCEnabled()).thenReturn(true);
+            when(theUserService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            List<GeneralApplicationTypesLR> typesLR = List.of(GeneralApplicationTypesLR.VARY_ORDER, GeneralApplicationTypesLR.STAY_THE_CLAIM);
+            caseDataBuilder.generalAppTypeLR(GAApplicationTypeLR.builder().types(typesLR).build());
+            caseDataBuilder.applicant1Represented(YES);
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, SET_FEES_AND_PBA);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -809,17 +1372,12 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseData(CaseData.builder().build());
 
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                       .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                       .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                                                          any(CaseData.class), any(UserDetails.class), anyString()))
                 .thenReturn(caseData);
-
-            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
-                                                                any(CaseData.class), any(UserDetails.class)))
-                .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -833,16 +1391,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                     .getTestCaseData(CaseData.builder().build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
+
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
                     any(CaseData.class), any(UserDetails.class), anyString()))
                     .thenReturn(getMockServiceData(caseData));
-
-            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
-                    any(CaseData.class), any(UserDetails.class)))
-                    .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -898,9 +1453,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetDynamicListWhenPreferredLocationValueIsNull() {
 
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().build());
+                .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().ccdCaseReference(1234L).build());
             when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                                                                         .email(APPLICANT_EMAIL_ID_CONSTANT)
                                                                         .build());
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
@@ -916,32 +1471,57 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldWithNotice_whenVaryApplicationIsUnConsented() {
+        void shouldWithNotice_whenVaryApplicationIsUnConsentedLiP() {
             GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
 
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build())
                     .build()
                     .toBuilder()
+                .ccdCaseReference(1234L)
                     .generalAppPBADetails(generalAppPBADetails)
                     .generalAppHearingDetails(GAHearingDetails.builder().build())
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .build();
-            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
                     .email(APPLICANT_EMAIL_ID_CONSTANT)
                     .build());
+
             when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
-                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer(new Answer() {
-                        public Object answer(InvocationOnMock invocation) {
-                            return invocation.getArguments()[1];
-                        }
-                    }
+                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
             );
 
-            when(helper.setRespondentDetailsIfPresent(any(CaseData.CaseDataBuilder.class), any(GeneralApplication.class),
-                    any(CaseData.class), any(UserDetails.class)))
-                    .thenReturn(GeneralApplicationDetailsBuilder.builder().getGeneralApplication());
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getErrors()).isNull();
+            assertThat(data.getGeneralAppInformOtherParty().getIsWithNotice()).isEqualTo(YES);
+        }
+
+        @Test
+        void shouldWithNotice_whenVaryApplicationIsUnConsentedLR() {
+            GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
+
+            List<GeneralApplicationTypesLR> types = List.of(GeneralApplicationTypesLR.VARY_PAYMENT_TERMS_OF_JUDGMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppTypeLR(GAApplicationTypeLR.builder().types(types).build())
+                .build()
+                .toBuilder()
+                .ccdCaseReference(1234L)
+                .generalAppPBADetails(generalAppPBADetails)
+                .generalAppHearingDetails(GAHearingDetails.builder().build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+                .build();
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                            .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                            .build());
+
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                    any(CaseData.class), any(UserDetails.class), anyString())).thenAnswer((Answer) invocation -> invocation.getArguments()[1]
+            );
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -963,56 +1543,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
-        }
-    }
-
-    @Nested
-    class AboutToStartCallbackHandling extends LocationRefSampleDataBuilder {
-        private static final String ERROR = "Application cannot be created until all the required respondent "
-                + "solicitor are assigned to the case.";
-
-        @Test
-        void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
-
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                              .courtName("Court Name").region("Region").build());
-            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            DynamicList dynamicList = getLocationDynamicList(data);
-
-            assertThat(response.getErrors()).isEmpty();
-            assertThat(data.getGeneralAppHearingDetails()).isNotNull();
-            assertThat(dynamicList).isNotNull();
-            assertThat(locationsFromDynamicList(dynamicList))
-                    .containsOnly("siteName - court Address - post code");
-        }
-
-        @Test
-        void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
-
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                              .courtName("Court Name").region("Region").build());
-            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(ERROR);
         }
     }
 }

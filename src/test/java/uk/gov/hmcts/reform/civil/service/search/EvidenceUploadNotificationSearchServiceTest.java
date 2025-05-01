@@ -4,6 +4,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -24,6 +25,8 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
                       .minimumShouldMatch(1)
                       .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
                       .should(boolQuery().must(matchQuery("state", "HEARING_READINESS")))
+                      .should(boolQuery().must(matchQuery("state", "DECISION_OUTCOME")))
+                      .should(boolQuery().must(matchQuery("state", "All_FINAL_ORDERS_ISSUED")))
                       .should(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))))
             .must(boolQuery()
                       .minimumShouldMatch(1)
@@ -33,5 +36,12 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
                           "now-1d"))
                       );
         return new Query(query, List.of("reference"), fromValue);
+    }
+
+    @Override
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
+        return null;
     }
 }

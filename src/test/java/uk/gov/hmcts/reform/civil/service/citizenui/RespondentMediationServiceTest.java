@@ -196,6 +196,7 @@ public class RespondentMediationServiceTest {
             .applicant1ProceedWithClaimSpec2v1(YES)
             .multiPartyClaimTwoApplicants()
             .defendantSingleResponseToBothClaimants(YES)
+            .setDefendantMediationFlag(YES)
             .build();
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
@@ -203,16 +204,65 @@ public class RespondentMediationServiceTest {
     }
 
     @Test
-    void shouldSetMediationRequired_whenIts1V2Claim() {
+    void shouldSetMediationRequired_whenIts1V2ClaimDefendant1AgreesToMediation() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .applicant1ProceedWithClaim(YES)
-            .defendantSingleResponseToBothClaimants(NO)
+            .respondent1(PartyBuilder.builder().individual().build())
             .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1ProceedWithClaim(YES)
+            .multiPartyClaimTwoDefendantSolicitors()
+            .setDefendantMediationFlag(YES)
+            .setDefendant2MediationFlag(NO)
             .build();
 
         DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
         assertThat(showConditionFlag).isEqualTo(DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO);
+    }
+
+    @Test
+    void shouldSetMediationRequired_whenIts1V2ClaimDefendant2AgreesToMediation() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1ProceedWithClaim(YES)
+            .multiPartyClaimTwoDefendantSolicitors()
+            .setDefendantMediationFlag(NO)
+            .setDefendant2MediationFlag(YES)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isEqualTo(DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO);
+    }
+
+    @Test
+    void shouldSetMediationRequired_whenIts1V2ClaimDefendant1and2AgreesToMediation() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1ProceedWithClaim(YES)
+            .multiPartyClaimTwoDefendantSolicitors()
+            .setDefendantMediationFlag(YES)
+            .setDefendant2MediationFlag(YES)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isEqualTo(DefendantResponseShowTag.CLAIMANT_MEDIATION_ONE_V_TWO);
+    }
+
+    @Test
+    void shouldSetMediationRequired_whenIts1V2ClaimDefendant1and2DoesNotAgreeToMediation() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .applicant1ProceedWithClaim(YES)
+            .multiPartyClaimTwoDefendantSolicitors()
+            .setDefendantMediationFlag(NO)
+            .setDefendant2MediationFlag(NO)
+            .build();
+
+        DefendantResponseShowTag showConditionFlag = respondentMediationService.setMediationRequired(caseData);
+        assertThat(showConditionFlag).isNull();
     }
 
     @Test

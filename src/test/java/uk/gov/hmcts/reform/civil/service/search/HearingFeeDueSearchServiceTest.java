@@ -2,15 +2,15 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
 
@@ -24,10 +24,21 @@ class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now()
-                                                                       .atTime(LocalTime.MIN)
-                                                                       .toString()))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))));
         return new Query(query, List.of("reference"), fromValue);
+    }
+
+    @Test
+    void testQuery() {
+        Query expectedQuery = buildQuery(0);
+        String queryString = expectedQuery.toString();
+        assertFalse(queryString.contains("data.hearingDueDate"));
+    }
+
+    @Override
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
+        return null;
     }
 }

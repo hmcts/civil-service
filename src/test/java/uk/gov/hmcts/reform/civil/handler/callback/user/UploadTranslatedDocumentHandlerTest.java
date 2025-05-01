@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentDefaultStrategy;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
@@ -19,44 +20,45 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    UploadTranslatedDocumentHandler.class,
-    UploadTranslatedDocumentStrategyFactory.class,
-    UploadTranslatedDocumentDefaultStrategy.class,
-    UploadTranslatedDocumentV1Strategy.class,
-    SystemGeneratedDocumentService.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
     private UploadTranslatedDocumentHandler handler;
 
-    @Autowired
-    private UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
-    @Autowired
-    private UploadTranslatedDocumentDefaultStrategy uploadTranslatedDocumentDefaultStrategy;
+    @Mock
+    private UploadTranslatedDocumentV1Strategy uploadTranslatedDocumentV1Strategy;
 
-    @Autowired
-    private SystemGeneratedDocumentService systemGeneratedDocumentService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
     private static final String FILE_NAME_1 = "Some file 1";
+
+    @BeforeEach
+    void setup() {
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        SystemGeneratedDocumentService systemGeneratedDocumentService = new SystemGeneratedDocumentService();
+        UploadTranslatedDocumentDefaultStrategy uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(
+            systemGeneratedDocumentService,
+            objectMapper,
+            featureToggleService
+        );
+        UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory = new UploadTranslatedDocumentStrategyFactory(
+            uploadTranslatedDocumentDefaultStrategy,
+            uploadTranslatedDocumentV1Strategy
+        );
+        handler = new UploadTranslatedDocumentHandler(uploadTranslatedDocumentStrategyFactory);
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -79,6 +81,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
                 .build()
                 .builder()
                 .systemGeneratedCaseDocuments(new ArrayList<>())
+                .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
                 .caseDataLiP(CaseDataLiP
                                  .builder()
                                  .translatedDocuments(translatedDocument)
@@ -88,7 +91,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(response.getData()).extracting("translatedDocument").isNull();
+            assertThat(response.getData()).doesNotHaveToString("translatedDocument");
         }
     }
 

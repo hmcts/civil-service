@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChildrenByAgeGroupLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
@@ -16,15 +17,19 @@ import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
+import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormPartyDefence;
+
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,21 +40,24 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
+
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SealedClaimLipResponseForm implements MappableObject {
 
     private final String claimReferenceNumber;
+    private final String ccdCaseReference;
     private final String claimantReferenceNumber;
     private final String defendantReferenceNumber;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate generationDate;
-    private final LipFormParty claimant1;
-    private final LipFormParty defendant1;
-    private final LipFormParty defendant2;
+    private final LipFormPartyDefence claimant1;
+    private final LipFormPartyDefence defendant1;
+    private final LipFormPartyDefence defendant2;
     private final AccommodationTemplate whereTheyLive;
     private final PartnerAndDependentsLRspec partnerAndDependent;
     private final List<EmployerDetailsLRspec> employerDetails;
@@ -61,6 +69,14 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<ReasonMoneyTemplateData> expenseList;
     //repayment details for repayment plan that are common between LR and LiP
     private final ResponseRepaymentDetailsForm commonDetails;
+
+    //CARM defendant Mediation Fields
+    private final String defendant1MediationContactNumber;
+    private final String defendant1MediationEmail;
+    private final String defendant1MediationCompanyName;
+    private final boolean defendant1MediationUnavailableDatesExists;
+    private final List<Element<UnavailableDate>> defendant1UnavailableDatesList;
+    private final boolean checkCarmToggle;
 
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())
@@ -76,13 +92,14 @@ public class SealedClaimLipResponseForm implements MappableObject {
     public static SealedClaimLipResponseForm toTemplate(final CaseData caseData) {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
+            .ccdCaseReference(formatCcdCaseReference(caseData))
             .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimant1(LipFormParty.toLipDefenceParty(caseData.getApplicant1()))
-            .defendant1(LipFormParty.toLipDefenceParty(
+            .claimant1(LipFormPartyDefence.toLipDefenceParty(caseData.getApplicant1()))
+            .defendant1(LipFormPartyDefence.toLipDefenceParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1CorrespondanceAddress()
             ))
-            .defendant2(LipFormParty.toLipDefenceParty(caseData.getRespondent2()))
+            .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
             .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
@@ -115,11 +132,13 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .ifPresent(selfEmployDetails ->
                            builder.selfEmployment(Respondent1SelfEmploymentLRspec.builder()
                                                       .amountOwed(selfEmployDetails.getAmountOwed() != null
-                                                                      ? MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAmountOwed())
+                                                                      ? (MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAmountOwed())).setScale(2, RoundingMode.CEILING)
                                                                       : null)
-                                                      .annualTurnover(MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAnnualTurnover()))
+                                                      .annualTurnover(selfEmployDetails.getAnnualTurnover() != null
+                                                                          ? (MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAnnualTurnover())).setScale(2, RoundingMode.CEILING)
+                                                          : null)
                                                       .jobTitle(selfEmployDetails.getJobTitle())
                                                       .reason(selfEmployDetails.getReason())
                                                       .build())
@@ -155,18 +174,17 @@ public class SealedClaimLipResponseForm implements MappableObject {
                 .map(list -> IntStream.range(0, list.size()).mapToObj(i -> new AccountSimpleTemplateData(
                     list.get(i),
                     i + 1
-                )).collect(Collectors.toList()))
+                )).toList())
                 .ifPresent(builder::bankAccountList);
             Optional.ofNullable(caseData.getRecurringIncomeForRespondent1())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
-                    .map(item -> ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                    .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).collect(Collectors.toList()))
                 .ifPresent(builder::incomeList);
             Optional.ofNullable(caseData.getRecurringExpensesForRespondent1())
                 .map(ElementUtils::unwrapElements)
                 .map(list -> list.stream()
-                    .map(item ->
-                             ReasonMoneyTemplateData.toReasonMoneyTemplateData(item)).collect(Collectors.toList()))
+                    .map(ReasonMoneyTemplateData::toReasonMoneyTemplateData).toList())
                 .ifPresent(builder::expenseList);
         }
     }

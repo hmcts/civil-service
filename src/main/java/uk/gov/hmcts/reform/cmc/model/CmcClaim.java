@@ -14,16 +14,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
 
 @Data
@@ -67,7 +70,7 @@ public class CmcClaim implements Claim {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime reDeterminationRequestedAt;
@@ -75,11 +78,13 @@ public class CmcClaim implements Claim {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    private LocalDate admissionPayImmediatelyPastPaymentDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate intentionToProceedDeadline;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime claimantRespondedAt;
+
     private ClaimantResponse claimantResponse;
     private ClaimState state;
     private ProceedOfflineReasonType proceedOfflineReason;
@@ -227,6 +232,41 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean hasClaimantSignedSettlementAgreement() {
+        return hasClaimantSignedSettlementAgreementOfferAccepted() || hasClaimantSignedSettlementAgreementChosenByCourt();
+    }
+
+    private boolean hasClaimantSignedSettlementAgreementOfferAccepted() {
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && isThroughAdmissions(settlement)
+            && Objects.nonNull(claimantResponse) && !claimantResponse.hasCourtDetermination();
+    }
+
+    private boolean hasClaimantSignedSettlementAgreementChosenByCourt() {
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant() && isThroughAdmissions(settlement)
+            && Objects.nonNull(claimantResponse) && claimantResponse.hasCourtDetermination();
+    }
+
+    @Override
+    public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && isThroughAdmissions(settlement)
+            && Objects.nonNull(claimantRespondedAt) && claimantRespondedAt.plusDays(7).isBefore(LocalDateTime.now());
+    }
+
+    @Override
+    public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
+        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled() && isThroughAdmissions(settlement);
+    }
+
+    @Override
+    public boolean hasDefendantRejectedSettlementAgreement() {
+        if (!Objects.nonNull(claimantResponse) || !ClaimantResponseType.ACCEPTATION.equals(claimantResponse.getType())) {
+            return false;
+        }
+        return claimantResponse.getFormaliseOption() == FormaliseOption.SETTLEMENT
+            && Objects.nonNull(settlement) && settlement.isOfferRejected();
+    }
+
+    @Override
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasResponse() && response.isPartAdmitPayImmediately()
@@ -255,11 +295,6 @@ public class CmcClaim implements Claim {
     @Override
     public boolean defendantRespondedWithPartAdmit() {
         return hasResponse() && response.isPartAdmit() && !hasClaimantResponse();
-    }
-
-    @Override
-    public boolean isHearingFormGenerated() {
-        return false;
     }
 
     @JsonIgnore
@@ -318,16 +353,6 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isBeforeHearing() {
-        return false;
-    }
-
-    @Override
-    public boolean isMoreDetailsRequired() {
-        return false;
-    }
-
-    @Override
     public boolean isMediationSuccessful() {
         return false;
     }
@@ -348,7 +373,32 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isSDOOrderCreated() {
+    public boolean isSDOOrderCreatedCP() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderCreatedPreCP() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderLegalAdviserCreated() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderInReview() {
+        return false;
+    }
+
+    @Override
+    public boolean isSDOOrderInReviewOtherParty() {
+        return false;
+    }
+
+    @Override
+    public boolean isDecisionForReconsiderationMade() {
         return false;
     }
 
@@ -393,5 +443,193 @@ public class CmcClaim implements Claim {
             && response.isPartAdmit()
             && Objects.nonNull(claimantResponse)
             && claimantResponse.getType().equals(ClaimantResponseType.REJECTION);
+    }
+
+    @Override
+    public boolean isClaimantDefaultJudgement() {
+        return false;
+    }
+
+    @Override
+    public boolean isPartialAdmissionAccepted() {
+
+        return hasResponse() && response.isPartAdmitPayImmediately()
+            && !response.getPaymentIntention().hasAlreadyPaid()
+            && claimantAcceptedDefendantResponse();
+    }
+
+    @Override
+    public boolean isPaymentPlanRejected() {
+
+        return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
+            && (response.getPaymentIntention() != null
+            && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments())));
+    }
+
+    @Override
+    public boolean isPaymentPlanRejectedRequestedJudgeDecision() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwFClaimSubmit() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfNoRemission() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfPartialRemission() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfUpdatedRefNumber() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfInvalidRefNumber() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfPaymentOutcome() {
+        return false;
+    }
+
+    @Override
+    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+        return false;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline() {
+        return false;
+    }
+
+    @Override
+    public boolean isWaitingForClaimantIntentDocUploadPostDefendantNocOnline() {
+        return false;
+    }
+
+    @Override
+    public boolean isClaimSubmittedNotPaidOrFailedNotHwF() {
+        return false;
+    }
+
+    @Override
+    public boolean isClaimSubmittedWaitingTranslatedDocuments() {
+        return false;
+    }
+
+    @Override
+    public boolean isNocForDefendant() {
+        return false;
+    }
+
+    private boolean isThroughAdmissions(Settlement settlement) {
+        List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
+        if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
+            return false;
+        }
+
+        //get the last offer
+        Collections.reverse(partyStatements);
+
+        return partyStatements.stream()
+            .filter(PartyStatement::hasOffer)
+            .findFirst()
+            .map(PartyStatement::getOffer)
+            .map(Offer::getPaymentIntention)
+            .isPresent();
+    }
+
+    @Override
+    public boolean isCaseStruckOut() {
+        return false;
+    }
+
+    @Override
+    public boolean isDefaultJudgementIssued() {
+        return false;
+    }
+
+    @Override
+    public boolean isCaseStayed() {
+        return false;
+    }
+
+    @Override
+    public boolean isHearingScheduled() {
+        return false;
+    }
+
+    @Override
+    public boolean isHearingLessThanDaysAway(int days) {
+        return false;
+    }
+
+    @Override
+    public boolean isAwaitingJudgment() {
+        return false;
+    }
+
+    @Override
+    public boolean trialArrangementsSubmitted() {
+        return false;
+    }
+
+    @Override
+    public boolean isOrderMade() {
+        return false;
+    }
+
+    @Override
+    public Optional<LocalDate> getHearingDate() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getTimeOfLastNonSDOOrder() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getBundleCreationDate() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<LocalDateTime> getWhenWasHearingScheduled() {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean isTrialArrangementStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isTrialScheduledNoPaymentStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isTrialScheduledPaymentPaidStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isBundleCreatedStatusActive() {
+        return false;
     }
 }

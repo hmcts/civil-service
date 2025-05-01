@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -43,6 +44,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     private final OrganisationService organisationService;
     private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -78,7 +80,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
@@ -88,12 +90,13 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
             );
         }
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             AGREED_EXTENSION_DATE, formatLocalDate(
-                caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE
-            )
+                caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         );
     }
 
@@ -106,7 +109,9 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
 
     private String getTemplate(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            return notificationsProperties.getClaimantLipDeadlineExtension();
+            return caseData.isClaimantBilingual() && featureToggleService.isDefendantNoCOnlineForCase(caseData)
+                ? notificationsProperties.getClaimantLipDeadlineExtensionWelsh()
+                : notificationsProperties.getClaimantLipDeadlineExtension();
         }
         return notificationsProperties.getClaimantDeadlineExtension();
     }

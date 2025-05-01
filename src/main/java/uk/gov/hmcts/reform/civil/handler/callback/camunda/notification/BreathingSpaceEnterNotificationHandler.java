@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.HashMap;
@@ -23,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
 @RequiredArgsConstructor
@@ -119,8 +120,9 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         HashMap<String, String> properties = new HashMap<>();
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
-        properties.put(PARTY_REFERENCES, PartyUtils.buildPartiesReferences(caseData));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         return properties;
     }
 }

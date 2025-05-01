@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -66,7 +66,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
     private final CoreCaseUserService coreCaseUserService;
-    private final StateFlowEngine stateFlowEngine;
+    private final IStateFlowEngine stateFlowEngine;
     private final UserService userService;
     private final FeatureToggleService toggleService;
     public static final String SPEC_ACKNOWLEDGEMENT_OF_SERVICE = "ACKNOWLEDGEMENT_OF_SERVICE";
@@ -100,7 +100,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         }
 
         if ((caseData.getNextDeadline() != null && caseData.getNextDeadline().isBefore(LocalDate.now()))
-            || (currentResponseDeadline != null && currentResponseDeadline.toLocalDate().isBefore(LocalDate.now()))) {
+            || (currentResponseDeadline != null && currentResponseDeadline.isBefore(LocalDateTime.now()))) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_DEADLINE_PAST))
                 .build();

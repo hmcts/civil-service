@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +10,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getDaysToAddToDeadline;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getDaysToAddToDeadlineSpec;
 
 @Service
@@ -55,21 +53,20 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
     }
 
-    public LocalDateTime calculateApplicantResponseDeadline(LocalDateTime responseDate, AllocatedTrack track) {
+    public LocalDateTime calculateApplicantResponseDeadline(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
-        int daysToAdd = getDaysToAddToDeadline(track);
-        return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
+        return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(28).atTime(END_OF_BUSINESS_DAY);
     }
 
-    public LocalDateTime calculateApplicantResponseDeadlineSpec(LocalDateTime responseDate, AllocatedTrack track) {
+    public LocalDateTime calculateApplicantResponseDeadlineSpec(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
-        int daysToAdd = getDaysToAddToDeadlineSpec(track);
+        int daysToAdd = getDaysToAddToDeadlineSpec();
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 
@@ -130,5 +127,15 @@ public class DeadlinesCalculator {
         int daysToAdd = 5;
         dateTime = dateTime.plusDays(daysToAdd);
         return dateTime.toLocalDate();
+    }
+
+    public LocalDateTime getRespondToSettlementAgreementDeadline(LocalDateTime fromDateTime) {
+        return plusWorkingDays(fromDateTime.toLocalDate(), 7).atTime(END_OF_BUSINESS_DAY);
+    }
+
+    public LocalDateTime getRespondentToImmediateSettlementAgreement(LocalDateTime responseDate) {
+        LocalDate fromDate = is4pmOrAfter(responseDate) ? responseDate.toLocalDate().plusDays(1)
+                : responseDate.toLocalDate();
+        return plusWorkingDays(fromDate, 5).atTime(END_OF_BUSINESS_DAY);
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -8,15 +9,17 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
+@Slf4j
 public class DocmosisTemplateDataUtils {
 
     public static final int CASE_NAME_LENGTH_TO_FIT_IN_DOCS = 37;
@@ -30,6 +33,7 @@ public class DocmosisTemplateDataUtils {
             ? caseName.replace(" vs ", " \nvs ")
             : caseName;
     };
+    public static final String DELIMITER = "-";
 
     private DocmosisTemplateDataUtils() {
         //NO-OP
@@ -72,8 +76,8 @@ public class DocmosisTemplateDataUtils {
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
         } else {
-            String errorMsg = String.format("Applicant1 not found for claim number: "
-                                                + caseData.getCcdCaseReference());
+            String errorMsg = String.format("Applicant1 not found for claim number: %s",
+                                            caseData.getCcdCaseReference());
             log.error(errorMsg);
             throw new IllegalArgumentException(errorMsg);
         }
@@ -247,5 +251,15 @@ public class DocmosisTemplateDataUtils {
                 return responseIntentions;
         }
         return responseIntentions;
+    }
+
+    public static String formatCcdCaseReference(CaseData caseData) {
+        return Optional.ofNullable(caseData.getCcdCaseReference())
+            .map(val -> String.join(
+                DELIMITER,
+                Arrays.stream(
+                val.toString().split("(?<=\\G.{4})")
+            ).toList()))
+            .orElse("");
     }
 }

@@ -1,0 +1,22 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "POST",
+        "urlPath": "/credit-account-payments",
+        "bodyPatterns": [
+          {
+            "contains": "\"PBA0077597\""
+          }
+        ]
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "Duplicate Payment"
+      }
+    }
+  ]
+}

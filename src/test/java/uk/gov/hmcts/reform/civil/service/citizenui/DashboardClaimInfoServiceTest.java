@@ -4,25 +4,38 @@ import org.elasticsearch.common.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +46,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed.REQUEST_A_CCJ;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -55,6 +70,9 @@ public class DashboardClaimInfoServiceTest {
 
     @Mock
     private DashboardClaimStatusFactory dashboardClaimStatusFactory;
+
+    @Mock
+    private CoreCaseEventDataService eventDataService;
 
     @Inject
     private DashboardClaimInfoService dashboardClaimInfoService;
@@ -97,9 +115,11 @@ public class DashboardClaimInfoServiceTest {
             claimStoreService,
             coreCaseDataService,
             dashboardClaimStatusFactory,
-            featureToggleService
+            featureToggleService,
+            eventDataService
         );
 
+        when(eventDataService.getEventsForCase(ArgumentMatchers.nullable(String.class))).thenReturn(Collections.emptyList());
         given(claimStoreService.getClaimsForClaimant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
 
@@ -251,6 +271,67 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
+    void shouldIncludeCcjCreationDateDateWhenItExists() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Harry")
+                                            .individualLastName("Porter")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName(
+                                                 "James")
+                                             .individualLastName("Bond")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .activeJudgment(JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT)
+                                            .createdTimestamp(DATE_IN_2025)
+                                            .build())
+                            .build());
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getCcjRequestedDate()).isEqualTo(DATE_IN_2025);
+    }
+
+    @Test
+    void shouldIncludeCcjCreationDateDateForCcjJourneyWhenActiveJudgmentNotExist() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder()
+                            .applicant1(Party.builder()
+                                            .individualFirstName("Harry")
+                                            .individualLastName("Porter")
+                                            .type(Party.Type.INDIVIDUAL)
+                                            .build())
+                            .respondent1(Party.builder()
+                                             .individualFirstName(
+                                                 "James")
+                                             .individualLastName("Bond")
+                                             .type(Party.Type.INDIVIDUAL)
+                                             .build())
+                            .applicant1ResponseDate(DATE_IN_2025)
+                            .caseDataLiP(CaseDataLiP.builder()
+                                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                                        .applicant1ChoosesHowToProceed(REQUEST_A_CCJ).build())
+                                             .build())
+                            .ccjPaymentDetails(CCJPaymentDetails.builder()
+                                                   .ccjPaymentPaidSomeOption(YesOrNo.NO)
+                                                   .build())
+                            .build());
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getCcjRequestedDate()).isEqualTo(DATE_IN_2025);
+    }
+
+    @Test
     void shouldGetThePartPaymentImmediateValue() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
@@ -386,5 +467,39 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
         assertThat(claimsForDefendant.getClaims().get(0).getCreatedDate()).isEqualTo(now);
+    }
+
+    @Test
+    void shouldIncludeDefaultJudgementIssuedDate() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
+                    JudgmentDetails.builder().issueDate(LocalDate.now()).state(JudgmentState.ISSUED)
+                        .type(JudgmentType.DEFAULT_JUDGMENT).build())
+                            .build());
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getDefaultJudgementIssuedDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void shouldIncludeDefaultJudgementIssuedDate_WhenJOFlagIsOff() {
+        given(caseDetailsConverter.toCaseData(CASE_DETAILS))
+            .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
+                            .defaultJudgmentDocuments(List.of(
+                                Element.<CaseDocument>builder()
+                                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
+                                               .createdDatetime(LocalDateTime.now()).build()).build()))
+                            .build());
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForDefendant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForDefendant.getClaims().get(0).getDefaultJudgementIssuedDate()).isEqualTo(LocalDate.now());
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -17,7 +18,9 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,8 +31,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefendantClaimDetailsNotificationHandler extends CallbackHandler implements NotificationData {
@@ -51,6 +57,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final ToggleConfiguration toggleConfiguration;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -85,17 +92,42 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String recipient = getRecipientEmail(caseData, caseEvent);
         String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
+        String orgName = getOrgName(caseData, caseEvent);
 
-        notificationService.sendMail(
-            recipient,
-            emailTemplate,
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        Map<String, String> notificationProperties = addProperties(caseData);
+        notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, orgName);
+
+        if (recipient != null) {
+            notificationService.sendMail(
+                recipient,
+                emailTemplate,
+                notificationProperties,
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        } else {
+            log.info(String.format(
+                "Email address is null for caseEvent: %s for: %s",
+                caseEvent,
+                caseData.getLegacyCaseReference()
+            ));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private String getOrgName(CaseData caseData, CaseEvent caseEvent) {
+        switch (caseEvent) {
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS:
+                return getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService);
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC:
+                return getApplicantLegalOrganizationName(caseData, organisationService);
+            case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS:
+                return getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService);
+            default:
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
     }
 
     private String getRecipientEmail(CaseData caseData, CaseEvent caseEvent) {
@@ -125,16 +157,17 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONSE_DEADLINE, formatLocalDate(caseData
                                                                      .getRespondent1ResponseDeadline()
                                                                      .toLocalDate(), DATE),
             RESPONSE_DEADLINE_PLUS_28,
             formatLocalDate(deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
                                 .toLocalDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
-        );
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
     }
 
 }

@@ -29,7 +29,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
         ServiceHearingValuesModel expectedHearingValues =
             ServiceHearingValuesModel.builder().publicCaseName("mock case name").build();
 
-        when(hearingValuesService.getValues(anyLong(), anyString(), anyString()))
+        when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenReturn(expectedHearingValues);
 
         HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
@@ -42,7 +42,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnHttp400_whenCaseNotFoundExceptionThrown() {
-        when(hearingValuesService.getValues(anyLong(), anyString(), anyString()))
+        when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenThrow(CaseNotFoundException.class);
 
         HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();
@@ -54,7 +54,7 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnHttp404_whenPartyIdsUpdatedExceptionThrown() {
-        when(hearingValuesService.getValues(anyLong(), anyString(), anyString()))
+        when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenThrow(MissingFieldsUpdatedException.class);
 
         HearingValuesRequest requestBody = HearingValuesRequest.builder().caseReference(1L).hearingId("hearingid").build();

@@ -1,28 +1,28 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM_SPEC;
 
-@SpringBootTest(classes = {
-    ProceedOfflineForSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
 class ProceedOfflineForSpecHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private ProceedOfflineForSpecCallbackHandler handler;
+    ProceedOfflineForSpecCallbackHandler handler;
+
+    @BeforeEach
+    public void setUp() {
+        handler = new ProceedOfflineForSpecCallbackHandler(new ObjectMapper().registerModule(new JavaTimeModule()));
+    }
 
     @Test
     void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {

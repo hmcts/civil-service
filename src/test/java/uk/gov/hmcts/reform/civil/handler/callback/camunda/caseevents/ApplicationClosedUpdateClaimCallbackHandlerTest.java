@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -34,19 +32,16 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    ApplicationClosedUpdateClaimCallbackHandler.class, JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private ApplicationClosedUpdateClaimCallbackHandler handler;
 
-    @Autowired
+    @InjectMocks
     private ObjectMapper mapper;
 
-    @MockBean
+    @Mock
     private GenAppStateHelperService helperService;
 
     private static final String APPLICATION_CLOSED_DESCRIPTION = "Application Closed";
@@ -64,7 +59,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    public void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
+    void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(CaseData.builder().build(),
                                         true,
@@ -93,7 +88,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    public void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
+    void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(CaseData.builder().build(),
                                         false,
@@ -111,7 +106,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    public void returnErrorIfHelperServiceThrowsErrors() {
+    void returnErrorIfHelperServiceThrowsErrors() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDetails(CaseData.builder().build(),
                                         true,

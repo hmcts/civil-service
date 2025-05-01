@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,18 +16,30 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Slf4j
 @Service
@@ -38,6 +51,11 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
+    private final FeatureToggleService featureToggleService;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
+    @Value("${case-flags.logging.enabled:false}")
+    private boolean caseFlagsLoggingEnabled;
+    private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -54,14 +72,41 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData updatedData = getUpdatedCaseData(callbackParams);
+        if (caseFlagsLoggingEnabled) {
+            log.info(
+                "case id: {}, defendant response cui before about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                callbackParams.getCaseData().getRespondent1().getFlags()
+            );
+        }
 
-        boolean responseLanguageIsBilingual = updatedData.isRespondentResponseBilingual();
+        CaseData caseData = getUpdatedCaseData(callbackParams);
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+
+        populateDQPartyIds(builder);
+        addEventAndDateAddedToRespondentExperts(builder);
+        addEventAndDateAddedToRespondentWitnesses(builder);
+
+        caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_CUI, builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
+
+        updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
+            caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
+
+        CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!responseLanguageIsBilingual) {
+        if (!caseData.isRespondentResponseBilingual()) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        }
+
+        if (caseFlagsLoggingEnabled) {
+            log.info(
+                "case id: {}, defendant response cui after about to submit: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                caseData.getRespondent1().getFlags()
+            );
         }
 
         return responseBuilder.build();
@@ -69,19 +114,32 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        final BigDecimal respondToAdmittedClaimOwingAmount = caseData.getRespondToAdmittedClaimOwingAmount();
+        if (respondToAdmittedClaimOwingAmount != null) {
+            log.info(
+                "case id: {}, respondToAdmittedClaimOwingAmount: {}",
+                callbackParams.getRequest().getCaseDetails().getId(),
+                 respondToAdmittedClaimOwingAmount
+            );
+        }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        CaseData updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> builder =  caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
+            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
             .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
-                responseDate,
-                allocatedTrack
-            ))
-            .build();
-        return updatedData;
+                responseDate
+            ));
+        if (featureToggleService.isGaForWelshEnabled()) {
+            String respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRespondent1LiPResponse)
+                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                .orElse(null);
+            builder.defendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
+        }
+        return builder.build();
     }
 }

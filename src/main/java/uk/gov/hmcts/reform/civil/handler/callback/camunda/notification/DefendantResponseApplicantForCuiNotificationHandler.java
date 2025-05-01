@@ -23,6 +23,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -83,11 +84,11 @@ public class DefendantResponseApplicantForCuiNotificationHandler
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         Map<String, String> properties = new HashMap<>();
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData));
-        if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-        }
+        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         return properties;
     }
 
@@ -96,8 +97,8 @@ public class DefendantResponseApplicantForCuiNotificationHandler
         if (isLiPClaimant) {
             emailTemplate = notificationsProperties.getNotifyLiPClaimantDefendantResponded();
         } else {
-            if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                if (caseData.getResponseClaimMediationSpecRequired().equals(YES)) {
+            if (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                if (YES.equals(caseData.getResponseClaimMediationSpecRequired())) {
                     emailTemplate = notificationsProperties.getRespondentLipFullDefenceWithMediationTemplate();
                 } else {
                     emailTemplate = notificationsProperties.getRespondentLipFullDefenceNoMediationTemplate();

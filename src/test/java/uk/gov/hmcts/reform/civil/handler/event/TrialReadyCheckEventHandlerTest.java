@@ -1,29 +1,23 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.event.TrialReadyCheckEvent;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 
-@SpringBootTest(classes = {
-    TrialReadyCheckEventHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    CoreCaseDataService.class
-})
+@ExtendWith(MockitoExtension.class)
 class TrialReadyCheckEventHandlerTest {
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @Autowired
+    @InjectMocks
     private TrialReadyCheckEventHandler handler;
 
     @Test

@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -16,18 +15,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -37,7 +39,7 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -51,9 +53,12 @@ import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
@@ -61,8 +66,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
@@ -72,6 +77,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -82,6 +89,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -94,15 +102,19 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
     LocationHelper.class,
-    AssignCategoryId.class
+    AssignCategoryId.class,
+    FrcDocumentsUtils.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
     private Time time;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
 
     @MockBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
@@ -127,6 +139,18 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private ToggleConfiguration toggleConfiguration;
+
+    @Autowired
+    private FrcDocumentsUtils frcDocumentsUtils;
+
+    @MockBean
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+
+    @Mock
+    private UnavailableDateValidator unavailableDateValidator;
+
+    @Mock
+    private LocationHelper locationHelper;
 
     @Nested
     class AboutToStartCallback {
@@ -219,11 +243,13 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2(PartyBuilder.builder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .createdBy("Defendant")
                                                                  .documentType(DEFENDANT_DEFENCE)
                                                                  .documentLink(Document.builder()
                                                                                    .documentUrl("url")
                                                                                    .documentHash("hash")
-                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentFileName(
+                                                                                       "respondent defense")
                                                                                    .documentBinaryUrl("binUrl")
                                                                                    .build()).build()))
                     .build();
@@ -239,11 +265,13 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetRespondent1ClaimResponseDocument_WhenAboutToStartIsInvoked() {
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
                     .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .createdBy("Defendant")
                                                                  .documentType(DEFENDANT_DEFENCE)
                                                                  .documentLink(Document.builder()
                                                                                    .documentUrl("url")
                                                                                    .documentHash("hash")
-                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentFileName(
+                                                                                       "respondent defense")
                                                                                    .documentBinaryUrl("binUrl")
                                                                                    .build()).build()))
                     .build();
@@ -253,6 +281,28 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .handle(params);
                 assertThat(response.getErrors()).isNull();
                 assertThat(response.getData()).extracting("respondent1ClaimResponseDocument").isNotNull();
+            }
+
+            @Test
+            void shouldSetRespondent2ClaimResponseDocument_WhenAboutToStartIsInvoked() {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+                    .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .createdBy("Defendant 2")
+                                                                 .documentType(DEFENDANT_DEFENCE)
+                                                                 .documentLink(Document.builder()
+                                                                                   .documentUrl("url")
+                                                                                   .documentHash("hash")
+                                                                                   .documentFileName(
+                                                                                       "respondent defense")
+                                                                                   .documentBinaryUrl("binUrl")
+                                                                                   .build()).build()))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+                assertThat(response.getErrors()).isNull();
+                assertThat(response.getData()).extracting("respondent2ClaimResponseDocument").isNotNull();
             }
 
             @Test
@@ -550,6 +600,17 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             when(time.now()).thenReturn(localDateTime);
             given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
+
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         }
 
         @ParameterizedTest
@@ -640,8 +701,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddPartyIdsToPartyFields_whenInvoked() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(true);
-
             var caseData = CaseDataBuilder.builder()
                 .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                 .build();
@@ -654,32 +713,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            when(featureToggleService.isHmcEnabled()).thenReturn(false);
-
-            var objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-            var caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
-                .build();
-
-            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("applicant1")
-                .isEqualTo(objectMapper.convertValue(caseData.getApplicant1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent1")
-                .isEqualTo(objectMapper.convertValue(caseData.getRespondent1(), HashMap.class));
-        }
-
-        @Test
         void shouldAssembleClaimantResponseDocuments2v1ProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -707,6 +744,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimMultiParty2v1(YES)
                 .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -719,7 +757,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(8, docs.size());
+            assertEquals(4, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -740,8 +778,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1ProceedOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -769,6 +807,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimMultiParty2v1(NO)
                 .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -781,7 +820,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(8, docs.size());
+            assertEquals(4, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -802,8 +841,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1NotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -831,6 +870,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimMultiParty2v1(NO)
                 .applicant2ProceedWithClaimMultiParty2v1(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -843,7 +883,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(8, docs.size());
+            assertEquals(4, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -864,8 +904,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v1Proceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -886,6 +926,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
                 .applicant1ProceedWithClaim(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -898,7 +939,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -918,8 +959,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v1NotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -940,6 +981,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
                 .applicant1ProceedWithClaim(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
+
                 .build();
             /*
             CourtLocation.builder()
@@ -952,7 +995,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -972,8 +1015,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -999,6 +1042,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1011,7 +1055,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1031,8 +1075,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssProceedOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1058,6 +1102,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1070,7 +1115,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1090,8 +1135,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssNotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1117,6 +1162,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
                 .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             /*
             CourtLocation.builder()
@@ -1129,7 +1175,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1149,9 +1195,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignCategoryId_whenInvoked() {
             // Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1176,21 +1222,53 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimValue(ClaimValue.builder()
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").region("4").build())
                 .build();
             //When
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            System.out.println(updatedData.getClaimantResponseDocuments());
             //Then
-            assertThat(updatedData.getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(4).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getClaimantResponseDocuments().get(5).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getClaimantResponseDocuments().get(6).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getClaimantResponseDocuments().get(7).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
+            assertThat(updatedData.getDuplicateClaimantDefendantResponseDocs().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
 
+        }
+
+        @Test
+        void shouldAssignCategoryId_frc_whenInvoked() {
+            // Given
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+            var caseData = CaseDataBuilder.builder()
+                .setIntermediateTrackClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .multiPartyClaimTwoApplicants()
+                .applicant1DQWithFixedRecoverableCostsIntermediate()
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            System.out.println(updatedData.getClaimantResponseDocuments());
+            //Then
+            assertThat(updatedData.getApplicant1DQ().getApplicant1DQFixedRecoverableCostsIntermediate().getFrcSupportingDocument().getCategoryID()).isEqualTo(
+                "DQApplicant");
         }
 
         @Nested
@@ -1286,6 +1364,74 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData().get("respondentSharedClaimResponseDocument")).isNull();
             }
+        }
+
+        @Test
+        void shouldUpdateLocation_WhenCmlIsCcmccAndToggleOn() {
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(handler.ccmccEpimsId).region(
+                    "ccmcRegion").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("10", "214320");
+        }
+
+        @Test
+        void shouldNotUpdateLocation_WhenCmlIsNotCcmccAndToggleOn() {
+            // Given
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("3", "12345");
+        }
+
+        @Test
+        void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
+        }
+
+        @Test
+        void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
+
+            handler = new RespondToDefenceCallbackHandler(exitSurveyContentService, unavailableDateValidator, mapper,
+                                                          time, featureToggleService, locationRefDataService, locationRefDataUtil,
+                                                          locationHelper, caseFlagsInitialiser, toggleConfiguration, assignCategoryId,
+                                                          caseDetailsConverter, frcDocumentsUtils, Optional.empty());
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            var caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.TWO_V_ONE)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("12345").region("3").build())
+                .build();
+            //When
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verifyNoInteractions(updateWaCourtLocationsService);
         }
     }
 

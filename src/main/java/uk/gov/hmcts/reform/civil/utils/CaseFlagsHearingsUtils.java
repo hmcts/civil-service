@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -9,7 +10,9 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 public class CaseFlagsHearingsUtils {
 
@@ -30,34 +33,78 @@ public class CaseFlagsHearingsUtils {
 
         getNonEmptyExpertAndWitnessFlags(caseData, nonEmptyFlags);
 
+        getNonEmptyIndividualsFlags(caseData, nonEmptyFlags);
+
         findActiveFlags(nonEmptyFlags);
 
         return nonEmptyFlags;
     }
 
+    public static List<FlagDetail> getAllActiveCaseLevelFlags(CaseData caseData) {
+        Flags caseFlags = caseData.getCaseFlags();
+        if (caseFlags != null) {
+            List<FlagDetail> flagDetails = unwrapElements(caseFlags.getDetails());
+
+            if (!flagDetails.isEmpty()) {
+                return flagDetails.stream().filter(f -> ("Active").equals(f.getStatus())).toList();
+            }
+        }
+        return emptyList();
+    }
+
     private static void getNonEmptyExpertAndWitnessFlags(CaseData caseData, List<PartyFlags> nonEmptyFlags) {
         if (caseData.getApplicantExperts() != null) {
-            findNonEmptyPartyFlagsForExpertsAndWitnesses(caseData.getApplicantExperts(), nonEmptyFlags);
+            findNonEmptyPartyFlags(caseData.getApplicantExperts(), nonEmptyFlags);
         }
 
         if (caseData.getApplicantWitnesses() != null) {
-            findNonEmptyPartyFlagsForExpertsAndWitnesses(caseData.getApplicantWitnesses(), nonEmptyFlags);
+            findNonEmptyPartyFlags(caseData.getApplicantWitnesses(), nonEmptyFlags);
         }
 
         if (caseData.getRespondent1Experts() != null) {
-            findNonEmptyPartyFlagsForExpertsAndWitnesses(caseData.getRespondent1Experts(), nonEmptyFlags);
+            findNonEmptyPartyFlags(caseData.getRespondent1Experts(), nonEmptyFlags);
         }
 
         if (caseData.getRespondent1Witnesses() != null) {
-            findNonEmptyPartyFlagsForExpertsAndWitnesses(caseData.getRespondent1Witnesses(), nonEmptyFlags);
+            findNonEmptyPartyFlags(caseData.getRespondent1Witnesses(), nonEmptyFlags);
         }
 
         if (caseData.getRespondent2Experts() != null) {
-            findNonEmptyPartyFlagsForExpertsAndWitnesses(caseData.getRespondent2Experts(), nonEmptyFlags);
+            findNonEmptyPartyFlags(caseData.getRespondent2Experts(), nonEmptyFlags);
         }
 
         if (caseData.getRespondent2Witnesses() != null) {
-            findNonEmptyPartyFlagsForExpertsAndWitnesses(caseData.getRespondent2Witnesses(), nonEmptyFlags);
+            findNonEmptyPartyFlags(caseData.getRespondent2Witnesses(), nonEmptyFlags);
+        }
+    }
+
+    private static void getNonEmptyIndividualsFlags(CaseData caseData, List<PartyFlags> nonEmptyFlags) {
+        if (caseData.getApplicant1OrgIndividuals() != null) {
+            findNonEmptyPartyFlags(caseData.getApplicant1OrgIndividuals(), nonEmptyFlags);
+        }
+
+        if (caseData.getApplicant2OrgIndividuals() != null) {
+            findNonEmptyPartyFlags(caseData.getApplicant2OrgIndividuals(), nonEmptyFlags);
+        }
+
+        if (caseData.getRespondent1OrgIndividuals() != null) {
+            findNonEmptyPartyFlags(caseData.getRespondent1OrgIndividuals(), nonEmptyFlags);
+        }
+
+        if (caseData.getRespondent2OrgIndividuals() != null) {
+            findNonEmptyPartyFlags(caseData.getRespondent2OrgIndividuals(), nonEmptyFlags);
+        }
+
+        if (caseData.getApplicant1LRIndividuals() != null) {
+            findNonEmptyPartyFlags(caseData.getApplicant1LRIndividuals(), nonEmptyFlags);
+        }
+
+        if (caseData.getRespondent1LRIndividuals() != null) {
+            findNonEmptyPartyFlags(caseData.getRespondent1LRIndividuals(), nonEmptyFlags);
+        }
+
+        if (caseData.getRespondent2LRIndividuals() != null) {
+            findNonEmptyPartyFlags(caseData.getRespondent2LRIndividuals(), nonEmptyFlags);
         }
     }
 
@@ -88,7 +135,7 @@ public class CaseFlagsHearingsUtils {
         }
     }
 
-    private static void findNonEmptyPartyFlagsForExpertsAndWitnesses(
+    private static void findNonEmptyPartyFlags(
         List<Element<PartyFlagStructure>> partyFlagStructure,
         List<PartyFlags> nonEmptyFlags) {
         for (Element<PartyFlagStructure> partyFlagStructureElement : partyFlagStructure) {

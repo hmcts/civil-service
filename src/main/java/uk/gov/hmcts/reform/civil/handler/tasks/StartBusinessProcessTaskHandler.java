@@ -14,36 +14,37 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
-import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler {
+public class StartBusinessProcessTaskHandler extends BaseExternalTaskHandler {
 
     public static final String BUSINESS_PROCESS = "businessProcess";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
-    private final StateFlowEngine stateFlowEngine;
-
-    private VariableMap variables;
+    private final IStateFlowEngine stateFlowEngine;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
         CaseData caseData = startBusinessProcess(externalTask);
-        variables = Variables.createVariables();
+        var variables = Variables.createVariables();
         var stateFlow = stateFlowEngine.evaluate(caseData);
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+
+        return ExternalTaskData.builder().variables(variables).build();
     }
 
     @Override
-    public VariableMap getVariableMap() {
-        return variables;
+    public VariableMap getVariableMap(ExternalTaskData externalTaskData) {
+        return externalTaskData.getVariables();
     }
 
     private CaseData startBusinessProcess(ExternalTask externalTask) {
@@ -55,8 +56,7 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = data.getBusinessProcess();
         switch (businessProcess.getStatusOrDefault()) {
-            case READY:
-            case DISPATCHED:
+            case READY, DISPATCHED:
                 return updateBusinessProcess(caseId, externalTask, startEventResponse, businessProcess);
             case STARTED:
                 if (businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {

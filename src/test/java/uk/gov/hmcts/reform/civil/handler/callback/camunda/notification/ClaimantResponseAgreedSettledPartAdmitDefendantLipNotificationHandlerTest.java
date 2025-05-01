@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -30,16 +29,28 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@SpringBootTest(classes = {
-    ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandlerTest extends BaseCallbackHandlerTest {
+
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationDetailsService organisationDetailsService;
+
+    @InjectMocks
+    private ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler handler;
 
     public static final String targetEmail = "sole.trader@email.com";
     public static final String template = "spec-lip-template-id";
@@ -53,28 +64,13 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
     public static final String EVENT_ID = "NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED";
     private static final String ORGANISATION_NAME = "Defendant solicitor org";
 
-    @MockBean
-    private NotificationService notificationService;
-    @MockBean
-    private NotificationsProperties notificationsProperties;
-    @MockBean
-    private OrganisationDetailsService organisationDetailsService;
-    @Autowired
-    private ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler handler;
-
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
-            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(bilingualTemplate);
-            when(notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate()).thenReturn(template_id_lr);
-            when(organisationDetailsService.getRespondentLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
-        }
-
         @Test
         void shouldNotifyRespondent_whenInvoked_spec_lip() {
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
@@ -129,7 +125,9 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         }
 
         @Test
-        void shouldNotNotify_whenInvoked_spec_lip_bilingual() {
+        void shouldNotify_whenInvoked_spec_lip_bilingual() {
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(bilingualTemplate);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
@@ -151,7 +149,9 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         }
 
         @Test
-        void shouldNotNotify_whenInvoked_spec_lip_english() {
+        void shouldNotify_whenInvoked_spec_lip_english() {
+            when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
@@ -174,6 +174,9 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         @Test
         void shouldNotifyRespondent_whenInvoked_spec_lr() {
+            when(notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate()).thenReturn(template_id_lr);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
@@ -199,12 +202,17 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             if (caseData.isRespondent1NotRepresented()) {
                 return Map.of(
                     RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                    CASEMAN_REF, caseData.getLegacyCaseReference()
+
                 );
             } else {
                 return Map.of(
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
+                    CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
+                    PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                    CASEMAN_REF, caseData.getLegacyCaseReference()
                 );
             }
         }

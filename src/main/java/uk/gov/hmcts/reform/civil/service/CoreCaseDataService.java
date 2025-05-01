@@ -19,13 +19,13 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
@@ -43,7 +43,6 @@ public class CoreCaseDataService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
     private final FeatureToggleService featureToggleService;
-    private final IdamClient idamClient;
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -54,9 +53,18 @@ public class CoreCaseDataService {
         submitUpdate(caseId.toString(), caseDataContentFromStartEventResponse(startEventResponse, contentModified));
     }
 
+    public void triggerEvent(Long caseId, CaseEvent eventName, Map<String, Object> contentModified,
+                             String eventSummary, String eventDescription) {
+        StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, contentModified);
+        caseDataContent.getEvent().setSummary(eventSummary);
+        caseDataContent.getEvent().setDescription(eventDescription);
+
+        submitUpdate(caseId.toString(), caseDataContent);
+    }
+
     public StartEventResponse startUpdate(String caseId, CaseEvent eventName) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
-
         return coreCaseDataApi.startEventForCaseWorker(
             systemUpdateUser.getUserToken(),
             authTokenGenerator.generate(),
@@ -132,7 +140,23 @@ public class CoreCaseDataService {
 
     public SearchResult searchCases(Query query) {
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
+        String searchString = query.toString();
+        log.info("Searching Elasticsearch with query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
+    public SearchResult searchMediationCases(Query query) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = query.toMediationQueryString();
+        log.info("Searching Elasticsearch with mediation query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, searchString);
+    }
+
+    public SearchResult searchCMCCases(Query query) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        String searchString = query.toString();
+        log.info("Searching Elasticsearch with query: " + searchString);
+        return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CMC_CASE_TYPE, searchString);
     }
 
     public CaseDetails getCase(Long caseId) {
@@ -188,7 +212,7 @@ public class CoreCaseDataService {
 
     private String createQuery(String authorization, int startIndex, String userEmailField) {
         if (featureToggleService.isLipVLipEnabled()) {
-            UserDetails defendantInfo = idamClient.getUserDetails(authorization);
+            UserDetails defendantInfo = userService.getUserDetails(authorization);
             return new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
                            .must(QueryBuilders.termQuery(userEmailField, defendantInfo.getEmail())))

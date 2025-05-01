@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -17,25 +16,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantForSpecNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantForSpecNotificationHandler.TASK_ID_CC;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    AcknowledgeClaimApplicantForSpecNotificationHandler.class
-})
-public class AcknowledgementClaimApplicantForSpecHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class AcknowledgementClaimApplicantForSpecHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private AcknowledgeClaimApplicantForSpecNotificationHandler handler;
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
 
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
 
-    @MockBean
+    @Mock
     private FeatureToggleService toggleService;
 
     @Test

@@ -4,6 +4,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -23,5 +24,12 @@ class CaseReadyBusinessProcessSearchServiceTest extends ElasticSearchServiceTest
             .must(matchQuery("data.businessProcess.status", "READY"))
             .must(rangeQuery("data.businessProcess.readyOn").lt("now-5m"));
         return new Query(query, List.of(), fromValue);
+    }
+
+    @Override
+    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
+                                          boolean initialSearch,
+                                          String searchAfterValue) {
+        return null;
     }
 }

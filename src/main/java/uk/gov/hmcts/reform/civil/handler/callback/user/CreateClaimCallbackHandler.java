@@ -19,8 +19,9 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.ClaimTypeHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -37,7 +38,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -46,6 +46,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
@@ -53,9 +55,9 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
+import uk.gov.hmcts.reform.civil.validation.PartyValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
@@ -78,11 +80,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUES
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
@@ -131,19 +133,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final ValidateEmailService validateEmailService;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService toggleService;
-    private final LocationRefDataService locationRefDataService;
+    private final LocationReferenceDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private final PartyValidator partyValidator;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
@@ -155,13 +158,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
-            .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
-            .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
+            .put(callbackKey(MID, "applicant"), this::validateApplicant1Details)
+            .put(callbackKey(MID, "applicant2"), this::validateApplicant2Details)
             .put(callbackKey(MID, "fee"), this::calculateFee)
             .put(callbackKey(MID, "idam-email"), this::getIdamEmail)
             .put(callbackKey(MID, "setRespondent2SameLegalRepresentativeToNo"), this::setRespondent2SameLegalRepToNo)
             .put(callbackKey(MID, "validate-defendant-legal-rep-email"), this::validateRespondentRepEmail)
             .put(callbackKey(MID, "validate-claimant-legal-rep-email"), this::validateClaimantRepEmail)
+            .put(callbackKey(MID, "respondent1"), this::validateRespondent1Details)
+            .put(callbackKey(MID, "respondent2"), this::validateRespondent2Details)
             .put(callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim)
             .put(callbackKey(MID, "appOrgPolicy"), this::validateApplicantSolicitorOrgPolicy)
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
@@ -198,7 +203,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
-        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
+        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(
+            OrganisationPolicy.builder()
                  .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                  .organisationID(value.getOrganisationIdentifier()).build())
                  .orgPolicyReference(null)
@@ -213,22 +219,53 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
+    private CallbackResponse validateApplicant1Details(CallbackParams callbackParams) {
         Party applicant = callbackParams.getCaseData().getApplicant1();
         List<String> errors = dateOfBirthValidator.validate(applicant);
+        validatePartyDetails(applicant, errors);;
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
     }
 
-    private CallbackResponse validateApplicant2DateOfBirth(CallbackParams callbackParams) {
-        Party applicant = callbackParams.getCaseData().getApplicant2();
-        List<String> errors = dateOfBirthValidator.validate(applicant);
+    private CallbackResponse validateApplicant2Details(CallbackParams callbackParams) {
+        Party applicant2 = callbackParams.getCaseData().getApplicant2();
+        List<String> errors = dateOfBirthValidator.validate(applicant2);
+        validatePartyDetails(applicant2, errors);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
+    }
+
+    private CallbackResponse validateRespondent1Details(CallbackParams callbackParams) {
+        Party respondent = callbackParams.getCaseData().getRespondent1();
+        List<String> errors = new ArrayList<>();
+        validatePartyDetails(respondent, errors);
+
+        return AboutToStartOrSubmitCallbackResponse.builder().errors(errors).build();
+    }
+
+    private CallbackResponse validateRespondent2Details(CallbackParams callbackParams) {
+        Party respondent2 = callbackParams.getCaseData().getRespondent2();
+        List<String> errors = new ArrayList<>();
+        if (respondent2 != null) {
+            validatePartyDetails(respondent2, errors);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private List<String> validatePartyDetails(Party party, List<String> errors) {
+        if (toggleService.isJudgmentOnlineLive()) {
+            if (party.getPrimaryAddress() != null) {
+                partyValidator.validateAddress(party.getPrimaryAddress(), errors);
+            }
+            partyValidator.validateName(party.getPartyName(), errors);
+        }
+        return errors;
     }
 
     private CallbackResponse validateApplicantSolicitorOrgPolicy(CallbackParams callbackParams) {
@@ -278,11 +315,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String customerReference = paymentDetails.map(PaymentDetails::getCustomerReference).orElse(reference);
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
-
         caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
-        if (toggleService.isPbaV3Enabled()) {
-            caseDataBuilder.paymentTypePBA("PBAv3");
-        }
+        caseDataBuilder.paymentTypePBA("PBAv3");
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
                        .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
@@ -293,7 +327,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse getIdamEmail(CallbackParams callbackParams) {
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
             .applicantSolicitor1CheckEmail(CorrectEmail.builder().email(userDetails.getEmail()).build())
@@ -483,10 +517,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         handleCourtLocationData(caseData, dataBuilder, callbackParams);
 
-        if (toggleService.isNoticeOfChangeEnabled()) {
-            // LiP are not represented or registered
-            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
-        }
+        // LiP are not represented or registered
+        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
 
         // temporarily default to yes for CIV-2659
         if (YES.equals(caseData.getRespondent1Represented()) && caseData.getRespondent1OrgRegistered() == null) {
@@ -499,7 +531,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
         //casename
-        dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        dataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
 
         //case management category
         CaseManagementCategoryElement civil =
@@ -511,34 +543,31 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
-        //Adding variables for feature Certificate of Service
-        if (toggleService.isCertificateOfServiceEnabled()) {
-            if (caseData.getRespondent1Represented().equals(NO)) {
-                dataBuilder.defendant1LIPAtClaimIssued(YES);
-            } else {
-                dataBuilder.defendant1LIPAtClaimIssued(NO);
-            }
+        if (caseData.getRespondent1Represented().equals(NO)) {
+            dataBuilder.defendant1LIPAtClaimIssued(YES);
+        } else {
+            dataBuilder.defendant1LIPAtClaimIssued(NO);
+        }
 
-            if (YES.equals(caseData.getAddRespondent2())) {
-                if (caseData.getRespondent2Represented() == NO) {
-                    dataBuilder.defendant2LIPAtClaimIssued(YES);
-                } else {
-                    dataBuilder.defendant2LIPAtClaimIssued(NO);
-                }
+        if (YES.equals(caseData.getAddRespondent2())) {
+            if (caseData.getRespondent2Represented() == NO) {
+                dataBuilder.defendant2LIPAtClaimIssued(YES);
+            } else {
+                dataBuilder.defendant2LIPAtClaimIssued(NO);
             }
         }
         //assign category ids to documents uploaded as part of particulars of claim
         assignParticularOfClaimCategoryIds(caseData);
 
-        dataBuilder.caseNamePublic(CaseNameUtils.buildCaseNamePublic(caseData));
+        dataBuilder.caseNamePublic(CaseNameUtils.buildCaseName(caseData));
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(dataBuilder);
-        }
+        dataBuilder.anyRepresented(YES);
+
+        populateWithPartyIds(dataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -547,7 +576,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         //second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = userService.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
 
         CaseData caseData = callbackParams.getCaseData();
@@ -561,14 +590,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        if (!toggleService.isPbaV3Enabled()) {
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
-        } else {
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
-        }
-
+        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
+
+        ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
+        dataBuilder.claimType(claimType);
+        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType, caseData.getPersonalInjuryType(),
+                                                     toggleService, caseData));
+
         dataBuilder.submittedDate(time.now());
 
         //set check email field to null for GDPR
@@ -579,12 +608,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
+            .confirmationHeader(getHeader())
             .confirmationBody(getBody(caseData))
             .build();
     }
 
-    private String getHeader(CaseData caseData) {
+    private String getHeader() {
         return format("# Please now pay your claim fee%n# using the link below");
     }
 
@@ -607,18 +636,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private String getBody(CaseData caseData) {
         return areRespondentsRepresentedAndRegistered(caseData)
             ? getConfirmationSummary(caseData)
-            : toggleService.isCertificateOfServiceEnabled()
-              ? format(CONFIRMATION_BODY_LIP_COS,
+            : format(CONFIRMATION_BODY_LIP_COS,
                        format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
                        format(caseDocLocation, caseData.getCcdCaseReference()),
                        claimUrlsConfiguration.getResponsePackLink())
-                + exitSurveyContentService.applicantSurvey()
-              : format(CONFIRMATION_BODY_COS,
-               format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
-               format(caseDocLocation, caseData.getCcdCaseReference()),
-               claimUrlsConfiguration.getResponsePackLink())
-            + exitSurveyContentService.applicantSurvey();
-
+                + exitSurveyContentService.applicantSurvey();
     }
 
     private String getConfirmationSummary(CaseData caseData) {
@@ -637,30 +659,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;
-    }
-
-    public StringBuilder caseParticipants(CaseData caseData) {
-        StringBuilder participantString = new StringBuilder();
-        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
-        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
-            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" v ").append(caseData.getRespondent1().getPartyName())
-                .append(" and ").append(caseData.getRespondent2().getPartyName());
-
-        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                .getPartyName());
-
-        } else {
-            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                .getPartyName());
-        }
-        return participantString;
-
     }
 
     private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,

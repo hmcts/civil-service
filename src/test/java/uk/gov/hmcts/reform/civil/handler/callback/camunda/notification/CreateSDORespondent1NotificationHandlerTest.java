@@ -4,10 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -24,7 +23,9 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -34,28 +35,43 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
-@SpringBootTest(classes = {
-    CreateSDORespondent1NotificationHandler.class,
-    JacksonAutoConfiguration.class,
-    CreateSDORespondent1LRNotificationSender.class,
-    CreateSDORespondent1LiPNotificationSender.class
-})
+@ExtendWith(MockitoExtension.class)
+class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTest {
 
-public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHandlerTest {
-
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+
+    @Mock
     private OrganisationService organisationService;
-    @Autowired
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private CreateSDORespondent1NotificationHandler handler;
+
+    @BeforeEach
+    void setup() {
+        CreateSDORespondent1LRNotificationSender lrNotificationSender =
+            new CreateSDORespondent1LRNotificationSender(notificationService, notificationsProperties,
+                                                         organisationService, featureToggleService
+        );
+        CreateSDORespondent1LiPNotificationSender lipNotificationSender =
+            new CreateSDORespondent1LiPNotificationSender(notificationService, notificationsProperties,
+                                                          featureToggleService
+        );
+        handler = new CreateSDORespondent1NotificationHandler(lipNotificationSender, lrNotificationSender);
+    }
+
     private static final String DEFENDANT_EMAIL = "respondent@example.com";
     private static final String LEGACY_REFERENCE = "create-sdo-respondent-1-notification-000DC001";
     private static final String DEFENDANT_NAME = "respondent";
@@ -65,17 +81,12 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getSdoOrdered()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getSdoOrderedSpec()).thenReturn(TEMPLATE_ID);
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
-        }
-
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
+            when(notificationsProperties.getSdoOrdered()).thenReturn(TEMPLATE_ID);
+            when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParams.builder()
                 .caseData(caseData)
@@ -90,13 +101,42 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             verify(notificationService).sendMail(
                 caseData.getRespondentSolicitor1EmailAddress(),
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 LEGACY_REFERENCE
             );
         }
 
         @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                TEMPLATE_ID,
+                getNotificationDataLipMap1(caseData),
+                LEGACY_REFERENCE
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentLiP_whenInvokedEA() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .respondent1Represented(YesOrNo.NO)
@@ -122,6 +162,8 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldNotifyRespondentLiPWithBilingual_whenDefendantResponseIsBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(TEMPLATE_ID);
+
             Party party = PartyBuilder.builder()
                 .individual(DEFENDANT_NAME)
                 .partyEmail(DEFENDANT_EMAIL)
@@ -154,26 +196,30 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME,
+                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF, "000DC001"
             );
         }
 
         @NotNull
         private Map<String, String> getNotificationDataLipMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, caseData.getRespondent1().getPartyName()
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                PARTY_NAME, caseData.getRespondent1().getPartyName(),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
             );
         }
 
         @NotNull
         private Map<String, String> getNotificationDataLipMap1(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName()
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
+                PARTY_NAME, caseData.getRespondent1().getPartyName(),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
             );
         }
     }
@@ -185,5 +231,3 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             .isEqualTo("CreateSDONotifyRespondentSolicitor1");
     }
 }
-
-

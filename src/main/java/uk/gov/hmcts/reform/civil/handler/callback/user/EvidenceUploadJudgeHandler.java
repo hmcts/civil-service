@@ -14,14 +14,18 @@ import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -59,7 +63,11 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.caseNoteType(null).build();
+        caseDataBuilder
+            .caseNoteType(null)
+            .documentAndNameToAdd(null)
+            .documentAndNoteToAdd(null)
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -69,10 +77,11 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     private AboutToStartOrSubmitCallbackResponse populateSubmittedDateTime(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String userAuth = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         if (caseData.getCaseNoteType().equals(CaseNoteType.NOTE_ONLY)) {
             CaseNote caseNoteTA = caseNoteService.buildCaseNote(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                userAuth,
                 caseData.getCaseNoteTA()
             );
 
@@ -82,6 +91,32 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
                 .caseNotesTA(caseNotesTa)
                 .caseNoteTA(null)
                 .build();
+        }
+
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
+            List<Element<DocumentWithName>> documentAndNameToAdd = caseData.getDocumentAndNameToAdd();
+            List<Element<DocumentWithName>> documentAndNameCurrent = new ArrayList<>();
+            if (nonNull(caseData.getDocumentAndName())) {
+                documentAndNameCurrent.addAll(caseData.getDocumentAndName());
+            }
+            documentAndNameToAdd.forEach(documentAndName -> {
+                List<Element<DocumentWithName>> newJudgeCaseNoteDocumentAndName =  caseNoteService.buildJudgeCaseNoteDocumentAndName(documentAndName.getValue(), userAuth);
+                documentAndNameCurrent.addAll(newJudgeCaseNoteDocumentAndName);
+            });
+            caseDataBuilder.documentAndName(documentAndNameCurrent);
+        }
+
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
+            List<Element<DocumentAndNote>> documentAndNoteToAdd = caseData.getDocumentAndNoteToAdd();
+            List<Element<DocumentAndNote>> documentAndNoteCurrent = new ArrayList<>();
+            if (nonNull(caseData.getDocumentAndNote())) {
+                documentAndNoteCurrent.addAll(caseData.getDocumentAndNote());
+            }
+            documentAndNoteToAdd.forEach(documentAndNote -> {
+                List<Element<DocumentAndNote>> newJudgeCaseNoteAndDocument =  caseNoteService.buildJudgeCaseNoteAndDocument(documentAndNote.getValue(), userAuth);
+                documentAndNoteCurrent.addAll(newJudgeCaseNoteAndDocument);
+            });
+            caseDataBuilder.documentAndNote(documentAndNoteCurrent);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -115,16 +150,16 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         StringBuilder stringBuilder = new StringBuilder();
         if (null != caseData.getCaseNoteType() && caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
-            IntStream.range(0, caseData.getDocumentAndName()
+            IntStream.range(0, caseData.getDocumentAndNameToAdd()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
-                caseData.getDocumentAndName().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
+                caseData.getDocumentAndNameToAdd().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
 
             return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
         }
         if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
-            IntStream.range(0, caseData.getDocumentAndNote()
+            IntStream.range(0, caseData.getDocumentAndNoteToAdd()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
-                caseData.getDocumentAndNote().get(i)
+                caseData.getDocumentAndNoteToAdd().get(i)
                     .getValue()
                     .getDocument()
                     .getDocumentFileName()).append("\n"));

@@ -1,0 +1,23 @@
+---
+version: '2.4'
+
+name: cftlib-additional-services
+
+services:
+  camunda:
+    container_name: camunda
+    image: camunda/camunda-bpm-platform:run-latest
+    environment:
+      CAMUNDA_BPM_GENERIC-PROPERTIES_PROPERTIES_ENFORCEHISTORYTIMETOLIVE: "false"
+    ports:
+      - 9404:8080
+
+  wiremock:
+    container_name: wiremock
+    image: wiremock/wiremock
+    volumes:
+      - ./../mocks/wiremock:/home/wiremock:rw
+    ports:
+      - 8765:8080
+    command:
+      - -global-response-templating

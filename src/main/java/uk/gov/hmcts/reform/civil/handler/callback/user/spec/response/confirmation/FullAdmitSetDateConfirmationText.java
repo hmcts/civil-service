@@ -49,22 +49,27 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
             sb.append(" accepts your offer</h3>");
         }
         sb.append("<ul>")
-            .append("<li>pay ").append(applicantName).append(" by ")
-            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE)).append("</li>")
-            .append("<li>keep proof of any payments you make</li>")
-            .append("<li>make sure ").append(applicantName).append(" tells the court that you've paid</li>")
+            .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName).append(" by ")
+            .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE)).append("</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">keep proof of any payments you make</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">make sure ").append(applicantName).append(" tells the court that you've paid</p></li>")
             .append("</ul>")
             .append("<p>Contact ")
             .append(applicantName);
-        if (applicantName.endsWith("s")) {
-            sb.append("'");
-        } else {
-            sb.append("'s");
-        }
-        sb.append(" legal representative if you need details on how to pay.</p>")
-            .append("<p>If you do not pay immediately, ").append(applicantName)
-            .append(" can request a county court judgment against you.</p>")
 
+        if (!caseData.isApplicant1NotRepresented()) {
+            if (applicantName.endsWith("s")) {
+                sb.append("'");
+            } else {
+                sb.append("'s");
+            }
+            sb.append(" legal representative if you need details on how to pay</p>");
+        } else {
+            sb.append(" if you need details on how to pay</p>");
+        }
+
+        sb.append("<p>If you do not pay immediately, ").append(applicantName)
+            .append(" can request a county court judgment against you.</p>")
             .append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName);
         if (caseData.getApplicant2() != null) {
@@ -73,8 +78,11 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
             sb.append(" rejects your offer</h3>");
         }
         sb.append("<ul>")
-            .append("<li>the court will decide how you must pay</li>")
+            .append("<li><p class=\"govuk-!-margin-0\">the court will decide how you must pay</p></li>")
             .append("</ul>");
+        if (caseData.isApplicant1NotRepresented()) {
+            sb.append("<p>This case will now proceed offline.</p>");
+        }
         return Optional.of(sb.toString());
     }
 }

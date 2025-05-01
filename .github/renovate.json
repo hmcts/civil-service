@@ -1,37 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>hmcts/.github:renovate-config"
+    "local>hmcts/.github:renovate-config",
+    "local>hmcts/.github//renovate/automerge-minor"
   ],
-  "labels": [
-    "dependencies"
-  ],
-  "helmv3": {
-    "bumpVersion": "patch"
-  },
-  "regexManagers": [
-    {
-      "fileMatch": [
-        "^Dockerfile$"
-      ],
-      "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\sARG .*?_VERSION=(?<currentValue>.*)\\s"
-      ]
-    }
-  ],
+  "automergeSchedule": ["after 8am and before 11am every weekday"],
+  "schedule": ["after 8am and before 11am every weekday"],
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "*"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch",
-      "automerge": true
+      "matchPackagePatterns": ["pact"],
+      "enabled": false
     }
-  ],
-  "prConcurrentLimit": 10
+  ]
 }

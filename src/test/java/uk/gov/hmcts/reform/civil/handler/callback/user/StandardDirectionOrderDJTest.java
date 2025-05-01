@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,18 +15,23 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -31,10 +39,10 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.camunda.UpdateWaCourtLocationsService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -44,12 +52,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -57,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -80,17 +93,21 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     @MockBean
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
-    private LocationRefDataService locationRefDataService;
-    @MockBean
-    private IdamClient idamClient;
+    private LocationReferenceDataService locationRefDataService;
     @MockBean
     private UserDetails userDetails;
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
     @MockBean
     private FeatureToggleService featureToggleService;
     @MockBean
     private CategoryService categoryService;
+    @MockBean
+    private UpdateWaCourtLocationsService updateWaCourtLocationsService;
+    @Mock
+    private LocationHelper locationHelper;
 
     @Nested
     class AboutToStartCallback {
@@ -142,11 +159,14 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "trial-disposal-screen";
         private final LocalDate date = LocalDate.of(2022, 3, 29);
+        private LocalDate nextWorkingDayDate;
 
         @BeforeEach
         void setup() {
+            nextWorkingDayDate = LocalDate.of(2023, 12, 15);
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
-            given(idamClient.getUserDetails(any()))
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
+            given(userService.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
         }
 
@@ -177,7 +197,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is "
                                + "to be placed at the disposal hearing by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsDJ").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal copies of "
@@ -185,14 +205,14 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "of fact on whose evidence reliance is "
                                + "to be placed by 4pm on ");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input2")
                 .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input3")
                 .isEqualTo("Any application by the defendant in relation to CPR 32.7 "
                                + "must be made by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(2).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input4")
                 .isEqualTo("and must be accompanied by proposed directions for allocation"
                                + " and listing for trial on quantum. This is because"
@@ -209,30 +229,30 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "updating report which is uploaded to the "
                                + "Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("disposalHearingQuestionsToExpertsDJ").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(6).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("input1")
                 .isEqualTo("If there is a claim for ongoing or future loss in the original schedule of losses then the "
                                + "claimant must send an up to date schedule of loss to the defendant by 4pm on the");
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("input2")
                 .isEqualTo("If the defendant wants to challenge this claim,"
                                + " they must send an up-to-date "
                                + "counter-schedule of loss to the "
                                + "claimant by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("input3")
                 .isEqualTo("If the defendant wants to challenge the"
                                + " sums claimed in the schedule of loss they"
                                + " must upload to the Digital Portal an "
                                + "updated counter schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("inputText4")
                 .isEqualTo("If there is a claim for future pecuniary loss and the parties have not already set out "
                                + "their case on periodical payments, they must do so in the respective schedule"
@@ -255,7 +275,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "to the Digital Portal together with payment of any "
                                + "appropriate fee, by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(1).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             //trialHearingJudgesRecitalDJ
             assertThat(response.getData()).extracting("trialHearingJudgesRecitalDJ").extracting("input")
@@ -267,12 +287,12 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "the parties by uploading to the digital "
                                + "portal their lists of documents by 4pm on");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input2")
                 .isEqualTo("Any request to inspect a document, or for a copy of a "
                                + "document, shall be made directly to the other party by 4pm on");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(6).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input3")
                 .isEqualTo("Requests will be complied with within 7 days of the receipt of the request");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input4")
@@ -282,7 +302,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
                 .isEqualTo("by 4pm on");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             //trialHearingWitnessOfFactDJ
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input1")
@@ -306,7 +326,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Witness statements shall be uploaded to the "
                                + "Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input9")
                 .isEqualTo("Evidence will not be permitted at trial from a witness whose "
                                + "statement has not been uploaded in accordance with this"
@@ -316,7 +336,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             //trialHearingSchedulesOfLossDJ
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal "
-                               + "an up-to-date schedule of loss to the defendant by 4pm on");
+                               + "an up-to-date schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input2")
                 .isEqualTo("If the defendant wants to challenge this claim, "
                                + "upload to the Digital Portal counter-schedule"
@@ -327,9 +347,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "then they must do so in the respective schedule "
                                + "and counter-schedule");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             //trialHearingTrialDJ
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("input1")
@@ -353,7 +373,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + " Any such application must be received by the court "
                                + "(together with the appropriate fee) by 4pm on");
             assertThat(response.getData()).extracting("trialHearingNotesDJ").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(1).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             //Additional instructions
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input1")
@@ -370,13 +390,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "Scott Schedule with the relevant "
                                + "columns completed by 4pm on");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input4")
                 .isEqualTo("The defendant must upload to the Digital Portal "
                                + "an amended version of the Scott Schedule with the relevant"
                                + " columns in response completed by 4pm on");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("trialClinicalNegligence").extracting("input1")
                 .isEqualTo("Documents should be retained as follows:");
@@ -395,7 +415,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "to medical notes are to be made by reference to"
                                + " the pages in that bundle");
 
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input1")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("input1")
                 .isEqualTo("If impecuniosity is alleged by the claimant and not admitted "
                                + "by the defendant, the claimant's "
                                + "disclosure as ordered earlier in this order must "
@@ -412,26 +432,26 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "or \n    ii) the repair or replacement of the claimant's vehicle;\n"
                                + "c. Evidence of any loan, overdraft or other credit "
                                + "facilities available to the claimant");
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input2")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input2")
                 .isEqualTo("The claimant must upload to the Digital Portal a witness "
                                + "statement addressing \na) the need to hire a replacement "
                                + "vehicle; and \nb) impecuniosity");
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input3")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input3")
                 .isEqualTo("This statement must be uploaded to the Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input4")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("date1")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input4")
                 .isEqualTo("A failure to comply will result in the claimant being "
                                + "debarred from asserting need or relying on impecuniosity "
                                + "as the case may be at the final hearing, unless they "
                                + "have the permission of the trial Judge.");
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input5")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("input5")
                 .isEqualTo("The parties are to liaise and use reasonable endeavours to"
                                + " agree the basic hire rate no "
                                + "later than 4pm on");
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input6")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("sdoDJR2TrialCreditHireDetails").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("input6")
                 .isEqualTo("If the parties fail to agree rates subject to liability "
                                + "and/or other issues pursuant to the paragraph above, "
                                + "each party may rely upon the written evidence by way of"
@@ -440,14 +460,14 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + " location from a mainstream supplier, or a local reputable "
                                + "supplier if none is available. The defendant’s evidence is "
                                + "to be uploaded to the Digital Portal by 4pm on");
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input7")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("input7")
                 .isEqualTo("and the claimant’s evidence in reply if "
                                + "so advised is to be uploaded by 4pm on");
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("date4")
-                .isEqualTo(LocalDate.now().plusWeeks(14).toString());
-            assertThat(response.getData()).extracting("trialCreditHire").extracting("input8")
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("date4")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("sdoDJR2TrialCreditHire").extracting("input8")
                 .isEqualTo("This witness statement is limited to 10 pages per party "
                                + "(to include any appendices).");
 
@@ -462,13 +482,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "Scott Schedule with the relevant columns "
                                + "completed by 4pm on");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input4")
                 .isEqualTo("The defendant must upload to the Digital Portal "
                                + "the amended Scott Schedule with the relevant columns "
                                + "in response completed by 4pm on");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input1")
                 .isEqualTo("The claimant has permission to rely upon the written "
@@ -478,27 +498,27 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "correspondence or updating report which is uploaded "
                                + "to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input2")
                 .isEqualTo("Any questions which are to be addressed to an expert must "
                                + "be sent to the expert directly and uploaded to the Digital "
                                + "Portal by 4pm on");
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input3")
                 .isEqualTo("The answers to the questions shall be answered by the Expert by");
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input4")
                 .isEqualTo("and uploaded to the Digital Portal by");
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date4")
-                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("input")
-                .isEqualTo("Photographs and/or a place of the accident location shall be prepared "
+                .isEqualTo("Photographs and/or a plan of the accident location shall be prepared "
                                + "and agreed by the parties and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+                .isEqualTo(nextWorkingDayDate.toString());
 
             assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
                 .isEqualTo(String.format("This order has been made without a hearing. Each party "
@@ -536,6 +556,39 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPrePopulateDisclosureOfDocumentsForR2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearing().build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
+                .isEqualTo("Standard disclosure shall be provided by "
+                               + "the parties by uploading to the digital "
+                               + "portal their lists of documents by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date1")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input2")
+                .isEqualTo("Any request to inspect a document, or for a copy of a "
+                               + "document, shall be made directly to the other party by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date2")
+                .isEqualTo(nextWorkingDayDate.toString());
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input3")
+                .isEqualTo("Requests will be complied with within 7 days of the receipt of the request");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input4")
+                .isEqualTo("Each party must upload to the Digital Portal"
+                               + " copies of those documents on which they wish to rely"
+                               + " at trial");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
+                .isEqualTo("by 4pm on");
+            assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
+                .isEqualTo(nextWorkingDayDate.toString());
+        }
+
+        @Test
         void shouldPrePopulateDJTrialHearingToggle() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -544,6 +597,47 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
+            assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
+
+            assertThat(response.getData()).extracting("hearingMethodValuesTrialHearingDJ").isNull();
+            assertThat(response.getData()).extracting("hearingMethodValuesDisposalHearingDJ").isNull();
+        }
+
+        @Test
+        void shouldPopulateLocationListsWithPreselectedCourt() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedTrialHearing()
+                .build();
+
+            String preSelectedCourt = "214320";
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString())).thenReturn(locations);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            DynamicList expected = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            assertThat(responseCaseData.getTrialHearingMethodInPersonDJ()).isEqualTo(expected);
+            assertThat(responseCaseData.getDisposalHearingMethodInPersonDJ()).isEqualTo(expected);
         }
 
         @Test
@@ -564,14 +658,17 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             List<String> hearingMethodValuesDisposalHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
-            List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesDisposalHearingDJ.getListItems().stream()
+            List<String> hearingMethodValuesTrialHearingDJActual = hearingMethodValuesTrialHearingDJ.getListItems().stream()
                 .map(DynamicListElement::getLabel)
-                .collect(Collectors.toList());
+                .toList();
 
             assertThat(hearingMethodValuesDisposalHearingDJActual).containsOnly("In Person");
             assertThat(hearingMethodValuesTrialHearingDJActual).containsOnly("In Person");
+
+            assertThat(hearingMethodValuesTrialHearingDJ.getValue().getLabel()).isEqualTo(HearingMethod.IN_PERSON.getLabel());
+            assertThat(hearingMethodValuesDisposalHearingDJ.getValue().getLabel()).isEqualTo(HearingMethod.IN_PERSON.getLabel());
         }
 
         private DynamicList getHearingMethodValuesDisposalHearingDJ(AboutToStartOrSubmitCallbackResponse response) {
@@ -584,6 +681,32 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
             System.out.println(responseCaseData);
             return responseCaseData.getHearingMethodValuesTrialHearingDJ();
+        }
+
+        @Test
+        void shouldPopulateWelshSectionForSDOR2DJ() {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearing().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("sdoR2DisposalHearingWelshLanguageDJ")
+                .extracting("description").isEqualTo(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+            assertThat(response.getData()).extracting("sdoR2TrialWelshLanguageDJ")
+                .extracting("description").isEqualTo(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
         }
     }
 
@@ -695,7 +818,14 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldFinishBusinessProcess() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .disposalHearingMethodInPersonDJ(options)
+                .trialHearingMethodInPersonDJ(options)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
@@ -717,9 +847,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .build();
             List<Element<CaseDocument>> documentList = new ArrayList<>();
             documentList.add(element(testDocument));
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("1010101").region("orange").build())
+                .trialHearingMethodInPersonDJ(options)
+                .disposalHearingMethodInPersonDJ(options)
                 .orderSDODocumentDJCollection(documentList)
                 .build();
 
@@ -728,8 +862,84 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             //Then
-            assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("sdo");
+            assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink()
+                           .getCategoryID()).isEqualTo("caseManagementOrders");
         }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        //LR scenarios trigger and ignore hmcLipEnabled
+        "true, YES, YES, YES",
+        "false, YES, YES, YES",
+        // LiP vs LR - ignore HMC court
+        "true,  NO, YES, NO",
+        "false,  NO, YES, NO",
+        //LR vs LiP - ignore HMC court
+        "true, YES, NO, YES",
+        "false, YES, NO, NO",
+        //LiP vs LiP - ignore HMC court
+        "true, NO, NO, YES",
+        "false, NO, NO, NO"
+    })
+    void shouldPopulateHmcLipEnabled_whenLiPAndHmcLipEnabled(boolean isCPAndWhitelisted, YesOrNo applicantRepresented,
+                                                             YesOrNo respondent1Represented,
+                                                             YesOrNo eaCourtLocation) {
+
+        if (NO.equals(respondent1Represented)) {
+            when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(isCPAndWhitelisted);
+        } else {
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(isCPAndWhitelisted);
+        }
+
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .region("2")
+                                        .baseLocation("111")
+                                        .build())
+            .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                       .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
+
+        CallbackParams params = callbackParamsOf(caseData.toBuilder()
+                                                     .applicant1Represented(applicantRepresented)
+                                                     .respondent1Represented(respondent1Represented)
+                                                     .build(), ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertEquals(eaCourtLocation, responseCaseData.getEaCourtLocation());
+    }
+
+    @Test
+    void shouldNotCallUpdateWaCourtLocationsServiceWhenNotPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        handler = new StandardDirectionOrderDJ(mapper, defaultJudgmentOrderFormGenerator, locationRefDataService, featureToggleService,
+                                               userService, assignCategoryId, categoryService, locationHelper,
+                                               Optional.empty(), deadlinesCalculator, workingDayIndicator);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verifyNoInteractions(updateWaCourtLocationsService);
+    }
+
+    @Test
+    void shouldCallUpdateWaCourtLocationsServiceWhenPresent_AndMintiEnabled() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
     }
 
     @Nested

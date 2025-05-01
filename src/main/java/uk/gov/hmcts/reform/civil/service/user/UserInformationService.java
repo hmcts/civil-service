@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.extension.rest.exception.RemoteProcessEngineException;
+import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;

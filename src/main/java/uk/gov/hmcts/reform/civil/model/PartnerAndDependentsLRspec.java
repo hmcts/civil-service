@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -16,4 +17,9 @@ public class PartnerAndDependentsLRspec {
     private final YesOrNo supportedAnyoneFinancialRequired;
     private final String supportPeopleNumber;
     private final String supportPeopleDetails;
+
+    @JsonIgnore
+    public boolean hasPartner() {
+        return YesOrNo.YES == liveWithPartnerRequired;
+    }
 }

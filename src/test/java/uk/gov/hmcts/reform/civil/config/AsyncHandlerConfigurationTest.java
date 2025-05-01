@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AsyncHandlerConfigurationTest {
+class AsyncHandlerConfigurationTest {
 
     private static final int QUEUE_SIZE = 1;
     private static final int CORE_POOL_SIZE = 2;

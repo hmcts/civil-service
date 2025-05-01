@@ -31,3 +31,12 @@ variable "appinsights_location" {
 variable "send_grid_subscription" {
   default = "1c4f0704-a29e-403d-b719-b90c34ef14c9"
 }
+
+variable "custom_alerts_enabled" {
+  default = 0
+}
+
+variable "ccd_service_bus_status" {
+  type = string
+  default = "Active"
+}

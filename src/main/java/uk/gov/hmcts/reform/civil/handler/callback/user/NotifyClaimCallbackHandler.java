@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
@@ -21,9 +20,10 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,20 +67,18 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         + " step by 4:00pm on %s.%n%nThis is a new online process - you don't need to file any further documents"
         + " to the court";
 
-    public static final String DOC_SERVED_DATE_IN_FUTURE =
-        "Date you served the documents must be today or in the past";
-
-    public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
-        "Date of Service should not be more than 14 days old";
     public static final String ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT = "There is a problem"
         + "\n"
         + "This action cannot currently be performed because it has either already"
         + " been completed or another action must be completed first.";
+
+    public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
+
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final ServiceOfDateValidationMessageUtils serviceOfDateValidationMessageUtils;
     private final Time time;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -103,11 +101,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (!featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT))
-                .build();
-        }
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
         dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
@@ -143,13 +136,11 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateCosDefendant1(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         ArrayList<String> errors = new ArrayList<>();
         CertificateOfService certificateOfService = caseData.getCosNotifyClaimDefendant1();
-        final String dateValidErrorMessage = getServiceOfDateValidationMessage(certificateOfService);
-        if (!dateValidErrorMessage.isEmpty()) {
-            errors.add(dateValidErrorMessage);
-        }
+        List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfService);
+        errors.addAll(dateValidationErrorMessages);
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
 
@@ -163,10 +154,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
         ArrayList<String> errors = new ArrayList<>();
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(certificateOfServiceDef2);
-        if (!dateValidationErrorMessage.isEmpty()) {
-            errors.add(dateValidationErrorMessage);
-        }
+        List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef2);
+        errors.addAll(dateValidationErrorMessages);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
@@ -190,7 +179,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         // workaround for hiding cases in CAA list before case notify
         setOrganisationPolicy(caseData, caseDataBuilder);
         LocalDateTime claimDetailsNotificationDeadline;
-        if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
+        if (areAnyRespondentsLitigantInPerson(caseData)) {
             claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
             if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
                 caseDataBuilder
@@ -245,7 +234,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getDeadline(LocalDateTime claimNotificationDate) {
-        return deadlinesCalculator.plus14DaysAt4pmDeadline(claimNotificationDate);
+        return deadlinesCalculator.plus14DaysDeadline(claimNotificationDate);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -254,7 +243,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         String header = "";
         String body = "";
 
-        if (featureToggleService.isCertificateOfServiceEnabled() && isConfirmationForLip(caseData)) {
+        if (isConfirmationForLip(caseData)) {
             String formattedDeadline = formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(),
                                                        DATE);
             header = String.format(CONFIRMATION_COS_HEADER, caseData.getLegacyCaseReference());
@@ -304,16 +293,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return Objects.equals("Both", caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel());
     }
 
-    private boolean isCosDefendantNotifyDateFutureDate(LocalDate cosDateOfServiceForDefendant) {
-        return time.now().toLocalDate().isBefore(cosDateOfServiceForDefendant);
-    }
-
-    private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
-                                                        .atTime(time.now().toLocalTime())));
-
-    }
-
     private boolean isConfirmationForLip(CaseData caseData) {
         return (caseData.getDefendant1LIPAtClaimIssued() != null
             && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
@@ -324,19 +303,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
-            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
-    }
-
-    private String getServiceOfDateValidationMessage(CertificateOfService certificateOfService) {
-        final String errorMessage = "";
-        if (Objects.nonNull(certificateOfService)) {
-            if (isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
-                return DOC_SERVED_DATE_IN_FUTURE;
-            } else if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
-                return DOC_SERVED_DATE_OLDER_THAN_14DAYS;
-            }
-        }
-        return errorMessage;
+            || (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }
 
     private LocalDateTime getServiceDate(CaseData caseData) {

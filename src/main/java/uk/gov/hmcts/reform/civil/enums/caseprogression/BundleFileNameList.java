@@ -10,14 +10,15 @@ public enum BundleFileNameList {
     CL_REPLY("CL's reply %s"),
     DF2_DEFENCE("DF 2 Defence"),
     REPLY_TO_PART_18("%s reply to part 18 request %s"),
-    DIRECTIONS_QUESTIONNAIRE("Directions Questionnaire %s"),
+    DIRECTIONS_QUESTIONNAIRE("%s Directions Questionnaire %s"),
+    DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID("Directions Questionnaire %s"),
     DIRECTIONS_ORDER("Directions Order %s"),
     ORDER("Order %s"),
     WITNESS_STATEMENT_DISPLAY_NAME("%s - Statement %s"),
     WITNESS_STATEMENT_OTHER_DISPLAY_NAME("Witness Statement %s %s %s"),
     WITNESS_STATEMENT("Witness Statement"),
     WITNESS_SUMMARY("Witness Summary %s %s"),
-    DOC_REFERRED_TO("Documents referred to in statement %s %s"),
+    DOC_REFERRED_TO("%s referred to in the statement of %s %s"),
     HEARSAY_NOTICE("Hearsay notice %s %s"),
     NOTICE_TO_ADMIT_FACTS("Notice to admit facts %s %s"),
     DF_RESPONSE("DF Response %s"),
@@ -26,7 +27,12 @@ public enum BundleFileNameList {
     QUESTIONS_TO("Questions to %s %s"),
     REPLIES_FROM("Replies from %s %s"),
     JOINT_STATEMENTS_OF_EXPERTS("Joint statement of experts %s %s %s"),
-    SKELETON_ARGUMENT("%s Skeleton argument %s");
+    SKELETON_ARGUMENT("%s Skeleton argument %s"),
+    PARTICULARS_OF_CLAIM("Particulars Of Claim %s"),
+    CERTIFICATE_OF_SUITABILITY("Certificate Of Suitability %s"),
+    SCHEDULE_OF_LOSS("Schedule Of Loss %s"),
+    MEDICAL_REPORT("Medical Report %s");
+
     String displayName;
 
     public String getDisplayName() {

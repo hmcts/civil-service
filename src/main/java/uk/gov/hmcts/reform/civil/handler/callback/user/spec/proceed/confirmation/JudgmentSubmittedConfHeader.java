@@ -14,13 +14,14 @@ public class JudgmentSubmittedConfHeader implements RespondToResponseConfirmatio
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (caseData.isDefendantPaymentPlanNo()
-            || caseData.hasClaimantAgreedToFreeMediation()) {
+            || caseData.hasClaimantAgreedToFreeMediation()
+            || caseData.isCcjRequestJudgmentByAdmissionDefendantNotPaid()) {
             return Optional.empty();
         }
 
         String claimNumber = caseData.getLegacyCaseReference();
         return Optional.of(format(
-            "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
+            "# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
             claimNumber
         ));
     }

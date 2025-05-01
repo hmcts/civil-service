@@ -4,8 +4,27 @@ import lombok.Getter;
 
 import java.util.function.Predicate;
 
+/**
+ * Using DashboardClaimStatusFactory means the order of the values of this enum reflect priority.
+ */
 public enum DashboardClaimStatus {
 
+    CASE_DISMISSED(
+        Claim::isCaseDismissed
+    ),
+    CASE_STAYED(Claim::isCaseStayed),
+    DEFENDANT_APPLY_NOC(
+        Claim::isNocForDefendant
+    ),
+    HEARING_FEE_UNPAID(
+        Claim::isCaseStruckOut
+    ),
+    MEDIATION_UNSUCCESSFUL(
+        Claim::isMediationUnsuccessful
+    ),
+    MEDIATION_SUCCESSFUL(
+        Claim::isMediationSuccessful
+    ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
     ),
@@ -15,23 +34,86 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
-    SDO_ORDER_CREATED(
-        Claim::isSDOOrderCreated
+    SDO_ORDER_CREATED_PRE_CP(
+        Claim::isSDOOrderCreatedPreCP
     ),
-    MORE_DETAILS_REQUIRED(
-        Claim::isMoreDetailsRequired
+    SDO_ORDER_CREATED_CP(
+        Claim::isSDOOrderCreatedCP
     ),
-    MEDIATION_UNSUCCESSFUL(
-        Claim::isMediationUnsuccessful
+    SDO_ORDER_LEGAL_ADVISER_CREATED(
+        Claim::isSDOOrderLegalAdviserCreated
     ),
-    MEDIATION_SUCCESSFUL(
-        Claim::isMediationSuccessful
+    SDO_ORDER_IN_REVIEW(
+        Claim::isSDOOrderInReview
+    ),
+    SDO_ORDER_IN_REVIEW_OTHER_PARTY(
+        Claim::isSDOOrderInReviewOtherParty
+    ),
+    DECISION_FOR_RECONSIDERATION_MADE(
+        Claim::isDecisionForReconsiderationMade
+    ),
+    AWAITING_JUDGMENT(
+        Claim::isAwaitingJudgment
+    ),
+    BUNDLE_CREATED(
+        Claim::isBundleCreatedStatusActive
+    ),
+    TRIAL_ARRANGEMENTS_SUBMITTED(
+        Claim::trialArrangementsSubmitted
+    ),
+    TRIAL_ARRANGEMENTS_REQUIRED(
+        Claim::isTrialArrangementStatusActive
+    ),
+    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
+        Claim::isHwfPaymentOutcome
+    ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
+    CLAIMANT_HWF_PARTIAL_REMISSION(
+        Claim::isHwfPartialRemission
+    ),
+    CLAIMANT_HWF_FULL_REMISSION(
+        Claim::isHwfFullRemission
+    ),
+    CLAIMANT_HWF_UPDATED_REF_NUMBER(
+        Claim::isHwfUpdatedRefNumber
+    ),
+    CLAIMANT_HWF_INVALID_REF_NUMBER(
+        Claim::isHwfInvalidRefNumber
+    ),
+    CLAIM_SUBMIT_HWF(
+        Claim::isHwFClaimSubmit
+    ),
+    HWF_MORE_INFORMATION_NEEDED(
+        Claim::isHwFMoreInformationNeeded
+    ),
+    HEARING_SUBMIT_HWF(
+        Claim::isHwFHearingSubmit
+    ),
+    HEARING_FORM_GENERATED(
+        Claim::isTrialScheduledNoPaymentStatusActive
+    ),
+    HEARING_FORM_GENERATED_RELISTING(
+        Claim::isTrialScheduledPaymentPaidStatusActive
     ),
     IN_MEDIATION(
         Claim::isMediationPending
     ),
+    WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD_PRE_DEF_NOC_ONLINE(
+        Claim::isWaitingForClaimantIntentDocUploadPreDefendantNocOnline
+    ),
+    WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD_POST_DEF_NOC_ONLINE(
+        Claim::isWaitingForClaimantIntentDocUploadPostDefendantNocOnline
+    ),
     CLAIM_ENDED(
         Claim::hasClaimEnded
+    ),
+    CLAIMANT_REJECTED_PAYMENT_PLAN(
+        Claim::isPaymentPlanRejected
+    ),
+    CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION(
+        Claim::isPaymentPlanRejectedRequestedJudgeDecision
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
@@ -39,8 +121,26 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
+    CLAIMANT_AND_DEFENDANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantAndDefendantSignedSettlementAgreement
+    ),
+    DEFENDANT_REJECTED_SETTLEMENT_AGREEMENT(
+        Claim::hasDefendantRejectedSettlementAgreement
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT_DEADLINE_EXPIRED(
+        Claim::hasClaimantSignedSettlementAgreementAndDeadlineExpired
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantSignedSettlementAgreement
+    ),
     SETTLED(
         Claim::isSettled
+    ),
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
+    ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::defendantRespondedWithPreferredLanguageWelsh
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
@@ -57,21 +157,17 @@ public enum DashboardClaimStatus {
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
-    HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
+    DEFAULT_JUDGEMENT(
+        Claim::isClaimantDefaultJudgement
     ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
-    ),
-    ELIGIBLE_FOR_CCJ(
-        Claim::isEligibleForCCJ
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
@@ -85,14 +181,17 @@ public enum DashboardClaimStatus {
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
     ),
+    CLAIM_SUBMITTED_NOT_PAID_OR_FAILED(
+        Claim::isClaimSubmittedNotPaidOrFailedNotHwF
+    ),
+    CLAIM_SUBMITTED_WAITING_TRANSLATED_DOCUMENTS(
+        Claim::isClaimSubmittedWaitingTranslatedDocuments
+    ),
     NO_RESPONSE(
         Claim::hasResponsePending
     ),
     PROCEED_OFFLINE(
         Claim::isProceedOffline
-    ),
-    RESPONSE_BY_POST(
-        Claim::isPaperResponse
     ),
     CHANGE_BY_DEFENDANT(
         Claim::hasChangeRequestFromDefendant
@@ -112,8 +211,20 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-
-    NO_STATUS(c -> false);
+    CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionAccepted
+    ),
+    ELIGIBLE_FOR_CCJ(
+        Claim::isEligibleForCCJ
+    ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
+    DEFAULT_JUDGEMENT_ISSUED(Claim::isDefaultJudgementIssued),
+    NO_STATUS(c -> false),
+    ORDER_MADE(
+        Claim::isOrderMade
+    );
 
     @Getter
     private final Predicate<Claim> claimMatcher;

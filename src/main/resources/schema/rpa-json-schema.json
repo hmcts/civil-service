@@ -51,6 +51,7 @@
           "type": "string",
           "enum": [
             "PERSONAL INJURY",
+            "CLAIM - UNSPEC ONLY",
             "CLAIM - SPEC ONLY"
           ],
           "description": ""
@@ -75,6 +76,7 @@
             "FAST TRACK",
             "MULTI TRACK",
             "SMALL CLAIM TRACK",
+            "INTERMEDIATE TRACK",
             ""
           ],
           "description": ""
@@ -350,7 +352,11 @@
         "breathingSpaceMentalHealthLifted",
         "interlocutoryJudgment",
         "defaultJudgment",
-        "judgmentByAdmission"
+        "setAsideJudgment",
+        "judgmentByAdmission",
+        "generalFormOfApplication",
+        "defenceStruckOut",
+        "certificateOfSatisfactionOrCancellation"
       ],
       "properties": {
         "miscellaneous": {
@@ -544,11 +550,59 @@
           ],
           "description": ""
         },
+        "setAsideJudgment": {
+          "$id": "#/properties/events/properties/setAsideJudgment",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/setAsideJudgmentEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
         "judgmentByAdmission": {
           "$id": "#/properties/events/properties/judgmentByAdmission",
           "anyOf": [
             {
               "$ref": "#/definitions/judgmentByAdmissionEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "generalFormOfApplication": {
+          "$id": "#/properties/events/properties/generalFormOfApplication",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/generalFormOfApplicationEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "defenceStruckOut": {
+          "$id": "#/properties/events/properties/defenceStruckOut",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/defenceStruckOutEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "certificateOfSatisfactionOrCancellation": {
+          "$id": "#/properties/events/properties/certificateOfSatisfactionOrCancellation",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/certificateOfSatisfactionOrCancellationEventType"
             },
             {
               "$ref": "#/definitions/nullEventType"
@@ -1978,6 +2032,99 @@
         "additionalProperties": false
       }
     },
+    "setAsideJudgmentEventType": {
+      "$id": "#/definitions/setAsideJudgmentEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/setAsideJudgmentEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "litigiousPartyID",
+          "dateReceived",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "170",
+            "description": "The CASEMAN code for the setAsideJudgmentEventType event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/setAsideJudgmentEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/setAsideJudgmentEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "applicant": {
+                "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventDetails/properties/applicant",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 250,
+                "description": ""
+              },
+              "result": {
+                "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventDetails/properties/result",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 250,
+                "description": ""
+              },
+              "resultDate": {
+                "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventDetails/properties/resultDate",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "applicationDate": {
+                "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventDetails/properties/applicationDate",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "miscText": {
+                "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/setAsideJudgmentEventType/items/properties/eventDetailsText",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "judgmentByAdmissionEventType": {
       "$id": "#/definitions/judgmentByAdmissionEventType",
       "type": "array",
@@ -2071,6 +2218,8 @@
                   "FOR",
                   "MTH",
                   "WK",
+                  "FUL",
+                  "FW",
                   null
                 ],
                 "default": null,
@@ -2145,6 +2294,204 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetailsText",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "generalFormOfApplicationEventType": {
+      "$id": "#/definitions/generalFormOfApplicationEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/generalFormOfApplicationEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventCode",
+            "type": "string",
+            "description": "The CASEMAN code for the generalFormOfApplication event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetailsText",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "defenceStruckOutEventType": {
+      "$id": "#/definitions/defenceStruckOutEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/defenceStruckOutEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "57",
+            "description": "The CASEMAN code for the Judge decision of Struck out Defense."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventDetails",
+            "type": "null"
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventDetailsText",
+            "type": "null"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "certificateOfSatisfactionOrCancellationEventType": {
+      "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "litigiousPartyID",
+          "dateReceived",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "600",
+            "description": "The CASEMAN code for the certificateOfSatisfactionOrCancellationEventType event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/status",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 250,
+                "description": ""
+              },
+              "datePaidInFull": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/datePaidInFull",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "notificationReceiptDate": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/notificationReceiptDate",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "miscText": {
+                "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/certificateOfSatisfactionOrCancellationEventType/items/properties/eventDetailsText",
             "type": [
               "string",
               "null"

@@ -13,27 +13,29 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTim
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ.disposalHearingMethodInPerson;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_DISPOSAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_R2_TRIAL;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDisposalHearingTimeEstimateDJ;
@@ -46,7 +48,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private final FeatureToggleService featureToggleService;
     private final DocumentHearingLocationHelper locationHelper;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
@@ -57,10 +59,14 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             : getDocmosisTemplateTrial();
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
+
+        UserDetails userDetails = userService.getUserDetails(authorisation);
+        String judgeName = userDetails.getFullName();
+
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(caseData, docmosisTemplate),
+                getFileName(judgeName),
                 docmosisDocument.getBytes(),
                 DocumentType.DEFAULT_JUDGMENT_SDO_ORDER
             )
@@ -72,8 +78,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return null;
     }
 
-    private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
-        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(String judgeName) {
+        StringBuilder updatedFileName = new StringBuilder();
+        updatedFileName.append(LocalDate.now()).append("_").append(judgeName).append(".pdf");
+        return updatedFileName.toString();
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentForms(CaseData caseData, String authorisation) {
@@ -83,7 +91,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData, String authorisation) {
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserDetails userDetails = userService.getUserDetails(authorisation);
 
         boolean isJudge = false;
 
@@ -143,12 +151,16 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
         djOrderFormBuilder.hearingLocation(locationHelper.getHearingLocation(courtLocation, caseData, authorisation));
 
+        djOrderFormBuilder.hasDisposalHearingWelshSectionDJ(getToggleValue(caseData.getSdoR2DisposalHearingUseOfWelshLangToggleDJ()));
+        djOrderFormBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2DisposalHearingWelshLanguageDJ() != null
+                                                          ? caseData.getSdoR2DisposalHearingWelshLanguageDJ().getDescription() : null);
+
         return djOrderFormBuilder.build();
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData, String authorisation) {
         String trialHearingLocation = getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ());
-        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        UserDetails userDetails = userService.getUserDetails(authorisation);
 
         boolean isJudge = false;
 
@@ -167,6 +179,12 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialCreditHire(caseData.getTrialCreditHire())
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
+            .sdoDJR2TrialCreditHireAddSection(nonNull(caseData.getSdoDJR2TrialCreditHire()))
+            .sdoDJR2TrialCreditHireDetailsAddSection(
+                (nonNull(caseData.getSdoDJR2TrialCreditHire())
+                    && nonNull(caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle())
+                    && caseData.getSdoDJR2TrialCreditHire().getDetailsShowToggle()
+                    .equals(List.of(AddOrRemoveToggle.ADD))))
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
             .typeBundleInfo(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData))
             .trialHearingTrialDJAddSection(
@@ -214,19 +232,27 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                 authorisation
                             ));
 
+        djTrialTemplateBuilder.sdoDJR2TrialCreditHire(caseData.getSdoDJR2TrialCreditHire());
+        djTrialTemplateBuilder.hasTrialHearingWelshSectionDJ(getToggleValue(caseData.getSdoR2TrialUseOfWelshLangToggleDJ()));
+        djTrialTemplateBuilder.welshLanguageDescriptionDJ(caseData.getSdoR2TrialWelshLanguageDJ() != null
+                                                              ? caseData.getSdoR2TrialWelshLanguageDJ().getDescription() : null);
+
         return djTrialTemplateBuilder.build();
 
     }
 
     private DocmosisTemplates getDocmosisTemplate() {
-        return DJ_SDO_DISPOSAL;
+        return DJ_SDO_R2_DISPOSAL;
     }
 
     private DocmosisTemplates getDocmosisTemplateTrial() {
-        return DJ_SDO_TRIAL;
+        return  DJ_SDO_R2_TRIAL;
     }
 
     private String checkDefendantRequested(final CaseData caseData) {
+        if (caseData.isRespondent1NotRepresented()) {
+            return caseData.getRespondent1().getPartyName();
+        }
         String defendantName = caseData.getDefendantDetails().getValue().getLabel();
         if (BOTH_DEFENDANTS.equals(defendantName)) {
             return caseData.getRespondent1().getPartyName()
@@ -263,11 +289,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return "";
     }
 
-    private String fillTypeBundleInfoTrial() {
-        return "An indexed electronic bundle of documents for trial, with each page "
-            + "clearly numbered including a case summary limited to 500 words";
-    }
-
     private String fillDisposalHearingTime(DisposalHearingFinalDisposalHearingTimeEstimate type) {
         switch (type) {
             case FIFTEEN_MINUTES:
@@ -284,11 +305,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private boolean addAdditionalDirection(CaseData caseData) {
-        if (caseData.getDisposalHearingAddNewDirectionsDJ() != null
-            || caseData.getTrialHearingAddNewDirectionsDJ() != null) {
-            return true;
-        }
-        return false;
+        return caseData.getDisposalHearingAddNewDirectionsDJ() != null
+            || caseData.getTrialHearingAddNewDirectionsDJ() != null;
     }
 
     private String getCourt(CaseData caseData) {

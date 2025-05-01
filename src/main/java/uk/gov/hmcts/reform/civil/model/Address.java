@@ -1,20 +1,20 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.utils.ObjectUtils;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.utils.ObjectUtils;
 
 import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
 
 @Data
 @Builder(toBuilder = true)
-@JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address {

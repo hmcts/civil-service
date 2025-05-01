@@ -35,7 +35,7 @@ public class CourtLocationUtils {
         return preferredLocation.orElse(null);
     }
 
-    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
+    public Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
         String locationLabel = location.getSiteName()
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -13,8 +14,10 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +28,13 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandler implements NotificationData {
@@ -43,6 +49,7 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,12 +74,19 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             ? getRespondentSolicitorEmailAddress(caseData)
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
 
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        Map<String, String> notificationProperties = addProperties(caseData);
+        notificationProperties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getOrgName(caseData, callbackParams));
+
+        if (recipient != null) {
+            notificationService.sendMail(
+                recipient,
+                notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
+                notificationProperties,
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        } else {
+            log.info(String.format("Email address is null for %s", caseData.getLegacyCaseReference()));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -104,13 +118,14 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             }
         }
 
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(respondent),
-            PARTY_REFERENCES, buildPartiesReferences(caseData),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),
-            RESPONSE_INTENTION, getResponseIntentionForEmail(caseData)
-        );
+            RESPONSE_INTENTION, getResponseIntentionForEmail(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
+        ));
     }
 
     private boolean isCcNotification(CallbackParams callbackParams) {
@@ -141,5 +156,11 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             }
         }
         return respondentSolicitorEmailAddress;
+    }
+
+    private String getOrgName(CaseData caseData, CallbackParams callbackParams) {
+        return isCcNotification(callbackParams)
+            ? getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
+            : getApplicantLegalOrganizationName(caseData, organisationService);
     }
 }

@@ -5,19 +5,21 @@ import org.elasticsearch.core.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class CmcClaimTest {
 
     private static final String NAME = "Mr John Clark";
@@ -128,6 +130,7 @@ public class CmcClaimTest {
             .build();
 
         assertTrue(claim.hasClaimantRejectOffer());
+        assertNull(claim.getResponse().getPaymentIntention());
     }
 
     @Test
@@ -143,4 +146,145 @@ public class CmcClaimTest {
         AssertionsForClassTypes.assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
     }
 
+    @Test
+    void shouldReturnTrueIfOfferAcceptedAndClaimantSignedSettlementAgreement() {
+        //Given
+        CmcClaim claim = CmcClaim.builder()
+                .response(Response.builder()
+                        .responseType(RespondentResponseType.FULL_ADMISSION)
+                        .build())
+                .settlement(Settlement.builder()
+                        .partyStatements(List.of(
+                                PartyStatement.builder()
+                                        .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
+                                        .build(),
+                                PartyStatement.builder()
+                                        .type(StatementType.ACCEPTATION)
+                                        .build()))
+                        .build())
+                .claimantResponse(ClaimantResponse.builder().build())
+                .build();
+        //When
+        boolean signed = claim.hasClaimantSignedSettlementAgreement();
+        //Then
+        assertThat(signed).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueIfClaimantSignedSettlementAgreementChosenByCourt() {
+        //Given
+        CmcClaim claim = CmcClaim.builder()
+                .response(Response.builder()
+                        .responseType(RespondentResponseType.FULL_ADMISSION)
+                        .build())
+                .settlement(Settlement.builder()
+                        .partyStatements(List.of(
+                                PartyStatement.builder()
+                                        .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
+                                        .build(),
+                                PartyStatement.builder()
+                                        .type(StatementType.ACCEPTATION)
+                                        .build()))
+                        .build())
+                .claimantResponse(ClaimantResponse.builder()
+                        .courtDetermination(CourtDetermination.builder().build())
+                        .build())
+                .build();
+        //When
+        boolean signed = claim.hasClaimantSignedSettlementAgreement();
+        //Then
+        assertThat(signed).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueIfSettlementAgreementDeadlineExpired() {
+        //Given
+        CmcClaim claim = CmcClaim.builder()
+                .response(Response.builder()
+                        .responseType(RespondentResponseType.FULL_ADMISSION)
+                        .build())
+                .settlement(Settlement.builder()
+                        .partyStatements(List.of(
+                                PartyStatement.builder()
+                                        .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
+                                        .build(),
+                                PartyStatement.builder()
+                                        .type(StatementType.ACCEPTATION)
+                                        .build()))
+                        .build())
+                .claimantRespondedAt(LocalDateTime.MIN)
+                .build();
+        //When
+        boolean signed = claim.hasClaimantSignedSettlementAgreementAndDeadlineExpired();
+        //Then
+        assertThat(signed).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueIfBothSignedSettlementAgreement() {
+        //Given
+        CmcClaim claim = CmcClaim.builder()
+                .response(Response.builder()
+                        .responseType(RespondentResponseType.FULL_ADMISSION)
+                        .build())
+                .settlement(Settlement.builder()
+                        .partyStatements(List.of(
+                                PartyStatement.builder()
+                                        .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
+                                        .build(),
+                                PartyStatement.builder()
+                                        .type(StatementType.ACCEPTATION)
+                                        .build(),
+                                PartyStatement.builder()
+                                        .type(StatementType.COUNTERSIGNATURE)
+                                        .build()))
+                        .build())
+                .build();
+        //When
+        boolean signed = claim.hasClaimantAndDefendantSignedSettlementAgreement();
+        //Then
+        assertThat(signed).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueIfDefendantRejectedSettlementAgreement() {
+        //Given
+        CmcClaim claim = CmcClaim.builder()
+                .response(Response.builder()
+                        .responseType(RespondentResponseType.FULL_ADMISSION)
+                        .build())
+                .settlement(Settlement.builder()
+                        .partyStatements(List.of(
+                                PartyStatement.builder()
+                                        .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
+                                        .build(),
+                                PartyStatement.builder()
+                                        .type(StatementType.REJECTION)
+                                        .build()))
+                        .build())
+                .claimantResponse(ClaimantResponse.builder()
+                        .type(ClaimantResponseType.ACCEPTATION)
+                        .formaliseOption(FormaliseOption.SETTLEMENT)
+                        .build())
+                .build();
+        //When
+        boolean signed = claim.hasDefendantRejectedSettlementAgreement();
+        //Then
+        assertThat(signed).isTrue();
+    }
 }

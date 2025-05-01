@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.util.ArrayList;
@@ -23,12 +23,12 @@ public class LocationRefDataUtilTest {
     @InjectMocks
     private LocationRefDataUtil locationRefDataUtil;
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private LocationReferenceDataService locationRefDataService;
     private static final String BEARER_TOKEN = "Bearer Token";
 
     @BeforeEach
     void setup() {
-        locationRefDataService = mock(LocationRefDataService.class);
+        locationRefDataService = mock(LocationReferenceDataService.class);
         locationRefDataUtil = new LocationRefDataUtil(locationRefDataService);
     }
 

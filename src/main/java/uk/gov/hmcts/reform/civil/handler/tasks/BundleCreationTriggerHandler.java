@@ -10,17 +10,18 @@ import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
+public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
 
     private final BundleCreationTriggerService bundleCreationTriggerService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -28,9 +29,10 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
     private final CoreCaseDataService coreCaseDataService;
 
     @Override
-    public void handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = bundleCreationTriggerService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+    public ExternalTaskData handleTask(ExternalTask externalTask) {
+        Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
+        List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
+        log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
 
         cases.forEach(caseDetails -> {
             try {
@@ -44,6 +46,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
+        return ExternalTaskData.builder().build();
     }
 
     boolean getIsBundleCreatedForHearingDate(Long caseId) {
@@ -53,7 +56,7 @@ public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
         if (caseBundles != null) {
             isBundleCreated =
                 !(caseBundles.stream().filter(bundleIdValue -> bundleIdValue.getValue().getBundleHearingDate().isPresent()).filter(bundleIdValue -> bundleIdValue.getValue()
-                    .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).collect(Collectors.toList()).isEmpty());
+                    .getBundleHearingDate().get().isEqual(caseData.getHearingDate())).toList().isEmpty());
         }
         return isBundleCreated;
     }
