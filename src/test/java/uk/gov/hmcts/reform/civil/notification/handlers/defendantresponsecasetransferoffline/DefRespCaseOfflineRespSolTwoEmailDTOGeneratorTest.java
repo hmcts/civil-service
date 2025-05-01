@@ -62,7 +62,6 @@ class DefRespCaseOfflineRespSolTwoEmailDTOGeneratorTest {
         assertThat(result).isEqualTo(TEMPLATE_MULTIPARTY);
     }
 
-
     @Test
     void shouldReturnCorrectReferenceTemplate() {
         assertThat(generator.getReferenceTemplate())
