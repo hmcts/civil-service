@@ -31,7 +31,7 @@ public class CaseProceedsInCasemanPartiesEmailGenerator implements PartiesEmailG
 
         EmailDTO applicantEmailDTO = getApplicant(caseData);
         if (applicantEmailDTO != null) {
-            partiesToEmail.add(getApplicant(caseData));
+            partiesToEmail.add(applicantEmailDTO);
         }
 
         partiesToEmail.addAll(getRespondents(caseData));
