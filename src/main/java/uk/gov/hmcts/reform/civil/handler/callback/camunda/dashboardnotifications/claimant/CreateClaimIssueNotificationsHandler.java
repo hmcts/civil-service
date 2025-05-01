@@ -17,6 +17,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT;
 
 @Service
 public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandler {
@@ -56,6 +57,15 @@ public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandl
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
         );
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder()
+                    .params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
         if (caseData.isHWFTypeClaimIssued() && caseData.claimIssueFullRemissionNotGrantedHWF()) {
             dashboardScenariosService.recordScenarios(
                 authToken,
