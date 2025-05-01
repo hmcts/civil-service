@@ -3,24 +3,23 @@ package uk.gov.hmcts.reform.civil.notification.handlers.generatedjform;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
 @Component
-public class GenerateDJFormRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
+public class GenerateDJFormRequestedRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
     NotificationsProperties notificationsProperties;
     private static final String REFERENCE_TEMPLATE_APPROVAL_DEF = "interim-judgment-approval-notification-def-%s";
     private static final String REFERENCE_TEMPLATE_REQUEST_DEF = "interim-judgment-requested-notification-def-%s";
 
-    public GenerateDJFormRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties,
-                                                     OrganisationService organisationService) {
+    public GenerateDJFormRequestedRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
+                                                              OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }
