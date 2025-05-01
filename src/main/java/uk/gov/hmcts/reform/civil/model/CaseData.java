@@ -1557,6 +1557,22 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(lang -> lang.equals(Language.WELSH) || lang.equals(Language.BOTH))
             .orElse(false);
     }
+  
+    @JsonIgnore
+    public boolean isLipClaimantSpecifiedBilingualDocuments() {
+        return isApplicant1NotRepresented()
+            && getApplicant1DQ() != null
+            && getApplicant1DQ().getApplicant1DQLanguage() != null
+            && (getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.BOTH || getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.WELSH);
+    }
+
+    @JsonIgnore
+    public boolean isLipDefendantSpecifiedBilingualDocuments() {
+        return isRespondent1NotRepresented()
+            && getRespondent1DQ() != null
+            && getRespondent1DQ().getRespondent1DQLanguage() != null
+            && (getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.BOTH || getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.WELSH);
+    }
 
     @JsonIgnore
     public String getApplicantSolicitor1UserDetailsEmail() {
