@@ -592,7 +592,7 @@ docStore:
 
 logging:
   level:
-    uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter: OFF
+    uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter: ERROR
 
 ---
 
