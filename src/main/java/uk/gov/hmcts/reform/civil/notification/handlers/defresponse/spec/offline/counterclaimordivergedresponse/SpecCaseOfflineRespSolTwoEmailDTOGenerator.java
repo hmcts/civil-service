@@ -1,8 +1,8 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.spec.counterclaimordivergedresponse;
+package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.spec.offline.counterclaimordivergedresponse;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -10,14 +10,14 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
-public class SpecCaseOfflineRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+public class SpecCaseOfflineRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE =
         "defendant-response-case-handed-offline-respondent-notification-%s";
 
     private final SpecCaseOfflineHelper caseOfflineHelper;
 
-    public SpecCaseOfflineRespSolOneEmailDTOGenerator(SpecCaseOfflineHelper caseOfflineHelper, OrganisationService organisationService) {
+    public SpecCaseOfflineRespSolTwoEmailDTOGenerator(SpecCaseOfflineHelper caseOfflineHelper, OrganisationService organisationService) {
         super(organisationService);
         this.caseOfflineHelper = caseOfflineHelper;
     }
@@ -34,7 +34,7 @@ public class SpecCaseOfflineRespSolOneEmailDTOGenerator extends RespSolOneEmailD
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        boolean isRespondent1 = true;
+        boolean isRespondent1 = false;
         String respSolOrgName = getLegalOrganizationNameForRespondent(caseData,
                                                                       isRespondent1, organisationService);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, respSolOrgName);

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.fulldefence;
+package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.online.fulldefence;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;

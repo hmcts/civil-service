@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.spec.counterclaimordivergedresponse;
+package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.spec.offline.counterclaimordivergedresponse;
 
 import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;

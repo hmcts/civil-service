@@ -1,26 +1,26 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.otherresponse;
+package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.offline.otherresponse;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetransferoffline.DefRespCaseOfflineHelper.caseOfflineNotificationProperties;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 
 @Component
-public class DefRespCaseOfflineAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
+public class DefRespCaseOfflineRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE =
-        "defendant-response-case-handed-offline-applicant-notification-%s";
+        "defendant-response-case-handed-offline-respondent-notification-%s";
 
-    NotificationsProperties notificationsProperties;
+    private final NotificationsProperties notificationsProperties;
 
-    public DefRespCaseOfflineAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
+    public DefRespCaseOfflineRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }
@@ -40,9 +40,10 @@ public class DefRespCaseOfflineAppSolOneEmailDTOGenerator extends AppSolOneEmail
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties,
-                                                      CaseData caseData) {
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        boolean isRespondent1 = false;
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                                                                                        isRespondent1, organisationService));
         properties.putAll(caseOfflineNotificationProperties(caseData));
         return properties;
     }

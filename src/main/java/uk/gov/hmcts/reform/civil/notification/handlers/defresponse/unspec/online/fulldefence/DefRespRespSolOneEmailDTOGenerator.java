@@ -1,8 +1,8 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.fulldefence;
+package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.online.fulldefence;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -13,13 +13,13 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
-public class DefRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
+public class DefRespRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
     protected static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
-    NotificationsProperties notificationsProperties;
+    private final NotificationsProperties notificationsProperties;
 
-    public DefRespAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
+    public DefRespRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }

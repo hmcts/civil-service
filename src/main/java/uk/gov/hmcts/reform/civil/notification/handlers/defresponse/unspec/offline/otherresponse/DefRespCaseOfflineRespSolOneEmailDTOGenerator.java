@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.otherresponse;
+package uk.gov.hmcts.reform.civil.notification.handlers.defresponse.unspec.offline.otherresponse;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;

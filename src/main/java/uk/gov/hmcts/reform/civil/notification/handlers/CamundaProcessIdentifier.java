@@ -7,5 +7,8 @@ public enum CamundaProcessIdentifier {
     GenerateOrderNotifyParties,
     DefendantResponseUnspecFullDefenceNotifyParties,
     DefendantResponseUnspecCaseHandedOfflineNotifyParties,
-    DefendantResponseSpecCaseHandedOfflineNotifyParties
+    DefendantResponseSpecCaseHandedOfflineNotifyParties,
+    DefendantResponseSpecFullDefenceFullPartAdmitNotifyParties,
+    DefendantResponseSpecOneRespRespondedNotifyParties,
+    DefendantResponseSpecLipvLRFullOrPartAdmit
 }
