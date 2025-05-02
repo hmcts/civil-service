@@ -22,7 +22,9 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_STAY_LIFTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +50,12 @@ class NotifyClaimantStayLiftedHandlerTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
 
     @InjectMocks
     private NotifyClaimantStayLiftedHandler handler;
@@ -107,6 +119,13 @@ class NotifyClaimantStayLiftedHandlerTest {
 
     @Test
     void sendNotificationShouldSendEmail() {
+        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                             + "\n For all other matters, call 0300 123 7050");
+        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+
         caseData = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
             .build();
@@ -124,7 +143,11 @@ class NotifyClaimantStayLiftedHandlerTest {
                 "name", "John Doe",
                 "claimantvdefendant", "John Doe V Jack Jackson",
                 "partyReferences", buildPartiesReferencesEmailSubject(caseData),
-                "casemanRef", caseData.getLegacyCaseReference()
+                "casemanRef", caseData.getLegacyCaseReference(),
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
             ),
             "stay-lifted-claimant-notification-1594901956117591"
         );

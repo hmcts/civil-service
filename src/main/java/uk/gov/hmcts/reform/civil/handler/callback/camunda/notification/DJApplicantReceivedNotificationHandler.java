@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -154,6 +155,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,
                        toggleService.isQueryManagementLRsEnabled());
         return properties;
@@ -178,6 +181,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,
                        toggleService.isQueryManagementLRsEnabled());
         return properties;
@@ -194,6 +199,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,
                        toggleService.isQueryManagementLRsEnabled());
         return properties;
@@ -210,6 +217,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,
                        toggleService.isQueryManagementLRsEnabled());
         return properties;

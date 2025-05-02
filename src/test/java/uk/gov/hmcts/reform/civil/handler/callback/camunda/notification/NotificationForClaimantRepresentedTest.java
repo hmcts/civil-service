@@ -20,7 +20,9 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -54,6 +56,10 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
     private ArgumentCaptor<String> targetEmail;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
     @Captor
     private ArgumentCaptor<String> emailTemplate;
     @Captor
@@ -159,6 +165,12 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSendNotificationToApplicantSolicitorAfterNoc() {
             //Given
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             CaseData caseData = CaseData.builder()
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                             DEFENDANT_EMAIL_ADDRESS).build())

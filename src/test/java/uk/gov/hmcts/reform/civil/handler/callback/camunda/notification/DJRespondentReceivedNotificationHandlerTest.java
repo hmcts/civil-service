@@ -262,10 +262,6 @@ class DJRespondentReceivedNotificationHandlerTest {
         void shouldGenerateEmail_whenInvokedAnd1v1AndLRvLiP() {
             when(notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate())
                 .thenReturn("test-template-requested-id");
-            when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested())
-                .thenReturn("test-template-requested-id");
-            when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
