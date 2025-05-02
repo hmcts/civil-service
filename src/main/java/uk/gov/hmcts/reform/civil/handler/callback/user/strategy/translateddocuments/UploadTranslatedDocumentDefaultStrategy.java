@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,9 +37,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         updateSystemGeneratedDocumentsWithOriginalDocuments(callbackParams);
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
-        if (!caseData.getPreTranslationDocuments().isEmpty()) {
-            updatedDocumentList = updateSystemGeneratedDocumentsWithPreTranslationDocument(callbackParams, updatedDocumentList);
-        }
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
         CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
@@ -49,9 +45,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataLip.setTranslatedDocuments(null);
         }
 
-        CaseData updatedCaseData = caseData.toBuilder()
-            .preTranslationDocuments(null)
-            .systemGeneratedCaseDocuments(updatedDocumentList)
+        CaseData updatedCaseData = caseData.toBuilder().systemGeneratedCaseDocuments(
+                updatedDocumentList)
             .caseDataLiP(caseDataLip)
             .businessProcess(BusinessProcess.ready(businessProcessEvent)).build();
 
@@ -90,15 +85,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             });
         }
         return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocuments, callbackParams);
-    }
-
-    private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithPreTranslationDocument(
-        CallbackParams callbackParams, List<Element<CaseDocument>> updatedDocumentList) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<Element<CaseDocument>> merged = new ArrayList<>(updatedDocumentList);
-        merged.addAll(caseData.getPreTranslationDocuments());
-        return merged;
-
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {

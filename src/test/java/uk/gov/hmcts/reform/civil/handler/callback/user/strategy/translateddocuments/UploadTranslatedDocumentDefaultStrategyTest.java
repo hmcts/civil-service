@@ -170,33 +170,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldAddPreTranslationDocuments_WhenLipVsLRAndCcdState_In_Respondent_Acknowledge() {
-        //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
-            .build().toBuilder()
-            .respondent1Represented(YesOrNo.YES)
-            .specRespondent1Represented(YesOrNo.YES)
-            .applicant1Represented(YesOrNo.NO)
-            .preTranslationDocuments(List.of(Element.<CaseDocument>builder().value(
-                CaseDocument.builder().documentName("docName").documentLink(Document.builder().build()).build()).build()))
-            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-            .ccdCaseReference(123L)
-            .build();
-
-        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
-        //When
-        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
-            callbackParams);
-        //Then
-        assertThat(response.getData())
-            .extracting("businessProcess")
-            .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
-    }
-
-    @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeIsOrderNotice_ToggleEnabledCP() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
