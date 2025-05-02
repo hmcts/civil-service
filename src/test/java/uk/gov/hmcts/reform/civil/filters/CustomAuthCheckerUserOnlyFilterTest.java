@@ -23,7 +23,6 @@ class CustomAuthCheckerUserOnlyFilterTest {
     @Mock
     private HttpServletRequest request;
 
-
     private CustomAuthCheckerUserOnlyFilter<User> filter;
 
     @BeforeEach
