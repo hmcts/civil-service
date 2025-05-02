@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.fulldefencefulladmitpartadmit;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
@@ -9,11 +9,11 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-public class SpecRespRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+public class SpecDefRespRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private final SpecRespEmailHelper specRespEmailHelper;
+    private final SpecDefRespEmailHelper specRespEmailHelper;
 
-    public SpecRespRespSolOneEmailDTOGenerator(SpecRespEmailHelper specRespEmailHelper, OrganisationService organisationService) {
+    public SpecDefRespRespSolOneEmailDTOGenerator(SpecDefRespEmailHelper specRespEmailHelper, OrganisationService organisationService) {
         super(organisationService);
         this.specRespEmailHelper = specRespEmailHelper;
     }
@@ -25,7 +25,7 @@ public class SpecRespRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGener
 
     @Override
     protected String getReferenceTemplate() {
-        return SpecRespEmailHelper.REFERENCE_TEMPLATE;
+        return SpecDefRespEmailHelper.REFERENCE_TEMPLATE;
     }
 
     @Override

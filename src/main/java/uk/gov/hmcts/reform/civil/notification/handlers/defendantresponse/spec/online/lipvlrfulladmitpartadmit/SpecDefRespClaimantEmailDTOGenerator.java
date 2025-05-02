@@ -1,18 +1,19 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.fulldefencefulladmitpartadmit;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.lipvlrfulladmitpartadmit;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common.SpecDefRespEmailHelper;
 
 import java.util.Map;
 
 @Component
-public class SpecRespClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
+public class SpecDefRespClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     protected static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
-    private final SpecRespEmailHelper specRespEmailHelper;
+    private final SpecDefRespEmailHelper specRespEmailHelper;
 
-    public SpecRespClaimantEmailDTOGenerator(SpecRespEmailHelper specRespEmailHelper) {
+    public SpecDefRespClaimantEmailDTOGenerator(SpecDefRespEmailHelper specRespEmailHelper) {
         this.specRespEmailHelper = specRespEmailHelper;
     }
 
@@ -23,7 +24,7 @@ public class SpecRespClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator
 
     @Override
     protected String getReferenceTemplate() {
-        return SpecRespEmailHelper.REFERENCE_TEMPLATE;
+        return SpecDefRespEmailHelper.REFERENCE_TEMPLATE;
     }
 
     @Override

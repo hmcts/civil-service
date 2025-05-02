@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.onlyonerespondentrespond;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -11,11 +11,11 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
 @Component
-public class SpecRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
+public class SpecDefRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    private final SpecRespEmailHelper specRespEmailHelper;
+    private final SpecDefRespEmailHelper specRespEmailHelper;
 
-    public SpecRespAppSolOneEmailDTOGenerator(SpecRespEmailHelper specRespEmailHelper, OrganisationService organisationService) {
+    public SpecDefRespAppSolOneEmailDTOGenerator(SpecDefRespEmailHelper specRespEmailHelper, OrganisationService organisationService) {
         super(organisationService);
         this.specRespEmailHelper = specRespEmailHelper;
     }
@@ -27,7 +27,7 @@ public class SpecRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerat
 
     @Override
     protected String getReferenceTemplate() {
-        return SpecRespEmailHelper.REFERENCE_TEMPLATE;
+        return SpecDefRespEmailHelper.REFERENCE_TEMPLATE;
     }
 
     @Override

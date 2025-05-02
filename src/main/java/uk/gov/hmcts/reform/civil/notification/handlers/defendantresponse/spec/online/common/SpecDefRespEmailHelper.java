@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.onlyonerespondentrespond;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,9 +15,9 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_AD
 
 @Component
 @AllArgsConstructor
-public class SpecRespEmailHelper {
+public class SpecDefRespEmailHelper {
 
-    protected static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
+    public static final String REFERENCE_TEMPLATE = "defendant-response-spec-notification-%s";
     private final NotificationsProperties notificationsProperties;
 
     public String getAppSolTemplate(CaseData caseData) {
