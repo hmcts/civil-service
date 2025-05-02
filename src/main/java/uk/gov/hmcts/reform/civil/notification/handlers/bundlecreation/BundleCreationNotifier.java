@@ -10,7 +10,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 public class BundleCreationNotifier extends Notifier {
 
     public BundleCreationNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
-                                  BundleCreationPartiesEmailGenerator partiesNotifier) {
+                                  BundleCreationAllPartiesEmailGenerator partiesNotifier) {
         super(notificationService, caseTaskTrackingService, partiesNotifier);
     }
 
