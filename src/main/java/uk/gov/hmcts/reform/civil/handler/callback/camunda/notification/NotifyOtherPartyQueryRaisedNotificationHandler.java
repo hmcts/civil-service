@@ -61,6 +61,10 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
 
     private CallbackResponse notifyOtherPartyQueryHasBeenRaised(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        // to avoid null pointer exception for lip bypassing the notification
+        if (caseData.isLipCase()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String queryId = processVariables.getQueryId();
