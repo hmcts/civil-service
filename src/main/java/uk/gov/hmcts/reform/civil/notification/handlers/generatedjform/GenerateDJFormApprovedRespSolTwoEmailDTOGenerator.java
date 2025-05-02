@@ -1,15 +1,12 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.generatedjform;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
-
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
 @Component
 public class GenerateDJFormApprovedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
 
 import java.util.HashMap;
@@ -46,15 +47,25 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
         Set<EmailDTO> recipients = new HashSet<>();
         if (isOneVTwoTwoLegalRep(caseData)) {
             if (generateDJFormHelper.checkDefendantRequested(caseData, true)) {
-                recipients.add(requestedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData));
+                addIfPartyNeedsNotification(caseData,
+                                            requestedRespSolOneEmailDTOGenerator,
+                                            recipients);
             } else if (generateDJFormHelper.checkDefendantRequested(caseData, false)) {
-                recipients.add(requestedRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData));
+                addIfPartyNeedsNotification(caseData,
+                                            requestedRespSolTwoEmailDTOGenerator,
+                                            recipients);
             } else if (generateDJFormHelper.checkIfBothDefendants(caseData)) {
-                recipients.add(approvedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData));
-                recipients.add(approvedRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData));
+                addIfPartyNeedsNotification(caseData,
+                                            approvedRespSolOneEmailDTOGenerator,
+                                            recipients);
+                addIfPartyNeedsNotification(caseData,
+                                            approvedRespSolTwoEmailDTOGenerator,
+                                            recipients);
             }
         } else {
-            recipients.add(approvedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData));
+            addIfPartyNeedsNotification(caseData,
+                                        approvedRespSolOneEmailDTOGenerator,
+                                        recipients);
         }
         return recipients;
     }
@@ -66,7 +77,10 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
                 || generateDJFormHelper.checkDefendantRequested(caseData, false)) {
                 recipients.add(requestedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData));
             } else if (generateDJFormHelper.checkIfBothDefendants(caseData)) {
-                recipients.add(approvedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData));
+                //Add respondent1 properties and send app sol email
+                recipients.add(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData));
+
+                //Add respondent2 properties and send new app solicitor email
                 EmailDTO emailDTO = approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData);
 
                 //If checkIfBothDefendants true - update defendant name key
@@ -78,5 +92,15 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
             recipients.add(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData));
         }
         return recipients;
+    }
+
+    private void addIfPartyNeedsNotification(CaseData caseData,
+                                             EmailDTOGenerator generator,
+                                             Set<EmailDTO> partiesToEmail) {
+        if ((generator != null) && generator.getShouldNotify(caseData)) {
+            log.info("Generating email for party [{}] for case ID: {}",
+                     generator.getClass().getSimpleName(), caseData.getCcdCaseReference());
+            partiesToEmail.add(generator.buildEmailDTO(caseData));
+        }
     }
 }
