@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
@@ -80,13 +79,12 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF2_DEFENSE_DQ.getValue());
             assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
         }
-        CaseDocument stitchedDocumentCopy = null;
-        CaseDocument stitchedDocument = null;
+
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("Calling civil stitch service for generate response sealed form for caseId {}", caseId);
             String auth = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
-            stitchedDocument =
+            CaseDocument stitchedDocument =
                 civilStitchService.generateStitchedCaseDocument(documentMetaDataList,
                                                                 sealedForm.getDocumentName(),
                                                                 caseId,
@@ -94,27 +92,20 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                                                                 auth);
             log.info("Civil stitch service for generate response sealed form {} for caseId {}", stitchedDocument, caseId);
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
-            stitchedDocumentCopy = assignCategoryId.copyCaseDocumentWithCategoryId(stitchedDocument, DocCategory.DQ_DEF1.getValue());
+            CaseDocument stitchedDocumentCopy = assignCategoryId.copyCaseDocumentWithCategoryId(stitchedDocument, DocCategory.DQ_DEF1.getValue());
             if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF2_DEFENSE_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, DocCategory.DQ_DEF2.getValue());
             }
-        }
-
-        boolean bilingual = caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual();
-
-        CaseDocument primary   = stitchEnabled ? stitchedDocument : sealedForm;
-        CaseDocument duplicate = stitchEnabled ? stitchedDocumentCopy : copy;
-
-        List<Element<CaseDocument>> target = bilingual
-            ? caseData.getPreTranslationDocuments()
-            : caseData.getSystemGeneratedCaseDocuments();
-
-        target.add(ElementUtils.element(primary));
-
-        if (Objects.nonNull(duplicate)) {
-            caseData.getDuplicateSystemGeneratedCaseDocs()
-                .add(ElementUtils.element(duplicate));
+            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+            if (Objects.nonNull(stitchedDocumentCopy)) {
+                caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(stitchedDocumentCopy));
+            }
+        } else {
+            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
+            if (Objects.nonNull(copy)) {
+                caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(copy));
+            }
         }
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 

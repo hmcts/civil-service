@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
@@ -357,67 +356,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
         assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
-    }
-
-    @Test
-    void shouldAddSealedFormToPreTranslationAndDuplicate_whenBilingualAndStitchDisabled() {
-        // Given
-        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
-        CaseData bilingualCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .claimantBilingualLanguagePreference(Language.WELSH.toString())
-            .build();
-
-        CallbackParams params = callbackParamsOf(bilingualCaseData, ABOUT_TO_SUBMIT);
-        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString()))
-            .thenReturn(SEALED_FORM);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-        // Then
-        long countPrimary = updatedData.getPreTranslationDocuments().stream()
-            .filter(e -> e.getValue().getDocumentName().equals(SEALED_FORM.getDocumentName()))
-            .count();
-        assertThat(countPrimary).isEqualTo(1);
-
-        long countDuplicate = updatedData.getDuplicateSystemGeneratedCaseDocs().stream()
-            .filter(e -> e.getValue().getDocumentName().equals(SEALED_FORM.getDocumentName()))
-            .count();
-        assertThat(countDuplicate).isEqualTo(1);
-    }
-
-    @Test
-    void shouldAddStitchedDocToPreTranslationAndDuplicate_whenBilingualAndStitchEnabled() {
-        // Given
-        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
-        CaseData bilingualCaseData = CaseDataBuilder.builder()
-            .atStatePendingClaimIssued().build().toBuilder()
-            .claimantBilingualLanguagePreference(Language.WELSH.toString())
-            .build();
-
-        CallbackParams params = callbackParamsOf(bilingualCaseData, ABOUT_TO_SUBMIT);
-        when(sealedClaimResponseFormGeneratorForSpec.generate(any(CaseData.class), anyString()))
-            .thenReturn(SEALED_FORM);
-        when(civilStitchService.generateStitchedCaseDocument(
-            anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE), anyString()))
-            .thenReturn(STITCHED_DOC);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-        // Then
-        long countPrimary = updatedData.getPreTranslationDocuments().stream()
-            .filter(e -> e.getValue().getDocumentName().equals(STITCHED_DOC.getDocumentName()))
-            .count();
-        assertThat(countPrimary).isEqualTo(1);
-
-        long countDuplicate = updatedData.getDuplicateSystemGeneratedCaseDocs().stream()
-            .filter(e -> e.getValue().getDocumentName().equals(STITCHED_DOC.getDocumentName()))
-            .count();
-        assertThat(countDuplicate).isEqualTo(1);
     }
 
     @Test
