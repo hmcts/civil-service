@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetransferoffline;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantResponse.unspec.offline.otherresponses;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,24 +17,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.notification.handlers.defendantResponse.unspec.offline.otherresponses.DefRespCaseOfflineHelper.caseOfflineNotificationProperties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
-class DefRespCaseOfflineRespSolTwoEmailDTOGeneratorTest {
+class DefRespCaseOfflineRespSolOneEmailDTOGeneratorTest {
 
     private static final String TEMPLATE_1V1 = "template-1v1";
     private static final String TEMPLATE_MULTIPARTY = "template-multiparty";
-    private static final String LEGAL_ORG_NAME = "Test Organisation";
+    private static final String LEGAL_ORG_NAME = "Resp1 Legal Org";
 
     private NotificationsProperties notificationsProperties;
     private OrganisationService organisationService;
-
-    private DefRespCaseOfflineRespSolTwoEmailDTOGenerator generator;
+    private DefRespCaseOfflineRespSolOneEmailDTOGenerator generator;
 
     @BeforeEach
     void setUp() {
         notificationsProperties = mock(NotificationsProperties.class);
         organisationService = mock(OrganisationService.class);
-        generator = new DefRespCaseOfflineRespSolTwoEmailDTOGenerator(notificationsProperties, organisationService);
+        generator = new DefRespCaseOfflineRespSolOneEmailDTOGenerator(notificationsProperties, organisationService);
     }
 
     @Test
@@ -45,9 +45,9 @@ class DefRespCaseOfflineRespSolTwoEmailDTOGeneratorTest {
 
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn(TEMPLATE_1V1);
 
-        String result = generator.getEmailTemplateId(caseData);
+        String templateId = generator.getEmailTemplateId(caseData);
 
-        assertThat(result).isEqualTo(TEMPLATE_1V1);
+        assertThat(templateId).isEqualTo(TEMPLATE_1V1);
     }
 
     @Test
@@ -57,41 +57,34 @@ class DefRespCaseOfflineRespSolTwoEmailDTOGeneratorTest {
             .build();
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty()).thenReturn(TEMPLATE_MULTIPARTY);
 
-        String result = generator.getEmailTemplateId(caseData);
+        String templateId = generator.getEmailTemplateId(caseData);
 
-        assertThat(result).isEqualTo(TEMPLATE_MULTIPARTY);
+        assertThat(templateId).isEqualTo(TEMPLATE_MULTIPARTY);
     }
 
     @Test
     void shouldReturnCorrectReferenceTemplate() {
-        assertThat(generator.getReferenceTemplate())
-            .isEqualTo("defendant-response-case-handed-offline-respondent-notification-%s");
+        String referenceTemplate = generator.getReferenceTemplate();
+        assertThat(referenceTemplate).isEqualTo("defendant-response-case-handed-offline-respondent-notification-%s");
     }
 
     @Test
     void shouldAddCustomProperties() {
         CaseData caseData = mock(CaseData.class);
-        Map<String, String> baseProps = Map.of("existing", "value");
+        Map<String, String> inputProps = new HashMap<>();
+        Map<String, String> offlineProps = Map.of("caseKey", "offlineVal");
 
-        Map<String, String> offlineProps = Map.of("offlineKey", "offlineValue");
-        Map<String, String> expected = Map.of(
-            "existing", "value",
-            NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC, LEGAL_ORG_NAME,
-            "offlineKey", "offlineValue"
-        );
+        try (var utilsMock = mockStatic(NotificationUtils.class);
+             var helperMock = mockStatic(DefRespCaseOfflineHelper.class)) {
 
-        try (
-            var utilsMock = mockStatic(NotificationUtils.class);
-            var helperMock = mockStatic(DefRespCaseOfflineHelper.class)
-        ) {
-            utilsMock.when(() -> getLegalOrganizationNameForRespondent(caseData, false, organisationService))
+            utilsMock.when(() -> getLegalOrganizationNameForRespondent(caseData, true, organisationService))
                 .thenReturn(LEGAL_ORG_NAME);
-            helperMock.when(() -> DefRespCaseOfflineHelper.caseOfflineNotificationProperties(caseData))
-                .thenReturn(offlineProps);
+            helperMock.when(() -> caseOfflineNotificationProperties(caseData)).thenReturn(offlineProps);
 
-            Map<String, String> result = generator.addCustomProperties(new HashMap<>(baseProps), caseData);
+            Map<String, String> result = generator.addCustomProperties(inputProps, caseData);
 
-            assertThat(result).containsExactlyInAnyOrderEntriesOf(expected);
+            assertThat(result).containsEntry(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC, LEGAL_ORG_NAME)
+                .containsEntry("caseKey", "offlineVal");
         }
     }
 }

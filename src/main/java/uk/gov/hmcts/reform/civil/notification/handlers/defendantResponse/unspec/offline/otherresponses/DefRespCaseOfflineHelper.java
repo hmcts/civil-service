@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetransferoffline;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantResponse.unspec.offline.otherresponses;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 

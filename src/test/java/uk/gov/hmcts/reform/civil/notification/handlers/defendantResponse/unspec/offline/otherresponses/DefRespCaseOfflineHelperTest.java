@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetransferoffline;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantResponse.unspec.offline.otherresponses;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.notification.handlers.defendantresponsecasetransferoffline.DefRespCaseOfflineHelper.caseOfflineNotificationProperties;
+import static uk.gov.hmcts.reform.civil.notification.handlers.defendantResponse.unspec.offline.otherresponses.DefRespCaseOfflineHelper.caseOfflineNotificationProperties;
 
 class DefRespCaseOfflineHelperTest {
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantResponse.unspec.online.fulldefence;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,37 +18,65 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
-class DefendantResponseAppSolOneEmailDTOGeneratorTest {
+class DefendantResponseRespSolOneEmailDTOGeneratorTest {
 
-    private DefendantResponseAppSolOneEmailDTOGenerator generator;
+    private DefendantResponseRespSolOneEmailDTOGenerator generator;
     private NotificationsProperties notificationsProperties;
 
     @BeforeEach
     void setUp() {
         notificationsProperties = mock(NotificationsProperties.class);
         OrganisationService organisationService = mock(OrganisationService.class);
-        generator = new DefendantResponseAppSolOneEmailDTOGenerator(notificationsProperties, organisationService);
+        generator = new DefendantResponseRespSolOneEmailDTOGenerator(notificationsProperties, organisationService);
     }
 
     @Test
-    void shouldAddRespondentNameAndAllocatedTrack_OneVOneScenario() {
-        Party respondent = Party.builder().type(Party.Type.INDIVIDUAL)
-            .individualFirstName("John").individualLastName("Doe").build();
-        CaseData caseData = CaseData.builder()
-            .respondent1(respondent)
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+    void shouldReturnCorrectEmailTemplateId() {
+        String expectedTemplateId = "some-template-id";
+        when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = generator.getEmailTemplateId(CaseData.builder().build());
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
+
+    @Test
+    void shouldReturnCorrectReferenceTemplate() {
+        assertThat(generator.getReferenceTemplate()).isEqualTo("defendant-response-applicant-notification-%s");
+    }
+
+    @Test
+    void shouldAddSingleRespondentNameAndTrack() {
+        Party respondent = Party.builder()
+            .individualFirstName("John")
+            .individualLastName("Doe")
+            .type(Party.Type.INDIVIDUAL)
             .build();
 
-        Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
+        CaseData caseData = CaseData.builder()
+            .respondent1(respondent)
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .build();
+
+        Map<String, String> properties = new HashMap<>();
+        Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
         assertThat(result.get(RESPONDENT_NAME)).isEqualTo("John Doe");
-        assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Fast Track");
+        assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Small Claim Track");
     }
 
     @Test
-    void shouldAddCombinedRespondentNames_OneVTwoScenario() {
-        Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("Alice").individualLastName("Smith").build();
-        Party respondent2 = Party.builder().type(Party.Type.COMPANY).companyName("Beta Ltd").build();
+    void shouldAddCombinedRespondentNamesWhenMultipleDefendants() {
+        Party respondent1 = Party.builder()
+            .individualFirstName("Alice")
+            .individualLastName("Brown")
+            .type(Party.Type.INDIVIDUAL)
+            .build();
+
+        Party respondent2 = Party.builder()
+            .companyName("Beta Ltd")
+            .type(Party.Type.COMPANY)
+            .build();
 
         CaseData caseData = CaseData.builder()
             .respondent1(respondent1)
@@ -58,20 +86,17 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
 
         Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
-        assertThat(result.get(RESPONDENT_NAME)).isEqualTo("Alice Smith and Beta Ltd");
+        assertThat(result.get(RESPONDENT_NAME)).isEqualTo("Alice Brown and Beta Ltd");
         assertThat(result.get(ALLOCATED_TRACK)).isEqualTo("Multi Track");
     }
 
     @Test
     void shouldReturnCorrectTemplateIdFromProperties() {
-        // Given
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn(expectedTemplateId);
 
-        // When
         String result = generator.getEmailTemplateId(CaseData.builder().build());
 
-        // Then
         assertThat(result).isEqualTo(expectedTemplateId);
         verify(notificationsProperties).getClaimantSolicitorDefendantResponseFullDefence();
     }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantResponse.unspec.online.fulldefence;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
