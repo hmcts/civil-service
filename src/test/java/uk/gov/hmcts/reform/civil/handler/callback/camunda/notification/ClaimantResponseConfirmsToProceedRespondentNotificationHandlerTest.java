@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -49,8 +52,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,6 +76,9 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private ClaimantResponseConfirmsToProceedRespondentNotificationHandler handler;
 
@@ -77,6 +88,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -96,6 +115,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_spec() {
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -110,15 +137,26 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "spec-template-id",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotifyRespondentSolicitor_whenSpecRejectAllNoMediation() {
-            when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
+            when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn(
+                "spec-template-no-mediation");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -136,8 +174,10 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "spec-template-no-mediation",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
@@ -145,6 +185,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -159,8 +207,10 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "spec-template-id",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
@@ -168,6 +218,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked_spec() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()).thenReturn("spec-template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -182,15 +240,26 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "spec-template-id",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotifyApplicantSolicitor_whenSpecRejectAllNoMediation() {
-            when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()).thenReturn("spec-template-no-mediation");
+            when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpecWithAction()).thenReturn(
+                "spec-template-no-mediation");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -208,8 +277,10 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "spec-template-no-mediation",
-                getNotificationDataMapSpec(caseData,
-                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC),
+                getNotificationDataMapSpec(
+                    caseData,
+                    CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC
+                ),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
@@ -217,6 +288,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor2withNoIntentionToProceed_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -240,6 +319,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor2withIntentionToProceed_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -263,6 +350,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondentSolicitor1withNoIntentionToProceed_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -286,6 +381,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -322,6 +425,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotNotifyRespondent_whenInvokedWithNoSolicitorRepresentedWithEmail() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn("spec-template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1Represented(null)
@@ -345,6 +456,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondent_whenMultiTrack() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -369,6 +488,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         void shouldNotifyRespondent_whenMultiTrack_mintiEligibleClaim() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
             when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -392,6 +519,14 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @Test
         void shouldNotifyRespondent2_whenMultiTrack() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -425,7 +560,13 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             "NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK",
             "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK"})
         void shouldNotNotify_whenLip(CaseEvent notificationEvent) {
-
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn(
+                "Email for Specified Claims: contactocmc@justice.gov.uk "
+                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
@@ -451,78 +592,119 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                CASEMAN_REF, "000DC001"
+                CLAIM_REFERENCE_NUMBER,
+                CASE_ID.toString(),
+                PARTY_REFERENCES,
+                "Claimant reference: 12345 - Defendant reference: 6789",
+                CLAIM_LEGAL_ORG_NAME_SPEC,
+                "Signer Name",
+                CASEMAN_REF,
+                "000DC001",
+                PHONE_CONTACT,
+                "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS,
+                "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT,
+                "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                CNBC_CONTACT,
+                "Email for Specified Claims: contactocmc@justice.gov.uk",
+                HMCTS_SIGNATURE,
+                "Online Civil Claims \n HM Courts & Tribunal Service"
             );
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapLRvLiP(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CASEMAN_REF, "000DC001"
+                CLAIM_REFERENCE_NUMBER,
+                CASE_ID.toString(),
+                RESPONDENT_NAME,
+                getPartyNameBasedOnType(caseData.getRespondent1()),
+                PARTY_REFERENCES,
+                "Claimant reference: 12345 - Defendant reference: 6789",
+                CASEMAN_REF,
+                "000DC001",
+                PHONE_CONTACT,
+                "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS,
+                "Monday to Friday, 8.30am to 5pm",
+                CNBC_CONTACT,
+                "Email for Specified Claims: contactocmc@justice.gov.uk",
+                SPEC_UNSPEC_CONTACT,
+                "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                HMCTS_SIGNATURE,
+                "Online Civil Claims \n HM Courts & Tribunal Service"
             );
         }
 
         @NotNull
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData, CaseEvent caseEvent) {
-            return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CASEMAN_REF, "000DC001"
+            Map<String, String> properties = new HashMap<>();
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent));
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, "000DC001");
+            properties.put(
+                PHONE_CONTACT,
+                "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050"
             );
+            properties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
+            properties.put(
+                SPEC_UNSPEC_CONTACT,
+                "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk"
+            );
+            properties.put(CNBC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk");
+            properties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+            return properties;
+        }
+
+        private String getLegalOrganisationName(CaseData caseData, CaseEvent caseEvent) {
+            String organisationID;
+            organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)
+                ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
+                : caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
+            return organisation.isPresent() ? organisation.get().getName() :
+                caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+        }
+
+        @Test
+        void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                                     .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build()).build())).isEqualTo(
+                TASK_ID);
+
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                                     .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build())
+                                                     .build())).isEqualTo(Task_ID_RESPONDENT_SOL2);
+
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                                                     .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC").build()).build())).isEqualTo(
+                TASK_ID_CC);
+
+            CaseData caseDataMultitrack = CaseDataBuilder.builder().setMultiTrackClaim().build();
+
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
+                                                     .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK").build()).build()))
+                .isEqualTo(TASK_ID_MULTITRACK);
+
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
+                                                     .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK").build()).build()))
+                .isEqualTo(TASK_ID_RESPONDENT_SOL2_MULTITRACK);
+
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
+                                                     .request(CallbackRequest.builder().eventId(
+                                                         "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK").build()).build()))
+                .isEqualTo(TASK_ID_CC_MULTITRACK);
         }
     }
 
-    private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
-        String organisationID;
-        organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)
-            ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
-    }
-
-    @Test
-    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                                                 .request(CallbackRequest.builder().eventId(
-                                                     "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build()).build())).isEqualTo(TASK_ID);
-
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                                                 .request(CallbackRequest.builder().eventId(
-                                                     "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED").build())
-                                                 .build())).isEqualTo(Task_ID_RESPONDENT_SOL2);
-
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                                                 .request(CallbackRequest.builder().eventId(
-                                                     "NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC").build()).build())).isEqualTo(
-            TASK_ID_CC);
-
-        CaseData caseDataMultitrack = CaseDataBuilder.builder().setMultiTrackClaim().build();
-
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
-                                                 .request(CallbackRequest.builder().eventId(
-                                                     "NOTIFY_RES_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK").build()).build()))
-            .isEqualTo(TASK_ID_MULTITRACK);
-
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
-                                                 .request(CallbackRequest.builder().eventId(
-                                                     "NOTIFY_RES_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_MULTITRACK").build()).build()))
-            .isEqualTo(TASK_ID_RESPONDENT_SOL2_MULTITRACK);
-
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseDataMultitrack)
-                                                 .request(CallbackRequest.builder().eventId(
-                                                     "NOTIFY_APP_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC_MULTITRACK").build()).build()))
-            .isEqualTo(TASK_ID_CC_MULTITRACK);
-    }
 }

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -36,8 +37,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Cl
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -53,6 +58,9 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
     @Mock
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLip handler;
     private static final String RESPONDENT_EMAIL_TEMPLATE = "template-id-respondent";
@@ -65,6 +73,10 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         void shouldNotifyRespondentSolicitor_whenInvoked_spec_lip() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("spec-lip-template-id");
             when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -88,6 +100,12 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         void shouldNotifyLiPRespondent_whenInvoked_spec_lip() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -117,6 +135,12 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         void shouldNotifyLiPRespondent_whenInvoked_spec_lip_response_in_bilingual() {
             when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(BILINGUAL_RESPONDENT_EMAIL_TEMPLATE);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -146,6 +170,12 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         @Test
         void shouldNotifyRespondentLip_whenInvoked_spec_partAdmit() {
             when(notificationsProperties.getNotifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec()).thenReturn("spec-lip-template-part-admit-id");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -173,7 +203,11 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. Sole Trader",
-                CASEMAN_REF, "000DC001"
+                CASEMAN_REF, "000DC001",
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
             );
         }
 
@@ -181,7 +215,11 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
         private Map<String, String> getNotificationDataMapPartAdmit(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
             );
         }
     }

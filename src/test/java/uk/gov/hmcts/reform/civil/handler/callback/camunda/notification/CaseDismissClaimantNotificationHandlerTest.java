@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,12 +21,17 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -40,8 +46,22 @@ class CaseDismissClaimantNotificationHandlerTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private CaseDismissClaimantNotificationHandler handler;
+
+    @BeforeEach
+    void setup() {
+        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
+        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+    }
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
@@ -109,7 +129,11 @@ class CaseDismissClaimantNotificationHandlerTest {
                 "name", "John Doe",
                 "claimantvdefendant", "John Doe V Jack Jackson",
                 "partyReferences", buildPartiesReferencesEmailSubject(caseData),
-                "casemanRef", caseData.getLegacyCaseReference()
+                "casemanRef", caseData.getLegacyCaseReference(),
+                "phoneContact", "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                "openingHours", "Monday to Friday, 8.30am to 5pm",
+                "specAndUnspecContact", "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                "hmctsSignature", "Online Civil Claims \n HM Courts & Tribunal Service"
             ),
             "dismiss-case-claimant-notification-1594901956117591"
         );

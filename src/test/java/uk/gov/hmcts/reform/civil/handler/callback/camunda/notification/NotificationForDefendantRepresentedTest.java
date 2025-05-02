@@ -25,9 +25,11 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
@@ -57,6 +59,10 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
     @Mock
     private PinInPostConfiguration pipInPostConfiguration;
     @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+    @Mock
     private OrganisationService organisationService;
     @Captor
     private ArgumentCaptor<String> targetEmail;
@@ -81,7 +87,8 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
         notificationHandler = new NotificationForDefendantRepresented(
             organisationService,
             notificationService,
-            notificationsProperties
+            notificationsProperties,
+            configuration, featureToggleService
         );
     }
 

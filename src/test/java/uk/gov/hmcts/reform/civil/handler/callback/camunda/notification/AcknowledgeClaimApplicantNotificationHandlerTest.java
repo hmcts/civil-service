@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,14 +17,17 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,15 +46,21 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_INTENTION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,11 +72,26 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
     private NotificationsProperties notificationsProperties;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
     @InjectMocks
     private AcknowledgeClaimApplicantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        void setUp() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+        }
+
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
@@ -353,15 +378,21 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 }
             }
 
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                RESPONDENT_NAME, respondent.getPartyName(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),
-                RESPONSE_INTENTION, getResponseIntentionForEmail(caseData),
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                CASEMAN_REF, "000DC001"
-            );
+            HashMap<String, String> properties = new HashMap<>();
+            properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            properties.put(RESPONDENT_NAME, respondent.getPartyName());
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE));
+            properties.put(RESPONSE_INTENTION, getResponseIntentionForEmail(caseData));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "org name");
+            properties.put(CASEMAN_REF, "000DC001");
+            properties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
+                                  + "\n For all other matters, call 0300 123 7050");
+            properties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
+            properties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+            properties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
+                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            return properties;
         }
     }
 

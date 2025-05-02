@@ -304,8 +304,9 @@ public class NotificationUtils {
                                                               boolean isLRQmEnabled) {
         if (isLRQmEnabled && !queryNotAllowedCaseStates(caseData) && !caseData.isLipCase()) {
             properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
+        } else {
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         }
-        properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         return properties;
     }
 
@@ -314,8 +315,9 @@ public class NotificationUtils {
                                                               boolean isLRQmEnabled) {
         if (isLRQmEnabled && !queryNotAllowedCaseStates(caseData) && !caseData.isLipCase()) {
             properties.put(CNBC_CONTACT, RAISE_QUERY_LR);
+        } else {
+            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
         }
-        properties.put(CNBC_CONTACT, configuration.getSpecUnspecContact());
         return properties;
     }
 }
