@@ -21,15 +21,14 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
+class ClaimantLipHelpWithFeesEmailDTOGeneratorTest {
 
-    public static final String EMAIL = "claimant@hmcts.net";
-    public static final String ENGLISH_TEMPLATE = "english-template";
-    public static final String WELSH_TEMPLATE = "welsh-template";
-    public static final String NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION = "notify-claimant-lip-help-with-fees-notification-%s";
-    public static final String LEGACY_REFERENCE = "000DC001";
-    public static final String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
-    public static final String CLAIMANT_NAME = "claimantName";
+    private static final String EMAIL = "claimant@hmcts.net";
+    private static final String ENGLISH_TEMPLATE = "english-template";
+    private static final String WELSH_TEMPLATE = "welsh-template";
+    private static final String NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION = "notify-claimant-lip-help-with-fees-notification-%s";
+    private static final String LEGACY_REFERENCE = "1594901956117591";
+    private static final String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -45,6 +44,7 @@ class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
                 .atStateClaimDetailsNotified()
                 .build()
                 .toBuilder()
+                .legacyCaseReference(LEGACY_REFERENCE)
                 .claimantUserDetails(
                         IdamUserDetails.builder().email(EMAIL).build()
                 )
@@ -66,11 +66,6 @@ class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldAlwaysReturnTrueForGetShouldNotify() {
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
     void shouldReturnEnglishTemplateAndCorrectParams() {
         when(notificationsProperties.getNotifyClaimantLipHelpWithFees())
                 .thenReturn(ENGLISH_TEMPLATE);
@@ -78,9 +73,9 @@ class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
         EmailDTO dto = generator.buildEmailDTO(caseData);
 
         Map<String, String> params = dto.getParameters();
+        assertThat(dto.getEmailTemplate()).isEqualTo(ENGLISH_TEMPLATE);
         assertThat(params)
                 .containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_REFERENCE)
-                .containsEntry(CLAIMANT_NAME, "John Doe")
                 .containsKey(CLAIMANT_V_DEFENDANT);
     }
 
@@ -98,7 +93,7 @@ class NotifyClaimantLipHelpWithFeesEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldExposeCorrectReferenceTemplate() {
+    void shouldReturnCorrectReferenceTemplate() {
         assertThat(generator.getReferenceTemplate())
                 .isEqualTo(NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION);
     }

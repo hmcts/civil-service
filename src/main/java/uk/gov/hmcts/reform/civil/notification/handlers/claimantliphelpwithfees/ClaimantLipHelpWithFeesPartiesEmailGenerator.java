@@ -2,24 +2,19 @@ package uk.gov.hmcts.reform.civil.notification.handlers.claimantliphelpwithfees;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
-import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
-
-import java.util.Set;
+import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
 @Component
-public class ClaimantLipHelpWithFeesPartiesEmailGenerator implements PartiesEmailGenerator {
-
-    private final ClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator;
+public class ClaimantLipHelpWithFeesPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
     public ClaimantLipHelpWithFeesPartiesEmailGenerator(
-            ClaimantLipHelpWithFeesEmailDTOGenerator dtoGenerator
+            ClaimantLipHelpWithFeesEmailDTOGenerator claimantEmailDTOGenerator
     ) {
-        this.dtoGenerator = dtoGenerator;
+        super(null, null, null, claimantEmailDTOGenerator, null);
     }
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
-        return Set.of(dtoGenerator.buildEmailDTO(caseData));
+    protected boolean shouldNotifyRespondents(CaseData caseData) {
+        return false;
     }
 }
