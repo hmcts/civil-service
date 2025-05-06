@@ -897,7 +897,6 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals(2, templateData.getDefendant1UnavailableDatesList().size());
     }
 
-
     @Test
     void shouldGenerateDocumentWithStatementOfTruthSuccessfully_DefendantLipTypeCompanyOROrg() {
         //Given
