@@ -73,11 +73,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        log.info("stitchEnabled {}, isLipvLipOneVOne {} isLipVLipEnabled {} for case {}", stitchEnabled,
-                 caseData.isLipvLipOneVOne(), featureToggleService.isLipVLipEnabled(), caseId);
-
         if (stitchEnabled && caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            log.info("if condition for case {}", caseId);
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("no of document sending for stitch {} for caseId {}", documentMetaDataList.size(), caseId);
             if (documentMetaDataList.size() > 1) {
@@ -89,31 +85,29 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                                                                     DocumentType.DEFENDANT_DEFENCE,
                                                                     authToken);
                 log.info("Civil stitch service for response cui sealed form {} for caseId {}", stitchedDocument, caseId);
-
-                caseDataBuilder.respondent1ClaimResponseDocumentSpec(stitchedDocument)
-                    .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                        stitchedDocument,  caseData));
-                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
-            } else {
-                log.info("Inner else condition for case {}", caseData.getCcdCaseReference());
-                addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
+                addToSystemGeneratedDocuments(caseDataBuilder, stitchedDocument, caseData);
             }
-        } else {
-            log.info("Outer else condition for case {}", caseData.getCcdCaseReference());
-            addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
         }
+        addToSystemGeneratedDocuments(caseDataBuilder, sealedForm, caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument sealedForm, CaseData caseData) {
-        caseDataBuilder.respondent1ClaimResponseDocumentSpec(sealedForm)
-            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                sealedForm,
-                caseData
-            ));
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
+    private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
+        if (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+        || caseData.isLipDefendantSpecifiedBilingualDocuments()) {
+            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+                .preTranslationDocuments(List.of(ElementUtils.element(document)));
+        } else {
+            caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                    document,
+                    caseData
+                ));
+            assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
+        }
     }
 
     private List<DocumentMetaData> fetchDocumentsToStitch(CaseData caseData, CaseDocument sealedForm) {
