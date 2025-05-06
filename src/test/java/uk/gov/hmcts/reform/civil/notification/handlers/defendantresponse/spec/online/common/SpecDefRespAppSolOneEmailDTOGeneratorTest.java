@@ -54,7 +54,7 @@ class SpecDefRespAppSolOneEmailDTOGeneratorTest {
 
             Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-            assertThat(result).containsEntry("whenWillBePaidImmediately", "10 MAY 2025")
+            assertThat(result).containsEntry("payImmediately", "10 MAY 2025")
                 .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, expectedOrgName);
         }
     }
