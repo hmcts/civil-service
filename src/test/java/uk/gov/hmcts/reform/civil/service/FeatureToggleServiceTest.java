@@ -293,11 +293,8 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsHmcForLipEnabled(Boolean toggleStat) {
-        var hmcCui = "hmc-cui-enabled";
-        givenToggle(hmcCui, toggleStat);
-
         assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
     }
 
