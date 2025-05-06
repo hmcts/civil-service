@@ -595,10 +595,6 @@ docStore:
     removal:
       enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
 
-logging:
-  level:
-    uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter: ERROR
-
 ---
 
 spring:
