@@ -397,6 +397,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.1.40'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.40'
+  implementation group: 'jakarta.servlet', name: 'jakarta.servlet-api', version: '4.0.4'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
