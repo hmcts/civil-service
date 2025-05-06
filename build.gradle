@@ -13,6 +13,7 @@ plugins {
   id "io.freefair.lombok" version "8.13.1"
   id 'com.github.hmcts.rse-cft-lib' version '0.19.1618'
   id "org.flywaydb.flyway" version "10.22.0"
+  id 'maven-publish'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -150,7 +151,7 @@ allprojects {
     mavenLocal()
     mavenCentral()
     maven {
-      url "https://jitpack.io"
+      url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1"
     }
   }
 }
@@ -587,6 +588,19 @@ bootRun {
         def key = it.substring(0, index)
         def value = it.substring(index + 1)
         environment key, value
+      }
+    }
+  }
+}
+
+publishing {
+  repositories {
+    maven {
+      name = "AzureArtifacts"
+      url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+      credentials {
+        username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+        password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
       }
     }
   }
