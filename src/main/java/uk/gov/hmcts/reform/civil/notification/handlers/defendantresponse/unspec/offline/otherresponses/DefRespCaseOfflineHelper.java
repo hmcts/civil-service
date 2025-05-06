@@ -4,7 +4,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -27,13 +26,9 @@ public class DefRespCaseOfflineHelper {
                 REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            String responseTypeToApplicant2 = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
-                : caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
+            String responseTypeToApplicant2 = caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
             return Map.of(
-                REASON, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
-                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName())
@@ -43,12 +38,8 @@ public class DefRespCaseOfflineHelper {
             return Map.of(
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-                RESPONDENT_ONE_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
-                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
-                    : caseData.getRespondent2ClaimResponseType().getDisplayedValue()
+                RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue()
             );
         }
     }
