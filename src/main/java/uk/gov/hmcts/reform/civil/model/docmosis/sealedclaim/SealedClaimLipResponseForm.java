@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
@@ -77,6 +78,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final boolean defendant1MediationUnavailableDatesExists;
     private final List<Element<UnavailableDate>> defendant1UnavailableDatesList;
     private final boolean checkCarmToggle;
+    private final StatementOfTruth uiStatementOfTruth;
 
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())
@@ -102,7 +104,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
+            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData))
+            .uiStatementOfTruth(caseData.getUiStatementOfTruth());
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
         addFinancialDetails(caseData, builder);
