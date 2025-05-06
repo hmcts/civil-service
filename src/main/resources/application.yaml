@@ -89,6 +89,12 @@ wa:
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
 
+
+scheduledExecutors:
+  messageProcessing:
+    pollIntervalMilliSeconds: ${MESSAGE_PROCESSING_POLL_INTERVAL_MILLISECONDS:5000}
+    threadPoolSize: ${MESSAGE_PROCESSING_THREAD_POOL_SIZE:1}
+
 fees:
   api:
     url: ${FEES_API_URL:http://localhost:6666}
