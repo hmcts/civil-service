@@ -13,8 +13,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
-public class AcknowledgeClaimSpecRespSolTwoEmailDTOGenerator
-        extends RespSolTwoEmailDTOGenerator {
+public class AcknowledgeClaimSpecRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     protected static final String REFERENCE_TEMPLATE = "acknowledge-claim-respondent-notification-%s";
 

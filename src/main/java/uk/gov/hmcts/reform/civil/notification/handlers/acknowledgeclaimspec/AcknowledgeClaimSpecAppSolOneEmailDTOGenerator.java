@@ -12,8 +12,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Component
-public class AcknowledgeClaimSpecAppSolOneEmailDTOGenerator
-        extends AppSolOneEmailDTOGenerator {
+public class AcknowledgeClaimSpecAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     protected static final String REFERENCE_TEMPLATE = "acknowledge-claim-applicant-notification-%s";
 

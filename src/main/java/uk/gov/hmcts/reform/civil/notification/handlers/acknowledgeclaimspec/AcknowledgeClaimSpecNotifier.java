@@ -13,7 +13,7 @@ public class AcknowledgeClaimSpecNotifier extends Notifier {
     public AcknowledgeClaimSpecNotifier(
             NotificationService notificationService,
             CaseTaskTrackingService caseTaskTrackingService,
-            AcknowledgeClaimSpecAllLegalRepsEmailGenerator allLegalRepsEmailGenerator
+            AcknowledgeClaimSpecEmailGenerator allLegalRepsEmailGenerator
     ) {
         super(notificationService, caseTaskTrackingService, allLegalRepsEmailGenerator);
     }
