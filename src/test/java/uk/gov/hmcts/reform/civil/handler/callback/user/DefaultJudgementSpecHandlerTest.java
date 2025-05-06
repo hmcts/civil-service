@@ -464,112 +464,20 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "claimPartialPayment";
 
         @Test
-        void shouldReturnError_whenPartialPaymentLargerFullClaim() {
-            BigDecimal claimAmount = new BigDecimal(2000);
+        void shouldReturnError_whenPartiallyPaid() {
             BigDecimal interestAmount = new BigDecimal(100);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .partialPayment(YesOrNo.YES)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .partialPaymentAmount("3000000")
                 .build();
 
             when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("The amount already paid exceeds the full claim amount");
-        }
-
-        @Test
-        void shouldNotReturnError_whenPartialPaymentLessFullClaim() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .partialPaymentAmount("3000")
-                .build();
-
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldReturnError_whenPartialPaymentExceedsTotalAmount() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
-            BigDecimal claimFeeAmount = new BigDecimal(50);
-            BigDecimal partialPaymentAmount = new BigDecimal(2260);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(claimFeeAmount.multiply(new BigDecimal(100)).longValue())).build())
-                .partialPayment(YesOrNo.YES)
-                .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
-                .build();
-
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).contains("The amount already paid exceeds the full claim amount");
-        }
-
-        @Test
-        void shouldNotReturnError_whenPartialPaymentIsLessThanTotalAmount() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
-            BigDecimal claimFeeAmount = new BigDecimal(50);
-            BigDecimal partialPaymentAmount = new BigDecimal(2100);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(claimFeeAmount.multiply(new BigDecimal(100)).longValue())).build())
-                .partialPayment(YesOrNo.YES)
-                .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
-                .build();
-
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldNotReturnError_whenPartialPaymentIsEqualToTotalAmount() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
-            BigDecimal claimFeeAmount = new BigDecimal(50);
-            BigDecimal partialPaymentAmount = new BigDecimal(2150);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .totalClaimAmount(claimAmount)
-                .totalInterest(interestAmount)
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(claimFeeAmount.multiply(new BigDecimal(100)).longValue())).build())
-                .partialPayment(YesOrNo.YES)
-                .partialPaymentAmount(partialPaymentAmount.multiply(new BigDecimal(100)).toString())
-                .build();
-
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(interestAmount);
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors().get(0)).isEqualTo("This feature is currently not available, please see guidance below");
         }
 
         @Test
@@ -581,7 +489,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YesOrNo.YES)
+                .partialPayment(NO)
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
                 .partialPaymentAmount("3000")
@@ -602,7 +510,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
+                .partialPayment(NO)
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
                 .claimFee(Fee.builder()
@@ -612,7 +520,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .claimFixedCosts(YES)
                     .fixedCostAmount("10000")
                     .build())
-                .partialPaymentAmount("3000")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -625,14 +532,14 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotShowNewFixedCostsPage_whenJudgmentAmountLessThan25AndYesClaimIssueFixedCostsAndShouldNotCalculateRepaymentBreakdown() {
-            BigDecimal claimAmount = new BigDecimal(2000);
-            BigDecimal interestAmount = new BigDecimal(100);
+            BigDecimal claimAmount = new BigDecimal(20);
+            BigDecimal interestAmount = new BigDecimal(1);
             when(interestCalculator.calculateInterest(any()))
                 .thenReturn(BigDecimal.valueOf(1));
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
+                .partialPayment(NO)
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -647,7 +554,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .claimFixedCosts(YES)
                     .fixedCostAmount("10")
                     .build())
-                .partialPaymentAmount("199500")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -667,7 +573,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
+                .partialPayment(NO)
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -682,7 +588,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                     .claimFixedCosts(YES)
                     .fixedCostAmount("100")
                     .build())
-                .partialPaymentAmount("197400")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -702,7 +607,7 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .partialPayment(YES)
+                .partialPayment(NO)
                 .totalClaimAmount(claimAmount)
                 .totalInterest(interestAmount)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -716,7 +621,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .fixedCosts(FixedCosts.builder()
                     .claimFixedCosts(NO)
                     .build())
-                .partialPaymentAmount("2090")
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
