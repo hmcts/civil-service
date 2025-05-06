@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -47,7 +47,7 @@ public class SpecDefRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGene
             properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
         }
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
-        //i dont see this param in all templates
+        //I dont see this param in all templates
         //properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         return properties;
     }

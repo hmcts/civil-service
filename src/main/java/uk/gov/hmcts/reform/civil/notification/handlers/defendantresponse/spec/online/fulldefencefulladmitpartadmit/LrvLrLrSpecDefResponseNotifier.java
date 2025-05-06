@@ -12,7 +12,7 @@ public class LrvLrLrSpecDefResponseNotifier extends Notifier {
 
     public LrvLrLrSpecDefResponseNotifier(NotificationService notificationService,
                                             CaseTaskTrackingService caseTaskTrackingService,
-                                            LrvLrLrSpecDefRespAllLegalRepsEmailDTOGenerator allLegalRepsEmailGenerator) {
+                                            LrvLrLrSpecDefRespAllPartiesEmailDTOGenerator allLegalRepsEmailGenerator) {
         super(notificationService, caseTaskTrackingService, allLegalRepsEmailGenerator);
     }
 

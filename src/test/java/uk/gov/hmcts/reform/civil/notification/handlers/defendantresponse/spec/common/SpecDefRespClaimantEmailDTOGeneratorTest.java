@@ -1,10 +1,9 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.lipvlrfulladmitpartadmit;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common.SpecDefRespEmailHelper;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.onlyonerespondentrespond;
 
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common.SpecDefRespAppSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespAppSolOneEmailDTOGenerator;
 
 public class SpecOneDefRespAllPartiesEmailDTOGenerator extends AllPartiesEmailGenerator {
 

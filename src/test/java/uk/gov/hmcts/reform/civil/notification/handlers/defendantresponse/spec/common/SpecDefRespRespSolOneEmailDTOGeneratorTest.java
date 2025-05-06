@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

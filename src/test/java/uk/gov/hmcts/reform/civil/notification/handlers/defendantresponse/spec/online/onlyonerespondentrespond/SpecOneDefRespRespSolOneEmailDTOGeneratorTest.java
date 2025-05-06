@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common.SpecDefRespEmailHelper;
+import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespEmailHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static org.assertj.core.api.Assertions.assertThat;

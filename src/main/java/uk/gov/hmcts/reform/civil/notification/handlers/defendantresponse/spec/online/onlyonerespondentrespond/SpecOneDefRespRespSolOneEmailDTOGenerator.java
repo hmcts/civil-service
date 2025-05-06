@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.o
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common.SpecDefRespEmailHelper;
-import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common.SpecDefRespRespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespEmailHelper;
+import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespRespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Component

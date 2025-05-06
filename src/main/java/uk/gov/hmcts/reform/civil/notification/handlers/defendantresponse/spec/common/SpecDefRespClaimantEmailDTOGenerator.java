@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.lipvlrfulladmitpartadmit;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.common.SpecDefRespEmailHelper;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.online.lipvlrfulladmitpartadmit;
+package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.offline.lipvlrfulladmitpartadmit;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
