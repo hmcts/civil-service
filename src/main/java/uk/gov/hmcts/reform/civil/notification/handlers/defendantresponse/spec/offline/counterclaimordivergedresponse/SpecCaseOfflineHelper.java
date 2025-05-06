@@ -52,8 +52,8 @@ public class SpecCaseOfflineHelper {
     }
 
     public String getRespTemplateForSpecClaims(CaseData caseData) {
-        if ((COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) &&
-                (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame())))) {
+        if ((COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame())))) {
             return notificationsProperties.getRespondentSolicitorCounterClaimForSpec();
         } else {
             return notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
 public class SpecDefRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
@@ -45,7 +46,7 @@ public class SpecDefRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGene
         } else {
             properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
         }
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName());
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         //i dont see this param in all templates
         //properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         return properties;
