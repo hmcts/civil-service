@@ -12,10 +12,16 @@ import javax.validation.constraints.NotNull;
 
 @Component
 public class RequestFilter extends OncePerRequestFilter {
+
+    /**
+     * This filter caches the request body for logging purposes.
+     * It wraps the request in a ContentCachingRequestWrapper to allow
+     * the request body to be read multiple times.
+     */
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
                                     javax.servlet.FilterChain filterChain) throws ServletException, IOException {
-                ContentCachingRequestWrapper cachedBodyHttpServletRequest =
+        ContentCachingRequestWrapper cachedBodyHttpServletRequest =
             new ContentCachingRequestWrapper(request);
 
         filterChain.doFilter(cachedBodyHttpServletRequest, response);
