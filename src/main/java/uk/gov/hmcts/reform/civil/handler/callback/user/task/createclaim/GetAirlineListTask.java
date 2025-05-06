@@ -32,11 +32,9 @@ public class GetAirlineListTask {
     public CallbackResponse getAirlineList(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            DynamicList airlineDropdownList = createAirlineDropdownList();
-            FlightDelayDetails flightDelayDetails = buildFlightDelayDetails(airlineDropdownList);
-            caseDataBuilder.flightDelayDetails(flightDelayDetails);
-        }
+        DynamicList airlineDropdownList = createAirlineDropdownList();
+        FlightDelayDetails flightDelayDetails = buildFlightDelayDetails(airlineDropdownList);
+        caseDataBuilder.flightDelayDetails(flightDelayDetails);
 
         return buildCallbackResponse(caseDataBuilder);
     }

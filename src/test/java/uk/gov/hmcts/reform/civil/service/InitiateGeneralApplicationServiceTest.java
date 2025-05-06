@@ -65,7 +65,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -417,7 +419,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
@@ -492,11 +493,65 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIP() {
+    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPQueryManagementOff() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
             .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isEqualTo(NO);
+    }
+
+    @Test
+    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPQueryManagementOn() {
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
+            .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build();
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isNotNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentOneLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaRespondentTwoLip())
+            .isEqualTo(NO);
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsGaApplicantLip())
+            .isEqualTo(NO);
+    }
+
+    @Test
+    void shouldPopulateGaForLipsFlagIfFeatureFlagIsOn_LRVsLIPCaseSettled() {
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(null).toBuilder()
+            .applicant1Represented(YES).respondent1Represented(NO).respondent2Represented(NO).build()
+            .toBuilder().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
@@ -562,7 +617,6 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldNotPopulateStatementOfTruthAndSetNoticeAndConsentOrderIfConsented() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
@@ -647,11 +701,50 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulatePartyNameDetails() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
+    void shouldPopulatePartyNameDetailsQMOff() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant2PartyName()).isEqualTo("Applicant2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseNameGaInternal()).isEqualTo("Internal caseName");
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK.getValue());
+    }
+
+    @Test
+    void shouldPopulatePartyNameDetailsQMOn() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant1PartyName()).isEqualTo("Applicant1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getClaimant2PartyName()).isEqualTo("Applicant2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant1PartyName()).isEqualTo("Respondent1");
+        assertThat(result.getGeneralApplications().get(0).getValue().getDefendant2PartyName()).isEqualTo("Respondent2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseNameGaInternal()).isEqualTo("Internal caseName");
+        assertThat(result.getGeneralApplications().get(0).getValue().getGaWaTrackLabel()).isEqualTo(FAST_CLAIM_TRACK.getValue());
+    }
+
+    @Test
+    void shouldPopulatePartyNameDetailsCaseSettled() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+            .toBuilder().ccdState(CASE_SETTLED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
@@ -702,10 +795,65 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateApplicantDetails() {
+    void shouldPopulateApplicantDetailsQMOff() {
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppApplnSolicitor().getId())
+            .isEqualTo(STRING_NUM_CONSTANT);
+
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
+            .isEqualTo("site name of CNBC");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isEqualTo("Address of CNBC");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isEqualTo("M5 4RR");
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolicitors()
+                       .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldPopulateApplicantDetailsQMOn() {
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppApplnSolicitor().getId())
+            .isEqualTo(STRING_NUM_CONSTANT);
+
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
+            .isEqualTo("site name of CNBC");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isEqualTo("Address of CNBC");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isEqualTo("M5 4RR");
+        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolicitors()
+                       .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldPopulateApplicantDetailsCaseDiscontinued() {
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
+            .toBuilder().ccdState(CASE_DISCONTINUED).previousCCDState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
@@ -860,11 +1008,50 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMade() {
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMadeQMOff() {
         when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(CASE_ISSUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                          respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("420219");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getRegion())
+            .isEqualTo("2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
+            .isEqualTo("Civil");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMadeQMOn() {
+        when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getCaseDataForWorkAllocation(CASE_ISSUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
                                               respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("420219");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getRegion())
+            .isEqualTo("2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
+            .isEqualTo("Civil");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMadeCaseDiscontinued() {
+        when(locationService.getWorkAllocationLocation(any(), anyString())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPreSdoCNBC(), true));
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(CASE_DISCONTINUED, UNSPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                          respondent2DQ).toBuilder().previousCCDState(CASE_ISSUED).build();
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -928,8 +1115,20 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecOrgClaimantCaseDiscontinued() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(CASE_DISCONTINUED, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ,
+                                          respondent2DQ).toBuilder().previousCCDState(null).build();
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("22222");
+    }
+
+    @Test
     void shouldCopyN245toEvidenceWithCategoryId_whenCreateVaryApplication() {
-        when(featureToggleService.isMintiEnabled()).thenReturn(true);
         CaseData caseData = new GeneralApplicationDetailsBuilder()
             .getVaryJudgmentWithN245TestData();
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));

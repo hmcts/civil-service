@@ -118,6 +118,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             ));
         }
 
+        builder.previousCCDState(caseData.getCcdState());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .state(nextState)
@@ -131,8 +133,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             && caseData.hasClaimantAgreedToFreeMediation())
             || (featureToggleService.isCarmEnabledForCase(caseData)
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+            && caseData.hasApplicantProceededWithClaim())) {
             builder.claimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
@@ -261,7 +262,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
-        return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
+        return (caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
             &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }

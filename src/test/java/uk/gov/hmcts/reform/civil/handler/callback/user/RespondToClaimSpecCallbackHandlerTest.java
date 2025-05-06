@@ -2243,6 +2243,34 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void specificSummary_whenFullAdmitNotPaid() {
+            // Given
+            BigDecimal totalClaimAmount = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondentClaimResponseTypeForSpecGeneric(FULL_ADMISSION)
+                .specDefenceAdmittedRequired(YesOrNo.YES)
+                .totalClaimAmount(totalClaimAmount)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(whenWillPay).build())
+                .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+                .respondent1Represented(YES)
+                .applicant1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(caseData.getTotalClaimAmount().toString());
+        }
+
+        @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseFullDefenceFullAdmission() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -2556,6 +2584,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(locationValues);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -2591,6 +2622,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(courtLocationUtils.getLocationsFromList(locations))
                 .thenReturn(locationValues);
             when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -2607,6 +2640,53 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(locationValues.getListItems().get(0).getLabel());
             assertThat(response.getData().get("showCarmFields")).isEqualTo("No");
         }
+
+        @Test
+        void shouldTriggerError_WhenRespondent1AlreadyRespondedAndTryToSubmitAgain() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
+            assertThat(response.getErrors()).isNotNull();
+            assertThat(response.getErrors()).contains(
+                "There is a problem \n You have already submitted the defendant's response");
+        }
+
+        @Test
+        void shouldTriggerError_WhenRespondent2AlreadyRespondedAndTryToSubmitAgain() {
+            //Given
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            //When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //Then
+            assertThat(response.getErrors()).isNotNull();
+        }
+
     }
 
     @Nested

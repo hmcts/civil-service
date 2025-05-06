@@ -164,29 +164,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
-        var sdoR2Key = "isSdoR2Enabled";
-        givenToggle(sdoR2Key, toggleStat);
-
-        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
         var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
         givenToggle(isJudgmentOnlineLiveKey, toggleStat);
 
         assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsMintiEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
-        givenToggle(mintiKey, toggleStat);
-
-        assertThat(featureToggleService.isMintiEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -218,9 +200,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenMultiOrIntermediateTrackEnabled(Boolean toggleStat) {
-        var mintiKey = "minti";
         var caseFileKey = "multi-or-intermediate-track";
-        givenToggle(mintiKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .build();
@@ -319,5 +299,14 @@ class FeatureToggleServiceTest {
         givenToggle(hmcCui, toggleStat);
 
         assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
+        var caseFlagsKey = "query-management";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 }

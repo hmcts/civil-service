@@ -29,6 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_LANGUAGE_PREFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_COSC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
@@ -1201,7 +1203,9 @@ class FlowStateAllowedEventServiceTest {
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
-                        SET_ASIDE_JUDGMENT
+                        SET_ASIDE_JUDGMENT,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1226,7 +1230,9 @@ class FlowStateAllowedEventServiceTest {
                         RECORD_JUDGMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
-                        SET_ASIDE_JUDGMENT
+                        SET_ASIDE_JUDGMENT,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1286,7 +1292,11 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        GENERATE_DIRECTIONS_ORDER,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1337,7 +1347,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1369,7 +1381,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1416,7 +1430,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1451,7 +1467,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1487,7 +1505,9 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1531,7 +1551,9 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         CONFIRM_ORDER_REVIEW,
                         NOC_REQUEST,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1564,26 +1586,31 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     PART_ADMIT_REJECT_REPAYMENT,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        REQUEST_JUDGEMENT_ADMISSION_SPEC
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     PART_ADMIT_PROCEED,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     PART_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1599,32 +1626,40 @@ class FlowStateAllowedEventServiceTest {
                         ORDER_REVIEW_OBLIGATION_CHECK,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
                         JUDGMENT_PAID_IN_FULL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     PART_ADMIT_AGREE_SETTLE,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     FULL_ADMIT_PAY_IMMEDIATELY,
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                        REQUEST_JUDGEMENT_ADMISSION_SPEC
+                        REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     FULL_ADMIT_PROCEED,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     FULL_ADMIT_NOT_PROCEED,
                     new CaseEvent[] {
-                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1633,7 +1668,9 @@ class FlowStateAllowedEventServiceTest {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         EDIT_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
-                        SET_ASIDE_JUDGMENT
+                        SET_ASIDE_JUDGMENT,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1701,7 +1738,9 @@ class FlowStateAllowedEventServiceTest {
                         CONFIRM_ORDER_REVIEW,
                         MEDIATION_UNSUCCESSFUL,
                         MEDIATION_SUCCESSFUL,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1726,7 +1765,9 @@ class FlowStateAllowedEventServiceTest {
                         SETTLE_CLAIM,
                         SETTLE_CLAIM_MARK_PAID_FULL,
                         DISCONTINUE_CLAIM_CLAIMANT,
-                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT
+                        VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1820,7 +1861,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC
                     }
                 ),
                 of(
@@ -1880,7 +1922,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1939,7 +1983,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -1998,7 +2043,9 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         AMEND_RESTITCH_BUNDLE,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2018,7 +2065,10 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CONFIRM_ORDER_REVIEW,
                         COURT_OFFICER_ORDER,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        JUDGMENT_PAID_IN_FULL,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2071,7 +2121,9 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2091,7 +2143,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CASE,
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2167,7 +2220,10 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM_CLAIMANT,
                         VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                         JUDGMENT_PAID_IN_FULL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2175,7 +2231,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[] {
                         DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                        LIP_CLAIM_SETTLED
+                        LIP_CLAIM_SETTLED,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2197,7 +2254,10 @@ class FlowStateAllowedEventServiceTest {
                         MANAGE_STAY,
                         CONFIRM_ORDER_REVIEW,
                         ORDER_REVIEW_OBLIGATION_CHECK,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        REFER_JUDGE_DEFENCE_RECEIVED,
+                        INITIATE_GENERAL_APPLICATION_COSC,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2212,7 +2272,8 @@ class FlowStateAllowedEventServiceTest {
                         INVALID_HWF_REFERENCE,
                         NO_REMISSION_HWF,
                         LIP_CLAIM_SETTLED,
-                        CITIZEN_CLAIM_ISSUE_PAYMENT
+                        CITIZEN_CLAIM_ISSUE_PAYMENT,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
@@ -2221,14 +2282,16 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
                         CHANGE_SOLICITOR_EMAIL,
-                        ORDER_REVIEW_OBLIGATION_CHECK
+                        ORDER_REVIEW_OBLIGATION_CHECK,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(
                     SIGN_SETTLEMENT_AGREEMENT,
                     new CaseEvent[] {
                         REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                        LIP_CLAIM_SETTLED
+                        LIP_CLAIM_SETTLED,
+                        CHANGE_LANGUAGE_PREFERENCE
                     }
                 ),
                 of(

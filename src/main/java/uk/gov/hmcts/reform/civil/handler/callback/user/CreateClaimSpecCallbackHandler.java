@@ -528,7 +528,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
-        if (toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
+        if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
             LocalDate today = LocalDate.now();
             LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
             if (scheduledDate.isAfter(today)) {

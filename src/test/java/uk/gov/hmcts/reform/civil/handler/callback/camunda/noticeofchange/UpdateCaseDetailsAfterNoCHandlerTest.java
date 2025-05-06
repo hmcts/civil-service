@@ -12,10 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
@@ -32,11 +34,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIMANT_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTest {
@@ -142,6 +147,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent1LRIndividual("Legal", "Rep")
                 .setUnassignedCaseListDisplayOrganisationReferences()
                 .anyRepresented(NO)
+                .build().toBuilder()
+                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -166,6 +173,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo(IdamUserDetails.builder().email("requester@example.com").build());
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
+            assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant");
         }
 
         @Test
@@ -412,6 +420,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep")
+                .build().toBuilder()
+                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -435,6 +445,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
+            assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant 1");
         }
 
         @Test
@@ -448,6 +459,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .updateOrgPolicyAfterNoC(false, false, NEW_ORG_ID)
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep1")
+                .build().toBuilder()
+                .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -471,6 +484,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isEqualTo(caseData.getRespondent1LRIndividuals());
+            assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant 1");
         }
 
         @Test
@@ -668,6 +682,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                                                     .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY R").build())
                                                     .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
                                                     .build())
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build(),
+                                                           CaseDocument.builder().documentType(CLAIMANT_CLAIM_FORM).build()))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -691,6 +707,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getAddressLine2()).isEqualTo(ORGANISATION.getContactInformation().get(0).getAddressLine2());
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getPostCode()).isEqualTo(ORGANISATION.getContactInformation().get(0).getPostCode());
             assertThat(updatedCaseData.getRespondentSolicitorDetails().getAddress().getCounty()).isEqualTo(ORGANISATION.getContactInformation().get(0).getCounty());
+            assertThat(updatedCaseData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
         }
 
         @Test
