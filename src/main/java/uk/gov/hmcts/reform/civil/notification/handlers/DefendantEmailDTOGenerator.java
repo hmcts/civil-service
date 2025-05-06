@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 public abstract class DefendantEmailDTOGenerator extends EmailDTOGenerator {
 
-
     public DefendantEmailDTOGenerator(NotificationsSignatureConfiguration configuration,
                                       FeatureToggleService featureToggleService) {
         super(configuration, featureToggleService);
