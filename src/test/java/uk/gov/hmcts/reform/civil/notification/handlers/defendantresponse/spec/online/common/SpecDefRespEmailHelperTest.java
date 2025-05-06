@@ -71,7 +71,6 @@ class SpecDefRespEmailHelperTest {
 
             String actual = helper.getAppSolTemplate(caseData);
             assertEquals(expectedTemplate, actual);
-
         }
     }
 
@@ -111,7 +110,6 @@ class SpecDefRespEmailHelperTest {
 
             String actual = helper.getRespondentTemplate(caseData);
             assertEquals(expectedTemplate, actual);
-
         }
     }
 
@@ -132,7 +130,6 @@ class SpecDefRespEmailHelperTest {
             assertEquals(expectedTemplate, actual);
 
         }
-        when(MultiPartyScenario.getMultiPartyScenario(caseData)).thenReturn(MultiPartyScenario.ONE_V_ONE);
     }
 
     @Test
