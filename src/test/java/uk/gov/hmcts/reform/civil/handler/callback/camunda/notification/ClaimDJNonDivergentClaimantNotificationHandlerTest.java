@@ -62,7 +62,6 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
     @Mock
     private NotificationsSignatureConfiguration configuration;
 
-
     @InjectMocks
     private ClaimDJNonDivergentClaimantNotificationHandler handler;
 

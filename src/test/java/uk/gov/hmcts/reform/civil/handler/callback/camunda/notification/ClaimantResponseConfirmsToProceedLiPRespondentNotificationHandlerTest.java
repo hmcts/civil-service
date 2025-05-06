@@ -303,7 +303,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
-
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .caseDataLip(CaseDataLiP.builder()
                                  .applicant1SettleClaim(NO)
@@ -354,7 +353,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
-
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()

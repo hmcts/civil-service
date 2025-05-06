@@ -108,7 +108,8 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         }
 
         @Nested
@@ -124,9 +125,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
 
                 CaseData caseData =
                     CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1().build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder()
-                                 .eventId(NOTIFY_FORMER_SOLICITOR.name()).build()).build();
 
                 Map<String, String> expectedProperties = new HashMap<>(Map.of(
                     CASE_NAME, CASE_TITLE,
@@ -145,7 +143,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
                 expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
                 expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
-
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_FORMER_SOLICITOR.name()).build()).build();
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -191,9 +191,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
                     .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder()
-                                 .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
 
                 Map<String, String> expectedProperties = new HashMap<>(Map.of(
                     CASE_NAME, CASE_TITLE,
@@ -213,6 +210,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
                 expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
 
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -233,9 +233,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
                     .applicant1Represented(YesOrNo.NO)
                     .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder()
-                                 .eventId(NOTIFY_NEW_DEFENDANT_SOLICITOR.name()).build()).build();
 
                 Map<String, String> expectedProperties = new HashMap<>(Map.of(
                     CASE_NAME, CASE_TITLE,
@@ -254,7 +251,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
                 expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
                 expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
-
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_NEW_DEFENDANT_SOLICITOR.name()).build()).build();
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
@@ -275,13 +274,8 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR_2).build()));
 
                 when(notificationsProperties.getNoticeOfChangeOtherParties()).thenReturn(OTHER_SOL_TEMPLATE);
-
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1()
                     .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder()
-                                 .eventId(NOTIFY_OTHER_SOLICITOR_2.name()).build()).build();
-
                 Map<String, String> expectedProperties = new HashMap<>(Map.of(
                     CASE_NAME, CASE_TITLE,
                     ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
@@ -299,6 +293,10 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
                 expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
                 expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId(NOTIFY_OTHER_SOLICITOR_2.name()).build()).build();
 
                 handler.handle(params);
 

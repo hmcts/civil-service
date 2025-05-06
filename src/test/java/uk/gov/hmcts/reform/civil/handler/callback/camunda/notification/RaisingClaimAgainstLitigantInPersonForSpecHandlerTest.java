@@ -59,10 +59,6 @@ class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
 
     @Test
     void shouldNotifyApplicantSolicitor_whenInvoked() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
         // When
         when(notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline()).thenReturn(TEMPLATE_ID);
         when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
@@ -72,6 +68,9 @@ class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
         when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                   + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
         handler.handle(params);
 
         // Then

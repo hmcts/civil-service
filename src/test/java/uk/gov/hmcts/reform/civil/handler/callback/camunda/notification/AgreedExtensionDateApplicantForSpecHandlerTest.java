@@ -117,7 +117,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
 
@@ -171,7 +172,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -193,7 +195,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -227,7 +230,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -248,7 +252,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -278,7 +283,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -308,7 +314,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -338,7 +345,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -369,7 +377,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -401,7 +410,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -448,7 +458,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
@@ -476,7 +487,8 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
                 when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()

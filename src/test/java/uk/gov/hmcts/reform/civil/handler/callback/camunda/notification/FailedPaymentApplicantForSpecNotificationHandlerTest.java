@@ -54,7 +54,6 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
     @Mock
     private NotificationsSignatureConfiguration configuration;
 
-
     @InjectMocks
     private FailedPaymentApplicantForSpecNotificationHandler handler;
 

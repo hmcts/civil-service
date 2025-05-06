@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -100,7 +99,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
                 when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                           + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentCounterClaim()
@@ -567,7 +565,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                           + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateRespondentCounterClaim()
@@ -606,7 +603,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                           + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
-
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -641,7 +637,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
                 when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                           + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged()

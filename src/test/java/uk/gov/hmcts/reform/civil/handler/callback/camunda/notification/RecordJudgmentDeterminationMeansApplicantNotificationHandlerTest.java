@@ -87,7 +87,6 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                                  .individualFirstName("Test Firstname").build())
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                                             .organisationID(ORG_NAME).build()).build()).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
@@ -97,7 +96,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 
             verify(notificationService).sendMail(

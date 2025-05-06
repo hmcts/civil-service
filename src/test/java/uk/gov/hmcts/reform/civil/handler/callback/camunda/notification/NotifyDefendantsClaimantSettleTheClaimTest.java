@@ -158,9 +158,11 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(DEFENDANT_REFERENCE_NUMBER,
                                                                                 referenceWasProvided ? "Def Ref Num" : "Not provided");
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(LEGAL_REP_NAME, "Legal Rep Name");
-            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
+                + "\n For all other matters, call 0300 123 7050");
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk "
+                + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
         }
 

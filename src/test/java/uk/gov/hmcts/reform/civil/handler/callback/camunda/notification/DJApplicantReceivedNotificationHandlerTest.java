@@ -70,7 +70,7 @@ class DJApplicantReceivedNotificationHandlerTest {
     private FeatureToggleService featureToggleService;
 
     @Mock
-    private NotificationsSignatureConfiguration configuration;;
+    private NotificationsSignatureConfiguration configuration;
 
     @Nested
     class AboutToSubmitCallback {
