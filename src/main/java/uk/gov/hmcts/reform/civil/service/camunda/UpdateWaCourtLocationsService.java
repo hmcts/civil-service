@@ -53,7 +53,10 @@ public class UpdateWaCourtLocationsService {
 
         Map<String, Object> evaluatedCourtMap = camundaRuntimeClient
             .getEvaluatedDmnCourtLocations(caseDataBuilder.build().getCaseManagementLocation().getBaseLocation(), claimTrack);
-        DmnListingLocations dmnListingLocations = objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
+
+        DmnListingLocations dmnListingLocations = evaluatedCourtMap == null
+            ? DmnListingLocations.constructFromBaseLocation(caseData.getCaseManagementLocation())
+            : objectMapper.convertValue(evaluatedCourtMap, DmnListingLocations.class);
 
         try {
             LocationRefData cmcListing = courtLocationDetails(locationRefDataList,

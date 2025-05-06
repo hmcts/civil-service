@@ -377,4 +377,34 @@ class UpdateWaCourtLocationsServiceTest {
         assertEquals(updatedCaseData.getTaskManagementLocations(), testCcmcTaskManagementLocations);
     }
 
+    @Test
+    public void shouldSetToBaseLocationWhenNoHitsFromDmn() {
+        when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+
+        List<LocationRefData> locations = List.of(
+            LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
+            LocationRefData.builder().epimmsId("654321").region("north").regionId("2").siteName("liverpool somewhere").build(),
+            LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
+        );
+
+        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+        when(camundaClient.getEvaluatedDmnCourtLocations(anyString(), anyString())).thenReturn(null);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("123456").region("1").build())
+            .allocatedTrack(AllocatedTrack.INTERMEDIATE_CLAIM)
+            .build();
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        updateWaCourtLocationsService.updateCourtListingWALocations("auth", caseDataBuilder);
+        CaseData updatedCaseData = caseDataBuilder.build();
+
+        TaskManagementLocationTypes taskManagementLocations = updatedCaseData.getTaskManagementLocations();
+
+        assertEquals(taskManagementLocations.getCmcListingLocation().getLocation(), "123456");
+        assertEquals(taskManagementLocations.getPtrListingLocation().getLocation(), "123456");
+        assertEquals(taskManagementLocations.getTrialListingLocation().getLocation(), "123456");
+        assertEquals(taskManagementLocations.getCcmcListingLocation().getLocation(), "123456");
+    }
+
 }
