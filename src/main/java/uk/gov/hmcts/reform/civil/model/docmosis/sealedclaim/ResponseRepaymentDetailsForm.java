@@ -66,7 +66,7 @@ public class ResponseRepaymentDetailsForm {
             builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             builder.responseType(caseData.getRespondent1ClaimResponseTypeForSpec());
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
+                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmountPlusInterest());
                 case PART_ADMISSION -> partAdmissionData(caseData, builder);
                 case FULL_DEFENCE -> fullDefenceData(caseData, builder);
                 case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
@@ -76,7 +76,7 @@ public class ResponseRepaymentDetailsForm {
             builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
             builder.responseType(caseData.getRespondent2ClaimResponseTypeForSpec());
             switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
-                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
+                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmountPlusInterest());
                 case PART_ADMISSION -> partAdmissionData(caseData, builder);
                 case FULL_DEFENCE -> fullDefenceData(caseData, builder);
                 case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
