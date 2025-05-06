@@ -912,6 +912,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .caseDataLiP(CaseDataLiP.builder().respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
                              .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondent1LiPStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
                     .whenWillThisAmountBePaid(whenWillPay)
