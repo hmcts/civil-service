@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
 @Component
 public class AmendRestitchBundleAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
+
     public AmendRestitchBundleAllPartiesEmailGenerator(
         AmendRestitchBundleAppSolOneEmailDTOGenerator appSolOneEmailGenerator,
         AmendRestitchBundleRespSolOneEmailDTOGenerator respSolOneEmailGenerator,
