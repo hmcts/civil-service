@@ -69,8 +69,9 @@ class CreateClaimAfterPaymentContinuingOnlineAppSolOneEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         Map<String, String> properties = generator.addCustomProperties(new HashMap<>(), caseData);
 
-        assertThat(properties).containsEntry(ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE));
-        assertThat(properties).containsEntry(NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE));
-        assertThat(properties).containsEntry(CLAIMANT_NAME, "John Doe");
+        assertThat(properties)
+                .containsEntry(ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE))
+                .containsEntry(NOTIFICATION_DEADLINE, formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE))
+                .containsEntry(CLAIMANT_NAME, "John Doe");
     }
 }
