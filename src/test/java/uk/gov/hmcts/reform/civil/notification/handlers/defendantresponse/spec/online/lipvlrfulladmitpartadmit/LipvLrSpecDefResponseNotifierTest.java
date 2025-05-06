@@ -5,7 +5,7 @@ import org.mockito.InjectMocks;
 import uk.gov.hmcts.reform.civil.notification.handlers.NotifierTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantResponseSpecOneRespRespondedNotifyParties;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantResponseSpecLipvLRFullOrPartAdmit;
 
 class LipvLrSpecDefResponseNotifierTest extends NotifierTestBase {
 
@@ -15,6 +15,6 @@ class LipvLrSpecDefResponseNotifierTest extends NotifierTestBase {
     @Test
     void shouldReturnCorrectTaskId() {
         String taskId = notifier.getTaskId();
-        assertThat(taskId).isEqualTo(DefendantResponseSpecOneRespRespondedNotifyParties.toString());
+        assertThat(taskId).isEqualTo(DefendantResponseSpecLipvLRFullOrPartAdmit.toString());
     }
 }
