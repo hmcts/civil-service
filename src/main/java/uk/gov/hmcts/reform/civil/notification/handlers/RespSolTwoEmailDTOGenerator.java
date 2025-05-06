@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -9,10 +10,16 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
-@AllArgsConstructor
 public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
 
     private final OrganisationService organisationService;
+
+    public RespSolTwoEmailDTOGenerator(NotificationsSignatureConfiguration configuration,
+                                       FeatureToggleService featureToggleService,
+                                       OrganisationService organisationService) {
+        super(configuration, featureToggleService);
+        this.organisationService = organisationService;
+    }
 
     @Override
     protected String getEmailAddress(CaseData caseData) {

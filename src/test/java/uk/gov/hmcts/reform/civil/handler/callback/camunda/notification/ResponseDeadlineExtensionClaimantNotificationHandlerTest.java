@@ -67,8 +67,6 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
     @Mock
     private PinInPostConfiguration pipInPostConfiguration;
     @Mock
-    private FeatureToggleService featureToggleService;
-    @Mock
     private NotificationsSignatureConfiguration configuration;
     @InjectMocks
     private ResponseDeadlineExtensionClaimantNotificationHandler handler;

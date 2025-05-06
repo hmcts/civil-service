@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
-@AllArgsConstructor
 public abstract class ClaimantEmailDTOGenerator extends EmailDTOGenerator {
+
+    public ClaimantEmailDTOGenerator(NotificationsSignatureConfiguration configuration, FeatureToggleService featureToggleService) {
+        super(configuration, featureToggleService);
+    }
 
     @Override
     public String getEmailAddress(CaseData caseData) {

@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Component
@@ -12,8 +14,9 @@ public class ClaimDismissedAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOG
     private final ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
 
     public ClaimDismissedAppSolOneEmailDTOGenerator(OrganisationService organisationService,
-                                                    ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
-        super(organisationService);
+                                                    ClaimDismissedEmailTemplater claimDismissedEmailTemplater,
+                                                    NotificationsSignatureConfiguration configuration, FeatureToggleService featureToggleService) {
+        super(configuration, featureToggleService, organisationService);
         this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
     }
 
