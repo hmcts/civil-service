@@ -160,6 +160,15 @@ idam:
     id: civil-service
     secret: ${CIVIL_CLIENT_SECRET:AAAAAAA}
 
+auth:
+  idam:
+    client:
+      baseUrl: ${IDAM_API_URL:http://localhost:5000}
+  provider:
+    service:
+      client:
+        baseUrl: ${IDAM_S2S_AUTH:http://localhost:4502}
+
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
 
@@ -467,7 +476,13 @@ notifications:
   notifyClaimantLRCoscApplied: "392cc0d5-51b3-4a82-8576-922424775617"
 
   queryRaised: "e0141ec9-d676-43fe-aef1-acdb0f950ebf"
+  queryRaisedLip: "88ddf39b-2ad8-41f1-b862-a55f6b4ddab0"
+  queryRaisedLipBilingual: "27e8d6c1-f0a0-46b0-8cd6-b7b18c825294"
   queryResponseReceived: "4e74a2ab-376f-47e1-9670-8f97648a13a4"
+  notifyOtherPartyQueryRaised: "a911957b-fca1-402b-acc5-6502e6de93a6"
+  notifyOtherPartyQueryResponseReceived: "a27a4110-9de9-4147-8c89-85c2af2a8d30"
+  queryLipResponseReceivedEnglish: "b097eb54-3e00-4272-9b77-426b23a71ce1"
+  queryLipResponseReceivedWelsh: "d1ff72f3-db0e-44c9-83e9-5c6a43681d69"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -531,12 +546,16 @@ azure:
       password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
       enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
     ccd-events-topic:
-      connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING}
+      connection-string: ${CCD_EVENTS_TOPIC_CONNECTION_STRING:dummy}
       topic-name: ${CCD_EVENTS_TOPIC_NAME:ccd-case-events-aat}
       civil-ccd-events-subscription-name: ${CCD_EVENTS_SUBSCRIPTION_NAME:civil-ccd-case-events-sub-aat}
       retry-duration: ${CCD_EVENTS_SUBSCRIPTION_RETRY_DURATION:60}
       threads: ${CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS:1}
       enabled: ${CCD_EVENTS_SUBSCRIPTION_ENABLED:false}
+    application-insights:
+      instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
+
+appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:dummy}
 
 async:
   handler:
@@ -570,6 +589,11 @@ docStore:
   doc:
     removal:
       enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
+
+logging:
+  level:
+    uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter: ERROR
+
 ---
 
 spring:

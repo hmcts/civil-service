@@ -1,18 +1,16 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,9 +30,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 public class NotificationUtils {
@@ -103,22 +98,6 @@ public class NotificationUtils {
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             );
-        }
-    }
-
-    public static String getSolicitorClaimDismissedProperty(List<String> stateHistoryNameList,
-                                                            NotificationsProperties notificationsProperties) {
-        //scenerio 1: Claim notification does not happen within 4 months of issue
-        if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName())) {
-            return notificationsProperties.getSolicitorClaimDismissedWithin4Months();
-        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName())) {
-            //scenerio 2: Claims details notification is not completed within 14 days of the claim notification step
-            return notificationsProperties.getSolicitorClaimDismissedWithin14Days();
-        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())) {
-            //scenerio 3 Claimant does not give their intention by the given deadline
-            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
-        } else {
-            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
         }
     }
 
@@ -200,11 +179,15 @@ public class NotificationUtils {
             if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            } else if (caseData.getRespondent1OrganisationIDCopy() != null) {
+                id = caseData.getRespondent1OrganisationIDCopy();
             }
         } else {
             if (caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            } else if (caseData.getRespondent2OrganisationIDCopy() != null) {
+                id = caseData.getRespondent2OrganisationIDCopy();
             }
         }
         if (id != null) {

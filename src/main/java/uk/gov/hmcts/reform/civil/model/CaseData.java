@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -77,6 +78,8 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -607,6 +610,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private List<DocumentToKeepCollection> documentToKeepCollection;
 
+    private final ChangeLanguagePreference changeLanguagePreference;
+    private final PreferredLanguage claimantLanguagePreferenceDisplay;
+    private final PreferredLanguage defendantLanguagePreferenceDisplay;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
@@ -827,7 +837,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean hasApplicantProceededWithClaim() {
         return YES == getApplicant1ProceedWithClaim()
-            || YES == getApplicant1ProceedWithClaimSpec2v1();
+            || YES == getApplicant1ProceedWithClaimSpec2v1()
+            || NO.equals(getApplicant1AcceptAdmitAmountPaidSpec())
+            || NO.equals(getApplicant1PartAdmitConfirmAmountPaidSpec())
+            || NO.equals(getApplicant1PartAdmitIntentionToSettleClaimSpec());
     }
 
     @JsonIgnore
@@ -1524,5 +1537,44 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return getCcjPaymentDetails() != null
             && getCcjPaymentDetails().getCcjPaymentPaidSomeOption() != null
             && NO.equals(getCcjPaymentDetails().getCcjPaymentPaidSomeOption());
+    }
+
+    @JsonIgnore
+    public boolean isLipClaimantSpecifiedBilingualDocuments() {
+        return isApplicant1NotRepresented()
+            && getApplicant1DQ() != null
+            && getApplicant1DQ().getApplicant1DQLanguage() != null
+            && (getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.BOTH || getApplicant1DQ().getApplicant1DQLanguage().getDocuments() == Language.WELSH);
+    }
+
+    @JsonIgnore
+    public boolean isLipDefendantSpecifiedBilingualDocuments() {
+        return isRespondent1NotRepresented()
+            && getRespondent1DQ() != null
+            && getRespondent1DQ().getRespondent1DQLanguage() != null
+            && (getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.BOTH || getRespondent1DQ().getRespondent1DQLanguage().getDocuments() == Language.WELSH);
+    }
+
+    @JsonIgnore
+    public String getApplicantSolicitor1UserDetailsEmail() {
+        return applicantSolicitor1UserDetails == null ? null : applicantSolicitor1UserDetails.getEmail();
+    }
+
+    @JsonIgnore
+    public String getClaimantUserDetailsEmail() {
+        final IdamUserDetails claimantUserDetails = getClaimantUserDetails();
+        return claimantUserDetails == null ? null : claimantUserDetails.getEmail();
+    }
+
+    @JsonIgnore
+    public String getRespondent1PartyEmail() {
+        final Party party = getRespondent1();
+        return party == null ? null : party.getPartyEmail();
+    }
+
+    @JsonIgnore
+    public String getRespondent2PartyEmail() {
+        final Party party = getRespondent2();
+        return party == null ? null : party.getPartyEmail();
     }
 }
