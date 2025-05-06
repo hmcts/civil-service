@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.NotifierTestBase;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DefendantResponseUnspecCaseHandedOfflineNotifyParties;
 
-class DefRespCaseOfflineUnspecNotifierTest extends NotifierTestBase  {
+class DefRespCaseOfflineUnspecNotifierTest extends NotifierTestBase {
 
     @InjectMocks
     private DefRespCaseOfflineUnspecNotifier notifier;
