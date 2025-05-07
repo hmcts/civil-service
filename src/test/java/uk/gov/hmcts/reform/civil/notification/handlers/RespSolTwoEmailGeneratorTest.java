@@ -7,8 +7,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -25,14 +23,12 @@ class RespSolTwoEmailGeneratorTest {
 
     private OrganisationService organisationService;
     private RespSolTwoEmailDTOGenerator emailGenerator;
-    private NotificationsSignatureConfiguration configuration;
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         organisationService = Mockito.mock(OrganisationService.class);
-        emailGenerator = new RespSolTwoEmailDTOGenerator(configuration, featureToggleService, organisationService) {
+        emailGenerator = new RespSolTwoEmailDTOGenerator(organisationService) {
             @Override
             public String getEmailTemplateId(CaseData caseData) {
                 return "template-id";
