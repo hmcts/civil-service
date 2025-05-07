@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
 
@@ -26,6 +28,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final InterlocutoryJudgementDocGenerator interlocutoryJudgementDocGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final FeatureToggleService featureToggleService;
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
         this::generateInterlocutoryJudgementDoc
@@ -60,12 +64,23 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseData updatedCaseData = caseData.toBuilder()
-            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                interlocutoryJudgementDoc,
-                caseData
-            ))
-            .build();
+        CaseData updatedCaseData;
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+            || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            preTranslationDocuments.add(element(interlocutoryJudgementDoc));
+            updatedCaseData = caseData.toBuilder()
+                .preTranslationDocuments(preTranslationDocuments)
+                .build();
+        } else {
+            updatedCaseData = caseData.toBuilder()
+                .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                    interlocutoryJudgementDoc,
+                    caseData
+                ))
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
