@@ -27,7 +27,7 @@ dependencies {
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.21.1'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
   implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.29'
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.4'
 
   runtimeOnly 'org.postgresql:postgresql:42.7.5'
   compileOnly 'org.projectlombok:lombok'
