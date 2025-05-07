@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -18,6 +19,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 
 class TemplateCommonPropertiesHelperTest {
 
+    private static final String TEST_HMCTS_SIGNATURE = "HMCTS Signature";
+    private static final String TEST_PHONE_CONTACT = "123-456-789";
+    private static final String TEST_OPENING_HOURS = "9:00 AM - 5:00 PM";
     private static final String TEST_SPEC_UNSPEC_CONTACT = "SpecUnspec Contact";
     private static final String TEST_CNBC_CONTACT = "CNBC Contact";
     private static final String TEST_RAISE_QUERY_LR = "Raise Query LR"; // Adding the constant here
@@ -37,6 +41,12 @@ class TemplateCommonPropertiesHelperTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         helper = new TemplateCommonPropertiesHelper(configuration, featureToggleService);
+
+        when(configuration.getHmctsSignature()).thenReturn(TEST_HMCTS_SIGNATURE);
+        when(configuration.getPhoneContact()).thenReturn(TEST_PHONE_CONTACT);
+        when(configuration.getOpeningHours()).thenReturn(TEST_OPENING_HOURS);
+        when(configuration.getSpecUnspecContact()).thenReturn(TEST_SPEC_UNSPEC_CONTACT);
+        when(configuration.getCnbcContact()).thenReturn(TEST_CNBC_CONTACT);
     }
 
     @Test
@@ -49,7 +59,7 @@ class TemplateCommonPropertiesHelperTest {
         helper.addSpecAndUnspecContact(caseData, properties);
 
         assertThat(properties)
-            .containsEntry(SPEC_UNSPEC_CONTACT, TEST_RAISE_QUERY_LR);
+            .containsEntry(SPEC_UNSPEC_CONTACT, TEST_SPEC_UNSPEC_CONTACT);
     }
 
     @Test
@@ -105,5 +115,17 @@ class TemplateCommonPropertiesHelperTest {
         boolean result = helper.isQueryManagementAllowedForLRCase(caseData);
 
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldAddCommonFooterSignature() {
+        Map<String, String> properties = new java.util.HashMap<>();
+
+        helper.addCommonFooterSignature(properties);
+
+        assertThat(properties)
+            .containsEntry(NotificationData.HMCTS_SIGNATURE, TEST_HMCTS_SIGNATURE)
+            .containsEntry(NotificationData.PHONE_CONTACT, TEST_PHONE_CONTACT)
+            .containsEntry(NotificationData.OPENING_HOURS, TEST_OPENING_HOURS);
     }
 }
