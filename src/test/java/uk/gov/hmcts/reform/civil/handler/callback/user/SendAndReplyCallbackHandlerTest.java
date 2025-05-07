@@ -272,7 +272,7 @@ class SendAndReplyCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .sendAndReplyOption(SEND)
-                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.valueOf(1000001)).build())
+                .claimValue(ClaimValue.builder().statementOfValueInPennies(BigDecimal.valueOf(10_000_01)).build())
                 .sendMessageMetadata(messageMetaData)
                 .sendMessageContent(messageContent)
                 .build();
