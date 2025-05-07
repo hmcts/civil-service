@@ -24,7 +24,6 @@ class TemplateCommonPropertiesHelperTest {
     private static final String TEST_OPENING_HOURS = "9:00 AM - 5:00 PM";
     private static final String TEST_SPEC_UNSPEC_CONTACT = "SpecUnspec Contact";
     private static final String TEST_CNBC_CONTACT = "CNBC Contact";
-    private static final String TEST_RAISE_QUERY_LR = "Raise Query LR"; // Adding the constant here
 
     @Mock
     private NotificationsSignatureConfiguration configuration;
@@ -51,11 +50,11 @@ class TemplateCommonPropertiesHelperTest {
 
     @Test
     void shouldAddSpecAndUnspecContactForLRCase() {
-        Map<String, String> properties = new java.util.HashMap<>();
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(false);
         when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
+        Map<String, String> properties = new java.util.HashMap<>();
         helper.addSpecAndUnspecContact(caseData, properties);
 
         assertThat(properties)
@@ -64,22 +63,22 @@ class TemplateCommonPropertiesHelperTest {
 
     @Test
     void shouldAddCnbcContactForLRCase() {
-        Map<String, String> properties = new java.util.HashMap<>();
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(false);
         when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
+        Map<String, String> properties = new java.util.HashMap<>();
         helper.addCnbcContact(caseData, properties);
 
         assertThat(properties)
-            .containsEntry(CNBC_CONTACT, TEST_RAISE_QUERY_LR);
+            .containsEntry(CNBC_CONTACT, TEST_CNBC_CONTACT);
     }
 
     @Test
     void shouldAddSpecAndUnspecContactForNonLRCase() {
-        Map<String, String> properties = new java.util.HashMap<>();
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
 
+        Map<String, String> properties = new java.util.HashMap<>();
         helper.addSpecAndUnspecContact(caseData, properties);
 
         assertThat(properties)
