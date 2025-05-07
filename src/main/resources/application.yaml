@@ -589,6 +589,7 @@ docStore:
   doc:
     removal:
       enabled: ${DOCSTORE_DOC_REMOVAL_ENABLED:false}
+
 ---
 
 spring:
