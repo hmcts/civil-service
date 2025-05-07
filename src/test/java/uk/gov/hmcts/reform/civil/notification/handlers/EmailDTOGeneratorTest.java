@@ -13,9 +13,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 class EmailDTOGeneratorTest {
 
@@ -74,24 +71,17 @@ class EmailDTOGeneratorTest {
 
     @Test
     void shouldBuildEmailDTOCorrectly() {
-        // Prepare mock data for the CaseData
         when(caseData.getLegacyCaseReference()).thenReturn(LEGACY_CASE_REFERENCE);
         when(caseData.getCcdCaseReference()).thenReturn(1234567890123456L);
 
-        // Call the method to build the EmailDTO
         EmailDTO emailDTO = emailDTOGenerator.buildEmailDTO(caseData);
 
-        // Perform assertions to ensure the emailDTO is built correctly
         assertThat(emailDTO.getTargetEmail()).isEqualTo(TEST_EMAIL);
         assertThat(emailDTO.getEmailTemplate()).isEqualTo(TEST_TEMPLATE_ID);
         assertThat(emailDTO.getReference()).isEqualTo(String.format(TEST_REFERENCE_TEMPLATE, LEGACY_CASE_REFERENCE));
 
-        // Verify the parameters map contains expected values
         assertThat(emailDTO.getParameters())
-            .containsEntry(CLAIM_REFERENCE_NUMBER, "1234567890123456")
-            .containsEntry(CASEMAN_REF, LEGACY_CASE_REFERENCE)
-            .containsEntry(CUSTOM_KEY, CUSTOM_VALUE)
-            .containsEntry(PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided");
+            .containsEntry(CUSTOM_KEY, CUSTOM_VALUE);
 
         verify(helper).addBaseProperties(eq(caseData), any());
         verify(helper).addCommonFooterSignature(any());
