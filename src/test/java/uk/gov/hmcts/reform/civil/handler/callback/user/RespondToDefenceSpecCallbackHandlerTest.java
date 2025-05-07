@@ -559,6 +559,51 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "set-applicant1-proceed-flag";
 
         @Test
+        void shouldSetApplicant1Proceed_whenPartAdmitApplicantRejectPaymentPlan() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentPartAdmission()
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicant1ProceedWithClaim"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldSetApplicant1Proceed_whenPartAdmitStatesPaidApplicantNotReceivedPayment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentPartAdmission()
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicant1ProceedWithClaim"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldSetApplicant1Proceed_whenPartAdmitStatesPaidApplicantRejects() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentPartAdmission()
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicant1ProceedWithClaim"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
         void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSpec2v1ClaimSubmitted()
@@ -1750,6 +1795,54 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldMoveCaseToIn_MediationWhenDefendantStatesPaidPartAdmitClaimantRejects() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build();
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isEqualTo(IN_MEDIATION.toString());
+        }
+
+        @Test
+        void shouldMoveCaseToIn_MediationWhenDefendantStatesPaidPartAdmitClaimantNotReceivedPayment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build();
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isEqualTo(IN_MEDIATION.toString());
+        }
+
+        @Test
+        void shouldMoveCaseToIn_MediationWhenClaimantProceedsPartAdmitDefendantPayImmediately1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build();
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isEqualTo(IN_MEDIATION.toString());
+        }
+
+        @Test
         void shouldMoveCaseToIn_MediationWhenClaimantProceeds1v1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -2403,6 +2496,24 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventCallbackValidateAmountPaidFlag {
 
         private static final String PAGE_ID = "validate-amount-paid";
+
+        @Test
+        void shouldReturnError_whenPartialAmountPaid() {
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YES)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("This feature is currently not available, please see guidance below");
+        }
 
         @Test
         void shouldCheckValidateAmountPaid_withErrorMessage() {
