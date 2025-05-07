@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationForClaimantRepresented extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
@@ -81,6 +83,8 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
                 isApplicantSolicitorNotify ? addPropertiesApplicantSolicitor(caseData) : addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE_DEFENDANT, caseData.getLegacyCaseReference())
             );
+        } else {
+            log.info("No recipientEmail or templateId provided, skipping notification for caseId {}", caseData.getCcdCaseReference());
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

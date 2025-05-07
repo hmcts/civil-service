@@ -1177,7 +1177,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicant1Email() {
-        return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
+        if (getApplicant1().getPartyEmail() != null) {
+            return getApplicant1().getPartyEmail();
+        }
+        if (getClaimantUserDetails() != null) {
+            return getClaimantUserDetails().getEmail();
+        } else {
+            if (getApplicantSolicitor1UserDetails() != null) {
+                return getApplicantSolicitor1UserDetails().getEmail();
+            }
+        }
+        return null;
     }
 
     @JsonIgnore
