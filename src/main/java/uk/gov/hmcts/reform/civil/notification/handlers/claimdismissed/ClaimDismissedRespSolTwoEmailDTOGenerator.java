@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Component
@@ -14,9 +12,8 @@ public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
     protected static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED = "claim-dismissed-respondent-notification-%s";
 
     public ClaimDismissedRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
-                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater,
-                                                     NotificationsSignatureConfiguration configuration, FeatureToggleService featureToggleService) {
-        super(configuration, featureToggleService, organisationService);
+                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
+        super(organisationService);
         this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
     }
 
