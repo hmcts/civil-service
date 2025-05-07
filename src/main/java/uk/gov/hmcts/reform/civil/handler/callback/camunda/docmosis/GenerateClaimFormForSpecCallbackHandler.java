@@ -76,10 +76,11 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         }
 
         LocalDate issueDate = time.now().toLocalDate();
-        LocalDateTime respondent1ResponseDeadline = deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now());
+        LocalDateTime respondent1RespDeadline = deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now());
+        log.info("Respondent1RespDeadline is {} for caseId{} in caseData", respondent1RespDeadline, caseId);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
-            .respondent1ResponseDeadline(respondent1ResponseDeadline)
-            .nextDeadline(respondent1ResponseDeadline.toLocalDate())
+            .respondent1ResponseDeadline(respondent1RespDeadline)
+            .nextDeadline(respondent1RespDeadline.toLocalDate())
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(
