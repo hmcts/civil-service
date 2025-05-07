@@ -27,7 +27,7 @@ public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
         return properties;
     }
 
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return isOneVTwoTwoLegalRep(caseData) ? Boolean.TRUE : Boolean.FALSE;
     }
 }
