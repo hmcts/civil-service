@@ -128,7 +128,7 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
                 .caseData(caseData)
-                .areSystemGeneratedDocumentsRemoved(false)
+                .documentsMarkedForDelete(new ArrayList<>())
                 .build();
 
             when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
@@ -165,7 +165,7 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
             DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
                 .caseData(caseData)
-                .areSystemGeneratedDocumentsRemoved(false)
+                .documentsMarkedForDelete(new ArrayList<>())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -208,7 +208,9 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
             DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
                 .caseData(caseData)
-                .areSystemGeneratedDocumentsRemoved(true)
+                .documentsMarkedForDelete(
+                    List.of(DocumentToKeep.builder().documentFileName("System Doc").documentId("123").systemGenerated(YesOrNo.YES).build(),
+                        DocumentToKeep.builder().documentFileName("User Doc").documentId("456").systemGenerated(YesOrNo.NO).build()))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -218,7 +220,9 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getWarnings())
-                .contains(DocumentRemovalHandler.WARNING_SYSTEM_DOCUMENT_REMOVED);
+                .contains("System Generated Document System Doc (123) will be removed from the case");
+            assertThat(response.getWarnings())
+                .contains("User Document User Doc (456) will be removed from the case");
             assertThat(response.getData())
                 .extracting("documentToKeepCollection")
                 .asInstanceOf(InstanceOfAssertFactories.list(DocumentToKeepCollection.class))

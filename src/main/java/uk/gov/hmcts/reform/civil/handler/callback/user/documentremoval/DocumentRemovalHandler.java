@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import uk.gov.hmcts.reform.civil.service.documentremoval.DocumentRemovalCaseDataDTO;
@@ -33,9 +34,6 @@ public class DocumentRemovalHandler extends CallbackHandler {
 
     private final ObjectMapper mapper;
     private final DocumentRemovalService documentRemovalService;
-    public static final String WARNING_SYSTEM_DOCUMENT_REMOVED =
-        "Are you sure you want to remove a system generated document?";
-
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REMOVE_DOCUMENT);
 
     @Override
@@ -74,19 +72,36 @@ public class DocumentRemovalHandler extends CallbackHandler {
     private CallbackResponse removeDocuments(CallbackParams params) {
         CaseData caseData = params.getCaseData();
         String authToken = params.getParams().get(BEARER_TOKEN).toString();
-        ArrayList<String> warnings = new ArrayList<>();
         log.info("Invoking event document removal about to submit callback for Case ID: {}",
             caseData.getCcdCaseReference());
 
         DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO =
             documentRemovalService.removeDocuments(caseData, caseData.getCcdCaseReference(), authToken);
-        if (documentRemovalCaseDataDTO.getAreSystemGeneratedDocumentsRemoved()) {
-            warnings.add(WARNING_SYSTEM_DOCUMENT_REMOVED);
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(documentRemovalCaseDataDTO.getCaseData().toMap(mapper))
-            .warnings(warnings)
+            .warnings(buildWarnings(documentRemovalCaseDataDTO))
             .build();
     }
+
+    private List<String> buildWarnings(DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO) {
+        List<String> warnings = new ArrayList<>();
+        if (documentRemovalCaseDataDTO.getDocumentsMarkedForDelete() != null
+            && !documentRemovalCaseDataDTO.getDocumentsMarkedForDelete().isEmpty()) {
+            documentRemovalCaseDataDTO.getDocumentsMarkedForDelete().forEach(document -> {
+                StringBuilder warningBuilder = new StringBuilder();
+                warningBuilder.append(document.getSystemGenerated().equals(YesOrNo.YES) ? "System Generated" : "User")
+                    .append(" Document ")
+                    .append(document.getDocumentFileName())
+                    .append(" (")
+                    .append(document.getDocumentId())
+                    .append(") will be removed from the case");
+
+                warnings.add(warningBuilder.toString());
+            });
+        }
+
+        return warnings;
+    }
+
 }

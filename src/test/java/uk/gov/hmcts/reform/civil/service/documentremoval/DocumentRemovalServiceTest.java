@@ -19,7 +19,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocumentToKeep;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
@@ -29,12 +31,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -58,6 +60,7 @@ class DocumentRemovalServiceTest {
             .builder()
             .addModule(new JavaTimeModule())
             .addModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES))
+            .addModule(new com.fasterxml.jackson.datatype.jdk8.Jdk8Module())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
@@ -442,8 +445,46 @@ class DocumentRemovalServiceTest {
 
             DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
 
-            assertTrue(result.getAreSystemGeneratedDocumentsRemoved());
+            assertEquals(1, result.getDocumentsMarkedForDelete().size());
+            assertEquals("123", result.getDocumentsMarkedForDelete().get(0).getDocumentId());
+            assertEquals(YesOrNo.YES, result.getDocumentsMarkedForDelete().get(0).getSystemGenerated());
             assertNull(result.getCaseData().getDecisionOnReconsiderationDocument().getDocumentLink());
+            assertNotNull(result.getCaseData().getRespondent1GeneratedResponseDocument());
+            assertEquals("Respondent1 Generated Response Doc.pdf",
+                result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
+            assertNull(result.getCaseData().getDocumentToKeepCollection());
+        }
+
+        @Test
+        void shouldFlagBundlesAsSystemGeneratedRemoveDocuments_TopLevelDoc() {
+
+            List<IdValue<Bundle>> bundles = List.of(
+                new IdValue<>("1", Bundle.builder().stitchStatus(Optional.of("NEW")).description("Trial Bundle")
+                    .stitchedDocument(Optional.of(Document.builder()
+                        .documentUrl("https://example1.com/1234")
+                        .documentBinaryUrl("https://example1.com/1234/binary")
+                        .documentFileName("Trial-Bundle.pdf")
+                        .build())).build()));
+
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .caseBundles(bundles)
+                .documentToKeepCollection(List.of(DocumentToKeepCollection.builder()
+                    .value(DocumentToKeep.builder()
+                        .documentId("456")
+                        .caseDocumentToKeep(buildCaseDocumentToKeep(
+                            "https://example1.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null))
+                        .build())
+                    .build()))
+                .respondent1GeneratedResponseDocument(buildCaseDocument(
+                    "https://example1.com/456", "Respondent1 Generated Response Doc.pdf", "https://example2.com/binary", null, "Civil"))
+                .build();
+
+            DocumentRemovalCaseDataDTO result = documentRemovalService.removeDocuments(caseData, 1L, "Auth");
+
+            assertEquals(1, result.getDocumentsMarkedForDelete().size());
+            assertEquals("1234", result.getDocumentsMarkedForDelete().get(0).getDocumentId());
+            assertEquals(YesOrNo.YES, result.getDocumentsMarkedForDelete().get(0).getSystemGenerated());
             assertNotNull(result.getCaseData().getRespondent1GeneratedResponseDocument());
             assertEquals("Respondent1 Generated Response Doc.pdf",
                 result.getCaseData().getRespondent1GeneratedResponseDocument().getDocumentLink().getDocumentFileName());
