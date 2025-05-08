@@ -129,7 +129,6 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
         }
 
-
         @Test
         @DisplayName("Should not send any notification to Applicant1's party as no email available")
         void doNotNotifyApplicantAfterNocApproval() {
