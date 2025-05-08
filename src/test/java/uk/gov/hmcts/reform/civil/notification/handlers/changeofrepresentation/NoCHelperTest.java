@@ -1,12 +1,17 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -23,7 +28,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
@@ -33,16 +37,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_FEE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NEW_SOL;
 
+@ExtendWith(MockitoExtension.class)
 class NoCHelperTest {
 
-    private OrganisationService organisationService;
-    private NoCHelper noCHelper;
+    private static final String APP_SOLICITOR_EMAIL = "appSol@gmail.com";
 
-    @BeforeEach
-    void setUp() {
-        organisationService = mock(OrganisationService.class);
-        noCHelper = new NoCHelper(organisationService);
-    }
+    @Mock
+    private OrganisationService organisationService;
+
+    @InjectMocks
+    private NoCHelper noCHelper;
 
     @Test
     void shouldReturnCorrectPropertiesForGetProperties() {
@@ -65,8 +69,15 @@ class NoCHelperTest {
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .individualLastName("Doe").individualFirstName("John").build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .email(APP_SOLICITOR_EMAIL).build())
+            .respondent1(Party.builder().partyName("John Doe").type(Party.Type.INDIVIDUAL)
+                             .individualFirstName("John")
+                             .individualLastName("Doe")
+                             .build())
             .issueDate(LocalDate.of(2023, 1, 10))
             .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                                         .organisationToRemoveID(orgToRemoveId)
                                         .organisationToAddID(orgToAddId)
                                         .build())
@@ -74,12 +85,20 @@ class NoCHelperTest {
 
         Map<String, String> result = noCHelper.getProperties(caseData, false);
 
-        assertThat(result.get(FORMER_SOL)).isEqualTo("Old Firm");
-        assertThat(result.get(NEW_SOL)).isEqualTo("New Firm");
+        assertThat(result.get(FORMER_SOL)).isEqualTo("remove org");
+        assertThat(result.get(NEW_SOL)).isEqualTo("add org");
     }
 
     @Test
     void shouldReturnLipWhenOrganisationIdIsNull() {
+        String orgToAddId = "add-id";
+
+        Organisation ORGANISATION_TO_ADD = Organisation.builder()
+            .name("add org")
+            .build();
+
+        when(organisationService.findOrganisationById(orgToAddId)).thenReturn(Optional.of(ORGANISATION_TO_ADD));
+
         Map<String, String> result = noCHelper.getProperties(
             CaseData.builder()
                 .ccdCaseReference(1234567890123456L)
@@ -88,25 +107,26 @@ class NoCHelperTest {
                                 .individualFirstName("Jane")
                                 .individualLastName("Doe")
                                 .build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                    .email(APP_SOLICITOR_EMAIL).build())
                 .respondent1(Party.builder().partyName("John Doe").type(Party.Type.INDIVIDUAL)
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .build())
+                                 .individualFirstName("John")
+                                 .individualLastName("Doe")
+                                 .build())
                 .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                            .organisationToAddID(null)
+                                            .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                                            .organisationToAddID(orgToAddId)
                                             .organisationToRemoveID(null)
                                             .build())
                 .build(), false);
 
         assertThat(result.get(FORMER_SOL)).isEqualTo("LiP");
-        assertThat(result.get(NEW_SOL)).isEqualTo("LiP");
+        assertThat(result.get(NEW_SOL)).isEqualTo("add org");
     }
 
     @Test
     void shouldThrowExceptionWhenOrganisationNotFound() {
         String orgId = "not-found";
-        when(organisationService.findOrganisationById(orgId)).thenReturn(Optional.empty());
-
         CaseData caseData = CaseData.builder()
             .changeOfRepresentation(ChangeOfRepresentation.builder()
                                         .organisationToRemoveID(orgId)
@@ -121,8 +141,16 @@ class NoCHelperTest {
     @Test
     void shouldReturnCorrectLipClaimantProperties() {
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().partyName("Claimant A").build())
-            .respondent1(Party.builder().partyName("Defendant B").build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualLastName("A")
+                            .individualFirstName("Claimant")
+                            .partyName("Claimant A").build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualLastName("B")
+                             .individualFirstName("Defendant")
+                             .partyName("Defendant B").build())
             .ccdCaseReference(1234567890123456L)
             .legacyCaseReference("LEGACY123")
             .build();
@@ -153,8 +181,8 @@ class NoCHelperTest {
     @Test
     void shouldReturnCorrectHearingFeeEmailProperties() {
         Organisation org = Organisation.builder()
-                .name("app sol org")
-                .build();
+            .name("app sol org")
+            .build();
         when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(org));
 
         CaseData caseData = CaseData.builder()
@@ -176,8 +204,8 @@ class NoCHelperTest {
             .build();
 
         Map<String, String> props = noCHelper.getHearingFeeEmailProperties(caseData);
-        assertThat(props.get(HEARING_DATE)).isEqualTo("01 Oct 2023");
+        assertThat(props.get(HEARING_DATE)).isEqualTo("1 October 2023");
         assertThat(props.get(COURT_LOCATION)).isEqualTo("Courtroom A");
-        assertThat(props.get(HEARING_FEE)).isEqualTo("10000");
+        assertThat(props.get(HEARING_FEE)).isEqualTo("£100.00");
     }
 }

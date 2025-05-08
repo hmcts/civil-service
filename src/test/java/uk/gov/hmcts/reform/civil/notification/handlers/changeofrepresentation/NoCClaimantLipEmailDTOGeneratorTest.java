@@ -1,51 +1,48 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class NoCClaimantLipEmailDTOGeneratorTest {
+
     private static final String ENGLISH_TEMPLATE_ID = "english-template-id";
     private static final String BILINGUAL_TEMPLATE_ID = "bilingual-template-id";
     private static final String CLAIMANT_EMAIL = "claimant@example.com";
     private static final String CASE_REFERENCE = "1234567890";
 
+    @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
     private NoCHelper noCHelper;
+
+    @InjectMocks
     private NoCClaimantLipEmailDTOGenerator generator;
 
+    @Mock
     private CaseData caseData;
 
-    @BeforeEach
-    void setUp() {
-        notificationsProperties = mock(NotificationsProperties.class);
-        noCHelper = mock(NoCHelper.class);
-        generator = new NoCClaimantLipEmailDTOGenerator(notificationsProperties, noCHelper);
-
-        caseData = mock(CaseData.class);
-    }
-
     @Test
-    void shouldReturnTrueWhenIsAppliantLipForRespondentSolicitorChange() {
-        mockStatic(NocNotificationUtils.class).when(() ->
-                         NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData)
-        ).thenReturn(true);
+    void shouldReturnTrueWhenApplicantIsLipForRespondentSolicitorChange() {
+        when(noCHelper.isApplicantLipForRespondentSolicitorChange(caseData)).thenReturn(true);
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
-    void shouldReturnEmailDTOWithCorrectValuesWhenNonBilingual() {
+    void shouldReturnEmailDTOWithCorrectValuesForNonBilingualClaimant() {
         when(caseData.isClaimantBilingual()).thenReturn(false);
         when(caseData.getApplicant1Email()).thenReturn(CLAIMANT_EMAIL);
         when(notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate())
@@ -62,7 +59,7 @@ class NoCClaimantLipEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnEmailDTOWithCorrectValuesWhenBilingual() {
+    void shouldReturnEmailDTOWithCorrectValuesForBilingualClaimant() {
         when(caseData.isClaimantBilingual()).thenReturn(true);
         when(caseData.getApplicant1Email()).thenReturn(CLAIMANT_EMAIL);
         when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC())

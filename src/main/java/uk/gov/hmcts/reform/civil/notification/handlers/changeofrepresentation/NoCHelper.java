@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RecipientData;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REFERENCE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
 @AllArgsConstructor
@@ -71,20 +72,13 @@ public class NoCHelper {
 
     public Map<String, String> getHearingFeeEmailProperties(CaseData caseData) {
         return Map.of(
-            LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
+            LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             COURT_LOCATION, caseData.getHearingLocation().getValue().getLabel(),
             HEARING_TIME, caseData.getHearingTimeHourMinute(),
             HEARING_FEE, String.valueOf(caseData.getHearingFee().formData()),
             HEARING_DUE_DATE, formatLocalDate(caseData.getHearingDueDate(), DATE)
         );
-    }
-
-    private String getLegalOrganizationName(CaseData caseData) {
-        String orgId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        return organisationService.findOrganisationById(orgId)
-            .map(Organisation::getName)
-            .orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
 
     private String getOrganisationName(String orgId) {
@@ -137,9 +131,10 @@ public class NoCHelper {
     private RecipientData getOtherSolicitor2(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
-                uk.gov.hmcts.reform.ccd.model.Organisation respondent1Org = caseData.getRespondent1OrganisationPolicy().getOrganisation();
-                String respondent1OrgID = respondent1Org != null
-                    ? respondent1Org.getOrganisationID() : caseData.getRespondent1OrganisationIDCopy();
+                String respondent1OrgID = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
+                    .map(OrganisationPolicy::getOrganisation)
+                    .map(Organisation::getOrganisationID)
+                    .orElse(caseData.getRespondent1OrganisationIDCopy());
                 return RecipientData.builder()
                     .email(caseData.getRespondentSolicitor1EmailAddress())
                     .orgId(respondent1OrgID)
@@ -147,14 +142,20 @@ public class NoCHelper {
             }
         } else {
             if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+                String applicantOrgId = Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
+                    .map(OrganisationPolicy::getOrganisation)
+                    .map(Organisation::getOrganisationID)
+                    .orElse(null);
                 return RecipientData.builder()
-                    .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
-                    .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .email(caseData.getApplicantSolicitor1UserDetailsEmail())
+                    .orgId(applicantOrgId)
                     .build();
             } else {
                 if (!isOtherPartyLip(caseData.getRespondent2OrganisationPolicy())) {
-                    uk.gov.hmcts.reform.ccd.model.Organisation respondent2Org = caseData.getRespondent2OrganisationPolicy().getOrganisation();
-                    String respondent2OrgID = respondent2Org != null ? respondent2Org.getOrganisationID() : caseData.getRespondent2OrganisationIDCopy();
+                    String respondent2OrgID = Optional.ofNullable(caseData.getRespondent2OrganisationPolicy())
+                        .map(OrganisationPolicy::getOrganisation)
+                        .map(Organisation::getOrganisationID)
+                        .orElse(caseData.getRespondent2OrganisationIDCopy());
                     return RecipientData.builder()
                         .email(caseData.getRespondentSolicitor2EmailAddress())
                         .orgId(respondent2OrgID)
@@ -216,24 +217,33 @@ public class NoCHelper {
      */
     private RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
+            String applicantOrgId = Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
+                .map(OrganisationPolicy::getOrganisation)
+                .map(Organisation::getOrganisationID)
+                .orElse(null);
             return RecipientData.builder()
                 .email(caseData.getApplicantSolicitor1UserDetailsEmail())
-                .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .orgId(applicantOrgId)
                 .build();
         } else if (isApplicant1NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
-                uk.gov.hmcts.reform.ccd.model.Organisation respondent1Org = caseData.getRespondent1OrganisationPolicy().getOrganisation();
-                String respondent1OrgID = respondent1Org != null
-                    ? respondent1Org.getOrganisationID() : caseData.getRespondent1OrganisationIDCopy();
+                String respondent1OrgID = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
+                    .map(OrganisationPolicy::getOrganisation)
+                    .map(Organisation::getOrganisationID)
+                    .orElseGet(caseData::getRespondent1OrganisationIDCopy);
                 return RecipientData.builder()
                     .email(caseData.getRespondentSolicitor1EmailAddress())
                     .orgId(respondent1OrgID)
                     .build();
             }
         } else if (isRespondent1NewSolicitor(caseData) && !caseData.isApplicantLipOneVOne()) {
+            String applicantOrgId = Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
+                .map(OrganisationPolicy::getOrganisation)
+                .map(Organisation::getOrganisationID)
+                .orElse(null);
             return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
-                .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .email(caseData.getApplicantSolicitor1UserDetailsEmail())
+                .orgId(applicantOrgId)
                 .build();
         }
         return null;

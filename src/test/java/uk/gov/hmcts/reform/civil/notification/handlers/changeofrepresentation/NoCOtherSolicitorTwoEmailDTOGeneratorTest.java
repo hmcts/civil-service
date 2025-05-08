@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,25 +35,22 @@ class NoCOtherSolicitorTwoEmailDTOGeneratorTest {
     private NoCOtherSolicitorTwoEmailDTOGenerator generator;
 
     private MockedStatic<MultiPartyScenario> multiPartyScenarioMock;
-    private MockedStatic<NocNotificationUtils> nocNotificationUtilsMock;
 
     @BeforeEach
     void setupStaticMocks() {
         multiPartyScenarioMock = mockStatic(MultiPartyScenario.class);
-        nocNotificationUtilsMock = mockStatic(NocNotificationUtils.class);
     }
 
     @AfterEach
     void closeStaticMocks() {
         multiPartyScenarioMock.close();
-        nocNotificationUtilsMock.close();
     }
 
     @Test
     void shouldNotify_whenBothConditionsAreFalse() {
         CaseData caseData = mock(CaseData.class);
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
-        nocNotificationUtilsMock.when(() -> NocNotificationUtils.isOtherParty2Lip(caseData)).thenReturn(false);
+        when(noCHelper.isOtherParty2Lip(caseData)).thenReturn(false);
 
         assertTrue(generator.getShouldNotify(caseData));
     }
@@ -63,8 +59,6 @@ class NoCOtherSolicitorTwoEmailDTOGeneratorTest {
     void shouldNotNotify_whenIsOneVTwoTwoLegalRepTrue() {
         CaseData caseData = mock(CaseData.class);
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-        nocNotificationUtilsMock.when(() -> NocNotificationUtils.isOtherParty2Lip(caseData)).thenReturn(false);
-
         assertFalse(generator.getShouldNotify(caseData));
     }
 
@@ -72,7 +66,7 @@ class NoCOtherSolicitorTwoEmailDTOGeneratorTest {
     void shouldNotNotify_whenOtherParty2LipIsTrue() {
         CaseData caseData = mock(CaseData.class);
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
-        nocNotificationUtilsMock.when(() -> NocNotificationUtils.isOtherParty2Lip(caseData)).thenReturn(true);
+        when(noCHelper.isOtherParty2Lip(caseData)).thenReturn(true);
 
         assertFalse(generator.getShouldNotify(caseData));
     }
@@ -88,15 +82,14 @@ class NoCOtherSolicitorTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         CaseData caseData = mock(CaseData.class);
-        nocNotificationUtilsMock.when(() -> NocNotificationUtils.getOtherSolicitor2Email(caseData))
-            .thenReturn("sol2@example.com");
+        when(noCHelper.getOtherSolicitor2Email(caseData)).thenReturn("sol2@example.com");
 
         assertEquals("sol2@example.com", generator.getEmailAddress(caseData));
     }
 
     @Test
     void shouldReturnCorrectReferenceTemplate() {
-        assertEquals("notice-of-change-%s", generator.getReferenceTemplate());
+        assertEquals(NoCHelper.REFERENCE_TEMPLATE, generator.getReferenceTemplate());
     }
 
     @Test

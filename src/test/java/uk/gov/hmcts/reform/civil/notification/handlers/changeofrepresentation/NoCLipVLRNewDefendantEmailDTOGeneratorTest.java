@@ -2,14 +2,12 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,35 +33,32 @@ class NoCLipVLRNewDefendantEmailDTOGeneratorTest {
     @InjectMocks
     private NoCLipVLRNewDefendantEmailDTOGenerator generator;
 
+    private final CaseData caseData = mock(CaseData.class);
+
     @Test
-    void shouldNotify_WhenConditionsMet() {
-        CaseData caseData = mock(CaseData.class);
-
+    void shouldNotify_WhenFeatureEnabledAndApplicantIsLip() {
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
-        try (MockedStatic<NocNotificationUtils> mockedUtils = mockStatic(NocNotificationUtils.class)) {
-            mockedUtils.when(() -> NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData))
-                .thenReturn(true);
+        when(noCHelper.isApplicantLipForRespondentSolicitorChange(caseData)).thenReturn(true);
 
-            assertTrue(generator.getShouldNotify(caseData));
-        }
+        assertTrue(generator.getShouldNotify(caseData));
     }
 
     @Test
-    void shouldNotNotify_WhenConditionsNotMet() {
-        CaseData caseData = mock(CaseData.class);
-
+    void shouldNotNotify_WhenFeatureDisabled() {
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(false);
-        try (MockedStatic<NocNotificationUtils> mockedUtils = mockStatic(NocNotificationUtils.class)) {
-            mockedUtils.when(() -> NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData))
-                .thenReturn(false);
+        assertFalse(generator.getShouldNotify(caseData));
+    }
 
-            assertFalse(generator.getShouldNotify(caseData));
-        }
+    @Test
+    void shouldNotNotify_WhenApplicantIsNotLip() {
+        when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
+        when(noCHelper.isApplicantLipForRespondentSolicitorChange(caseData)).thenReturn(false);
+
+        assertFalse(generator.getShouldNotify(caseData));
     }
 
     @Test
     void shouldReturnCorrectEmailAddress() {
-        CaseData caseData = mock(CaseData.class);
         when(caseData.getRespondentSolicitor1EmailAddress()).thenReturn("solicitor@example.com");
 
         assertEquals("solicitor@example.com", generator.getEmailAddress(caseData));
@@ -72,7 +66,6 @@ class NoCLipVLRNewDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = mock(CaseData.class);
         when(notificationsProperties.getNotifyNewDefendantSolicitorNOC()).thenReturn("template-id");
 
         assertEquals("template-id", generator.getEmailTemplateId(caseData));
@@ -85,13 +78,12 @@ class NoCLipVLRNewDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = mock(CaseData.class);
-        Map<String, String> initialProps = new HashMap<>();
-        Map<String, String> customProps = Map.of("key", "value");
+        Map<String, String> baseProps = new HashMap<>();
+        Map<String, String> additionalProps = Map.of("key", "value");
 
-        when(noCHelper.getProperties(caseData, false)).thenReturn(customProps);
+        when(noCHelper.getProperties(caseData, false)).thenReturn(additionalProps);
 
-        Map<String, String> result = generator.addCustomProperties(initialProps, caseData);
+        Map<String, String> result = generator.addCustomProperties(baseProps, caseData);
 
         assertEquals("value", result.get("key"));
     }

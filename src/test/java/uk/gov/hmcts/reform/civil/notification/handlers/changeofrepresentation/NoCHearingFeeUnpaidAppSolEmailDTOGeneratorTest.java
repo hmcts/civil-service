@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -14,9 +18,9 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
 
     private static final String SOLICITOR_EMAIL = "solicitor@example.com";
@@ -24,18 +28,19 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
     private static final String CASE_REFERENCE = "000DC123";
     private static final Map<String, String> EMAIL_PROPS = Map.of("feeAmount", "£300");
 
+    @Mock
     private NoCHelper noCHelper;
+
+    @Mock
     private NotificationsProperties notificationsProperties;
+
+    @InjectMocks
     private NoCHearingFeeUnpaidAppSolEmailDTOGenerator generator;
 
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        noCHelper = mock(NoCHelper.class);
-        notificationsProperties = mock(NotificationsProperties.class);
-        generator = new NoCHearingFeeUnpaidAppSolEmailDTOGenerator(noCHelper, notificationsProperties);
-
         caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1234567890123456L)
             .hearingReferenceNumber("REFERENCE_NUM")
@@ -85,7 +90,6 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
 
     @Test
     void shouldBuildEmailDTO_WhenConditionsMet() {
-        when(noCHelper.isHearingFeePaid(caseData)).thenReturn(false);
         when(notificationsProperties.getHearingFeeUnpaidNoc()).thenReturn(TEMPLATE_ID);
         when(noCHelper.getHearingFeeEmailProperties(caseData)).thenReturn(EMAIL_PROPS);
 

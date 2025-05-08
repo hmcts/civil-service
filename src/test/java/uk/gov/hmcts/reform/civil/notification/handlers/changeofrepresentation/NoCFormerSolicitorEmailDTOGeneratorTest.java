@@ -2,43 +2,50 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class NoCFormerSolicitorEmailDTOGeneratorTest {
 
     private static final String FORMER_SOLICITOR_EMAIL = "solicitor@example.com";
     private static final String TEMPLATE_ID = "template-id-123";
     private static final String CASE_REFERENCE = "000DC001";
 
+    @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
     private NoCHelper noCHelper;
+
+    @InjectMocks
     private NoCFormerSolicitorEmailDTOGenerator generator;
+
+    @Mock
     private CaseData caseData;
 
+    @Mock
+    private ChangeOfRepresentation changeOfRepresentation;
+
     @BeforeEach
-    void setUp() {
-        notificationsProperties = mock(NotificationsProperties.class);
-        noCHelper = mock(NoCHelper.class);
-        generator = new NoCFormerSolicitorEmailDTOGenerator(notificationsProperties, noCHelper);
-        caseData = mock(CaseData.class);
+    void setUpMocks() {
+        when(caseData.getChangeOfRepresentation()).thenReturn(changeOfRepresentation);
     }
 
     @Test
     void shouldNotify_WhenOrganisationToRemoveIdIsPresent() {
-        ChangeOfRepresentation change = mock(ChangeOfRepresentation.class);
-        when(caseData.getChangeOfRepresentation()).thenReturn(change);
-        when(change.getOrganisationToRemoveID()).thenReturn("OrgToRemove");
+        when(changeOfRepresentation.getOrganisationToRemoveID()).thenReturn("OrgToRemove");
 
         Boolean result = generator.getShouldNotify(caseData);
 
@@ -47,9 +54,7 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
 
     @Test
     void shouldNotNotify_WhenOrganisationToRemoveIdIsNull() {
-        ChangeOfRepresentation change = mock(ChangeOfRepresentation.class);
-        when(caseData.getChangeOfRepresentation()).thenReturn(change);
-        when(change.getOrganisationToRemoveID()).thenReturn(null);
+        when(changeOfRepresentation.getOrganisationToRemoveID()).thenReturn(null);
 
         Boolean result = generator.getShouldNotify(caseData);
 
@@ -58,18 +63,11 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
 
     @Test
     void shouldBuildEmailDTO_WithExpectedValues() {
-        ChangeOfRepresentation change = mock(ChangeOfRepresentation.class);
-        when(caseData.getChangeOfRepresentation()).thenReturn(change);
-        when(change.getOrganisationToRemoveID()).thenReturn("OrgToRemove");
-
+        when(changeOfRepresentation.getOrganisationToRemoveID()).thenReturn("OrgToRemove");
         when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(TEMPLATE_ID);
         when(caseData.getLegacyCaseReference()).thenReturn(CASE_REFERENCE);
-        mockStatic(NocNotificationUtils.class).when(() ->
-                                    NocNotificationUtils.getPreviousSolicitorEmail(caseData))
-            .thenReturn(FORMER_SOLICITOR_EMAIL);
-
-        Map<String, String> customProps = Map.of("key", "value");
-        when(noCHelper.getProperties(caseData, false)).thenReturn(customProps);
+        when(noCHelper.getPreviousSolicitorEmail(caseData)).thenReturn(FORMER_SOLICITOR_EMAIL);
+        when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
 
         EmailDTO emailDTO = generator.buildEmailDTO(caseData);
 
