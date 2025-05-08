@@ -76,14 +76,17 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
         boolean isRespondentNotification = isRespondentNotification(caseEvent);
         boolean isApplicantSolicitorNotify = isApplicantSolicitorNotification(caseEvent);
         String templateId = getTemplateID(isRespondentNotification, isApplicantSolicitorNotify, caseData.isClaimantBilingual());
-        if (isNotEmpty(recipientEmail) && templateId != null) {
+        boolean eligibleForNotification = isNotEmpty(recipientEmail) && templateId != null;
+        if (eligibleForNotification) {
             notificationService.sendMail(
                 recipientEmail,
                 templateId,
                 isApplicantSolicitorNotify ? addPropertiesApplicantSolicitor(caseData) : addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE_DEFENDANT, caseData.getLegacyCaseReference())
             );
-        } else {
+        }
+
+        if (!eligibleForNotification) {
             log.info("No recipientEmail or templateId provided, skipping notification for caseId {}", caseData.getCcdCaseReference());
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
