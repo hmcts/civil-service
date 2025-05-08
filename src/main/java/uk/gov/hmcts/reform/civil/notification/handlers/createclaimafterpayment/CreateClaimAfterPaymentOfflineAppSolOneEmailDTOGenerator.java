@@ -9,8 +9,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 @Component
-public class CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGenerator
-        extends AppSolOneEmailDTOGenerator {
+public class CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
 

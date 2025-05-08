@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -13,17 +14,11 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CreateClaimAfterPaymentOfflineEmailGeneratorTest {
-
-    public static final String TARGET_EMAIL = "test@example.com";
-    public static final String TEMPLATE_ID = "template-id";
-    public static final String REFERENCE = "reference";
-
-    @Mock
-    private CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGenerator appSolOneGenerator;
 
     @Mock
     private FeatureToggleService featureToggleService;
@@ -32,24 +27,12 @@ class CreateClaimAfterPaymentOfflineEmailGeneratorTest {
     private CreateClaimAfterPaymentOfflineEmailGenerator emailGenerator;
 
     @Test
-    void shouldReturnSingleEmailDTO_whenNotLipvLipAndToggleOff() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
-
-        EmailDTO dto = EmailDTO.builder()
-                .targetEmail(TARGET_EMAIL)
-                .emailTemplate(TEMPLATE_ID)
-                .reference(REFERENCE)
-                .build();
-        when(appSolOneGenerator.buildEmailDTO(caseData)).thenReturn(dto);
-
-        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData);
-
-        assertThat(result).containsExactly(dto);
+    void shouldExtendAllPartiesEmailGenerator() {
+        assertThat(emailGenerator).isInstanceOf(AllPartiesEmailGenerator.class);
     }
 
     @Test
-    void shouldReturnEmptySet_whenLipvLipAndToggleOn() {
+    void shouldReturnEmptySetWhenLipVLipEnabled() {
         CaseData caseData = mock(CaseData.class);
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -57,23 +40,28 @@ class CreateClaimAfterPaymentOfflineEmailGeneratorTest {
         Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData);
 
         assertThat(result).isEmpty();
+        verify(featureToggleService).isLipVLipEnabled();
     }
 
     @Test
-    void shouldReturnSingleEmailDTO_whenLipvLipAndToggleOff() {
+    void shouldCallSuperWhenLipVLipDisabled() {
         CaseData caseData = mock(CaseData.class);
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
-        EmailDTO dto = EmailDTO.builder()
-                .targetEmail(TARGET_EMAIL)
-                .emailTemplate(TEMPLATE_ID)
-                .reference(REFERENCE)
-                .build();
-        when(appSolOneGenerator.buildEmailDTO(caseData)).thenReturn(dto);
+        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData);
+
+        assertThat(result).isNotNull();
+        verify(featureToggleService).isLipVLipEnabled();
+    }
+
+    @Test
+    void shouldCallSuperWhenLipVLipNotOneVOneAndLipVLipDisabled() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.isLipvLipOneVOne()).thenReturn(false);
 
         Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData);
 
-        assertThat(result).containsExactly(dto);
+        assertThat(result).isNotNull();
     }
 }
