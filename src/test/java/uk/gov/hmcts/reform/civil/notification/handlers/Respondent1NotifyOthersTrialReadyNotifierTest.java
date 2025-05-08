@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.trialready.respondentonenotifyotherstrialready.RespondentOneNotifyOthersTrialReadyNotifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -52,7 +53,7 @@ public class Respondent1NotifyOthersTrialReadyNotifierTest {
     @Mock
     private StateFlow stateFlow;
     @InjectMocks
-    private Respondent1NotifyOthersTrialReadyNotifier respondent1NotifyOthersTrialReadyNotifier;
+    private RespondentOneNotifyOthersTrialReadyNotifier respondent1NotifyOthersTrialReadyNotifier;
 
     @Test
     void shouldNotifyApplicant_whenInvoked() {

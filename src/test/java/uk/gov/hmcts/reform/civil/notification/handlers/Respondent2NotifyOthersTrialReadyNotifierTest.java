@@ -7,13 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.trialready.respondenttwonotifyotherstrialready.RespondentTwoNotifyOthersTrialReadyNotifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +43,7 @@ public class Respondent2NotifyOthersTrialReadyNotifierTest {
     @Mock
     private OrganisationService organisationService;
     @InjectMocks
-    private Respondent2NotifyOthersTrialReadyNotifier respondent2NotifyOthersTrialReadyNotifier;
+    private RespondentTwoNotifyOthersTrialReadyNotifier respondent2NotifyOthersTrialReadyNotifier;
 
     @Test
     void shouldNotifyApplicantAndRespondent1_whenInvoked() {
