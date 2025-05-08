@@ -97,7 +97,12 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!caseData.isRespondentResponseBilingual()) {
+        boolean needsTranslating = featureToggleService.isGaForWelshEnabled()
+            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments())
+            : caseData.isRespondentResponseBilingual();
+
+        if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
