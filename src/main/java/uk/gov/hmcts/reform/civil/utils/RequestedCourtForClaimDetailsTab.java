@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RequestedCourtForTabDetails;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RemoteHearing;
 import uk.gov.hmcts.reform.civil.model.dq.RemoteHearingLRspec;
@@ -88,12 +89,23 @@ public class RequestedCourtForClaimDetailsTab {
     private String getCourtName(String auth, DQ courtDetail) {
         LocationRefData courtLocationDetails;
         List<LocationRefData> locationRefDataList = locationRefDataService.getHearingCourtLocations(auth);
+
+        String preferredBaseLocation = Optional.ofNullable(courtDetail)
+            .map(DQ::getRequestedCourt)
+            .map(RequestedCourt::getCaseLocation)
+            .map(CaseLocationCivil::getBaseLocation)
+            .orElse(null);
+        if (preferredBaseLocation == null) {
+            System.out.println("HEREEEEEEEEEEEEEEEEEE");
+            return null;
+        }
+
         var foundLocations = locationRefDataList.stream()
-            .filter(location -> location.getEpimmsId().equals(courtDetail.getRequestedCourt().getCaseLocation().getBaseLocation())).toList();
+            .filter(location -> location.getEpimmsId().equals(preferredBaseLocation)).toList();
         if (!foundLocations.isEmpty()) {
             courtLocationDetails = foundLocations.get(0);
         } else {
-            log.info("Requested Court Location not found, in location data");
+            log.info("Preferred requested Court Location not found in location data");
             return null;
         }
         return courtLocationDetails.getSiteName();

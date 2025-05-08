@@ -61,6 +61,27 @@ class RequestedCourtForClaimDetailsTabTest {
     }
 
     @Test
+    void shouldNotUpdateRequestedCourtDetailsWHenRequestedCourtNull() {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(null)
+                               .respondent1DQRemoteHearingLRspec(null)
+                               .build());
+        CallbackParams callbackParams = CallbackParams.builder()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
+            .build();
+
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(callbackParams, caseDataBuilder);
+        RequestedCourtForTabDetails tabDetails = caseDataBuilder.build().getRequestedCourtForTabDetailsRes1();
+
+        assertThat(tabDetails.getRequestedCourt()).isEqualTo(null);
+        assertThat(tabDetails.getRequestedCourtName()).isEqualTo(null);
+        assertThat(tabDetails.getReasonForHearingAtSpecificCourt()).isEqualTo(null);
+        assertThat(tabDetails.getRequestHearingHeldRemotely()).isEqualTo(null);
+        assertThat(tabDetails.getRequestHearingHeldRemotelyReason()).isEqualTo(null);
+    }
+
+    @Test
     void shouldUpdateRequestedCourtTabDetailsForApplicantUnspec() {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
