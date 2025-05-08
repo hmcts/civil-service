@@ -34,6 +34,7 @@ public class SecurityConfiguration {
         "/loggers/**", "/assignment/**", "/service-request-update",
         "/service-request-update-claim-issued", "/case/document/downloadDocument/**",
         "/fees/claim/calculate-interest",
+        "/fees/claim/total-amount",
         "/testing-support/flowstate"
     };
 

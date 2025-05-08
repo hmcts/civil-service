@@ -13,11 +13,12 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 
 @Component
 @RequiredArgsConstructor
-public class JudgmentAmountsCalculator {
+public class JudgmentAndSettlementAmountsCalculator {
 
     private final InterestCalculator interestCalculator;
 
@@ -49,34 +50,42 @@ public class JudgmentAmountsCalculator {
     }
 
     public BigDecimal getDebtAmount(CaseData caseData) {
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        var subTotal = caseData.getTotalClaimAmount()
-            .add(interest);
-        subTotal = subTotal.subtract(getPartialPayment(caseData));
-
-        return subTotal;
+        return calculateClaimAmountWithInterestMinusPartialPayment(caseData);
     }
 
     @NotNull
-    public  BigDecimal getJudgmentAmount(CaseData caseData) {
-        BigDecimal judgmentAmount = calculateJudgmentAmountForFixedCosts(caseData)
+    public BigDecimal getTotalClaimAmount(CaseData caseData) {
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
+        BigDecimal totalClaimAmount = subTotal
+            .add(getClaimFeePounds(caseData, caseData.getClaimFee()));
+        return totalClaimAmount;
+    }
+
+    @NotNull
+    public BigDecimal getJudgmentAmount(CaseData caseData) {
+        BigDecimal judgmentAmount = calculateClaimAmountWithInterestMinusPartialPayment(caseData)
             .add(JudgmentsOnlineHelper.getFixedCostsOnCommencement(caseData)).add(getClaimFeePounds(caseData, caseData.getClaimFee()));
         return judgmentAmount;
     }
 
-    private  BigDecimal calculateJudgmentAmountForFixedCosts(CaseData caseData) {
+    private BigDecimal calculateClaimAmountWithInterestMinusPartialPayment(CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        return getClaimAmountMinusPartialPayment(caseData, interest);
+    }
 
+    @NotNull
+    private BigDecimal getClaimAmountMinusPartialPayment(CaseData caseData, BigDecimal interest) {
         BigDecimal subTotal = caseData.getTotalClaimAmount().add(interest);
         BigDecimal partialPaymentPounds = getPartialPayment(caseData);
         return subTotal.subtract(partialPaymentPounds);
     }
 
     private BigDecimal getClaimFeePounds(CaseData caseData, Fee claimfee) {
-        BigDecimal claimFeePounds;
+        BigDecimal claimFeePounds = BigDecimal.ZERO;
         if (caseData.getOutstandingFeeInPounds() != null) {
             claimFeePounds = caseData.getOutstandingFeeInPounds();
-        } else {
+        } else if (nonNull(claimfee) && claimfee.getCalculatedAmountInPence() != null) {
             claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
         }
         return claimFeePounds;
