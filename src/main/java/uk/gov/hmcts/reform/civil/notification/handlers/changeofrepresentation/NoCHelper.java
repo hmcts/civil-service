@@ -176,7 +176,7 @@ public class NoCHelper {
      * @param organisationToCheck Object to check null
      * @return true if the organisation is null meaning the party is a LiP
      */
-    private boolean isOtherPartyLip(OrganisationPolicy organisationToCheck) {
+    protected boolean isOtherPartyLip(OrganisationPolicy organisationToCheck) {
         return organisationToCheck == null
             || organisationToCheck.getOrganisation() == null;
     }
@@ -215,7 +215,7 @@ public class NoCHelper {
      * @return Recipient data model that contains a String email and a String Organisation id, else returns null if
      *     the part is a LiP.
      */
-    private RecipientData getOtherSolicitor1(CaseData caseData) {
+    protected RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             String applicantOrgId = Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
                 .map(OrganisationPolicy::getOrganisation)
@@ -249,12 +249,12 @@ public class NoCHelper {
         return null;
     }
 
-    private boolean isApplicant1NewSolicitor(CaseData caseData) {
+    protected boolean isApplicant1NewSolicitor(CaseData caseData) {
         return caseData.getChangeOfRepresentation().getCaseRole()
             .equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
     }
 
-    private boolean isRespondent1NewSolicitor(CaseData caseData) {
+    protected boolean isRespondent1NewSolicitor(CaseData caseData) {
         return caseData.getChangeOfRepresentation().getCaseRole()
             .equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
     }
