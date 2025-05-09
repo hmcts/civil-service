@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -35,7 +34,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LIP_MANUAL_DETERMINATION;
@@ -220,7 +221,6 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
-
 
     private CaseData createCaseData(Party.Type type) {
         return CaseDataBuilder.builder()
