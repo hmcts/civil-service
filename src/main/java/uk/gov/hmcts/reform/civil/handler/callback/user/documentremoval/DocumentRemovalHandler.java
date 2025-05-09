@@ -92,7 +92,7 @@ public class DocumentRemovalHandler extends CallbackHandler {
                 StringBuilder warningBuilder = new StringBuilder();
                 warningBuilder.append(document.getSystemGenerated().equals(YesOrNo.YES) ? "System Generated" : "User")
                     .append(" Document ")
-                    .append(document.getDocumentFileName())
+                    .append(document.getCaseDocumentToKeep().getDocumentFilename())
                     .append(" (")
                     .append(document.getDocumentId())
                     .append(") will be removed from the case");

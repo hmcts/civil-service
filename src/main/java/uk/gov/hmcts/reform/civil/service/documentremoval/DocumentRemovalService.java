@@ -129,7 +129,6 @@ public class DocumentRemovalService {
                 DocumentToKeepCollection.builder()
                     .value(DocumentToKeep.builder()
                         .documentId(docId)
-                        .documentFileName(documentNode.getKey().get(DOCUMENT_FILENAME).asText())
                         .caseDocumentToKeep(CaseDocumentToKeep.builder()
                             .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText())
                             .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())

@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 public class DocumentToKeep {
 
     private String documentId;
-    private String documentFileName;
     private CaseDocumentToKeep caseDocumentToKeep;
     private LocalDateTime uploadedDate;
     private YesOrNo systemGenerated;

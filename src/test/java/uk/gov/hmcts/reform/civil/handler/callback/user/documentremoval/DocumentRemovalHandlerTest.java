@@ -209,8 +209,10 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
             DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
                 .caseData(caseData)
                 .documentsMarkedForDelete(
-                    List.of(DocumentToKeep.builder().documentFileName("System Doc").documentId("123").systemGenerated(YesOrNo.YES).build(),
-                        DocumentToKeep.builder().documentFileName("User Doc").documentId("456").systemGenerated(YesOrNo.NO).build()))
+                    List.of(DocumentToKeep.builder().caseDocumentToKeep(CaseDocumentToKeep.builder().documentFilename("System Doc").build())
+                            .documentId("123").systemGenerated(YesOrNo.YES).build(),
+                        DocumentToKeep.builder().caseDocumentToKeep(CaseDocumentToKeep.builder().documentFilename("User Doc").build())
+                            .documentId("456").systemGenerated(YesOrNo.NO).build()))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
