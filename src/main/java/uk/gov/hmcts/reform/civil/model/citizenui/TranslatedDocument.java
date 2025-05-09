@@ -28,6 +28,7 @@ public class TranslatedDocument {
             case CLAIMANT_INTENTION : return CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
             case ORDER_NOTICE : return ORDER_NOTICE_TRANSLATED_DOCUMENT;
             case STANDARD_DIRECTION_ORDER: return SDO_TRANSLATED_DOCUMENT;
+            case INTERLOCUTORY_JUDGMENT: return INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
             case MANUAL_DETERMINATION: return MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
             default: throw new DocumentUploadException("No document file type found for Translated document");
         }
