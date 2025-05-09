@@ -60,7 +60,9 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
         boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        if (!isLrQmEnabled || !featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
+        if (!(isLrQmEnabled &&
+            caseData.getPreviousCCDState() == null &&
+            !featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation()))) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
                 caseId,
                 "CLAIMANT"
