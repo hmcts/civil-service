@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lrvlrlrandlipvlr;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
