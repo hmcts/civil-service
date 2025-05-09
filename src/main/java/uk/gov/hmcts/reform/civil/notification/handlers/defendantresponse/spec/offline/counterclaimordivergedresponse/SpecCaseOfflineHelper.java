@@ -38,49 +38,57 @@ public class SpecCaseOfflineHelper {
         if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
             return notificationsProperties.getClaimantSolicitorCounterClaimForSpec();
-        } else {
-            if (is1v1Or2v1Case(caseData)) {
-                return notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
-            } else {
-                if (isOneVTwoTwoLegalRep(caseData)) {
-                    return notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
-                } else {
-                    return notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
-                }
-            }
         }
+
+        if (is1v1Or2v1Case(caseData)) {
+            return notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
+        }
+
+        if (isOneVTwoTwoLegalRep(caseData)) {
+            return notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+        }
+
+        return notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
     }
 
     public String getRespTemplateForSpecClaims(CaseData caseData) {
         if ((COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame())))) {
             return notificationsProperties.getRespondentSolicitorCounterClaimForSpec();
-        } else {
-            return notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
         }
+
+        return notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
     }
 
     public static Map<String, String> caseOfflineNotificationProperties(CaseData caseData) {
-        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
             return Map.of(
-                REASON, caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
-            );
-        } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            String responseTypeToApplicant2 = caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue();
-            return Map.of(
-                REASON, caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
-                    .concat(" against " + caseData.getApplicant1().getPartyName())
-                    .concat(" and " + responseTypeToApplicant2)
-                    .concat(" against " + caseData.getApplicant2().getPartyName())
-            );
-        } else {
-            //1v2 template is used and expects different data
-            return Map.of(
-                RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-                RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
+                REASON, getReasonToBeDisplayed(caseData.getRespondent1ClaimResponseTypeForSpec())
             );
         }
+
+        if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            var reasonToBeDisplayed = getReasonToBeDisplayed(caseData.getClaimant1ClaimResponseTypeForSpec());
+            return Map.of(
+                REASON, reasonToBeDisplayed
+                    .concat(" against " + caseData.getApplicant1().getPartyName())
+                    .concat(" and " + reasonToBeDisplayed)
+                    .concat(" against " + caseData.getApplicant2().getPartyName())
+            );
+        }
+
+        //1v2 template is used and expects different data
+        return Map.of(
+                RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
+                RESPONDENT_ONE_RESPONSE, getReasonToBeDisplayed(caseData.getRespondent1ClaimResponseTypeForSpec()),
+                RESPONDENT_TWO_RESPONSE, getReasonToBeDisplayed(caseData.getRespondent2ClaimResponseTypeForSpec())
+        );
+    }
+
+    private static String getReasonToBeDisplayed(RespondentResponseTypeSpec responseTypeSpec) {
+        return (responseTypeSpec != null)
+            ? (responseTypeSpec.getDisplayedValue() != null ? responseTypeSpec.getDisplayedValue() : "")
+            : "";
     }
 }

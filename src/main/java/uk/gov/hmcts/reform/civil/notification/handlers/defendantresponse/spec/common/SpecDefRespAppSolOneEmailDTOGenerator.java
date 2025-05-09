@@ -33,15 +33,17 @@ public class SpecDefRespAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGene
 
     @Override
     public Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+        if (IMMEDIATELY.equals(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
             caseData.getRespondent2ClaimResponseTypeForSpec()))
         ) {
-            String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
-                .getWhenWillThisAmountBePaid().getDayOfMonth()
-                + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
-                + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
+            String shouldBePaidBy = "";
+            var admitPart = caseData.getRespondToClaimAdmitPartLRspec();
+            if (admitPart != null && admitPart.getWhenWillThisAmountBePaid() != null) {
+                var paymentDate = admitPart.getWhenWillThisAmountBePaid();
+                shouldBePaidBy = paymentDate.getDayOfMonth() + " " + paymentDate.getMonth() + " " + paymentDate.getYear();
+            }
             properties.put(WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy);
         } else {
             properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
