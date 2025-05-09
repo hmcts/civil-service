@@ -567,11 +567,13 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .type(Party.Type.INDIVIDUAL)
                             .partyName("CLAIMANT_NAME")
                             .build())
+                    .nextDeadline(LocalDate.now())
                     .build();
             given(deadlinesCalculator.getRespondentToImmediateSettlementAgreement(any())).willReturn(LocalDateTime.MAX);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
             assertThat(updatedCaseData.getRespondent1RespondToSettlementAgreementDeadline()).isNotNull();
         }
 

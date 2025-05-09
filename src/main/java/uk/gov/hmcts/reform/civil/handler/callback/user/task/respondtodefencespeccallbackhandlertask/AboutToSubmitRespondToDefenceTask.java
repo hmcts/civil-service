@@ -121,7 +121,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         }
 
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
-
+        builder.nextDeadline(null);
         builder.previousCCDState(caseData.getCcdState());
 
         return AboutToStartOrSubmitCallbackResponse.builder()

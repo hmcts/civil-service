@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -15,6 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -110,7 +114,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             1,
             0,
             0,
-            0);
+            0
+        );
 
         @BeforeEach
         void setup() {
@@ -125,7 +130,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "ENGLISH").build()).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -150,7 +156,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(150000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "ENGLISH").build()).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -220,7 +227,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .totalClaimAmount(BigDecimal.valueOf(5000))
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "BOTH").build()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -251,25 +259,25 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                  .partyName("CLAIMANT_NAME")
                                  .build())
                 .respondent1DQ(Respondent1DQ.builder()
-                                  .respondent1DQExperts(Experts.builder()
-                                                           .expertRequired(YES)
-                                                           .details(wrapElements(Expert.builder()
-                                                                                     .name(
-                                                                                         "John Smith")
-                                                                                     .firstName("Jane")
-                                                                                     .lastName("Smith")
-
-                                                                                     .build()))
-                                                           .build())
-                                  .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
-                                                             .details(wrapElements(Witness.builder()
+                                   .respondent1DQExperts(Experts.builder()
+                                                             .expertRequired(YES)
+                                                             .details(wrapElements(Expert.builder()
                                                                                        .name(
                                                                                            "John Smith")
                                                                                        .firstName("Jane")
                                                                                        .lastName("Smith")
 
-                                                                                       .build())).build())
-                                  .build())
+                                                                                       .build()))
+                                                             .build())
+                                   .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(YES)
+                                                               .details(wrapElements(Witness.builder()
+                                                                                         .name(
+                                                                                             "John Smith")
+                                                                                         .firstName("Jane")
+                                                                                         .lastName("Smith")
+
+                                                                                         .build())).build())
+                                   .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -321,6 +329,54 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(expert.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
             assertThat(witness.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
             assertThat(witness.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
+            assertThat(updatedCaseData.getNextDeadline()).isEqualTo(respondToDeadline.toLocalDate());
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+            "WELSH, ENGLISH, ENGLISH, true, false",
+            "ENGLISH, ENGLISH, ENGLISH, true, true",
+            "WELSH, ENGLISH, WELSH, true, false",
+            "WELSH, WELSH, ENGLISH, true, false",
+            "ENGLISH, WELSH, WELSH, true, false",
+            "WELSH, WELSH, WELSH, true, false",
+            "WELSH, WELSH, ENGLISH, true, false",
+            "WELSH, ENGLISH, ENGLISH, false, true",
+            "WELSH, WELSH, ENGLISH, false, false",
+            "ENGLISH, WELSH, ENGLISH, false, false",
+            "WELSH, WELSH, WELSH, false, false"
+        })
+            void shouldMoveToAwaitingApplicantResponse_whenNoTranslations(String claimantBilingualPreference,
+                                                                          String defendantBilingualPreference,
+                                                                          String defendantDocumentLanguage,
+                                                                          boolean toggleEnabled,
+                                                                          boolean changeState) {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(toggleEnabled);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .claimantBilingualLanguagePreference(claimantBilingualPreference)
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(defendantBilingualPreference)
+                                                             .build())
+                                 .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQLanguage(WelshLanguageRequirements.builder()
+                                                              .documents(Language.valueOf(defendantDocumentLanguage))
+                                                              .build())
+                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            String newState = response.getState();
+
+            if (changeState) {
+                assertThat(newState).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
+            } else {
+                assertThat(newState).isNull();
+            }
         }
 
         @Test

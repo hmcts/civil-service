@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -312,6 +313,22 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         assertNotNull(response);
         assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");
+    }
+
+    @Test
+    void shouldRemoveNextDeadlin_whenRespondedToDefence() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .atState(FULL_DEFENCE_PROCEED)
+            .nextDeadline(LocalDate.now())
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        assertNotNull(response);
+        assertThat(getCaseData(response)).extracting("nextDeadline").isNull();
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

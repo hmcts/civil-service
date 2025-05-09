@@ -105,7 +105,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .respondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual() ? null : getRespondToSettlementAgreementDeadline(
                 caseData,
                 applicant1ResponseDate
-            ));
+            ))
+            .nextDeadline(null);
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
