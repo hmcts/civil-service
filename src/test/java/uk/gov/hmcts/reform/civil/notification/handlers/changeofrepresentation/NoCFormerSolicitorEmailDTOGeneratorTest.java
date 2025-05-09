@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,14 +37,10 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
     @Mock
     private ChangeOfRepresentation changeOfRepresentation;
 
-    @BeforeEach
-    void setUpMocks() {
-        when(caseData.getChangeOfRepresentation()).thenReturn(changeOfRepresentation);
-    }
-
     @Test
     void shouldNotify_WhenOrganisationToRemoveIdIsPresent() {
         when(changeOfRepresentation.getOrganisationToRemoveID()).thenReturn("OrgToRemove");
+        when(caseData.getChangeOfRepresentation()).thenReturn(changeOfRepresentation);
 
         Boolean result = generator.getShouldNotify(caseData);
 
@@ -55,6 +50,7 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
     @Test
     void shouldNotNotify_WhenOrganisationToRemoveIdIsNull() {
         when(changeOfRepresentation.getOrganisationToRemoveID()).thenReturn(null);
+        when(caseData.getChangeOfRepresentation()).thenReturn(changeOfRepresentation);
 
         Boolean result = generator.getShouldNotify(caseData);
 
@@ -63,7 +59,6 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
 
     @Test
     void shouldBuildEmailDTO_WithExpectedValues() {
-        when(changeOfRepresentation.getOrganisationToRemoveID()).thenReturn("OrgToRemove");
         when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(TEMPLATE_ID);
         when(caseData.getLegacyCaseReference()).thenReturn(CASE_REFERENCE);
         when(noCHelper.getPreviousSolicitorEmail(caseData)).thenReturn(FORMER_SOLICITOR_EMAIL);

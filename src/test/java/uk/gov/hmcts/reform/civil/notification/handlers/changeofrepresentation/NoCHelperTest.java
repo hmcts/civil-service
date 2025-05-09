@@ -53,16 +53,16 @@ class NoCHelperTest {
         String orgToRemoveId = "remove-id";
         String orgToAddId = "add-id";
 
-        Organisation ORGANISATION_TO_REMOVE = Organisation.builder()
+        Organisation orgToRemove = Organisation.builder()
             .name("remove org")
             .build();
 
-        Organisation ORGANISATION_TO_ADD = Organisation.builder()
+        Organisation orgToAdd = Organisation.builder()
             .name("add org")
             .build();
 
-        when(organisationService.findOrganisationById(orgToRemoveId)).thenReturn(Optional.of(ORGANISATION_TO_REMOVE));
-        when(organisationService.findOrganisationById(orgToAddId)).thenReturn(Optional.of(ORGANISATION_TO_ADD));
+        when(organisationService.findOrganisationById(orgToRemoveId)).thenReturn(Optional.of(orgToRemove));
+        when(organisationService.findOrganisationById(orgToAddId)).thenReturn(Optional.of(orgToAdd));
 
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
@@ -93,11 +93,11 @@ class NoCHelperTest {
     void shouldReturnLipWhenOrganisationIdIsNull() {
         String orgToAddId = "add-id";
 
-        Organisation ORGANISATION_TO_ADD = Organisation.builder()
+        Organisation orgToAdd = Organisation.builder()
             .name("add org")
             .build();
 
-        when(organisationService.findOrganisationById(orgToAddId)).thenReturn(Optional.of(ORGANISATION_TO_ADD));
+        when(organisationService.findOrganisationById(orgToAddId)).thenReturn(Optional.of(orgToAdd));
 
         Map<String, String> result = noCHelper.getProperties(
             CaseData.builder()
