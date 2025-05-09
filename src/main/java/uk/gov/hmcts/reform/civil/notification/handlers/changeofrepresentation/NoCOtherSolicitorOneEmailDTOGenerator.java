@@ -16,7 +16,7 @@ public class NoCOtherSolicitorOneEmailDTOGenerator extends EmailDTOGenerator {
     private final NoCHelper noCHelper;
 
     @Override
-    public Boolean getShouldNotify(CaseData caseData) {
+    public boolean getShouldNotify(CaseData caseData) {
         return !(noCHelper.isOtherParty1Lip(caseData));
     }
 
