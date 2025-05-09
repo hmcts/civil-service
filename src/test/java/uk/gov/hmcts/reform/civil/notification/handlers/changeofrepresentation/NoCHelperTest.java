@@ -348,7 +348,6 @@ class NoCHelperTest {
             .applicant1Represented(YesOrNo.YES)
             .build();
 
-
         RecipientData result = noCHelper.getOtherSolicitor1(caseData);
 
         assertThat(result).isNotNull();
