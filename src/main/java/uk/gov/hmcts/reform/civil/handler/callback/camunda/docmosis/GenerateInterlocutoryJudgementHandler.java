@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
@@ -72,6 +73,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             preTranslationDocuments.add(element(interlocutoryJudgementDoc));
             updatedCaseData = caseData.toBuilder()
                 .preTranslationDocuments(preTranslationDocuments)
+                .preTranslationDocumentType(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT)
                 .build();
         } else {
             updatedCaseData = caseData.toBuilder()
