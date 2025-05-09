@@ -121,7 +121,7 @@ class NoCHelperTest {
                 .build(), false);
 
         assertThat(result).containsEntry(FORMER_SOL, "LiP");
-        assertThat(result).containsEntry(NEW_SOL,"add org");
+        assertThat(result).containsEntry(NEW_SOL, "add org");
     }
 
     @Test
@@ -156,8 +156,8 @@ class NoCHelperTest {
             .build();
 
         Map<String, String> props = noCHelper.getClaimantLipProperties(caseData);
-        assertThat(props).containsEntry(CLAIMANT_NAME,"Claimant A");
-        assertThat(props).containsEntry(CLAIM_NUMBER,"LEGACY123");
+        assertThat(props).containsEntry(CLAIMANT_NAME, "Claimant A");
+        assertThat(props).containsEntry(CLAIM_NUMBER, "LEGACY123");
     }
 
     @Test
