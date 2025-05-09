@@ -143,7 +143,7 @@ class LocationHelperTest {
 
         Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
         Assertions.assertThat(court.orElseThrow().getCaseLocation())
-            .isEqualTo(CaseLocationCivil.builder().baseLocation(CCMCC_EPIMS).region(CCMCC_REGION_ID).build());
+            .isEqualTo(CaseLocationCivil.builder().baseLocation("987456").region("region 1").build());
     }
 
     @Test
