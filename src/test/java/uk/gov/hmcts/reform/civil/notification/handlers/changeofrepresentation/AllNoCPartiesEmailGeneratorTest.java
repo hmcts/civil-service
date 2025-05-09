@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AllNoCPartiesEmailGeneratorTest {
+    
     private NoCFormerSolicitorEmailDTOGenerator formerSolicitorEmailDTOGenerator;
     private NoCOtherSolicitorOneEmailDTOGenerator otherSolicitorOneEmailDTOGenerator;
     private NoCOtherSolicitorTwoEmailDTOGenerator otherSolicitorTwoEmailDTOGenerator;
