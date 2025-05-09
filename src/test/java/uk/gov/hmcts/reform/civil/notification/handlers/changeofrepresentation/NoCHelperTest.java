@@ -85,8 +85,8 @@ class NoCHelperTest {
 
         Map<String, String> result = noCHelper.getProperties(caseData, false);
 
-        assertThat(result.get(FORMER_SOL)).isEqualTo("remove org");
-        assertThat(result.get(NEW_SOL)).isEqualTo("add org");
+        assertThat(result).containsEntry(FORMER_SOL, "remove org");
+        assertThat(result).containsEntry(NEW_SOL, "add org");
     }
 
     @Test
@@ -120,8 +120,8 @@ class NoCHelperTest {
                                             .build())
                 .build(), false);
 
-        assertThat(result.get(FORMER_SOL)).isEqualTo("LiP");
-        assertThat(result.get(NEW_SOL)).isEqualTo("add org");
+        assertThat(result).containsEntry(FORMER_SOL, "LiP");
+        assertThat(result).containsEntry(NEW_SOL,"add org");
     }
 
     @Test
@@ -156,8 +156,8 @@ class NoCHelperTest {
             .build();
 
         Map<String, String> props = noCHelper.getClaimantLipProperties(caseData);
-        assertThat(props.get(CLAIMANT_NAME)).isEqualTo("Claimant A");
-        assertThat(props.get(CLAIM_NUMBER)).isEqualTo("LEGACY123");
+        assertThat(props).containsEntry(CLAIMANT_NAME,"Claimant A");
+        assertThat(props).containsEntry(CLAIM_NUMBER,"LEGACY123");
     }
 
     @Test
@@ -204,8 +204,8 @@ class NoCHelperTest {
             .build();
 
         Map<String, String> props = noCHelper.getHearingFeeEmailProperties(caseData);
-        assertThat(props.get(HEARING_DATE)).isEqualTo("1 October 2023");
-        assertThat(props.get(COURT_LOCATION)).isEqualTo("Courtroom A");
-        assertThat(props.get(HEARING_FEE)).isEqualTo("£100.00");
+        assertThat(props).containsEntry(HEARING_DATE, "1 October 2023");
+        assertThat(props).containsEntry(COURT_LOCATION, "Courtroom A");
+        assertThat(props).containsEntry(HEARING_FEE, "£100.00");
     }
 }

@@ -10,7 +10,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 
 public abstract class EmailDTOGenerator implements NotificationData {
 
-    public abstract Boolean getShouldNotify(CaseData caseData);
+    public abstract boolean getShouldNotify(CaseData caseData);
 
     public EmailDTO buildEmailDTO(CaseData caseData) {
         Map<String, String> properties = addProperties(caseData);

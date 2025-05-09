@@ -24,7 +24,7 @@ public abstract class AppSolOneEmailDTOGenerator extends EmailDTOGenerator {
         return properties;
     }
 
-    public Boolean getShouldNotify(CaseData caseData) {
+    public boolean getShouldNotify(CaseData caseData) {
         return caseData.isApplicantLiP() ? Boolean.FALSE : Boolean.TRUE;
     }
 }
