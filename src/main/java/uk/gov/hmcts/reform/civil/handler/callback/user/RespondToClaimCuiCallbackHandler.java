@@ -16,6 +16,9 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -28,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -93,7 +97,12 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!caseData.isRespondentResponseBilingual()) {
+        boolean needsTranslating = featureToggleService.isGaForWelshEnabled()
+            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments())
+            : caseData.isRespondentResponseBilingual();
+
+        if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
@@ -120,15 +129,26 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
-        return caseData.toBuilder()
+        LocalDateTime applicantDeadline = deadlinesCalculator.calculateApplicantResponseDeadline(
+            responseDate
+        );
+
+        CaseData.CaseDataBuilder<?, ?> builder =  caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
             .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
-            .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
-                responseDate
-            ))
-            .build();
+            .applicant1ResponseDeadline(applicantDeadline)
+            .nextDeadline(applicantDeadline.toLocalDate());
+
+        if (featureToggleService.isGaForWelshEnabled()) {
+            String respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
+                .map(CaseDataLiP::getRespondent1LiPResponse)
+                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                .orElse(null);
+            builder.defendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
+        }
+        return builder.build();
     }
 }
