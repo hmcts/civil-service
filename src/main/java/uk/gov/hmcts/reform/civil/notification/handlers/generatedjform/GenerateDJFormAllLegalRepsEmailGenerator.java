@@ -43,7 +43,7 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
         return partiesToEmail;
     }
 
-    private Set<EmailDTO> getRespondents(CaseData caseData) {
+    public Set<EmailDTO> getRespondents(CaseData caseData) {
         Set<EmailDTO> recipients = new HashSet<>();
         if (isOneVTwoTwoLegalRep(caseData)) {
             if (generateDJFormHelper.checkDefendantRequested(caseData, true)) {
@@ -70,7 +70,7 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
         return recipients;
     }
 
-    private Set<EmailDTO> getApplicant(CaseData caseData) {
+    public Set<EmailDTO> getApplicant(CaseData caseData) {
         Set<EmailDTO> recipients = new HashSet<>();
         if (isOneVTwoTwoLegalRep(caseData)) {
             if (generateDJFormHelper.checkDefendantRequested(caseData, true)
@@ -84,7 +84,7 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
                 EmailDTO emailDTO = approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData);
 
                 //If checkIfBothDefendants true - update defendant name key
-                Map<String, String> updateProps = new HashMap<>(emailDTO.getParameters());;
+                Map<String, String> updateProps = new HashMap<>(emailDTO.getParameters());
                 emailDTO.setParameters(generateDJFormHelper.updateRespondent2Properties(updateProps, caseData));
                 recipients.add(emailDTO);
             }
@@ -94,7 +94,7 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
         return recipients;
     }
 
-    private void addIfPartyNeedsNotification(CaseData caseData,
+    public void addIfPartyNeedsNotification(CaseData caseData,
                                              EmailDTOGenerator generator,
                                              Set<EmailDTO> partiesToEmail) {
         if ((generator != null) && generator.getShouldNotify(caseData)) {
