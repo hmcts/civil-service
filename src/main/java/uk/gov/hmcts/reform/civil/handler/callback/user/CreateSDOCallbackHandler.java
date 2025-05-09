@@ -1518,10 +1518,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
-            List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
-                .getSystemGeneratedCaseDocuments();
-            generatedDocuments.add(element(document));
-            dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+            if (featureToggleService.isGaForWelshEnabled()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+                || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+                List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
+                    .getPreTranslationSdoOrderDocuments();
+                sdoDocuments.add(element(document));
+                dataBuilder.preTranslationSdoOrderDocuments(sdoDocuments);
+            } else {
+                List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
+                    .getSystemGeneratedCaseDocuments();
+                generatedDocuments.add(element(document));
+                dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+            }
         }
         // null/remove preview SDO document, otherwise it will show as duplicate within case file view
         dataBuilder.sdoOrderDocument(null);

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -44,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
@@ -107,10 +109,12 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         caseDataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
         caseDataBuilder.caseNamePublic(buildCaseName(caseData));
+        caseDataBuilder
+            .allPartyNames(getAllPartyNames(caseData));
         populateWithPartyIds(caseDataBuilder);
 
         caseDataBuilder.anyRepresented(NO);
-        
+
         if (caseData.getIsFlightDelayClaim() == YesOrNo.YES) {
             caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
         }
@@ -126,6 +130,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
                                                        .baseLocation(locationRefData.getEpimmsId())
                                                        .build());
             caseDataBuilder.locationName(locationRefData.getSiteName());
+        }
+        if (featureToggleService.isGaForWelshEnabled()) {
+            caseDataBuilder.claimantLanguagePreferenceDisplay(PreferredLanguage.fromString(caseData.getClaimantBilingualLanguagePreference()));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

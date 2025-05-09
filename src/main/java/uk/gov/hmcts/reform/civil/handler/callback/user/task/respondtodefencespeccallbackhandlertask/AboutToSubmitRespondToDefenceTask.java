@@ -118,6 +118,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             ));
         }
 
+        builder.nextDeadline(null);
         builder.previousCCDState(caseData.getCcdState());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -133,8 +134,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             && caseData.hasClaimantAgreedToFreeMediation())
             || (featureToggleService.isCarmEnabledForCase(caseData)
             && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
-            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+            && caseData.hasApplicantProceededWithClaim())) {
             builder.claimMovedToMediationOn(LocalDate.now());
             log.info("Moved Claim to mediation for Case : {}", caseData.getCcdCaseReference());
         }
