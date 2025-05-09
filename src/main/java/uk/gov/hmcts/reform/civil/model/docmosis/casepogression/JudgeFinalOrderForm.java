@@ -17,6 +17,7 @@ import java.time.LocalDate;
 public class JudgeFinalOrderForm implements MappableObject {
 
     private final String caseNumber;
+    private final String legacyNumber;
     private final String caseName;
     private final String claimantReference;
     private final String defendantReference;
