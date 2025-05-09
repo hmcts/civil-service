@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
@@ -149,6 +150,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT);
         verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
     }
 
@@ -174,6 +176,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT);
         verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
     }
 
@@ -201,6 +204,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT);
         verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
     }
 
@@ -228,6 +232,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT);
         verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
     }
 
