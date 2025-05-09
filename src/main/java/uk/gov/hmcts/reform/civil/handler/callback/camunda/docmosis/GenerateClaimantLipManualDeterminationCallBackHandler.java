@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.manualdetermination.ClaimantLipManualDeterminationFormGenerator;
@@ -72,6 +73,7 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(claimantResponseForm));
             caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.MANUAL_DETERMINATION_DOCUMENT);
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
                                                              .getSystemGeneratedDocumentsWithAddedDocument(
