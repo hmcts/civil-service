@@ -27,7 +27,7 @@ public class SecurityConfiguration {
         "next-hearing-date-admin"
     };
 
-    private static final String[] AUTH_WHITELIST = {
+    public static final String[] AUTH_WHITELIST = {
         "/",
         "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**",
         "/health", "/env", "/health/**", "/status/health",

@@ -1,15 +1,14 @@
 package uk.gov.hmcts.reform.civil.filters;
 
-import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
+import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class CustomAuthCheckerUserOnlyFilter<T extends User> extends AuthCheckerUserOnlyFilter<T> {
+import static uk.gov.hmcts.reform.civil.config.SecurityConfiguration.AUTH_WHITELIST;
 
-    // Health check endpoints to be skipped
-    private static final String[] HEALTH_ENDPOINTS = {"/health", "/env", "/status/health"};
+public class CustomAuthCheckerUserOnlyFilter<T extends User> extends AuthCheckerUserOnlyFilter<T> {
 
     public CustomAuthCheckerUserOnlyFilter(RequestAuthorizer<T> userRequestAuthorizer) {
         super(userRequestAuthorizer);
@@ -17,28 +16,38 @@ public class CustomAuthCheckerUserOnlyFilter<T extends User> extends AuthChecker
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
-        // Skip processing for health endpoints
-        if (isHealthEndpoint(request.getRequestURI())) {
-            return null;  // Skip authentication logic for health endpoints
+        // Skip processing for whitelisted endpoints
+        if (isWhitelisted(request.getRequestURI())) {
+            return null;  // Skip authentication logic for whitelisted endpoints
         }
         return super.getPreAuthenticatedPrincipal(request);
     }
 
     @Override
     protected Object getPreAuthenticatedCredentials(HttpServletRequest request) {
-        // Skip processing for health endpoints
-        if (isHealthEndpoint(request.getRequestURI())) {
-            return null;  // Skip credentials processing for health endpoints
+        // Skip processing for whitelisted endpoints
+        if (isWhitelisted(request.getRequestURI())) {
+            return null;  // Skip credentials processing for whitelisted endpoints
         }
         return super.getPreAuthenticatedCredentials(request);
     }
 
-    private boolean isHealthEndpoint(String requestURI) {
-        for (String endpoint : HEALTH_ENDPOINTS) {
-            if (requestURI.startsWith(endpoint)) {
-                return true;  // Skip the filter for any health check endpoints
+    boolean isWhitelisted(String requestURI) {
+        for (String endpoint : AUTH_WHITELIST) {
+            // Special case for the root path "/"
+            if (endpoint.equals("/")) {
+                if (requestURI.equals("/")) {
+                    return true;  // Exact match for the root path "/"
+                }
+                continue;
+            }
+            // Strip out wildcards ** or * and match the URI using startsWith()
+            String strippedEndpoint = endpoint.replace("**", "").replace("*", "");
+            // Use startsWith to check if the requestURI starts with the stripped endpoint
+            if (requestURI.startsWith(strippedEndpoint)) {
+                return true;
             }
         }
-        return false;  // Apply filter for other paths
+        return false;  // Apply filter for non-whitelisted paths
     }
 }
