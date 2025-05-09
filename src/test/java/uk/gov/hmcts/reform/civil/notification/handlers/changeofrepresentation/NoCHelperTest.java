@@ -13,8 +13,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.RecipientData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -199,5 +201,171 @@ class NoCHelperTest {
     @Test
     void isOtherPartyLip_shouldReturnTrueWhenOrgPolicyNull() {
         assertTrue(noCHelper.isOtherPartyLip(null));
+    }
+
+    @Test
+    void getOtherSolicitor2_shouldReturnRespondent1SolicitorData_whenRespondent2IsNewSolicitor_andRespondent1IsNotLip() {
+        OrganisationPolicy respondent1Policy = OrganisationPolicy.builder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                              .organisationID("RESP1_ORG_ID").build())
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent1OrganisationPolicy(respondent1Policy)
+            .respondentSolicitor1EmailAddress("resp1sol@example.com")
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                        .organisationToAddID("orgAdd")
+                                        .organisationToRemoveID("orgRemove")
+                                        .formerRepresentationEmailAddress("former@sol.com")
+                                        .build())
+            .build();
+
+        RecipientData result = noCHelper.getOtherSolicitor2(caseData);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getEmail()).isEqualTo("resp1sol@example.com");
+        assertThat(result.getOrgId()).isEqualTo("RESP1_ORG_ID");
+    }
+
+    @Test
+    void getOtherSolicitor2_shouldReturnApplicantSolicitorData_whenScenarioIsTwoVOne() {
+        OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                              .organisationID("APP_ORG_ID").build())
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .applicant1OrganisationPolicy(applicantPolicy)
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .email("appsol@example.com").build())
+            .addApplicant2(YesOrNo.YES)
+            .build();
+
+        RecipientData result = noCHelper.getOtherSolicitor2(caseData);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getEmail()).isEqualTo("appsol@example.com");
+        assertThat(result.getOrgId()).isEqualTo("APP_ORG_ID");
+    }
+
+    @Test
+    void getOtherSolicitor2_shouldReturnRespondent2SolicitorData_whenRespondent2NotLipAndNotTwoVOne() {
+        OrganisationPolicy respondent2Policy = OrganisationPolicy.builder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                              .organisationID("RESP2_ORG_ID").build())
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent2OrganisationPolicy(respondent2Policy)
+            .respondentSolicitor2EmailAddress("resp2sol@example.com")
+            .build();
+
+        RecipientData result = noCHelper.getOtherSolicitor2(caseData);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getEmail()).isEqualTo("resp2sol@example.com");
+        assertThat(result.getOrgId()).isEqualTo("RESP2_ORG_ID");
+    }
+
+    @Test
+    void getOtherSolicitor2_shouldReturnNull_whenAllConditionsFail() {
+        CaseData caseData = baseCaseData;
+
+        RecipientData result = noCHelper.getOtherSolicitor2(caseData);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void getOtherSolicitor1_shouldReturnRespondent1Solicitor_whenApplicant1IsNewSolicitor_andRespondent1IsNotLip() {
+        OrganisationPolicy respondent1Policy = OrganisationPolicy.builder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                              .organisationID("RESP1_ORG_ID").build())
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .respondent1OrganisationPolicy(respondent1Policy)
+            .respondentSolicitor1EmailAddress("resp1sol@example.com")
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                                        .organisationToAddID("orgAdd")
+                                        .organisationToRemoveID("orgRemove")
+                                        .formerRepresentationEmailAddress("former@sol.com")
+                                        .build())
+            .build();
+
+        RecipientData result = noCHelper.getOtherSolicitor1(caseData);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getEmail()).isEqualTo("resp1sol@example.com");
+        assertThat(result.getOrgId()).isEqualTo("RESP1_ORG_ID");
+    }
+
+    @Test
+    void getOtherSolicitor1_shouldReturnApplicantSolicitor_whenRespondent2IsNewSolicitor() {
+        OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                              .organisationID("APP_ORG_ID").build())
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .applicant1OrganisationPolicy(applicantPolicy)
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .email("appsol@example.com").build())
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                        .organisationToAddID("orgAdd")
+                                        .organisationToRemoveID("orgRemove")
+                                        .formerRepresentationEmailAddress("former@sol.com")
+                                        .build())
+            .build();
+
+        RecipientData result = noCHelper.getOtherSolicitor1(caseData);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getEmail()).isEqualTo("appsol@example.com");
+        assertThat(result.getOrgId()).isEqualTo("APP_ORG_ID");
+    }
+
+    @Test
+    void getOtherSolicitor1_shouldReturnApplicantSolicitor_whenRespondent1IsNewSolicitor_andApplicantIsNotLip() {
+        OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                              .organisationID("APP_ORG_ID").build())
+            .build();
+
+        CaseData caseData = baseCaseData.toBuilder()
+            .applicant1OrganisationPolicy(applicantPolicy)
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .email("appsol@example.com").build())
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                        .organisationToAddID("orgAdd")
+                                        .organisationToRemoveID("orgRemove")
+                                        .formerRepresentationEmailAddress("former@sol.com")
+                                        .build())
+            .applicant1Represented(YesOrNo.YES)
+            .build();
+
+
+        RecipientData result = noCHelper.getOtherSolicitor1(caseData);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getEmail()).isEqualTo("appsol@example.com");
+        assertThat(result.getOrgId()).isEqualTo("APP_ORG_ID");
+    }
+
+    @Test
+    void getOtherSolicitor1_shouldReturnNull_whenNoConditionsMatch() {
+        CaseData caseData = baseCaseData.toBuilder()
+            .changeOfRepresentation(ChangeOfRepresentation.builder()
+                                        .caseRole(CaseRole.CLAIMANT.getFormattedName())
+                                        .build())
+            .build();
+
+        RecipientData result = noCHelper.getOtherSolicitor1(caseData);
+
+        assertThat(result).isNull();
     }
 }

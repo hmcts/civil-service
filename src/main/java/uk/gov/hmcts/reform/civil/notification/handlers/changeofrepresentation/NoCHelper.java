@@ -128,7 +128,7 @@ public class NoCHelper {
      * @return Recipient data model that contains a String email and a String Organisation id, else returns null if
      *     the part is a LiP.
      */
-    private RecipientData getOtherSolicitor2(CaseData caseData) {
+    protected RecipientData getOtherSolicitor2(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
                 String respondent1OrgID = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
