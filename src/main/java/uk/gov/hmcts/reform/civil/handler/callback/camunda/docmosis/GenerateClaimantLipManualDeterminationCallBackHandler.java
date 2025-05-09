@@ -67,8 +67,7 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
         if (featureToggleService.isGaForWelshEnabled()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
             || caseData.isLipClaimantSpecifiedBilingualDocuments()
-            || caseData.isLipDefendantSpecifiedBilingualDocuments()))
-        {
+            || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(claimantResponseForm));
