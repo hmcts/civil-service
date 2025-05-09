@@ -3,10 +3,9 @@ package uk.gov.hmcts.reform.civil.filters;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilter;
+import uk.gov.hmcts.reform.civil.config.SecurityConfiguration;
 
 import javax.servlet.http.HttpServletRequest;
-
-import static uk.gov.hmcts.reform.civil.config.SecurityConfiguration.AUTH_WHITELIST;
 
 public class CustomAuthCheckerUserOnlyFilter<T extends User> extends AuthCheckerUserOnlyFilter<T> {
 
@@ -33,7 +32,7 @@ public class CustomAuthCheckerUserOnlyFilter<T extends User> extends AuthChecker
     }
 
     boolean isWhitelisted(String requestURI) {
-        for (String endpoint : AUTH_WHITELIST) {
+        for (String endpoint : SecurityConfiguration.getAuthWhitelist()) {
             // Special case for the root path "/"
             if (endpoint.equals("/")) {
                 if (requestURI.equals("/")) {
