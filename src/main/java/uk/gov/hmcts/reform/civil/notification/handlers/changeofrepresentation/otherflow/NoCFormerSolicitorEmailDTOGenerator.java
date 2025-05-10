@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lrvlrlrandlipvlr;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.otherflow;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,26 +10,24 @@ import java.util.Map;
 
 @Component
 @AllArgsConstructor
-public class NoCClaimantLipEmailDTOGenerator extends EmailDTOGenerator {
+public class NoCFormerSolicitorEmailDTOGenerator extends EmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
     private final NoCHelper noCHelper;
 
     @Override
     public boolean getShouldNotify(CaseData caseData) {
-        return noCHelper.isApplicantLipForRespondentSolicitorChange(caseData);
+        return caseData.getChangeOfRepresentation().getOrganisationToRemoveID() != null;
     }
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
-        return caseData.getApplicant1Email();
+        return noCHelper.getPreviousSolicitorEmail(caseData);
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.isClaimantBilingual()
-            ? notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC()
-            : notificationsProperties.getNotifyClaimantLipForDefendantRepresentedTemplate();
+        return notificationsProperties.getNoticeOfChangeFormerSolicitor();
     }
 
     @Override
@@ -39,7 +37,7 @@ public class NoCClaimantLipEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.putAll(noCHelper.getClaimantLipProperties(caseData));
-        return  properties;
+        properties.putAll(noCHelper.getProperties(caseData, false));
+        return properties;
     }
 }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lrvlrlrandlipvlr;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.otherflow;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

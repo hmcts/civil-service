@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lrvlrlrandlipvlr;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.otherflow;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

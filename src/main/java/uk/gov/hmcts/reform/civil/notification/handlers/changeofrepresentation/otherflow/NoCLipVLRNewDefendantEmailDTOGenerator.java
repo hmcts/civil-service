@@ -1,33 +1,36 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lrvlrlrandlipvlr;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.otherflow;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
 @Component
 @AllArgsConstructor
-public class NoCFormerSolicitorEmailDTOGenerator extends EmailDTOGenerator {
+public class NoCLipVLRNewDefendantEmailDTOGenerator extends EmailDTOGenerator {
 
+    private final FeatureToggleService featureToggleService;
     private final NotificationsProperties notificationsProperties;
     private final NoCHelper noCHelper;
 
     @Override
     public boolean getShouldNotify(CaseData caseData) {
-        return caseData.getChangeOfRepresentation().getOrganisationToRemoveID() != null;
+        return featureToggleService.isDefendantNoCOnlineForCase(caseData)
+            && noCHelper.isApplicantLipForRespondentSolicitorChange(caseData);
     }
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
-        return noCHelper.getPreviousSolicitorEmail(caseData);
+        return caseData.getRespondentSolicitor1EmailAddress();
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNoticeOfChangeFormerSolicitor();
+        return notificationsProperties.getNotifyNewDefendantSolicitorNOC();
     }
 
     @Override
