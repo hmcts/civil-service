@@ -4,14 +4,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,9 +39,12 @@ class NoCClaimantLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTrueWhenApplicantIsLipForRespondentSolicitorChange() {
-        when(noCHelper.isApplicantLipForRespondentSolicitorChange(caseData)).thenReturn(true);
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.isApplicantLipForRespondentSolicitorChange(caseData))
+                    .thenReturn(true);
 
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
+            assertThat(generator.getShouldNotify(caseData)).isTrue();
+        }
     }
 
     @Test
