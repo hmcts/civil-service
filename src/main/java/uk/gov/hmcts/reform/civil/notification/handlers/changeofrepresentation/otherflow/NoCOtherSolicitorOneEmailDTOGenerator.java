@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ public class NoCOtherSolicitorOneEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
     public boolean getShouldNotify(CaseData caseData) {
-        return !(noCHelper.isOtherParty1Lip(caseData));
+        return !(NotificationHelper.isOtherParty1Lip(caseData));
     }
 
     @Override
@@ -27,7 +28,7 @@ public class NoCOtherSolicitorOneEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
-        return noCHelper.getOtherSolicitor1Email(caseData);
+        return NotificationHelper.getOtherSolicitor1Email(caseData);
     }
 
     @Override

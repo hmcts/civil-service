@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
@@ -19,7 +20,7 @@ public class NoCOtherSolicitorTwoEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
     public boolean getShouldNotify(CaseData caseData) {
-        return !(isOneVTwoTwoLegalRep(caseData) || noCHelper.isOtherParty2Lip(caseData));
+        return !(isOneVTwoTwoLegalRep(caseData) || NotificationHelper.isOtherParty2Lip(caseData));
     }
 
     @Override
@@ -29,7 +30,7 @@ public class NoCOtherSolicitorTwoEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
-        return noCHelper.getOtherSolicitor2Email(caseData);
+        return NotificationHelper.getOtherSolicitor2Email(caseData);
     }
 
     @Override

@@ -4,15 +4,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,14 +64,18 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
     void shouldBuildEmailDTO_WithExpectedValues() {
         when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(TEMPLATE_ID);
         when(caseData.getLegacyCaseReference()).thenReturn(CASE_REFERENCE);
-        when(noCHelper.getPreviousSolicitorEmail(caseData)).thenReturn(FORMER_SOLICITOR_EMAIL);
-        when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.getPreviousSolicitorEmail(caseData))
+                .thenReturn(FORMER_SOLICITOR_EMAIL);
 
-        EmailDTO emailDTO = generator.buildEmailDTO(caseData);
+            when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
 
-        assertThat(emailDTO.getTargetEmail()).isEqualTo(FORMER_SOLICITOR_EMAIL);
-        assertThat(emailDTO.getEmailTemplate()).isEqualTo(TEMPLATE_ID);
-        assertThat(emailDTO.getReference()).isEqualTo("notice-of-change-" + CASE_REFERENCE);
-        assertThat(emailDTO.getParameters()).containsEntry("key", "value");
+            EmailDTO emailDTO = generator.buildEmailDTO(caseData);
+
+            assertThat(emailDTO.getTargetEmail()).isEqualTo(FORMER_SOLICITOR_EMAIL);
+            assertThat(emailDTO.getEmailTemplate()).isEqualTo(TEMPLATE_ID);
+            assertThat(emailDTO.getReference()).isEqualTo("notice-of-change-" + CASE_REFERENCE);
+            assertThat(emailDTO.getParameters()).containsEntry("key", "value");
+        }
     }
 }

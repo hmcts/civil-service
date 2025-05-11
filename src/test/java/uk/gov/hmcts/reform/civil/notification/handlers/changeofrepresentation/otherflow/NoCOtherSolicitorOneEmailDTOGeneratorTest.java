@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,17 +35,23 @@ class NoCOtherSolicitorOneEmailDTOGeneratorTest {
     @Test
     void shouldNotify_WhenOtherPartyIsNotLip() {
         CaseData caseData = mock(CaseData.class);
-        when(noCHelper.isOtherParty1Lip(caseData)).thenReturn(false);
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.isOtherParty1Lip(caseData))
+                    .thenReturn(false);
 
-        assertTrue(generator.getShouldNotify(caseData));
+            assertTrue(generator.getShouldNotify(caseData));
+        }
     }
 
     @Test
     void shouldNotNotify_WhenOtherPartyIsLip() {
         CaseData caseData = mock(CaseData.class);
-        when(noCHelper.isOtherParty1Lip(caseData)).thenReturn(true);
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.isOtherParty1Lip(caseData))
+                    .thenReturn(true);
 
-        assertFalse(generator.getShouldNotify(caseData));
+            assertFalse(generator.getShouldNotify(caseData));
+        }
     }
 
     @Test
@@ -56,9 +65,12 @@ class NoCOtherSolicitorOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         CaseData caseData = mock(CaseData.class);
-        when(noCHelper.getOtherSolicitor1Email(caseData)).thenReturn("other.solicitor@example.com");
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.getOtherSolicitor1Email(caseData))
+                    .thenReturn("other.solicitor@example.com");
 
-        assertEquals("other.solicitor@example.com", generator.getEmailAddress(caseData));
+            assertEquals("other.solicitor@example.com", generator.getEmailAddress(caseData));
+        }
     }
 
     @Test

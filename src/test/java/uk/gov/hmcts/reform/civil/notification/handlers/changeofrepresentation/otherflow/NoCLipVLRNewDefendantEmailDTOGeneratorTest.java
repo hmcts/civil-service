@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.o
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -16,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,9 +41,12 @@ class NoCLipVLRNewDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotify_WhenFeatureEnabledAndApplicantIsLip() {
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
-        when(noCHelper.isApplicantLipForRespondentSolicitorChange(caseData)).thenReturn(true);
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.isApplicantLipForRespondentSolicitorChange(caseData))
+                    .thenReturn(true);
 
-        assertTrue(generator.getShouldNotify(caseData));
+            assertTrue(generator.getShouldNotify(caseData));
+        }
     }
 
     @Test
@@ -52,9 +58,12 @@ class NoCLipVLRNewDefendantEmailDTOGeneratorTest {
     @Test
     void shouldNotNotify_WhenApplicantIsNotLip() {
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
-        when(noCHelper.isApplicantLipForRespondentSolicitorChange(caseData)).thenReturn(false);
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.isApplicantLipForRespondentSolicitorChange(caseData))
+                    .thenReturn(false);
 
-        assertFalse(generator.getShouldNotify(caseData));
+            assertFalse(generator.getShouldNotify(caseData));
+        }
     }
 
     @Test

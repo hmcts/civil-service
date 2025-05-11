@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
@@ -20,7 +21,7 @@ public class NoCLipVLRNewDefendantEmailDTOGenerator extends EmailDTOGenerator {
     @Override
     public boolean getShouldNotify(CaseData caseData) {
         return featureToggleService.isDefendantNoCOnlineForCase(caseData)
-            && noCHelper.isApplicantLipForRespondentSolicitorChange(caseData);
+            && NotificationHelper.isApplicantLipForRespondentSolicitorChange(caseData);
     }
 
     @Override

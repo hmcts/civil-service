@@ -10,6 +10,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.HashMap;
@@ -50,9 +51,12 @@ class NoCOtherSolicitorTwoEmailDTOGeneratorTest {
     void shouldNotify_whenBothConditionsAreFalse() {
         CaseData caseData = mock(CaseData.class);
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
-        when(noCHelper.isOtherParty2Lip(caseData)).thenReturn(false);
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.isOtherParty2Lip(caseData))
+                .thenReturn(false);
 
-        assertTrue(generator.getShouldNotify(caseData));
+            assertTrue(generator.getShouldNotify(caseData));
+        }
     }
 
     @Test
@@ -66,9 +70,12 @@ class NoCOtherSolicitorTwoEmailDTOGeneratorTest {
     void shouldNotNotify_whenOtherParty2LipIsTrue() {
         CaseData caseData = mock(CaseData.class);
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
-        when(noCHelper.isOtherParty2Lip(caseData)).thenReturn(true);
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.isOtherParty2Lip(caseData))
+                .thenReturn(true);
 
-        assertFalse(generator.getShouldNotify(caseData));
+            assertFalse(generator.getShouldNotify(caseData));
+        }
     }
 
     @Test
@@ -82,9 +89,12 @@ class NoCOtherSolicitorTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         CaseData caseData = mock(CaseData.class);
-        when(noCHelper.getOtherSolicitor2Email(caseData)).thenReturn("sol2@example.com");
+        try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
+            mockedStatic.when(() -> NotificationHelper.getOtherSolicitor2Email(caseData))
+                .thenReturn("sol2@example.com");
 
-        assertEquals("sol2@example.com", generator.getEmailAddress(caseData));
+            assertEquals("sol2@example.com", generator.getEmailAddress(caseData));
+        }
     }
 
     @Test
