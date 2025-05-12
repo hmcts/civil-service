@@ -84,6 +84,7 @@ import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -98,10 +99,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.validation.Valid;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
@@ -713,7 +714,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             localRespondToClaim = getRespondToAdmittedClaim();
         }
 
-        return Optional.ofNullable(localRespondToClaim)
+        return ofNullable(localRespondToClaim)
             .map(RespondToClaim::getHowMuchWasPaid)
             .map(amount -> MonetaryConversions.penniesToPounds(amount).compareTo(totalClaimAmount) >= 0)
             .orElse(false);
@@ -727,7 +728,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public LocalDate getDateForRepayment() {
-        return Optional.ofNullable(respondToClaimAdmitPartLRspec)
+        return ofNullable(respondToClaimAdmitPartLRspec)
             .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
     }
 
@@ -926,20 +927,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
             if (applicant1SuggestedPayImmediately()) {
                 whenWillThisAmountBePaid = getApplicant1SuggestPayImmediatelyPaymentDateForDefendantSpec();
             } else if (applicant1SuggestedPayBySetDate()) {
-                whenWillThisAmountBePaid = Optional.ofNullable(getApplicant1RequestedPaymentDateForDefendantSpec()).map(
+                whenWillThisAmountBePaid = ofNullable(getApplicant1RequestedPaymentDateForDefendantSpec()).map(
                     PaymentBySetDate::getPaymentSetDate).orElse(null);
             }
             firstRepaymentDate = getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
         } else {
             whenWillThisAmountBePaid =
-                Optional.ofNullable(getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                ofNullable(getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
                     null);
-            firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
+            firstRepaymentDate = ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
                 null);
         }
-        LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(
+        LocalDate respondentSettlementAgreementDeadline = ofNullable(
             getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
-        Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(getCaseDataLiP());
+        Optional<CaseDataLiP> optionalCaseDataLiP = ofNullable(getCaseDataLiP());
         YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(
             null);
         boolean hasDoneSettlementAgreementInTime = (nonNull(hasDoneSettlementAgreement) && hasDoneSettlementAgreement == YesOrNo.YES)
@@ -1064,17 +1065,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicantOrganisationId() {
-        return getOrganisationId(Optional.ofNullable(getApplicant1OrganisationPolicy()));
+        return getOrganisationId(ofNullable(getApplicant1OrganisationPolicy()));
     }
 
     @JsonIgnore
     public String getRespondent1OrganisationId() {
-        return getOrganisationId(Optional.ofNullable(getRespondent1OrganisationPolicy()));
+        return getOrganisationId(ofNullable(getRespondent1OrganisationPolicy()));
     }
 
     @JsonIgnore
     public String getRespondent2OrganisationId() {
-        return getOrganisationId(Optional.ofNullable(getRespondent2OrganisationPolicy()));
+        return getOrganisationId(ofNullable(getRespondent2OrganisationPolicy()));
     }
 
     @JsonIgnore
@@ -1095,7 +1096,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Optional<Element<CaseDocument>> getSDODocument() {
-        return Optional.ofNullable(systemGeneratedCaseDocuments)
+        return ofNullable(systemGeneratedCaseDocuments)
             .flatMap(docs -> docs.stream()
                 .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
                 .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
@@ -1107,7 +1108,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(Element::getValue)
             .filter(doc -> doc.getDocumentType().equals(documentType))
             .toList();
-        return Optional.ofNullable(documents.isEmpty() ? null : documents);
+        return ofNullable(documents.isEmpty() ? null : documents);
     }
 
     @JsonIgnore
@@ -1117,7 +1118,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
                     .getDocumentType().equals(DocumentType.DECISION_MADE_ON_APPLICATIONS)).findAny();
         }
-        return Optional.empty();
+        return empty();
     }
 
     @JsonIgnore
@@ -1138,7 +1139,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Address getRespondent1CorrespondanceAddress() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
             .orElse(null);
@@ -1152,26 +1153,26 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public List<Element<RecurringIncomeLRspec>> getRecurringIncomeForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncomeFA).orElse(
+            return ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncomeFA).orElse(
                 null);
         }
-        return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncome).orElse(null);
+        return ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringIncome).orElse(null);
     }
 
     @JsonIgnore
     public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
+            return ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
                 .orElse(
                     null);
         }
-        return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
+        return ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
     }
 
     @JsonIgnore
     public List<Element<ManageDocument>> getManageDocumentsList() {
-        return Optional.ofNullable(getManageDocuments()).orElse(new ArrayList<>());
+        return ofNullable(getManageDocuments()).orElse(new ArrayList<>());
     }
 
     @JsonIgnore
@@ -1183,12 +1184,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicant1Email() {
-        return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
+        return ofNullable(getApplicant1().getPartyEmail())
+            .or(() -> ofNullable(getClaimantUserDetails())
+                .map(IdamUserDetails::getEmail))
+            .or(() -> ofNullable(getApplicantSolicitor1UserDetails())
+                .map(IdamUserDetails::getEmail))
+            .orElse(null);
     }
 
     @JsonIgnore
     public String getHelpWithFeesReferenceNumber() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getHelpWithFees)
             .map(HelpWithFees::getHelpWithFeesReferenceNumber).orElse(null);
     }
@@ -1201,7 +1207,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Address getRespondent1CorrespondenceAddress() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
             .orElse(null);
@@ -1257,7 +1263,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public List<ClaimAmountBreakupDetails> getClaimAmountBreakupDetails() {
-        return Optional.ofNullable(getClaimAmountBreakup())
+        return ofNullable(getClaimAmountBreakup())
             .map(Collection::stream)
             .map(claimAmountBreakupStream -> claimAmountBreakupStream
                 .map(item -> new ClaimAmountBreakupDetails(
@@ -1271,14 +1277,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public BigDecimal getCalculatedClaimFeeInPence() {
-        return Optional.ofNullable(getClaimFee())
+        return ofNullable(getClaimFee())
             .map(Fee::getCalculatedAmountInPence)
             .orElse(BigDecimal.ZERO);
     }
 
     @JsonIgnore
     public BigDecimal getCalculatedHearingFeeInPence() {
-        return Optional.ofNullable(getHearingFee())
+        return ofNullable(getHearingFee())
             .map(Fee::getCalculatedAmountInPence)
             .orElse(BigDecimal.ZERO);
     }
@@ -1299,20 +1305,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public BigDecimal getClaimIssueRemissionAmount() {
-        return Optional.ofNullable(getClaimIssuedHwfDetails())
+        return ofNullable(getClaimIssuedHwfDetails())
             .map(HelpWithFeesDetails::getRemissionAmount)
             .orElse(BigDecimal.ZERO);
     }
 
     @JsonIgnore
     public BigDecimal getHearingRemissionAmount() {
-        return Optional.ofNullable(getHearingHwfDetails())
+        return ofNullable(getHearingHwfDetails())
             .map(HelpWithFeesDetails::getRemissionAmount)
             .orElse(BigDecimal.ZERO);
     }
 
     public boolean hasApplicant1SignedSettlementAgreement() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
 
@@ -1397,7 +1403,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean hasApplicant1AcceptedCcj() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasApplicant1RequestedCcj).isPresent();
     }
@@ -1428,20 +1434,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean hasApplicant1AcceptedCourtDecision() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasClaimantAcceptedCourtDecision).isPresent();
     }
 
     @JsonIgnore
     public boolean hasApplicant1CourtDecisionInFavourOfClaimant() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
     }
 
     public boolean hasApplicant1CourtDecisionInFavourOfDefendant() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfDefendant).isPresent();
     }
@@ -1484,7 +1490,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public LocalDate getApplicant1ClaimSettleDate() {
-        return Optional.ofNullable(getCaseDataLiP())
+        return ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimSettledDate).orElse(null);
     }
 
@@ -1496,7 +1502,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         } else if (getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION) {
             localRespondToClaim = getRespondToAdmittedClaim();
         }
-        return Optional.ofNullable(localRespondToClaim).map(RespondToClaim::getHowMuchWasPaid)
+        return ofNullable(localRespondToClaim).map(RespondToClaim::getHowMuchWasPaid)
             .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) < 0).orElse(false);
     }
 
