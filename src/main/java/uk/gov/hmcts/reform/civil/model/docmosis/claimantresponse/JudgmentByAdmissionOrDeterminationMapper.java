@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -229,7 +230,9 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                                     ? getRepaymentFrequency(caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) : null)
             .repaymentDate(caseData.isPayByInstallment()
                                ? DateFormatHelper.formatLocalDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate(), DateFormatHelper.DATE) : null)
-            .installmentAmount(caseData.isPayByInstallment() ? String.valueOf(caseData.getRespondent1RepaymentPlan().getPaymentAmount().setScale(2)) : null)
+            .installmentAmount(caseData.isPayByInstallment()
+                                   ? String.valueOf(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
+                                   : null)
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
             .claimFee(getClaimFee(caseData))
