@@ -26,7 +26,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_NOTIFICATIONS_RESPONSE_TO_QUERY;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -92,6 +94,12 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
             && size) {
             dashboardScenariosService.recordScenarios(
                 authToken,
+                SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                notificationParams
+            );
+            dashboardScenariosService.recordScenarios(
+                authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 notificationParams
@@ -99,6 +107,12 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         }
         if (isLIPDefendant(roles) && caseData.getQmRespondentCitizenQueries() != null
             && caseData.getQmRespondentCitizenQueries().getCaseMessages().size() > 0) {
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                notificationParams
+            );
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT.getScenario(),

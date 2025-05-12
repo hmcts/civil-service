@@ -242,6 +242,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT("Scenario.AAA6.ViewMessages.Available.Defendant"),
     SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT("Scenario.AAA6.LiPQM.QueryResponded.Claimant"),
     SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT("Scenario.AAA6.LiPQM.QueryResponded.Defendant"),
+    SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE("Scenario.AAA6.LiPQM.QueryResponded.Claimant.Delete"),
+    SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE("Scenario.AAA6.LiPQM.QueryResponded.Defendant.Delete"),
     SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT("Scenario.AAA6.Applications.and.messages.to.the.court"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.JO.Claimant");
 
