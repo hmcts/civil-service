@@ -119,6 +119,7 @@ class ClaimSettledDashboardNotificationHandlerTest  extends BaseCallbackHandlerT
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("test").region(
                     "test").build())
                 .applicant1Represented(YesOrNo.NO)
+
                 .caseDataLip(CaseDataLiP.builder().applicant1SettleClaim(YesOrNo.YES)
                                  .applicant1ClaimSettledDate(
                                      LocalDate.now()).build()).build();

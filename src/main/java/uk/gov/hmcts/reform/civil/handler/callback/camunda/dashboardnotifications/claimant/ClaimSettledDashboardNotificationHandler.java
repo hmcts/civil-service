@@ -60,19 +60,23 @@ public class ClaimSettledDashboardNotificationHandler extends DashboardCallbackH
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
         boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        if (!(isLrQmEnabled &&
-            caseData.getPreviousCCDState() == null &&
-            !featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation()))) {
-            dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                caseId,
-                "CLAIMANT"
-            );
-
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
-                caseId,
-                "CLAIMANT",
-                "Application.View"
-            );
+        if (!isLrQmEnabled){
+            inactiveGAItems(caseId);
+        } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())){
+            inactiveGAItems(caseId);
         }
+    }
+
+    private void inactiveGAItems(String caseId) {
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(
+            caseId,
+            "CLAIMANT"
+        );
+
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+            caseId,
+            "CLAIMANT",
+            "Application.View"
+        );
     }
 }
