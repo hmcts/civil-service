@@ -4,10 +4,10 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.LiPQM.QueryResponded.Claimant.Delete',
         '{"Notice.AAA6.LiPQM.QueryResponded.Claimant"}',
-        '{: []}'),
+        '{"": []}'),
        ('Scenario.AAA6.LiPQM.QueryResponded.Defendant.Delete',
         '{"Notice.AAA6.LiPQM.QueryResponded.Defendant"}',
-        '{: []}');
+        '{"": []}');
 
 /**
  * Add scenario
