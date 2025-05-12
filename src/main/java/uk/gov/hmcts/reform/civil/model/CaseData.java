@@ -1089,9 +1089,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Optional<Element<CaseDocument>> getSDODocument() {
+        return getLatestDocumentOfType(DocumentType.SDO_ORDER);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getTranslatedSDODocument() {
+        return getLatestDocumentOfType(DocumentType.SDO_TRANSLATED_DOCUMENT);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getLatestDocumentOfType(DocumentType documentType) {
         return Optional.ofNullable(systemGeneratedCaseDocuments)
             .flatMap(docs -> docs.stream()
-                .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
+                .filter(doc -> doc.getValue().getDocumentType().equals(documentType))
                 .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
     }
 
