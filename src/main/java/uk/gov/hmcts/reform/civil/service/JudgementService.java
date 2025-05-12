@@ -128,7 +128,6 @@ public class JudgementService {
     }
 
     private boolean isJOFullAdmitRepaymentPlan(CaseData caseData) {
-        return featureToggleService.isJudgmentOnlineLive()
-            && caseData.isFullAdmitClaimSpec() && !caseData.isPayImmediately();
+        return caseData.isFullAdmitClaimSpec() && !caseData.isPayImmediately();
     }
 }

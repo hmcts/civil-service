@@ -2574,7 +2574,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceedOnJo() {
-            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
