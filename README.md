@@ -262,7 +262,8 @@ For that you should have such file as this:
     "fs": "read",
     "env": {
       "override": {
-        "REFERENCE_DATABASE_MIGRATION": "false"
+        "REFERENCE_DATABASE_MIGRATION": "false",
+        "CCD_EVENTS_SUBSCRIPTION_ENABLED": "false"
       }
     }
   },

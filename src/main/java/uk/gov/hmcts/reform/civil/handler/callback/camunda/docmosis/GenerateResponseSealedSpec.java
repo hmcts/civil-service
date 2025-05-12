@@ -130,6 +130,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             "Sealed Claim form",
             LocalDate.now().toString()
         ));
+
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             documents.add(new DocumentMetaData(
                 caseData.getSpecResponseTimelineDocumentFiles(),
@@ -137,13 +138,17 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 LocalDate.now().toString()
             ));
         }
-        if (caseData.getRespondent1SpecDefenceResponseDocument() != null) {
-            documents.add(new DocumentMetaData(
-                caseData.getRespondent1SpecDefenceResponseDocument().getFile(),
-                "Supported docs",
-                LocalDate.now().toString()
-            ));
-        }
+
+        ElementUtils.unwrapElements(caseData.getDefendantResponseDocuments()).stream()
+            .filter(cd -> DocumentType.DEFENDANT_DEFENCE.equals(cd.getDocumentType()))
+            .map(cd ->
+                     new DocumentMetaData(
+                         cd.getDocumentLink(),
+                         "Supported docs",
+                         LocalDate.now().toString()
+                     )
+            ).forEach(documents::add);
+
         ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
             .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
             .map(cd ->

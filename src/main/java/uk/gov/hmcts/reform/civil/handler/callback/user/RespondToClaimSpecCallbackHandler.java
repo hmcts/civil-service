@@ -1700,6 +1700,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 defendantUploads.add(documentElement);
             }
         }
+
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
         if (respondent1DQ != null) {
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
