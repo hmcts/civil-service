@@ -55,9 +55,9 @@ public class ClaimSettledDefendantDashboardNotificationHandler extends Dashboard
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
         boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
 
-        if (!isLrQmEnabled){
+        if (!isLrQmEnabled) {
             inactiveGAItems(caseId);
-        } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())){
+        } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
             inactiveGAItems(caseId);
         }
 
