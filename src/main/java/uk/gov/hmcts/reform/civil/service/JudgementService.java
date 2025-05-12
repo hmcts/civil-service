@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -25,10 +26,12 @@ public class JudgementService {
     private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
+    private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s which include the amounts shown:";
     private final FeatureToggleService featureToggleService;
+    private final InterestCalculator interestCalculator;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
-        log.info("---Checking judgment details");
+
         return CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
             .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))
@@ -56,9 +59,15 @@ public class JudgementService {
 
     public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (caseData.isPartAdmitClaimSpec()) {
-            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        if (isJOFullAdmitRepaymentPlan(caseData)) {
+            BigDecimal interest = interestCalculator.calculateInterestForJO(caseData);
+            claimAmount = claimAmount.add(interest);
+        } else {
+            if (caseData.isPartAdmitClaimSpec()) {
+                claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+            }
         }
+
         return claimAmount;
     }
 
@@ -86,10 +95,16 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        return ccjJudgmentClaimAmount(caseData)
-            .add(ccjJudgmentClaimFee(caseData))
-            .add(ccjJudgmentInterest(caseData))
-            .add(ccjJudgmentFixedCost(caseData));
+        if (isJOFullAdmitRepaymentPlan(caseData)) {
+            return ccjJudgmentClaimAmount(caseData)
+                .add(ccjJudgmentClaimFee(caseData))
+                .add(ccjJudgmentFixedCost(caseData));
+        } else {
+            return ccjJudgmentClaimAmount(caseData)
+                .add(ccjJudgmentClaimFee(caseData))
+                .add(ccjJudgmentInterest(caseData))
+                .add(ccjJudgmentFixedCost(caseData));
+        }
     }
 
     public BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
@@ -106,7 +121,14 @@ public class JudgementService {
             }
             return JUDGEMENT_BY_COURT;
         } else {
-            return String.format(JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
+            return String.format(
+                isJOFullAdmitRepaymentPlan(caseData)
+                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
         }
+    }
+
+    private boolean isJOFullAdmitRepaymentPlan(CaseData caseData) {
+        return featureToggleService.isJudgmentOnlineLive()
+            && caseData.isFullAdmitClaimSpec() && !caseData.isPayImmediately();
     }
 }

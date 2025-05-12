@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentAddress;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -136,76 +135,5 @@ public class JudgmentsOnlineHelperTest {
     @Test
     void testWelshChar() {
         assertThat(JudgmentsOnlineHelper.removeWelshCharacters("TEST Welsh ˆ`´¨")).isEqualTo("TEST Welsh ");
-    }
-
-    @Test
-    void shouldIncludeAllSections_whenAllValuesPresent() {
-        // given
-        JudgmentDetails judgment = JudgmentDetails.builder()
-            .orderedAmount("1000")
-            .costs("200")
-            .claimFeeAmount("300")
-            .build();
-        BigDecimal interest = new BigDecimal("1.50");
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
-            .totalClaimAmount(BigDecimal.valueOf(1000L))
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YesOrNo.YES)
-            .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Smith")
-                                                 .build())
-                                      .build())
-            .build();
-
-        // when
-        String result = JudgmentsOnlineHelper.getRepaymentBreakdownSummaryForJO(
-            judgment, interest, caseData);
-
-        // then
-        assertThat(result).contains("pay £108.50 which include");
-        assertThat(result).contains("\n### Claim amount\n£11.50");
-        assertThat(result).contains("\n### Fixed cost amount\n£94.00");
-        assertThat(result).contains("\n### Claim fee amount\n£3.00");
-        assertThat(result).contains("\n## Subtotal\n£108.50\n");
-    }
-
-    @Test
-    void shouldHandleNullInterestAndNoClaimFee() {
-        // given
-        JudgmentDetails judgment = JudgmentDetails.builder()
-            .orderedAmount("500")
-            .costs("300")
-            .build();
-        BigDecimal interest = null;
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued().build().toBuilder()
-            .totalClaimAmount(BigDecimal.valueOf(1000L))
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YesOrNo.YES)
-            .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("John Smith")
-                                                 .build())
-                                      .build())
-            .build();
-
-        // when
-        String result = JudgmentsOnlineHelper.getRepaymentBreakdownSummaryForJO(
-            judgment, interest, caseData);
-
-        // then
-        assertThat(result).contains("pay £100.00 which include");
-        assertThat(result).contains("\n### Claim amount\n£5.00");
-        assertThat(result).contains("\n### Fixed cost amount\n£95.00");
-        assertThat(result).doesNotContain("### Claim fee amount");
-        assertThat(result).contains("\n## Subtotal\n£100.00\n");
     }
 }

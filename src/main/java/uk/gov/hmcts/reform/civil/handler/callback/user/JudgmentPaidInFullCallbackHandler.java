@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -36,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
@@ -82,7 +80,6 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         caseData.setActiveJudgment(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        log.info("--- Checking judgment on JudgmentPaidInFullCallbackHandler");
         caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment(), interest));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder

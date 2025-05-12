@@ -47,8 +47,8 @@ class JudgmentByAdmissionMapperTest {
 
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private FeatureToggleService featureToggleService;
-    private JudgementService judgementService = new JudgementService(featureToggleService);
     private InterestCalculator interestCalculator = new InterestCalculator();
+    private JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
 
     @Test

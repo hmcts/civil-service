@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.cosc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -32,7 +31,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHECK_AND_MARK_PAID_I
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.CANCELLED;
 import static uk.gov.hmcts.reform.civil.enums.cosc.CoscRPAStatus.SATISFIED;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHandler {
@@ -81,7 +79,6 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
                 caseData.getCertOfSC().getDefendantFinalPaymentDate()
             ));
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            log.info("--- Checking judgment on CheckAndMarkDefendantPaidInFullCallbackHandler");
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment(), interest));
             caseData.setJoDefendantMarkedPaidInFullIssueDate(LocalDateTime.now());
         }
