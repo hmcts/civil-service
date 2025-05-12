@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -302,9 +304,30 @@ class UpdateClaimStateServiceTest {
         assertThat(response).isEqualTo(CaseState.IN_MEDIATION.name());
     }
 
-    @Test
-    void shouldChangeCaseState_whenApplicantAgreeClaimSettlement() {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+    @ParameterizedTest
+    @CsvSource({"true","false"})
+    void shouldNotChangeCaseState_whenHaveFullAdmissionFromRespondent(boolean carmEnabled) {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(carmEnabled);
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+            .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                    MediationDecision.Yes).build())
+                             .build())
+            .build().toBuilder()
+            .responseClaimMediationSpecRequired(YES).build();
+        //When
+        var response = service.setUpCaseState(caseData);
+        //Then
+        assertThat(response).isNotEqualTo(CaseState.IN_MEDIATION.name());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true","false"})
+    void shouldChangeCaseState_whenApplicantAgreeClaimSettlement(boolean carmEnabled) {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(carmEnabled);
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()

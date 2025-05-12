@@ -12,11 +12,14 @@ public class CaseStateUtils {
     }
 
     public static boolean shouldMoveToInMediationState(CaseData caseData, boolean carmEnabled) {
+        if (caseData.isFullAdmitClaimSpec()) {
+            return false;
+        }
         if (carmEnabled && SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
             return caseData.hasApplicantProceededWithClaim()
                 || (caseData.getCaseDataLiP() != null
                 && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()));
         }
-        return false;
+        return (!caseData.isFullAdmitClaimSpec() && caseData.hasDefendantAgreedToFreeMediation() && caseData.hasClaimantAgreedToFreeMediation());
     }
 }
