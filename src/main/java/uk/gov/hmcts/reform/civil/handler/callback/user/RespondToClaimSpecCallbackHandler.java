@@ -89,6 +89,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -138,6 +139,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferencesSpec;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
@@ -1447,6 +1449,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
+        updatedData.caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
+
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && ifResponseTypeIsPartOrFullAdmission(caseData)) {
@@ -1466,8 +1470,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent1ResponseDate() != null) {
+                LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
                 updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate));
+                    .applicant1ResponseDeadline(applicant1ResponseDeadline)
+                    .nextDeadline(applicant1ResponseDeadline.toLocalDate());
             }
 
             // 1v1, 2v1
@@ -1482,9 +1488,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
+            boolean nextDeadlineRespondent2 = NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                && isNull(caseData.getRespondent2ResponseDate());
+            LocalDateTime applicant1ResponseDeadline = getApplicant1ResponseDeadline(responseDate);
+            LocalDate respondent2Deadline = nonNull(caseData.getRespondent2ResponseDeadline())
+                ? caseData.getRespondent2ResponseDeadline().toLocalDate()
+                : caseData.getRespondent1ResponseDeadline().toLocalDate();
+
+            LocalDate nextDeadline = nextDeadlineRespondent2
+                ? respondent2Deadline
+                : applicant1ResponseDeadline.toLocalDate();
+
             updatedData
                 .respondent1ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
+                .applicant1ResponseDeadline(applicant1ResponseDeadline)
+                .nextDeadline(nextDeadline)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
@@ -1518,6 +1536,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
+
         if (solicitorHasCaseRole(callbackParams, respondentTwoCaseRoleToCheck)
             && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
