@@ -1224,6 +1224,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isRespondentTwoSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent2OrgRegistered());
+    }
+
+    @JsonIgnore
     public String getRespondent1Email() {
         if (isRespondent1NotRepresented()) {
             return getRespondent1().getPartyEmail();

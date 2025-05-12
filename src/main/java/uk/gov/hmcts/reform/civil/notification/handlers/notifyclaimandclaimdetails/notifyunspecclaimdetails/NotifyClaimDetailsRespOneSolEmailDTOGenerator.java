@@ -1,0 +1,55 @@
+package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetails.notifyunspecclaimdetails;
+
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+
+import java.util.Map;
+import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+
+public class NotifyClaimDetailsRespOneSolEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+
+    private final NotifyClaimDetailsHelper notifyClaimDetailsHelper;
+
+    public NotifyClaimDetailsRespOneSolEmailDTOGenerator(OrganisationService organisationService,
+                                              NotifyClaimDetailsHelper notifyClaimDetailsHelper) {
+        super(organisationService);
+        this.notifyClaimDetailsHelper = notifyClaimDetailsHelper;
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData) {
+        return notifyClaimDetailsHelper.getEmailTemplate();
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return NotifyClaimDetailsHelper.REFERENCE_TEMPLATE;
+    }
+
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.putAll(notifyClaimDetailsHelper.getCustomProperties(caseData));
+        return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        String respondentName = Optional.ofNullable(caseData.getRespondent1())
+            .map(Party::getPartyName)
+            .orElse(null);
+
+        if (!caseData.isRespondentSolicitorRegistered()) {
+            return false;
+        }
+
+        if (isOneVTwoTwoLegalRep(caseData)) {
+            return notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
+        }
+
+        return true;
+    }
+}
