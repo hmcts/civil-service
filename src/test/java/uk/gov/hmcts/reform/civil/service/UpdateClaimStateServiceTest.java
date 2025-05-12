@@ -305,7 +305,7 @@ class UpdateClaimStateServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true","false"})
+    @CsvSource({"true", "false"})
     void shouldNotChangeCaseState_whenHaveFullAdmissionFromRespondent(boolean carmEnabled) {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(carmEnabled);
         //Given
@@ -325,7 +325,7 @@ class UpdateClaimStateServiceTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"true","false"})
+    @CsvSource({"true", "false"})
     void shouldChangeCaseState_whenApplicantAgreeClaimSettlement(boolean carmEnabled) {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(carmEnabled);
         //Given
