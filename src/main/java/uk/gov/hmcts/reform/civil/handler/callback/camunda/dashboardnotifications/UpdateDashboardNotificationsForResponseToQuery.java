@@ -66,12 +66,10 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
     private CallbackResponse createDashboardNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String queryId = processVariables.getQueryId();
         log.info("queryid " + queryId);
-        ScenarioRequestParams
-            notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+
         if (queryId == null) {
             queryId = caseData.getQmLatestQuery().getQueryId();
         }
@@ -87,6 +85,9 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         log.info("getQmApplicantCitizenQueries " + notnull);
         boolean size = caseData.getQmApplicantCitizenQueries().getCaseMessages().size() == 1;
         log.info("getCaseMessages " + size);
+        ScenarioRequestParams
+            notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (isLIPClaimant(roles) && notnull
             && size) {
             dashboardScenariosService.recordScenarios(
