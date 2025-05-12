@@ -27,8 +27,7 @@ public class UpdateClaimStateService {
         if (shouldNotChangeStateMinti(updatedData)) {
             return updatedData.getCcdState().name();
         } else if (shouldMoveToInMediationState(updatedData,
-                                         featureToggleService.isCarmEnabledForCase(updatedData))
-            || (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation())) {
+                                         featureToggleService.isCarmEnabledForCase(updatedData))) {
             return CaseState.IN_MEDIATION.name();
         } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
