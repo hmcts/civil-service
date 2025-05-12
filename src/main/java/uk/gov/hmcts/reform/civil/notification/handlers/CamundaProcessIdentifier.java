@@ -5,5 +5,7 @@ public enum CamundaProcessIdentifier {
     LitigationFriendAddedNotifier,
     ChangeOfRepresentationNotifyParties,
     //NoC - Lip v Lip to LR v Lip
-    ClaimantLipRepresentedWithNoCNotifier
+    ClaimantLipRepresentedWithNoCNotifier,
+    //NoC - Lip v Lip to Lip v Lr or Lr v Lip to Lr v Lr
+    DefendantLipRepresentedWithNoCNotifier
 }
