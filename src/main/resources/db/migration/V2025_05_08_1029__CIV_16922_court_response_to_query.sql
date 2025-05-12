@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA6.LiPQM.QueryResponded.Claimant', '{"Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant","Notice.AAA6.LiPQM.NoC.AllOpenQueriesClosed.Claimant","Notice.AAA6.LiPQM.QueryResponded.Claimant"}', '{"Notice.AAA6.LiPQM.QueryResponded.Claimant": []}'),
+VALUES ('Scenario.AAA6.LiPQM.QueryResponded.Claimant', '{"Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant","Notice.AAA6.LiPQM.NoC.AllOpenQueriesClosed.Claimant"}', '{"Notice.AAA6.LiPQM.QueryResponded.Claimant": []}'),
        ('Scenario.AAA6.LiPQM.QueryResponded.Defendant', '{"Notice.AAA6.LiPQM.QueryResponded.Defendant","Notice.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant","Notice.AAA6.LiPQM.NoC.AllOpenQueriesClosed.Defendant"}', '{"Notice.AAA6.LiPQM.QueryResponded.Defendant": []}');
 
 /**
