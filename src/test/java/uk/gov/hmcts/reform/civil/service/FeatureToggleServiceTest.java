@@ -162,8 +162,13 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
     }
 
-    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive() {
-        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(false);
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
+        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
+        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
+
+        assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -260,6 +265,16 @@ class FeatureToggleServiceTest {
         boolean result = featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(location);
 
         assertEquals(expected, result);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
+        when(featureToggleService.isJudgmentOnlineLive())
+            .thenReturn(toggleStat);
+        when(featureToggleService.isJOLiveFeedActive())
+            .thenReturn(toggleStat);
+        assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest

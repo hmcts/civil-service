@@ -494,6 +494,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgment);
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            log.info("--- Checking judgment on DefaultJudgmentSpecHandler");
             caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());

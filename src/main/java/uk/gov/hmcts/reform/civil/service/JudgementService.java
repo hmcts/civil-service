@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JudgementService {
@@ -26,6 +28,7 @@ public class JudgementService {
     private final FeatureToggleService featureToggleService;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
+        log.info("---Checking judgment details");
         return CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
             .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))

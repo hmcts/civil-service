@@ -68,7 +68,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJudgmentOnlineLive() {
-        return false;
+        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
     }
 
     public boolean isCjesServiceAvailable() {

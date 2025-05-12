@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT_NOTIFICATION;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecordJudgmentCallbackHandler extends CallbackHandler {
@@ -102,6 +104,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         }
         caseData.setActiveJudgment(recordJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        log.info("--- Checking judgment on RecordJudgmentCallbackHandler");
         caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment(), interest));
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();

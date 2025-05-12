@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSIO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends CallbackHandler {
@@ -142,6 +144,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
 
             BigDecimal interest = interestCalculator.calculateInterest(data);
+            log.info("--- Checking judgment on RequestJudgmentByAdmissionForSpecCui");
             caseDataBuilder
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
