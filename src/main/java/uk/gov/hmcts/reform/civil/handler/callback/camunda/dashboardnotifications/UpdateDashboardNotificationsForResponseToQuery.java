@@ -83,7 +83,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         log.info("is lip" + isLIPClaimant(roles));
         boolean notnull = caseData.getQmApplicantCitizenQueries() != null;
         log.info("getQmApplicantCitizenQueries " + notnull);
-        boolean size = caseData.getQmApplicantCitizenQueries().getCaseMessages().size() == 1;
+        boolean size = caseData.getQmApplicantCitizenQueries().getCaseMessages().size() > 0;
         log.info("getCaseMessages " + size);
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
@@ -98,7 +98,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
             );
         }
         if (isLIPDefendant(roles) && caseData.getQmRespondentCitizenQueries() != null
-            && caseData.getQmRespondentCitizenQueries().getCaseMessages().size() == 1) {
+            && caseData.getQmRespondentCitizenQueries().getCaseMessages().size() > 0) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT.getScenario(),
