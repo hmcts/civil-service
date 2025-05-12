@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +49,16 @@ class UploadTranslatedDocumentDefaultStrategyTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private AssignCategoryId assignCategoryId;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
-                                                                                              objectMapper, featureToggleService);
+                                                                                              objectMapper, assignCategoryId,
+                                                                                              featureToggleService);
     }
 
     @Test

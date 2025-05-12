@@ -17,14 +17,14 @@ import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
 @RequiredArgsConstructor
@@ -32,6 +32,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final ObjectMapper objectMapper;
+    private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
 
     @Override
@@ -62,7 +63,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslatedDocuments = caseData.getPreTranslationDocuments();
-        List<Element<CaseDocument>> preTranslatedDocumentsCopy = new ArrayList<>(caseData.getPreTranslationDocuments());
         List<Element<CaseDocument>> sdoOrderDocuments = caseData.getPreTranslationSdoOrderDocuments();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
@@ -72,12 +72,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     systemGeneratedDocuments.add(originalSdo);
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
-                    Element<CaseDocument> originalDocumentCopy = preTranslatedDocumentsCopy.remove(0);
+
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-                    if (originalDocumentCopy.getValue().getDocumentName().contains("claimant")) {
-                        originalDocumentCopy.setId(UUID.randomUUID());
-                        originalDocumentCopy.getValue().getDocumentLink().setCategoryID(DocCategory.APP1_DQ.getValue());
-                        systemGeneratedDocuments.add(originalDocumentCopy);
+                    if (originalDocument.getValue().getDocumentName().contains("claimant")) {
+                        CaseDocument claimantSealedCopy = CaseDocument.toCaseDocument(originalDocument.getValue().getDocumentLink(),
+                                                                                originalDocument.getValue().getDocumentType());
+                        systemGeneratedDocuments.add(element(claimantSealedCopy));
+                        assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
                     }
                     systemGeneratedDocuments.add(originalDocument);
                 }
