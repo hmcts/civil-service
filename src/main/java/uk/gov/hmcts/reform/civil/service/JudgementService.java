@@ -140,6 +140,12 @@ public class JudgementService {
     }
 
     private boolean isJOFullAdmitRepaymentPlan(CaseData caseData) {
-        return caseData.isFullAdmitClaimSpec() && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
+        return caseData.isFullAdmitClaimSpec()
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+            && isLRvLR(caseData);
+    }
+
+    private boolean isLRvLR(CaseData caseData) {
+        return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
     }
 }

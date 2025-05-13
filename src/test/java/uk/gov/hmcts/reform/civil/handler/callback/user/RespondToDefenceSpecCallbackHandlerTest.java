@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
@@ -2581,9 +2582,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             BigDecimal interestAmount = BigDecimal.valueOf(100);
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
+                .fixedCosts(FixedCosts.builder()
+                                .claimFixedCosts(YesOrNo.YES)
+                                .fixedCostAmount("10000")
+                                .build())
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
@@ -2598,7 +2603,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
             BigDecimal expectedSubTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()).add(BigDecimal.valueOf(100));
             assertThat(subTotal).isEqualTo(expectedSubTotal);
 
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
