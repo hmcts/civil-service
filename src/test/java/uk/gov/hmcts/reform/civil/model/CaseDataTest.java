@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -45,7 +50,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
@@ -61,9 +69,129 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+@ExtendWith(MockitoExtension.class)
 class CaseDataTest {
 
     private static final BigDecimal CLAIM_FEE = new BigDecimal(2000);
+
+    @Mock
+    private Party mockApplicant1;
+
+    @Mock
+    private IdamUserDetails mockClaimantUserDetails;
+
+    @Mock
+    private IdamUserDetails mockApplicantSolicitor1UserDetails;
+
+    @Spy // Using @Spy to test a real method of CaseData while mocking its dependencies
+    private CaseData caseDataSpy = CaseDataBuilder.builder().build();
+
+    @Test
+    @DisplayName("Should return Applicant1's party email when available")
+    void shouldReturnApplicant1PartyEmail_whenPresent() {
+        String expectedEmail = "applicant1@example.com";
+        when(mockApplicant1.getPartyEmail()).thenReturn(expectedEmail);
+        doReturn(mockApplicant1).when(caseDataSpy).getApplicant1();
+
+        String actualEmail = caseDataSpy.getApplicant1Email();
+
+        assertEquals(expectedEmail, actualEmail);
+    }
+
+    @Test
+    @DisplayName("Should return ClaimantUserDetails email if Applicant1's party email is null")
+    void shouldReturnClaimantUserDetailsEmail_whenApplicant1EmailIsNull() {
+        String expectedEmail = "claimant@example.com";
+        when(mockApplicant1.getPartyEmail()).thenReturn(null);
+        doReturn(mockApplicant1).when(caseDataSpy).getApplicant1();
+
+        when(mockClaimantUserDetails.getEmail()).thenReturn(expectedEmail);
+        doReturn(mockClaimantUserDetails).when(caseDataSpy).getClaimantUserDetails();
+
+        String actualEmail = caseDataSpy.getApplicant1Email();
+
+        assertEquals(expectedEmail, actualEmail);
+    }
+
+    @Test
+    @DisplayName("Should return SolicitorUserDetails email if Applicant1 and Claimant emails are null")
+    void shouldReturnSolicitorEmail_whenApplicantAndClaimantEmailsAreNull() {
+        String expectedEmail = "solicitor@example.com";
+        when(mockApplicant1.getPartyEmail()).thenReturn(null);
+        doReturn(mockApplicant1).when(caseDataSpy).getApplicant1();
+
+        // Scenario 1: ClaimantUserDetails object is null
+        doReturn(null).when(caseDataSpy).getClaimantUserDetails();
+
+        when(mockApplicantSolicitor1UserDetails.getEmail()).thenReturn(expectedEmail);
+        doReturn(mockApplicantSolicitor1UserDetails).when(caseDataSpy).getApplicantSolicitor1UserDetails();
+
+        String actualEmail = caseDataSpy.getApplicant1Email();
+
+        assertEquals(expectedEmail, actualEmail);
+    }
+
+    @Test
+    @DisplayName("Should return SolicitorUserDetails email if Applicant1 email is null and ClaimantUserDetails has null email")
+    void shouldReturnSolicitorEmail_whenApplicantEmailIsNullAndClaimantUserDetailsHasNullEmail() {
+        String expectedEmail = "solicitor@example.com";
+        when(mockApplicant1.getPartyEmail()).thenReturn(null);
+        doReturn(mockApplicant1).when(caseDataSpy).getApplicant1();
+
+        // Scenario 2: ClaimantUserDetails object exists but its email is null
+        when(mockClaimantUserDetails.getEmail()).thenReturn(null);
+        doReturn(mockClaimantUserDetails).when(caseDataSpy).getClaimantUserDetails();
+
+        when(mockApplicantSolicitor1UserDetails.getEmail()).thenReturn(expectedEmail);
+        doReturn(mockApplicantSolicitor1UserDetails).when(caseDataSpy).getApplicantSolicitor1UserDetails();
+
+        String actualEmail = caseDataSpy.getApplicant1Email();
+
+        assertEquals(expectedEmail, actualEmail);
+    }
+
+    @Test
+    @DisplayName("Should return null if all email sources are null or empty")
+    void shouldReturnNull_whenAllEmailSourcesAreNullOrEmpty() {
+        when(mockApplicant1.getPartyEmail()).thenReturn(null);
+        doReturn(mockApplicant1).when(caseDataSpy).getApplicant1();
+
+        // ClaimantUserDetails object exists but its email is null
+        when(mockClaimantUserDetails.getEmail()).thenReturn(null);
+        doReturn(mockClaimantUserDetails).when(caseDataSpy).getClaimantUserDetails();
+
+        // ApplicantSolicitor1UserDetails object exists but its email is null
+        when(mockApplicantSolicitor1UserDetails.getEmail()).thenReturn(null);
+        doReturn(mockApplicantSolicitor1UserDetails).when(caseDataSpy).getApplicantSolicitor1UserDetails();
+
+        String actualEmail = caseDataSpy.getApplicant1Email();
+
+        assertNull(actualEmail);
+    }
+
+    @Test
+    @DisplayName("Should return null if all user detail objects themselves are null")
+    void shouldReturnNull_whenAllUserDetailsObjectsAreNull() {
+        when(mockApplicant1.getPartyEmail()).thenReturn(null); // Applicant1 exists, but email is null
+        doReturn(mockApplicant1).when(caseDataSpy).getApplicant1();
+
+        doReturn(null).when(caseDataSpy).getClaimantUserDetails(); // ClaimantUserDetails object is null
+        doReturn(null).when(caseDataSpy).getApplicantSolicitor1UserDetails(); // ApplicantSolicitor1UserDetails object is null
+
+        String actualEmail = caseDataSpy.getApplicant1Email();
+
+        assertNull(actualEmail);
+    }
+
+    @Test
+    @DisplayName("Should throw NullPointerException if getApplicant1() returns null (due to .getPartyEmail() call)")
+    void shouldThrowNPE_whenGetApplicant1ReturnsNull() {
+        doReturn(null).when(caseDataSpy).getApplicant1();
+
+        assertThrows(NullPointerException.class, () -> {
+            caseDataSpy.getApplicant1Email();
+        }, "Expected NullPointerException because getApplicant1().getPartyEmail() will be invoked on a null Applicant object");
+    }
 
     @Test
     void applicant1Proceed_when1v1() {
