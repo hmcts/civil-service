@@ -23,15 +23,22 @@ import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 @Service
 @RequiredArgsConstructor
@@ -86,8 +93,35 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             .changeOfRepresentation(getChangeOfRepresentation(
                 callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
+        copyCitizenQueryIntoLrCollection(updatedCaseDataBuilder, caseRole);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
+    }
+
+    private void copyCitizenQueryIntoLrCollection(CaseData.CaseDataBuilder<?,?> updatedCaseDataBuilder, String caseRole) {
+        CaseData caseData = updatedCaseDataBuilder.build();
+        if (isApplicant(caseRole) && nonNull(caseData.getQmApplicantCitizenQueries())) {
+            updatedCaseDataBuilder.qmApplicantSolicitorQueries(caseData.getQmApplicantCitizenQueries());
+        }
+        if (Objects.equals(getRespondentSol(caseRole), RESPONDENTSOLICITORONE) && nonNull(caseData.getQmRespondentCitizenQueries())) {
+            updatedCaseDataBuilder.qmRespondentSolicitor1Queries(caseData.getQmRespondentCitizenQueries());
+        }
+        if (Objects.equals(getRespondentSol(caseRole), RESPONDENTSOLICITORTWO) && nonNull(caseData.getQmRespondentCitizenQueries())) {
+            updatedCaseDataBuilder.qmRespondentSolicitor2Queries(caseData.getQmRespondentCitizenQueries());
+        }
+    }
+
+    private CaseRole getRespondentSol(String caseRole) {
+        if (isApplicant(caseRole)) {
+            return null;
+        }
+        if (isRespondentSolicitorOne(Collections.singletonList(caseRole))) {
+            return RESPONDENTSOLICITORONE;
+        } else if (isRespondentSolicitorTwo(Collections.singletonList(caseRole))) {
+            return RESPONDENTSOLICITORTWO;
+        }
+        return null;
     }
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
@@ -187,7 +221,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
                 if (respondent1OrganisationIDCopy != null) {
                     return respondent1OrganisationIDCopy;
                 }
-            } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+            } else if (caseRole.equals(RESPONDENTSOLICITORTWO.getFormattedName())) {
                 String respondent2OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
                     "respondent2OrganisationIDCopy"), String.class);
                 if (respondent2OrganisationIDCopy != null) {
@@ -201,7 +235,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private void setAddLegalRepDeadlinesToNull(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, String caseRole) {
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
             updatedCaseDataBuilder.addLegalRepDeadlineRes1(null);
-        } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
+        } else if (RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
             updatedCaseDataBuilder.addLegalRepDeadlineRes2(null);
         }
     }
@@ -212,7 +246,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
             return caseData.getRespondentSolicitor1EmailAddress();
-        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+        } else if (caseRole.equals(RESPONDENTSOLICITORTWO.getFormattedName())) {
             return caseData.getRespondentSolicitor2EmailAddress();
         }
         return null;
@@ -255,7 +289,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
                     if (respondent1OrganisationIDCopy != null) {
                         return respondent1OrganisationIDCopy;
                     }
-                } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+                } else if (caseRole.equals(RESPONDENTSOLICITORTWO.getFormattedName())) {
                     String respondent2OrganisationIDCopy = caseData.getRespondent2OrganisationIDCopy();
                     if (respondent2OrganisationIDCopy != null) {
                         return respondent2OrganisationIDCopy;
