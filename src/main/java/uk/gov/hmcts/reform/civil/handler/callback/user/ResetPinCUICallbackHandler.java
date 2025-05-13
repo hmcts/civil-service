@@ -10,8 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.resetpin.ResetPinDefendantLipNotifier;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
 import java.util.List;
@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 public class ResetPinCUICallbackHandler extends CallbackHandler {
 
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    private final ResetPinDefendantLipNotifier resetPinDefendantLipNotifier;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -47,11 +48,19 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
     private CallbackResponse resetPinExpiryDate(CallbackParams callbackParams) {
         CaseData updatedCase = callbackParams.getCaseData().toBuilder()
             .respondent1PinToPostLRspec(defendantPinToPostLRspecService
-                                            .resetPinExpiryDate(callbackParams
-                                                                    .getCaseData()
-                                                                    .getRespondent1PinToPostLRspec()))
-            .businessProcess(BusinessProcess.ready(RESET_PIN))
+                .resetPinExpiryDate(callbackParams
+                    .getCaseData()
+                    .getRespondent1PinToPostLRspec()))
+
             .build();
+        List<String> errors = resetPinDefendantLipNotifier.notifyParties(updatedCase);
+
+        if (!errors.isEmpty()) {
+            log.error("Error sending notification: {}", errors);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCase.toMap(objectMapper))
