@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.RAISE_QUERY_LR;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Component
+@Slf4j
 public class TemplateCommonPropertiesHelper {
 
     public static final Set<CaseState> qmNotAllowedStates = EnumSet.of(PENDING_CASE_ISSUED, CLOSED,
@@ -69,6 +71,9 @@ public class TemplateCommonPropertiesHelper {
     }
 
     public boolean isQueryManagementAllowedForLRCase(CaseData caseData) {
+        log.info("featureToggleService.isQueryManagementLRsEnabled() " + featureToggleService.isQueryManagementLRsEnabled());
+        log.info("!queryNotAllowedCaseStates(caseData)" + !queryNotAllowedCaseStates(caseData));
+        log.info("!caseData.isLipCase()" + !caseData.isLipCase());
         return featureToggleService.isQueryManagementLRsEnabled()
             && !queryNotAllowedCaseStates(caseData)
             && !caseData.isLipCase();

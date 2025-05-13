@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 public class NotificationUtils {
 
     private NotificationUtils() {
@@ -302,6 +304,9 @@ public class NotificationUtils {
     public static Map<String, String> addSpecAndUnspecContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isLRQmEnabled) {
+        log.info("isLRQmEnabled " + isLRQmEnabled);
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("!caseData.isLipCase() " + !caseData.isLipCase());
         if (isLRQmEnabled && !queryNotAllowedCaseStates(caseData) && !caseData.isLipCase()) {
             properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
         } else {
@@ -313,6 +318,9 @@ public class NotificationUtils {
     public static Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isLRQmEnabled) {
+        log.info("isLRQmEnabled " + isLRQmEnabled);
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("!caseData.isLipCase() " + !caseData.isLipCase());
         if (isLRQmEnabled && !queryNotAllowedCaseStates(caseData) && !caseData.isLipCase()) {
             properties.put(CNBC_CONTACT, RAISE_QUERY_LR);
         } else {
