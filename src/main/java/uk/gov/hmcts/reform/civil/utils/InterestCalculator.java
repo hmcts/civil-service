@@ -22,7 +22,6 @@ import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 
-@Slf4j
 @Component
 @NoArgsConstructor
 public class InterestCalculator {
@@ -32,7 +31,6 @@ public class InterestCalculator {
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
 
     public BigDecimal calculateInterestForJO(CaseData caseData) {
-        log.info("To date {}", getToDateForJO(caseData));
         return this.calculateInterest(caseData, getToDateForJO(caseData));
     }
 
@@ -43,9 +41,7 @@ public class InterestCalculator {
     private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
-            log.info("Claim Interest YES");
             if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
-                log.info("Same rate interest");
                 if (caseData.getSameRateInterestSelection().getSameRateInterestType()
                     .equals(SameRateInterestType.SAME_RATE_INTEREST_8_PC)) {
                     interestAmount = calculateInterestAmount(caseData, EIGHT_PERCENT_INTEREST_RATE, interestToDate);
@@ -59,18 +55,14 @@ public class InterestCalculator {
                 interestAmount = caseData.getBreakDownInterestTotal();
             }
         }
-        log.info("Final interest amount {}", interestAmount);
         return interestAmount;
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
         if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)) {
-            log.info("From claim submit date");
             LocalDate interestFromDate = getSubmittedDate(caseData);
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
         } else if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_A_SPECIFIC_DATE)) {
-            log.info("From specific date {} {} {} {}", caseData.getTotalClaimAmount(), interestRate,
-                     caseData.getInterestFromSpecificDate(), interestToDate);
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
                 caseData.getInterestFromSpecificDate(), interestToDate);
         }
@@ -98,7 +90,6 @@ public class InterestCalculator {
     protected BigDecimal calculateInterestByDate(BigDecimal claimAmount, BigDecimal interestRate, LocalDate
         interestFromSpecificDate, LocalDate interestToSpecificDate) {
         long numberOfDays = getNumberOfDays(interestFromSpecificDate, interestToSpecificDate);
-        log.info("number of days {}", numberOfDays);
         BigDecimal interestPerDay = getInterestPerDay(claimAmount, interestRate);
         return interestPerDay.multiply(BigDecimal.valueOf(numberOfDays));
     }
@@ -115,7 +106,6 @@ public class InterestCalculator {
             = claimAmount.multiply(interestRate.divide(HUNDRED));
         BigDecimal interestPerDay = interestForAYear.divide(NUMBER_OF_DAYS_IN_YEAR, TO_FULL_PENNIES,
             RoundingMode.HALF_UP);
-        log.info("Interest per day");
         return interestPerDay;
     }
 

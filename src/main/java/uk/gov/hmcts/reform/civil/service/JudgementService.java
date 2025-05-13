@@ -60,11 +60,9 @@ public class JudgementService {
 
     public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (isJOFullAdmitRepaymentPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData)) {
             BigDecimal interest = interestCalculator.calculateInterestForJO(caseData);
-            log.info("Interest added to claim amount {}", interest.toString());
             claimAmount = claimAmount.add(interest);
-            log.info("Claim amount {}", claimAmount.toString());
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
@@ -89,7 +87,7 @@ public class JudgementService {
     }
 
     private BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
-        if (isJOFullAdmitRepaymentPlan(caseData)
+        if (isLrFullAdmitRepaymentPlan(caseData)
             && nonNull(caseData.getFixedCosts())
             && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
             BigDecimal claimIssueFixedCost = MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
@@ -106,8 +104,7 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        if (isJOFullAdmitRepaymentPlan(caseData)) {
-            log.info("Adding interest from claim amount");
+        if (isLrFullAdmitRepaymentPlan(caseData)) {
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentFixedCost(caseData));
@@ -134,15 +131,16 @@ public class JudgementService {
             return JUDGEMENT_BY_COURT;
         } else {
             return String.format(
-                isJOFullAdmitRepaymentPlan(caseData)
+                isLrFullAdmitRepaymentPlan(caseData)
                     ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
         }
     }
 
-    private boolean isJOFullAdmitRepaymentPlan(CaseData caseData) {
+    private boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
         return caseData.isFullAdmitClaimSpec()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-            && isLRvLR(caseData);
+            && isLRvLR(caseData)
+            && featureToggleService.isLrAdmissionBulkEnabled();
     }
 
     private boolean isLRvLR(CaseData caseData) {
