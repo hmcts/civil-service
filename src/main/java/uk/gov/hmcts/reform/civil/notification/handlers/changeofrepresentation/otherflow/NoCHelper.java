@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class NoCHelper {
     private final OrganisationService organisationService;
 
     public Map<String, String> getProperties(CaseData caseData, boolean isOtherSolicitor2) {
-        return Map.of(
+        return new HashMap<>(Map.of(
             CASE_NAME, NotificationHelper.getCaseName(caseData),
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
@@ -53,7 +54,7 @@ public class NoCHelper {
             OTHER_SOL_NAME, getOtherSolicitorOrgName(caseData, isOtherSolicitor2),
             LEGAL_REP_NAME_WITH_SPACE, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             REFERENCE, caseData.getCcdCaseReference().toString()
-        );
+        ));
     }
 
     public Map<String, String> getClaimantLipProperties(CaseData caseData) {
