@@ -128,7 +128,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             } else if (Objects.nonNull(translatedDocuments)
                 && ((translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT))
                 || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION)))) {
-                return null;
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
             }
         }
 
