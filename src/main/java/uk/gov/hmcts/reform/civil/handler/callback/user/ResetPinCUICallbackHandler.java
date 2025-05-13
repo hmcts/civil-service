@@ -56,7 +56,7 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
         List<String> errors = resetPinDefendantLipNotifier.notifyParties(updatedCase);
 
         if (!errors.isEmpty()) {
-            log.error("Error sending notification: {}", errors);
+            log.error("Error sending notification for case id {} : {}", updatedCase.getCcdCaseReference(), errors);
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
