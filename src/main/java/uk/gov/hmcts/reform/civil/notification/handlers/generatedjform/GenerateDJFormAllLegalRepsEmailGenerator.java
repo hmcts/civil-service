@@ -30,7 +30,6 @@ public class GenerateDJFormAllLegalRepsEmailGenerator implements PartiesEmailGen
 
     private final GenerateDJFormHelper generateDJFormHelper;
 
-
     @Override
     public Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
