@@ -326,6 +326,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(expert.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
             assertThat(witness.getDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate());
             assertThat(witness.getEventAdded()).isEqualTo(DEFENDANT_RESPONSE_EVENT.getValue());
+            assertThat(updatedCaseData.getNextDeadline()).isEqualTo(respondToDeadline.toLocalDate());
         }
 
         @ParameterizedTest
