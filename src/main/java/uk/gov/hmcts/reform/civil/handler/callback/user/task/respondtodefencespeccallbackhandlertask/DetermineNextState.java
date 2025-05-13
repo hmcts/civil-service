@@ -41,7 +41,7 @@ public class DetermineNextState  {
             && isOneVOne(caseData)) {
 
             log.debug("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
-            if (caseData.hasClaimantAgreedToFreeMediation()) {
+            if (!caseData.isFullAdmitClaimSpec() && caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
                 Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, builder, businessProcess);
