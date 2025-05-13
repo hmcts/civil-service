@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.UnspecNotifyClaimNotifier;
 
 @Component
-public class NotifyClaimDetailsAllPartiesNotifier extends Notifier {
+public class NotifyClaimAllPartiesNotifier extends Notifier {
 
-    public NotifyClaimDetailsAllPartiesNotifier(NotificationService notificationService,
+    public NotifyClaimAllPartiesNotifier(NotificationService notificationService,
                                                 CaseTaskTrackingService caseTaskTrackingService,
                                                 NotifyClaimAllPartiesEmailGenerator allPartiesEmailGenerator) {
         super(notificationService, caseTaskTrackingService, allPartiesEmailGenerator);
@@ -20,5 +20,4 @@ public class NotifyClaimDetailsAllPartiesNotifier extends Notifier {
     public String getTaskId() {
         return UnspecNotifyClaimNotifier.toString();
     }
-
 }
