@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetails.notifyunspecclaim;
+package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetails.notifyunspecclaimdetails;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,16 +24,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
-class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
+class NotifyClaimDetailsRespSolTwoEmailDTOGeneratorTest {
 
     @Mock
     private OrganisationService organisationService;
 
     @Mock
-    private NotifyClaimHelper notifyClaimHelper;
+    private NotifyClaimDetailsHelper notifyClaimDetailsHelper;
 
     @InjectMocks
-    private NotifyClaimRespSolTwoEmailDTOGenerator generator;
+    private NotifyClaimDetailsRespSolTwoEmailDTOGenerator generator;
 
     private CaseData caseData;
 
@@ -44,7 +45,7 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateId() {
         String templateId = "email-template-123";
-        when(notifyClaimHelper.getEmailTemplate()).thenReturn(templateId);
+        when(notifyClaimDetailsHelper.getEmailTemplate()).thenReturn(templateId);
 
         String result = generator.getEmailTemplateId(caseData);
 
@@ -53,7 +54,7 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectReferenceTemplate() {
-        assertEquals("notify-claim-notification-%s", generator.getReferenceTemplate());
+        assertEquals(NotifyClaimDetailsHelper.REFERENCE_TEMPLATE, generator.getReferenceTemplate());
     }
 
     @Test
@@ -61,7 +62,7 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
         Map<String, String> base = new HashMap<>();
         Map<String, String> custom = Map.of("key", "value");
 
-        when(notifyClaimHelper.getCustomProperties(caseData)).thenReturn(custom);
+        when(notifyClaimDetailsHelper.getCustomProperties(caseData)).thenReturn(custom);
 
         Map<String, String> result = generator.addCustomProperties(base, caseData);
 
@@ -77,8 +78,8 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
         when(caseData.getRespondent2()).thenReturn(respondent2);
 
         try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
-            scenario.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-            when(notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, "respondent 2 name")).thenReturn(true);
+            scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
+            when(notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, "respondent 2 name")).thenReturn(true);
 
             boolean result = generator.getShouldNotify(caseData);
 
@@ -89,7 +90,7 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnFalseWhenNotMultiparty() {
         try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
-            scenario.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
+            scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
 
             boolean result = generator.getShouldNotify(caseData);
 
@@ -102,7 +103,7 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
         when(caseData.isRespondentTwoSolicitorRegistered()).thenReturn(false);
 
         try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
-            scenario.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
+            scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
 
             boolean result = generator.getShouldNotify(caseData);
 
@@ -111,13 +112,13 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnFalseWhenRespondentNameIsNull() {
+    void shouldReturnFalseWhenRespondentTwoNameIsNull() {
         when(caseData.isRespondentTwoSolicitorRegistered()).thenReturn(true);
         when(caseData.getRespondent2()).thenReturn(null);
 
         try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
-            scenario.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-            when(notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, null)).thenReturn(false);
+            scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
+            when(notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, null)).thenReturn(false);
 
             boolean result = generator.getShouldNotify(caseData);
 
