@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
+import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
@@ -88,6 +89,14 @@ public class JudgementService {
     }
 
     private BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
+        if (isJOFullAdmitRepaymentPlan(caseData)
+            && nonNull(caseData.getFixedCosts())
+            && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            BigDecimal claimIssueFixedCost = MonetaryConversions.penniesToPounds(BigDecimal.valueOf(
+                Integer.parseInt(caseData.getFixedCosts().getFixedCostAmount())));
+            return caseData.getUpFixedCostAmount(ccjJudgmentClaimAmount(caseData))
+                .add(claimIssueFixedCost);
+        }
         return caseData.getUpFixedCostAmount(ccjJudgmentClaimAmount(caseData));
     }
 
