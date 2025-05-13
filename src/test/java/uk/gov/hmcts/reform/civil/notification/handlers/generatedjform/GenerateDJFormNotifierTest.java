@@ -14,7 +14,6 @@ class GenerateDJFormNotifierTest extends NotifierTestBase {
     @Test
     void shouldReturnCorrectTaskId() {
         String taskId = notifier.getTaskId();
-        assertThat(taskId).isEqualTo("GenerateDJForm");
+        assertThat(taskId).isEqualTo("GenerateDJFormNotifyParties");
     }
-
 }

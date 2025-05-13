@@ -4,14 +4,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,32 +24,38 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 class GenerateDJFormApprovedAppSolOneEmailDTOGeneratorTest {
 
     public static final String TEMPLATE_ID = "template-id";
+    protected static final String APPLICANT_LEGAL_ORG_NAME = "Test Legal Org";
 
     private GenerateDJFormApprovedAppSolOneEmailDTOGenerator generator;
     private NotificationsProperties notificationsProperties;
+    private OrganisationService organisationService;
     private GenerateDJFormHelper generateDJFormHelper;
     private static final String REFERENCE_TEMPLATE_APPROVAL_CLAIMANT = "interim-judgment-approval-notification-%s";
 
     private MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic;
+    private MockedStatic<NotificationUtils> notificationUtilsMockedStatic;
 
     @BeforeEach
     void setUp() {
         notificationsProperties = mock(NotificationsProperties.class);
-        OrganisationService organisationService = mock(OrganisationService.class);
+        organisationService = Mockito.mock(OrganisationService.class);
         generateDJFormHelper = mock(GenerateDJFormHelper.class);
         generator = new GenerateDJFormApprovedAppSolOneEmailDTOGenerator(
             notificationsProperties,
             organisationService,
             generateDJFormHelper
         );
-
         multiPartyScenarioMockedStatic = mockStatic(MultiPartyScenario.class);
+        notificationUtilsMockedStatic = mockStatic(NotificationUtils.class);
     }
 
     @AfterEach
     void tearDown() {
         if (multiPartyScenarioMockedStatic != null) {
             multiPartyScenarioMockedStatic.close();
+        }
+        if (notificationUtilsMockedStatic != null) {
+            notificationUtilsMockedStatic.close();
         }
     }
 
@@ -72,10 +80,13 @@ class GenerateDJFormApprovedAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Map<String, String> properties = new HashMap<>();
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Test Legal Org");
+
         CaseData caseData = mock(CaseData.class);
         Party respondent1 = mock(Party.class);
         Party respondent2 = mock(Party.class);
+
+        notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+            .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
         when(caseData.getCcdCaseReference()).thenReturn(1234567890123456L);
         when(caseData.getRespondent1()).thenReturn(respondent1);
@@ -89,19 +100,21 @@ class GenerateDJFormApprovedAppSolOneEmailDTOGeneratorTest {
 
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-        assertThat(result).containsEntry(LEGAL_REP_CLAIMANT, "Test Legal Org");
-        assertThat(result).containsEntry(CLAIM_NUMBER_INTERIM, "1234567890123456");
-        assertThat(result).containsEntry(DEFENDANT_NAME_INTERIM, "Respondent 2");
+        assertThat(result.get(LEGAL_REP_CLAIMANT)).isEqualTo(APPLICANT_LEGAL_ORG_NAME);
+        assertThat(result.get(CLAIM_NUMBER_INTERIM)).isEqualTo("1234567890123456");
+        assertThat(result.get(DEFENDANT_NAME_INTERIM)).isEqualTo("Respondent 2");
     }
 
     @Test
     void shouldAddCustomPropertiesWhenIf_isOneVTwoTwoLegalRep_ConditionIsFalse() {
         Map<String, String> properties = new HashMap<>();
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Test Legal Org");
 
         CaseData caseData = mock(CaseData.class);
         Party respondent1 = mock(Party.class);
         Party respondent2 = mock(Party.class);
+
+        notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+            .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
         when(caseData.getCcdCaseReference()).thenReturn(1234567890123456L);
         when(caseData.getRespondent1()).thenReturn(respondent1);
@@ -115,7 +128,7 @@ class GenerateDJFormApprovedAppSolOneEmailDTOGeneratorTest {
 
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-        assertThat(result.get(LEGAL_REP_CLAIMANT)).isEqualTo("Test Legal Org");
+        assertThat(result.get(LEGAL_REP_CLAIMANT)).isEqualTo(APPLICANT_LEGAL_ORG_NAME);
         assertThat(result.get(CLAIM_NUMBER_INTERIM)).isEqualTo("1234567890123456");
         assertThat(result.get(DEFENDANT_NAME_INTERIM)).isEqualTo("Respondent 1");
     }
@@ -123,12 +136,13 @@ class GenerateDJFormApprovedAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomPropertiesWhenIf_checkDefendantRequested_ConditionIsFalse() {
         Map<String, String> properties = new HashMap<>();
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Test Legal Org");
 
         CaseData caseData = mock(CaseData.class);
         Party respondent1 = mock(Party.class);
         Party respondent2 = mock(Party.class);
 
+        notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+            .thenReturn(APPLICANT_LEGAL_ORG_NAME);
         when(caseData.getCcdCaseReference()).thenReturn(1234567890123456L);
         when(caseData.getRespondent1()).thenReturn(respondent1);
         when(caseData.getRespondent2()).thenReturn(respondent2);
@@ -141,7 +155,7 @@ class GenerateDJFormApprovedAppSolOneEmailDTOGeneratorTest {
 
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-        assertThat(result.get(LEGAL_REP_CLAIMANT)).isEqualTo("Test Legal Org");
+        assertThat(result.get(LEGAL_REP_CLAIMANT)).isEqualTo(APPLICANT_LEGAL_ORG_NAME);
         assertThat(result.get(CLAIM_NUMBER_INTERIM)).isEqualTo("1234567890123456");
         assertThat(result.get(DEFENDANT_NAME_INTERIM)).isEqualTo("Respondent 1");
     }
