@@ -304,10 +304,8 @@ class UpdateClaimStateServiceTest {
         assertThat(response).isEqualTo(CaseState.IN_MEDIATION.name());
     }
 
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void shouldNotChangeCaseState_whenHaveFullAdmissionFromRespondent(boolean carmEnabled) {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(carmEnabled);
+    @Test
+    void shouldNotChangeCaseState_whenHaveFullAdmissionFromRespondent() {
         //Given
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
