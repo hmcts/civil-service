@@ -258,7 +258,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldNotSetBusinessProcess_WhenDocumentTypeIsInterlocJudgment() {
+    void shouldSetBusinessProcess_WhenDocumentTypeIsInterlocJudgment() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
@@ -295,11 +295,12 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Then
         assertThat(response.getData())
             .extracting("businessProcess")
-            .isNull();
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN.name());
     }
 
     @Test
-    void shouldNotSetBusinessProcess_WhenDocumentTypeIsManualDetermination() {
+    void shouldSetBusinessProcess_WhenDocumentTypeIsManualDetermination() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
@@ -336,6 +337,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Then
         assertThat(response.getData())
             .extracting("businessProcess")
-            .isNull();
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN.name());
     }
 }
