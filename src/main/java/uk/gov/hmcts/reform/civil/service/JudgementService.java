@@ -31,7 +31,7 @@ public class JudgementService {
     private final InterestCalculator interestCalculator;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
-
+        log.info("Creating payment details");
         return CCJPaymentDetails.builder()
             .ccjJudgmentAmountClaimAmount(ccjJudgmentClaimAmount(caseData))
             .ccjJudgmentAmountClaimFee(ccjJudgmentClaimFee(caseData))
@@ -61,7 +61,9 @@ public class JudgementService {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (isJOFullAdmitRepaymentPlan(caseData)) {
             BigDecimal interest = interestCalculator.calculateInterestForJO(caseData);
+            log.info("Interest added to claim amount {}", interest.toString());
             claimAmount = claimAmount.add(interest);
+            log.info("Claim amount {}", claimAmount.toString());
         } else {
             if (caseData.isPartAdmitClaimSpec()) {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
@@ -96,6 +98,7 @@ public class JudgementService {
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
         if (isJOFullAdmitRepaymentPlan(caseData)) {
+            log.info("Adding interest from claim amount");
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentFixedCost(caseData));
@@ -128,6 +131,6 @@ public class JudgementService {
     }
 
     private boolean isJOFullAdmitRepaymentPlan(CaseData caseData) {
-        return caseData.isFullAdmitClaimSpec() && !caseData.isPayImmediately();
+        return caseData.isFullAdmitClaimSpec() && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
     }
 }
