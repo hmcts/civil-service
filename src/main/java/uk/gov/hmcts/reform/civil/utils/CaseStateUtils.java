@@ -21,6 +21,6 @@ public class CaseStateUtils {
                 || (caseData.getCaseDataLiP() != null
                 && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()));
         }
-        return (!caseData.isFullAdmitClaimSpec() && caseData.hasDefendantAgreedToFreeMediation() && caseData.hasClaimantAgreedToFreeMediation());
+        return caseData.hasDefendantAgreedToFreeMediation() && caseData.hasClaimantAgreedToFreeMediation();
     }
 }
