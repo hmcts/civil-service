@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -36,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS =
@@ -70,28 +68,17 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String queryId = processVariables.getQueryId();
-        log.info("queryid " + queryId);
-
         if (queryId == null) {
             queryId = caseData.getQmLatestQuery().getQueryId();
         }
         CaseMessage responseQuery = getQueryById(caseData, queryId);
         String parentQueryId = responseQuery.getParentId();
-        log.info("parentQueryId " + parentQueryId);
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
-        for (String role : roles) {
-            log.info("role " + role);
-        }
-        log.info("is lip" + isLIPClaimant(roles));
-        boolean notnull = caseData.getQmApplicantCitizenQueries() != null;
-        log.info("getQmApplicantCitizenQueries " + notnull);
-        boolean size = caseData.getQmApplicantCitizenQueries().getCaseMessages().size() > 0;
-        log.info("getCaseMessages " + size);
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        if (isLIPClaimant(roles) && notnull
-            && size) {
+        if (isLIPClaimant(roles) && caseData.getQmApplicantCitizenQueries() != null
+            && caseData.getQmApplicantCitizenQueries().getCaseMessages().size() > 0) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
