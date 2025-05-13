@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetails.notifyunspecclaimdetails;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
@@ -10,6 +11,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
+@Component
 public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private final NotifyClaimDetailsHelper notifyClaimDetailsHelper;

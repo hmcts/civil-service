@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetails.notifyunspecclaimdetails;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+@Component
 public class NotifyClaimDetailsAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     private final NotifyClaimDetailsHelper notifyClaimDetailsHelper;
