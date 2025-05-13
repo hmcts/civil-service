@@ -60,8 +60,7 @@ public class DetermineNextState  {
             }
         }
 
-        if (shouldMoveToInMediationState(
-            caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
+        if (shouldMoveToInMediationState(caseData, featureToggleService)) {
             nextState = CaseState.IN_MEDIATION.name();
             businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         }
