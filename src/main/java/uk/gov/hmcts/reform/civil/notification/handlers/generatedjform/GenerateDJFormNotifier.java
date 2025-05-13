@@ -5,10 +5,12 @@ import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.GenerateDJFormNotifyParties;
+
 @Component
 public class GenerateDJFormNotifier extends Notifier {
 
-    private static final String TASK_ID = "GenerateDJForm";
+    private static final String TASK_ID = GenerateDJFormNotifyParties.toString();
 
     public GenerateDJFormNotifier(
         NotificationService notificationService,

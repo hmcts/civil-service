@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
 public class GenerateDJFormRequestedAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
@@ -37,7 +38,7 @@ public class GenerateDJFormRequestedAppSolOneEmailDTOGenerator extends AppSolOne
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(LEGAL_REP_CLAIMANT, properties.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+        properties.put(LEGAL_REP_CLAIMANT, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName());
         if (isOneVTwoTwoLegalRep(caseData)
