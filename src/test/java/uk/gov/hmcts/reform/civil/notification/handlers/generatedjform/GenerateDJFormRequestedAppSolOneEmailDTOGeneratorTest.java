@@ -13,8 +13,10 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockStatic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 
 class GenerateDJFormRequestedAppSolOneEmailDTOGeneratorTest {
