@@ -69,7 +69,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
-            .orderedAmount(orderAmount.add(totalInterest).toString())
+            .orderedAmount(addInterest(orderAmount, totalInterest, caseData))
             .costs(costs.toString())
             .claimFeeAmount(claimFeeAmount.toString())
             .amountAlreadyPaid(amountAlreadyPaid.toString())
@@ -79,6 +79,14 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
 
         return activeJudgmentDetails;
+    }
+
+    private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData){
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
+            return orderAmount.toString();
+        } else {
+            return orderAmount.add(totalInterest).toString();
+        }
     }
 
     public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {

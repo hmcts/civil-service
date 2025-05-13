@@ -136,7 +136,7 @@ public class JudgementService {
         }
     }
 
-    private boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
+    public boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
         return caseData.isFullAdmitClaimSpec()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
             && isLRvLR(caseData)
