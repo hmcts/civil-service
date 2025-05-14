@@ -41,7 +41,7 @@ public class RespondentOneNotifyOthersTrialReadyPartiesEmailGenerator extends Tr
             partiesToEmail.add(applicantEmailDTO);
         }
 
-        EmailDTO respondentTwoEmailDTO = getRespondentOne(caseData);
+        EmailDTO respondentTwoEmailDTO = getRespondentTwo(caseData);
         if (respondentTwoEmailDTO != null) {
             partiesToEmail.add(respondentTwoEmailDTO);
         }

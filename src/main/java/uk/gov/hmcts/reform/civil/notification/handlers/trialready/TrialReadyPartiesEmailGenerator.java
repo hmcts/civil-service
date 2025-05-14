@@ -45,7 +45,7 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
             return null;
         }
 
-        boolean isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1LiP();
+        boolean isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent2LiP();
         return isLiP ? defendantTwoEmailDTOGenerator.buildEmailDTO(caseData) : respSolTwoEmailDTOGenerator.buildEmailDTO(caseData);
     }
 }

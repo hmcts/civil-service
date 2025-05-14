@@ -49,7 +49,7 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGenerator extends TrialR
             partiesToEmail.add(respondentOneEmailDTO);
         }
 
-        EmailDTO respondentTwoEmailDTO = getRespondentOne(caseData);
+        EmailDTO respondentTwoEmailDTO = getRespondentTwo(caseData);
         if (respondentTwoEmailDTO != null) {
             partiesToEmail.add(respondentTwoEmailDTO);
         }
