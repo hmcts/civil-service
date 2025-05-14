@@ -44,6 +44,7 @@ class NotifyClaimHelperTest {
 
         CaseData caseData = CaseData.builder()
             .respondent1(Party.builder()
+                             .individualTitle("Mr")
                              .individualFirstName("John").individualLastName("Doe")
                              .type(Party.Type.INDIVIDUAL).build())
             .claimDetailsNotificationDeadline(deadline)
@@ -52,8 +53,8 @@ class NotifyClaimHelperTest {
         Map<String, String> props = notifyClaimHelper.getCustomProperties(caseData);
 
         assertEquals(2, props.size());
-        assertEquals("John Doe", props.get("respondentName"));
-        assertEquals("01 Jun 2025", props.get("claimDetailsNotificationDeadline")); // depends on DATE pattern
+        assertEquals("Mr John Doe", props.get("defendantName"));
+        assertEquals("1 June 2025", props.get("claimDetailsNotificationDeadline")); // depends on DATE pattern
     }
 
     @Test
