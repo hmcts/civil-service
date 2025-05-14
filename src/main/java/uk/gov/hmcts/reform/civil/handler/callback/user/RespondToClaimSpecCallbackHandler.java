@@ -1920,6 +1920,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                 format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
             );
+        } else if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && (caseData.isPayBySetDate())) {
+            return format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                + "We will let you know when they respond.%n%n",
+                formatLocalDateTime(responseDeadline, DATE)
+            );
         } else {
             return format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>"
