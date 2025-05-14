@@ -214,15 +214,6 @@ public class RoboticsNotificationService {
         return subject;
     }
 
-    private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
-        if (isSpecClaim) {
-            return roboticsEmailConfiguration.getSpecRecipient();
-        }
-
-        return isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
-    }
-
     private Optional<EmailData> prepareJudgementLipEmail(RoboticsEmailParams params) {
         try {
             RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData(), params.getAuthToken());
