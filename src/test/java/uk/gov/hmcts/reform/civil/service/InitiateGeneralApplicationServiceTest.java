@@ -448,6 +448,21 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
+    void shouldExtendDeadline_buildCaseData() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataCollectionOfApps(CaseData.builder().build());
+        when(calc.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getClaimDismissedDeadline().toLocalDate())
+            .isEqualTo(LocalDateTime.now().plusMonths(24).toLocalDate());
+    }
+
+    @Test
     void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsentInfoNotProvided() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null);
