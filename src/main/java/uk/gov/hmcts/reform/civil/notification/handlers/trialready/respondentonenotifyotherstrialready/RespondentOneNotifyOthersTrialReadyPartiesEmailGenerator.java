@@ -19,7 +19,15 @@ import java.util.Set;
 @Component
 @Slf4j
 public class RespondentOneNotifyOthersTrialReadyPartiesEmailGenerator extends TrialReadyPartiesEmailGenerator {
-    public RespondentOneNotifyOthersTrialReadyPartiesEmailGenerator(TrialReadyAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator, TrialReadyClaimantEmailDTOGenerator claimantEmailDTOGenerator, TrialReadyRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator, TrialReadyRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator, TrialReadyDefendantEmailDTOGenerator defendantEmailDTOGenerator, TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator, IStateFlowEngine stateFlowEngine) {
+
+    public RespondentOneNotifyOthersTrialReadyPartiesEmailGenerator(TrialReadyAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator,
+                                                                    TrialReadyClaimantEmailDTOGenerator claimantEmailDTOGenerator,
+                                                                    TrialReadyRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator,
+                                                                    TrialReadyRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator,
+                                                                    TrialReadyDefendantEmailDTOGenerator defendantEmailDTOGenerator,
+                                                                    TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator,
+                                                                    IStateFlowEngine stateFlowEngine
+    ) {
         super(
             appSolOneEmailDTOGenerator,
             claimantEmailDTOGenerator,

@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 @Component
 public class RespondentTwoNotifyOthersTrialReadyNotifier extends Notifier {
 
-
     public RespondentTwoNotifyOthersTrialReadyNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
                                                        RespondentTwoNotifyOthersTrialReadyPartiesEmailGenerator partiesNotifier) {
         super(notificationService, caseTaskTrackingService, partiesNotifier);

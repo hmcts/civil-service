@@ -22,6 +22,7 @@ public class DefendantTwoEmailDTOGeneratorTest {
 
     private NotificationsProperties notificationsProperties;
     private DefendantTwoEmailDTOGenerator emailDTOGenerator;
+
     @BeforeEach
     void setUp() {
         emailDTOGenerator = new DefendantTwoEmailDTOGenerator(notificationsProperties) {
