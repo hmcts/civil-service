@@ -23,11 +23,6 @@ public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEma
     }
 
     @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return notifyClaimDetailsHelper.getEmailTemplate();
-    }
-
-    @Override
     protected String getReferenceTemplate() {
         return NotifyClaimDetailsHelper.REFERENCE_TEMPLATE;
     }
@@ -48,5 +43,10 @@ public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEma
             return notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, respondentName);
         }
         return false;
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData) {
+        return notifyClaimDetailsHelper.getEmailTemplate();
     }
 }

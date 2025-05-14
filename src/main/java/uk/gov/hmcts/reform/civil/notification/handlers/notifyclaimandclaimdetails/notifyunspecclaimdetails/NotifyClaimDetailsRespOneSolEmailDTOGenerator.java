@@ -23,16 +23,6 @@ public class NotifyClaimDetailsRespOneSolEmailDTOGenerator extends RespSolOneEma
     }
 
     @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return notifyClaimDetailsHelper.getEmailTemplate();
-    }
-
-    @Override
-    protected String getReferenceTemplate() {
-        return NotifyClaimDetailsHelper.REFERENCE_TEMPLATE;
-    }
-
-    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.putAll(notifyClaimDetailsHelper.getCustomProperties(caseData));
         return properties;
@@ -53,5 +43,15 @@ public class NotifyClaimDetailsRespOneSolEmailDTOGenerator extends RespSolOneEma
         }
 
         return true;
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData) {
+        return notifyClaimDetailsHelper.getEmailTemplate();
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return NotifyClaimDetailsHelper.REFERENCE_TEMPLATE;
     }
 }

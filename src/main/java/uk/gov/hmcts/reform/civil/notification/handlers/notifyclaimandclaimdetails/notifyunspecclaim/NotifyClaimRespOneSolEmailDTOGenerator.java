@@ -33,12 +33,6 @@ public class NotifyClaimRespOneSolEmailDTOGenerator extends RespSolOneEmailDTOGe
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.putAll(notifyClaimHelper.retrieveCustomProperties(caseData));
-        return properties;
-    }
-
-    @Override
     public Boolean getShouldNotify(CaseData caseData) {
         String respondentName = Optional.ofNullable(caseData.getRespondent1())
             .map(Party::getPartyName)
@@ -53,5 +47,11 @@ public class NotifyClaimRespOneSolEmailDTOGenerator extends RespSolOneEmailDTOGe
         }
 
         return true;
+    }
+
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.putAll(notifyClaimHelper.retrieveCustomProperties(caseData));
+        return properties;
     }
 }

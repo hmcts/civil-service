@@ -23,16 +23,6 @@ public class NotifyClaimRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGe
     }
 
     @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return notifyClaimHelper.getNotifyClaimEmailTemplate();
-    }
-
-    @Override
-    protected String getReferenceTemplate() {
-        return NotifyClaimHelper.NOTIFY_REFERENCE_TEMPLATE;
-    }
-
-    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.putAll(notifyClaimHelper.retrieveCustomProperties(caseData));
         return properties;
@@ -48,5 +38,15 @@ public class NotifyClaimRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGe
             return notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
         }
         return false;
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return NotifyClaimHelper.NOTIFY_REFERENCE_TEMPLATE;
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData) {
+        return notifyClaimHelper.getNotifyClaimEmailTemplate();
     }
 }

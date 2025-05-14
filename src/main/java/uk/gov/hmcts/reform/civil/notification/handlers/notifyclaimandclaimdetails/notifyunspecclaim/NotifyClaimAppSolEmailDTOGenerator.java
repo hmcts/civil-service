@@ -19,11 +19,6 @@ public class NotifyClaimAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerat
     }
 
     @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return notifyClaimHelper.getNotifyClaimEmailTemplate();
-    }
-
-    @Override
     protected String getReferenceTemplate() {
         return NotifyClaimHelper.NOTIFY_REFERENCE_TEMPLATE;
     }
@@ -32,5 +27,10 @@ public class NotifyClaimAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerat
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.putAll(notifyClaimHelper.retrieveCustomProperties(caseData));
         return properties;
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData) {
+        return notifyClaimHelper.getNotifyClaimEmailTemplate();
     }
 }
