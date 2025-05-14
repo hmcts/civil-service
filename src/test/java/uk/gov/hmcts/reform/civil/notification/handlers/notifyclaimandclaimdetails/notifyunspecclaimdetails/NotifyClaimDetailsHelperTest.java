@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -56,8 +57,8 @@ class NotifyClaimDetailsHelperTest {
         Map<String, String> props = notifyClaimDetailsHelper.getCustomProperties(caseData);
 
         assertEquals(2, props.size());
-        assertEquals("01 Jun 2025", props.get("responseDeadline")); // formatted date
-        assertEquals("29 Jun 2025", props.get("responseDeadlinePlus28")); // formatted date
+        assertEquals("1 June 2025", props.get("responseDeadline")); // formatted date
+        assertEquals("29 June 2025", props.get("responseDeadlinePlus28")); // formatted date
     }
 
     @Test
@@ -104,6 +105,6 @@ class NotifyClaimDetailsHelperTest {
 
         boolean result = notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, targetDefendant);
 
-        assertTrue(!result);
+        assertFalse(result);
     }
 }
