@@ -21,15 +21,15 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @AllArgsConstructor
 public class NotifyClaimHelper {
 
-    protected static final String REFERENCE_TEMPLATE = "notify-claim-notification-%s";
+    protected static final String NOTIFY_REFERENCE_TEMPLATE = "notify-claim-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
-    public String getEmailTemplate() {
+    public String getNotifyClaimEmailTemplate() {
         return notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate();
     }
 
-    public Map<String, String> getCustomProperties(CaseData caseData) {
+    public Map<String, String> retrieveCustomProperties(CaseData caseData) {
         return Map.of(
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,

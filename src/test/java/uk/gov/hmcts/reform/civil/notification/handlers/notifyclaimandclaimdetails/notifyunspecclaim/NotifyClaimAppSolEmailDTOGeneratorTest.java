@@ -32,12 +32,12 @@ class NotifyClaimAppSolEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateId() {
         String expectedTemplateId = "template-id-abc123";
-        when(notifyClaimHelper.getEmailTemplate()).thenReturn(expectedTemplateId);
+        when(notifyClaimHelper.getNotifyClaimEmailTemplate()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = generator.getEmailTemplateId(caseData);
 
         assertEquals(expectedTemplateId, actualTemplateId);
-        verify(notifyClaimHelper).getEmailTemplate();
+        verify(notifyClaimHelper).getNotifyClaimEmailTemplate();
     }
 
     @Test
@@ -46,20 +46,20 @@ class NotifyClaimAppSolEmailDTOGeneratorTest {
         String referenceTemplate = generator.getReferenceTemplate();
 
         // Then
-        assertEquals(NotifyClaimHelper.REFERENCE_TEMPLATE, referenceTemplate);
+        assertEquals(NotifyClaimHelper.NOTIFY_REFERENCE_TEMPLATE, referenceTemplate);
     }
 
     @Test
     void shouldAddCustomProperties() {
         Map<String, String> baseProperties = new HashMap<>();
         Map<String, String> customProperties = Map.of("key1", "value1", "key2", "value2");
-        when(notifyClaimHelper.getCustomProperties(caseData)).thenReturn(customProperties);
+        when(notifyClaimHelper.retrieveCustomProperties(caseData)).thenReturn(customProperties);
 
         Map<String, String> result = generator.addCustomProperties(baseProperties, caseData);
 
         assertEquals(2, result.size());
         assertEquals("value1", result.get("key1"));
         assertEquals("value2", result.get("key2"));
-        verify(notifyClaimHelper).getCustomProperties(caseData);
+        verify(notifyClaimHelper).retrieveCustomProperties(caseData);
     }
 }

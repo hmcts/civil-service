@@ -13,7 +13,7 @@ public class NotifyClaimDetailsAppSolEmailDTOGenerator extends AppSolOneEmailDTO
     private final NotifyClaimDetailsHelper notifyClaimDetailsHelper;
 
     public NotifyClaimDetailsAppSolEmailDTOGenerator(OrganisationService organisationService,
-                                              NotifyClaimDetailsHelper notifyClaimDetailsHelper) {
+                                                     NotifyClaimDetailsHelper notifyClaimDetailsHelper) {
         super(organisationService);
         this.notifyClaimDetailsHelper = notifyClaimDetailsHelper;
     }

@@ -33,7 +33,7 @@ class NotifyClaimHelperTest {
         when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
             .thenReturn(expectedTemplateId);
 
-        String actual = notifyClaimHelper.getEmailTemplate();
+        String actual = notifyClaimHelper.getNotifyClaimEmailTemplate();
 
         assertEquals(expectedTemplateId, actual);
     }
@@ -50,7 +50,7 @@ class NotifyClaimHelperTest {
             .claimDetailsNotificationDeadline(deadline)
             .build();
 
-        Map<String, String> props = notifyClaimHelper.getCustomProperties(caseData);
+        Map<String, String> props = notifyClaimHelper.retrieveCustomProperties(caseData);
 
         assertEquals(2, props.size());
         assertEquals("Mr John Doe", props.get("defendantName"));

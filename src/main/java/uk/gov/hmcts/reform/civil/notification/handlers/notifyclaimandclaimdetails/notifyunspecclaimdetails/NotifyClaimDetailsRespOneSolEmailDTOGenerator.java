@@ -49,7 +49,7 @@ public class NotifyClaimDetailsRespOneSolEmailDTOGenerator extends RespSolOneEma
         }
 
         if (isOneVTwoTwoLegalRep(caseData)) {
-            return notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
+            return notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, respondentName);
         }
 
         return true;

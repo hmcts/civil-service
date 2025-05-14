@@ -45,7 +45,7 @@ public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEma
                 .map(Party::getPartyName)
                 .orElse(null);
 
-            return notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
+            return notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, respondentName);
         }
         return false;
     }

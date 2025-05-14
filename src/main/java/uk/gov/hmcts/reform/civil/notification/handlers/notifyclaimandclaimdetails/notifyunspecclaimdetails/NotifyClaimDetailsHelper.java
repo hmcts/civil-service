@@ -41,7 +41,7 @@ public class NotifyClaimDetailsHelper {
         );
     }
 
-    protected boolean checkIfThisDefendantToBeNotified(final CaseData caseData, String defendantName) {
+    protected boolean checkDefendantToBeNotifiedWithClaimDetails(final CaseData caseData, String defendantName) {
         String defendantNotifyClaimDetails = Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimDetailsOptions())
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)

@@ -72,7 +72,7 @@ class NotifyClaimDetailsHelperTest {
             .defendantSolicitorNotifyClaimDetailsOptions(list)
             .build();
 
-        boolean result = notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, targetDefendant);
+        boolean result = notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, targetDefendant);
 
         assertTrue(result);
     }
@@ -86,7 +86,7 @@ class NotifyClaimDetailsHelperTest {
             .defendantSolicitorNotifyClaimDetailsOptions(list)
             .build();
 
-        boolean result = notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, "Any Name");
+        boolean result = notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, "Any Name");
 
         assertTrue(result);
     }
@@ -103,7 +103,7 @@ class NotifyClaimDetailsHelperTest {
             .defendantSolicitorNotifyClaimDetailsOptions(list)
             .build();
 
-        boolean result = notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, targetDefendant);
+        boolean result = notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, targetDefendant);
 
         assertFalse(result);
     }

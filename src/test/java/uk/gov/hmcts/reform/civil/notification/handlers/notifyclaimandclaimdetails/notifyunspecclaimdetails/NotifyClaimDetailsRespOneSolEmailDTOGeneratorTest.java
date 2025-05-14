@@ -88,7 +88,7 @@ class NotifyClaimDetailsRespOneSolEmailDTOGeneratorTest {
 
         try (MockedStatic<MultiPartyScenario> staticMock = mockStatic(MultiPartyScenario.class)) {
             staticMock.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-            when(notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, "respondent name")).thenReturn(true);
+            when(notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, "respondent name")).thenReturn(true);
 
             boolean result = generator.getShouldNotify(caseData);
 

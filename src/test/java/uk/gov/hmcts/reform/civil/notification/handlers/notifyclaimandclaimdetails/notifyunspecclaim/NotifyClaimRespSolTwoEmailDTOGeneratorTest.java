@@ -44,7 +44,7 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateId() {
         String templateId = "email-template-123";
-        when(notifyClaimHelper.getEmailTemplate()).thenReturn(templateId);
+        when(notifyClaimHelper.getNotifyClaimEmailTemplate()).thenReturn(templateId);
 
         String result = generator.getEmailTemplateId(caseData);
 
@@ -61,7 +61,7 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
         Map<String, String> base = new HashMap<>();
         Map<String, String> custom = Map.of("key", "value");
 
-        when(notifyClaimHelper.getCustomProperties(caseData)).thenReturn(custom);
+        when(notifyClaimHelper.retrieveCustomProperties(caseData)).thenReturn(custom);
 
         Map<String, String> result = generator.addCustomProperties(base, caseData);
 

@@ -79,7 +79,7 @@ class NotifyClaimDetailsRespSolTwoEmailDTOGeneratorTest {
 
         try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
             scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-            when(notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, "respondent 2 name")).thenReturn(true);
+            when(notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, "respondent 2 name")).thenReturn(true);
 
             boolean result = generator.getShouldNotify(caseData);
 
@@ -118,7 +118,7 @@ class NotifyClaimDetailsRespSolTwoEmailDTOGeneratorTest {
 
         try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
             scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-            when(notifyClaimDetailsHelper.checkIfThisDefendantToBeNotified(caseData, null)).thenReturn(false);
+            when(notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, null)).thenReturn(false);
 
             boolean result = generator.getShouldNotify(caseData);
 
