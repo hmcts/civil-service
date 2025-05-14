@@ -329,7 +329,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         );
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().documentFileName("interlocutory_judgment.pdf").build(),
                                                                         DocumentType.INTERLOCUTORY_JUDGEMENT)));
 
         CaseData caseData = CaseDataBuilder.builder()
