@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
@@ -40,6 +42,8 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
 
     @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private static final CaseDocument FORM = CaseDocument.builder()
         .createdBy("John")
@@ -58,6 +62,7 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
     @Test
     void shouldGenerateForm_ifCcjHasBeenRequested() {
         CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
@@ -73,6 +78,7 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
 
     @Test
     void shouldNotGenerateForm_ifCcjHasNotBeenRequested() {
+
         CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
@@ -88,6 +94,7 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
 
     @Test
     void shouldGenerateForm_ifDefaultCcjHasBeenRequested() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         CaseEvent event = CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseData.builder()
@@ -100,4 +107,39 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
     }
+
+    @Test
+    void shouldGenerateForm_ifCcjHasBeenRequestedWhenWelsh() {
+        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
+        CaseData caseData = CaseData.builder()
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .build())
+                             .build())
+            .build();
+
+        handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
+        verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
+    }
+
+    @Test
+    void shouldGenerateJudgementForm_ifCcjHasBeenRequestedWhenWelsh() {
+        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
+        CaseData caseData = CaseData.builder()
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .build())
+                             .build())
+            .build();
+
+        handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
+        verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
+    }
+
 }

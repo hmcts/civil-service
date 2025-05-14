@@ -22,10 +22,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.*;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
@@ -122,7 +119,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
             } else if (Objects.nonNull(translatedDocuments)
                 && ((translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT))
-                || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION)))) {
+                || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION))
+                || (translatedDocuments.get(0).getValue().getDocumentType().equals(CCJ_REQUEST_DETERMINATION)))) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
             }
         }
