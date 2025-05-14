@@ -81,14 +81,6 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         return activeJudgmentDetails;
     }
 
-    private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData){
-        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
-            return orderAmount.toString();
-        } else {
-            return orderAmount.add(totalInterest).toString();
-        }
-    }
-
     public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {
         JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
         builder.activeJudgment(activeJudgmentDetails);
@@ -216,5 +208,13 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             return PaymentPlanSelection.PAY_BY_DATE;
         }
         return PaymentPlanSelection.PAY_IMMEDIATELY;
+    }
+
+    private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
+            return orderAmount.toString();
+        } else {
+            return orderAmount.add(totalInterest).toString();
+        }
     }
 }
