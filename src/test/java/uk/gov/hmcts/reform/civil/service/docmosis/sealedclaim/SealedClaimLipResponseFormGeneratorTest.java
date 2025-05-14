@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -894,5 +895,35 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
         Assertions.assertEquals(2, templateData.getDefendant1UnavailableDatesList().size());
+    }
+
+    @Test
+    void shouldGenerateDocumentWithStatementOfTruthSuccessfully_DefendantLipTypeCompanyOROrg() {
+        //Given
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        //When
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
+            .applicant1(company("A"))
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder().respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
+                             .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondent1LiPStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build())
+            .totalClaimAmount(BigDecimal.valueOf(10_000))
+            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build());
+
+        //Then
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        assertThat(templateData.getUiStatementOfTruth().getName()).isEqualTo("Test");
+        assertThat(templateData.getUiStatementOfTruth().getRole()).isEqualTo("Test");
     }
 }
