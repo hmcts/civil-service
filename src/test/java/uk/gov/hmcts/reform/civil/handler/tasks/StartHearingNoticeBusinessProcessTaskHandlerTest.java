@@ -34,11 +34,7 @@ import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
@@ -57,10 +53,9 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHa
 @ExtendWith(SpringExtension.class)
 class StartHearingNoticeBusinessProcessTaskHandlerTest {
 
-    private static final String CASE_ID = "1";
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-    public static final String ERROR_CODE = "ABORT";
-
+    private static final String CASE_ID = "1";
+    private final VariableMap variables = Variables.createVariables();
     @Mock
     private ExternalTask mockTask;
     @Mock
@@ -71,8 +66,6 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
     private FeatureToggleService featureToggleService;
     @Autowired
     private StartHearingNoticeBusinessProcessTaskHandler handler;
-
-    private final VariableMap variables = Variables.createVariables();
 
     @BeforeEach
     void init() {
@@ -108,26 +101,21 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
     }
 
     @Test
-    void shouldRaiseBpmnError_whenBusinessProcessStatusIsStarted_AndHaveSameProcessInstanceId() {
-        BusinessProcess businessProcess = getBusinessProcess(STARTED, PROCESS_INSTANCE_ID);
+    void shouldStart_whenBusinessProcessStatusIsStarted_AndHaveSameProcessInstanceId() {
+        BusinessProcess businessProcess = BusinessProcess.builder().status(STARTED)
+            .processInstanceId(PROCESS_INSTANCE_ID).build();
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
+        when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
         verify(coreCaseDataService).startUpdate(CASE_ID, START_BUSINESS_PROCESS);
-        verify(coreCaseDataService, never()).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
-        verify(externalTaskService, never()).handleFailure(
-            any(ExternalTask.class),
-            anyString(),
-            anyString(),
-            anyInt(),
-            anyLong()
-        );
-        verify(externalTaskService).handleBpmnError(mockTask, ERROR_CODE);
+        verify(coreCaseDataService).submitUpdate(CASE_ID, content(startEventResponse, businessProcess.start()));
+        verify(externalTaskService).complete(mockTask, variables);
     }
 
     private CaseDataContent content(StartEventResponse startEventResponse, BusinessProcess businessProcess) {
@@ -138,13 +126,6 @@ class StartHearingNoticeBusinessProcessTaskHandlerTest {
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId()).build())
             .data(data)
-            .build();
-    }
-
-    private BusinessProcess getBusinessProcess(BusinessProcessStatus started, String processInstanceId) {
-        return BusinessProcess.builder()
-            .status(started)
-            .processInstanceId(processInstanceId)
             .build();
     }
 }

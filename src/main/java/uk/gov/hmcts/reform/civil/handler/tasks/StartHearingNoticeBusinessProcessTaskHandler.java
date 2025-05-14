@@ -64,15 +64,8 @@ public class StartHearingNoticeBusinessProcessTaskHandler extends BaseExternalTa
         }
 
         switch (businessProcess.getStatusOrDefault()) {
-            case READY, DISPATCHED:
+            case READY, DISPATCHED, STARTED:
                 return updateBusinessProcess(caseId, externalTask, startEventResponse, businessProcess);
-            case STARTED:
-                String businessProcessError = String.format("Hearing notice existing business process error: Aborting the hearing notice process on the case [%s]"
-                                                                + " for the hearing [%s]. An existing process [%s] has not yet finished or is stuck. "
-                                                                + "Last successful task [%s].",
-                                             caseId, hearingId, businessProcess.getProcessInstanceId(), businessProcess.getCamundaEvent());
-                log.error(businessProcessError);
-                throw new BpmnError("ABORT");
             default:
                 String unexpectedStatusError = String.format("Hearing notice unexpected business process status error: Aborting the hearing notice process because " +
                                                  "an unexpected business process status [%s] was received for the case [%s] for the hearing [%s].",
