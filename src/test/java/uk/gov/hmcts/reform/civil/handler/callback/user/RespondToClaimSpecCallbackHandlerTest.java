@@ -96,6 +96,7 @@ import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -206,6 +207,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
     @MockBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
+    @MockBean
+    private InterestCalculator interestCalculator;
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
@@ -778,6 +781,39 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertEquals("Validation error", response.getErrors().get(0));
 
+        }
+
+        @Test
+        public void testValidateSpecDefendantResponseAdmitClaimOwingAmount() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .ccdCaseReference(354L)
+                .totalClaimAmount(new BigDecimal(7000))
+                .totalClaimAmountPlusInterestAdmitPart(new BigDecimal(7000.05))
+                .respondent1(PartyBuilder.builder().individual().build())
+                .isRespondent1(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .isRespondent2(YES)
+                .specDefenceAdmitted2Required(NO)
+                .specDefenceAdmittedRequired(NO)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondToAdmittedClaimOwingAmount(new BigDecimal("705000"))
+                .respondToAdmittedClaimOwingAmount2(new BigDecimal(50000))
+                .build();
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNotNull();
         }
     }
 
