@@ -71,7 +71,6 @@ class StayCaseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
         HashMap<String, Object> params = new HashMap<>();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()

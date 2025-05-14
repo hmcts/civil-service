@@ -288,7 +288,6 @@ class DetermineNextStateTest {
             .build();
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    builder, "", businessProcess);

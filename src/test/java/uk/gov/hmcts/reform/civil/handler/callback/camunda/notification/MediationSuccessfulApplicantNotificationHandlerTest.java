@@ -105,7 +105,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate()).thenReturn(TEMPLATE_LIP_ID);
 
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
@@ -135,7 +134,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate()).thenReturn(TEMPLATE_LIP_ID);
 
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
@@ -163,10 +161,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyApplicantLipFeatureToggleDisabled_whenInvoked() {
-            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
-
             //Given
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
             Party applicant1 = PartyBuilder.builder().soleTrader()
                 .partyEmail(APPLICANT_LIP_MAIL)
                 .build();
@@ -323,7 +318,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(NO)
                 .setClaimTypeToSpecClaim()
@@ -349,7 +343,6 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiPBilingual()
                 .legacyCaseReference(REFERENCE_NUMBER)

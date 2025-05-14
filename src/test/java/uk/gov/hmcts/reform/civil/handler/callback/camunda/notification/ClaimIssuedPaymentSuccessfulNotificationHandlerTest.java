@@ -63,7 +63,6 @@ class ClaimIssuedPaymentSuccessfulNotificationHandlerTest extends BaseCallbackHa
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_FOR_SUCCESSFUL_PAYMENT").build()).build();
 
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             handler.handle(params);
 
             verify(notificationService).sendMail(

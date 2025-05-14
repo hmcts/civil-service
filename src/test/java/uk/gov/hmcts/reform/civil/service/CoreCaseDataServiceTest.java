@@ -44,7 +44,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -276,7 +275,6 @@ class CoreCaseDataServiceTest {
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -296,7 +294,6 @@ class CoreCaseDataServiceTest {
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -314,7 +311,6 @@ class CoreCaseDataServiceTest {
         @Test
         void shouldSearchCasesByDefendantUser_whenLipVLipEnabled() {
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -329,7 +325,6 @@ class CoreCaseDataServiceTest {
         @Test
         void shouldSearchCasesByClaimantUser_whenLipVLipEnabled() {
             UserDetails userDetails = UserDetails.builder().email("someemail@email.com").build();
-            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
             given(userService.getUserDetails(anyString())).willReturn(userDetails);
             String query = new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
@@ -341,18 +336,6 @@ class CoreCaseDataServiceTest {
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
         }
 
-        @Test
-        void shouldSearchAllCasesForUser_whenLipVLipDisabled() {
-            given(featureToggleService.isLipVLipEnabled()).willReturn(false);
-            String query = new SearchSourceBuilder()
-                .query(QueryBuilders.matchAllQuery())
-                .sort("data.submittedDate", SortOrder.DESC)
-                .from(0)
-                .size(RETURNED_NUMBER_OF_CASES).toString();
-            service.getCCDDataBasedOnIndex(USER_AUTH_TOKEN, 0, "data.defendantUserDetails.email");
-            verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query);
-            verify(userService, never()).getUserDetails(USER_AUTH_TOKEN);
-        }
     }
 
     @Nested

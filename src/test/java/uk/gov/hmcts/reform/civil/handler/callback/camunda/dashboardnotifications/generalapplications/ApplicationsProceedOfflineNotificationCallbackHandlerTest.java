@@ -70,20 +70,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
 
         @BeforeEach
         void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGeneralApplicationsEnabled()).thenReturn(true);
-        }
-
-        @Test
-        void shouldNotCallRecordScenario_whenLipVLipIsDisabled() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(false);
-
-            CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, CaseData.builder().build())
-                .build();
-
-            handler.handle(callbackParams);
-            verifyNoInteractions(dashboardScenariosService);
         }
 
         @Test

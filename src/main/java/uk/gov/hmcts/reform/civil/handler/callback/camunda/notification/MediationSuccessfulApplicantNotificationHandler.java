@@ -62,8 +62,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
             if (Objects.nonNull(caseData.getApplicant1Represented())
-                && caseData.isApplicant1NotRepresented()
-                && featureToggleService.isLipVLipEnabled()) {
+                && caseData.isApplicant1NotRepresented()) {
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
                     caseData.isClaimantBilingual() ? notificationsProperties.getNotifyLipSuccessfulMediationWelsh() : notificationsProperties.getNotifyLipSuccessfulMediation(),
@@ -88,8 +87,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             }
         } else {
             if (Objects.nonNull(caseData.getApplicant1Represented())
-                && caseData.isApplicant1NotRepresented()
-                && featureToggleService.isLipVLipEnabled()) {
+                && caseData.isApplicant1NotRepresented()) {
                 notificationService.sendMail(
                     caseData.getApplicant1().getPartyEmail(),
                     addTemplate(caseData),

@@ -132,7 +132,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
                 .ccdCaseReference(123L)
                 .build();
 
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
