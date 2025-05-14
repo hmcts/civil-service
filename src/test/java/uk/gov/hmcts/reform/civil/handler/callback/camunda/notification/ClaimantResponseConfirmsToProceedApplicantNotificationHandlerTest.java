@@ -12,10 +12,14 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -25,8 +29,7 @@ import java.util.Map;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
@@ -53,7 +56,8 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn(BILINGUAL_TEMPLATE_ID);
         }
 
         @Test
@@ -102,6 +106,78 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
             assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
                 "NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED").build()).build())).isEqualTo(TASK_ID);
+        }
+
+        @Test
+        void shouldNotifyLipApplicant_whenTranslatedDocUploaded() {
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1(Party.builder().partyEmail("rambo@email.com").type(Party.Type.INDIVIDUAL)
+                                .individualFirstName("Mr. John").individualLastName("Rambo").build()).build();
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                "rambo@email.com",
+                BILINGUAL_TEMPLATE_ID,
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyLipApplicant_whenTranslatedDocUploadedAndWelshFlagOn() {
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1(Party.builder().partyEmail("rambo@email.com").type(Party.Type.INDIVIDUAL)
+                                .individualFirstName("Mr. John").individualLastName("Rambo").build()).build();
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                "rambo@email.com",
+                BILINGUAL_TEMPLATE_ID,
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotNotifyLipApplicant_whenMainCaseHasWelshParty() {
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
+                .applicant1Represented(YesOrNo.NO)
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage("BOTH")
+                                                                              .build()).build())
+                .applicant1(Party.builder().partyEmail("rambo@email.com").type(Party.Type.INDIVIDUAL)
+                                .individualFirstName("Mr. John").individualLastName("Rambo").build()).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+            handler.handle(params);
+
+            verify(notificationService, times(0)).sendMail(
+                "rambo@email.com",
+                BILINGUAL_TEMPLATE_ID,
+                getNotificationDataMap(caseData),
+                "claimant-confirms-to-proceed-applicant-notification-000DC001"
+            );
         }
 
         @NotNull

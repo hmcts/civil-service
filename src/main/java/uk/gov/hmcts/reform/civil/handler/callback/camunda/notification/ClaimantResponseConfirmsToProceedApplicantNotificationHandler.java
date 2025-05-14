@@ -14,10 +14,12 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -25,7 +27,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED,
+                                                          NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC);
 
     public static final String TASK_ID = "NotifyLiPApplicantClaimantConfirmToProceed";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-applicant-notification-%s";
@@ -57,7 +60,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     private CallbackResponse notifyApplicantForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.getApplicant1Email() != null) {
+        if (caseData.getApplicant1Email() != null && shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
                 getEmailTemplate(caseData),
@@ -67,6 +70,17 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private boolean shouldSendNotification(CaseData caseData, String eventId) {
+        if (featureToggleService.isGaForWelshEnabled()) {
+            return ((!(caseData.isClaimantBilingual()
+                || caseData.isRespondentResponseBilingual()
+                || caseData.isLipDefendantSpecifiedBilingualDocuments()
+                || caseData.isLipClaimantSpecifiedBilingualDocuments()))
+                || (NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId)));
+        }
+        return true;
     }
 
     private String getEmailTemplate(CaseData caseData) {
