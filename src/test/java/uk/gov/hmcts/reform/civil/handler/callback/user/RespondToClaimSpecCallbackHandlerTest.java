@@ -784,7 +784,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void testValidateSpecDefendantResponseAdmitClaimOwingAmount() {
+        void testValidateSpecDefendantResponseAdmitClaimOwingAmount() {
             // Given
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
