@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
@@ -29,6 +30,9 @@ public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEma
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        boolean isRespondent1 = false;
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                isRespondent1, organisationService));
         properties.putAll(notifyClaimDetailsHelper.getCustomProperties(caseData));
         return properties;
     }

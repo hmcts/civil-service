@@ -34,7 +34,7 @@ class NotifyClaimDetailsHelperTest {
     void shouldReturnCorrectEmailTemplateId() {
         // Given
         String expectedTemplateId = "template-id-abc";
-        when(notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate())
+        when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
             .thenReturn(expectedTemplateId);
 
         // When

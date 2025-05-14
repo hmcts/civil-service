@@ -4,16 +4,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyClaimDetailsAppSolEmailDTOGeneratorTest {
@@ -53,11 +58,18 @@ class NotifyClaimDetailsAppSolEmailDTOGeneratorTest {
         Map<String, String> customProperties = Map.of("key1", "value1", "key2", "value2");
         when(notifyClaimDetailsHelper.getCustomProperties(caseData)).thenReturn(customProperties);
 
+        String APPLICANT_LEGAL_ORG_NAME = "applicant-legal-org-name";
+        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
+        notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+            .thenReturn(APPLICANT_LEGAL_ORG_NAME);
+
         Map<String, String> result = generator.addCustomProperties(baseProperties, caseData);
 
-        assertEquals(2, result.size());
-        assertEquals("value1", result.get("key1"));
-        assertEquals("value2", result.get("key2"));
-        verify(notifyClaimDetailsHelper).getCustomProperties(caseData);  // Verify interaction with mock
+        assertEquals(3, result.size());
+        assertThat(result).containsEntry("key1", "value1");
+        assertThat(result).containsEntry("key2", "value2");
+        assertThat(result).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, APPLICANT_LEGAL_ORG_NAME);
+        verify(notifyClaimDetailsHelper).getCustomProperties(caseData);
+        notificationUtilsMockedStatic.close();
     }
 }

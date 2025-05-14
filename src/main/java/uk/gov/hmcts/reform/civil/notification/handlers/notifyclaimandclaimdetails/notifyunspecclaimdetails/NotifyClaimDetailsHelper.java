@@ -27,7 +27,7 @@ public class NotifyClaimDetailsHelper {
     private final DeadlinesCalculator deadlinesCalculator;
 
     public String getEmailTemplate() {
-        return notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate();
+        return notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
     }
 
     public Map<String, String> getCustomProperties(CaseData caseData) {

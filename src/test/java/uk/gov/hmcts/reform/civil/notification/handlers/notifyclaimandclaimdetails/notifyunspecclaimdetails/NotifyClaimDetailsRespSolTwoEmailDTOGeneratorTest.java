@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetails.notifyunspecclaimdetails;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,9 +68,17 @@ class NotifyClaimDetailsRespSolTwoEmailDTOGeneratorTest {
 
         when(notifyClaimDetailsHelper.getCustomProperties(caseData)).thenReturn(custom);
 
+        String RESPONDENT_TWO_LEGAL_ORG_NAME = "respondent2-legal-org-name";
+        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
+        notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.FALSE, organisationService))
+            .thenReturn(RESPONDENT_TWO_LEGAL_ORG_NAME);
+
         Map<String, String> result = generator.addCustomProperties(base, caseData);
 
-        assertEquals("value", result.get("key"));
+        assertEquals(2, result.size());
+        assertThat(result).containsEntry("key", "value");
+        assertThat(result).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, RESPONDENT_TWO_LEGAL_ORG_NAME);
+        notificationUtilsMockedStatic.close();
     }
 
     @Test

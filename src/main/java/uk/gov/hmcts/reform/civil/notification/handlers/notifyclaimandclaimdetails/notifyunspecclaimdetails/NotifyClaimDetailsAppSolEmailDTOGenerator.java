@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+
 @Component
 public class NotifyClaimDetailsAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
@@ -25,6 +27,7 @@ public class NotifyClaimDetailsAppSolEmailDTOGenerator extends AppSolOneEmailDTO
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.putAll(notifyClaimDetailsHelper.getCustomProperties(caseData));
         return properties;
     }
