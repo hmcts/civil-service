@@ -173,6 +173,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabledButRespondent1ClaimResponseTypeForSpecIsFullAdmissionSoNoDqWillGenerate() {
         //Given
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName("responseForm.pdf").build()));
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
@@ -201,6 +202,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingBilingual() {
         //Given
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseData caseData = CaseDataBuilder.builder()
