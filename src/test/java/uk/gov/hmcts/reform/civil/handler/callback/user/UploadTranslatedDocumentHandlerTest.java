@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private AssignCategoryId assignCategoryId;
 
     @Mock
     private UploadTranslatedDocumentV1Strategy uploadTranslatedDocumentV1Strategy;
@@ -51,6 +54,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
         UploadTranslatedDocumentDefaultStrategy uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(
             systemGeneratedDocumentService,
             objectMapper,
+            assignCategoryId,
             featureToggleService
         );
         UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory = new UploadTranslatedDocumentStrategyFactory(
