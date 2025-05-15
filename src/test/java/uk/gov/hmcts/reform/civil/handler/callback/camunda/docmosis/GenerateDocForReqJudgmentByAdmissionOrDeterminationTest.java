@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 
@@ -106,7 +108,6 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verifyNoInteractions(formGenerator);
     }
-
 
     @Test
     void shouldGenerateForm_ifDefaultCcjHasBeenRequested() {

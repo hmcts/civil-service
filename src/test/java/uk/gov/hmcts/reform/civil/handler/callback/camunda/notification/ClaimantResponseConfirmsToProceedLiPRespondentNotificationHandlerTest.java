@@ -172,7 +172,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verifyNoInteractions(notificationService);
         }
 
-
         @Test
         void shouldNotNotifyLipRespondent_ifNoPartyEmail() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();

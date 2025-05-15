@@ -29,7 +29,9 @@ import java.util.Map;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
@@ -72,7 +74,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
             verify(notificationService).sendMail(
                 "rambo@email.com",
                     TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
         }
@@ -97,7 +99,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
             verify(notificationService).sendMail(
                     "rambo@email.com",
                     BILINGUAL_TEMPLATE_ID,
-                    getNotificationDataMap(caseData),
+                    getNotificationDataMap(),
                     "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
         }
@@ -126,7 +128,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
             verify(notificationService, times(1)).sendMail(
                 "rambo@email.com",
                 BILINGUAL_TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
         }
@@ -150,7 +152,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
             verify(notificationService, times(1)).sendMail(
                 "rambo@email.com",
                 BILINGUAL_TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
         }
@@ -175,13 +177,13 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
             verify(notificationService, times(0)).sendMail(
                 "rambo@email.com",
                 BILINGUAL_TEMPLATE_ID,
-                getNotificationDataMap(caseData),
+                getNotificationDataMap(),
                 "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 APPLICANT_ONE_NAME, "Mr. John Rambo"
