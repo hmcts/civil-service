@@ -150,6 +150,7 @@ public class EventHistoryMapper {
         stateFlowEngine.evaluate(caseData).getStateHistory()
             .forEach(state -> {
                 FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state.getName());
+                log.info("flow state is: {}", flowState);
                 switch (flowState) {
                     case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
                         buildUnrepresentedDefendant(builder, caseData);
@@ -1126,6 +1127,7 @@ public class EventHistoryMapper {
 
     private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                    LocalDateTime dateReceived) {
+        log.info("at buildQueriesEvent in history mapper");
         if (featureToggleService.isQueryManagementLRsEnabled()) {
             boolean queryOnCase = caseData.getQmApplicantSolicitorQueries() != null
                 || caseData.getQmRespondentSolicitor1Queries() != null
@@ -1134,6 +1136,7 @@ public class EventHistoryMapper {
                 || caseData.getQmRespondentCitizenQueries() != null;
 
             if (queryOnCase) {
+                log.info("at buildQueriesEvent in history mapper, QUERY ON CASE");
                 builder.miscellaneous(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
