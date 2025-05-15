@@ -17,7 +17,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
@@ -915,6 +918,85 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo("requester@example.com");
             assertThat(updatedCaseData.getApplicant1Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getAnyRepresented()).isEqualTo(YES);
+        }
+
+        @Test
+        void shouldResetLanguageFlag_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
+                    .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
+                    .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
+                    .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                    .applicant1Represented(NO)
+                    .anyRepresented(NO)
+                    .claimantBilingualLanguagePreference("WELSH")
+                    .build();
+            caseData = caseData.toBuilder().claimantLanguagePreferenceDisplay(PreferredLanguage.WELSH).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isNull();
+            assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isNull();
+        }
+
+        @Test
+        void shouldResetLanguageFlag_afterNocSubmittedByDefendantSolicitorForDefendantLip() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
+                    .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
+                    .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
+                    .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                    .applicant1Represented(NO)
+                    .anyRepresented(NO)
+                    .build();
+            caseData = caseData.toBuilder()
+                    .caseDataLiP(CaseDataLiP.builder()
+                            .respondent1LiPResponse(
+                                    RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()
+                            ).build())
+                    .defendantLanguagePreferenceDisplay(PreferredLanguage.WELSH).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isNull();
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isNull();
+        }
+
+        @Test
+        void shouldNotResetLanguageFlagIfWelshDisabled_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued()
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                    .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
+                    .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
+                    .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
+                    .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                    .applicant1Represented(NO)
+                    .anyRepresented(NO)
+                    .claimantBilingualLanguagePreference("WELSH")
+                    .build();
+            caseData = caseData.toBuilder().claimantLanguagePreferenceDisplay(PreferredLanguage.WELSH).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
+            assertThat(updatedCaseData.getClaimantLanguagePreferenceDisplay()).isEqualTo(PreferredLanguage.WELSH);
         }
 
         private void assertSolicitorReferences(boolean isApplicant, boolean isRespondent1, boolean respondent2Exists,
