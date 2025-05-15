@@ -5736,7 +5736,7 @@ class EventHistoryMapperTest {
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             CaseData caseData;
             if (queryType.equals("LR_QUERY")) {
-                 caseData = CaseDataBuilder.builder()
+                caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .build().toBuilder()
                     .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
@@ -5744,15 +5744,14 @@ class EventHistoryMapperTest {
                                                      .build())
                     .build();
             } else {
-                 caseData = CaseDataBuilder.builder()
+                caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .build().toBuilder()
                     .qmApplicantCitizenQueries(CaseQueriesCollection.builder()
-                                                     .roleOnCase("APPLICANT")
-                                                     .build())
+                                                   .roleOnCase("APPLICANT")
+                                                   .build())
                     .build();
             }
-
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
