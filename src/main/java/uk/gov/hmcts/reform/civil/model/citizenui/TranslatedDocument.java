@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_ISSUE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
@@ -34,6 +35,7 @@ public class TranslatedDocument {
             case ORDER_NOTICE : return ORDER_NOTICE_TRANSLATED_DOCUMENT;
             case STANDARD_DIRECTION_ORDER: return SDO_TRANSLATED_DOCUMENT;
             case INTERLOCUTORY_JUDGMENT: return INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
+            case MANUAL_DETERMINATION: return MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
             default: throw new DocumentUploadException("No document file type found for Translated document");
         }
     }
