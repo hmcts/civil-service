@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -16,11 +17,14 @@ import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
 @RequiredArgsConstructor
@@ -28,11 +32,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final ObjectMapper objectMapper;
+    private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
 
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        updateSystemGeneratedDocumentsWithOriginalDocuments(callbackParams);
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
@@ -53,6 +59,33 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             .build();
     }
 
+    private void updateSystemGeneratedDocumentsWithOriginalDocuments(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        List<Element<CaseDocument>> preTranslatedDocuments = caseData.getPreTranslationDocuments();
+        List<Element<CaseDocument>> sdoOrderDocuments = caseData.getPreTranslationSdoOrderDocuments();
+        if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
+            translatedDocuments.forEach(document -> {
+                if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
+                    Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
+                    List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+                    systemGeneratedDocuments.add(originalSdo);
+                } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
+                    Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
+
+                    List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+                    if (originalDocument.getValue().getDocumentName().contains("claimant")) {
+                        CaseDocument claimantSealedCopy = CaseDocument.toCaseDocument(originalDocument.getValue().getDocumentLink(),
+                                                                                originalDocument.getValue().getDocumentType());
+                        systemGeneratedDocuments.add(element(claimantSealedCopy));
+                        assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
+                    }
+                    systemGeneratedDocuments.add(originalDocument);
+                }
+            });
+        }
+    }
+
     private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
@@ -60,6 +93,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
                     document.getValue().getFile().setCategoryID("orders");
+                } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
+                    document.getValue().getFile().setCategoryID("caseManagementOrders");
                 }
             });
         }
@@ -82,6 +117,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(ORDER_NOTICE)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER_NOTICE;
+            } else if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
             }
         }
 
