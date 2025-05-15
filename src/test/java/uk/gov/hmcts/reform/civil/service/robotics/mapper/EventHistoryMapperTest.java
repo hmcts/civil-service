@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -5725,16 +5727,32 @@ class EventHistoryMapperTest {
             );
         }
 
-        @Test
-        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists() {
+        @ParameterizedTest
+        @CsvSource({
+            "LR_QUERY",
+            "LIP_QUERY",
+        })
+        void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists(String queryType) {
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateTakenOfflineByStaff()
-                .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
-                                                 .roleOnCase("APPLICANT")
-                                                 .build())
-                .build();
+            CaseData caseData;
+            if (queryType.equals("LR_QUERY")) {
+                 caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .build().toBuilder()
+                    .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                                                     .roleOnCase("APPLICANT")
+                                                     .build())
+                    .build();
+            } else {
+                 caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineByStaff()
+                    .build().toBuilder()
+                    .qmApplicantCitizenQueries(CaseQueriesCollection.builder()
+                                                     .roleOnCase("APPLICANT")
+                                                     .build())
+                    .build();
+            }
+
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
