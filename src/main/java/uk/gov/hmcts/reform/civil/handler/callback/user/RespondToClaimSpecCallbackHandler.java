@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -178,6 +179,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final FrcDocumentsUtils frcDocumentsUtils;
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final FeatureToggleService featureToggleService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     private final InterestCalculator interestCalculator;
 
     @Override
@@ -1494,6 +1496,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent2DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
             updatedData.respondent2DQ(dq.build());
+            requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2Spec(callbackParams, updatedData);
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
@@ -1542,6 +1545,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                             .build());
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
+            requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(callbackParams, updatedData);
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
