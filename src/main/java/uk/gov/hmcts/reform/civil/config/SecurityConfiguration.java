@@ -78,7 +78,6 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    // Public getter (if needed), but no setter to prevent modification
     public static String[] getAuthWhitelist() {
         return Arrays.copyOf(AUTH_WHITELIST, AUTH_WHITELIST.length);
     }

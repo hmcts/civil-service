@@ -15,34 +15,29 @@ public class CustomAuthCheckerUserOnlyFilter<T extends User> extends AuthChecker
 
     @Override
     protected Object getPreAuthenticatedPrincipal(HttpServletRequest request) {
-        // Skip processing for whitelisted endpoints
         if (isWhitelisted(request.getRequestURI())) {
-            return null;  // Skip authentication logic for whitelisted endpoints
+            return null;
         }
         return super.getPreAuthenticatedPrincipal(request);
     }
 
     @Override
     protected Object getPreAuthenticatedCredentials(HttpServletRequest request) {
-        // Skip processing for whitelisted endpoints
         if (isWhitelisted(request.getRequestURI())) {
-            return null;  // Skip credentials processing for whitelisted endpoints
+            return null;
         }
         return super.getPreAuthenticatedCredentials(request);
     }
 
     boolean isWhitelisted(String requestURI) {
         for (String endpoint : SecurityConfiguration.getAuthWhitelist()) {
-            // Special case for the root path "/"
             if (endpoint.equals("/")) {
                 if (requestURI.equals("/")) {
-                    return true;  // Exact match for the root path "/"
+                    return true;
                 }
                 continue;
             }
-            // Strip out wildcards ** or * and match the URI using startsWith()
             String strippedEndpoint = endpoint.replace("**", "").replace("*", "");
-            // Use startsWith to check if the requestURI starts with the stripped endpoint
             if (requestURI.startsWith(strippedEndpoint)) {
                 return true;
             }
