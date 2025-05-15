@@ -90,9 +90,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     }
                 } else if (document.getValue().getDocumentType().equals(MANUAL_DETERMINATION)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
-                    Optional<Element<CaseDocument>> preTranslationManualDeterminationDoc = preTranslationDocuments.stream()
-                        .filter(item -> item.getValue().getDocumentType() == DocumentType.LIP_MANUAL_DETERMINATION)
-                        .findFirst();
+                        Optional<Element<CaseDocument>> preTranslationManualDeterminationDoc = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.LIP_MANUAL_DETERMINATION)
+                            .findFirst();
                         preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationManualDeterminationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
