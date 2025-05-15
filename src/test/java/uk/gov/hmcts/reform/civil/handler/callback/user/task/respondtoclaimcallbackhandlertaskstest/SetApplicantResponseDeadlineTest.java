@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtoclaimcallbackhandlertaskstest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -32,9 +35,11 @@ import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -81,8 +86,10 @@ class SetApplicantResponseDeadlineTest {
     @Mock
     private  AssignCategoryId assignCategoryId;
 
-    @Mock
-    private  ObjectMapper objectMapper;
+    @Spy
+    private final ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @Mock
     private  CoreCaseUserService coreCaseUserService;
@@ -231,5 +238,50 @@ class SetApplicantResponseDeadlineTest {
         assertEquals("AWAITING_APPLICANT_INTENTION", response.getState());
 
         verify(frcDocumentsUtils).assembleDefendantsFRCDocuments(caseData);
+    }
+
+    @Test
+    void shouldExtendClaimDeadline() {
+        LocalDateTime responseDate = LocalDateTime.now();
+        LocalDateTime deadline = responseDate.plusDays(4);
+
+        when(time.now()).thenReturn(responseDate);
+        when(deadlinesCalculator.calculateApplicantResponseDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        CallbackRequest callbackRequest = CallbackRequest
+            .builder()
+            .eventId(CREATE_CLAIM.name())
+            .caseDetailsBefore(CaseDetails.builder().data(Map.of("state", "created")).build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .claimDismissedDeadline(LocalDateTime.now().plusMonths(6))
+            .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+            .respondentResponseIsSame(NO)
+            .respondent2SameLegalRepresentative(NO)
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .build();
+
+        CallbackParams callbackParams = CallbackParams.builder()
+            .caseData(caseData)
+            .params(Map.of(BEARER_TOKEN, "BearerToken"))
+            .request(callbackRequest)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) setApplicantResponseDeadline.execute(callbackParams);
+
+        Object deadlineValue = response.getData().get("claimDismissedDeadline");
+
+        LocalDateTime actual = LocalDateTime.parse(deadlineValue.toString());
+        LocalDateTime expected = LocalDateTime.now().plusMonths(24);
+
+        assertThat(actual.toLocalDate()).isEqualTo(expected.toLocalDate());
     }
 }

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 @Slf4j
 public class SetApplicantResponseDeadline implements CaseTask {
 
+    private static final int RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FrcDocumentsUtils frcDocumentsUtils;
@@ -88,6 +90,10 @@ public class SetApplicantResponseDeadline implements CaseTask {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> updatedData = updateRespondentAddresses(caseData);
+        updatedData.claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            RESPONSE_CLAIM_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
 
         LocalDateTime responseDate = time.now();
         LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate);

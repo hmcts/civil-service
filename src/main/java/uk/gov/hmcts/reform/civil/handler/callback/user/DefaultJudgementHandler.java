@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
@@ -57,9 +57,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
     public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested ";
     public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
+    private static final int DEFAULT_JUDGEMENT_DEADLINE_EXTENSION_MONTHS = 24;
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -267,6 +268,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicantDJ(caseDataBuilder);
         caseDataBuilder.setRequestDJDamagesFlagForWA(YesOrNo.YES).build();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
+        caseDataBuilder.claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            DEFAULT_JUDGEMENT_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
