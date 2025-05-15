@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -21,7 +22,9 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -49,10 +52,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataLip.setTranslatedDocuments(null);
         }
 
-        CaseData updatedCaseData = caseData.toBuilder().systemGeneratedCaseDocuments(
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)
-            .caseDataLiP(caseDataLip)
-            .businessProcess(BusinessProcess.ready(businessProcessEvent)).build();
+            .caseDataLiP(caseDataLip);
+
+        if (businessProcessEvent != null) {
+            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
+        }
+        CaseData updatedCaseData = caseDataBuilder.build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
@@ -64,12 +71,21 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslatedDocuments = caseData.getPreTranslationDocuments();
         List<Element<CaseDocument>> sdoOrderDocuments = caseData.getPreTranslationSdoOrderDocuments();
+        List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
                 if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
                     Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
                     systemGeneratedDocuments.add(originalSdo);
+                }  else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.INTERLOCUTORY_JUDGEMENT)
+                            .findFirst();
+                        preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
+                        preTranslationInterlocJudgment.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
 
@@ -80,7 +96,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         systemGeneratedDocuments.add(element(claimantSealedCopy));
                         assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
                     }
-                    systemGeneratedDocuments.add(originalDocument);
                 }
             });
         }
@@ -102,15 +117,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
-        if ((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
-                || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData))) {
-            if (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
-            } else if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION;
-            }
-        }
-
         if (featureToggleService.isCaseProgressionEnabled()) {
             List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
 
@@ -120,6 +126,18 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
+            } else if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
+                return null;
+            }
+        }
+
+        if ((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
+                || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData))) {
+            if (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED) {
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
+            } else if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION;
             }
         }
 
