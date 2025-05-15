@@ -139,6 +139,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabled() {
         //Given
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         List<Element<CaseDocument>> documents = List.of(
                 element(CaseDocument.builder().documentName("Stitched document").build()),
@@ -174,6 +175,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         //Given
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName("responseForm.pdf").build()));
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
@@ -207,6 +209,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
             .claimantBilingualLanguagePreference(Language.WELSH.toString())
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
         //When
