@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @Slf4j
 public class InitiateGeneralApplicationService {
 
+    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
@@ -85,6 +87,10 @@ public class InitiateGeneralApplicationService {
 
     private CaseData populateGeneralApplicationData(CaseData.CaseDataBuilder<?, ?> dataBuilder, List<Element<GeneralApplication>> applications) {
         return dataBuilder
+            .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                GA_CLAIM_DEADLINE_EXTENSION_MONTHS,
+                LocalDate.now()
+            ))
             .generalApplications(applications)
             .generalAppType(GAApplicationType.builder().build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())

@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
@@ -95,6 +96,8 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @MockBean
     private RoboticsAddressMapper addressMapper;
@@ -1796,4 +1799,49 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void shouldExtendDeadline() {
+        when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(24));
+
+        Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+        Party respondent = Party.builder()
+            .individualFirstName("Dis")
+            .individualLastName("Guy")
+            .type(INDIVIDUAL).flags(respondent1Flags).build();
+
+        CaseData caseDataBefore = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .respondent1(respondent).build()
+            .toBuilder()
+            .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
+            .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
+            .caseNamePublic("'John Rambo' v 'Dis Guy'")
+            .build();
+
+        when(interestCalculator.calculateInterest(any()))
+            .thenReturn(BigDecimal.valueOf(0)
+            );
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Smith")
+                                                 .build())
+                                      .build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, caseDataBefore.toMap(mapper));
+
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        Object deadlineValue = response.getData().get("claimDismissedDeadline");
+        assertThat(deadlineValue).isNotNull();
+
+        LocalDate expectedDate = LocalDate.now().plusMonths(24);
+        LocalDate actualDate = LocalDateTime.parse(deadlineValue.toString()).toLocalDate();
+
+        assertThat(actualDate).isEqualTo(expectedDate);
+    }
 }
