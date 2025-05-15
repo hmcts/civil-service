@@ -1127,9 +1127,13 @@ public class EventHistoryMapper {
     private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                    LocalDateTime dateReceived) {
         if (featureToggleService.isQueryManagementLRsEnabled()) {
-            if (caseData.getQmApplicantSolicitorQueries() != null
+            boolean queryOnCase = caseData.getQmApplicantSolicitorQueries() != null
                 || caseData.getQmRespondentSolicitor1Queries() != null
-                || caseData.getQmRespondentSolicitor2Queries() != null) {
+                || caseData.getQmRespondentSolicitor2Queries() != null
+                || caseData.getQmApplicantCitizenQueries() != null
+                || caseData.getQmRespondentCitizenQueries() != null;
+
+            if (queryOnCase) {
                 builder.miscellaneous(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
