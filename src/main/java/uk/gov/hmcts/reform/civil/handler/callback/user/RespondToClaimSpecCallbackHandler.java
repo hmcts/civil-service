@@ -1203,6 +1203,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
             BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
             updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
+            updatedCaseData.totalClaimAmountPlusInterestAdmitPart2(totalAmountWithInterest);
         }
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
