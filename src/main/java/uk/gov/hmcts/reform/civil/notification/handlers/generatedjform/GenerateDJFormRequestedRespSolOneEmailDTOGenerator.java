@@ -23,11 +23,6 @@ public class GenerateDJFormRequestedRespSolOneEmailDTOGenerator extends RespSolO
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getInterimJudgmentRequestedDefendant();
-    }
-
-    @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE_REQUEST_DEF;
     }
@@ -39,5 +34,10 @@ public class GenerateDJFormRequestedRespSolOneEmailDTOGenerator extends RespSolO
         properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName());
         return properties;
+    }
+
+    @Override
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getInterimJudgmentRequestedDefendant();
     }
 }

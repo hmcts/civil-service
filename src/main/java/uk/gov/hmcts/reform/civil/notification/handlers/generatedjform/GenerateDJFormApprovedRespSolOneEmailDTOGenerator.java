@@ -23,8 +23,12 @@ public class GenerateDJFormApprovedRespSolOneEmailDTOGenerator extends RespSolOn
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getInterimJudgmentApprovalDefendant();
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        boolean isRespondent1 = true;
+        properties.put(LEGAL_ORG_DEF, getLegalOrganizationNameForRespondent(caseData, isRespondent1, organisationService));
+        properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
+        properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName());
+        return properties;
     }
 
     @Override
@@ -33,11 +37,7 @@ public class GenerateDJFormApprovedRespSolOneEmailDTOGenerator extends RespSolOn
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        boolean isRespondent1 = true;
-        properties.put(LEGAL_ORG_DEF, getLegalOrganizationNameForRespondent(caseData, isRespondent1, organisationService));
-        properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
-        properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName());
-        return properties;
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getInterimJudgmentApprovalDefendant();
     }
 }
