@@ -25,7 +25,7 @@ public abstract class Notifier extends BaseNotifier {
 
     public void notifyParties(CaseData caseData, String eventId, String taskId) {
         log.info("Notifying parties for case ID: {} and eventId: {} and taskId: {} ", caseData.getCcdCaseReference(), eventId, taskId);
-        final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData);
+        final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData, taskId);
         final List<String> errors = sendNotification(partiesToEmail);
         if (!errors.isEmpty()) {
             final HashMap<String, String> additionalProperties = new HashMap<>();
