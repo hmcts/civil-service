@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.List;
@@ -27,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_SOLICITOR;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
@@ -75,13 +78,18 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
         String recipientEmail = getRecipientEmail(caseEvent, caseData);
         boolean isRespondentNotification = isRespondentNotification(caseEvent);
         boolean isApplicantSolicitorNotify = isApplicantSolicitorNotification(caseEvent);
-        String templateId = getTemplateID(isRespondentNotification, isApplicantSolicitorNotify, caseData.isClaimantBilingual());
+        String templateId = getTemplateID(
+            isRespondentNotification,
+            isApplicantSolicitorNotify,
+            caseData.isClaimantBilingual(),
+            caseData.isRespondent1LiP()
+        );
         boolean eligibleForNotification = isNotEmpty(recipientEmail) && templateId != null;
         if (eligibleForNotification) {
             notificationService.sendMail(
                 recipientEmail,
                 templateId,
-                isApplicantSolicitorNotify ? addPropertiesApplicantSolicitor(caseData) : addProperties(caseData),
+                getEmailProperties(caseData, isRespondentNotification, isApplicantSolicitorNotify),
                 String.format(REFERENCE_TEMPLATE_DEFENDANT, caseData.getLegacyCaseReference())
             );
         }
@@ -112,14 +120,37 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
 
     public Map<String, String> addPropertiesApplicantSolicitor(CaseData caseData) {
         return Map.of(
-                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
-                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-                LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+            LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                         .getOrganisation().getOrganisationID()),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
         );
+    }
+
+    public Map<String, String> addPropertiesForDefendantSolicitor(CaseData caseData) {
+        return Map.of(
+            CASEMAN_REF, caseData.getLegacyCaseReference(),
+            CASE_NAME, NocNotificationUtils.getCaseName(caseData),
+            ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
+            CCD_REF, caseData.getCcdCaseReference().toString(),
+            OTHER_SOL_NAME, getLegalOrganizationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)),
+            NEW_SOL, getLegalOrganizationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+        );
+    }
+
+    public Map<String, String> getEmailProperties(CaseData caseData, boolean isDefendantEvent,
+                                                  boolean isApplicantSolicitorNotify) {
+        if (isDefendantEvent && !caseData.isRespondent1LiP()) {
+            return addPropertiesForDefendantSolicitor(caseData);
+        }
+        if (isApplicantSolicitorNotify) {
+            return addPropertiesApplicantSolicitor(caseData);
+        }
+        return addProperties(caseData);
     }
 
     private boolean isRespondentNotification(CaseEvent caseEvent) {
@@ -128,14 +159,19 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
     }
 
     private String getRecipientEmailForRespondent(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondent1())
-            .map(Party::getPartyEmail)
-            .orElse("");
+        if (caseData.isRespondent1LiP()) {
+            return Optional.ofNullable(caseData.getRespondent1())
+                .map(Party::getPartyEmail)
+                .orElse("");
+        }
+        return caseData.getRespondentSolicitor1EmailAddress();
     }
 
-    private String getTemplateID(boolean isDefendantEvent, boolean isApplicantSolicitorNotify, boolean isBilingual) {
+    private String getTemplateID(boolean isDefendantEvent, boolean isApplicantSolicitorNotify, boolean isBilingual,
+                                 boolean isRespondentLip) {
         if (isDefendantEvent) {
-            return notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate();
+            return isRespondentLip ? notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate() :
+                notificationsProperties.getNoticeOfChangeOtherParties();
         }
         if (isBilingual) {
             return notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate();
