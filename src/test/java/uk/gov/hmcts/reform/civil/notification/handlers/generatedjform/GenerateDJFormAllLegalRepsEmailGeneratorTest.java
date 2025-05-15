@@ -50,6 +50,8 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
     @Mock
     private GenerateDJFormHelper generateDJFormHelper;
 
+    private static final String TASK_ID = "taskId";
+
     @InjectMocks
     private GenerateDJFormAllLegalRepsEmailGenerator generator;
 
@@ -78,15 +80,15 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         when(generateDJFormHelper.checkDefendantRequested(caseData, false)).thenReturn(false);
         when(generateDJFormHelper.checkIfBothDefendants(caseData)).thenReturn(true);
 
-        when(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData))
+        when(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID))
             .thenReturn(applicantEmail1)
             .thenReturn(applicantEmail2);
 
-        Set<EmailDTO> result = generator.getPartiesToNotify(caseData);
+        Set<EmailDTO> result = generator.getPartiesToNotify(caseData, TASK_ID);
 
         assertThat(result).containsExactlyInAnyOrder(applicantEmail1, applicantEmail2);
 
-        verify(approvedAppSolOneEmailDTOGenerator, times(2)).buildEmailDTO(caseData);
+        verify(approvedAppSolOneEmailDTOGenerator, times(2)).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -98,12 +100,12 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
             .thenReturn(true);
         when(generateDJFormHelper.checkDefendantRequested(caseData, true)).thenReturn(true);
         when(requestedRespSolOneEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
-        when(requestedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respondent1Email);
+        when(requestedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(respondent1Email);
 
-        Set<EmailDTO> result = generator.getRespondents(caseData);
+        Set<EmailDTO> result = generator.getRespondents(caseData, TASK_ID);
 
         assertThat(result).containsExactly(respondent1Email);
-        verify(requestedRespSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(requestedRespSolOneEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -116,12 +118,12 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         when(generateDJFormHelper.checkDefendantRequested(caseData, true)).thenReturn(false);
         when(generateDJFormHelper.checkDefendantRequested(caseData, false)).thenReturn(true);
         when(requestedRespSolTwoEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
-        when(requestedRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respondent2Email);
+        when(requestedRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(respondent2Email);
 
-        Set<EmailDTO> result = generator.getRespondents(caseData);
+        Set<EmailDTO> result = generator.getRespondents(caseData, TASK_ID);
 
         assertThat(result).containsExactly(respondent2Email);
-        verify(requestedRespSolTwoEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(requestedRespSolTwoEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -137,14 +139,14 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         when(generateDJFormHelper.checkIfBothDefendants(caseData)).thenReturn(true);
         when(approvedRespSolOneEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
         when(approvedRespSolTwoEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
-        when(approvedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respondent1Email);
-        when(approvedRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respondent2Email);
+        when(approvedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(respondent1Email);
+        when(approvedRespSolTwoEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(respondent2Email);
 
-        Set<EmailDTO> result = generator.getRespondents(caseData);
+        Set<EmailDTO> result = generator.getRespondents(caseData, TASK_ID);
 
         assertThat(result).containsExactlyInAnyOrder(respondent1Email, respondent2Email);
-        verify(approvedRespSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(approvedRespSolTwoEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(approvedRespSolOneEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
+        verify(approvedRespSolTwoEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -155,12 +157,12 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData))
             .thenReturn(false);
         when(approvedRespSolOneEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
-        when(approvedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respondent1Email);
+        when(approvedRespSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(respondent1Email);
 
-        Set<EmailDTO> result = generator.getRespondents(caseData);
+        Set<EmailDTO> result = generator.getRespondents(caseData, TASK_ID);
 
         assertThat(result).containsExactly(respondent1Email);
-        verify(approvedRespSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(approvedRespSolOneEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -174,7 +176,7 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         when(generateDJFormHelper.checkDefendantRequested(caseData, false)).thenReturn(false);
         when(generateDJFormHelper.checkIfBothDefendants(caseData)).thenReturn(false);
 
-        Set<EmailDTO> result = generator.getRespondents(caseData);
+        Set<EmailDTO> result = generator.getRespondents(caseData, TASK_ID);
 
         assertThat(result).isEmpty();
 
@@ -191,13 +193,13 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
             .thenReturn(true);
 
         when(generateDJFormHelper.checkDefendantRequested(caseData, true)).thenReturn(true);
-        when(requestedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(requestedAppSolEmail);
+        when(requestedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(requestedAppSolEmail);
 
-        Set<EmailDTO> result = generator.getApplicant(caseData);
+        Set<EmailDTO> result = generator.getApplicant(caseData, TASK_ID);
 
         assertThat(result).containsExactly(requestedAppSolEmail);
 
-        verify(requestedAppSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(requestedAppSolOneEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -213,14 +215,14 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         when(generateDJFormHelper.checkDefendantRequested(caseData, true)).thenReturn(false);
         when(generateDJFormHelper.checkDefendantRequested(caseData, false)).thenReturn(false);
         when(generateDJFormHelper.checkIfBothDefendants(caseData)).thenReturn(true);
-        when(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(approvedAppSolEmail1, approvedAppSolEmail2);
+        when(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(approvedAppSolEmail1, approvedAppSolEmail2);
         when(generateDJFormHelper.updateRespondent2Properties(anyMap(), eq(caseData))).thenReturn(updatedProperties);
 
-        Set<EmailDTO> result = generator.getApplicant(caseData);
+        Set<EmailDTO> result = generator.getApplicant(caseData, TASK_ID);
 
         assertThat(result).containsExactlyInAnyOrder(approvedAppSolEmail1, approvedAppSolEmail2);
 
-        verify(approvedAppSolOneEmailDTOGenerator, times(2)).buildEmailDTO(caseData);
+        verify(approvedAppSolOneEmailDTOGenerator, times(2)).buildEmailDTO(caseData, TASK_ID);
         verify(generateDJFormHelper).updateRespondent2Properties(anyMap(), eq(caseData));
     }
 
@@ -232,13 +234,13 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData))
             .thenReturn(false);
 
-        when(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(approvedAppSolEmail);
+        when(approvedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(approvedAppSolEmail);
 
-        Set<EmailDTO> result = generator.getApplicant(caseData);
+        Set<EmailDTO> result = generator.getApplicant(caseData, TASK_ID);
 
         assertThat(result).containsExactly(approvedAppSolEmail);
 
-        verify(approvedAppSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(approvedAppSolOneEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -252,7 +254,7 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         when(generateDJFormHelper.checkDefendantRequested(caseData, false)).thenReturn(false);
         when(generateDJFormHelper.checkIfBothDefendants(caseData)).thenReturn(false);
 
-        Set<EmailDTO> result = generator.getApplicant(caseData);
+        Set<EmailDTO> result = generator.getApplicant(caseData, TASK_ID);
 
         assertThat(result).isEmpty();
 
@@ -270,13 +272,13 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         when(generateDJFormHelper.checkDefendantRequested(caseData, true)).thenReturn(false);
         when(generateDJFormHelper.checkDefendantRequested(caseData, false)).thenReturn(true);
 
-        when(requestedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(requestedAppSolEmail);
+        when(requestedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData, TASK_ID)).thenReturn(requestedAppSolEmail);
 
-        Set<EmailDTO> result = generator.getApplicant(caseData);
+        Set<EmailDTO> result = generator.getApplicant(caseData, TASK_ID);
 
         assertThat(result).containsExactly(requestedAppSolEmail);
 
-        verify(requestedAppSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(requestedAppSolOneEmailDTOGenerator).buildEmailDTO(caseData, TASK_ID);
     }
 
     @Test
@@ -284,7 +286,7 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         Set<EmailDTO> partiesToEmail = new HashSet<>();
 
-        generator.addIfPartyNeedsNotification(caseData, null, partiesToEmail);
+        generator.addIfPartyNeedsNotification(caseData, TASK_ID, null, partiesToEmail);
 
         assertThat(partiesToEmail).isEmpty();
     }
