@@ -23,13 +23,13 @@ public class GenerateDJFormApprovedRespSolTwoEmailDTOGenerator extends RespSolTw
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getInterimJudgmentApprovalDefendant();
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE_APPROVAL_DEF;
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE_APPROVAL_DEF;
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getInterimJudgmentApprovalDefendant();
     }
 
     @Override

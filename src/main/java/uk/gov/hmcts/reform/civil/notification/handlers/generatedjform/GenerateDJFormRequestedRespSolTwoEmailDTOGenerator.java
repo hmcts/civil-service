@@ -28,16 +28,16 @@ public class GenerateDJFormRequestedRespSolTwoEmailDTOGenerator extends RespSolT
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE_REQUEST_DEF;
-    }
-
-    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         boolean isRespondent1 = false;
         properties.put(LEGAL_ORG_DEF, getLegalOrganizationNameForRespondent(caseData, isRespondent1, organisationService));
         properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName());
         return properties;
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE_REQUEST_DEF;
     }
 }
