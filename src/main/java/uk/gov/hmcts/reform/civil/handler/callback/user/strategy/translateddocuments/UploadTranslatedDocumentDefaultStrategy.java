@@ -80,7 +80,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
                     systemGeneratedDocuments.add(originalSdo);
-                }  else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
+                } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.INTERLOCUTORY_JUDGEMENT)
@@ -88,17 +88,16 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
                         preTranslationInterlocJudgment.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
-                }  else if (document.getValue().getDocumentType().equals(MANUAL_DETERMINATION)) {
+                } else if (document.getValue().getDocumentType().equals(MANUAL_DETERMINATION)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
-                    Optional<Element<CaseDocument>> preTranslationManualDeterminationDoc= preTranslationDocuments.stream()
+                    Optional<Element<CaseDocument>> preTranslationManualDeterminationDoc = preTranslationDocuments.stream()
                         .filter(item -> item.getValue().getDocumentType() == DocumentType.LIP_MANUAL_DETERMINATION)
                         .findFirst();
                         preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationManualDeterminationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
-               }  else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
+                } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
-
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
                     if (originalDocument.getValue().getDocumentName().contains("claimant")) {
                         CaseDocument claimantSealedCopy = CaseDocument.toCaseDocument(originalDocument.getValue().getDocumentLink(),
