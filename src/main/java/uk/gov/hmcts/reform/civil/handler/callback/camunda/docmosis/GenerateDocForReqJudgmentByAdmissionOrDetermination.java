@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
@@ -61,6 +63,7 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
                     .getPreTranslationDocuments();
                 translatedDocuments.add(element(claimantResponseDoc));
                 updatedCaseDataBuilder.preTranslationDocuments(translatedDocuments);
+                updatedCaseDataBuilder.preTranslationDocumentType(getTranslatedDocumentType(caseEvent));
             } else {
                 updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                     claimantResponseDoc,
@@ -72,6 +75,13 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private PreTranslationDocumentType getTranslatedDocumentType(CaseEvent caseEvent) {
+        return switch (caseEvent) {
+            case GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC -> PreTranslationDocumentType.CCJ_REQUEST_ADMISSION;
+            default -> null;
+        };
     }
 
     private boolean shouldGenerateJudgmentDoc(CaseEvent caseEvent, CaseData caseData) {

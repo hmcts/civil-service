@@ -97,13 +97,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationManualDeterminationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
                 } else if (document.getValue().getDocumentType().equals(CCJ_REQUEST_ADMISSION)) {
-                        if (Objects.nonNull(preTranslationDocuments)) {
-                            Optional<Element<CaseDocument>> preTranslationDoc = preTranslationDocuments.stream()
-                                .filter(item -> item.getValue().getDocumentType() == DocumentType.CCJ_REQUEST_ADMISSION)
-                                .findFirst();
-                            preTranslationDoc.ifPresent(preTranslationDocuments::remove);
-                            preTranslationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
-                        }
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationDoc = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.CCJ_REQUEST_ADMISSION)
+                            .findFirst();
+                        preTranslationDoc.ifPresent(preTranslationDocuments::remove);
+                        preTranslationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();

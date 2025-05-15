@@ -14,12 +14,12 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
