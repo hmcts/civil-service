@@ -616,6 +616,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private List<DocumentToKeepCollection> documentToKeepCollection;
 
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsApp;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes1;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes2;
+
     private final ChangeLanguagePreference changeLanguagePreference;
     private final PreferredLanguage claimantLanguagePreferenceDisplay;
     private final PreferredLanguage defendantLanguagePreferenceDisplay;
