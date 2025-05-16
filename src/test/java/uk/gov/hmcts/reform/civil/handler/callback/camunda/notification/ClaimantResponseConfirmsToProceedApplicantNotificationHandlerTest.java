@@ -198,7 +198,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
 
             verify(notificationService, times(0)).sendMail(
                 "rambo@email.com",
-               TEMPLATE_ID,
+                TEMPLATE_ID,
                 getNotificationDataMap(),
                 "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
