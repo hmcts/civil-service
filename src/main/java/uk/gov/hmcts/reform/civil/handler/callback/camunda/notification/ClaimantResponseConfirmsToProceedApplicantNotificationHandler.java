@@ -73,6 +73,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     }
 
     private boolean shouldSendNotification(CaseData caseData, String eventId) {
+        System.out.println("I am here too");
         if (featureToggleService.isGaForWelshEnabled()) {
             return ((!(caseData.isClaimantBilingual()
                 || caseData.isRespondentResponseBilingual()
@@ -85,17 +86,20 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
 
     private String getEmailTemplate(CaseData caseData) {
         if (isBilingualForLipApplicant(caseData)) {
+            System.out.println("I am BIlingual");
             return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
         }
+        System.out.println("I am English");
         return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
     }
 
     private boolean isBilingualForLipApplicant(CaseData caseData) {
+        System.out.println("I am here");
         return caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()
-            && caseData.isClaimantBilingual()
+            && (caseData.isClaimantBilingual()
             || (featureToggleService.isGaForWelshEnabled() && (caseData.isRespondentResponseBilingual()
             || caseData.isLipDefendantSpecifiedBilingualDocuments()
-            || caseData.isLipClaimantSpecifiedBilingualDocuments()));
+            || caseData.isLipClaimantSpecifiedBilingualDocuments())));
     }
 
     @Override

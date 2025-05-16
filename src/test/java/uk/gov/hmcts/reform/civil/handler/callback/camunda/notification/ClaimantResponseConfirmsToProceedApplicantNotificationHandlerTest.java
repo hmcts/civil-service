@@ -144,28 +144,32 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage("ENGLISH")
+                                                                              .build()).build())
                 .applicant1(Party.builder().partyEmail("rambo@email.com").type(Party.Type.INDIVIDUAL)
                                 .individualFirstName("Mr. John").individualLastName("Rambo").build()).build();
-            caseData.setClaimantBilingualLanguagePreference("BOTH");
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name())
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED.name())
                     .build()).build();
 
             handler.handle(params);
 
             verify(notificationService, times(1)).sendMail(
                 "rambo@email.com",
-                BILINGUAL_TEMPLATE_ID,
+                TEMPLATE_ID,
                 getNotificationDataMap(),
                 "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
         }
 
         @ParameterizedTest
-        @CsvSource({"WELSH, ENGLISH, ENGLISH, WELSH",
-            "WELSH, BOTH, ENGLISH, WELSH",
-            "WELSH, WELSH, WELSH, WELSH"})
+        @CsvSource({"WELSH, ENGLISH, ENGLISH, ENGLISH",
+            "ENGLISH, WELSH, ENGLISH, WELSH",
+            "ENGLISH, ENGLISH, WELSH, ENGLISH",
+            "ENGLISH, ENGLISH, ENGLISH, WELSH"})
         void shouldNotNotifyLipApplicant_whenMainCaseHasWelshParty(String claimantLang, String respondentLang,
                                                                    Language claimantDocLang, Language respondentDocLang) {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
@@ -187,13 +191,14 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                CallbackRequest.builder().eventId("NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC")
                     .build()).build();
+
             handler.handle(params);
 
             verify(notificationService, times(0)).sendMail(
                 "rambo@email.com",
-                BILINGUAL_TEMPLATE_ID,
+               TEMPLATE_ID,
                 getNotificationDataMap(),
                 "claimant-confirms-to-proceed-applicant-notification-000DC001"
             );
