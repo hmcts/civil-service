@@ -1,22 +1,23 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.notification.handlers.resetpin.ResetPinDefendantLipNotifier;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,17 +26,27 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    ResetPinCUICallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-    @Autowired
+    @Mock
+    private ResetPinDefendantLipNotifier resetPinDefendantLipNotifier;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     private ResetPinCUICallbackHandler handler;
+
+    @BeforeEach
+    public void setUpTest() {
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        handler = new ResetPinCUICallbackHandler(
+            defendantPinToPostLRspecService,
+            resetPinDefendantLipNotifier,
+            objectMapper
+        );
+    }
 
     @Nested
     class AboutToSubmitCallback {
@@ -43,10 +54,10 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         private final DefendantPinToPostLRspec givenPin =
             DefendantPinToPostLRspec.builder()
                 .expiryDate(LocalDate.of(
-                                2021,
-                                1,
-                                1
-                            )
+                        2021,
+                        1,
+                        1
+                    )
                 )
                 .citizenCaseRole("citizen")
                 .respondentCaseRole("citizen")
@@ -61,6 +72,7 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldResetPinExpiryDate() {
             given(defendantPinToPostLRspecService.resetPinExpiryDate(any())).willReturn(pin);
+            given(resetPinDefendantLipNotifier.notifyParties(any())).willReturn(List.of());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().addRespondent1PinToPostLRspec(givenPin)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -71,6 +83,21 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("respondent1PinToPostLRspec")
                 .extracting("expiryDate")
                 .isEqualTo(pin.getExpiryDate().toString());
+            verify(defendantPinToPostLRspecService, times(1)).resetPinExpiryDate(givenPin);
+        }
+
+        @Test
+        void shouldHandleErrorsFromResetPinExpiryDate() {
+            given(defendantPinToPostLRspecService.resetPinExpiryDate(any())).willReturn(pin);
+            given(resetPinDefendantLipNotifier.notifyParties(any())).willReturn(List.of("An error occured"));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().addRespondent1PinToPostLRspec(givenPin)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().get(0))
+                .isEqualTo("An error occured");
             verify(defendantPinToPostLRspecService, times(1)).resetPinExpiryDate(givenPin);
         }
     }
