@@ -19,7 +19,7 @@ public class ResetPinDefendantLipNotifier extends BaseNotifier {
     }
 
     public List<String> notifyParties(CaseData caseData) {
-        return sendNotification(partiesNotifier.getPartiesToNotify(caseData));
+        return sendNotification(partiesNotifier.getPartiesToNotify(caseData, null));
     }
 }
 

@@ -16,9 +16,9 @@ public class ResetPinDefendantLipEmailGenerator implements PartiesEmailGenerator
     private final ResetPinDefendantLipEmailDTOGenerator resetPinDefendantLipEmailDTOGenerator;
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
+    public Set<EmailDTO> getPartiesToNotify(final CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
-        partiesToEmail.add(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData));
+        partiesToEmail.add(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         return partiesToEmail;
     }
 }

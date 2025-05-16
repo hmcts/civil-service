@@ -39,12 +39,12 @@ class ResetPinDefendantLipEmailGeneratorTest {
             .reference("reset-pin-notification")
             .build();
 
-        when(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(emailDTO);
+        when(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData, null)).thenReturn(emailDTO);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, null);
 
         assertThat(partiesToNotify).hasSize(1);
         assertThat(partiesToNotify).contains(emailDTO);
-        verify(resetPinDefendantLipEmailDTOGenerator, times(1)).buildEmailDTO(caseData);
+        verify(resetPinDefendantLipEmailDTOGenerator, times(1)).buildEmailDTO(caseData, null);
     }
 }
