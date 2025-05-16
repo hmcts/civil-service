@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 class QueryDocumentTest {
 
     private static LocalDate HEARING_DATE = LocalDate.of(2025, 3, 15);
-    private static LocalDateTime DATE_QUERY_RAISED = LocalDateTime.of(2025, 1, 15, 12, 0, 0);
+    private static OffsetDateTime DATE_QUERY_RAISED = OffsetDateTime.of(LocalDateTime.of(2025, 1, 15, 12, 0, 0), ZoneOffset.UTC);
     private static String CASE_ID = "1111222233334444";
     private static UUID SOLICITOR_ID = UUID.randomUUID();
     private static UUID CASEWORKER_ID = UUID.randomUUID();

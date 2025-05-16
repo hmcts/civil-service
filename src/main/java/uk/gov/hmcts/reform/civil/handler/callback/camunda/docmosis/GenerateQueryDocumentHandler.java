@@ -82,7 +82,7 @@ public class GenerateQueryDocumentHandler extends CallbackHandler {
             queryDocumentCategory
         );
 
-        updateQueryDocument(messageThread.get(0).getValue().getCreatedOn(), caseDocument, builder);
+        updateQueryDocument(messageThread.get(0).getValue().getCreatedOn().toLocalDateTime(), caseDocument, builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper)).build();
