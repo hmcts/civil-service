@@ -15,7 +15,7 @@ public abstract class ClaimantEmailDTOGenerator extends EmailDTOGenerator {
         return caseData.getApplicant1Email();
     }
 
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isApplicantLiP() ? Boolean.TRUE : Boolean.FALSE;
     }
 
