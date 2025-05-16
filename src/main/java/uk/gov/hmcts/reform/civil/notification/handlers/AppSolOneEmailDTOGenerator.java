@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLega
 @AllArgsConstructor
 public abstract class AppSolOneEmailDTOGenerator extends EmailDTOGenerator {
 
-    private final OrganisationService organisationService;
+    protected final OrganisationService organisationService;
 
     @Override
     public String getEmailAddress(CaseData caseData) {
@@ -24,7 +24,7 @@ public abstract class AppSolOneEmailDTOGenerator extends EmailDTOGenerator {
         return properties;
     }
 
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isApplicantLiP() ? Boolean.FALSE : Boolean.TRUE;
     }
 }
