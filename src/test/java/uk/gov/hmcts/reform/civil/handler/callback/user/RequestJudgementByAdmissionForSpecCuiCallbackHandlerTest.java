@@ -59,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSIO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -106,7 +107,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1ResponseDate(LocalDateTime.now())
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .ccdState(AWAITING_APPLICANT_INTENTION)
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
                 .build();
@@ -121,7 +122,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             LocalDate whenWillPay = LocalDate.of(2023, 10, 11);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1ResponseDate(LocalDateTime.now().minusDays(15))
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .ccdState(AWAITING_APPLICANT_INTENTION)
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
@@ -821,6 +822,43 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
+                .handle(params);
+            assertEquals(format("# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
+                                caseData.getLegacyCaseReference()), response.getConfirmationHeader());
+            assertThat(response.getConfirmationBody()).contains("Download county court judgment");
+        }
+
+        @Test
+        void shouldSetUpBusinessProcessAndCaseStateAll_Final_Ordered_IssuedOnLRAdmission() {
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1Represented(YES)
+                .applicant1Represented(YES)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .defendantDetailsSpec(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("John Doe")
+                                                     .build())
+                                          .build())
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+                .ccdState(All_FINAL_ORDERS_ISSUED)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
