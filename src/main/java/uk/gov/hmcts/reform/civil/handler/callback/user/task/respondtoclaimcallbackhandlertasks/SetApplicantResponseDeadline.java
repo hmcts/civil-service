@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -55,6 +56,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
     private final UserService userService;
     private final UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse;
     private final AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     public SetApplicantResponseDeadline(Time time,
                                         DeadlinesCalculator deadlinesCalculator,
@@ -66,7 +68,8 @@ public class SetApplicantResponseDeadline implements CaseTask {
                                         CoreCaseUserService coreCaseUserService,
                                         UserService userService,
                                         UpdateDataRespondentDeadlineResponse updateDataRespondentDeadlineResponse,
-                                        AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse) {
+                                        AssembleDocumentsForDeadlineResponse assembleDocumentsForDeadlineResponse,
+                                        RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab) {
         this.time = time;
         this.deadlinesCalculator = deadlinesCalculator;
         this.frcDocumentsUtils = frcDocumentsUtils;
@@ -78,6 +81,7 @@ public class SetApplicantResponseDeadline implements CaseTask {
         this.userService = userService;
         this.updateDataRespondentDeadlineResponse = updateDataRespondentDeadlineResponse;
         this.assembleDocumentsForDeadlineResponse = assembleDocumentsForDeadlineResponse;
+        this.requestedCourtForClaimDetailsTab = requestedCourtForClaimDetailsTab;
     }
 
     public CallbackResponse execute(CallbackParams callbackParams) {
@@ -129,6 +133,13 @@ public class SetApplicantResponseDeadline implements CaseTask {
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
         updateDocumentGenerationRespondent2(callbackParams, updatedData, caseData);
+
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
+            requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2(callbackParams, updatedData);
+        } else {
+            requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, updatedData);
+        }
 
         if (isMultipartyScenario1v2With2LegalRep(caseData)) {
 
