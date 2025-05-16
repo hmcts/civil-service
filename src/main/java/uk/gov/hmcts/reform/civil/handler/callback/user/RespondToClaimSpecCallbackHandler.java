@@ -1195,7 +1195,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedCaseData.showCarmFields(NO);
         }
-
+        if (featureToggleService.isLrAdmissionBulkEnabled()) {
+            updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds());
+        }
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
         ofNullable(caseData.getRespondent2())

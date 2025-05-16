@@ -45,6 +45,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK;
 
 @Slf4j
 @Service
@@ -153,7 +155,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
-        builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
+        builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, featureToggleService.isLrAdmissionBulkEnabled()));
     }
 
     private void addCarmMediationDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
@@ -426,15 +428,19 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
         if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-            return DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
+            return featureToggleService.isLrAdmissionBulkEnabled()
+                    ? DEFENDANT_RESPONSE_SPEC_SEALED_1V2_LR_ADMISSION_BULK
+                    : DEFENDANT_RESPONSE_SPEC_SEALED_1V2;
         }
         return getDocmosisTemplateForSingleParty();
     }
 
     private DocmosisTemplates getDocmosisTemplateForSingleParty() {
-        if (featureToggleService.isPinInPostEnabled()) {
-            return DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
+        if (featureToggleService.isLrAdmissionBulkEnabled()) {
+            return DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS_LR_ADMISSION_BULK;
         }
-        return DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
+        return featureToggleService.isPinInPostEnabled()
+                ? DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS
+                : DEFENDANT_RESPONSE_SPEC_SEALED_1V1;
     }
 }
