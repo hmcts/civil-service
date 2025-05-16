@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.OR
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_DETERMINATION_TRANSLATED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_ADMISSION_TRANSLATED;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
