@@ -4,11 +4,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 public abstract class AbstractNotifyManageStayClaimantHandler extends AbstractNotifyManageStayHandler {
 
-    public AbstractNotifyManageStayClaimantHandler(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public AbstractNotifyManageStayClaimantHandler(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                                   NotificationsSignatureConfiguration configuration, FeatureToggleService featureToggleService) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override

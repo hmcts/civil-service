@@ -11,7 +11,8 @@ public class AddDefLitFriendRespSolOneEmailDTOGenerator extends RespSolOneEmailD
 
     private final NotificationsProperties notificationsProperties;
 
-    public AddDefLitFriendRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
+    public AddDefLitFriendRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
+                                                      OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }

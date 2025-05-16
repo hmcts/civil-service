@@ -9,11 +9,16 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @RequiredArgsConstructor
@@ -21,6 +26,8 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
 
     protected final NotificationService notificationService;
     protected final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public Map<String, Callback> callbacks() {
@@ -64,13 +71,17 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
             );
         } else {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, getPartyName(callbackParams),
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
+            ));
+            addCommonFooterSignature(properties, configuration);
+            addSpecAndUnspecContact(caseData, properties, configuration,
+                                    featureToggleService.isQueryManagementLRsEnabled());
+            return properties;
         }
     }
 

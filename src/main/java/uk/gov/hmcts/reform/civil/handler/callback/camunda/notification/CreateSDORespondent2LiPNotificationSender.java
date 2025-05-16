@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 /**
@@ -18,8 +19,9 @@ public class CreateSDORespondent2LiPNotificationSender extends AbstractCreateSDO
     public CreateSDORespondent2LiPNotificationSender(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
+        NotificationsSignatureConfiguration configuration,
         FeatureToggleService featureToggleService) {
-        super(notificationService, notificationsProperties, featureToggleService);
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override

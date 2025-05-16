@@ -25,9 +25,11 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
@@ -57,6 +59,10 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
     @Mock
     private PinInPostConfiguration pipInPostConfiguration;
     @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+    @Mock
     private OrganisationService organisationService;
     @Captor
     private ArgumentCaptor<String> targetEmail;
@@ -81,7 +87,8 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
         notificationHandler = new NotificationForDefendantRepresented(
             organisationService,
             notificationService,
-            notificationsProperties
+            notificationsProperties,
+            configuration, featureToggleService
         );
     }
 
@@ -168,6 +175,12 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
 
     @Test
     void notificationForLRAfterDefendantNOCApproval() {
+        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                             + "\n For all other matters, call 0300 123 7050");
+        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
@@ -216,6 +229,12 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
         when(organisationService.findOrganisationById("OrgId")).thenReturn(Optional.ofNullable(Organisation.builder()
                                                                                                    .name("test appl org")
                                                                                                    .build()));
+        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                             + "\n For all other matters, call 0300 123 7050");
+        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(

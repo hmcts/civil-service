@@ -117,6 +117,13 @@ public interface NotificationData {
 
     String QUERY_DATE = "queryDate";
 
+    //footer
+    String HMCTS_SIGNATURE = "hmctsSignature";
+    String PHONE_CONTACT = "phoneContact";
+    String OPENING_HOURS = "openingHours";
+    String SPEC_UNSPEC_CONTACT = "specAndUnspecContact";
+    String CNBC_CONTACT = "cnbcContact";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
