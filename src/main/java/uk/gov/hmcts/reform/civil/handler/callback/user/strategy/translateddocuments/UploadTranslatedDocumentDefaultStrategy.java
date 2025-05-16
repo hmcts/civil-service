@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -21,8 +22,14 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.*;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CCJ_REQUEST_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
+
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
@@ -67,19 +74,46 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslatedDocuments = caseData.getPreTranslationDocuments();
         List<Element<CaseDocument>> sdoOrderDocuments = caseData.getPreTranslationSdoOrderDocuments();
+        List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
-                if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
-                    Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
-                    List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-                    systemGeneratedDocuments.add(originalSdo);
-                } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
+                if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
+                    if (Objects.nonNull(sdoOrderDocuments) && sdoOrderDocuments.size() > 0) {
+                        Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
+                        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+                        systemGeneratedDocuments.add(originalSdo);
+                    }
+                } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.INTERLOCUTORY_JUDGEMENT)
+                            .findFirst();
+                        preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
+                        preTranslationInterlocJudgment.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
+                } else if (document.getValue().getDocumentType().equals(MANUAL_DETERMINATION)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationManualDetermination = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.LIP_MANUAL_DETERMINATION)
+                            .findFirst();
+                        preTranslationManualDetermination.ifPresent(preTranslationDocuments::remove);
+                        preTranslationManualDetermination.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
+                } else if (document.getValue().getDocumentType().equals(CCJ_REQUEST_DETERMINATION)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationReqDetermination = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.CCJ_REQUEST_DETERMINATION)
+                            .findFirst();
+                        preTranslationReqDetermination.ifPresent(preTranslationDocuments::remove);
+                        preTranslationReqDetermination.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
+                }  else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
 
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
                     if (originalDocument.getValue().getDocumentName().contains("claimant")) {
                         CaseDocument claimantSealedCopy = CaseDocument.toCaseDocument(originalDocument.getValue().getDocumentLink(),
-                                                                                originalDocument.getValue().getDocumentType());
+                                                                                      originalDocument.getValue().getDocumentType());
                         systemGeneratedDocuments.add(element(claimantSealedCopy));
                         assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
                     }
