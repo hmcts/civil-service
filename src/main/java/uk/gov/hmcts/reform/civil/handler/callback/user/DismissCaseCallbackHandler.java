@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +58,8 @@ public class DismissCaseCallbackHandler extends CallbackHandler {
             .hearingTimeHourMinute(null)
             .hearingDuration(null)
             .information(null)
-            .hearingNoticeListOther(null);
+            .hearingNoticeListOther(null)
+            .takenOfflineByStaffDate(LocalDateTime.now());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
