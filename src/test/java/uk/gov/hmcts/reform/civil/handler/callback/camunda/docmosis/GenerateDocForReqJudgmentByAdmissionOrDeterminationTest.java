@@ -20,6 +20,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -153,71 +156,59 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
             .build();
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));;
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        System.out.println(updatedData);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
         verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
     }
 
-    @Test
-    void shouldGenerateForm_ifJudgmentAdmissionWithCcjHasBeenRequestedWhenFTisOn_claimantIsWelsh() {
+    @ParameterizedTest
+    @CsvSource({"WELSH, ENGLISH, ENGLISH, WELSH",
+        "WELSH, BOTH, ENGLISH, WELSH",
+        "WELSH, WELSH, WELSH, WELSH"})
+    void shouldGenerateForm_ifJudgmentAdmissionWithCcjHasBeenRequestedWhenFTisOn(String claimantLang, String respondentLang,
+                                                                                                         Language claimantDocLang, Language respondentDocLang) {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
         given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                .build())
-                             .build())
-            .claimantBilingualLanguagePreference("WELSH")
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));;
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        System.out.println(updatedData);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldGenerateForm_ifJudgmentAdmissionWithCcjHasBeenRequestedWhenFTisOn_DefendantIsWelsh() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
-        given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                                         .build())
-                             .build())
-            .claimantBilingualLanguagePreference("ENGLISH")
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));;
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        System.out.println(updatedData);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldGenerateForm_ifJudgmentAdmissionWithCcjHasBeenRequestedWhenFTisOn_DefendantDocLangIsWelsh() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
-        given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build())
+            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(respondentLang).build())
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                         .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
                                                         .build())
                              .build())
             .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.WELSH).build()).build())
-            .claimantBilingualLanguagePreference("BOTH")
+                respondentDocLang).build()).build())
+            .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang).build()).build())
+            .claimantBilingualLanguagePreference(claimantLang)
             .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));;
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        System.out.println(updatedData);
         assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+        verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"ENGLISH, ENGLISH, ENGLISH, ENGLISH"})
+    void shouldGenerateForm_ifJudgmentAdmissionWithCcjHasBeenRequestedWhenFTisOn_NoWelshSelected(String claimantLang, String respondentLang,
+                                                                                                         Language claimantDocLang, Language respondentDocLang) {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseEvent event = CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+        given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
+        CaseData caseData = CaseData.builder()
+            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(respondentLang).build())
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .build())
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
+                respondentDocLang).build()).build())
+            .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang).build()).build())
+            .claimantBilingualLanguagePreference(claimantLang)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));;
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
         verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
     }
 }

@@ -69,7 +69,6 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
                     caseData
                 ));
             }
-
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper))

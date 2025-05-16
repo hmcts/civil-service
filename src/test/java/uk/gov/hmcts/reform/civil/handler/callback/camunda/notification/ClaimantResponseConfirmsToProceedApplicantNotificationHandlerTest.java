@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +22,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -157,17 +162,29 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
             );
         }
 
-        @Test
-        void shouldNotNotifyLipApplicant_whenMainCaseHasWelshParty() {
+        @ParameterizedTest
+        @CsvSource({"WELSH, ENGLISH, ENGLISH, WELSH",
+            "WELSH, BOTH, ENGLISH, WELSH",
+            "WELSH, WELSH, WELSH, WELSH"})
+        void shouldNotNotifyLipApplicant_whenMainCaseHasWelshParty(String claimantLang, String respondentLang,
+                                                                   Language claimantDocLang, Language respondentDocLang) {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .applicant1Represented(YesOrNo.NO)
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                                              .respondent1ResponseLanguage("BOTH")
+                                                                              .respondent1ResponseLanguage(respondentLang)
                                                                               .build()).build())
                 .applicant1(Party.builder().partyEmail("rambo@email.com").type(Party.Type.INDIVIDUAL)
-                                .individualFirstName("Mr. John").individualLastName("Rambo").build()).build();
+                                .individualFirstName("Mr. John").individualLastName("Rambo").build())
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder()
+                                                                                 .documents(respondentDocLang)
+                                                                                 .build()).build())
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder()
+                                                                              .documents(claimantDocLang)
+                                                                              .build()).build())
+                .claimantBilingualLanguagePreference(claimantLang)
+                .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED.name())
