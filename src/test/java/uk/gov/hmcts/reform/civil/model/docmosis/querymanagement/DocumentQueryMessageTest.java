@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class DocumentQueryMessageTest {
 
     private static final LocalDate HEARING_DATE = LocalDate.of(2025, 3, 15);
-    private static final LocalDateTime DATE_QUERY_RAISED = LocalDateTime.of(2025, 1, 15, 12, 0, 0);
+    private static final OffsetDateTime DATE_QUERY_RAISED = OffsetDateTime.of(LocalDateTime.of(2025, 1, 15, 12, 0, 0), ZoneOffset.UTC);
     private static final UUID SOLICITOR_ID = UUID.randomUUID();
     private static final UUID CASEWORKER_ID = UUID.randomUUID();
     private static final String QUERY_ID = "query-id";

@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 
 @Data
 @Builder(toBuilder = true)
@@ -47,7 +48,7 @@ public class DocumentQueryMessage {
             .name(isCaseworkerMessage ? "Caseworker" : caseMessage.getName())
             .subject(isInitialQueryMessage ? caseMessage.getSubject() : null)
             .body(caseMessage.getBody())
-            .createdOn(caseMessage.getCreatedOn().format(DateTimeFormatter.ofPattern(CREATED_ON_FORMAT)))
+            .createdOn(convertFromUTC(caseMessage.getCreatedOn().toLocalDateTime()).format(DateTimeFormatter.ofPattern(CREATED_ON_FORMAT)))
             .isHearingRelated(isInitialQueryMessage ? caseMessage.getIsHearingRelated() : null)
             .hearingDate(nonNull(caseMessage.getHearingDate()) && isInitialQueryMessage
                              ? caseMessage.getHearingDate().format(DateTimeFormatter.ofPattern(HEARING_DATE_FORMAT)) : null)

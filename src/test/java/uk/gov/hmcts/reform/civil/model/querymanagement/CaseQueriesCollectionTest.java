@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +21,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnLatestCaseMessage() {
-        LocalDateTime now = LocalDateTime.of(2025, 3, 1, 7, 0, 0);
+        OffsetDateTime now = OffsetDateTime.of(LocalDateTime.of(2025, 3, 1, 7, 0, 0), ZoneOffset.UTC);
         CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")

@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.civil.service.QueryDocumentGenerator;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -68,7 +68,7 @@ class GenerateQueryDocumentHandlerTest extends BaseCallbackHandlerTest {
         );
     }
 
-    private static LocalDateTime DATE_QUERY_RAISED = LocalDateTime.now();
+    private static OffsetDateTime DATE_QUERY_RAISED = OffsetDateTime.now();
     private static Long CASE_ID = 1L;
     private static String QUERY_ID = "query-id";
     private static String PARENT_QUERY_ID = "parent-id";
@@ -80,7 +80,7 @@ class GenerateQueryDocumentHandlerTest extends BaseCallbackHandlerTest {
     private static final CaseDocument INITIAL_QUERY_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(queryDocumentFilename)
         .documentType(DocumentType.QUERY_DOCUMENT)
-        .createdDatetime(DATE_QUERY_RAISED)
+        .createdDatetime(DATE_QUERY_RAISED.toLocalDateTime())
         .build().toBuilder()
         .documentLink(Document.builder().documentBinaryUrl(
                 "http://dm-store:4506/documents/73526424-8434-4b1f-aaaa-bd33a3f8338f/binary")
@@ -91,7 +91,7 @@ class GenerateQueryDocumentHandlerTest extends BaseCallbackHandlerTest {
     private static final CaseDocument OTHER_QUERY_DOCUMENT = CaseDocumentBuilder.builder()
         .documentName(String.format(QUERY_DOCUMENT.getDocumentTitle(), "Other query doc"))
         .documentType(DocumentType.QUERY_DOCUMENT)
-        .createdDatetime(DATE_QUERY_RAISED.minusDays(2))
+        .createdDatetime(DATE_QUERY_RAISED.minusDays(2).toLocalDateTime())
         .build().toBuilder()
         .documentLink(Document.builder().documentBinaryUrl(
                 "http://dm-store:4506/documents/73526424-8434-4b1f-bbbb-bd33a3f8338f/binary")
@@ -163,7 +163,7 @@ class GenerateQueryDocumentHandlerTest extends BaseCallbackHandlerTest {
         CaseDocument updatedQueryDocument = CaseDocumentBuilder.builder()
             .documentName(queryDocumentFilename)
             .documentType(DocumentType.QUERY_DOCUMENT)
-            .createdDatetime(DATE_QUERY_RAISED)
+            .createdDatetime(DATE_QUERY_RAISED.toLocalDateTime())
             .build().toBuilder()
             .documentLink(Document.builder().documentBinaryUrl(
                     "http://dm-store:4506/documents/73526424-8434-4b1f-cccc-bd33a3f8338f/binary")
