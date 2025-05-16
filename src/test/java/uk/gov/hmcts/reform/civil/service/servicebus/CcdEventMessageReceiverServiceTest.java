@@ -6,24 +6,34 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.handler.message.CcdEventMessageHandler;
+import uk.gov.hmcts.reform.civil.model.ExceptionRecord;
 import uk.gov.hmcts.reform.civil.model.Result;
-import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
+import uk.gov.hmcts.reform.dashboard.entities.ExceptionRecordEntity;
+import uk.gov.hmcts.reform.dashboard.repositories.ExceptionRecordRepository;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 
 @ExtendWith(MockitoExtension.class)
 class CcdEventMessageReceiverServiceTest {
+
+    private static final String CASE_ID = "1234567890";
 
     @Mock
     private CcdEventMessageHandler messageHandler1;
@@ -32,7 +42,13 @@ class CcdEventMessageReceiverServiceTest {
     private CcdEventMessageHandler messageHandler2;
 
     @Mock
-    private CaseTaskTrackingService caseTaskTrackingService;
+    private IdempotencyKeyGenerator idempotencyKeyGenerator;
+
+    @Mock
+    private ExceptionRecordRepository exceptionRecordRepository;
+
+    @Captor
+    private ArgumentCaptor<ExceptionRecordEntity> exceptionRecordEntityArgumentCaptor;
 
     private CcdEventMessageReceiverService ccdEventMessageReceiverService;
 
@@ -44,7 +60,8 @@ class CcdEventMessageReceiverServiceTest {
         ccdEventMessageReceiverService = new CcdEventMessageReceiverService(
             objectMapper,
             Arrays.asList(messageHandler1, messageHandler2),
-            caseTaskTrackingService
+            idempotencyKeyGenerator,
+            exceptionRecordRepository
         );
     }
 
@@ -59,28 +76,77 @@ class CcdEventMessageReceiverServiceTest {
 
         ccdEventMessageReceiverService.handleCcdCaseEventAsbMessage("1", "1", message);
 
-        verify(messageHandler2, times(1)).handle(any());
-        verify(messageHandler1, times(0)).handle(any());
+        verify(messageHandler2, times(1)).handle(any(), any());
+        verify(messageHandler1, times(0)).handle(any(), any());
+
+        verifyNoInteractions(exceptionRecordRepository);
     }
 
     @SneakyThrows
     @Test
-    public void messageHandler1ShouldReturnErrorAndCallCaseTaskTracker() {
+    public void messageHandler1ShouldReturnErrorAndSaveToDb() {
         String caseEvent = "TEST_CASE_EVENT";
 
-        Map<String, String> testProps = Map.of("test", "props");
-
-        Result.Error error = new Result.Error(caseEvent, testProps);
+        Result.Error error = new Result.Error(new ExceptionRecord(caseEvent, "1234567890", List.of("email1", "robotics")));
         when(messageHandler1.canHandle(caseEvent)).thenReturn(true);
-        when(messageHandler1.handle(any())).thenReturn(error);
+        when(messageHandler1.handle(any(), any())).thenReturn(error);
 
         String message = "{\"JurisdictionId\":\"civil\",\"CaseTypeId\":\"CIVIL\",\"caseId\":\"1234567890\",\"EventId\":\"TEST_CASE_EVENT\"}";
 
         ccdEventMessageReceiverService.handleCcdCaseEventAsbMessage("1", "1", message);
 
-        verify(messageHandler1, times(1)).handle(any());
-        verify(messageHandler2, times(0)).handle(any());
-        verify(caseTaskTrackingService).trackCaseTask(eq("1234567890"), any(), eq(caseEvent), eq(testProps));
+        verify(messageHandler1, times(1)).handle(any(), any());
+        verify(messageHandler2, times(0)).handle(any(), any());
+        verify(exceptionRecordRepository).save(any());
+    }
+
+    @SneakyThrows
+    @Test
+    public void messageHandler1ShouldReturnSuccessAfterRetryAndDeleteFromDb() {
+        final String idempotencyKey = "idempotencyKey";
+
+        ExceptionRecordEntity databaseRecord = ExceptionRecordEntity.builder()
+            .successfulActions(emptyList())
+            .reference(CASE_ID)
+            .taskId(ADD_CASE_NOTE.name())
+            .idempotencyKey(idempotencyKey)
+            .build();
+
+        when(messageHandler1.canHandle(ADD_CASE_NOTE.name())).thenReturn(true);
+        when(messageHandler1.handle(any(), any())).thenReturn(new Result.Success());
+        when(exceptionRecordRepository.findByIdempotencyKey(idempotencyKey)).thenReturn(
+            Optional.of(databaseRecord)
+        );
+
+        ccdEventMessageReceiverService.retryHandleMessage(databaseRecord);
+
+        verify(messageHandler1, times(1)).handle(any(), any());
+        verify(messageHandler2, times(0)).handle(any(), any());
+        verify(exceptionRecordRepository).deleteByIdempotencyKey(idempotencyKey);
+    }
+
+    @SneakyThrows
+    @Test
+    public void messageHandler1ShouldUpdateExceptionRecordAfterRetryWhenAdditionalSuccessfulAction() {
+        final String idempotencyKey = "idempotencyKey";
+        ExceptionRecordEntity databaseRecord = ExceptionRecordEntity.builder()
+            .successfulActions(emptyList())
+            .reference(CASE_ID)
+            .taskId(ADD_CASE_NOTE.name())
+            .idempotencyKey(idempotencyKey)
+            .build();
+
+        when(messageHandler1.canHandle(ADD_CASE_NOTE.name())).thenReturn(true);
+        when(messageHandler1.handle(any(), any())).thenReturn(new Result.Error(new ExceptionRecord(ADD_CASE_NOTE.name(),
+                                                                                                   CASE_ID,
+                                                                                                   List.of(("emailAppSolicitor1")))));
+        when(exceptionRecordRepository.findByIdempotencyKey(idempotencyKey)).thenReturn(Optional.of(databaseRecord));
+
+        ccdEventMessageReceiverService.retryHandleMessage(databaseRecord);
+
+        verify(exceptionRecordRepository).save(exceptionRecordEntityArgumentCaptor.capture());
+        ExceptionRecordEntity databaseEntry = exceptionRecordEntityArgumentCaptor.getValue();
+        assertThat(databaseEntry.getSuccessfulActions()).containsOnly("emailAppSolicitor1");
     }
 
 }
