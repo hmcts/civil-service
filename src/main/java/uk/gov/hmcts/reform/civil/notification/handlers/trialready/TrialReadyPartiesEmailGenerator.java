@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.UNREPRESENTED_DEFENDANT_TWO;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.DraftTransitionBuilder.claimSubmittedRespondent2Unrepresented;
 
 @AllArgsConstructor
 public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGenerator {
@@ -19,7 +18,6 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
     protected final TrialReadyRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator;
     protected final TrialReadyDefendantEmailDTOGenerator defendantEmailDTOGenerator;
     protected final TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator;
-    protected final IStateFlowEngine stateFlowEngine;
 
     protected EmailDTO getApplicant(CaseData caseData) {
         if (caseData.getTrialReadyApplicant() != null) {
@@ -40,7 +38,7 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
     }
 
     protected EmailDTO getRespondentTwo(CaseData caseData) {
-        boolean isTwoLipDefendants = stateFlowEngine.evaluate(caseData).isFlagSet(UNREPRESENTED_DEFENDANT_TWO);
+        boolean isTwoLipDefendants = claimSubmittedRespondent2Unrepresented.test(caseData);
         if (caseData.getTrialReadyRespondent2() != null || !(isOneVTwoTwoLegalRep(caseData) || isTwoLipDefendants)) {
             return null;
         }

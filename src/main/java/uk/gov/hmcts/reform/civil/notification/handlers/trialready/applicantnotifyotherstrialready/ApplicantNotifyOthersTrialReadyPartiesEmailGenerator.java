@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyDefe
 import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyPartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyRespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyRespSolTwoEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,8 +24,7 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGenerator extends TrialR
                                                                 TrialReadyRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator,
                                                                 TrialReadyRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator,
                                                                 TrialReadyDefendantEmailDTOGenerator defendantEmailDTOGenerator,
-                                                                TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator,
-                                                                IStateFlowEngine stateFlowEngine
+                                                                TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator
     ) {
         super(
             appSolOneEmailDTOGenerator,
@@ -34,8 +32,7 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGenerator extends TrialR
             respSolOneEmailDTOGenerator,
             respSolTwoEmailDTOGenerator,
             defendantEmailDTOGenerator,
-            defendantTwoEmailDTOGenerator,
-            stateFlowEngine
+            defendantTwoEmailDTOGenerator
         );
     }
 

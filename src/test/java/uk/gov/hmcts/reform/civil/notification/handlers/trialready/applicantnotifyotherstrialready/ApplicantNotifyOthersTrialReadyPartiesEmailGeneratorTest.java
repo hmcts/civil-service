@@ -16,19 +16,19 @@ import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyDefe
 import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyDefendantTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyRespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.trialready.TrialReadyRespSolTwoEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,17 +55,11 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGeneratorTest {
     @Mock
     private TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator;
 
-    @Mock
-    private SimpleStateFlowEngine stateFlowEngine;
-
     @Test
     void shouldNotifyRespSolOneWhenRepresented() {
         CaseData caseData = mock(CaseData.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
-        StateFlow stateFlow = mock(StateFlow.class);
 
-        when(stateFlow.isFlagSet(any())).thenReturn(false);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
         when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
 
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
@@ -85,12 +79,9 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolTwoEmail = mock(EmailDTO.class);
-        StateFlow stateFlow = mock(StateFlow.class);
 
         when(caseData.getTrialReadyRespondent1()).thenReturn(null);
         when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-        when(stateFlow.isFlagSet(any())).thenReturn(false);
-        when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
         when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
         when(respSolTwoEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolTwoEmail);
 
@@ -123,8 +114,9 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGeneratorTest {
         when(caseData.getTrialReadyRespondent1()).thenReturn(null);
         when(caseData.getTrialReadyRespondent2()).thenReturn(null);
         when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-        when(stateFlow.isFlagSet(any())).thenReturn(true);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+        when(caseData.getSubmittedDate()).thenReturn(LocalDateTime.now());
+        when(caseData.getAddRespondent2()).thenReturn(YES);
+        when(caseData.getRespondent2Represented()).thenReturn(NO);
         when(defendantEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(defendant1Email);
         when(defendantTwoEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(defendant2Email);
 
@@ -150,13 +142,13 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolTwoEmail = mock(EmailDTO.class);
-        StateFlow stateFlow = mock(StateFlow.class);
 
         when(caseData.getTrialReadyRespondent1()).thenReturn(null);
         when(caseData.getTrialReadyRespondent2()).thenReturn(null);
         when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
-        when(stateFlow.isFlagSet(any())).thenReturn(true);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
+        when(caseData.getSubmittedDate()).thenReturn(LocalDateTime.now());
+        when(caseData.getAddRespondent2()).thenReturn(YES);
+        when(caseData.getRespondent2Represented()).thenReturn(NO);
         when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
         when(respSolTwoEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolTwoEmail);
 
@@ -180,12 +172,9 @@ public class ApplicantNotifyOthersTrialReadyPartiesEmailGeneratorTest {
     @Test
     void shouldNotNotifyPartiesWhenTrialReadyRespondentIsSet() {
         CaseData caseData = mock(CaseData.class);
-        StateFlow stateFlow = mock(StateFlow.class);
 
         when(caseData.getTrialReadyRespondent1()).thenReturn(YES);
         when(caseData.getTrialReadyRespondent2()).thenReturn(YES);
-        when(stateFlow.isFlagSet(any())).thenReturn(false);
-        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
 
         MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic = Mockito.mockStatic(MultiPartyScenario.class);
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
