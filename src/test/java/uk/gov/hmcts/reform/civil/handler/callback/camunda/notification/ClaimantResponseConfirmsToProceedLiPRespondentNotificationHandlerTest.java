@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -122,6 +123,46 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
             caseData.setClaimantBilingualLanguagePreference("BOTH");
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotNotifyLipRespondent_ifRespondentIsBilingual() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage("BOTH")
+                                                                              .build()).build())
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .respondent1(Party.builder().partyEmail("abc@gmail.com").type(Party.Type.INDIVIDUAL)
+                    .individualFirstName("Mr. John").individualLastName("Rambo").build()).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotNotifyLipRespondent_ifRespondentIsBilingualWelshFlagIsON() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                              .respondent1ResponseLanguage("BOTH")
+                                                                              .build()).build())
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .respondent1(Party.builder().partyEmail("abc@gmail.com").type(Party.Type.INDIVIDUAL)
+                                 .individualFirstName("Mr. John").individualLastName("Rambo").build()).build();
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
                     .build()).build();

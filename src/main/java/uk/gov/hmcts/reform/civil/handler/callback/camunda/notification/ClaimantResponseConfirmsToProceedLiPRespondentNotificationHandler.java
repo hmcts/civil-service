@@ -83,9 +83,18 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
     }
 
     private boolean shouldSendNotification(CaseData caseData, String eventId) {
-        return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
-            && (!caseData.isClaimantBilingual()
-            || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId));
+        if (Objects.nonNull(caseData.getRespondent1().getPartyEmail())) {
+            if (featureToggleService.isGaForWelshEnabled() && (caseData.isClaimantBilingual()
+                || caseData.isRespondentResponseBilingual()
+                || caseData.isLipDefendantSpecifiedBilingualDocuments()
+                || caseData.isLipClaimantSpecifiedBilingualDocuments())) {
+                return false;
+            } else if (NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId)) {
+                return true;
+            }
+            return !caseData.isClaimantBilingual();
+        }
+        return false;
     }
 
     private String getRespondent1LipEmailTemplate(CaseData caseData) {
