@@ -436,6 +436,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .build();
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(

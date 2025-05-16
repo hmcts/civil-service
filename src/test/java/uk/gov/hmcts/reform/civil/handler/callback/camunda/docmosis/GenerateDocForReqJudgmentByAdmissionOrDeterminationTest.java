@@ -8,6 +8,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,6 +83,13 @@ class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallba
             featureToggleService
         );
 
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC);
+        assertThat(handler.handledEvents()).contains(GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC);
+        assertThat(handler.handledEvents()).contains(GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC);
     }
 
     @Test
