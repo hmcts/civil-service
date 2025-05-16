@@ -86,7 +86,7 @@ public class JudgementService {
             ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
     }
 
-    private BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
+    public BigDecimal ccjJudgmentFixedCost(CaseData caseData) {
         if (isLrFullAdmitRepaymentPlan(caseData)
             && nonNull(caseData.getFixedCosts())
             && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {

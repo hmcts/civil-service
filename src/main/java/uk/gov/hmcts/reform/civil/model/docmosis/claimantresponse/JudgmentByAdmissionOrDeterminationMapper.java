@@ -90,7 +90,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee(getClaimFee(caseData).toString())
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjAlreadyPaidAmount(getAlreadyPaidAmount(caseData))
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
@@ -100,12 +100,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .build();
     }
 
-    private String getClaimFee(CaseData caseData) {
+    private BigDecimal getClaimFee(CaseData caseData) {
         BigDecimal claimFee = judgementService.ccjJudgmentClaimFee(caseData);
         if (BigDecimal.ZERO.compareTo(claimFee) == 0) {
-            return BigDecimal.ZERO.toString();
+            return BigDecimal.ZERO;
         }
-        return claimFee.setScale(2).toString();
+        return claimFee.setScale(2);
     }
 
     private String getAlreadyPaidAmount(CaseData caseData) {
@@ -235,7 +235,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                                    : null)
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(getClaimFee(caseData))
+            .claimFee((getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString())
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .build();
