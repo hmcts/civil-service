@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class DocumentQueryMessageTest {
 
     private static final LocalDate HEARING_DATE = LocalDate.of(2025, 3, 15);
-    private static final OffsetDateTime DATE_QUERY_RAISED = OffsetDateTime.of(LocalDateTime.of(2025, 1, 15, 12, 0, 0), ZoneOffset.UTC);
+    private static final OffsetDateTime DATE_QUERY_RAISED = OffsetDateTime.of(LocalDateTime.of(2025, 5, 15, 12, 0, 0), ZoneOffset.UTC);
     private static final UUID SOLICITOR_ID = UUID.randomUUID();
     private static final UUID CASEWORKER_ID = UUID.randomUUID();
     private static final String QUERY_ID = "query-id";
@@ -38,7 +38,7 @@ class DocumentQueryMessageTest {
             .id(PARENT_QUERY_ID)
             .name("Solicitor")
             .subject("initial query")
-            .createdOn("15-01-2025 12:00")
+            .createdOn("15-05-2025 13:00")
             .isHearingRelated(YES)
             .hearingDate("15-03-2025")
             .build();
@@ -63,7 +63,7 @@ class DocumentQueryMessageTest {
             .messageType("Caseworker response")
             .id(QUERY_ID)
             .name("Caseworker")
-            .createdOn("16-01-2025 12:00")
+            .createdOn("16-05-2025 13:00")
             .build();
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(queryResponse, true);
@@ -86,7 +86,7 @@ class DocumentQueryMessageTest {
             .messageType("Follow up")
             .id(QUERY_ID)
             .name("Solicitor")
-            .createdOn("17-01-2025 12:00")
+            .createdOn("17-05-2025 13:00")
             .build();
 
         DocumentQueryMessage actual = DocumentQueryMessage.from(queryFollowUp, false);
