@@ -12,6 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.manualdetermination.ClaimantLipManualDeterminationFormGenerator;
 
@@ -21,6 +24,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +37,7 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(CallbackType.ABOUT_TO_SUBMIT),
             this::prepareClaimantLipManualDetermination);
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -59,8 +64,22 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument claimantResponseForm = claimantLipManualDeterminationFormGenerator.generate(callbackParams.getCaseData(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
-                .getSystemGeneratedDocumentsWithAddedDocument(claimantResponseForm, caseData));
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+            || caseData.isLipClaimantSpecifiedBilingualDocuments()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
+                .getPreTranslationDocuments();
+            translatedDocuments.add(element(claimantResponseForm));
+            caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.MANUAL_DETERMINATION_DOCUMENT);
+        } else {
+            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
+                                                             .getSystemGeneratedDocumentsWithAddedDocument(
+                                                                 claimantResponseForm,
+                                                                 caseData
+                                                             ));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
