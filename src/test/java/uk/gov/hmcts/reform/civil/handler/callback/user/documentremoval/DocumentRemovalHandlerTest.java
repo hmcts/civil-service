@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeepCollection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.documentremoval.DocumentRemovalCaseDataDTO;
 import uk.gov.hmcts.reform.civil.service.documentremoval.DocumentRemovalService;
 
 import java.util.ArrayList;
@@ -125,8 +126,13 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
 
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
+                .caseData(caseData)
+                .documentsMarkedForDelete(new ArrayList<>())
+                .build();
 
-            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(caseData);
+            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
+            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData())
@@ -157,12 +163,68 @@ class DocumentRemovalHandlerTest extends BaseCallbackHandlerTest {
                 .documentToKeepCollection(List.of(docsToKeepCollection))
                 .build();
 
+            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
+                .caseData(caseData)
+                .documentsMarkedForDelete(new ArrayList<>())
+                .build();
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(caseData);
+            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getData())
+                .extracting("documentToKeepCollection")
+                .asInstanceOf(InstanceOfAssertFactories.list(DocumentToKeepCollection.class))
+                .size()
+                .isEqualTo(1);
+
+            var expectedData = caseData.toMap(mapper);
+            assertEquals(expectedData, response.getData());
+        }
+
+        @Test
+        void testWithWarningsWhenSystemGeneratedDocumentsAreRemoved() {
+            DocumentToKeep docToKeep = DocumentToKeep.builder()
+                .caseDocumentToKeep(CaseDocumentToKeep.builder()
+                    .documentFilename("example.pdf")
+                    .documentUrl("http://example.com/doc/123")
+                    .documentBinaryUrl("http://example.com/doc/123/binary")
+                    .build())
+                .documentId(documentId)
+                .systemGenerated(YesOrNo.YES)
+                .build();
+
+            DocumentToKeepCollection docsToKeepCollection = DocumentToKeepCollection.builder()
+                .value(docToKeep).build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                .toBuilder()
+                .ccdCaseReference(Long.valueOf(caseId))
+                .applicant1Represented(YesOrNo.NO)
+                .documentToKeepCollection(List.of(docsToKeepCollection))
+                .build();
+
+            DocumentRemovalCaseDataDTO documentRemovalCaseDataDTO = DocumentRemovalCaseDataDTO.builder()
+                .caseData(caseData)
+                .documentsMarkedForDelete(
+                    List.of(DocumentToKeep.builder().caseDocumentToKeep(CaseDocumentToKeep.builder().documentFilename("System Doc").build())
+                            .documentId("123").systemGenerated(YesOrNo.YES).build(),
+                        DocumentToKeep.builder().caseDocumentToKeep(CaseDocumentToKeep.builder().documentFilename("User Doc").build())
+                            .documentId("456").systemGenerated(YesOrNo.NO).build()))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            when(documentRemovalService.removeDocuments(any(), anyLong(), anyString())).thenReturn(documentRemovalCaseDataDTO);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getWarnings())
+                .contains("System Generated Document System Doc (123) will be removed from the case");
+            assertThat(response.getWarnings())
+                .contains("User Document User Doc (456) will be removed from the case");
             assertThat(response.getData())
                 .extracting("documentToKeepCollection")
                 .asInstanceOf(InstanceOfAssertFactories.list(DocumentToKeepCollection.class))
