@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.notification.handlers.createsdo.CreateSDONotifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;

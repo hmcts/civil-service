@@ -1,7 +1,9 @@
-package uk.gov.hmcts.reform.civil.notification.handlers;
+package uk.gov.hmcts.reform.civil.notification.handlers.createsdo;
 
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
