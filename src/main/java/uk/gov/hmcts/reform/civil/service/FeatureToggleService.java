@@ -168,6 +168,6 @@ public class FeatureToggleService {
     }
 
     public boolean isLrAdmissionBulkEnabled() {
-       return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
+        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
     }
 }
