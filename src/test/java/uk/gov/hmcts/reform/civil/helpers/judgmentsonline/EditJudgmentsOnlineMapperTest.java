@@ -41,7 +41,7 @@ public class EditJudgmentsOnlineMapperTest {
 
     private FeatureToggleService featureToggleService;
     private InterestCalculator interestCalculator = new InterestCalculator();
-    private JudgementService judgementService = new JudgementService(featureToggleService);
+    private JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
     private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
