@@ -102,6 +102,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
@@ -184,7 +185,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     FrcDocumentsUtils.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
-    InterestCalculator.class
+    InterestCalculator.class,
+    RequestedCourtForClaimDetailsTab.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
