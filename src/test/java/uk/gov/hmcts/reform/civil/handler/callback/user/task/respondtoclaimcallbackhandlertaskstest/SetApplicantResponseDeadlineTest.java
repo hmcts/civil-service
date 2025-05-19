@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
@@ -97,6 +98,9 @@ class SetApplicantResponseDeadlineTest {
 
     @Mock
     private  CourtLocationUtils courtLocationUtils;
+
+    @Mock
+    private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @BeforeEach
     void setUp() {
