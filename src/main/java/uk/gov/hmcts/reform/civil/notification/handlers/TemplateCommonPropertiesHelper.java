@@ -23,6 +23,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.RAISE_QUERY_LIP;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.RAISE_QUERY_LR;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -57,6 +59,15 @@ public class TemplateCommonPropertiesHelper {
         return properties;
     }
 
+    public Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties) {
+        if (isQueryManagementAllowedForLipCase(caseData)) {
+            properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LIP);
+        } else {
+            properties.put(SPEC_UNSPEC_CONTACT, LIP_CONTACT_EMAIL);
+        }
+        return properties;
+    }
+
     public Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties) {
         if (isQueryManagementAllowedForLRCase(caseData)) {
             properties.put(CNBC_CONTACT, RAISE_QUERY_LR);
@@ -77,6 +88,12 @@ public class TemplateCommonPropertiesHelper {
         return featureToggleService.isQueryManagementLRsEnabled()
             && !queryNotAllowedCaseStates(caseData)
             && !caseData.isLipCase();
+    }
+
+    public boolean isQueryManagementAllowedForLipCase(CaseData caseData) {
+        return featureToggleService.isLipQueryManagementEnabled(caseData)
+            && !queryNotAllowedCaseStates(caseData)
+            && caseData.isLipCase();
     }
 
     public Map<String, String> addBaseProperties(CaseData caseData, Map<String, String> properties) {

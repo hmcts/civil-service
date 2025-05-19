@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.HashMap;
@@ -21,6 +22,8 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Slf4j
@@ -34,6 +37,8 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_FOR_SUCCESSFUL_PAYMENT);
     private static final String REFERENCE_TEMPLATE = "claim-issued-claimant-notification-%s";
     public static final String TASK_ID_CLAIMANT = "ClaimIssuedNotifyApplicant1ForSpec";
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -72,7 +77,7 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return new HashMap<>(Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
@@ -80,6 +85,11 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
             RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                    .toLocalDate(), DATE)
         ));
+
+        addCommonFooterSignature(properties, configuration);
+        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private String addEmail(CaseData caseData) {

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -17,14 +16,20 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Service
 @RequiredArgsConstructor
-public class EvidenceUploadRespondentNotificationHandler implements NotificationData {
+public class EvidenceUploadRespondentNotificationHandler  {
 
     private static final String REFERENCE_TEMPLATE = "evidence-upload-notification-%s";
     private final NotificationService notificationService;
@@ -54,7 +59,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
 
         if (null != email && nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
-            Map<String, String> properties = addProperties(caseData);
+            Map<String, String> properties = addProperties(caseData, isRespondentLip);
             properties.put(CLAIM_REFERENCE_NUMBER, getCaseRef(caseData, isRespondentLip));
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getOrgName(caseData, isForRespondentSolicitor1, isRespondentLip));
             notificationService.sendMail(
@@ -79,8 +84,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         }
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
+    public Map<String, String> addProperties(CaseData caseData, boolean isRespondentLip) {
         HashMap<String, String> properties = new HashMap<>(Map.of(
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             UPLOADED_DOCUMENTS, caseData.getNotificationText(),
@@ -89,6 +93,13 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
         addCommonFooterSignature(properties, configuration);
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 featureToggleService.isQueryManagementLRsEnabled());
+        if (isRespondentLip) {
+            addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        } else {
+            addSpecAndUnspecContact(caseData, properties, configuration,
+                                    featureToggleService.isQueryManagementLRsEnabled());
+        }
         return properties;
     }
 

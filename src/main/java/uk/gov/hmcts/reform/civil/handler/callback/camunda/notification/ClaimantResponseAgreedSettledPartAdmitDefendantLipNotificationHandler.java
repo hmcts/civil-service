@@ -23,6 +23,7 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -70,6 +71,8 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             addCommonFooterSignature(properties, configuration);
             addSpecAndUnspecContact(caseData, properties, configuration,
                                     featureToggleService.isQueryManagementLRsEnabled());
+            addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(

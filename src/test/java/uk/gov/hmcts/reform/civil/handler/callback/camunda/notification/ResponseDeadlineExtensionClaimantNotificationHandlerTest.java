@@ -138,6 +138,10 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -164,6 +168,10 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             given(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).willReturn(emailLipWelshTemplate);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -191,6 +199,10 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
             when(toggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -219,7 +231,11 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 DEFENDANT_NAME, "Mr. Sole Trader",
                 FRONTEND_URL, "url",
                 RESPONSE_DEADLINE, formatLocalDate(
-                    caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+                    caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE),
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
             );
         }
     }

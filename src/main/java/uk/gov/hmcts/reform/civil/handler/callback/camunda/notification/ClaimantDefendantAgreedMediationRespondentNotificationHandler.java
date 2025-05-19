@@ -22,6 +22,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT2_MEDIATION_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
@@ -109,6 +110,8 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
             addCommonFooterSignature(properties, configuration);
             addSpecAndUnspecContact(caseData, properties, configuration,
                                     featureToggleService.isQueryManagementLRsEnabled());
+            addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             return properties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(

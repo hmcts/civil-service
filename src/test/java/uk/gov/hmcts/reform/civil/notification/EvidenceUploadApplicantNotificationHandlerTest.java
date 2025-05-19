@@ -91,8 +91,6 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT);
 
@@ -101,7 +99,7 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             verify(notificationService).sendMail(
                 APPLICANT_LIP_EMAIL,
                 TEMPLATE_ID_LIP,
-                getNotificationDataMap(caseData),
+                getNotificationDataMapLip(caseData),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -113,8 +111,6 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = createCaseDataForLip(NOTIFICATION_TEXT).toBuilder()
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
@@ -124,7 +120,7 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             verify(notificationService).sendMail(
                 APPLICANT_LIP_EMAIL,
                 TEMPLATE_ID_WELSH_LIP,
-                getNotificationDataMap(caseData),
+                getNotificationDataMapLip(caseData),
                 "evidence-upload-notification-" + caseData.getLegacyCaseReference()
             );
         }
@@ -176,6 +172,24 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
                 PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
                 OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
                 SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
+
+            );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMapLip(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, YesOrNo.NO.equals(caseData.getApplicant1Represented())
+                    ? caseData.getLegacyCaseReference() : caseData.getCcdCaseReference().toString(),
+                UPLOADED_DOCUMENTS, caseData.getNotificationText(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, YesOrNo.NO.equals(caseData.getApplicant1Represented())
+                    ? "John Doe" : "Signer Name",
+                CASEMAN_REF, "000DC001",
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT, "contactocmc@justice.gov.uk",
                 HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
 
             );

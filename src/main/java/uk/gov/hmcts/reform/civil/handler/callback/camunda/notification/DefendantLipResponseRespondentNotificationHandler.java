@@ -12,12 +12,17 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_RESPONSE_SUBMISSION;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,8 @@ public class DefendantLipResponseRespondentNotificationHandler extends CallbackH
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     public static final String TASK_ID = "DefendantLipResponseNotifyDefendant";
     private static final String REFERENCE_TEMPLATE =
@@ -49,11 +56,15 @@ public class DefendantLipResponseRespondentNotificationHandler extends CallbackH
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private CallbackResponse sendEmailToDefendant(CallbackParams callbackParams) {

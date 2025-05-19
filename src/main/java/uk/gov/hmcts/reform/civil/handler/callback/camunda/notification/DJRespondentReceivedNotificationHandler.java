@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -247,10 +248,8 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addCommonFooterSignature(properties, configuration);
-        addCnbcContact(caseData, properties, configuration,
-                       toggleService.isQueryManagementLRsEnabled());
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                toggleService.isQueryManagementLRsEnabled());
+        addLipContact(caseData, properties, toggleService.isQueryManagementLRsEnabled(),
+                      toggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 

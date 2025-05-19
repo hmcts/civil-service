@@ -259,7 +259,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
                     CASEMAN_REF, caseData.getLegacyCaseReference(),
                     PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
                     OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                    SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                    SPEC_UNSPEC_CONTACT, "contactocmc@justice.gov.uk",
                     HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
                 );
             } else {

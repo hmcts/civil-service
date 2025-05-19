@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
@@ -141,7 +142,7 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
     }
 
     public Map<String, String> addPropertiesForClaimantLiP(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
@@ -149,7 +150,11 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
             RESPONSE_DEADLINE, formatLocalDate(
                 caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE
             )
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesForRespondent(CaseData caseData) {

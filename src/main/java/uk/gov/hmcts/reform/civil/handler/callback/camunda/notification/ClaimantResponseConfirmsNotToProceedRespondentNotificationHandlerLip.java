@@ -23,6 +23,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -99,8 +100,8 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             ));
             addCommonFooterSignature(properties, configuration);
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
+            addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(

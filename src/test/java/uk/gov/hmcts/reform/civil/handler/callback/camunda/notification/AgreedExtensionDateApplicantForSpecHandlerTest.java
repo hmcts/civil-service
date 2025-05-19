@@ -8,6 +8,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -58,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
@@ -135,6 +138,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");
                 when(notificationsProperties.getClaimantLipDeadlineExtension())
                     .thenReturn("template-id");
+                when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+                when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
+                when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 invokeAboutToSubmitWithEvent("NOTIFY_LIP_APPLICANT_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
 
@@ -152,6 +160,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://localhost:3001/");
                 when(notificationsProperties.getClaimantLipDeadlineExtensionWelsh())
                     .thenReturn("template-id-welsh");
+                when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+                when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
+                when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+                when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                          + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
                 invokeAboutToSubmitWithEvent("NOTIFY_LIP_APPLICANT_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
 
@@ -563,7 +576,11 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, "http://localhost:3001/",
-                RESPONSE_DEADLINE, formatLocalDate(extensionDate, DATE)
+                RESPONSE_DEADLINE, formatLocalDate(extensionDate, DATE),
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT, "contactocmc@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
             );
         }
 

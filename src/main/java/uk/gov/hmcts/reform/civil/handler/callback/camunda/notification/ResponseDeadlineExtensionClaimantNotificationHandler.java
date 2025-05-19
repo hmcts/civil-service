@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_F
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -84,7 +85,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            return Map.of(
+            HashMap<String, String> lipProperties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
@@ -92,7 +93,13 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
                 RESPONSE_DEADLINE, formatLocalDate(
                     caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE
                 )
-            );
+            ));
+            addCommonFooterSignature(lipProperties, configuration);
+            addSpecAndUnspecContact(caseData, lipProperties, configuration,
+                                    featureToggleService.isQueryManagementLRsEnabled());
+            addLipContact(caseData, lipProperties, featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+            return lipProperties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),

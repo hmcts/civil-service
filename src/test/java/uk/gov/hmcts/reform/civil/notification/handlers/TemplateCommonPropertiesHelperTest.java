@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
@@ -23,6 +24,7 @@ class TemplateCommonPropertiesHelperTest {
     private static final String TEST_PHONE_CONTACT = "123-456-789";
     private static final String TEST_OPENING_HOURS = "9:00 AM - 5:00 PM";
     private static final String TEST_SPEC_UNSPEC_CONTACT = "SpecUnspec Contact";
+    private static final String TEST_LIP_CONTACT = "contactocmc@justice.gov.uk";
     private static final String TEST_CNBC_CONTACT = "CNBC Contact";
 
     @Mock
@@ -59,6 +61,20 @@ class TemplateCommonPropertiesHelperTest {
 
         assertThat(properties)
             .containsEntry(SPEC_UNSPEC_CONTACT, TEST_SPEC_UNSPEC_CONTACT);
+    }
+
+    @Test
+    void shouldLipContactForLipCase() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(caseData.isLipCase()).thenReturn(true);
+        when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+
+        Map<String, String> properties = new java.util.HashMap<>();
+        helper.addLipContact(caseData, properties);
+
+        assertThat(properties)
+            .containsEntry(SPEC_UNSPEC_CONTACT, TEST_LIP_CONTACT);
     }
 
     @Test
@@ -103,6 +119,18 @@ class TemplateCommonPropertiesHelperTest {
         when(caseData.getCcdState()).thenReturn(CaseState.AWAITING_APPLICANT_INTENTION);
 
         boolean result = helper.isQueryManagementAllowedForLRCase(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void shouldCheckIfQueryManagementAllowedForLipCase() {
+        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(caseData.isLipCase()).thenReturn(true);
+        when(caseData.getCcdState()).thenReturn(CaseState.AWAITING_APPLICANT_INTENTION);
+
+        boolean result = helper.isQueryManagementAllowedForLipCase(caseData);
 
         assertThat(result).isTrue();
     }

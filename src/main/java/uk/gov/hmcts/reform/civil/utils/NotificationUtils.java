@@ -57,6 +57,8 @@ public class NotificationUtils {
     public static String REFERENCE_NOT_PROVIDED = "Not provided";
     public static String RAISE_QUERY_LR = "Contact us about your claim by selecting "
         + "Raise a query from the next steps menu in case file view.";
+    public static String RAISE_QUERY_LIP = "To contact the court, select contact or apply to the court on your dashboard.";
+    public static String LIP_CONTACT_EMAIL = "contactocmc@justice.gov.uk";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
@@ -311,6 +313,18 @@ public class NotificationUtils {
             properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
         } else {
             properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        }
+        return properties;
+    }
+
+    public static Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties, boolean isLRQmEnabled, boolean isLipQmEnabled) {
+
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("is LIP on case " + caseData.isLipCase());
+        if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+            properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LIP);
+        } else {
+            properties.put(SPEC_UNSPEC_CONTACT, LIP_CONTACT_EMAIL);
         }
         return properties;
     }

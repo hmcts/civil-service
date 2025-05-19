@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -72,10 +73,14 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isRespondent1NotRepresented()) {
-            return Map.of(
+            HashMap<String, String> lipProperties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-            );
+            ));
+            addCommonFooterSignature(lipProperties, configuration);
+            addLipContact(caseData, lipProperties, featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+            return lipProperties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -38,6 +39,8 @@ class ClaimIssuedPaymentSuccessfulNotificationHandlerTest extends BaseCallbackHa
     private FeatureToggleService toggleService;
     @Mock
     private NotificationsProperties notificationsProperties;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
 
     @InjectMocks
     private ClaimIssuedPaymentSuccessfulNotificationHandler handler;
@@ -53,6 +56,11 @@ class ClaimIssuedPaymentSuccessfulNotificationHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSpec1v1ClaimSubmitted()
                 .specRespondent1Represented(YesOrNo.NO)
