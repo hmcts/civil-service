@@ -107,14 +107,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         systemGeneratedDocuments.add(element(claimantSealedCopy));
                         assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
                     }
-                } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
-                    if (Objects.nonNull(preTranslationDocuments)) {
-                        Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
-                            .filter(item -> item.getValue().getDocumentType() == DocumentType.INTERLOCUTORY_JUDGEMENT)
-                            .findFirst();
-                        preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
-                        preTranslationInterlocJudgment.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
-                    }
                 } else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
