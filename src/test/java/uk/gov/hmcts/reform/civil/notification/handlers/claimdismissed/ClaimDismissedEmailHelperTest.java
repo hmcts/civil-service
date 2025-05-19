@@ -13,14 +13,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ClaimDismissedEmailValidatorTest {
+class ClaimDismissedEmailHelperTest {
 
-    private ClaimDismissedEmailValidator validator;
+    private ClaimDismissedEmailHelper claimDismissedEmailHelper;
+    private ClaimDismissedEmailTemplater claimDismissedEmailTemplater =  mock(ClaimDismissedEmailTemplater.class);
     private MockedStatic<MultiPartyScenario> multiPartyScenarioMock;
 
     @BeforeEach
     void setUp() {
-        validator = new ClaimDismissedEmailValidator();
+        claimDismissedEmailHelper = new ClaimDismissedEmailHelper(
+            claimDismissedEmailTemplater
+        );
         multiPartyScenarioMock = org.mockito.Mockito.mockStatic(MultiPartyScenario.class);
     }
 
@@ -37,7 +40,7 @@ class ClaimDismissedEmailValidatorTest {
         when(caseData.getClaimDismissedDate()).thenReturn(LocalDateTime.now());
 
         // Act
-        boolean result = validator.isValidForEmail(caseData);
+        boolean result = claimDismissedEmailHelper.isValidForRespondentEmail(caseData);
 
         // Assert
         assertThat(result).isTrue();
@@ -51,7 +54,7 @@ class ClaimDismissedEmailValidatorTest {
         when(caseData.getClaimDismissedDate()).thenReturn(LocalDateTime.now());
 
         // Act
-        boolean result = validator.isValidForEmail(caseData);
+        boolean result = claimDismissedEmailHelper.isValidForRespondentEmail(caseData);
 
         // Assert
         assertThat(result).isFalse();
@@ -65,7 +68,7 @@ class ClaimDismissedEmailValidatorTest {
         when(caseData.getClaimDismissedDate()).thenReturn(null);
 
         // Act
-        boolean result = validator.isValidForEmail(caseData);
+        boolean result = claimDismissedEmailHelper.isValidForRespondentEmail(caseData);
 
         // Assert
         assertThat(result).isFalse();
@@ -79,9 +82,23 @@ class ClaimDismissedEmailValidatorTest {
         when(caseData.getClaimDismissedDate()).thenReturn(null);
 
         // Act
-        boolean result = validator.isValidForEmail(caseData);
+        boolean result = claimDismissedEmailHelper.isValidForRespondentEmail(caseData);
 
         // Assert
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldReturnCorrectTemplateId() {
+        // Arrange
+        CaseData caseData = mock(CaseData.class);
+        String expectedTemplateId = "template-id";
+        when(claimDismissedEmailTemplater.getTemplateId(caseData)).thenReturn(expectedTemplateId);
+
+        // Act
+        String actualTemplateId = claimDismissedEmailHelper.getTemplateId(caseData);
+
+        // Assert
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
     }
 }

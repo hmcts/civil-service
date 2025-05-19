@@ -14,9 +14,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.Cla
 class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
     @Mock
-    private ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
-    @Mock
-    private ClaimDismissedEmailValidator claimDismissedEmailValidator;
+    private ClaimDismissedEmailHelper claimDismissedEmailHelper;
 
     @InjectMocks
     private ClaimDismissedRespSolTwoEmailDTOGenerator emailGenerator;
@@ -30,7 +28,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
     void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
-        when(claimDismissedEmailTemplater.getTemplateId(caseData)).thenReturn(expectedTemplateId);
+        when(claimDismissedEmailHelper.getTemplateId(caseData)).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
 
@@ -47,7 +45,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
     @Test
     void shouldReturnCorrectShouldNotify() {
         CaseData caseData = CaseData.builder().build();
-        when(claimDismissedEmailValidator.isValidForEmail(caseData)).thenReturn(false);
+        when(claimDismissedEmailHelper.isValidForRespondentEmail(caseData)).thenReturn(false);
         boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isFalse();

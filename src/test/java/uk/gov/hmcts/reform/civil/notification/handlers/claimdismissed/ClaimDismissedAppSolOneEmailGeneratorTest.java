@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.Cla
 class ClaimDismissedAppSolOneEmailGeneratorTest {
 
     @Mock
-    private ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
+    private ClaimDismissedEmailHelper claimDismissedEmailHelper;
 
     @InjectMocks
     private ClaimDismissedAppSolOneEmailDTOGenerator emailGenerator;
@@ -28,7 +28,7 @@ class ClaimDismissedAppSolOneEmailGeneratorTest {
     void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
-        when(claimDismissedEmailTemplater.getTemplateId(caseData)).thenReturn(expectedTemplateId);
+        when(claimDismissedEmailHelper.getTemplateId(caseData)).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
 

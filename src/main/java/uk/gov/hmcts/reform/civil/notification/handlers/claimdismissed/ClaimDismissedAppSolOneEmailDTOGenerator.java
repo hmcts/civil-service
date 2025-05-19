@@ -9,17 +9,17 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 public class ClaimDismissedAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     protected static final String CLAIM_DISMISSED_APPLICANT_NOTIFICATION_REFERENCE_TEMPLATE = "claim-dismissed-applicant-notification-%s";
-    private final ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
+    private final ClaimDismissedEmailHelper claimDismissedEmailHelper;
 
     public ClaimDismissedAppSolOneEmailDTOGenerator(OrganisationService organisationService,
-                                                    ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
+                                                    ClaimDismissedEmailHelper claimDismissedEmailHelper) {
         super(organisationService);
-        this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
+        this.claimDismissedEmailHelper = claimDismissedEmailHelper;
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return claimDismissedEmailTemplater.getTemplateId(caseData);
+        return claimDismissedEmailHelper.getTemplateId(caseData);
     }
 
     @Override
