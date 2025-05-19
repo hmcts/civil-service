@@ -8,18 +8,18 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 @Component
 public class ClaimDismissedRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private final ClaimDismissedEmailHelper claimDismissedEmailHelper;
+    private final ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
     protected static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED = "claim-dismissed-respondent-notification-%s";
 
-    public ClaimDismissedRespSolOneEmailDTOGenerator(OrganisationService organisationService, ClaimDismissedEmailHelper claimDismissedEmailHelper
+    public ClaimDismissedRespSolOneEmailDTOGenerator(OrganisationService organisationService, ClaimDismissedEmailTemplater claimDismissedEmailHelper
     ) {
         super(organisationService);
-        this.claimDismissedEmailHelper = claimDismissedEmailHelper;
+        this.claimDismissedEmailTemplater = claimDismissedEmailHelper;
     }
 
     @Override
     public String getEmailTemplateId(CaseData caseData) {
-        return claimDismissedEmailHelper.getTemplateId(caseData); //NOSONAR
+        return claimDismissedEmailTemplater.getTemplateId(caseData);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class ClaimDismissedRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
 
     @Override
     protected Boolean getShouldNotify(CaseData caseData) {
-        return claimDismissedEmailHelper.isValidForRespondentEmail(caseData); //NOSONAR
+        return caseData.isRespondent1LiP() ? Boolean.FALSE : Boolean.TRUE  && caseData.getClaimDismissedDate() != null;
     }
 
 }

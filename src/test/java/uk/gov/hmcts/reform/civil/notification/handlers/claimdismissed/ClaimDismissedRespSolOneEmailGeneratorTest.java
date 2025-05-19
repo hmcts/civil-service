@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -14,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.Cla
 class ClaimDismissedRespSolOneEmailGeneratorTest {
 
     @Mock
-    private ClaimDismissedEmailHelper claimDismissedEmailHelper;
+    private ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
 
     @InjectMocks
     private ClaimDismissedRespSolOneEmailDTOGenerator emailGenerator;
@@ -28,7 +31,7 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
     void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
-        when(claimDismissedEmailHelper.getTemplateId(caseData)).thenReturn(expectedTemplateId);
+        when(claimDismissedEmailTemplater.getTemplateId(caseData)).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
 
@@ -44,11 +47,26 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
 
     @Test
     void shouldReturnCorrectShouldNotify() {
-        CaseData caseData = CaseData.builder().build();
-        when(claimDismissedEmailHelper.isValidForRespondentEmail(caseData)).thenReturn(true);
-        boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.YES)
+            .claimDismissedDate(LocalDateTime.now())
+            .build();
+
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isTrue();
+    }
+
+    @Test
+    void shouldReturnCorrectShouldNotifyForLip() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .claimDismissedDate(LocalDateTime.now())
+            .build();
+
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
     }
 
 }
