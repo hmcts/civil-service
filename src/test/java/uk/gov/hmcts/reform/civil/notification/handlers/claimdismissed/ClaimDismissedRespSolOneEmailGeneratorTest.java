@@ -80,4 +80,16 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
 
         assertThat(shouldNotify).isTrue();
     }
+
+    @Test
+    void shouldNotNotifyForRespondentSolcitorWhenClaimDismissedDateNotGiven() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.YES)
+            .claimDismissedDate(null)
+            .build();
+
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
 }
