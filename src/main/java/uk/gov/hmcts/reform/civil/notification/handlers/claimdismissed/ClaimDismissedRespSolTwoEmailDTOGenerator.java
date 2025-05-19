@@ -26,4 +26,9 @@ public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED;
     }
+
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return super.getShouldNotify(caseData) && caseData.getClaimDismissedDate() != null;
+    }
 }

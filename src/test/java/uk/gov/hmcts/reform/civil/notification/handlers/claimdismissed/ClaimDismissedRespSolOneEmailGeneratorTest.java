@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedRespSolOneEmailDTOGenerator.REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED;
@@ -40,5 +42,16 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
         String referenceTemplate = emailGenerator.getReferenceTemplate();
 
         assertThat(referenceTemplate).isEqualTo(REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED);
+    }
+
+    @Test
+    void shouldReturnCorrectShouldNotify() {
+        CaseData caseData = CaseData.builder()
+            .claimDismissedDate(LocalDateTime.now())
+            .build();
+
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isTrue();
     }
 }

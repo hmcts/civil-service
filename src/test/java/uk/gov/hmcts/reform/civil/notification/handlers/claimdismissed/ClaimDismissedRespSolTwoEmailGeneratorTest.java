@@ -41,4 +41,14 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
         assertThat(referenceTemplate).isEqualTo(REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED);
     }
+
+    @Test
+    void shouldReturnCorrectShouldNotify() {
+        CaseData caseData = CaseData.builder().build();
+        when(caseData.getClaimDismissedDate()).thenReturn(null);
+
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
 }

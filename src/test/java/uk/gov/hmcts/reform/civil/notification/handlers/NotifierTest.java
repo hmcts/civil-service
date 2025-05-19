@@ -35,7 +35,7 @@ class NotifierTest {
 
     private CaseTaskTrackingService caseTaskTrackingService;
 
-    private AllLegalRepsEmailGenerator emailGenerator;
+    private PartiesEmailGenerator emailGenerator;
 
     private TestNotifier notifier;
     EmailDTO party1;
@@ -48,7 +48,7 @@ class NotifierTest {
     private class TestNotifier extends Notifier {
         public TestNotifier(NotificationService notificationService,
                             CaseTaskTrackingService caseTaskTrackingService,
-                            AllLegalRepsEmailGenerator emailGenerator) {
+                            PartiesEmailGenerator emailGenerator) {
             super(notificationService, caseTaskTrackingService, emailGenerator);
         }
 
