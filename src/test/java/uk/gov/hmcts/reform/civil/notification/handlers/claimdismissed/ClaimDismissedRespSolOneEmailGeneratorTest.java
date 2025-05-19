@@ -58,7 +58,7 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectShouldNotifyForLip() {
+    void shouldNotNotifyForLip() {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
             .claimDismissedDate(LocalDateTime.now())
@@ -69,4 +69,15 @@ class ClaimDismissedRespSolOneEmailGeneratorTest {
         assertThat(shouldNotify).isFalse();
     }
 
+    @Test
+    void shouldNotifyForRespondentSolcitorWhenClaimDismissedDateGiven() {
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.YES)
+            .claimDismissedDate(LocalDateTime.now())
+            .build();
+
+        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isTrue();
+    }
 }
