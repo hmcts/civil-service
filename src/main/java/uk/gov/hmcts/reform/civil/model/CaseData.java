@@ -213,6 +213,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String personalInjuryTypeOther;
     private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     private final StatementOfTruth uiStatementOfTruth;
+    private final StatementOfTruth respondent1LiPStatementOfTruth;
     private final String legacyCaseReference;
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
@@ -614,6 +615,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo isGaRespondentTwoLip;
 
     private List<DocumentToKeepCollection> documentToKeepCollection;
+
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsApp;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes1;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes2;
 
     private final ChangeLanguagePreference changeLanguagePreference;
     private final PreferredLanguage claimantLanguagePreferenceDisplay;
