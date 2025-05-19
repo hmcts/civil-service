@@ -36,9 +36,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
@@ -55,8 +60,6 @@ public class NotificationUtils {
     }
 
     public static String REFERENCE_NOT_PROVIDED = "Not provided";
-    public static String RAISE_QUERY_LR = "Contact us about your claim by selecting "
-        + "Raise a query from the next steps menu in case file view.";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
@@ -76,7 +79,7 @@ public class NotificationUtils {
 
     public static Map<String, String> caseOfflineNotificationAddProperties(
         CaseData caseData, OrganisationPolicy organisationPolicy, OrganisationService organisationService,
-        boolean qmLREnabled, NotificationsSignatureConfiguration configuration) {
+        boolean qmLREnabled, boolean qmLipEnabled, NotificationsSignatureConfiguration configuration) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
@@ -85,9 +88,9 @@ public class NotificationUtils {
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    qmLREnabled);
+            addAllFooterItems(caseData, properties, configuration,
+                              qmLREnabled,
+                              qmLipEnabled);
             return properties;
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             String responseTypeToApplicant2 = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
@@ -105,9 +108,9 @@ public class NotificationUtils {
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    qmLREnabled);
+            addAllFooterItems(caseData, properties, configuration,
+                              qmLREnabled,
+                              qmLipEnabled);
             return properties;
         } else {
             //1v2 template is used and expects different data
@@ -125,9 +128,9 @@ public class NotificationUtils {
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(organisationPolicy, organisationService),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    qmLREnabled);
+            addAllFooterItems(caseData, properties, configuration,
+                              qmLREnabled,
+                              qmLipEnabled);
             return properties;
         }
     }
@@ -293,6 +296,20 @@ public class NotificationUtils {
         return qmNotAllowedStates.contains(caseData.getCcdState());
     }
 
+    public static Map<String, String> addAllFooterItems(CaseData caseData, Map<String, String> properties,
+                                                        NotificationsSignatureConfiguration configuration,
+                                                        boolean isLRQmEnabled, boolean isLipQMEnabled) {
+
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration, isLRQmEnabled);
+
+        addCommonFooterSignatureWelsh(properties, configuration);
+        addLipContactWelsh(caseData, properties, configuration, isLRQmEnabled, isLipQMEnabled);
+        addLipContact(caseData, properties, configuration, isLRQmEnabled, isLipQMEnabled);
+
+        return properties;
+    }
+
     public static Map<String, String> addCommonFooterSignature(Map<String, String> properties,
                                                                NotificationsSignatureConfiguration configuration) {
         properties.putAll(Map.of(HMCTS_SIGNATURE, configuration.getHmctsSignature(),
@@ -301,16 +318,47 @@ public class NotificationUtils {
         return properties;
     }
 
+    public static Map<String, String> addCommonFooterSignatureWelsh(Map<String, String> properties,
+                                                               NotificationsSignatureConfiguration configuration) {
+        properties.putAll(Map.of(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature(),
+                                 WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact(),
+                                 WELSH_OPENING_HOURS, configuration.getWelshOpeningHours()));
+        return properties;
+    }
+
     public static Map<String, String> addSpecAndUnspecContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isLRQmEnabled) {
-        log.info("isLRQmEnabled " + isLRQmEnabled);
-        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
-        log.info("!caseData.isLipCase() " + !caseData.isLipCase());
         if (isLRQmEnabled && !queryNotAllowedCaseStates(caseData) && !caseData.isLipCase()) {
-            properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
         } else {
             properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        }
+        return properties;
+    }
+
+    public static Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
+                                                    boolean isLRQmEnabled, boolean isLipQmEnabled) {
+
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("is LIP on case " + caseData.isLipCase());
+        if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+            properties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
+        } else {
+            properties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        }
+        return properties;
+    }
+
+    public static Map<String, String> addLipContactWelsh(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
+                                                         boolean isLRQmEnabled, boolean isLipQmEnabled) {
+
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("is LIP on case " + caseData.isLipCase());
+        if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+            properties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
+        } else {
+            properties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
         }
         return properties;
     }
@@ -318,11 +366,8 @@ public class NotificationUtils {
     public static Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isLRQmEnabled) {
-        log.info("isLRQmEnabled " + isLRQmEnabled);
-        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
-        log.info("!caseData.isLipCase() " + !caseData.isLipCase());
         if (isLRQmEnabled && !queryNotAllowedCaseStates(caseData) && !caseData.isLipCase()) {
-            properties.put(CNBC_CONTACT, RAISE_QUERY_LR);
+            properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         } else {
             properties.put(CNBC_CONTACT, configuration.getCnbcContact());
         }
