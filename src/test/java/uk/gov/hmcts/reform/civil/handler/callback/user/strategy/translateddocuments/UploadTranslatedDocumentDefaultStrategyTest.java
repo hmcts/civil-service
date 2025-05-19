@@ -41,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.O
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(MockitoExtension.class)|
+@ExtendWith(MockitoExtension.class)
 class UploadTranslatedDocumentDefaultStrategyTest {
 
     private static final String FILE_NAME_1 = "claimant";
