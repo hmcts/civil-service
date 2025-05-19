@@ -9,12 +9,15 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private final ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
+    private final ClaimDismissedEmailValidator claimDismissedEmailValidator;
     protected static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED = "claim-dismissed-respondent-notification-%s";
 
     public ClaimDismissedRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
-                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
+                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater,
+                                                     ClaimDismissedEmailValidator claimDismissedEmailValidator) {
         super(organisationService);
         this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
+        this.claimDismissedEmailValidator = claimDismissedEmailValidator;
     }
 
     @Override
@@ -29,6 +32,6 @@ public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
 
     @Override
     protected Boolean getShouldNotify(CaseData caseData) {
-        return super.getShouldNotify(caseData) && caseData.getClaimDismissedDate() != null;
+        return claimDismissedEmailValidator.isValidForEmail(caseData);
     }
 }

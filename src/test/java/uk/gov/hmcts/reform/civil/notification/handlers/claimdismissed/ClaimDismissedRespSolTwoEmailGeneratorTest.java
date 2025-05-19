@@ -15,6 +15,8 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
 
     @Mock
     private ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
+    @Mock
+    private ClaimDismissedEmailValidator claimDismissedEmailValidator;
 
     @InjectMocks
     private ClaimDismissedRespSolTwoEmailDTOGenerator emailGenerator;
@@ -45,9 +47,8 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
     @Test
     void shouldReturnCorrectShouldNotify() {
         CaseData caseData = CaseData.builder().build();
-        when(caseData.getClaimDismissedDate()).thenReturn(null);
-
-        Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+        when(claimDismissedEmailValidator.isValidForEmail(caseData)).thenReturn(false);
+        boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isFalse();
     }
