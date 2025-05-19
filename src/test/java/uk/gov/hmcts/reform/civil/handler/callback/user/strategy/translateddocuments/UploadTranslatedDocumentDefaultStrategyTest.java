@@ -485,6 +485,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN.name());
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO.name());
     }
 }
