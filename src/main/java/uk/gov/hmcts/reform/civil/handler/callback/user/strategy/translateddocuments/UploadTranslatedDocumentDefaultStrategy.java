@@ -98,6 +98,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationManualDeterminationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
+                }  else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.SETTLEMENT_AGREEMENT)
+                            .findFirst();
+                        preTranslationSettlementAgreement.ifPresent(preTranslationDocuments::remove);
+                        preTranslationSettlementAgreement.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
@@ -106,14 +114,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                                                                                 originalDocument.getValue().getDocumentType());
                         systemGeneratedDocuments.add(element(claimantSealedCopy));
                         assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
-                    }
-                } else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
-                    if (Objects.nonNull(preTranslationDocuments)) {
-                        Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
-                            .filter(item -> item.getValue().getDocumentType() == DocumentType.SETTLEMENT_AGREEMENT)
-                            .findFirst();
-                        preTranslationSettlementAgreement.ifPresent(preTranslationDocuments::remove);
-                        preTranslationSettlementAgreement.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
                 }
             });
