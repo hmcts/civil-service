@@ -15,7 +15,8 @@ public class CreateSDORespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGene
 
     private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-2-notification-%s";
 
-    protected CreateSDORespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService, FeatureToggleService featureToggleService) {
+    protected CreateSDORespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService,
+                                                   FeatureToggleService featureToggleService) {
         super(notificationsProperties, organisationService);
         this.featureToggleService = featureToggleService;
     }
