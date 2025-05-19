@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 @Component
 public class CreateSDODefendantTwoEmailDTOGenerator extends DefendantTwoEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-1-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-2-notification-%s";
 
     protected CreateSDODefendantTwoEmailDTOGenerator(NotificationsProperties notificationsProperties) {
         super(notificationsProperties);

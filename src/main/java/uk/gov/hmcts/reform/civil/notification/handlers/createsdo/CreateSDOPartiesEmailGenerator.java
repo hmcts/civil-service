@@ -32,7 +32,7 @@ public class CreateSDOPartiesEmailGenerator implements PartiesEmailGenerator {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
         partiesToEmail.add(getApplicant(caseData));
-        partiesToEmail.addAll(getRespondent(caseData));
+        partiesToEmail.addAll(getRespondents(caseData));
         return partiesToEmail;
     }
 
@@ -40,7 +40,7 @@ public class CreateSDOPartiesEmailGenerator implements PartiesEmailGenerator {
         return caseData.isApplicantLiP() ? claimantEmailDTOGenerator.buildEmailDTO(caseData) : appSolOneEmailDTOGenerator.buildEmailDTO(caseData);
     }
 
-    private Set<EmailDTO> getRespondent(CaseData caseData) {
+    private Set<EmailDTO> getRespondents(CaseData caseData) {
         Set<EmailDTO> recipients = new HashSet<>();
 
         if (caseData.isRespondent1LiP()) {
