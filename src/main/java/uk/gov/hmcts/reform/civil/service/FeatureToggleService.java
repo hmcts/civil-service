@@ -170,4 +170,8 @@ public class FeatureToggleService {
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
     }
+
+    public boolean isLrAdmissionBulkEnabled() {
+        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
+    }
 }
