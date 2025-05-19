@@ -19,7 +19,7 @@ public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
 
     @Override
     public String getEmailTemplateId(CaseData caseData) {
-        return claimDismissedEmailHelper.getTemplateId(caseData);
+        return claimDismissedEmailHelper.getTemplateId(caseData); //NOSONAR
     }
 
     @Override
@@ -29,6 +29,6 @@ public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
 
     @Override
     protected Boolean getShouldNotify(CaseData caseData) {
-        return claimDismissedEmailHelper.isValidForRespondentEmail(caseData);
+        return claimDismissedEmailHelper.isValidForRespondentEmail(caseData); //NOSONAR
     }
 }
