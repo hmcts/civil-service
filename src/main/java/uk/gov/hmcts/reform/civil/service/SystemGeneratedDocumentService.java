@@ -25,17 +25,24 @@ public class SystemGeneratedDocumentService {
     }
 
     public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
+        List<Element<CaseDocument>> finalOrderDocuments = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
+        return addToDocumentCollection(finalOrderDocuments, translatedDocuments);
+    }
 
-        CaseData caseData = callbackParams.getCaseData();
-        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+    public List<Element<CaseDocument>> getFinalOrderDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
+        List<Element<CaseDocument>> finalOrderDocuments = callbackParams.getCaseData().getFinalOrderDocumentCollection();
+        return addToDocumentCollection(finalOrderDocuments, translatedDocuments);
+    }
+
+    private List<Element<CaseDocument>> addToDocumentCollection(List<Element<CaseDocument>> documentCollection, List<Element<TranslatedDocument>> translatedDocuments) {
         if (Objects.nonNull(translatedDocuments)) {
             for (Element<TranslatedDocument> translateDocument : translatedDocuments) {
                 CaseDocument caseDocument = CaseDocument.toCaseDocument(translateDocument.getValue().getFile(),
-                        translateDocument.getValue().getCorrespondingDocumentType(translateDocument.getValue().getDocumentType()));
-                systemGeneratedDocuments.add(element(caseDocument));
+                                                                        translateDocument.getValue().getCorrespondingDocumentType(translateDocument.getValue().getDocumentType()));
+                documentCollection.add(element(caseDocument));
             }
         }
-        return systemGeneratedDocuments;
+        return documentCollection;
     }
 
 }

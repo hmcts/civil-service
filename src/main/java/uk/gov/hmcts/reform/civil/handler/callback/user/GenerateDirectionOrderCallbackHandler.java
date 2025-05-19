@@ -613,13 +613,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
-
-        if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
-            finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (featureToggleService.isGaForWelshEnabled()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+                || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            preTranslationDocuments.addAll(finalCaseDocuments);
+            caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
+            // Do not trigger business process when document is hidden
+        } else {
+            if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
+                finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
+                caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
+                caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
+            }
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
@@ -635,8 +644,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                 caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation());
             }
         }
-
-        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         if (nonNull(caseData.getFinalOrderSelection())) {
             // populate hearing notes in listing tab with hearing notes from either assisted or freeform order, if either exist.

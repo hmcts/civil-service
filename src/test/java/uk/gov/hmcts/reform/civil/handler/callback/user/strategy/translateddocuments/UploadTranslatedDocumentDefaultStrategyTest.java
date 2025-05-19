@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
@@ -318,7 +319,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldNotSetBusinessProcess_WhenDocumentTypeIsInterlocJudgment() {
+    void shouldSetBusinessProcess_WhenDocumentTypeIsInterlocJudgment() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
@@ -399,5 +400,47 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .extracting("businessProcess")
             .extracting("camundaEvent")
             .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN.name());
+    }
+
+    @Test
+    void shouldSetBusinessProcess_WhenDocumentTypeIsFinalOrder() {
+        //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(FINAL_ORDER)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
+                                                                        DocumentType.JUDGE_FINAL_ORDER)));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocuments(translatedDocument)
+                             .build())
+            .preTranslationDocuments(preTranslationDocuments)
+            .finalOrderDocumentCollection(new ArrayList<>())
+            .ccdCaseReference(123L)
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.GENERATE_ORDER_NOTIFICATION.name());
     }
 }
