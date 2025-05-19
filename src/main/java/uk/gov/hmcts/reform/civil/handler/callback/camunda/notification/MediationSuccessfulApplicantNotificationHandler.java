@@ -38,7 +38,6 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL);
     private static final String REFERENCE_TEMPLATE = "mediation-successful-applicant-notification-%s";
     private static final String REFERENCE_TEMPLATE_LIP = "mediation-successful-applicant-notification-LIP-%s";
-    private static final String REFERENCE_TEMPLATE_LIP_WELSH = "mediation-successful-applicant-notification-LIP-%s";
     public static final String TASK_ID = "MediationSuccessfulNotifyApplicant";
     private final Map<String, Callback> callbacksMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicant
@@ -56,7 +55,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
     private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
+        boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         if (isCarmEnabled) {
             String claimId = caseData.getLegacyCaseReference();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
@@ -74,7 +73,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 sendEmail(
                     caseData.getApplicantSolicitor1UserDetails().getEmail(),
                     notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation(),
-                    oneVtwoProperties(caseData),
+                        oneVtwoProperties(caseData),
                     referenceTemplate
                 );
             } else {

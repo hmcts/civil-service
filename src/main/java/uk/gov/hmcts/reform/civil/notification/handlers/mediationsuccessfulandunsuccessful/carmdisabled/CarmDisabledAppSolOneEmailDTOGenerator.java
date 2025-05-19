@@ -1,21 +1,21 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.mediation.carmDisabled;
+package uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.mediation.MediationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class CarmDisabledAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "mediation-successful-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "mediation-update-applicant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -27,7 +27,15 @@ public class CarmDisabledAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGen
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate();
+        return getEmailTemplateId(caseData, null);
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData, String taskId) {
+        if (MediationSuccessfulNotifyParties.toString().equals(taskId)) {
+            return notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate();
+        }
+        return notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate();
     }
 
     @Override
@@ -36,7 +44,7 @@ public class CarmDisabledAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGen
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+    protected Map<String, String>  addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.putAll(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.mediation.carmEnabled;
+package uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmenabled;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -6,17 +6,22 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerato
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_TWO;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
+import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class CarmAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "mediation-successful-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "mediation-update-applicant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -28,11 +33,24 @@ public class CarmAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        if (isOneVTwoTwoLegalRep(caseData) || isOneVTwoLegalRep(caseData)) {
-            return
-                notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation();
+        return getEmailTemplateId(caseData, null);
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData, String taskId) {
+        if (MediationSuccessfulNotifyParties.toString().equals(taskId)) {
+            if (isOneVTwoTwoLegalRep(caseData) || isOneVTwoLegalRep(caseData)) {
+                return
+                    notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation();
+            }
+            return notificationsProperties.getNotifyLrClaimantSuccessfulMediation();
         }
-        return notificationsProperties.getNotifyLrClaimantSuccessfulMediation();
+
+        if (findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_CLAIMANT_TWO))) {
+            return notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate();
+        } else {
+            return notificationsProperties.getMediationUnsuccessfulLRTemplate();
+        }
     }
 
     @Override
@@ -42,6 +60,11 @@ public class CarmAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        String partyName = "your claim against " + caseData.getRespondent1().getPartyName();
+        if (null != caseData.getRespondent2()) {
+            partyName = String.format("%s and %s", partyName, caseData.getRespondent2().getPartyName());
+        }
+        properties.put(PARTY_NAME, partyName);
         if (isOneVTwoTwoLegalRep(caseData) || isOneVTwoLegalRep(caseData)) {
             properties.putAll(Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),

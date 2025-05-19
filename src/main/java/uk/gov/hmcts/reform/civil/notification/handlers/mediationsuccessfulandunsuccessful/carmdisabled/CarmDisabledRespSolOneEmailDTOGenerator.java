@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.mediation.carmDisabled;
+package uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -8,14 +8,13 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class CarmDisabledRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "notification-mediation-successful-defendant-LIP-%s";
+    private static final String REFERENCE_TEMPLATE = "mediation-update-defendant-notification-LIP-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -26,8 +25,17 @@ public class CarmDisabledRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOG
     }
 
     @Override
+    protected String getEmailTemplateId(CaseData caseData, String taskId) {
+        if (MediationSuccessfulNotifyParties.toString().equals(taskId)) {
+            return notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim();
+        }
+
+        return notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr();
+    }
+
+    @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyLrDefendantSuccessfulMediationForLipVLrClaim();
+        return getEmailTemplateId(caseData, null);
     }
 
     @Override
@@ -37,7 +45,7 @@ public class CarmDisabledRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOG
 
     //Only in case of lip v lr
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isLipvLROneVOne();
     }
 

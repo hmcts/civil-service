@@ -1,27 +1,38 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.mediation.carmDisabled;
+package uk.gov.hmcts.reform.civil.notification.handlers.mediationsuccessfulandunsuccessful.carmdisabled;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.mediation.MediationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 
 @Component
 @AllArgsConstructor
 public class CarmDisabledClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE_LIP = "mediation-successful-applicant-notification-LIP-%s";
+    private static final String REFERENCE_TEMPLATE_LIP = "mediation-update-claimant-notification-LIP-%s";
 
     private final NotificationsProperties notificationsProperties;
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.isClaimantBilingual()
+        return getEmailTemplateId(caseData, null);
+    }
+
+    @Override
+    protected String getEmailTemplateId(CaseData caseData, String taskId) {
+        if (MediationSuccessfulNotifyParties.toString().equals(taskId)) {
+            return caseData.isClaimantBilingual()
                 ? notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate() :
                 notificationsProperties.getNotifyApplicantLiPMediationSuccessfulTemplate();
+        }
+        return caseData.isClaimantBilingual()
+            ? notificationsProperties.getMediationUnsuccessfulClaimantLIPWelshTemplate() :
+            notificationsProperties.getMediationUnsuccessfulClaimantLIPTemplate();
 
     }
 
