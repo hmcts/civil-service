@@ -1,19 +1,19 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed;
+package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.rejectrepayment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+@Component
 @RequiredArgsConstructor
 @Slf4j
-@Component
-public class ClaimantRespConfirmProceedClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
+public class ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "claimant-reject-repayment-respondent-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
     private final FeatureToggleService featureToggleService;
@@ -21,9 +21,9 @@ public class ClaimantRespConfirmProceedClaimantEmailDTOGenerator extends Claiman
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         if (isBilingualForLipApplicant(caseData)) {
-            return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
+            return notificationsProperties.getNotifyDefendantLipWelshTemplate();
         }
-        return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        return notificationsProperties.getNotifyDefendantLipTemplate();
     }
 
     @Override
