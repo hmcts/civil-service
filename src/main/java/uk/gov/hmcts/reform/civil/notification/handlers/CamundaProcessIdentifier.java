@@ -5,6 +5,7 @@ public enum CamundaProcessIdentifier {
     ClaimantConfirmProceedNotifyParties,
     RejectRepaymentPlanNotifyParties,
     LitigationFriendAddedNotifier,
+    AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
 }
