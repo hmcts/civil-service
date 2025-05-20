@@ -80,6 +80,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         log.info("Respondent1RespDeadline is {} for caseId{} in caseData", respondent1RespDeadline, caseId);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(respondent1RespDeadline)
+            .nextDeadline(respondent1RespDeadline.toLocalDate())
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(

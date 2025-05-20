@@ -15,11 +15,11 @@ public class LipvLipEmailGenerator implements PartiesEmailGenerator {
     private final DefendantEmailDTOGenerator defendantEmailDTOGenerator;
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
+    public Set<EmailDTO> getPartiesToNotify(final CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
-        partiesToEmail.add(claimantEmailDTOGenerator.buildEmailDTO(caseData));
-        partiesToEmail.add(defendantEmailDTOGenerator.buildEmailDTO(caseData));
+        partiesToEmail.add(claimantEmailDTOGenerator.buildEmailDTO(caseData, taskId));
+        partiesToEmail.add(defendantEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         return partiesToEmail;
     }
 }
