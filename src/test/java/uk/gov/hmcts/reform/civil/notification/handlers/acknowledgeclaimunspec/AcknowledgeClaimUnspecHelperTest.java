@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_INTENTION;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -58,6 +60,9 @@ class AcknowledgeClaimUnspecHelperTest {
                 .thenReturn(MultiPartyScenario.ONE_V_ONE);
             partyUtils.when(() -> isAcknowledgeUserRespondentTwo(caseData)).thenReturn(false);
             partyUtils.when(() -> getPartyNameBasedOnType(respondent)).thenReturn("Resp Name");
+            partyUtils.when(() ->
+                                    PartyUtils.getResponseIntentionForEmail(caseData))
+                .thenReturn("Response intention");
 
             notificationUtils.when(() ->
                                        getLegalOrganizationNameForRespondent(caseData, true, organisationService)
@@ -72,7 +77,8 @@ class AcknowledgeClaimUnspecHelperTest {
             assertThat(result)
                 .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Legal Org Name")
                 .containsEntry(RESPONDENT_NAME, "Resp Name")
-                .containsEntry(RESPONSE_DEADLINE, "01 Jan 2029");
+                .containsEntry(RESPONSE_DEADLINE, "01 Jan 2029")
+                .containsEntry(RESPONSE_INTENTION, "Response intention");
         }
     }
 

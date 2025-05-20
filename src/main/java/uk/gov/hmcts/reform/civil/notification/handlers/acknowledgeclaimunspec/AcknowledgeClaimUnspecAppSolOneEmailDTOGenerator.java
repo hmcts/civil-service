@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
 @Component
 public class AcknowledgeClaimUnspecAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
@@ -42,7 +41,6 @@ public class AcknowledgeClaimUnspecAppSolOneEmailDTOGenerator extends AppSolOneE
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties = acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData);
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
-        properties.put(RESPONSE_INTENTION, getResponseIntentionForEmail(caseData));
         return properties;
     }
 }

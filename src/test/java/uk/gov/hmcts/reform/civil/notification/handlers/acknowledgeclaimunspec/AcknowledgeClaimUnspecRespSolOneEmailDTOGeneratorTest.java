@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_INTENTION;
 import static uk.gov.hmcts.reform.civil.notification.handlers.acknowledgeclaimunspec.AcknowledgeClaimUnspecRespSolOneEmailDTOGenerator.REF_SOL_ONE_REF_TEMPLATE;
 
 class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
@@ -59,7 +60,8 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
         Map<String, String> addedProperties = Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, "TestOrg",
             RESPONDENT_NAME, "Resp1 name",
-            RESPONSE_DEADLINE, "2029-01-01"
+            RESPONSE_DEADLINE, "2029-01-01",
+            RESPONSE_INTENTION, "Response intention"
         );
         when(acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData))
             .thenReturn(new HashMap<>(addedProperties));
@@ -67,7 +69,8 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
         assertThat(properties)
             .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "TestOrg")
             .containsEntry(RESPONDENT_NAME, "Resp1 name")
-            .containsEntry(RESPONSE_DEADLINE, "2029-01-01");
+            .containsEntry(RESPONSE_DEADLINE, "2029-01-01")
+            .containsEntry(RESPONSE_INTENTION, "Response intention");
     }
 
     @Test

@@ -15,9 +15,11 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_INTENTION;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.isAcknowledgeUserRespondentTwo;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
@@ -40,6 +42,7 @@ public class AcknowledgeClaimUnspecHelper {
         );
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(respondent));
         properties.put(RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE));
+        properties.put(RESPONSE_INTENTION, getResponseIntentionForEmail(caseData));
 
         return properties;
     }
