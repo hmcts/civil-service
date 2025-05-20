@@ -102,6 +102,10 @@ public class FeatureToggleService {
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return false;
+        }
+
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
         if (caseData.getSubmittedDate() == null) {
