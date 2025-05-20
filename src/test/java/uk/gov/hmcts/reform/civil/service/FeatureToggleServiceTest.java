@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -15,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -164,15 +167,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
-        var sdoR2Key = "isSdoR2Enabled";
-        givenToggle(sdoR2Key, toggleStat);
-
-        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
         var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
         givenToggle(isJudgmentOnlineLiveKey, toggleStat);
@@ -223,6 +217,18 @@ class FeatureToggleServiceTest {
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseIsNotSpecClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .build();
+
+        assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isFalse();
+
+        verifyNoInteractions(featureToggleApi);
     }
 
     @ParameterizedTest
@@ -308,5 +314,14 @@ class FeatureToggleServiceTest {
         givenToggle(hmcCui, toggleStat);
 
         assertThat(featureToggleService.isHmcForLipEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
+        var caseFlagsKey = "query-management";
+        givenToggle(caseFlagsKey, toggleStat);
+
+        assertThat(featureToggleService.isQueryManagementLRsEnabled()).isEqualTo(toggleStat);
     }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForPa
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
@@ -74,6 +76,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         "<br>The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
+    public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
@@ -258,6 +261,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
+        if (YesOrNo.YES.equals(caseData.getPartialPayment())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
+                .build();
+        }
+
         BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
         BigDecimal totalIncludeInterestAndFeeAndCosts = caseData.getTotalClaimAmount()
             .add(interestCalculator.calculateInterest(caseData))
@@ -353,7 +362,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     @NotNull
     private StringBuilder buildRepaymentBreakdown(CaseData caseData, CallbackParams callbackParams) {
-
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         Fee claimfee = caseData.getClaimFee();
         BigDecimal claimFeePounds = JudgmentsOnlineHelper.getClaimFeePounds(caseData, claimfee);
@@ -403,6 +411,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal.setScale(2));
+        log.info("Case {} with calculated interest: {} and Repayment Breakdown details: {}", caseData.getCcdCaseReference(), interest, repaymentBreakdown);
         return repaymentBreakdown;
     }
 
@@ -484,11 +493,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (featureToggleService.isJudgmentOnlineLive()) {
             JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgment);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
-        } 
-        
+        }
+
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
         String nextState;

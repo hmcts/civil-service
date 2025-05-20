@@ -10,14 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.helpers.settlediscontinue.SettleClaimHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SETTLE_CLAIM;
@@ -28,15 +27,16 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 public class SettleClaimCallbackHandler extends CallbackHandler {
 
     protected final ObjectMapper objectMapper;
+    private final DashboardNotificationService dashboardNotificationService;
 
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM);
+    private final TaskListService taskListService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::checkState,
             callbackKey(ABOUT_TO_SUBMIT), this::saveJudgmentPaidInFullDetails,
-            callbackKey(SUBMITTED), this::buildConfirmation
+            callbackKey(SUBMITTED), this::inactivateTaskListAndBuildConfirmation
         );
     }
 
@@ -45,30 +45,46 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse checkState(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-
-        SettleClaimHelper.checkState(caseData, errors);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
-        CaseData caseDataBuilder = callbackParams.getCaseData().toBuilder().build();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
+
+        deleteMainCaseDashboardNotifications(caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .state(CASE_SETTLED.name())
             .build();
     }
 
-    private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
+    private CallbackResponse inactivateTaskListAndBuildConfirmation(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.isApplicantLiP()) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
+                                                                                                   "CLAIMANT",
+                                                                                                   "Application.View"
+            );
+        }
+        if (caseData.isRespondent1LiP()) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
+                                                                                                   "DEFENDANT",
+                                                                                                   "Application.View"
+            );
+        }
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim marked as settled")
             .confirmationBody("<br />")
             .build();
+    }
+
+    private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (caseDataBuilder.build().isApplicantLiP()) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseDataBuilder.build().getCcdCaseReference().toString(), "CLAIMANT");
+        }
+        if (caseDataBuilder.build().isRespondent1LiP()) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseDataBuilder.build().getCcdCaseReference().toString(), "DEFENDANT");
+        }
     }
 }

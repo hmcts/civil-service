@@ -59,8 +59,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferencesSpec;
 import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Component
@@ -184,6 +186,9 @@ public class SubmitClaimTask {
             dataBuilder.respondentSolicitor2ServiceAddress(caseData.getRespondentSolicitor1ServiceAddress());
             dataBuilder.respondentSolicitor2OrganisationDetails(caseData.getRespondentSolicitor1OrganisationDetails());
         }
+        dataBuilder
+            .allPartyNames(getAllPartyNames(caseData))
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferencesSpec(caseData));
 
         populateWithPartyIds(dataBuilder);
 
@@ -218,7 +223,7 @@ public class SubmitClaimTask {
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if (featureToggleService.isSdoR2Enabled() && isFlightDelayClaim != null && isFlightDelayClaim.equals(YES)) {
+        if (isFlightDelayClaim != null && isFlightDelayClaim.equals(YES)) {
             String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
             dataBuilder.claimType(ClaimType.FLIGHT_DELAY)
                 .flightDelayDetails(FlightDelayDetails.builder()

@@ -94,6 +94,7 @@ public class ClaimFormMapper {
                                   .map(EvidenceTemplateData::toEvidenceTemplateData)
                                   .toList())
                               .orElse(Collections.emptyList()))
+            .uiStatementOfTruth(caseData.getUiStatementOfTruth())
             .build();
     }
 
@@ -107,8 +108,8 @@ public class ClaimFormMapper {
     @Nullable
     private static LocalDate getInterestFromDate(CaseData caseData) {
         return Optional.ofNullable(caseData.getInterestFromSpecificDate())
-            .orElse(Optional.ofNullable(caseData.getIssueDate())
-                .orElse(null));
+            .orElse(Optional.ofNullable(caseData.getSubmittedDate())
+                        .map(LocalDateTime::toLocalDate).orElse(null));
     }
 
     @Nullable

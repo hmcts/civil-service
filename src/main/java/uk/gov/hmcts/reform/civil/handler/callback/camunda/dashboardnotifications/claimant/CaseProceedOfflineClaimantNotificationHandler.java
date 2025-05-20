@@ -80,11 +80,13 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
     @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return (caseData.getPreviousCCDState() != null && caseMovedInCaseManStates.contains(caseData.getPreviousCCDState())
-                && caseData.isLipvLipOneVOne()) || (shouldRecordScenarioInCaseProgression(caseData));
+            && (caseData.isLipvLipOneVOne() || caseData.isLipvLROneVOne()))
+            || (shouldRecordScenarioInCaseProgression(caseData));
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData) {
         return featureToggleService.isCaseProgressionEnabled()
+            && caseData.getPreviousCCDState() != null
             && caseMovedInCaseManStatesCaseProgression.contains(caseData.getPreviousCCDState())
             && caseData.isLipvLipOneVOne();
     }
@@ -98,7 +100,7 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             "CLAIMANT"
         );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseId,
             "CLAIMANT",
             GA

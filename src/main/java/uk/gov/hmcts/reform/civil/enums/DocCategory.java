@@ -16,7 +16,11 @@ public enum DocCategory {
     HEARING_NOTICES("hearingNotices"),
     NOTICE_OF_DISCONTINUE("discontinueNotices"),
     CLAIMANT1_DETAILS_OF_CLAIM("detailsOfClaim"),
-    PARTICULARS_OF_CLAIM("particularsOfClaim");
+    PARTICULARS_OF_CLAIM("particularsOfClaim"),
+    CLAIMANT_QUERY_DOCUMENTS("ClaimantQueryDocuments"),
+    CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS("ClaimantQueryDocumentAttachments"),
+    DEFENDANT_QUERY_DOCUMENTS("DefendantQueryDocuments"),
+    DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS("DefendantQueryDocumentAttachments");
 
     private final String value;
 }
