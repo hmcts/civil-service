@@ -141,15 +141,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         if (featureToggleService.isJudgmentOnlineLive()) {
             JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
 
-            BigDecimal interest = !judgementService.isLrFullAdmitRepaymentPlan(data)
-                ? interestCalculator.calculateInterest(data) : null;
-            String breakdownSummary = JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(
-                activeJudgment, interest);
-
+            BigDecimal interest = interestCalculator.calculateInterest(data);
             caseDataBuilder
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(breakdownSummary)
+                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest))
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 
