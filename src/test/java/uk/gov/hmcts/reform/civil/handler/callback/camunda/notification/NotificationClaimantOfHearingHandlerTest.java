@@ -4,14 +4,17 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
@@ -22,12 +25,11 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
@@ -56,12 +58,18 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NotificationClaimantOfHearingHandlerTest {
 
     @Mock
@@ -92,6 +100,9 @@ class NotificationClaimantOfHearingHandlerTest {
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getHmctsSignatureWelsh()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \\n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+            when(configuration.getPhoneContactWelsh()).thenReturn("Ffôn: 0300 303 5174");
+            when(configuration.getOpeningHoursWelsh()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
         }
 
         @Test
@@ -689,10 +700,15 @@ class NotificationClaimantOfHearingHandlerTest {
                 : "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -705,10 +721,10 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
         return expectedProperties;
     }
 
@@ -722,10 +738,15 @@ class NotificationClaimantOfHearingHandlerTest {
                 : "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -739,10 +760,15 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -755,10 +781,15 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -772,10 +803,15 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -788,10 +824,15 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -804,10 +845,15 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -820,10 +866,15 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+        expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+        expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -836,10 +887,10 @@ class NotificationClaimantOfHearingHandlerTest {
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-        expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
         return expectedProperties;
     }
 

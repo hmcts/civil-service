@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,9 +36,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -120,6 +126,14 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
 
         @Test
         void shouldNotNotifyApplicantLipVSLR_whenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getHmctsSignatureWelsh()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \\n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+            when(configuration.getPhoneContactWelsh()).thenReturn("Ffôn: 0300 303 5174");
+            when(configuration.getOpeningHoursWelsh()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
@@ -136,14 +150,21 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             verify(notificationService).sendMail(
                 "aabc@gmail.com",
                 "template-id",
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, "1234", "claimantName", "A B"),
+                getNotificationDataMapLip(),
                 "case-proceeds-in-caseman-applicant-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotNotifyApplicantLipVSLrForBilingualLip_whenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getHmctsSignatureWelsh()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \\n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+            when(configuration.getPhoneContactWelsh()).thenReturn("Ffôn: 0300 303 5174");
+            when(configuration.getOpeningHoursWelsh()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
@@ -161,10 +182,26 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
             verify(notificationService).sendMail(
                 "aabc@gmail.com",
                 "template-id",
-                Map.of(
-                    CLAIM_REFERENCE_NUMBER, "1234", "claimantName", "A B"),
+                getNotificationDataMapLip(),
                 "case-proceeds-in-caseman-applicant-notification-000DC001"
             );
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMapLip() {
+            Map<String, String> expectedProperties = new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER, "1234",
+                "claimantName", "A B"
+            ));
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
+            expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
+            expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            return expectedProperties;
         }
     }
 }
