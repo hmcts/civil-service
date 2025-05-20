@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!isDefendantFullAdmitPayImmediately(caseData)) {
             return Optional.empty();
         }

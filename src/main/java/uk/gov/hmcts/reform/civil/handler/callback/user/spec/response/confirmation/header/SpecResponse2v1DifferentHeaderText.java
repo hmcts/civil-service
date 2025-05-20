@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.Optional;
 public class SpecResponse2v1DifferentHeaderText implements RespondToClaimConfirmationHeaderSpecGenerator {
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (caseData.getApplicant2() == null
             || YesOrNo.YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
             || Objects.equals(

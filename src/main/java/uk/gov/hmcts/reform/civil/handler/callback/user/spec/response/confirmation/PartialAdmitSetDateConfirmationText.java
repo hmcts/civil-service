@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Component
+@AllArgsConstructor
 public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
 
     /**
@@ -29,12 +33,13 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
      *     the respondent wants to pay by a set date and all fields needed for the text are available.
      */
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
+
         BigDecimal admitOwed = caseData.getRespondToAdmittedClaimOwingAmountPounds();
         LocalDate whenWillYouPay = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
         BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
@@ -96,7 +101,11 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
         sb.append("<p>Because you've said you will not pay immediately, ")
             .append(applicantName)
             .append(" can request a county court judgment against you for &#163;")
-            .append(admitOwed).append(P_TAG)
+            .append(admitOwed)
+            .append(featureToggleService.isLrAdmissionBulkEnabled()
+                        ? " plus the claim fee and any fixed costs claimed"
+                        : "")
+            .append(P_TAG)
 
             .append(headingThreeText)
             .append(applicantName)
@@ -106,9 +115,12 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
         if (caseData.hasDefendantAgreedToFreeMediation()) {
             sb.append("<p>We'll ask if they want to try mediation. ")
               .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
-              .append(
-                        "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
-                    .append(totalClaimAmount).append(P_TAG);
+              .append("<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
+                .append(totalClaimAmount)
+                .append(featureToggleService.isLrAdmissionBulkEnabled()
+                            ? " plus the claim fee and any costs and further interest claimed"
+                            : "")
+                .append(P_TAG);
         } else {
             sb.append("<p>The court will review the case for the full amount of &#163;")
               .append(totalClaimAmount).append(P_TAG);
