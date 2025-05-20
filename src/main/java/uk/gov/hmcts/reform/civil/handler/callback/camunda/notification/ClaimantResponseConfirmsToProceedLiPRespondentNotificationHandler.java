@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
@@ -154,10 +155,14 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                                     featureToggleService.isQueryManagementLRsEnabled());
             return properties;
         }
-        return Map.of(
+        HashMap<String, String> lipProperties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
+        ));
+        addCommonFooterSignature(lipProperties, configuration);
+        addLipContact(caseData, lipProperties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return lipProperties;
     }
 
     private boolean isFullDefenceStatesPaid(CaseData caseData) {

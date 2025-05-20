@@ -11,13 +11,17 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
 
     private static final String LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "notification-mediation-unsuccessful-defendant-LIP-%s";
     private static final String TASK_ID_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "SendMediationUnsuccessfulDefendantLIP";
@@ -47,16 +52,26 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
-                      CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                      CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-        );
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesCARM(CaseData caseData) {
-        return Map.of(PARTY_NAME, caseData.getRespondent1().getPartyName(),
-                      CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-        );
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     @Override

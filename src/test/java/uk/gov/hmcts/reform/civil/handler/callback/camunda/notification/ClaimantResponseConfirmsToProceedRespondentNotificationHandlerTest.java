@@ -53,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -428,10 +429,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn(
-                "Email for Specified Claims: contactocmc@justice.gov.uk "
-                    + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1Represented(null)
@@ -627,10 +624,8 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
                 OPENING_HOURS,
                 "Monday to Friday, 8.30am to 5pm",
-                CNBC_CONTACT,
-                "Email for Specified Claims: contactocmc@justice.gov.uk",
-                SPEC_UNSPEC_CONTACT,
-                "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                LIP_CONTACT,
+                "Email: contactocmc@justice.gov.uk",
                 HMCTS_SIGNATURE,
                 "Online Civil Claims \n HM Courts & Tribunal Service"
             );

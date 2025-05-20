@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -102,9 +103,21 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
         private static final Map<String, String> PROPERTY_LIP_MAP = Map.of(CLAIMANT_NAME, APPLICANT_PARTY_NAME,
                                                                            RESPONDENT_NAME, DEFENDANT_PARTY_NAME,
-                                                                           CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
+                                                                           CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER,
+                                                                           PHONE_CONTACT,
+                                                                           "For anything related to hearings, call 0300 123 5577 "
+                                                                               + "\n For all other matters, call 0300 123 7050",
+                                                                           OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                                                                           LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
+                                                                           HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
         private static final Map<String, String> CARM_LIP_CLAIMANT_PROPERTY_MAP = Map.of(PARTY_NAME, APPLICANT_PARTY_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+                                                                                         CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
+                                                                                         PHONE_CONTACT,
+                                                                                         "For anything related to hearings, call 0300 123 5577"
+                                                                                             + " \n For all other matters, call 0300 123 7050",
+                                                                                         OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                                                                                         LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
+                                                                                         HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
 
         @Test
         void shouldSendNotificationToClaimantLr_whenEventIsCalled() {
@@ -143,6 +156,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         @Test
         void shouldSendNotificationToClaimantLip_whenEventIsCalled() {
             //Given
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
@@ -173,6 +190,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         @Test
         void shouldSendNotificationToClaimantLip_whenEventIsCalledClaimIssueInBilingual() {
             //Given
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
@@ -344,6 +365,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 "NOT_CONTACTABLE_DEFENDANT_TWO"})
             void shouldSendNotificationToClaimantLIP_1v1_whenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
+                when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+                when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                     + "\n For all other matters, call 0300 123 7050");
+                when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
                 CaseData caseData = CaseData.builder()
                     .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                     .partyEmail(APPLICANT_PARTY_EMAIL).build())
@@ -378,6 +403,10 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 "NOT_CONTACTABLE_DEFENDANT_TWO"})
             void shouldSendNotificationToClaimantLIP_1v1_WithBilingualwhenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
+                when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+                when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                     + "\n For all other matters, call 0300 123 7050");
+                when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
                 CaseData caseData = CaseData.builder()
                     .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME)
                                     .partyEmail(APPLICANT_PARTY_EMAIL).build())

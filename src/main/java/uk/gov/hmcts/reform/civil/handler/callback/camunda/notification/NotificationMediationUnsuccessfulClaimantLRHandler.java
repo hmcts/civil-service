@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulRea
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_TWO;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -86,11 +87,15 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     }
 
     public Map<String, String> addPropertiesLip(final CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesNoAttendanceCARM(final CaseData caseData) {
@@ -125,9 +130,14 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     }
 
     public Map<String, String> addPropertiesCARMforLIP(CaseData caseData) {
-        return Map.of(PARTY_NAME, caseData.getApplicant1().getPartyName(),
-                      CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-        );
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private void sendEmail(final CaseData caseData) {

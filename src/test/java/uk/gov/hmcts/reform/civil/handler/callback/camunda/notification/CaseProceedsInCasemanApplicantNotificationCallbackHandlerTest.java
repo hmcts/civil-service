@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -120,6 +121,11 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
 
         @Test
         void shouldNotNotifyApplicantLipVSLR_whenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
@@ -137,13 +143,23 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
                 "aabc@gmail.com",
                 "template-id",
                 Map.of(
-                    CLAIM_REFERENCE_NUMBER, "1234", "claimantName", "A B"),
+                    CLAIM_REFERENCE_NUMBER, "1234",
+                    "claimantName", "A B",
+                    PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                    OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                    LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
+                    HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"),
                 "case-proceeds-in-caseman-applicant-notification-000DC001"
             );
         }
 
         @Test
         void shouldNotNotifyApplicantLipVSLrForBilingualLip_whenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)
                 .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
@@ -162,7 +178,12 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
                 "aabc@gmail.com",
                 "template-id",
                 Map.of(
-                    CLAIM_REFERENCE_NUMBER, "1234", "claimantName", "A B"),
+                    CLAIM_REFERENCE_NUMBER, "1234",
+                    "claimantName", "A B",
+                    PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                    OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                    LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
+                    HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"),
                 "case-proceeds-in-caseman-applicant-notification-000DC001"
             );
         }

@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -239,7 +240,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
                     CASEMAN_REF, caseData.getLegacyCaseReference(),
                     PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
                     OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                    SPEC_UNSPEC_CONTACT, "contactocmc@justice.gov.uk",
+                    LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
                     HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
                 );
             } else {

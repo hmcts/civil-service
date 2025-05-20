@@ -19,6 +19,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
@@ -114,10 +115,14 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
     }
 
     public Map<String, String> addPropertiesLipApplicant(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-            );
+            ));
+        addCommonFooterSignature(properties, getNotificationsSignatureConfiguration());
+        addLipContact(caseData, properties, getFeatureToggleService().isQueryManagementLRsEnabled(),
+                      getFeatureToggleService().isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesSpec1v2DiffSol(CaseData caseData) {

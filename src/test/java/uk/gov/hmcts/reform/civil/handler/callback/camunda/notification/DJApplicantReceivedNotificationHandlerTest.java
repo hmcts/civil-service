@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_SPECIFIED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -180,6 +181,10 @@ class DJApplicantReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
                 .thenReturn("test-template-requested-lip-id");
             when(featureToggleService.isLipVLipEnabled())
@@ -208,6 +213,10 @@ class DJApplicantReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantLip_whenInvokedAndLiPvsLiPEnabledAndBilingual() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
                 .thenReturn("test-template-requested-lip-id-bilingual");
             when(featureToggleService.isLipVLipEnabled())
@@ -273,7 +282,11 @@ class DJApplicantReceivedNotificationHandlerTest {
             return Map.of(
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
             );
 
         }

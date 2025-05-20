@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -61,9 +62,9 @@ public class TemplateCommonPropertiesHelper {
 
     public Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties) {
         if (isQueryManagementAllowedForLipCase(caseData)) {
-            properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LIP);
+            properties.put(LIP_CONTACT, RAISE_QUERY_LIP);
         } else {
-            properties.put(SPEC_UNSPEC_CONTACT, LIP_CONTACT_EMAIL);
+            properties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
         }
         return properties;
     }

@@ -46,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -90,6 +91,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         @Test
         void shouldNotifyLipRespondent_whenInvoked() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -109,6 +114,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         @Test
         void shouldNotifyLipRespondent_whenTranslatedDocUploaded() {
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(RESPONDENT_EMAIL_TEMPLATE);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build();
             caseData.setClaimantBilingualLanguagePreference("BOTH");
@@ -451,6 +460,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         void shouldNotifyLipRespondentWithBilingualTemplateWhenRespondentIsBilingual() {
             when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(
                 BILINGUAL_RESPONDENT_EMAIL_TEMPLATE);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .build().toBuilder()
@@ -476,7 +489,11 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-                RESPONDENT_NAME, DEFENDANT
+                RESPONDENT_NAME, DEFENDANT,
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
             );
         }
 

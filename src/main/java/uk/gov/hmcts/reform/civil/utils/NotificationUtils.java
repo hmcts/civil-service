@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -58,7 +59,7 @@ public class NotificationUtils {
     public static String RAISE_QUERY_LR = "Contact us about your claim by selecting "
         + "Raise a query from the next steps menu in case file view.";
     public static String RAISE_QUERY_LIP = "To contact the court, select contact or apply to the court on your dashboard.";
-    public static String LIP_CONTACT_EMAIL = "contactocmc@justice.gov.uk";
+    public static String LIP_CONTACT_EMAIL = "Email: contactocmc@justice.gov.uk";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
@@ -322,9 +323,9 @@ public class NotificationUtils {
         log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
         log.info("is LIP on case " + caseData.isLipCase());
         if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
-            properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LIP);
+            properties.put(LIP_CONTACT, RAISE_QUERY_LIP);
         } else {
-            properties.put(SPEC_UNSPEC_CONTACT, LIP_CONTACT_EMAIL);
+            properties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
         }
         return properties;
     }

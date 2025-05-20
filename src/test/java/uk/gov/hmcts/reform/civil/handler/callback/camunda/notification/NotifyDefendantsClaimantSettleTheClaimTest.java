@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_REP_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
@@ -86,6 +87,10 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
         @Test
         void shouldSendNotificationToDefendantLip_whenLiPvLiPandDefendantHasEmail() {
             //Given
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_LIP_EMAIL_ADDRESS).build())
@@ -110,6 +115,11 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(RESPONDENT_NAME, "ABC ABC");
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(CLAIM_REFERENCE_NUMBER, "8372942374");
             assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(CLAIMANT_NAME, "Org Name");
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 "
+                + "\n For all other matters, call 0300 123 7050");
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(LIP_CONTACT, "Email: contactocmc@justice.gov.uk");
+            assertThat(notificationDataMap.getAllValues().get(0)).containsEntry(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
         }
 
         @ParameterizedTest
