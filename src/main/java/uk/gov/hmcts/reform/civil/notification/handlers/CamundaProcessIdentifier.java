@@ -9,5 +9,6 @@ public enum CamundaProcessIdentifier {
     ClaimantResponseNotAgreedRepaymentNotify,
     ApplicantNotifyOthersTrialReady,
     Respondent1NotifyOthersTrialReady,
-    Respondent2NotifyOthersTrialReady
+    Respondent2NotifyOthersTrialReady,
+    CreateSDONotify
 }
