@@ -73,7 +73,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .costs(costs.toString())
             .claimFeeAmount(claimFeeAmount.toString())
             .amountAlreadyPaid(amountAlreadyPaid.toString())
-            .totalAmount(generateTotalAmount(orderAmount, totalInterest, claimFeeAmount, caseData))
+            .totalAmount(generateTotalAmount(orderAmount, totalInterest, claimFeeAmount, costs, caseData))
             .build();
 
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
@@ -219,11 +219,11 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private String generateTotalAmount(BigInteger orderAmount, BigInteger totalInterest,
-                                       BigInteger claimFeeAmount, CaseData caseData) {
+                                       BigInteger claimFeeAmount, BigInteger costs, CaseData caseData) {
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
-            return orderAmount.add(claimFeeAmount).toString();
+            return orderAmount.add(claimFeeAmount).add(costs).toString();
         } else {
-            return orderAmount.add(totalInterest).add(claimFeeAmount).toString();
+            return orderAmount.add(totalInterest).add(claimFeeAmount).add(costs).toString();
         }
     }
 }
