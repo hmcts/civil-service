@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT1_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT2_HMC;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
@@ -702,6 +704,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
             expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+            expectedProperties.put((LIP_CONTACT), LIP_CONTACT_EMAIL);
             return expectedProperties;
         }
 
@@ -719,6 +722,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
             expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+            expectedProperties.put((LIP_CONTACT), LIP_CONTACT_EMAIL);
             return expectedProperties;
         }
 
@@ -736,6 +740,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
             expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+            expectedProperties.put((LIP_CONTACT), LIP_CONTACT_EMAIL);
             return expectedProperties;
         }
 
@@ -753,6 +758,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
             expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+            expectedProperties.put((LIP_CONTACT), LIP_CONTACT_EMAIL);
             return expectedProperties;
         }
 
@@ -770,6 +776,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
             expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
             expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+            expectedProperties.put((LIP_CONTACT), LIP_CONTACT_EMAIL);
             return expectedProperties;
         }
 

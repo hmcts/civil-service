@@ -17,7 +17,9 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignatureWelsh;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContactWelsh;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
@@ -86,7 +88,11 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
         ));
         addCommonFooterSignature(properties, configuration);
         if (isApplicantLip(caseData)) {
+            addCommonFooterSignature(properties, configuration);
             addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+            addCommonFooterSignatureWelsh(properties, configuration);
+            addLipContactWelsh(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
         } else {
             addSpecAndUnspecContact(caseData, properties, configuration,

@@ -121,9 +121,13 @@ public interface NotificationData {
     String HMCTS_SIGNATURE = "hmctsSignature";
     String PHONE_CONTACT = "phoneContact";
     String OPENING_HOURS = "openingHours";
+    String HMCTS_SIGNATURE_WELSH = "hmctsSignatureWelsh";
+    String PHONE_CONTACT_WELSH = "phoneContactWelsh";
+    String OPENING_HOURS_WELSH = "openingHoursWelsh";
     String SPEC_UNSPEC_CONTACT = "specAndUnspecContact";
     String CNBC_CONTACT = "cnbcContact";
     String LIP_CONTACT = "lipContact";
+    String LIP_CONTACT_WELSH = "lipContactWelsh";
 
     Map<String, String> addProperties(CaseData caseData);
 

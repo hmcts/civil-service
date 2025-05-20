@@ -12,13 +12,19 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignatureWelsh;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContactWelsh;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -32,6 +38,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimSubmitted
     );
@@ -64,11 +71,18 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        Map<String, String> properties = new HashMap<>(Map.of(
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addCommonFooterSignatureWelsh(properties, configuration);
+        addLipContact(caseData, properties, toggleService.isQueryManagementLRsEnabled(),
+                      toggleService.isLipQueryManagementEnabled(caseData));
+        addLipContactWelsh(caseData, properties, toggleService.isQueryManagementLRsEnabled(),
+                           toggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private String addTemplate(CaseData caseData) {

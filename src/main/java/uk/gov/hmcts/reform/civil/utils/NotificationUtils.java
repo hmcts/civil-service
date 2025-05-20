@@ -31,21 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Slf4j
@@ -60,6 +46,8 @@ public class NotificationUtils {
         + "Raise a query from the next steps menu in case file view.";
     public static String RAISE_QUERY_LIP = "To contact the court, select contact or apply to the court on your dashboard.";
     public static String LIP_CONTACT_EMAIL = "Email: contactocmc@justice.gov.uk";
+    public static String RAISE_QUERY_LIP_WELSH = "I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd.";
+    public static String LIP_CONTACT_EMAIL_WELSH = "E-bost: ymholiadaucymraeg@justice.gov.uk";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
@@ -304,6 +292,14 @@ public class NotificationUtils {
         return properties;
     }
 
+    public static Map<String, String> addCommonFooterSignatureWelsh(Map<String, String> properties,
+                                                               NotificationsSignatureConfiguration configuration) {
+        properties.putAll(Map.of(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh(),
+                                 PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh(),
+                                 OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh()));
+        return properties;
+    }
+
     public static Map<String, String> addSpecAndUnspecContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isLRQmEnabled) {
@@ -326,6 +322,19 @@ public class NotificationUtils {
             properties.put(LIP_CONTACT, RAISE_QUERY_LIP);
         } else {
             properties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        }
+        return properties;
+    }
+
+    public static Map<String, String> addLipContactWelsh(CaseData caseData, Map<String, String> properties, boolean isLRQmEnabled, boolean isLipQmEnabled) {
+
+        log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
+        log.info("is LIP on case " + caseData.isLipCase());
+        log.info("is WELSH");
+        if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+            properties.put(LIP_CONTACT_WELSH, RAISE_QUERY_LIP_WELSH);
+        } else {
+            properties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
         }
         return properties;
     }

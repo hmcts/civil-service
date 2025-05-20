@@ -41,11 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -169,6 +165,12 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         addCommonFooterSignature(map, configuration);
         addSpecAndUnspecContact(caseData, map, configuration,
                                 featureToggleService.isQueryManagementLRsEnabled());
+        addCommonFooterSignature(map, configuration);
+        addCommonFooterSignatureWelsh(map, configuration);
+        addLipContact(caseData, map, featureToggleService.isQueryManagementLRsEnabled(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        addLipContactWelsh(caseData, map, featureToggleService.isQueryManagementLRsEnabled(),
+                           featureToggleService.isLipQueryManagementEnabled(caseData));
         return map;
     }
 

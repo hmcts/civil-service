@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,11 +36,13 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.EXTERNAL_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -105,6 +108,10 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
 
         @Test
         void shouldNotifyLiPClaimant_whenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(notificationsProperties.getNotifyLiPClaimantDefendantChangedContactDetails()).thenReturn(TEMPLATE_ID);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(FRONTEND_CUI_URL);
 
@@ -140,13 +147,18 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
 
         @NotNull
         private Map<String, String> getNotificationDataMapForLiPClaimant() {
-            return Map.of(
+            Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 CLAIMANT_NAME, APPLICANT_NAME,
                 CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER,
                 RESPONDENT_NAME, DEFENDANT_NAME,
                 FRONTEND_URL, FRONTEND_CUI_URL,
                 EXTERNAL_ID, EXTERNAL_CASE_ID
-            );
+            ));
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+            return expectedProperties;
         }
     }
 }
