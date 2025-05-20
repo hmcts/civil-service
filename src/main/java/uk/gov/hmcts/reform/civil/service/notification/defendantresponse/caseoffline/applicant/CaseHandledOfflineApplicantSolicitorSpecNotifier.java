@@ -18,9 +18,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -108,9 +106,9 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, getNotificationsSignatureConfiguration());
-        addSpecAndUnspecContact(caseData, properties, getNotificationsSignatureConfiguration(),
-                                getFeatureToggleService().isQueryManagementLRsEnabled());
+        addAllFooterItems(caseData, properties, getNotificationsSignatureConfiguration(),
+                          getFeatureToggleService().isQueryManagementLRsEnabled(),
+                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -119,9 +117,9 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
             ));
-        addCommonFooterSignature(properties, getNotificationsSignatureConfiguration());
-        addLipContact(caseData, properties, getFeatureToggleService().isQueryManagementLRsEnabled(),
-                      getFeatureToggleService().isLipQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, getNotificationsSignatureConfiguration(),
+                          getFeatureToggleService().isQueryManagementLRsEnabled(),
+                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -132,9 +130,9 @@ public class CaseHandledOfflineApplicantSolicitorSpecNotifier extends CaseHandle
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, getNotificationsSignatureConfiguration());
-        addSpecAndUnspecContact(caseData, properties, getNotificationsSignatureConfiguration(),
-                                getFeatureToggleService().isQueryManagementLRsEnabled());
+        addAllFooterItems(caseData, properties, getNotificationsSignatureConfiguration(),
+                          getFeatureToggleService().isQueryManagementLRsEnabled(),
+                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
         return properties;
     }
 

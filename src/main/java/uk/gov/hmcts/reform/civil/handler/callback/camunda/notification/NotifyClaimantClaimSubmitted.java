@@ -21,10 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignatureWelsh;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContactWelsh;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -76,12 +73,9 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
         ));
-        addCommonFooterSignature(properties, configuration);
-        addCommonFooterSignatureWelsh(properties, configuration);
-        addLipContact(caseData, properties, toggleService.isQueryManagementLRsEnabled(),
-                      toggleService.isLipQueryManagementEnabled(caseData));
-        addLipContactWelsh(caseData, properties, toggleService.isQueryManagementLRsEnabled(),
-                           toggleService.isLipQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, configuration,
+                          toggleService.isQueryManagementLRsEnabled(),
+                          toggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 

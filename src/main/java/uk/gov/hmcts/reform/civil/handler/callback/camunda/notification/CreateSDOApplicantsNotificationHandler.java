@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANTS_SOLICITOR_SDO_TRIGGERED;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -82,7 +82,9 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantsLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                  .getOrganisation().getOrganisationID(), caseData)
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 featureToggleService.isQueryManagementLRsEnabled());
         return properties;

@@ -21,7 +21,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -77,9 +78,9 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             ));
-            addCommonFooterSignature(lipProperties, configuration);
-            addLipContact(caseData, lipProperties, featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+            addAllFooterItems(caseData, lipProperties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
             return lipProperties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -88,9 +89,9 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 

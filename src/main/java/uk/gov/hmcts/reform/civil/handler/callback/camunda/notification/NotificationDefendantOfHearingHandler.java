@@ -137,16 +137,9 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             CLAIM_LEGAL_ORG_NAME_SPEC, orgName,
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()));
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
-        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
-                      featureToggleService.isLipQueryManagementEnabled(caseData));
-
-//
-//        addCommonFooterSignatureWelsh(properties, configuration);
-//        addLipContactWelsh(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
-//                           featureToggleService.isLipQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -166,7 +159,9 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 featureToggleService.isQueryManagementLRsEnabled());
         return properties;

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 
 @Service
@@ -57,7 +57,9 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
                       featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
@@ -68,7 +70,9 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
             PARTY_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
                       featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;

@@ -26,7 +26,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -155,7 +155,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,
@@ -169,7 +171,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addLipContact(caseData, properties, toggleService.isQueryManagementLRsEnabled(),
                       toggleService.isLipQueryManagementEnabled(caseData));
         return properties;
@@ -185,7 +189,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,
@@ -203,7 +209,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,
@@ -221,7 +229,9 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 toggleService.isQueryManagementLRsEnabled());
         addCnbcContact(caseData, properties, configuration,

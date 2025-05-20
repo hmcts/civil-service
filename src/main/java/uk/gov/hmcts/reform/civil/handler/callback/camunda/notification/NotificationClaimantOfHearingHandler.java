@@ -162,15 +162,9 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             }
             map.put(CLAIMANT_REFERENCE_NUMBER, reference);
         }
-        addCommonFooterSignature(map, configuration);
-        addSpecAndUnspecContact(caseData, map, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
-        addCommonFooterSignature(map, configuration);
-        addCommonFooterSignatureWelsh(map, configuration);
-        addLipContact(caseData, map, featureToggleService.isQueryManagementLRsEnabled(),
-                      featureToggleService.isLipQueryManagementEnabled(caseData));
-        addLipContactWelsh(caseData, map, featureToggleService.isQueryManagementLRsEnabled(),
-                           featureToggleService.isLipQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, map, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         return map;
     }
 
@@ -240,7 +234,9 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 featureToggleService.isQueryManagementLRsEnabled());
         return properties;

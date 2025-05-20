@@ -26,7 +26,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -94,11 +95,9 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
                     caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE
                 )
             ));
-            addCommonFooterSignature(lipProperties, configuration);
-            addSpecAndUnspecContact(caseData, lipProperties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
-            addLipContact(caseData, lipProperties, featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+            addAllFooterItems(caseData, lipProperties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
             return lipProperties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -110,7 +109,9 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 featureToggleService.isQueryManagementLRsEnabled());
         return properties;

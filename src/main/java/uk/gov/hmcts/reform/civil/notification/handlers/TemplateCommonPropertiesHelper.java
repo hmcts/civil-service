@@ -24,9 +24,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.RAISE_QUERY_LIP;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.RAISE_QUERY_LR;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Component
@@ -53,7 +50,7 @@ public class TemplateCommonPropertiesHelper {
 
     public Map<String, String> addSpecAndUnspecContact(CaseData caseData, Map<String, String> properties) {
         if (isQueryManagementAllowedForLRCase(caseData)) {
-            properties.put(SPEC_UNSPEC_CONTACT, RAISE_QUERY_LR);
+            properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
         } else {
             properties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         }
@@ -62,16 +59,16 @@ public class TemplateCommonPropertiesHelper {
 
     public Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties) {
         if (isQueryManagementAllowedForLipCase(caseData)) {
-            properties.put(LIP_CONTACT, RAISE_QUERY_LIP);
+            properties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
         } else {
-            properties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+            properties.put(LIP_CONTACT, configuration.getLipContactEmail());
         }
         return properties;
     }
 
     public Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties) {
         if (isQueryManagementAllowedForLRCase(caseData)) {
-            properties.put(CNBC_CONTACT, RAISE_QUERY_LR);
+            properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         } else {
             properties.put(CNBC_CONTACT, configuration.getCnbcContact());
         }

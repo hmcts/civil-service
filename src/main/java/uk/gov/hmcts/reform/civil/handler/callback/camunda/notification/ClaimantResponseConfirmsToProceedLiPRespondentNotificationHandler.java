@@ -28,8 +28,9 @@ import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
@@ -129,7 +130,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             addCnbcContact(caseData, properties, configuration,
                            featureToggleService.isQueryManagementLRsEnabled());
             addSpecAndUnspecContact(caseData, properties, configuration,
@@ -148,7 +151,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 CASEMAN_REF, caseData.getLegacyCaseReference(),
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ));
-            addCommonFooterSignature(properties, configuration);
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             addCnbcContact(caseData, properties, configuration,
                            featureToggleService.isQueryManagementLRsEnabled());
             addSpecAndUnspecContact(caseData, properties, configuration,
@@ -159,9 +164,9 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         ));
-        addCommonFooterSignature(lipProperties, configuration);
-        addLipContact(caseData, lipProperties, featureToggleService.isQueryManagementLRsEnabled(),
-                      featureToggleService.isLipQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, lipProperties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         return lipProperties;
     }
 

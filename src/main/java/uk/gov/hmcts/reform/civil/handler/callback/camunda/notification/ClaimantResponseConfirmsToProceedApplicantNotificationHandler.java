@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -93,7 +93,9 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
                       featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;

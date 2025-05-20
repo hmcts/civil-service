@@ -16,7 +16,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -56,7 +56,9 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             addSpecAndUnspecContact(caseData, properties, configuration,
                                     featureToggleService.isQueryManagementLRsEnabled());
             return properties;
@@ -68,7 +70,9 @@ public abstract class FullDefenceSolicitorCCSpecNotifier extends FullDefenceSoli
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             addSpecAndUnspecContact(caseData, properties, configuration,
                                     featureToggleService.isQueryManagementLRsEnabled());
             return properties;

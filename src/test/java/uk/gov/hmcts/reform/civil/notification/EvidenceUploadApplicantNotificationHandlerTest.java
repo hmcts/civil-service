@@ -40,8 +40,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.UPLOADED_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL_WELSH;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
@@ -205,11 +204,11 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
             expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-            expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
             expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
             expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-            expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             return expectedProperties;
         }
     }

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_RESPONSE_SUBMISSION;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 
 @Service
@@ -61,7 +61,9 @@ public class DefendantLipResponseRespondentNotificationHandler extends CallbackH
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
                       featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;

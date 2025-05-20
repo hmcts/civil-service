@@ -96,12 +96,9 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             ));
-            addCommonFooterSignature(properties, configuration);
-            addCommonFooterSignatureWelsh(properties, configuration);
-            addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-            addLipContactWelsh(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+            addAllFooterItems(caseData, properties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
             return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -110,7 +107,9 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 featureToggleService.isQueryManagementLRsEnabled());
         return properties;

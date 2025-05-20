@@ -25,7 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -129,10 +130,9 @@ public class BreathingSpaceEnterNotificationHandler extends CallbackHandler impl
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
-
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 }
