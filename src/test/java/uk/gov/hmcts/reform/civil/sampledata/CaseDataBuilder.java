@@ -705,7 +705,6 @@ public class CaseDataBuilder {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
         return this;
     }
-
     public CaseDataBuilder helpWithFeesMoreInformationHearing(HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing) {
         this.helpWithFeesMoreInformationHearing = helpWithFeesMoreInformationHearing;
         return this;
