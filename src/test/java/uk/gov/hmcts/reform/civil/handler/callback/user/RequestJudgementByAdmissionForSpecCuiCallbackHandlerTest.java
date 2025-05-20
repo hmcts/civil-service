@@ -859,7 +859,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
             when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
-
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
             assertEquals(format("# Judgment Submitted %n## A county court judgment(CCJ) has been submitted for case %s",
