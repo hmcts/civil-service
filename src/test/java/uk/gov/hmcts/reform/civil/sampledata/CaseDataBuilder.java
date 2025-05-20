@@ -703,7 +703,6 @@ public class CaseDataBuilder {
     private CaseQueriesCollection qmApplicantCitizenQueries;
     private CaseQueriesCollection qmRespondentCitizenQueries;
 
-
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
         return this;
