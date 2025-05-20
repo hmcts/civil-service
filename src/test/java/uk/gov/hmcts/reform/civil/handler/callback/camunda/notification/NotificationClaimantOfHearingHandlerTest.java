@@ -4,16 +4,17 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
@@ -24,12 +25,11 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
@@ -67,8 +67,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL_WELSH;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -709,8 +707,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -747,8 +745,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -769,8 +767,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -790,8 +788,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -812,8 +810,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -833,8 +831,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -854,8 +852,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
@@ -875,8 +873,8 @@ class NotificationClaimantOfHearingHandlerTest {
         expectedProperties.put(PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh());
         expectedProperties.put(OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh());
         expectedProperties.put(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh());
-        expectedProperties.put(LIP_CONTACT_WELSH, LIP_CONTACT_EMAIL_WELSH);
-        expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 

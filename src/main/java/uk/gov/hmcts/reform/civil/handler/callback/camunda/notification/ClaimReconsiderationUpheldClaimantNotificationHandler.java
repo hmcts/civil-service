@@ -22,8 +22,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service

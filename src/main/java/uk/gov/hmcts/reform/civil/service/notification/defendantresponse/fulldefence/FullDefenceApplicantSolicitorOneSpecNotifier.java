@@ -20,9 +20,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -97,8 +95,6 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
             addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
             return properties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -112,13 +108,6 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
             addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-            if (caseData.isApplicant1NotRepresented()) {
-                addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
-                              featureToggleService.isLipQueryManagementEnabled(caseData));
-            } else {
-                addSpecAndUnspecContact(caseData, properties, configuration,
-                                        featureToggleService.isQueryManagementLRsEnabled());
-            }
             return properties;
         }
     }

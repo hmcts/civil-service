@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -22,7 +22,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.*;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Slf4j
@@ -110,8 +111,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+
         return properties;
     }
 }

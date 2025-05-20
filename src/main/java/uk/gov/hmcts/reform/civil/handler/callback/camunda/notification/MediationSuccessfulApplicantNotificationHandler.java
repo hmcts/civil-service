@@ -22,12 +22,10 @@ import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -145,8 +143,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+
         return properties;
     }
 
@@ -161,8 +158,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+
         return properties;
     }
 
@@ -178,8 +174,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+
         return properties;
     }
 
@@ -200,8 +195,6 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
-                      featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 

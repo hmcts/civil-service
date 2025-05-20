@@ -21,8 +21,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION_LIP_CLAIMANT;
-
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -85,8 +84,6 @@ public class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler 
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-        addLipContact(caseData, properties, featureToggleService.isQueryManagementLRsEnabled(),
-                      featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 

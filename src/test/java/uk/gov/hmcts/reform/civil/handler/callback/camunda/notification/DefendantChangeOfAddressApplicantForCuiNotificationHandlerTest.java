@@ -42,7 +42,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
@@ -157,7 +156,7 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
             expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-            expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             return expectedProperties;
         }
     }

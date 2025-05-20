@@ -18,7 +18,6 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -68,9 +67,9 @@ public class FullDefenceRespondentSolicitorTwoCCSpecNotifier extends FullDefence
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        addAllFooterItems(caseData, properties, getConfiguration(),
+                          getFeatureToggleService().isQueryManagementLRsEnabled(),
+                          getFeatureToggleService().isLipQueryManagementEnabled(caseData));
         return properties;
     }
 

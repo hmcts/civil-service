@@ -300,15 +300,19 @@ public class NotificationUtils {
                                                         NotificationsSignatureConfiguration configuration,
                                                         boolean isLRQmEnabled, boolean isLipQMEnabled) {
         addCommonFooterSignature(properties, configuration);
-        addCommonFooterSignatureWelsh(properties, configuration);
         addSpecAndUnspecContact(caseData, properties, configuration,
                                 isLRQmEnabled);
-        addLipContact(caseData, properties, configuration,
-                      isLRQmEnabled,
-                      isLipQMEnabled);
-        addLipContactWelsh(caseData, properties, configuration,
-                           isLRQmEnabled,
-                           isLipQMEnabled);
+        if (caseData.isLipCase()) {
+            if (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()) {
+                addCommonFooterSignatureWelsh(properties, configuration);
+                addLipContactWelsh(caseData, properties, configuration,
+                                   isLRQmEnabled,
+                                   isLipQMEnabled);
+            }
+            addLipContact(caseData, properties, configuration, isLRQmEnabled, isLipQMEnabled);
+        }
+
+        //addCnbcContact(caseData, properties, configuration, isLRQmEnabled);
         return properties;
     }
 

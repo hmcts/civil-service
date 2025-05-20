@@ -29,10 +29,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DE
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
-
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -133,10 +129,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-            addCnbcContact(caseData, properties, configuration,
-                           featureToggleService.isQueryManagementLRsEnabled());
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
             return properties;
         }
         if (shouldSendMediationNotificationDefendant1LRCarm(
@@ -154,10 +146,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-            addCnbcContact(caseData, properties, configuration,
-                           featureToggleService.isQueryManagementLRsEnabled());
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
             return properties;
         }
         HashMap<String, String> lipProperties = new HashMap<>(Map.of(

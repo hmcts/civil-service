@@ -27,12 +27,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.RAISE_QUERY_LR;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
@@ -422,9 +423,9 @@ class NotificationUtilsTest {
             @Test
             void shouldAddQueryStringWhenAllConditionsTrue() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-                when(configuration.getCnbcContact()).thenReturn(RAISE_QUERY_LR);
+                when(configuration.getRaiseQueryLr()).thenReturn("raise query");
                 Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
-                assertThat(actual.get(CNBC_CONTACT)).isEqualTo(RAISE_QUERY_LR);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("raise query");
             }
         }
 
@@ -470,9 +471,9 @@ class NotificationUtilsTest {
             @Test
             void shouldAddQueryStringWhenAllConditionsTrue() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-                when(configuration.getSpecUnspecContact()).thenReturn(RAISE_QUERY_LR);
+                when(configuration.getRaiseQueryLr()).thenReturn("raise query");
                 Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo(RAISE_QUERY_LR);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("raise query");
             }
         }
 
@@ -483,16 +484,18 @@ class NotificationUtilsTest {
             void shouldAddLipEmailWhenQmNotEnabled() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), false, false);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
+                when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, false);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
             }
 
             @Test
             void shouldAddLipEmailWhenLrQmNotEnabled() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), false, true);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
+                when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, true);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
             }
 
             @ParameterizedTest()
@@ -501,16 +504,18 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                     .respondent1Represented(NO)
                     .ccdState(Enum.valueOf(CaseState.class, caseState)).build();
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), true, true);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
+                when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
             }
 
             @Test
             void shouldAddLipQueryTextWhenQmEnabledAndValidState() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), true, true);
-                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("To contact the court, select contact or apply to the court on your dashboard.");
+                when(configuration.getRaiseQueryLip()).thenReturn("To contact the court, select contact or apply to the court on your dashboard.");
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                assertThat(actual.get(LIP_CONTACT)).isEqualTo("To contact the court, select contact or apply to the court on your dashboard.");
             }
 
         }

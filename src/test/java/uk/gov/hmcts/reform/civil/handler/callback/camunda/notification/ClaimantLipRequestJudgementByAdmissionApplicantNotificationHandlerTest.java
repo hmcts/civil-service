@@ -37,7 +37,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.LIP_CONTACT_EMAIL;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -106,7 +105,7 @@ class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandlerTest ext
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
             expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-            expectedProperties.put(LIP_CONTACT, LIP_CONTACT_EMAIL);
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             return expectedProperties;
         }
     }
