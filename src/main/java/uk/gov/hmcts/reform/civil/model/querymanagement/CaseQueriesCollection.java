@@ -53,10 +53,9 @@ public class CaseQueriesCollection {
 
     @JsonIgnore
     public boolean hasAQueryAwaitingResponse() {
-       return caseMessages.stream()
+        return caseMessages.stream()
             .filter(message -> nonNull(message.getValue()) && message.getValue().getParentId() == null)
-            .map(parentMessage -> messageThread(parentMessage.getId().toString()).size() % 2 != 0)
-            .anyMatch(noResponse -> noResponse);
+            .anyMatch(parentMessage -> messageThread(parentMessage.getValue().getId().toString()).size() % 2 != 0);
     }
 
     @JsonIgnore

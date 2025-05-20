@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
@@ -98,6 +100,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isGaForLipsEnabled()).thenReturn(true);
+            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -140,6 +143,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -161,6 +165,45 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
         }
 
         @Test
+        void shouldRecordScenario_whenDefendantCitizenQueryIsOpen() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
+                .includesRespondentCitizenQueryFollowUp(LocalDateTime.now())
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .ccdCaseReference(12890L)
+                .previousCCDState(CASE_PROGRESSION).build();
+
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
+            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+            HashMap<String, Object> scenarioParams = new HashMap<>();
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE.name()).build()
+            ).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT_WITHOUT_TASK_CHANGES.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+            verify(dashboardScenariosService).recordScenarios(
+                "BEARER_TOKEN",
+                SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
         void shouldNotRecordScenario_whenInvoked() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
@@ -169,6 +212,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                     .previousCCDState(PENDING_CASE_ISSUED).build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -198,6 +242,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(false);
+            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -226,6 +271,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
                     .build();
 
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
+            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
@@ -274,6 +320,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
             when(toggleService.isCaseProgressionEnabled()).thenReturn(true);
             when(toggleService.isCoSCEnabled()).thenReturn(true);
+            when(toggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +59,7 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
@@ -84,6 +86,52 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
+            caseId,
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
+
+    @Test
+    void shouldRecordQMNotificationScenario_whenInvokedWhileDefendantCitizenHasAnOpenQuery() {
+        // Given
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
+            .includesRespondentCitizenQueryFollowUp(LocalDateTime.now())
+            .build().toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .ccdCaseReference(1234L)
+            .previousCCDState(AWAITING_APPLICANT_INTENTION).build();
+
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId(CaseEvent.CREATE_DASHBOARD_NOTIFICATION_DISMISS_CASE_DEFENDANT.name()).build()
+        ).build();
+
+        // When
+        handler.handle(params);
+        final String caseId = caseData.getCcdCaseReference().toString();
+        // Then
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            caseId,
+            "DEFENDANT"
+        );
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            caseId,
+            "DEFENDANT"
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            DashboardScenarios.SCENARIO_AAA6_DISMISS_CASE_DEFENDANT.getScenario(),
+            caseId,
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
             caseId,
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );

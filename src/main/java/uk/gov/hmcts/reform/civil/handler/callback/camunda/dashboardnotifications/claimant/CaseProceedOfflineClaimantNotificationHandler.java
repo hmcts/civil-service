@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT;
@@ -70,14 +71,14 @@ public class CaseProceedOfflineClaimantNotificationHandler extends DashboardCall
             featureToggleService.isGaForLipsEnabled(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
             featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0,
-            SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT.getScenario(), claimantQueryAwaitingAResponse(caseData)
+            SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT.getScenario(), claimantQueryAwaitingAResponse(caseData)
         );
     }
 
     private boolean claimantQueryAwaitingAResponse(CaseData caseData) {
         return featureToggleService.isLipQueryManagementEnabled(caseData)
-            && nonNull(caseData.getQmApplicantCitizenQueries()) ?
-            caseData.getQmApplicantSolicitorQueries().hasAQueryAwaitingResponse() : false;
+            && nonNull(caseData.getQmApplicantCitizenQueries())
+            ? caseData.getQmApplicantCitizenQueries().hasAQueryAwaitingResponse() : false;
     }
 
     @Override
