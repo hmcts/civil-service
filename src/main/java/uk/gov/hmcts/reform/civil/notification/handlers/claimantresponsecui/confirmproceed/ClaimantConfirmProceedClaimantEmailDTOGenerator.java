@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class ClaimantRespConfirmProceedClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
+public class ClaimantConfirmProceedClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-applicant-notification-%s";
 

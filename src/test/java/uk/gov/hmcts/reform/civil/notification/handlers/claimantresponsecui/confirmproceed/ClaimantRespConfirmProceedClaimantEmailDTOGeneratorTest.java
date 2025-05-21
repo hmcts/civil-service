@@ -27,7 +27,7 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
     private FeatureToggleService featureToggleService;
 
     @InjectMocks
-    private ClaimantRespConfirmProceedClaimantEmailDTOGenerator emailGenerator;
+    private ClaimantConfirmProceedClaimantEmailDTOGenerator emailGenerator;
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {

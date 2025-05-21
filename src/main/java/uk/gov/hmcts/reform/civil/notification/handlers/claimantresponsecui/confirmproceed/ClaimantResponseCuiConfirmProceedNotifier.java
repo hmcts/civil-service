@@ -12,7 +12,7 @@ public class ClaimantResponseCuiConfirmProceedNotifier extends Notifier {
 
     public ClaimantResponseCuiConfirmProceedNotifier(NotificationService notificationService,
                                                      CaseTaskTrackingService caseTaskTrackingService,
-                                                     ClaimantRespConfirmProceedClaimantEmailGenerator claimantEmailGenerator) {
+                                                     ClaimantConfirmProceedAllPartiesEmailGenerator claimantEmailGenerator) {
         super(notificationService, caseTaskTrackingService, claimantEmailGenerator);
     }
 
