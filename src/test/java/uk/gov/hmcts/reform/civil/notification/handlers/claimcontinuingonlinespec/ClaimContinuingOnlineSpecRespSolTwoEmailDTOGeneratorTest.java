@@ -1,19 +1,17 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.claimcontinuingonlinespec;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,17 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
-import static uk.gov.hmcts.reform.civil.prd.model.Organisation.builder;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
 
-    private static final String TEMPLATE_ID = "resp-template-2";
-    private static final String REF_TEMPLATE = "claim-continuing-online-notification-%s";
-    private static final String ORG_NAME = "Resp2 Org";
-    private static final LocalDateTime DEADLINE = LocalDateTime.of(2025, 5, 12, 10, 30);
-    public static final String ID = "Org123";
-    public static final String LEGACY_CASE_REFERENCE = "000DC002";
+    private static final String TEMPLATE_ID = "resp-sol-two-template";
+    private static final String ORG_NAME = "Respondent Two Org";
+    public static final String CLAIM_CONTINUING_ONLINE_NOTIFICATION = "claim-continuing-online-notification-%s";
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -42,45 +36,45 @@ class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
     @InjectMocks
     private ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator emailGenerator;
 
-    @BeforeEach
-    void setUp() {
+    @Test
+    void shouldReturnTemplateId() {
         when(notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec())
                 .thenReturn(TEMPLATE_ID);
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        String id = emailGenerator.getEmailTemplateId(caseData);
+        assertThat(id).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
-    void shouldReturnTemplateAndReference() {
-        CaseData caseData = CaseData.builder().build();
-
-        assertThat(emailGenerator.getEmailTemplateId(caseData))
-                .isEqualTo(TEMPLATE_ID);
-        assertThat(emailGenerator.getReferenceTemplate())
-                .isEqualTo(REF_TEMPLATE);
+    void shouldReturnReferenceTemplate() {
+        String ref = emailGenerator.getReferenceTemplate();
+        assertThat(ref).isEqualTo(CLAIM_CONTINUING_ONLINE_NOTIFICATION);
     }
 
     @Test
-    void shouldIncludeLegalOrgName_forSecondRespondent() {
+    void shouldAddClaimLegalOrgNameToProperties() {
         when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(
-                        builder()
-                                .name(ORG_NAME)
-                                .build()
-                ));
+                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
 
-        Organisation organisation = Organisation.builder()
-                .organisationID(ID)
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        Map<String, String> props = emailGenerator.addCustomProperties(new HashMap<>(), caseData);
+        assertThat(props).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME);
+    }
+
+    @Test
+    void shouldNotify_whenOneVTwoTwoLegalRep() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .build();
+        boolean result = emailGenerator.getShouldNotify(caseData);
+        assertThat(result).isTrue();
+    }
 
-        CaseData caseData = CaseData.builder()
-                .ccdCaseReference(1234L)
-                .legacyCaseReference(LEGACY_CASE_REFERENCE)
-                .respondent2ResponseDeadline(DEADLINE)
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
-                .build();
-
-        EmailDTO dto = emailGenerator.buildEmailDTO(caseData);
-        Map<String, String> params = dto.getParameters();
-
-        assertThat(params).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME);
+    @Test
+    void shouldNotNotify_whenNotOneVTwoTwoLegalRep() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        boolean result = emailGenerator.getShouldNotify(caseData);
+        assertThat(result).isFalse();
     }
 }

@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.claimcontinuingonlinespe
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Component
 public class ClaimContinuingOnlineSpecEmailGenerator extends AllPartiesEmailGenerator {
 
@@ -11,6 +13,10 @@ public class ClaimContinuingOnlineSpecEmailGenerator extends AllPartiesEmailGene
             ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator respOneGen,
             ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator respTwoGen
     ) {
-        super(appGen, respOneGen, respTwoGen, null, null);
+        super(List.of(
+                appGen,
+                respOneGen,
+                respTwoGen
+        ));
     }
 }

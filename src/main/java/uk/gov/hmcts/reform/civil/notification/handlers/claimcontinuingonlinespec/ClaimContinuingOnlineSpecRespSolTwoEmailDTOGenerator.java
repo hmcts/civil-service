@@ -8,20 +8,20 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
-    protected static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
 
-    public ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator(
-            NotificationsProperties notificationsProperties,
-            OrganisationService organisationService
-    ) {
+    public ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
+                                                                NotificationsProperties notificationsProperties
+                                                                ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
         this.organisationService = organisationService;
@@ -48,5 +48,10 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
                 getLegalOrganizationNameForRespondent(caseData, false, organisationService)
         );
         return updated;
+    }
+
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return isOneVTwoTwoLegalRep(caseData);
     }
 }

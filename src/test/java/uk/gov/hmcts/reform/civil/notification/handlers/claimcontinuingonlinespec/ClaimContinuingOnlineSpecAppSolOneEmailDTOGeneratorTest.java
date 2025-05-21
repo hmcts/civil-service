@@ -1,52 +1,46 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.claimcontinuingonlinespec;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimContinuingOnlineSpecAppSolOneEmailDTOGeneratorTest {
 
-    private static final LocalDate ISSUE_DATE = LocalDate.of(2025, 4, 28);
-    private static final LocalDateTime RESP1_DEADLINE = LocalDateTime.of(2025, 5, 12, 10, 30);
-    public static final String TEMPLATE_1_V_1 = "template-1v1";
-    public static final String TEMPLATE_1_V_2 = "template-1v2";
-    public static final String TEST_NAME = "test name";
-    public static final String FIRST_NAME = "John";
-    public static final String LAST_NAME = "Doe";
-    public static final String ID = "test id";
-    public static final long CCD_CASE_REFERENCE = 1234L;
-    public static final String LEGACY_CASE_REFERENCE = "000DC001";
+    private static final String TEMPLATE_SINGLE     = "template-single";
+    private static final String TEMPLATE_MULTI      = "template-multi";
+    private static final String ORG_NAME            = "Legal Org";
+    private static final String REFERENCE_TEMPLATE  = "claim-continuing-online-notification-%s";
+    public static final String ISSUED_ON = "issuedOn";
+    public static final String CLAIM_DETAILS_NOTIFICATION_DEADLINE = "claimDetailsNotificationDeadline";
+    public static final String PARTY_REFERENCES = "partyReferences";
+    public static final String DEFENDANT_NAME = "defendantName";
+    public static final String RESPONSE_DEADLINE = "responseDeadline";
+    public static final String DEFENDANT_ONE_NAME = "defendantOneName";
+    public static final String DEFENDANT_TWO_NAME = "defendantTwoName";
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -58,103 +52,85 @@ class ClaimContinuingOnlineSpecAppSolOneEmailDTOGeneratorTest {
     private ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator emailGenerator;
 
     @Test
-    void shouldChoose1v1Template_whenNoSecondRespondent() {
+    void shouldReturnSingleTemplate_whenNoSecondDefendant() {
         when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec())
-                .thenReturn(TEMPLATE_1_V_1);
-        CaseData caseData = CaseData.builder()
-                .issueDate(ISSUE_DATE)
-                .respondent1ResponseDeadline(RESP1_DEADLINE)
+                .thenReturn(TEMPLATE_SINGLE);
+
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
                 .build();
 
-        assertThat(emailGenerator.getEmailTemplateId(caseData))
-                .isEqualTo(TEMPLATE_1_V_1);
+        String id = emailGenerator.getEmailTemplateId(caseData);
+        assertThat(id).isEqualTo(TEMPLATE_SINGLE);
     }
 
     @Test
-    void shouldChoose1v2Template_whenSecondRespondentPresent() {
+    void shouldReturnMultiTemplate_whenSecondDefendantPresent() {
         when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec())
-                .thenReturn(TEMPLATE_1_V_2);
-        CaseData caseData = CaseData.builder()
-                .issueDate(ISSUE_DATE)
-                .respondent1ResponseDeadline(RESP1_DEADLINE)
-                .respondent2ResponseDeadline(RESP1_DEADLINE.plusDays(1))
-                .respondent2(uk.gov.hmcts.reform.civil.model.Party.builder().build())
+                .thenReturn(TEMPLATE_MULTI);
+
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-        assertThat(emailGenerator.getEmailTemplateId(caseData))
-                .isEqualTo(TEMPLATE_1_V_2);
+        String id = emailGenerator.getEmailTemplateId(caseData);
+        assertThat(id).isEqualTo(TEMPLATE_MULTI);
     }
 
     @Test
-    void shouldIncludeAllCustomProperties_for1v1() {
-
-        Party respondent1 = Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName(FIRST_NAME)
-                .individualLastName(LAST_NAME)
-                .build();
-
-        Organisation organisation = Organisation.builder()
-                .organisationID(ID)
-                .build();
-
-        CaseData caseData = CaseData.builder()
-                .ccdCaseReference(CCD_CASE_REFERENCE)
-                .legacyCaseReference(LEGACY_CASE_REFERENCE)
-                .issueDate(ISSUE_DATE)
-                .respondent1ResponseDeadline(RESP1_DEADLINE)
-                .applicant1OrganisationPolicy((OrganisationPolicy.builder().organisation(organisation).build()))
-                .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().name(TEST_NAME).build())
-                .respondent1(respondent1)
-                .build();
-
-        EmailDTO dto = emailGenerator.buildEmailDTO(caseData);
-        Map<String, String> params = dto.getParameters();
-
-        assertThat(params)
-                .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, TEST_NAME)
-                .containsEntry(CLAIM_DETAILS_NOTIFICATION_DEADLINE, formatLocalDate(RESP1_DEADLINE.toLocalDate(), DATE))
-                .containsEntry(ISSUED_ON, formatLocalDate(ISSUE_DATE, DATE))
-                .containsKey(PARTY_REFERENCES)
-                .containsEntry(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()))
-                .containsEntry(RESPONSE_DEADLINE, formatLocalDateTime(RESP1_DEADLINE, DATE_TIME_AT));
+    void shouldReturnReferenceTemplate() {
+        assertThat(emailGenerator.getReferenceTemplate()).isEqualTo(REFERENCE_TEMPLATE);
     }
 
-    @Test
-    void shouldIncludeBothRespondentNames_for1v2() {
-        Organisation organisation = Organisation.builder()
-                .organisationID(ID)
-                .build();
+    @Nested
+    class AddCustomPropertiesTests {
 
-        Party respondent1 = Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName(FIRST_NAME)
-                .individualLastName(LAST_NAME)
-                .build();
+        @BeforeEach
+        void stubOrgService() {
+            when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+        }
 
-        Party respondent2 = Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("Jane")
-                .individualLastName(LAST_NAME)
-                .build();
+        @Test
+        void singleDefendant_shouldIncludeDefendantNameAndResponseDeadline() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .build();
 
-        CaseData caseData = CaseData.builder()
-                .ccdCaseReference(CCD_CASE_REFERENCE)
-                .legacyCaseReference(LEGACY_CASE_REFERENCE)
-                .issueDate(ISSUE_DATE)
-                .respondent1ResponseDeadline(RESP1_DEADLINE)
-                .respondent2ResponseDeadline(RESP1_DEADLINE.plusDays(1))
-                .applicant1OrganisationPolicy((OrganisationPolicy.builder().organisation(organisation).build()))
-                .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().name(TEST_NAME).build())
-                .respondent1(respondent1)
-                .respondent2(respondent2)
-                .build();
+            Map<String, String> props =
+                    emailGenerator.addCustomProperties(new HashMap<>(), caseData);
 
-        EmailDTO dto = emailGenerator.buildEmailDTO(caseData);
-        Map<String, String> params = dto.getParameters();
+            assertThat(props)
+                    .containsEntry(ISSUED_ON,
+                            formatLocalDate(caseData.getIssueDate(), DATE))
+                    .containsEntry(CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+                            formatLocalDate(
+                                    caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE))
+                    .containsEntry(PARTY_REFERENCES,
+                            buildPartiesReferencesEmailSubject(caseData))
+                    .containsEntry(DEFENDANT_NAME,
+                            getPartyNameBasedOnType(caseData.getRespondent1()))
+                    .containsEntry(RESPONSE_DEADLINE,
+                            formatLocalDateTime(
+                                    caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+        }
 
-        assertThat(params)
-                .containsEntry(RESPONDENT_ONE_NAME, "John Doe")
-                .containsEntry(RESPONDENT_TWO_NAME, "Jane Doe");
+        @Test
+        void twoDefendants_shouldIncludeBothDefendantNames() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+            Map<String, String> props =
+                    emailGenerator.addCustomProperties(new HashMap<>(), caseData);
+
+            assertThat(props)
+                    .containsEntry(DEFENDANT_ONE_NAME,
+                            getPartyNameBasedOnType(caseData.getRespondent1()))
+                    .containsEntry(DEFENDANT_TWO_NAME,
+                            getPartyNameBasedOnType(caseData.getRespondent2()));
+        }
     }
 }

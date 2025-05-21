@@ -18,14 +18,12 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    protected static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
-    public ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator(
-            NotificationsProperties notificationsProperties,
-            OrganisationService organisationService
-    ) {
+    public ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator(OrganisationService organisationService,
+                                                               NotificationsProperties notificationsProperties) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }
@@ -61,8 +59,10 @@ public class ClaimContinuingOnlineSpecAppSolOneEmailDTOGenerator extends AppSolO
             updated.put(RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
         } else {
             updated.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-            updated.put(RESPONSE_DEADLINE, formatLocalDateTime(
-                    caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+            updated.put(
+                    RESPONSE_DEADLINE,
+                    formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT)
+            );
         }
 
         return updated;
