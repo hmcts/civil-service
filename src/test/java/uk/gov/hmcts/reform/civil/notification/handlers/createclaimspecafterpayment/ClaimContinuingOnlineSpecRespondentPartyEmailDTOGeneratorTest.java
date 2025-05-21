@@ -132,14 +132,15 @@ class ClaimContinuingOnlineSpecRespondentPartyEmailDTOGeneratorTest {
 
         Map<String, String> properties = generator.addProperties(caseData);
 
-        assertThat(properties).containsEntry(NotificationData.RESPONDENT_NAME, RESPONDENT_NAME);
-        assertThat(properties).containsEntry(NotificationData.CLAIMANT_NAME, CLAIMANT_NAME);
-        assertThat(properties).containsEntry(ISSUED_ON, DateFormatHelper.formatLocalDate(LocalDate.now(), DateFormatHelper.DATE));
-        assertThat(properties).containsEntry(RESPOND_URL, RESPOND_TO_CLAIM_URL);
-        assertThat(properties).containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE);
-        assertThat(properties).containsEntry(CLAIM_16_DIGIT_NUMBER, "1234567890123456");
-        assertThat(properties).containsEntry(NotificationData.PIN, PIN);
-        assertThat(properties).containsEntry(RESPONSE_DEADLINE, DateFormatHelper.formatLocalDate(LocalDate.now().plusDays(14), DateFormatHelper.DATE));
-        assertThat(properties).containsEntry(FRONTEND_URL, CUI_FRONT_END_URL);
+        assertThat(properties)
+                .containsEntry(NotificationData.RESPONDENT_NAME, RESPONDENT_NAME)
+                .containsEntry(NotificationData.CLAIMANT_NAME, CLAIMANT_NAME)
+                .containsEntry(ISSUED_ON, DateFormatHelper.formatLocalDate(LocalDate.now(), DateFormatHelper.DATE))
+                .containsEntry(RESPOND_URL, RESPOND_TO_CLAIM_URL)
+                .containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE)
+                .containsEntry(CLAIM_16_DIGIT_NUMBER, "1234567890123456")
+                .containsEntry(NotificationData.PIN, PIN)
+                .containsEntry(RESPONSE_DEADLINE, DateFormatHelper.formatLocalDate(LocalDate.now().plusDays(14), DateFormatHelper.DATE))
+                .containsEntry(FRONTEND_URL, CUI_FRONT_END_URL);
     }
 }

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ContinuingOnlineSpecClaimApplicantNotifier;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimContinuingOnlineSpecApplicantNotifierTest {
+class ClaimContinuingOnlineSpecApplicantNotifierTest {
 
     @InjectMocks
     private ClaimContinuingOnlineSpecApplicantNotifier notifier;

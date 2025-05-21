@@ -7,7 +7,7 @@ public enum CamundaProcessIdentifier {
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
     CreateClaimSpecAfterPaymentContinuingOfflineNotifier,
-    CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForSpec,
+    RaisingClaimAgainstSpecLitigantInPersonForNotifier,
     ClaimSubmissionLipClaimantNotificationNotifier,
     ContinuingOnlineApplicantSpecClaimNotifier,
     ContinuingOnlineRespondentSpecClaimNotifier,

@@ -6,10 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForSpec;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.RaisingClaimAgainstSpecLitigantInPersonForNotifier;
 
 @ExtendWith(MockitoExtension.class)
-public class RaisingClaimAgainstLitigantInPersonForSpecNotifierTest {
+class RaisingClaimAgainstLitigantInPersonForSpecNotifierTest {
 
     @InjectMocks
     private RaisingClaimAgainstLitigantInPersonForSpecNotifier notifier;
@@ -17,6 +17,6 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotifierTest {
     @Test
     void shouldReturnCorrectTaskId() {
         assertThat(notifier.getTaskId())
-                .isEqualTo(CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForSpec.toString());
+                .isEqualTo(RaisingClaimAgainstSpecLitigantInPersonForNotifier.toString());
     }
 }

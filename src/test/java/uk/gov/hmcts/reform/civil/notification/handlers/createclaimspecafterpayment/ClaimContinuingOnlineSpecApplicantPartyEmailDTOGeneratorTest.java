@@ -97,12 +97,13 @@ class ClaimContinuingOnlineSpecApplicantPartyEmailDTOGeneratorTest {
                 .legacyCaseReference(LEGACY_CASE_REFERENCE)
                 .build();
 
-        Map<String, String> props = generator.addCustomProperties(new HashMap<>(), caseData);
+        Map<String, String> properties = generator.addCustomProperties(new HashMap<>(), caseData);
 
-        assertThat(props).containsEntry(RESPONDENT_NAME, RESP_NAME);
-        assertThat(props).containsEntry(CLAIMANT_NAME, APP_NAME);
-        assertThat(props).containsEntry(ISSUED_ON, formatLocalDate(issueDate, DATE));
-        assertThat(props).containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE);
-        assertThat(props).containsEntry(RESPONSE_DEADLINE, formatLocalDate(deadline.toLocalDate(), DATE));
+        assertThat(properties)
+                .containsEntry(RESPONDENT_NAME, RESP_NAME)
+                .containsEntry(CLAIMANT_NAME, APP_NAME)
+                .containsEntry(ISSUED_ON, formatLocalDate(issueDate, DATE))
+                .containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE)
+                .containsEntry(RESPONSE_DEADLINE, formatLocalDate(deadline.toLocalDate(), DATE));
     }
 }
