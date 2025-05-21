@@ -11,7 +11,8 @@ public class AddDefLitFriendAppSolOneEmailDTOGenerator extends AppSolOneEmailDTO
 
     NotificationsProperties notificationsProperties;
 
-    public AddDefLitFriendAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
+    public AddDefLitFriendAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
+                                                     OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }
