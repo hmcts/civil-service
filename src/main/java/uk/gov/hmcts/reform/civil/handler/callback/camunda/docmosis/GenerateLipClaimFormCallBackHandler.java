@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -42,6 +43,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -84,10 +86,13 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         );
 
         List<Element<CaseDocument>> translatedDocuments = caseData.getPreTranslationDocuments();
+
         // Remove Draft form from documents
         if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
             systemGeneratedCaseDocuments = systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
                 .toList();
+        } else if (featureToggleService.isGaForWelshEnabled() && caseData.isClaimantBilingual()
+            && event == GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC) {
             translatedDocuments.add(element(caseDocument));
         }
 

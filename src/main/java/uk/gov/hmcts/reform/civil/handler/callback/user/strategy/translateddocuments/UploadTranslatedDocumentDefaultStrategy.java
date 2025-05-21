@@ -104,6 +104,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                                                                                 originalDocument.getValue().getDocumentType());
                         systemGeneratedDocuments.add(element(claimantSealedCopy));
                         assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
+                    } else if (originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM) {
+                        systemGeneratedDocuments.add(originalDocument);
                     }
                 }
             });
