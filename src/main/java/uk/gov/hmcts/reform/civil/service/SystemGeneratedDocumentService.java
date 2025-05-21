@@ -25,8 +25,8 @@ public class SystemGeneratedDocumentService {
     }
 
     public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
-        List<Element<CaseDocument>> finalOrderDocuments = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
-        return addToDocumentCollection(finalOrderDocuments, translatedDocuments);
+        List<Element<CaseDocument>> systemGeneratedDocument = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
+        return addToDocumentCollection(systemGeneratedDocument, translatedDocuments);
     }
 
     public List<Element<CaseDocument>> getFinalOrderDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
