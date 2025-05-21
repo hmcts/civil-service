@@ -72,7 +72,7 @@ public class ClaimContinuingOnlineSpecRespondentPartyNotifier extends Notifier {
         }
         caseDataService.triggerEvent(
                 caseData.getCcdCaseReference(),
-                CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC,
+                CaseEvent.NOTIFY_EVENT,
                 updates
         );
 

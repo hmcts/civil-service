@@ -97,7 +97,7 @@ class ClaimContinuingOnlineSpecRespondentPartyNotifierTest {
 
         verify(caseDataService).triggerEvent(
                 eq(caseData.getCcdCaseReference()),
-                eq(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC),
+                eq(CaseEvent.NOTIFY_EVENT),
                 ArgumentMatchers.any()
         );
         verify(bulkPrintService).printLetter(
@@ -121,7 +121,7 @@ class ClaimContinuingOnlineSpecRespondentPartyNotifierTest {
 
         verify(caseDataService).triggerEvent(
                 eq(caseData.getCcdCaseReference()),
-                eq(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC),
+                eq(CaseEvent.NOTIFY_EVENT),
                 argThat(updates -> AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name().equals(updates.get("state")))
         );
     }
@@ -151,7 +151,7 @@ class ClaimContinuingOnlineSpecRespondentPartyNotifierTest {
 
         verify(caseDataService).triggerEvent(
                 eq(caseData.getCcdCaseReference()),
-                eq(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC),
+                eq(CaseEvent.NOTIFY_EVENT),
                 argThat(updates -> updates.containsKey(CLAIM_NOTIFICATION_DATE)
                         && updates.get(CLAIM_NOTIFICATION_DATE).equals(now))
         );
