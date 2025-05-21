@@ -14,11 +14,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +33,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
@@ -40,6 +45,8 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
     private static final String REFERENCE_TEMPLATE_DEFENDANT =
         "notify-lip-after-noc-approval-%s";
     public static final String TASK_ID_APPLICANT = "NotifyClaimantLipAfterNocApproval";
@@ -119,15 +126,19 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
     }
 
     public Map<String, String> addPropertiesApplicantSolicitor(CaseData caseData) {
-        return Map.of(
-            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-            LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
+                LEGAL_ORG_APPLICANT1, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                         .getOrganisation().getOrganisationID()),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     public Map<String, String> addPropertiesForDefendantSolicitor(CaseData caseData) {
