@@ -10,7 +10,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,19 +65,16 @@ class AcknowledgeClaimUnspecAppSolOneEmailDTOGeneratorTest {
         Map<String, String> addedProperties = Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, "TestOrg",
             RESPONDENT_NAME, "Resp1 name",
-            RESPONSE_DEADLINE, "2029-01-01"
+            RESPONSE_DEADLINE, "2029-01-01",
+            RESPONSE_INTENTION, "Response intention"
         );
         when(acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData))
             .thenReturn(new HashMap<>(addedProperties));
-        try (MockedStatic<NotificationUtils> notificationUtilsMock = mockStatic(NotificationUtils.class);
-             MockedStatic<PartyUtils> partyUtilsMock = mockStatic(PartyUtils.class)) {
+        try (MockedStatic<NotificationUtils> notificationUtilsMock = mockStatic(NotificationUtils.class)) {
 
             notificationUtilsMock.when(() ->
                                            NotificationUtils.getApplicantLegalOrganizationName(any(), any()))
                 .thenReturn("Claim org");
-            partyUtilsMock.when(() ->
-                                    PartyUtils.getResponseIntentionForEmail(caseData))
-                .thenReturn("Response intention");
             properties = emailGenerator.addCustomProperties(properties, caseData);
             assertThat(properties)
                 .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Claim org")

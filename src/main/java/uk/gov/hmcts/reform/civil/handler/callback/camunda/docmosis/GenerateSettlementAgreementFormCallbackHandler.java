@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlementagreement.SettlementAgreementFormGenerator;
 
@@ -21,6 +23,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
     private final SettlementAgreementFormGenerator settlementAgreementFormGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_LIP_SIGN_SETTLEMENT_AGREEMENT_FORM);
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateResponseDocument);
     private static final String TASK_ID = "GenerateSignSettlementAgreement";
@@ -41,10 +45,19 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+            || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            preTranslationDocuments.add(element(claimantResponseForm));
+            updatedCaseDataBuilder
+                .preTranslationDocuments(preTranslationDocuments);
+        } else {
+            updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 claimantResponseForm,
                 caseData
-        ));
+            ));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedCaseDataBuilder.build().toMap(objectMapper))

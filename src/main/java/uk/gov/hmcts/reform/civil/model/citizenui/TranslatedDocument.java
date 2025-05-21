@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.IN
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_ADMISSION_TRANSLATED;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
 
 @Data
 @AllArgsConstructor
@@ -38,6 +39,7 @@ public class TranslatedDocument {
             case INTERLOCUTORY_JUDGMENT: return INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
             case MANUAL_DETERMINATION: return MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
             case CCJ_REQUEST_ADMISSION: return CCJ_REQUEST_ADMISSION_TRANSLATED;
+            case SETTLEMENT_AGREEMENT: return SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
             default: throw new DocumentUploadException("No document file type found for Translated document");
         }
     }
