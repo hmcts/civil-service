@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
@@ -39,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetail
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JudgmentByAdmissionOrDeterminationMapper {
@@ -212,7 +210,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .orElse("0");
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
-        log.info("Generating document for JBA");
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         return builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
@@ -322,8 +319,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getClaimCosts(CaseData caseData) {
-        log.info("Getting claim costs {}, {}, {}", judgementService.isLrFullAdmitRepaymentPlan(caseData),
-                 getClaimFee(caseData), judgementService.ccjJudgmentFixedCost(caseData));
         return judgementService.isLrFullAdmitRepaymentPlan(caseData)
             ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
             : getClaimFee(caseData).toString();
