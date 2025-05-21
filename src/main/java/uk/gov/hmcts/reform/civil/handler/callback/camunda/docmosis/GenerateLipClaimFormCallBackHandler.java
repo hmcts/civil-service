@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_FORM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT1_DETAILS_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -87,7 +88,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
             systemGeneratedCaseDocuments = systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
                 .toList();
-            translatedDocuments.add(systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() == DocumentType.SEALED_CLAIM).toList().get(0));
+            translatedDocuments.add(element(caseDocument));
         }
 
         return caseData.toBuilder()
