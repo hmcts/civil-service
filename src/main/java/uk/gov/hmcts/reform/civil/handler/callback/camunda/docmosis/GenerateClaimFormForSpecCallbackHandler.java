@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.PARTICULARS_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Slf4j
@@ -116,6 +118,8 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 wrapElements(caseData.getSpecClaimDetailsDocumentFiles())).build());
         }
 
+        List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
+            .getPreTranslationDocuments();
         if (documentMetaDataList.size() > 1) {
             log.info("Calling civil stitch service from spec claim form generation for caseId {}", caseId);
             String auth = callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString();
@@ -130,8 +134,17 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             log.info("Civil stitch service spec response {} for caseId {}", stitchedDocument, caseId);
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, categoryId);
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
+            if (caseData.isClaimantBilingual()) {
+                translatedDocuments.add(element(stitchedDocument)) ;
+                caseDataBuilder.preTranslationDocuments(translatedDocuments);
+
+            }
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+            if (caseData.isClaimantBilingual()) {
+                translatedDocuments.add(element(sealedClaim));
+                caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            }
         }
 
         // these documents are added servedDocumentFiles, if we do not remove/null the original,
