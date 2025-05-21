@@ -105,6 +105,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             .findFirst();
                         preTranslationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
                 }  else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
