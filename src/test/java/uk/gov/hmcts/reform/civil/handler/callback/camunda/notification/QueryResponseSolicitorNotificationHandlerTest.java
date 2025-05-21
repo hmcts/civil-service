@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaS
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,7 +66,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     @InjectMocks
     private QueryResponseSolicitorNotificationHandler handler;
 
-    private CaseData createCaseDataWithMultipleFollowUpQueries(LocalDateTime now) {
+    private CaseData createCaseDataWithMultipleFollowUpQueries(OffsetDateTime now) {
         CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
             .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
             .caseMessages(wrapElements(
@@ -223,7 +224,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             .build();
     }
 
-    private CaseData createCaseDataWithQueries(LocalDateTime now) {
+    private CaseData createCaseDataWithQueries(OffsetDateTime now) {
         CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
             .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
             .caseMessages(wrapElements(
@@ -386,7 +387,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -395,7 +396,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "applicant@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1)),
+                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -410,7 +411,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -419,7 +420,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent1@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1)),
+                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -434,7 +435,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -443,7 +444,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent2@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1)),
+                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -458,7 +459,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -467,7 +468,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "applicant@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now),
+                getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -482,7 +483,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -491,7 +492,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent1@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now),
+                getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -506,7 +507,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -515,7 +516,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent2@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now),
+                getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -534,7 +535,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -559,7 +560,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder().claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -585,7 +586,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build()).build();
@@ -621,7 +622,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
