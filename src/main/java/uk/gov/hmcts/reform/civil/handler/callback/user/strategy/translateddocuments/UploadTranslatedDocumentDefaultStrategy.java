@@ -28,7 +28,9 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -104,6 +106,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationFinalOrderDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationFinalOrderDoc.ifPresent(caseData.getFinalOrderDocumentCollection()::add);
                     }
+                }  else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.SETTLEMENT_AGREEMENT)
+                            .findFirst();
+                        preTranslationSettlementAgreement.ifPresent(preTranslationDocuments::remove);
+                        preTranslationSettlementAgreement.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
@@ -166,6 +176,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             } else if (Objects.nonNull(translatedDocuments)
                 && (translatedDocuments.get(0).getValue().getDocumentType().equals(FINAL_ORDER))) {
                 return CaseEvent.GENERATE_ORDER_NOTIFICATION;
+            } else if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
+                return UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
             }
         }
 
