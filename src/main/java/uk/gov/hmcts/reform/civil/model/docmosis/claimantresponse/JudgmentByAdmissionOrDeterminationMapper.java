@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -37,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetail
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JudgmentByAdmissionOrDeterminationMapper {
@@ -46,6 +49,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+    private final FeatureToggleService featureToggleService;
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -208,7 +212,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .orElse("0");
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
-
+        log.info("Generating document for JBA");
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         return builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
@@ -235,7 +239,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                                    : null)
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee((getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString())
+            .claimFee(getClaimCosts(caseData))
             .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .build();
@@ -315,5 +319,13 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             return "SET_DATE";
         }
         return null;
+    }
+
+    private String getClaimCosts(CaseData caseData) {
+        log.info("Getting claim costs {}, {}, {}", judgementService.isLrFullAdmitRepaymentPlan(caseData),
+                 getClaimFee(caseData), judgementService.ccjJudgmentFixedCost(caseData));
+        return judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
+            : getClaimFee(caseData).toString();
     }
 }
