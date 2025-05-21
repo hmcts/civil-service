@@ -42,7 +42,7 @@ public class QueryDocumentGenerator {
             )
         );
         assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, documentCategory.getValue());
-        caseDocument.setCreatedDatetime(messageThread.get(0).getValue().getCreatedOn());
+        caseDocument.setCreatedDatetime(messageThread.get(0).getValue().getCreatedOn().toLocalDateTime());
         return caseDocument;
     }
 }
