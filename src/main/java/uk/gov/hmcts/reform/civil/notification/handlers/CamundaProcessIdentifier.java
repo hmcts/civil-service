@@ -4,4 +4,7 @@ public enum CamundaProcessIdentifier {
     ClaimDismissedNotifyParties,
     LitigationFriendAddedNotifier,
     ContinuingOnlineSpecClaimNotifier
+    AcknowledgeClaimUnspecNotifyParties,
+    GenerateOrderNotifyPartiesCourtOfficerOrder,
+    GenerateOrderNotifyParties,
 }
