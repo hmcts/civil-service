@@ -135,7 +135,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, categoryId);
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
             if (caseData.isClaimantBilingual()) {
-                translatedDocuments.add(element(stitchedDocument)) ;
+                translatedDocuments.add(element(stitchedDocument));
                 caseDataBuilder.preTranslationDocuments(translatedDocuments);
 
             }
