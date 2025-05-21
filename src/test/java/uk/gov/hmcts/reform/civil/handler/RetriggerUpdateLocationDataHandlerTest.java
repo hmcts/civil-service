@@ -22,6 +22,7 @@ class RetriggerUpdateLocationDataHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
     private RetriggerUpdateLocationDataHandler handler;
+    private static final String YES = "Yes";
 
     @BeforeEach
     void setUp() {
@@ -33,6 +34,9 @@ class RetriggerUpdateLocationDataHandlerTest {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
         when(externalTask.getVariable("ePimId")).thenReturn("123456");
+        when(externalTask.getVariable("caseManagementLocation")).thenReturn(YES);
+        when(externalTask.getVariable("courtLocation")).thenReturn(YES);
+        when(externalTask.getVariable("applicant1DQRequestedCourt")).thenReturn(YES);
         when(externalTask.getProcessInstanceId()).thenReturn("1");
 
         handler.handleTask(externalTask);
@@ -41,6 +45,9 @@ class RetriggerUpdateLocationDataHandlerTest {
             1L,
             CaseEvent.UPDATE_CASE_DATA,
             "123456",
+            YES,
+            YES,
+            YES,
             "Update locations epimId by 123456",
             EVENT_DESCRIPTION
         );
@@ -48,6 +55,9 @@ class RetriggerUpdateLocationDataHandlerTest {
             2L,
             CaseEvent.UPDATE_CASE_DATA,
             "123456",
+            YES,
+            YES,
+            YES,
             "Update locations epimId by 123456",
             EVENT_DESCRIPTION
         );

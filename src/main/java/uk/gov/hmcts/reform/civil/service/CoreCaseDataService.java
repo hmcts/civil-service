@@ -68,45 +68,56 @@ public class CoreCaseDataService {
         submitUpdate(caseId.toString(), caseDataContent);
     }
 
-    public void triggerUpdateLocationEpimdsIdEvent(Long caseId, CaseEvent eventName, String epimdsId,
-                             String eventSummary, String eventDescription) {
+    public void triggerUpdateLocationEpimdsIdEvent(Long caseId, CaseEvent eventName,
+                                                   String epimdsId,
+                                                   String caseManagementLocationObj,
+                                                   String courtLocationObj,
+                                                   String applicant1DQRequestedCourtObj,
+                                                   String eventSummary,
+                                                   String eventDescription) {
         StartEventResponse startEventResponse = startUpdate(caseId.toString(), eventName);
         HashMap<String, Object> payload = new HashMap<>(startEventResponse.getCaseDetails().getData());
         //set case management location epimsId
-        Object caseManagementLocation = payload.get("caseManagementLocation");
-        if (caseManagementLocation != null) {
-            CaseLocationCivil existingLocation = getCaseManagementLocationObj(caseManagementLocation);
-            CaseLocationCivil newCmLocation = CaseLocationCivil.builder()
-                .region(existingLocation.getRegion()).baseLocation(epimdsId).build();
-            payload.put("caseManagementLocation", newCmLocation);
+        if ("Yes".equalsIgnoreCase(caseManagementLocationObj)) {
+            Object caseManagementLocation = payload.get("caseManagementLocation");
+            if (caseManagementLocation != null) {
+                CaseLocationCivil existingLocation = getCaseManagementLocationObj(caseManagementLocation);
+                CaseLocationCivil newCmLocation = CaseLocationCivil.builder()
+                    .region(existingLocation.getRegion()).baseLocation(epimdsId).build();
+                payload.put("caseManagementLocation", newCmLocation);
+            }
         }
         //set court Location epimsId
-        Object courtLocation = payload.get("courtLocation");
-        if (courtLocation != null) {
-            CourtLocation existingCourtLocation = getCourtLocationObj(courtLocation);
-            CourtLocation newCourtLocation = CourtLocation.builder()
-                .caseLocation(CaseLocationCivil.builder()
-                                  .region(existingCourtLocation.getCaseLocation().getRegion())
-                                  .baseLocation(epimdsId).build())
-                .applicantPreferredCourt(existingCourtLocation.getApplicantPreferredCourt())
-                .reasonForHearingAtSpecificCourt(existingCourtLocation.getReasonForHearingAtSpecificCourt())
-                .build();
-            payload.put("courtLocation", newCourtLocation);
+        if ("Yes".equalsIgnoreCase(courtLocationObj)) {
+            Object courtLocation = payload.get("courtLocation");
+            if (courtLocation != null) {
+                CourtLocation existingCourtLocation = getCourtLocationObj(courtLocation);
+                CourtLocation newCourtLocation = CourtLocation.builder()
+                    .caseLocation(CaseLocationCivil.builder()
+                                      .region(existingCourtLocation.getCaseLocation().getRegion())
+                                      .baseLocation(epimdsId).build())
+                    .applicantPreferredCourt(existingCourtLocation.getApplicantPreferredCourt())
+                    .reasonForHearingAtSpecificCourt(existingCourtLocation.getReasonForHearingAtSpecificCourt())
+                    .build();
+                payload.put("courtLocation", newCourtLocation);
+            }
         }
         //set applicant1 DQ RequestedCourt epimsId
-        Object applicant1DQRequestedCourt = payload.get("applicant1DQRequestedCourt");
-        if (applicant1DQRequestedCourt != null) {
-            RequestedCourt existingRequestedCourt = getRequestedCourtObj(applicant1DQRequestedCourt);
-            RequestedCourt newRequestedCourt = RequestedCourt.builder()
-                .caseLocation(CaseLocationCivil.builder()
-                                  .region(existingRequestedCourt.getCaseLocation().getRegion())
-                                  .baseLocation(epimdsId).build())
-                .responseCourtCode(existingRequestedCourt.getResponseCourtCode())
-                .responseCourtName(existingRequestedCourt.getResponseCourtName())
-                .reasonForHearingAtSpecificCourt(existingRequestedCourt.getReasonForHearingAtSpecificCourt())
-                .otherPartyPreferredSite(existingRequestedCourt.getOtherPartyPreferredSite())
-                .build();
-            payload.put("applicant1DQRequestedCourt", newRequestedCourt);
+        if ("Yes".equalsIgnoreCase(applicant1DQRequestedCourtObj)) {
+            Object applicant1DQRequestedCourt = payload.get("applicant1DQRequestedCourt");
+            if (applicant1DQRequestedCourt != null) {
+                RequestedCourt existingRequestedCourt = getRequestedCourtObj(applicant1DQRequestedCourt);
+                RequestedCourt newRequestedCourt = RequestedCourt.builder()
+                    .caseLocation(CaseLocationCivil.builder()
+                                      .region(existingRequestedCourt.getCaseLocation().getRegion())
+                                      .baseLocation(epimdsId).build())
+                    .responseCourtCode(existingRequestedCourt.getResponseCourtCode())
+                    .responseCourtName(existingRequestedCourt.getResponseCourtName())
+                    .reasonForHearingAtSpecificCourt(existingRequestedCourt.getReasonForHearingAtSpecificCourt())
+                    .otherPartyPreferredSite(existingRequestedCourt.getOtherPartyPreferredSite())
+                    .build();
+                payload.put("applicant1DQRequestedCourt", newRequestedCourt);
+            }
         }
         //set payload
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(startEventResponse, Map.of());
