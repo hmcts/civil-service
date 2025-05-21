@@ -679,7 +679,6 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
-            LocalDateTime now = LocalDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
