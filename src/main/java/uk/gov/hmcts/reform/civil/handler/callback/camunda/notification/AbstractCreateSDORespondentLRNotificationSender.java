@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -19,8 +20,9 @@ public abstract class AbstractCreateSDORespondentLRNotificationSender extends Ab
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
         OrganisationService organisationService,
-        FeatureToggleService featureToggleService) {
-        super(notificationService, notificationsProperties, featureToggleService);
+        FeatureToggleService featureToggleService,
+        NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
         this.organisationService = organisationService;
     }
 
