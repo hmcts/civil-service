@@ -88,6 +88,6 @@ class EmailDTOGeneratorTest {
         verify(helper).addCommonFooterSignature(any());
         verify(helper).addCnbcContact(eq(caseData), any());
         verify(helper).addSpecAndUnspecContact(eq(caseData), any());
-        verify(helper).addLipContact(eq(caseData), any());
+        verify(helper).addspecContact(eq(caseData), any());
     }
 }

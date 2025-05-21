@@ -143,7 +143,6 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-
         return properties;
     }
 
@@ -158,7 +157,6 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-
         return properties;
     }
 
@@ -174,15 +172,18 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-
         return properties;
     }
 
     public Map<String, String> lipProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesLip(CaseData caseData) {

@@ -100,11 +100,15 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_NUMBER, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesDefendantLr(CaseData caseData) {
@@ -123,12 +127,16 @@ public class NotificationForDefendantRepresented extends CallbackHandler impleme
     }
 
     public Map<String, String> addPropertiesClaimant(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName(),
             CLAIM_NUMBER, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     public Map<String, String> addPropertiesClaimantLr(CaseData caseData) {

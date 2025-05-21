@@ -64,14 +64,14 @@ class TemplateCommonPropertiesHelperTest {
     }
 
     @Test
-    void shouldLipContactForLipCase() {
+    void shouldspecContactForLipCase() {
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
         when(caseData.isLipCase()).thenReturn(true);
         when(caseData.getCcdState()).thenReturn(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
 
         Map<String, String> properties = new java.util.HashMap<>();
-        helper.addLipContact(caseData, properties);
+        helper.addspecContact(caseData, properties);
 
         assertThat(properties)
             .containsEntry(SPEC_UNSPEC_CONTACT, TEST_LIP_CONTACT);

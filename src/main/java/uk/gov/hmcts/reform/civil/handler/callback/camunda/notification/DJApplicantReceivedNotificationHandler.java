@@ -25,8 +25,7 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_DJ_RECEIVED;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.*;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -155,6 +154,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         addAllFooterItems(caseData, properties, configuration,
                           toggleService.isQueryManagementLRsEnabled(),
                           toggleService.isLipQueryManagementEnabled(caseData));
+        addCnbcContact(caseData, properties, configuration,
+                       toggleService.isQueryManagementLRsEnabled());
         return properties;
     }
 
@@ -183,6 +184,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         addAllFooterItems(caseData, properties, configuration,
                           toggleService.isQueryManagementLRsEnabled(),
                           toggleService.isLipQueryManagementEnabled(caseData));
+        addCnbcContact(caseData, properties, configuration,
+                       toggleService.isQueryManagementLRsEnabled());
         return properties;
     }
 
@@ -199,6 +202,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         addAllFooterItems(caseData, properties, configuration,
                           toggleService.isQueryManagementLRsEnabled(),
                           toggleService.isLipQueryManagementEnabled(caseData));
+        addCnbcContact(caseData, properties, configuration,
+                       toggleService.isQueryManagementLRsEnabled());
         return properties;
     }
 
@@ -215,6 +220,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         addAllFooterItems(caseData, properties, configuration,
                           toggleService.isQueryManagementLRsEnabled(),
                           toggleService.isLipQueryManagementEnabled(caseData));
+        addCnbcContact(caseData, properties, configuration,
+                       toggleService.isQueryManagementLRsEnabled());
         return properties;
     }
 

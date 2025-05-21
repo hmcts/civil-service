@@ -57,7 +57,7 @@ public class TemplateCommonPropertiesHelper {
         return properties;
     }
 
-    public Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties) {
+    public Map<String, String> addspecContact(CaseData caseData, Map<String, String> properties) {
         if (isQueryManagementAllowedForLipCase(caseData)) {
             properties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
         } else {

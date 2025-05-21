@@ -36,14 +36,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
@@ -299,20 +299,14 @@ public class NotificationUtils {
     public static Map<String, String> addAllFooterItems(CaseData caseData, Map<String, String> properties,
                                                         NotificationsSignatureConfiguration configuration,
                                                         boolean isLRQmEnabled, boolean isLipQMEnabled) {
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                isLRQmEnabled);
-        if (caseData.isLipCase()) {
-            if (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()) {
-                addCommonFooterSignatureWelsh(properties, configuration);
-                addLipContactWelsh(caseData, properties, configuration,
-                                   isLRQmEnabled,
-                                   isLipQMEnabled);
-            }
-            addLipContact(caseData, properties, configuration, isLRQmEnabled, isLipQMEnabled);
-        }
 
-        //addCnbcContact(caseData, properties, configuration, isLRQmEnabled);
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration, isLRQmEnabled);
+
+        addCommonFooterSignatureWelsh(properties, configuration);
+        addLipContactWelsh(caseData, properties, configuration, isLRQmEnabled, isLipQMEnabled);
+        addLipContact(caseData, properties, configuration, isLRQmEnabled, isLipQMEnabled);
+
         return properties;
     }
 
@@ -326,9 +320,9 @@ public class NotificationUtils {
 
     public static Map<String, String> addCommonFooterSignatureWelsh(Map<String, String> properties,
                                                                NotificationsSignatureConfiguration configuration) {
-        properties.putAll(Map.of(HMCTS_SIGNATURE_WELSH, configuration.getHmctsSignatureWelsh(),
-                                 PHONE_CONTACT_WELSH, configuration.getPhoneContactWelsh(),
-                                 OPENING_HOURS_WELSH, configuration.getOpeningHoursWelsh()));
+        properties.putAll(Map.of(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature(),
+                                 WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact(),
+                                 WELSH_OPENING_HOURS, configuration.getWelshOpeningHours()));
         return properties;
     }
 
@@ -364,7 +358,6 @@ public class NotificationUtils {
 
         log.info("!queryNotAllowedCaseStates(caseData) " + !queryNotAllowedCaseStates(caseData));
         log.info("is LIP on case " + caseData.isLipCase());
-        log.info("is WELSH");
         if (isLRQmEnabled && isLipQmEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
             properties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
         } else {
