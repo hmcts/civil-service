@@ -41,4 +41,5 @@ class ClaimDismissedAppSolOneEmailGeneratorTest {
 
         assertThat(referenceTemplate).isEqualTo(CLAIM_DISMISSED_APPLICANT_NOTIFICATION_REFERENCE_TEMPLATE);
     }
+
 }
