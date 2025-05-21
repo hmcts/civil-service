@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,7 +47,7 @@ class QueryDocumentGeneratorTest {
     private static final Long CASE_ID = 12345L;
     private static final String AUTHORIZATION = "Bearer token";
     private static final DocCategory DOCUMENT_CATEGORY = DocCategory.CLAIMANT_QUERY_DOCUMENTS;
-    private static final LocalDateTime CREATED_ON = LocalDateTime.now();
+    private static final OffsetDateTime CREATED_ON = OffsetDateTime.now();
     private static final byte[] DOCUMENT_BYTES = "sample bytes".getBytes();
     private static final String SUBJECT = "Query Subject";
     private static final String CREATED_BY = "testUser";
@@ -81,7 +81,7 @@ class QueryDocumentGeneratorTest {
         uploadedCaseDocument = CaseDocument.builder()
             .documentName(generatedDocmosisDocument.getDocumentTitle())
             .documentType(DocumentType.QUERY_DOCUMENT)
-            .createdDatetime(CREATED_ON)
+            .createdDatetime(CREATED_ON.toLocalDateTime())
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(QueryDocument.class), eq(QUERY_DOCUMENT)))

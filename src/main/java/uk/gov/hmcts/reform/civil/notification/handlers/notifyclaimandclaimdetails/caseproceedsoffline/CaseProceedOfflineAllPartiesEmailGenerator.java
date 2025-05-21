@@ -3,14 +3,12 @@ package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetai
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Component
 public class CaseProceedOfflineAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
     public CaseProceedOfflineAllPartiesEmailGenerator(CaseProceedOfflineAppSolEmailDTOGenerator caseProceedOfflineAppSolEmailDTOGenerator) {
-        super(caseProceedOfflineAppSolEmailDTOGenerator,
-              null,
-              null,
-              null,
-              null);
+        super(List.of(caseProceedOfflineAppSolEmailDTOGenerator));
     }
 }
