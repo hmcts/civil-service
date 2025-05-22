@@ -26,17 +26,9 @@ public class DefendantSignSettlementClaimantEmailDTOGenerator extends ClaimantEm
     protected String getEmailTemplateId(CaseData caseData) {
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
         boolean isAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
-        boolean isNotAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementNotAgreed).orElse(false);
 
-        if (isAgreed) {
-            return caseData.isClaimantBilingual() ? notificationsProperties.getNotifyApplicantLipForSignedSettlementAgreementInBilingual() :
-                notificationsProperties.getNotifyApplicantForSignedSettlementAgreement();
-        } else if (isNotAgreed) {
-            return caseData.isClaimantBilingual() ? notificationsProperties.getNotifyApplicantLipForNotAgreedSignSettlementInBilingual() :
-                notificationsProperties.getNotifyApplicantForNotAgreedSignSettlement();
-        }
-
-        return null;
+        return isAgreed ? notificationsProperties.getNotifyRespondentForSignedSettlementAgreement() :
+            notificationsProperties.getNotifyRespondentForNotAgreedSignSettlement();
     }
 
     @Override
