@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -28,10 +29,13 @@ class ClaimantLipHelpWithFeesEmailDTOGeneratorTest {
     private static final String WELSH_TEMPLATE = "welsh-template";
     private static final String NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION = "notify-claimant-lip-help-with-fees-notification-%s";
     private static final String LEGACY_REFERENCE = "1594901956117591";
-    private static final String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
+    public static final String TASK_ID = "reference";
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     @InjectMocks
     private ClaimantLipHelpWithFeesEmailDTOGenerator generator;
@@ -70,12 +74,11 @@ class ClaimantLipHelpWithFeesEmailDTOGeneratorTest {
         when(notificationsProperties.getNotifyClaimantLipHelpWithFees())
                 .thenReturn(ENGLISH_TEMPLATE);
 
-        EmailDTO dto = generator.buildEmailDTO(caseData);
+        EmailDTO dto = generator.buildEmailDTO(caseData, TASK_ID);
 
         Map<String, String> params = dto.getParameters();
         assertThat(dto.getEmailTemplate()).isEqualTo(ENGLISH_TEMPLATE);
         assertThat(params)
-                .containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_REFERENCE)
                 .containsKey(CLAIMANT_V_DEFENDANT);
     }
 
@@ -88,7 +91,7 @@ class ClaimantLipHelpWithFeesEmailDTOGeneratorTest {
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .build();
 
-        EmailDTO dto = generator.buildEmailDTO(caseData);
+        EmailDTO dto = generator.buildEmailDTO(caseData, TASK_ID);
         assertThat(dto.getEmailTemplate()).isEqualTo(WELSH_TEMPLATE);
     }
 
