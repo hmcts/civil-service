@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +12,10 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.YamlNotificationTestUtil;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
@@ -26,6 +31,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,16 +43,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
@@ -69,6 +70,20 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
     @InjectMocks
     private NotifyMediationUnsuccessfulDefendantLiPHandler notificationHandler;
 
+    @BeforeEach
+    void setUp() {
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+    }
+
     @Nested
     class AboutToSubmitCallback {
 
@@ -82,25 +97,6 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
         private static final String BILINGUAL_EMAIL_TEMPLATE = "test-notification-bilingual-id";
         private static final String BILINGUAL_SELECTION = "BOTH";
         private static final String ENGLISH_SELECTION = "ENGLISH";
-
-        private static final Map<String, String> PROPERTY_MAP = Map.of(
-            DEFENDANT_NAME, DEFENDANT_PARTY_NAME,
-            CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER,
-            CLAIMANT_NAME, CLAIMANT_ORG_NAME,
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
-
-        private static final Map<String, String> CARM_PROPERTY_MAP = Map.of(
-            PARTY_NAME, DEFENDANT_PARTY_NAME,
-            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
 
         @ParameterizedTest
         @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
@@ -135,7 +131,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getFullCarmPropertyMap(caseData));
         }
 
         @ParameterizedTest
@@ -172,7 +168,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getFullCarmPropertyMap(caseData));
         }
 
         @Test
@@ -202,7 +198,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getFullPropertyMap());
         }
 
         @Test
@@ -233,7 +229,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(BILINGUAL_EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getFullPropertyMap());
         }
 
         @Test
@@ -264,7 +260,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(PROPERTY_MAP);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getFullPropertyMap());
         }
 
         @Test
@@ -286,6 +282,38 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                                                            emailTemplate.capture(),
                                                            notificationDataMap.capture(), reference.capture()
             );
+        }
+
+        @NotNull
+        private Map<String, String> getFullPropertyMap() {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(DEFENDANT_NAME, DEFENDANT_PARTY_NAME);
+            properties.put(CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
+            properties.put(CLAIMANT_NAME, CLAIMANT_ORG_NAME);
+            return properties;
+        }
+
+        @NotNull
+        private Map<String, String> getFullCarmPropertyMap(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(PARTY_NAME, DEFENDANT_PARTY_NAME);
+            properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+            return properties;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties() {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            return expectedProperties;
         }
     }
 }

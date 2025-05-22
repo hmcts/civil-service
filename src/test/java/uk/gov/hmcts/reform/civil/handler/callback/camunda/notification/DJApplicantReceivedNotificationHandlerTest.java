@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.YamlNotificationTestUtil;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -25,6 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,24 +40,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJApplicantReceivedNotificationHandler.TASK_ID;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_APPLICANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_SPECIFIED;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class DJApplicantReceivedNotificationHandlerTest {
 
     @Mock
@@ -76,19 +70,27 @@ class DJApplicantReceivedNotificationHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
+        @BeforeEach
+        void setUp() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+        }
+
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -112,13 +114,6 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -148,13 +143,6 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
 
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
@@ -181,10 +169,6 @@ class DJApplicantReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
                 .thenReturn("test-template-requested-lip-id");
             when(featureToggleService.isLipVLipEnabled())
@@ -213,10 +197,6 @@ class DJApplicantReceivedNotificationHandlerTest {
 
         @Test
         void shouldNotifyApplicantLip_whenInvokedAndLiPvsLiPEnabledAndBilingual() {
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
                 .thenReturn("test-template-requested-lip-id-bilingual");
             when(featureToggleService.isLipVLipEnabled())
@@ -247,48 +227,50 @@ class DJApplicantReceivedNotificationHandlerTest {
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
-                LEGAL_ORG_SPECIFIED, "Test Org Name",
-                CLAIM_NUMBER, CASE_ID.toString(),
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CASEMAN_REF, "000DC001",
-                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service",
-                CNBC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk"
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(LEGAL_ORG_SPECIFIED, "Test Org Name");
+            properties.put(CLAIM_NUMBER, CASE_ID.toString());
+            properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, "000DC001");
+            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            return properties;
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMapForRequested() {
-            return Map.of(
-                LEGAL_ORG_APPLICANT1, "Test Org Name",
-                CLAIM_NUMBER, CASE_ID.toString(),
-                DEFENDANT_NAME, "David",
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CASEMAN_REF, "000DC001",
-                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service",
-                CNBC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk"
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(LEGAL_ORG_APPLICANT1, "Test Org Name");
+            properties.put(CLAIM_NUMBER, CASE_ID.toString());
+            properties.put(DEFENDANT_NAME, "David");
+            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(CASEMAN_REF, "000DC001");
+            properties.put(CNBC_CONTACT, configuration.getCnbcContact());
+            return properties;
         }
 
         @NotNull
         public Map<String, String> getLipvLiPData(CaseData caseData) {
-            return Map.of(
-                APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
-                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-            );
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+            properties.put(CLAIM_NUMBER, LEGACY_CASE_REFERENCE);
+            properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            return properties;
+        }
 
+        @NotNull
+        public Map<String, String> addCommonProperties() {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            return expectedProperties;
         }
 
     }

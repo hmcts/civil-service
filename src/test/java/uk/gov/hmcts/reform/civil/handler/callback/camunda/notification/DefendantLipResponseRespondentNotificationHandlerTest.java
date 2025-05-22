@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
@@ -31,9 +33,14 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 
 @ExtendWith(MockitoExtension.class)
 class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -59,14 +66,24 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
         private final String defendantEmail = "sherlock@scotlandyard.co.uk";
         private final String legacyReference = "000MC001";
 
-        @Test
-        void shouldSendEmailToLipDefendant() {
-            String emailTemplate = "emailTemplate";
-            given(notificationsProperties.getRespondentLipResponseSubmissionTemplate()).willReturn(emailTemplate);
+        @BeforeEach
+        void setUp() {
             when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
             when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+            when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
+            when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            when(configuration.getLipContactEmail()).thenReturn("Email: contactocmc@justice.gov.uk");
+            when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
+        }
+
+        @Test
+        void shouldSendEmailToLipDefendant() {
+            String emailTemplate = "emailTemplate";
+            given(notificationsProperties.getRespondentLipResponseSubmissionTemplate()).willReturn(emailTemplate);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -102,10 +119,6 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
             String bilingualEmailTemplate = "bilingualEmailTemplate";
             given(notificationsProperties.getRespondentLipResponseSubmissionBilingualTemplate()).willReturn(
                 bilingualEmailTemplate);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -137,7 +150,7 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
+            Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
@@ -145,7 +158,17 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
                 OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
                 LIP_CONTACT, "Email: contactocmc@justice.gov.uk",
                 HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-            );
+            ));
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            return expectedProperties;
         }
 
     }

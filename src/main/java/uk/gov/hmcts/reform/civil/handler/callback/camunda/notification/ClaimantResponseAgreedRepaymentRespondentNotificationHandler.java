@@ -108,10 +108,14 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             return properties;
         }
         if (caseData.isRespondent1NotRepresented()) {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-            );
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
+            return properties;
         }
         return null;
     }

@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.YamlNotificationTestUtil;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -25,8 +27,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 
 @ExtendWith(MockitoExtension.class)
 public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
@@ -45,19 +57,22 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
+        @BeforeEach
+        void setUp() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        }
+
         @Test
         void shouldNotifyClaimant_whenInvokedAnd1v1() {
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-            when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
-            when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-            when(configuration.getLipContactEmail()).thenReturn("Email: contactocmc@justice.gov.uk");
-            when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build()).build();
 
@@ -77,16 +92,6 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
 
         @Test
         void shouldNotifyClaimantInWelsh_whenInvokedAnd1v1() {
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-            when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
-            when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-            when(configuration.getLipContactEmail()).thenReturn("Email: contactocmc@justice.gov.uk");
-            when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
@@ -107,13 +112,6 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
             );
         }
 
-        @Test
-        void shouldReturnCamundaTask() {
-            String response = handler.camundaActivityId(CallbackParamsBuilder.builder().build());
-
-            assertThat(response).isEqualTo("NotifyClaimantHwf");
-        }
-
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
@@ -132,5 +130,12 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             return expectedProperties;
         }
+    }
+
+    @Test
+    void shouldReturnCamundaTask() {
+        String response = handler.camundaActivityId(CallbackParamsBuilder.builder().build());
+
+        assertThat(response).isEqualTo("NotifyClaimantHwf");
     }
 }

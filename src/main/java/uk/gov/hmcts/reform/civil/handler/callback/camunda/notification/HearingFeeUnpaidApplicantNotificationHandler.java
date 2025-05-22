@@ -101,11 +101,16 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
     }
 
     private Map<String, String> addPropertiesApplicantLip(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getApplicant1().getPartyName()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
+
     }
 
     private boolean isApplicantLip(CaseData caseData) {

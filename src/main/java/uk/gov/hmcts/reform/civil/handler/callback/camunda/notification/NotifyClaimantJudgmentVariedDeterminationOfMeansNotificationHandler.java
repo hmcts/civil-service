@@ -91,16 +91,19 @@ public class NotifyClaimantJudgmentVariedDeterminationOfMeansNotificationHandler
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-
         return properties;
     }
 
     public Map<String, String> addLIPProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PARTY_NAME, caseData.getApplicant1().getPartyName()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private String getTemplate() {

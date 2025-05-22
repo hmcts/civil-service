@@ -169,7 +169,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     }
 
     private Map<String, String> addPropertiesLiP(boolean isApplicant, CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER,
             caseData.getCcdCaseReference().toString(),
             PARTY_NAME,
@@ -177,7 +177,11 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
             CLAIMANT_V_DEFENDANT,
             getAllPartyNames(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     @Override
@@ -191,7 +195,6 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
                           featureToggleService.isLipQueryManagementEnabled(caseData));
-
         return properties;
     }
 

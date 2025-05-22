@@ -113,13 +113,16 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
     }
 
     private Map<String, String> addPropertiesLip(CaseData caseData) {
-
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     private boolean isLipApplicant(CallbackParams callbackParams) {

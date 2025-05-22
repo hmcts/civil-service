@@ -224,11 +224,16 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
     }
 
     private Map<String, String> getLipProperties(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_NAME, getPartyName(caseData),
             CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData)
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     private boolean isApplicantLip(CaseData caseData) {
