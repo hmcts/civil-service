@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.o
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Component
 public class SpecCaseOfflineAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
@@ -12,10 +14,9 @@ public class SpecCaseOfflineAllPartiesEmailGenerator extends AllPartiesEmailGene
         SpecCaseOfflineRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator,
         SpecCaseOfflineClaimantEmailDTOGenerator claimantEmailDTOGenerator
     ) {
-        super(appSolOneEmailDTOGenerator,
-              respSolOneEmailDTOGenerator,
-              respSolTwoEmailDTOGenerator,
-              claimantEmailDTOGenerator,
-              null);
+        super(List.of(appSolOneEmailDTOGenerator,
+                      respSolOneEmailDTOGenerator,
+                      respSolTwoEmailDTOGenerator,
+                      claimantEmailDTOGenerator));
     }
 }

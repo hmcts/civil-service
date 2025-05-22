@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.co
 import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespRespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespClaimantEmailDTOGenerator;
 
+import java.util.List;
+
 @Component
 public class LrvLrLrSpecDefRespAllPartiesEmailDTOGenerator extends AllPartiesEmailGenerator {
 
@@ -16,10 +18,10 @@ public class LrvLrLrSpecDefRespAllPartiesEmailDTOGenerator extends AllPartiesEma
         SpecDefRespRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator,
         SpecDefRespClaimantEmailDTOGenerator claimantEmailDTOGenerator
     ) {
-        super(appSolOneEmailDTOGenerator,
-              respSolOneEmailDTOGenerator,
-              respSolTwoEmailDTOGenerator,
-                claimantEmailDTOGenerator,
-                null);
+        super(
+            List.of(appSolOneEmailDTOGenerator,
+            respSolOneEmailDTOGenerator,
+            respSolTwoEmailDTOGenerator,
+            claimantEmailDTOGenerator));
     }
 }

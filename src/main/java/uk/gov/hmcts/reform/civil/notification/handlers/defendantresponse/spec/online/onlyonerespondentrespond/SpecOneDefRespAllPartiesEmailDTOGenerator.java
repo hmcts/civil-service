@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.o
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespAppSolOneEmailDTOGenerator;
 
+import java.util.List;
+
 public class SpecOneDefRespAllPartiesEmailDTOGenerator extends AllPartiesEmailGenerator {
 
     public SpecOneDefRespAllPartiesEmailDTOGenerator(
@@ -10,10 +12,9 @@ public class SpecOneDefRespAllPartiesEmailDTOGenerator extends AllPartiesEmailGe
         SpecOneDefRespRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator,
         SpecOneDefRespRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator
     ) {
-        super(appSolOneEmailDTOGenerator,
-              respSolOneEmailDTOGenerator,
-              respSolTwoEmailDTOGenerator,
-              null,
-              null);
+        super(
+            List.of(appSolOneEmailDTOGenerator,
+            respSolOneEmailDTOGenerator,
+            respSolTwoEmailDTOGenerator));
     }
 }

@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.common.SpecDefRespRespSolOneEmailDTOGenerator;
 
+import java.util.List;
+
 @Component
 public class LipvLrSpecDefRespAllPartiesEmailDTOGenerator extends AllPartiesEmailGenerator {
 
@@ -12,10 +14,7 @@ public class LipvLrSpecDefRespAllPartiesEmailDTOGenerator extends AllPartiesEmai
         SpecDefRespClaimantEmailDTOGenerator claimantEmailDTOGenerator,
         SpecDefRespRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator
     ) {
-        super(null,
-              respSolOneEmailDTOGenerator,
-              null,
-              claimantEmailDTOGenerator,
-              null);
+        super(List.of(respSolOneEmailDTOGenerator,
+              claimantEmailDTOGenerator));
     }
 }
