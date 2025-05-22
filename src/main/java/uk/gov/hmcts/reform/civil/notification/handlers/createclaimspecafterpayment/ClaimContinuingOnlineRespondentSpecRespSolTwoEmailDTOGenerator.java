@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -24,11 +25,13 @@ public class ClaimContinuingOnlineRespondentSpecRespSolTwoEmailDTOGenerator exte
 
     public ClaimContinuingOnlineRespondentSpecRespSolTwoEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
-            OrganisationService organisationService
+            OrganisationService organisationService,
+            TemplateCommonPropertiesHelper templateCommonPropertiesHelper
     ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
         this.organisationService = organisationService;
+        this.templateCommonPropertiesHelper = templateCommonPropertiesHelper;
     }
 
     @Override

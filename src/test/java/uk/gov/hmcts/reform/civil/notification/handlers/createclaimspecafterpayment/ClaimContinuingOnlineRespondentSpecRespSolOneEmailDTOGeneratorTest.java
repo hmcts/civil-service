@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -27,11 +28,15 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 class ClaimContinuingOnlineRespondentSpecRespSolOneEmailDTOGeneratorTest {
 
     public static final String CLAIM_CONTINUING_ONLINE_NOTIFICATION = "claim-continuing-online-notification-%s";
+
     @Mock
     private NotificationsProperties notificationsProperties;
 
     @Mock
     private OrganisationService organisationService;
+
+    @Mock
+    private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     @InjectMocks
     private ClaimContinuingOnlineRespondentSpecRespSolOneEmailDTOGenerator generator;

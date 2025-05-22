@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.createclaimspecafterpaym
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -22,11 +23,13 @@ public class ClaimContinuingOnlineRespondentSpecRespSolOneEmailDTOGenerator exte
 
     public ClaimContinuingOnlineRespondentSpecRespSolOneEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
-            OrganisationService organisationService
+            OrganisationService organisationService,
+            TemplateCommonPropertiesHelper templateCommonPropertiesHelper
     ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
         this.organisationService = organisationService;
+        this.templateCommonPropertiesHelper = templateCommonPropertiesHelper;
     }
 
     @Override

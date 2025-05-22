@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -36,6 +37,9 @@ class ClaimContinuingOnlineRespondentSpecRespSolTwoEmailDTOGeneratorTest {
 
     @Mock
     private OrganisationService organisationService;
+
+    @Mock
+    private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     @InjectMocks
     private ClaimContinuingOnlineRespondentSpecRespSolTwoEmailDTOGenerator generator;
