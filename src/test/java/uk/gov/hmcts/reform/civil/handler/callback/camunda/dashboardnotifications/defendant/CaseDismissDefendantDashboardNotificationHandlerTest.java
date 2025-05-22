@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -100,7 +100,7 @@ class CaseDismissDefendantDashboardNotificationHandlerTest extends BaseCallbackH
         when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
-            .includesRespondentCitizenQueryFollowUp(LocalDateTime.now())
+            .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
             .build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)

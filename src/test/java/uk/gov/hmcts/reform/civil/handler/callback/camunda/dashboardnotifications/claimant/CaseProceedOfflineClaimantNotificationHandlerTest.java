@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -202,7 +202,7 @@ class CaseProceedOfflineClaimantNotificationHandlerTest extends BaseCallbackHand
         void shouldRecordQMScenario_whenInvokedForCaseWithOpenApplicantCitizenQuery() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
-                .includesApplicantCitizenQueryFollowUp(LocalDateTime.now())
+                .includesApplicantCitizenQueryFollowUp(OffsetDateTime.now())
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)

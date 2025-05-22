@@ -191,6 +191,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -4252,7 +4253,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder includesApplicantCitizenQuery(LocalDateTime queryCreationDatetime) {
+    public CaseDataBuilder includesApplicantCitizenQuery(OffsetDateTime queryCreationDatetime) {
         List<Element<CaseMessage>> caseMessages = new ArrayList<>();
         caseMessages.add(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
@@ -4270,7 +4271,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder includesApplicantCitizenQueryResponse(LocalDateTime queryCreationDatetime) {
+    public CaseDataBuilder includesApplicantCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQuery(queryCreationDatetime);
         this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
             Stream.concat(
@@ -4288,7 +4289,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder includesApplicantCitizenQueryFollowUp(LocalDateTime queryCreationDatetime) {
+    public CaseDataBuilder includesApplicantCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQueryResponse(queryCreationDatetime);
         this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
                 Stream.concat(
@@ -4307,7 +4308,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder includesRespondentCitizenQuery(LocalDateTime queryCreationDatetime) {
+    public CaseDataBuilder includesRespondentCitizenQuery(OffsetDateTime queryCreationDatetime) {
         List<Element<CaseMessage>> caseMessages = new ArrayList<>();
         caseMessages.add(Element.<CaseMessage>builder()
                              .id(UUID.randomUUID())
@@ -4325,7 +4326,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder includesRespondentCitizenQueryResponse(LocalDateTime queryCreationDatetime) {
+    public CaseDataBuilder includesRespondentCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQuery(queryCreationDatetime);
         this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
             Stream.concat(
@@ -4343,7 +4344,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder includesRespondentCitizenQueryFollowUp(LocalDateTime queryCreationDatetime) {
+    public CaseDataBuilder includesRespondentCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQueryResponse(queryCreationDatetime);
         this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
                 Stream.concat(

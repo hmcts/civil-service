@@ -126,7 +126,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnFalse_collectionHasNoQueriesAwaitingAResponse() {
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")
@@ -157,7 +157,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnTrue_whenCollectionHasQueryAwaitingResponse() {
-        LocalDateTime now = LocalDateTime.now();
+        OffsetDateTime now = OffsetDateTime.now();
         CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")

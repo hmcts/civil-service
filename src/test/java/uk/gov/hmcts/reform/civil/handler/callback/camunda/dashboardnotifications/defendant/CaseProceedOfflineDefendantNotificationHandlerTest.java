@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -168,7 +168,7 @@ class CaseProceedOfflineDefendantNotificationHandlerTest extends BaseCallbackHan
         void shouldRecordScenario_whenDefendantCitizenQueryIsOpen() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
-                .includesRespondentCitizenQueryFollowUp(LocalDateTime.now())
+                .includesRespondentCitizenQueryFollowUp(OffsetDateTime.now())
                 .build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .ccdCaseReference(12890L)

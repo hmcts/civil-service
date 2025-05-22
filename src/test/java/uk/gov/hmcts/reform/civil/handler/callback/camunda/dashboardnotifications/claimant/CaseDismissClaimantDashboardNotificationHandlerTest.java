@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -90,7 +90,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
     @Test
     void shouldRecordQMNotificationScenario_whenInvokedWhileClaimantCitizenHasAnOpenQuery() {
         // Given
-        LocalDateTime queryDate = LocalDateTime.now();
+        OffsetDateTime queryDate = OffsetDateTime.now();
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
