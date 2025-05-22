@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.time.LocalDateTime;
@@ -27,10 +28,14 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
 
     public static final String TEMPLATE_ID = "template-id";
     public static final String ACKNOWLEDGE_CLAIM_RESPONDENT_NOTIFICATION = "acknowledge-claim-respondent-notification-%s";
+    public static final String TASK_ID = "reference";
     public final LocalDateTime deadline = LocalDateTime.of(2025, 5, 8, 0, 0);
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     @InjectMocks
     private AcknowledgeClaimSpecRespSolOneEmailDTOGenerator emailGenerator;
@@ -65,7 +70,7 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
                 )
                 .build();
 
-        EmailDTO dto = emailGenerator.buildEmailDTO(caseData);
+        EmailDTO dto = emailGenerator.buildEmailDTO(caseData, TASK_ID);
         Map<String, String> params = dto.getParameters();
 
         assertThat(params)

@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.acknowledgeclaimspec;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Component
 public class AcknowledgeClaimSpecEmailGenerator extends AllPartiesEmailGenerator {
 
@@ -11,6 +13,6 @@ public class AcknowledgeClaimSpecEmailGenerator extends AllPartiesEmailGenerator
             AcknowledgeClaimSpecRespSolOneEmailDTOGenerator respSolOne,
             AcknowledgeClaimSpecRespSolTwoEmailDTOGenerator respSolTwo
     ) {
-        super(appSolOne, respSolOne, respSolTwo, null, null);
+        super(List.of(appSolOne, respSolOne, respSolTwo));
     }
 }

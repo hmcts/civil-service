@@ -11,17 +11,18 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AcknowledgeClaimSpecRespSolTwoEmailDTOGeneratorTest {
@@ -29,9 +30,13 @@ class AcknowledgeClaimSpecRespSolTwoEmailDTOGeneratorTest {
     public static final String TEMPLATE_ID = "template-id";
     public static final String ACKNOWLEDGE_CLAIM_RESPONDENT_NOTIFICATION = "acknowledge-claim-respondent-notification-%s";
     public final LocalDateTime deadline = LocalDateTime.of(2025, 5, 8, 0, 0);
+    public static final String TASK_ID = "reference";
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     @InjectMocks
     private AcknowledgeClaimSpecRespSolTwoEmailDTOGenerator emailGenerator;
@@ -73,7 +78,7 @@ class AcknowledgeClaimSpecRespSolTwoEmailDTOGeneratorTest {
                 )
                 .build();
 
-        EmailDTO dto = emailGenerator.buildEmailDTO(caseData);
+        EmailDTO dto = emailGenerator.buildEmailDTO(caseData, TASK_ID);
         Map<String, String> params = dto.getParameters();
 
         assertThat(params)
