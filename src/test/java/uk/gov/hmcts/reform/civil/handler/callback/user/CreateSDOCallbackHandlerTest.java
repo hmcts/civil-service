@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
@@ -52,6 +53,8 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -59,6 +62,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
@@ -957,6 +961,101 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallbackWelshParty {
+
+        private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
+        @BeforeEach
+        void setup() {
+            userId = UUID.randomUUID().toString();
+
+            given(time.now()).willReturn(submittedDate);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        }
+
+        @Test
+        void shouldSaveDocumentToTempList_whenClaimantIsWelsh() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .sdoOrderDocument(CaseDocument.builder().documentLink(
+                        Document.builder().documentUrl("url").build())
+                                      .build())
+                .claimantBilingualLanguagePreference("WELSH")
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
+            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
+        }
+
+        @Test
+        void shouldSaveDocumentToTempList_whenDefendantIsWelsh() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .sdoOrderDocument(CaseDocument.builder().documentLink(
+                        Document.builder().documentUrl("url").build())
+                                      .build())
+                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
+            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
+        }
+
+        @Test
+        void shouldSaveDocumentToTempList_whenClaimantDocPreferenceIsWelsh() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .sdoOrderDocument(CaseDocument.builder().documentLink(
+                        Document.builder().documentUrl("url").build())
+                                      .build())
+                .applicant1Represented(NO)
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(Language.WELSH).build()).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
+            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
+        }
+
+        @Test
+        void shouldSaveDocumentToTempList_whenDefendantDocPreferenceIsWelsh() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .sdoOrderDocument(CaseDocument.builder().documentLink(
+                        Document.builder().documentUrl("url").build())
+                                      .build())
+                .respondent1Represented(NO)
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(Language.BOTH).build()).build())
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
+            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
+            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
         }
     }
 

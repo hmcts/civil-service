@@ -19,12 +19,15 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,7 +52,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String USER_ID = "UserId";
     private static final Long CASE_ID = Long.parseLong("1234123412341234");
     private static final String QUERY_ID = "QueryId";
-    private static final LocalDateTime NOW = LocalDateTime.of(2025, 3, 1, 7, 0, 0);
+    private static final OffsetDateTime NOW = OffsetDateTime.of(LocalDateTime.of(2025, 3, 1, 7, 0, 0), ZoneOffset.UTC);
 
     @InjectMocks
     private RaiseQueryCallbackHandler handler;
@@ -205,7 +208,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             for (Document document : documents) {
-                assertThat(document.getCategoryID()).isEqualTo(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue());
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue());
             }
         }
 
@@ -229,7 +232,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             for (Document document : documents) {
-                assertThat(document.getCategoryID()).isEqualTo(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue());
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue());
             }
         }
 
@@ -253,7 +256,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
             for (Document document : documents) {
-                assertThat(document.getCategoryID()).isEqualTo(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue());
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue());
             }
         }
 
@@ -295,7 +298,6 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
@@ -309,7 +311,168 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(YES.getLabel());
         }
 
-        private CaseQueriesCollection mockQueriesCollection(String queryId, LocalDateTime latestDate) {
+        @Nested
+        class PartyNameUpdate {
+
+            @Test
+            public void shouldUpdateApplicantQueryCollectionPartyName_1v1() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    APPLICANTSOLICITORONE.name()));
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmApplicantSolicitorQueries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmApplicantSolicitorQueries().getPartyName()).isEqualTo("Claimant");
+            }
+
+            @Test
+            public void shouldUpdateRespondentOneQueryCollectionPartyName_1v1() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    RESPONDENTSOLICITORONE.name()));
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmRespondentSolicitor1Queries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant");
+            }
+
+            @Test
+            public void shouldUpdateApplicantQueryCollectionPartyName_1v2_same() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    APPLICANTSOLICITORONE.name()));
+                CaseData caseData = CaseDataBuilder.builder().atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension()
+                    .build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmApplicantSolicitorQueries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmApplicantSolicitorQueries().getPartyName()).isEqualTo("Claimant");
+            }
+
+            @Test
+            public void shouldUpdateRespondentOneQueryCollectionPartyName_1v2_same() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    RESPONDENTSOLICITORONE.name(), RESPONDENTSOLICITORTWO.name()));
+                CaseData caseData = CaseDataBuilder.builder().atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension()
+                    .build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmRespondentSolicitor1Queries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant");
+            }
+
+            @Test
+            public void shouldUpdateApplicantQueryCollectionPartyName_1v2_diff() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    APPLICANTSOLICITORONE.name()));
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension_1v2DS().build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmApplicantSolicitorQueries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmApplicantSolicitorQueries().getPartyName()).isEqualTo("Claimant");
+            }
+
+            @Test
+            public void shouldUpdateRespondentQueryCollectionPartyName_1v2_diff() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    RESPONDENTSOLICITORONE.name()));
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension_1v2DS()
+                    .build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmRespondentSolicitor1Queries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant 1");
+            }
+
+            @Test
+            public void shouldUpdateRespondentTwoQueryCollectionPartyName_1v2_diff() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    RESPONDENTSOLICITORTWO.name()));
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedTimeExtension_1v2DS()
+                    .build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmRespondentSolicitor2Queries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmRespondentSolicitor2Queries().getPartyName()).isEqualTo("Defendant 2");
+            }
+
+            @Test
+            public void shouldUpdateApplicantQueryCollectionPartyName_2v1() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    APPLICANTSOLICITORONE.name()));
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1FullDefence().build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmApplicantSolicitorQueries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmApplicantSolicitorQueries().getPartyName()).isEqualTo("Claimant");
+            }
+
+            @Test
+            public void shouldUpdateRespondentOneQueryCollectionPartyName_2v1() {
+                when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                    RESPONDENTSOLICITORONE.name()));
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1FullDefence().build().toBuilder()
+                    .ccdCaseReference(CASE_ID)
+                    .qmRespondentSolicitor1Queries(mockQueriesCollection(QUERY_ID, NOW))
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+                assertThat(updatedData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant");
+            }
+        }
+
+        private CaseQueriesCollection mockQueriesCollection(String queryId, OffsetDateTime latestDate) {
             return CaseQueriesCollection.builder()
                 .partyName("partyName")
                 .roleOnCase("roleOnCase")
@@ -335,7 +498,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
         }
 
-        private CaseQueriesCollection mockQueriesCollectionWithAttachments(String queryId, LocalDateTime latestDate) {
+        private CaseQueriesCollection mockQueriesCollectionWithAttachments(String queryId, OffsetDateTime latestDate) {
             return CaseQueriesCollection.builder()
                 .partyName("partyName")
                 .roleOnCase("roleOnCase")

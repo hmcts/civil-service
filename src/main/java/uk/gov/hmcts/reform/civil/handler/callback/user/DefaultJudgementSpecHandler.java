@@ -76,6 +76,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         "<br>The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
+    public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private final ObjectMapper objectMapper;
@@ -259,6 +260,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse partialPayment(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+
+        if (YesOrNo.YES.equals(caseData.getPartialPayment())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
+                .build();
+        }
 
         BigDecimal claimFeeAmount = MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence());
         BigDecimal totalIncludeInterestAndFeeAndCosts = caseData.getTotalClaimAmount()
@@ -486,7 +493,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (featureToggleService.isJudgmentOnlineLive()) {
             JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgment);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment));
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
         }

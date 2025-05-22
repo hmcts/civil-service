@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -37,6 +38,7 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     boolean isNonDivergent = false;
     private final RoboticsAddressMapper addressMapper;
     private final JudgementService judgementService;
+    private final InterestCalculator interestCalculator;
 
     @Override
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
@@ -82,7 +84,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {
         JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
         builder.activeJudgment(activeJudgmentDetails);
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder);
+        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder, interest);
         return builder;
     }
 

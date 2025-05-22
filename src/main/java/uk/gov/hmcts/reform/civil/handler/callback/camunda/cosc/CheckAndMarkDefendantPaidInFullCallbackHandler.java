@@ -16,6 +16,9 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +44,7 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
     private final JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper;
     private final RuntimeService runtimeService;
     private final ObjectMapper objectMapper;
+    private final InterestCalculator interestCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -74,7 +78,8 @@ public class CheckAndMarkDefendantPaidInFullCallbackHandler extends CallbackHand
                 caseData,
                 caseData.getCertOfSC().getDefendantFinalPaymentDate()
             ));
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment()));
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(caseData.getActiveJudgment(), interest));
             caseData.setJoDefendantMarkedPaidInFullIssueDate(LocalDateTime.now());
         }
         caseData.setJoCoscRpaStatus(JudgmentState.CANCELLED.equals(caseData.getActiveJudgment().getState()) ? CANCELLED : SATISFIED);

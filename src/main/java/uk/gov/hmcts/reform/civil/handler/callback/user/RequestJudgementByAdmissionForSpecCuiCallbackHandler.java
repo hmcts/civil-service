@@ -23,7 +23,9 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final InterestCalculator interestCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -138,10 +141,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         if (featureToggleService.isJudgmentOnlineLive()) {
             JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseDataBuilder.build());
 
+            BigDecimal interest = interestCalculator.calculateInterest(data);
             caseDataBuilder
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment))
+                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest))
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 

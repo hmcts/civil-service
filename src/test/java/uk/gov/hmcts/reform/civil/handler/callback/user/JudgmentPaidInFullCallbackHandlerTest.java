@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaymentPlan;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,13 +35,15 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private JudgmentPaidInFullCallbackHandler handler;
 
+    private final InterestCalculator interestCalculator = new InterestCalculator();
+
     @BeforeEach
     void setup() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         JudgmentPaidInFullOnlineMapper paidInFullJudgmentOnlineMapper = new JudgmentPaidInFullOnlineMapper();
-        handler = new JudgmentPaidInFullCallbackHandler(objectMapper, paidInFullJudgmentOnlineMapper);
+        handler = new JudgmentPaidInFullCallbackHandler(objectMapper, paidInFullJudgmentOnlineMapper, interestCalculator);
     }
 
     @Test

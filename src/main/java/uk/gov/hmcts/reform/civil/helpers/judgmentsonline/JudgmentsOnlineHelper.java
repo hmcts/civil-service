@@ -172,7 +172,7 @@ public class JudgmentsOnlineHelper {
     }
 
     @NotNull
-    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment) {
+    public static String calculateRepaymentBreakdownSummary(JudgmentDetails activeJudgment, BigDecimal interest) {
 
         BigDecimal totalAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getTotalAmount()));
 
@@ -184,6 +184,10 @@ public class JudgmentsOnlineHelper {
         BigDecimal orderedAmount = MonetaryConversions.penniesToPounds(new BigDecimal(activeJudgment.getOrderedAmount()));
         if (null != orderedAmount) {
             repaymentBreakdown.append("\n").append("### Claim amount \n £").append(orderedAmount.setScale(2));
+        }
+
+        if (interest != null && interest.compareTo(BigDecimal.ZERO) != 0) {
+            repaymentBreakdown.append("\n ### Claim interest amount \n").append("£").append(interest.setScale(2));
         }
 
         if (null != activeJudgment.getCosts()) {
