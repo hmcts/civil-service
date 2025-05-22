@@ -80,12 +80,11 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     }
 
     private CaseData buildClaimFormData(CaseData caseData, CaseDocument caseDocument, CaseEvent event) {
+        List<Element<CaseDocument>> translatedDocuments = null;
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
             caseDocument,
             caseData
         );
-
-        List<Element<CaseDocument>> translatedDocuments = caseData.getPreTranslationDocuments();
 
         // Remove Draft form from documents
         if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
@@ -93,6 +92,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
                 .toList();
         } else if (featureToggleService.isGaForWelshEnabled() && caseData.isClaimantBilingual()
             && event == GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC) {
+            translatedDocuments = caseData.getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocument));
         }
 
