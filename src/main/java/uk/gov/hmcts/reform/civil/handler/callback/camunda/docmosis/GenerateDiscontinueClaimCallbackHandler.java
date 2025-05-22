@@ -12,8 +12,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -23,7 +27,10 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +45,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final NoticeOfDiscontinuanceFormGenerator formGenerator;
     private final RuntimeService runTimeService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -75,8 +83,22 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         if (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2() != null) {
             respondent2DiscontinueDoc = generateForm(caseData.getRespondent2(), callbackParams);
         }
-
-        if (caseData.isJudgeOrderVerificationRequired()) {
+        if (featureToggleService.isGaForWelshEnabled()
+            && caseData.isRespondent1LiP() &&
+            caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE) &&
+            (caseData.isRespondentResponseBilingual()
+                || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
+                .getPreTranslationDocuments();
+            applicant1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_CLAIMANT);
+            respondent1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+            assignDiscontinuanceCategoryId(applicant1DiscontinueDoc);
+            assignDiscontinuanceCategoryId(respondent1DiscontinueDoc);
+            translatedDocuments.add(element(applicant1DiscontinueDoc));
+            translatedDocuments.add(element(respondent1DiscontinueDoc));
+            caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
+        } else if (caseData.isJudgeOrderVerificationRequired()) {
             caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
             caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
             assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueCWViewDoc());
@@ -113,6 +135,15 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             caseData.getBusinessProcess().getProcessInstanceId(),
             "JUDGE_ORDER_VERIFICATION_REQUIRED",
             caseData.isJudgeOrderVerificationRequired()
+        );
+        runTimeService.setVariable(
+            caseData.getBusinessProcess().getProcessInstanceId(),
+            "WELSH_ENABLED",
+            featureToggleService.isGaForWelshEnabled()
+                && caseData.isRespondent1LiP() &&
+                caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+                && (caseData.isRespondentResponseBilingual()
+                || caseData.isLipDefendantSpecifiedBilingualDocuments())
         );
     }
 }

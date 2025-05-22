@@ -31,6 +31,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList.NO;
+import static uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList.YES;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.NOTICE_OF_DISCONTINUANCE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
@@ -315,6 +319,112 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .extracting("businessProcess")
             .extracting("camundaEvent")
             .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT.name());
+    }
+
+    @Test
+    void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claim() {
+        //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(NOTICE_OF_DISCONTINUANCE_CLAIMANT)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+        TranslatedDocument translatedDocument2 = TranslatedDocument
+            .builder()
+            .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)
+            .file(Document.builder().documentFileName(FILE_NAME_2).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1),
+            element(translatedDocument2)
+        );
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            DocumentType.NOTICE_OF_DISCONTINUANCE_CLAIMANT
+        )));
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT
+        )));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build().toBuilder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocuments(translatedDocument)
+                             .build())
+            .preTranslationDocuments(preTranslationDocuments)
+            .courtPermissionNeeded(NO)
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .ccdCaseReference(123L)
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DISCONTINUANCE_DOC.name());
+    }
+
+    @Test
+    void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claimForJudgeVerification() {
+        //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(NOTICE_OF_DISCONTINUANCE_CLAIMANT)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+        TranslatedDocument translatedDocument2 = TranslatedDocument
+            .builder()
+            .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)
+            .file(Document.builder().documentFileName(FILE_NAME_2).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1),
+            element(translatedDocument2)
+        );
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            DocumentType.NOTICE_OF_DISCONTINUANCE_CLAIMANT
+        )));
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT
+        )));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build().toBuilder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocuments(translatedDocument)
+                             .build())
+            .preTranslationDocuments(preTranslationDocuments)
+            .courtPermissionNeeded(YES)
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .ccdCaseReference(123L)
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
+        assertThat(documentsList)
+            .extracting("value")
+            .extracting("documentName")
+            .isNotNull();
     }
 
     @Test
