@@ -49,4 +49,12 @@ public class DefendantSignSettlementDefendantEmailDTOGenerator extends Defendant
         properties.put(FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl());
         return properties;
     }
+
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
+        boolean isAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
+        boolean isNotAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementNotAgreed).orElse(false);
+        return (isAgreed || isNotAgreed) && caseData.isRespondent1LiP();
+    }
 }
