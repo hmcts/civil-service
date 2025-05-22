@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class DefendantResponseRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    protected static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
+    protected static final String RESP_REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -25,13 +25,13 @@ public class DefendantResponseRespSolOneEmailDTOGenerator extends RespSolOneEmai
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
+    protected String getReferenceTemplate() {
+        return RESP_REFERENCE_TEMPLATE;
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
     }
 
     @Override

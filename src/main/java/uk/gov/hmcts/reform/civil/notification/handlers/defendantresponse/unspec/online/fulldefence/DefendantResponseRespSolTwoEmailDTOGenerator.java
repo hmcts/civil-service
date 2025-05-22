@@ -29,16 +29,16 @@ public class DefendantResponseRespSolTwoEmailDTOGenerator extends RespSolTwoEmai
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
-    }
-
-    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()) +
             " and " +
             getPartyNameBasedOnType(caseData.getRespondent2()));
         properties.put(ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()));
         return properties;
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE;
     }
 }
