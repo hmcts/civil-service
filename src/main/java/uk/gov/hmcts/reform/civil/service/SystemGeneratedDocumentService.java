@@ -24,13 +24,13 @@ public class SystemGeneratedDocumentService {
         return systemGeneratedDocuments;
     }
 
-    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
-        List<Element<CaseDocument>> systemGeneratedDocument = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
+    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
+        List<Element<CaseDocument>> systemGeneratedDocument = caseData.getSystemGeneratedCaseDocuments();
         return addToDocumentCollection(systemGeneratedDocument, translatedDocuments);
     }
 
-    public List<Element<CaseDocument>> getFinalOrderDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
-        List<Element<CaseDocument>> finalOrderDocuments = callbackParams.getCaseData().getFinalOrderDocumentCollection();
+    public List<Element<CaseDocument>> getFinalOrderDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
+        List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
         return addToDocumentCollection(finalOrderDocuments, translatedDocuments);
     }
 
