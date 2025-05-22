@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.notification.defendantresponse.caseoffline.CaseHandledOfflineRecipient;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -24,6 +26,8 @@ public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHan
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData, CaseHandledOfflineRecipient recipientType) {
@@ -61,11 +65,13 @@ public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHan
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent1OrganisationPolicy(), organisationService);
+        return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent1OrganisationPolicy(), organisationService,
+                                                                      featureToggleService.isQueryManagementLRsEnabled(), configuration);
     }
 
     public Map<String, String> addPropertiesRespondent2(CaseData caseData) {
-        return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent2OrganisationPolicy(), organisationService);
+        return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent2OrganisationPolicy(), organisationService,
+                                                                      featureToggleService.isQueryManagementLRsEnabled(), configuration);
     }
 
 }
