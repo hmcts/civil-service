@@ -14,7 +14,7 @@ public class DefRespCaseOfflineUnspecNotifier
 
     public DefRespCaseOfflineUnspecNotifier(NotificationService notificationService,
                                             CaseTaskTrackingService caseTaskTrackingService,
-                                            AddDefLitFriendAllLegalRepsEmailGenerator allLegalRepsEmailGenerator) {
+                                            DefRespCaseOfflineAllLegalRepsEmailGenerator allLegalRepsEmailGenerator) {
         super(notificationService, caseTaskTrackingService, allLegalRepsEmailGenerator);
     }
 

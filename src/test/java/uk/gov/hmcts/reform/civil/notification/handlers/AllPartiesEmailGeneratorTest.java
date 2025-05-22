@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,11 +49,11 @@ class AllPartiesEmailGeneratorTest {
         respSolTwoEmailGenerator = Mockito.mock(RespSolTwoEmailDTOGenerator.class);
         claimantEmailDTOGenerator = Mockito.mock(ClaimantEmailDTOGenerator.class);
         defendantEmailDTOGenerator = Mockito.mock(DefendantEmailDTOGenerator.class);
-        emailGenerator = new AllPartiesEmailGenerator(appSolOneEmailGenerator,
+        emailGenerator = new AllPartiesEmailGenerator(List.of(appSolOneEmailGenerator,
                                                       respSolOneEmailGenerator,
                                                       respSolTwoEmailGenerator,
                                                       claimantEmailDTOGenerator,
-                                                      defendantEmailDTOGenerator);
+                                                      defendantEmailDTOGenerator));
     }
 
     @Test

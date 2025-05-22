@@ -2,18 +2,21 @@ package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.unspec
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllLegalRepsEmailGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
+
+import java.util.List;
 
 @Component
-public class DefRespCaseOfflineAllLegalRepsEmailGenerator extends AllLegalRepsEmailGenerator {
+public class DefRespCaseOfflineAllLegalRepsEmailGenerator extends AllPartiesEmailGenerator {
 
     public DefRespCaseOfflineAllLegalRepsEmailGenerator(
         DefRespCaseOfflineAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator,
         DefRespCaseOfflineRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator,
         DefRespCaseOfflineRespSolTwoEmailDTOGenerator respSolTwoEmailDTOGenerator
     ) {
-        super(appSolOneEmailDTOGenerator,
-            respSolOneEmailDTOGenerator,
-            respSolTwoEmailDTOGenerator);
+        super(List.of(appSolOneEmailDTOGenerator,
+                      respSolOneEmailDTOGenerator,
+                      respSolTwoEmailDTOGenerator));
     }
 
 }
