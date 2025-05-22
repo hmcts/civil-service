@@ -2369,12 +2369,50 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void specificSummary_whenPartialAdmitNotPay() {
+        void specificSummary_whenPartialAdmitNotPay_LrAdmissionBulkEnabled() {
             // Given
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             BigDecimal admitted = BigDecimal.valueOf(1000);
             LocalDate whenWillPay = LocalDate.now().plusMonths(1);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
+                .setDefendantMediationFlag(YES)
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToAdmittedClaimOwingAmountPounds(admitted)
+                .respondToClaimAdmitPartLRspec(
+                    RespondToClaimAdmitPartLRspec.builder()
+                        .whenWillThisAmountBePaid(whenWillPay)
+                        .build()
+                )
+                .totalClaimAmount(admitted.multiply(BigDecimal.valueOf(2)))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
+            String claimNumber = caseData.getLegacyCaseReference();
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .contains(caseData.getApplicant1().getPartyName())
+                .contains(admitted.toString())
+                .contains(caseData.getTotalClaimAmount().toString() + " plus the claim fee and any costs and further interest claimed")
+                .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
+        }
+
+        @Test
+        void specificSummary_whenPartialAdmitNotPay_LrAdmissionBulkNotEnabled() {
+            // Given
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
+            BigDecimal admitted = BigDecimal.valueOf(1000);
+            LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .setDefendantMediationFlag(YES)
                 .build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
@@ -2399,6 +2437,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains(caseData.getApplicant1().getPartyName())
                 .contains(admitted.toString())
                 .contains(caseData.getTotalClaimAmount().toString())
+                .doesNotContain("plus the claim fee and any costs and further interest claimed")
                 .contains(DateFormatHelper.formatLocalDate(whenWillPay, DATE));
         }
 
