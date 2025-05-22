@@ -22,10 +22,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
-import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -62,6 +63,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -103,7 +105,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .respondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual() ? null : getRespondToSettlementAgreementDeadline(
                 caseData,
                 applicant1ResponseDate
-            ));
+            ))
+            .nextDeadline(null);
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
@@ -130,6 +133,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 .joIsLiveJudgmentExists(YES)
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, builder);
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =

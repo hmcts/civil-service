@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.querymanagement;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -7,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +21,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnLatestCaseMessage() {
-        LocalDateTime now = LocalDateTime.of(2025, 3, 1, 7, 0, 0);
+        OffsetDateTime now = OffsetDateTime.of(LocalDateTime.of(2025, 3, 1, 7, 0, 0), ZoneOffset.UTC);
         CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")
@@ -73,4 +77,51 @@ class CaseQueriesCollectionTest {
 
         assertNull(latest);
     }
+
+    @Test
+    void shouldReturnTrue_whenCaseQueriesCollectionIsSame() {
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        CaseQueriesCollection sameCaseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        boolean result = caseQueries.isSame(sameCaseQueries);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseQueriesCollectionIsNull() {
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        boolean result = caseQueries.isSame(null);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnFalse_whenCaseQueriesCollectionIsDifferent() {
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .build();
+
+        CaseQueriesCollection differentCaseQueries = CaseQueriesCollection.builder()
+            .partyName("Jane Doe")
+            .roleOnCase("respondent-solicitor")
+            .build();
+
+        boolean result = caseQueries.isSame(differentCaseQueries);
+
+        assertFalse(result);
+    }
+
 }

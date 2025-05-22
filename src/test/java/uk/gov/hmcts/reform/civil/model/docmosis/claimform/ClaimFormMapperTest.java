@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
@@ -157,12 +158,16 @@ class ClaimFormMapperTest {
                              .partyEmail(EMAIL)
                              .type(Party.Type.COMPANY)
                              .build())
+            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(COMPANY);
         assertThat(form.getDefendant().name()).isEqualTo(COMPANY);
+        assertThat(form.getUiStatementOfTruth().getName()).isEqualTo(caseData.getUiStatementOfTruth().getName());
+        assertThat(form.getUiStatementOfTruth().getRole()).isEqualTo(caseData.getUiStatementOfTruth().getRole());
+
     }
 
     @Test
