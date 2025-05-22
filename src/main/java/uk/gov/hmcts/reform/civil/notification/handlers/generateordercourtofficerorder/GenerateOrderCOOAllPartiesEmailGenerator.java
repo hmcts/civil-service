@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.generateordercourtofficerorder;
 
 import lombok.Setter;
+import org.elasticsearch.core.List;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
@@ -15,10 +16,10 @@ public class GenerateOrderCOOAllPartiesEmailGenerator extends AllPartiesEmailGen
         GenerateOrderCOOClaimantEmailDTOGenerator claimantEmailDTOGenerator,
         GenerateOrderCOODefendantEmailDTOGenerator defendantEmailDTOGenerator
     ) {
-        super(appSolEmailDTOGenerator,
-              resp1EmailDTOGenerator,
-              resp2EmailDTOGenerator,
-              claimantEmailDTOGenerator,
-              defendantEmailDTOGenerator);
+        super(List.of(appSolEmailDTOGenerator,
+                      resp1EmailDTOGenerator,
+                      resp2EmailDTOGenerator,
+                      claimantEmailDTOGenerator,
+                      defendantEmailDTOGenerator));
     }
 }

@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 
 class EmailDTOGeneratorTest {
 
@@ -28,6 +28,9 @@ class EmailDTOGeneratorTest {
 
     @Mock
     private CaseData caseData;
+
+    @Mock
+    private TemplateCommonPropertiesHelper helper;
 
     @BeforeEach
     void setUp() {
@@ -62,6 +65,9 @@ class EmailDTOGeneratorTest {
                 return properties;
             }
         };
+
+        // Inject the mocked helper
+        emailDTOGenerator.templateCommonPropertiesHelper = helper;
     }
 
     @Test
@@ -74,10 +80,20 @@ class EmailDTOGeneratorTest {
         assertThat(emailDTO.getTargetEmail()).isEqualTo(TEST_EMAIL);
         assertThat(emailDTO.getEmailTemplate()).isEqualTo(TEST_TEMPLATE_ID);
         assertThat(emailDTO.getReference()).isEqualTo(String.format(TEST_REFERENCE_TEMPLATE, LEGACY_CASE_REFERENCE));
+
         assertThat(emailDTO.getParameters())
+<<<<<<< HEAD
                 .containsEntry(CLAIM_REFERENCE_NUMBER, "1234567890123456")
                 .containsEntry(CASEMAN_REF, LEGACY_CASE_REFERENCE)
                 .containsEntry(CUSTOM_KEY, CUSTOM_VALUE)
                 .containsEntry(PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided");
+=======
+            .containsEntry(CUSTOM_KEY, CUSTOM_VALUE);
+
+        verify(helper).addBaseProperties(eq(caseData), any());
+        verify(helper).addCommonFooterSignature(any());
+        verify(helper).addCnbcContact(eq(caseData), any());
+        verify(helper).addSpecAndUnspecContact(eq(caseData), any());
+>>>>>>> origin/master
     }
 }

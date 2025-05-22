@@ -14,7 +14,7 @@ public class DefendantResponseUnspecNotifier
 
     public DefendantResponseUnspecNotifier(NotificationService notificationService,
                                            CaseTaskTrackingService caseTaskTrackingService,
-                                           AddDefLitFriendAllLegalRepsEmailGenerator allLegalRepsEmailGenerator) {
+                                           DefendantResponseAllLegalRepsEmailGenerator allLegalRepsEmailGenerator) {
         super(notificationService, caseTaskTrackingService, allLegalRepsEmailGenerator);
     }
 
