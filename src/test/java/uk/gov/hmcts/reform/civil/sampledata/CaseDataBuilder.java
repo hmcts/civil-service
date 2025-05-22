@@ -2516,6 +2516,23 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDraftMock() {
+        CaseDataBuilder caseDataBuilder = atStateClaimDraft();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region("2").baseLocation("41112").build());
+        caseDataBuilder.applicant1DQ(Applicant1DQ.builder()
+            .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
+                                            .caseLocation(CaseLocationCivil.builder()
+                                                              .baseLocation("dummy base").region("dummy region")
+                                                              .build())
+                                            .responseCourtName("testCourt")
+                                            .responseCourtCode("0000")
+                                            .reasonForHearingAtSpecificCourt("reason")
+                                            .otherPartyPreferredSite("site")
+                                            .build())
+                .build());
+        return caseDataBuilder;
+    }
+
     public CaseDataBuilder atStateClaimDraft() {
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference("12345")
