@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -21,13 +20,14 @@ import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
-import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
-import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
+import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,13 +43,13 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_SOLICITOR_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_SOLICITOR_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_SOLICITOR_ID;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
 @Slf4j
@@ -68,9 +68,12 @@ public class RoboticsDataMapper {
         var roboticsBuilder = RoboticsCaseData.builder()
             .header(buildCaseHeader(caseData, authToken))
             .litigiousParties(buildLitigiousParties(caseData))
-            .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
             .events(eventHistoryMapper.buildEvents(caseData, authToken));
+
+        if (!(caseData.isLipvLipOneVOne())) {
+            roboticsBuilder.solicitors(buildSolicitors(caseData));
+        }
 
         if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
             || caseData.getCcdState() == CASE_DISMISSED) {
@@ -81,14 +84,19 @@ public class RoboticsDataMapper {
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
-        return ClaimDetails.builder()
-            .amountClaimed(caseData.getClaimValue().toPounds())
+        ClaimDetails.ClaimDetailsBuilder claimDetailsBuilder = ClaimDetails.builder();
+
+        if (!caseData.isLipvLipOneVOne() && !caseData.isLRvLipOneVOne()) {
+            claimDetailsBuilder.amountClaimed(caseData.getClaimValue().toPounds());
+        }
+
+        return claimDetailsBuilder
             .courtFee(ofNullable(caseData.getClaimFee())
-                          .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
-                          .orElse(null))
+                        .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
+                        .orElse(null))
             .caseIssuedDate(ofNullable(caseData.getIssueDate())
-                                .map(issueDate -> issueDate.format(ISO_DATE))
-                                .orElse(null))
+                        .map(issueDate -> issueDate.format(ISO_DATE))
+                        .orElse(null))
             .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
             .build();
     }
@@ -100,7 +108,7 @@ public class RoboticsDataMapper {
             .owningCourtName("CCMCC")
             .caseType(getCaseType(caseData))
             .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
-            .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
+            .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack(), caseData.getResponseClaimTrack()))
             .build();
     }
 
@@ -111,7 +119,17 @@ public class RoboticsDataMapper {
         return "CLAIM - UNSPEC ONLY";
     }
 
-    private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
+    private String buildAllocatedTrack(AllocatedTrack allocatedTrack, String responseClaimTrack) {
+        if (allocatedTrack == null) {
+            if (responseClaimTrack == null) {
+                return "";
+            }
+            return switch (responseClaimTrack) {
+                case "FAST_CLAIM" -> "FAST TRACK";
+                case "SMALL_CLAIM" -> "SMALL CLAIM TRACK";
+                default -> "";
+            };
+        }
         return switch (allocatedTrack) {
             case FAST_CLAIM -> "FAST TRACK";
             case MULTI_CLAIM -> "MULTI TRACK";
@@ -246,14 +264,13 @@ public class RoboticsDataMapper {
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
-        String respondent1SolicitorId = caseData.getRespondent1Represented() == YES
-            ? RESPONDENT_SOLICITOR_ID : null;
+        String respondent1SolicitorId = caseData.getRespondent1Represented() == YES ? RESPONDENT_SOLICITOR_ID : null;
 
         var respondentParties = new ArrayList<>(List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
                 caseData.getApplicant1LitigationFriend(),
-                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
+                caseData.isLipvLipOneVOne() ? null : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
                 "Claimant",
                 APPLICANT_ID,
                 APPLICANT_SOLICITOR_ID,
