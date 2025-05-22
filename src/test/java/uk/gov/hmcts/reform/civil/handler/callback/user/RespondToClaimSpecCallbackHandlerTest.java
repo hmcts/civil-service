@@ -96,6 +96,8 @@ import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -160,7 +162,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
     AssignCategoryId.class,
-    FrcDocumentsUtils.class
+    FrcDocumentsUtils.class,
+    RequestedCourtForClaimDetailsTab.class
 })
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -206,6 +209,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
     @MockBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
+    @MockBean
+    private InterestCalculator interestCalculator;
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
@@ -654,6 +659,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
                 ))
                 .build();
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(
                 caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
 
@@ -778,6 +784,94 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertEquals("Validation error", response.getErrors().get(0));
 
+        }
+
+        @Test
+        void testValidateSpecDefendantResponseAdmitClaimOwingAmount() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                .toBuilder()
+                .respondent1(PartyBuilder.builder().individual().build())
+                .isRespondent1(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .isRespondent2(YES)
+                .specDefenceAdmitted2Required(NO)
+                .specDefenceAdmittedRequired(NO)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(new BigDecimal(7000))
+                .totalClaimAmountPlusInterestAdmitPart(new BigDecimal(7000.05))
+                .respondToAdmittedClaimOwingAmount(new BigDecimal("705000"))
+                .respondToAdmittedClaimOwingAmount2(new BigDecimal(50000))
+                .build();
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNotNull();
+        }
+
+        @Test
+        void testValidateSpecDefendantResponseAdmitClaimOwingAmountIsNull() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                .toBuilder()
+                .respondent1(PartyBuilder.builder().individual().build())
+                .isRespondent1(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .isRespondent2(YES)
+                .specDefenceAdmitted2Required(YES)
+                .specDefenceAdmittedRequired(YES)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(new BigDecimal(7000))
+                .build();
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void testValidateSpecDefendantResponseAdmitClaimOwingAmountNotPartAdmit() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
+                .toBuilder()
+                .respondent1(PartyBuilder.builder().individual().build())
+                .isRespondent1(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .isRespondent2(NO)
+                .specDefenceAdmitted2Required(NO)
+                .specDefenceAdmittedRequired(YES)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .totalClaimAmount(new BigDecimal(7000))
+                .respondToAdmittedClaimOwingAmount(new BigDecimal(50000))
+                .build();
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
+            CallbackParams params = callbackParamsOf(
+                caseData, MID, "specHandleAdmitPartClaim", "DEFENDANT_RESPONSE_SPEC");
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
         }
     }
 
@@ -2801,6 +2895,53 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .doesNotContain(caseData.getApplicant1().getPartyName())
                 .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
         }
+
+        @Test
+        void shouldReturnSubmittedResponse_whenFullAdmitWithPayBySetDate() {
+            // Given
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondToClaimAdmitPartLRspec(
+                    RespondToClaimAdmitPartLRspec.builder()
+                        .whenWillThisAmountBePaid(whenWillPay)
+                        .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .doesNotContain("Download questionnaire (opens in a new tab)");
+        }
+
+        @Test
+        void shouldReturnSubmittedResponse_whenFullAdmitWithRepaymentPlan() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YesOrNo.NO)
+                .defenceAdmitPartPaymentTimeRouteRequired(
+                    RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getConfirmationBody())
+                .doesNotContain("Download questionnaire (opens in a new tab)");
+        }
     }
 
     @Nested
@@ -2993,6 +3134,27 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNotNull();
         }
 
+        @Test
+        void shouldPopulateTotalClaimAmountPlusInterestAdmitPart() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .totalClaimAmount(new BigDecimal(7000))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal("0.05"));
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getData().get("totalClaimAmountPlusInterestAdmitPart")).isNotNull();
+        }
     }
 
     @Nested

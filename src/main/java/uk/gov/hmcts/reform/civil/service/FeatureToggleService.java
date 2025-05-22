@@ -102,6 +102,10 @@ public class FeatureToggleService {
     }
 
     public boolean isDashboardEnabledForCase(CaseData caseData) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return false;
+        }
+
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch;
         if (caseData.getSubmittedDate() == null) {
@@ -165,5 +169,9 @@ public class FeatureToggleService {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
+
+    public boolean isLrAdmissionBulkEnabled() {
+        return featureToggleApi.isFeatureEnabled("lr-admission-bulk");
     }
 }
