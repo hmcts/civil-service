@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
@@ -13,8 +15,10 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class FullDefenceApplicantSolicitorOneUnspecNotifier extends FullDefenceSolicitorUnspecNotifier {
 
     @Autowired
-    public FullDefenceApplicantSolicitorOneUnspecNotifier(NotificationService notificationService, NotificationsProperties notificationsProperties) {
-        super(notificationService, notificationsProperties);
+    public FullDefenceApplicantSolicitorOneUnspecNotifier(NotificationService notificationService, NotificationsProperties notificationsProperties,
+                                                          FeatureToggleService featureToggleService,
+                                                          NotificationsSignatureConfiguration configuration) {
+        super(notificationService, notificationsProperties, configuration, featureToggleService);
     }
 
     @Override
