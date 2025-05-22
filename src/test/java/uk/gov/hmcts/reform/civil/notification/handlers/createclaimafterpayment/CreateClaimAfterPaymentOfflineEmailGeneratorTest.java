@@ -20,8 +20,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreateClaimAfterPaymentOfflineEmailGeneratorTest {
 
+    public static final String TASK_ID = "reference";
+
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGenerator appSolOneGenerator;
 
     @InjectMocks
     private CreateClaimAfterPaymentOfflineEmailGenerator emailGenerator;
@@ -37,7 +42,7 @@ class CreateClaimAfterPaymentOfflineEmailGeneratorTest {
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData, TASK_ID);
 
         assertThat(result).isEmpty();
         verify(featureToggleService).isLipVLipEnabled();
@@ -49,7 +54,7 @@ class CreateClaimAfterPaymentOfflineEmailGeneratorTest {
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
-        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData, TASK_ID);
 
         assertThat(result).isNotNull();
         verify(featureToggleService).isLipVLipEnabled();
@@ -60,7 +65,7 @@ class CreateClaimAfterPaymentOfflineEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         when(caseData.isLipvLipOneVOne()).thenReturn(false);
 
-        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> result = emailGenerator.getPartiesToNotify(caseData, TASK_ID);
 
         assertThat(result).isNotNull();
     }

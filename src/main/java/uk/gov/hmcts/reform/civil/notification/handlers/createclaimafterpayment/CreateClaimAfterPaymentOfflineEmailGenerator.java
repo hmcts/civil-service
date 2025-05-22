@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.createclaimafterpayment;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -19,15 +20,15 @@ public class CreateClaimAfterPaymentOfflineEmailGenerator extends AllPartiesEmai
             CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGenerator appSolOneGenerator,
             FeatureToggleService featureToggleService
     ) {
-        super(appSolOneGenerator, null, null, null, null);
+        super(List.of(appSolOneGenerator));
         this.featureToggleService = featureToggleService;
     }
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
+    public Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId) {
         if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             return Collections.emptySet();
         }
-        return super.getPartiesToNotify(caseData);
+        return super.getPartiesToNotify(caseData, taskId);
     }
 }

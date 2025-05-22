@@ -11,12 +11,15 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Notificat
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +39,9 @@ class CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     @InjectMocks
     private CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGenerator generator;
@@ -172,12 +178,19 @@ class CreateClaimAfterPaymentOfflineAppSolOneEmailDTOGeneratorTest {
                 .applicant1(applicant)
                 .build();
 
+        when(templateCommonPropertiesHelper.addBaseProperties(eq(cd), any()))
+                .thenAnswer(invocation -> {
+                    Map<String, String> properties = invocation.getArgument(1);
+                    properties.put(NotificationData.CASEMAN_REF, LEGACY_CASE_REFERENCE);
+                    properties.put(NotificationData.PARTY_REFERENCES, "Party References");
+                    return null;
+                });
+
         Map<String, String> props = generator.addProperties(cd);
 
         assertThat(props)
-                .hasSize(3)
-                .containsEntry(NotificationData.CLAIM_REFERENCE_NUMBER, "1234")
-                .containsEntry(NotificationData.CASEMAN_REF,          LEGACY_CASE_REFERENCE)
-                .containsKey(NotificationData.PARTY_REFERENCES);
+                .containsEntry(NotificationData.CASEMAN_REF, LEGACY_CASE_REFERENCE)
+                .containsKey(NotificationData.PARTY_REFERENCES)
+                .isNotEmpty();
     }
 }
