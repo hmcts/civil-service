@@ -27,10 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.helpers.settlediscontinue.DiscontinueClaimHelper.is1v2LrVLrCase;
@@ -56,9 +53,11 @@ public class DiscontinueClaimClaimantCallbackHandler extends CallbackHandler {
     public static final String NO_COURT_PERMISSION_PART_DISCONTINUE_BODY = "### Next step \n "
             + "Any listed hearings will still proceed as normal.\n\n"
             + "All other parties will be notified.";
-    public static final String NO_COURT_PERMISSION_FULL_DISCONTINUE_ANYONE_BODY = "### Next step \n "
-            + "This will now be reviewed and the claim will proceed offline and your online account will not "
-            + "be updated for this claim.\n\nAny updates will be sent by post.";
+    public static final String NO_COURT_PERMISSION_FULL_DISCONTINUE_ANYONE_BODY = """
+        <html><body><h3>Next step</h3><p>This will now be reviewed and the claim will proceed offline and your online account will not be updated for this claim.
+
+         Any updates will be sent by post.</p></body></html>""";
+
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
 
