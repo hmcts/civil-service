@@ -82,18 +82,11 @@ class EmailDTOGeneratorTest {
         assertThat(emailDTO.getReference()).isEqualTo(String.format(TEST_REFERENCE_TEMPLATE, LEGACY_CASE_REFERENCE));
 
         assertThat(emailDTO.getParameters())
-<<<<<<< HEAD
-                .containsEntry(CLAIM_REFERENCE_NUMBER, "1234567890123456")
-                .containsEntry(CASEMAN_REF, LEGACY_CASE_REFERENCE)
-                .containsEntry(CUSTOM_KEY, CUSTOM_VALUE)
-                .containsEntry(PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided");
-=======
             .containsEntry(CUSTOM_KEY, CUSTOM_VALUE);
 
         verify(helper).addBaseProperties(eq(caseData), any());
         verify(helper).addCommonFooterSignature(any());
         verify(helper).addCnbcContact(eq(caseData), any());
         verify(helper).addSpecAndUnspecContact(eq(caseData), any());
->>>>>>> origin/master
     }
 }
