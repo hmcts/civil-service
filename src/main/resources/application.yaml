@@ -426,8 +426,8 @@ notifications:
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
   notifyClaimantLipForClaimSubmissionTemplate: "e4cd677a-b3b8-4d63-84a3-89907d505e8e"
-  notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "f2080ac4-2585-47fd-ac18-5f94148adc07"
-  notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "1f6006bb-6726-48c4-ac5f-a456d043f1b7"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "5e9238b4-aa44-4d7f-966e-aa3cd592209d"
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "4a9fb225-0321-4308-b541-beba45aaf94c"
   bilingualClaimantClaimContinuingOnlineForSpec: "461b4ce6-3783-409d-be47-ea1230170833"
 
   notifyApplicantForHwfNoRemission: "29c666fe-3ac8-4871-9d16-f44f68de1684"
@@ -450,7 +450,7 @@ notifications:
   notifyDefendantJudgmentVariedDeterminationOfMeansTemplate: "456d99c4-de02-408a-9f8b-603585350dcc"
 
   notifyLipSuccessfulMediation: "49ebb139-dd50-48af-b560-766cbb6620f0"
-  notifyLipSuccessfulMediationWelsh: "806d08f3-a1e8-48ed-877f-af98f05183ca"
+  notifyLipSuccessfulMediationWelsh: "af843e6a-2af2-4e20-9a2a-e5da08b6c500"
   notifyOneVTwoClaimantSuccessfulMediation: "1d7d8f78-1d47-4acd-9f2c-d500937a9fe4"
   notifyLrClaimantSuccessfulMediation:  "92f2334a-e4f9-432d-880c-0ddb17f184fd"
   notifyTwoVOneDefendantSuccessfulMediation: "3131fa2f-b708-47f4-ae61-618440f889a7"
@@ -461,19 +461,19 @@ notifications:
   notifyClaimantLipForDefendantRepresentedTemplate: "6b4d2b15-c537-4603-9542-f0c7c89d7024"
   notifyDefendantLipForNoLongerAccessTemplate: "187436dd-b5e2-495b-a96e-54a0937a33d1"
   notifyDefendantLrAfterNoticeOfChangeTemplate: "633b2b9f-14e0-4b22-80a5-4db95401045c"
-  notifyClaimantLipBilingualAfterDefendantNOC: "cecae355-dc00-4a8d-8d64-576c79518d88"
-  notifyDefendantLipBilingualAfterDefendantNOC: "36cd9c65-b979-45ba-b7ff-9061e03ce51e"
+  notifyClaimantLipBilingualAfterDefendantNOC: "426fd2b5-5fd1-48a4-9004-63131c07ad49"
+  notifyDefendantLipBilingualAfterDefendantNOC: "036295d3-7722-4057-88c7-f5c96c7eb3c5"
   notifyNewDefendantSolicitorNOC: "79f033b1-a21b-408a-a7aa-28f9b17c7ed1"
 
   notifyDJNonDivergentSpecClaimantTemplate: "128fa6e8-5942-4e45-830f-35d3b46906d9"
   notifyDJNonDivergentSpecDefendantTemplate: "7b372a69-92ed-40fe-b521-dbf7eefe5818"
-  hearingNotificationLipDefendantTemplateWelsh: "b70a2965-2a98-43e0-b484-0d28cd99e787"
+  hearingNotificationLipDefendantTemplateWelsh: "af2f664a-dcc6-4239-94e0-a0956132182c"
   notifySettleClaimMarkedPaidInFullDefendantTemplate: "01b7ca56-f687-4ba9-a22b-04f0af8b79a6"
-  orderBeingTranslatedTemplateWelsh: "8349f32b-7635-41ce-a887-02e65d85df00"
+  orderBeingTranslatedTemplateWelsh: "8e5c35fc-b9b3-4172-9509-e5f1838a218a"
 
   notifyClaimantLRJudgmentByAdmissionTemplate: "ab7e8c6e-26a2-4fdf-932a-2d300d0d5129"
   notifyDefendantLIPJudgmentByAdmissionTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
-  notifyLiPOrderTranslatedTemplate: "d81749f7-cef5-4159-8d99-146eb572a690"
+  notifyLiPOrderTranslatedTemplate: "d1eb5d79-6d1f-4b05-bbdf-a18fda06cf01"
   notifyClaimDiscontinuedLRTemplate: "445e95e4-4d15-4757-9cb2-a75a47b73ac9"
   notifyClaimDiscontinuedLipTemplate: "68342b9f-f9ad-4efc-a465-fb84fb60e3ce"
 
@@ -485,7 +485,7 @@ notifications:
   notifyLRStayLifted: "bd2c8d45-2050-4e98-8779-985105a9eb7b"
   notifyLRStayUpdateRequested: "d164bdcc-e7e4-4868-a5b2-78c9e2bb6334"
   notifyLipStayUpdateRequested: "3c1cde59-b856-459c-ae58-2411314bb1f2"
-  notifyLipBilingualStayUpdateRequested: "95e2509e-7e8a-4c59-a756-605286b88847"
+  notifyLipBilingualStayUpdateRequested: "2f57d5f1-bc41-49a8-94e8-51df8afc5eff"
   notifyClaimantLRCoscApplied: "0ef9cda6-1ad4-4191-857b-c298ec71cf4c"
 
   queryRaised: "dc16db17-4db4-4c3d-a9b1-bf36aa0d1fc7"

@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.YamlNotificationTestUtil;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -94,15 +95,16 @@ class NotificationClaimantOfHearingHandlerTest {
 
         @BeforeEach
         void setUp() {
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-            when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \\n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-            when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
-            when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Test
@@ -690,207 +692,180 @@ class NotificationClaimantOfHearingHandlerTest {
     }
 
     @NotNull
-    private Map<String, String> getNotificationFeeDataMap(CaseData caseData, boolean is1v2) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            "claimantReferenceNumber", "12345", "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "23-11-2022",
-            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, is1v2 ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
-                : "Claimant reference: 12345 - Defendant reference: 6789",
-            CASEMAN_REF, "000DC001"
-        ));
+    public Map<String, String> addCommonProperties() {
+        Map<String, String> expectedProperties = new HashMap<>();
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
         expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
         expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
         expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
         expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
         return expectedProperties;
     }
 
     @NotNull
+    private Map<String, String> getNotificationFeeDataMap(CaseData caseData, boolean is1v2) {
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "claimantReferenceNumber", "12345",
+            "hearingFee", "£300.00",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "03:30pm",
+            "hearingDueDate", "23-11-2022",
+            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+            PARTY_REFERENCES, is1v2
+                ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+                : "Claimant reference: 12345 - Defendant reference: 6789",
+            CASEMAN_REF, "000DC001"
+        ));
+        return expectedProperties;
+    }
+
+
+    @NotNull
     private Map<String, String> getNotificationFeeDataMapHMC(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "hearingFee", "£300.00",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "03:30pm",
+            "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDataMap(CaseData caseData, boolean is1v2) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022", "hearingTime", "08:30am",
+            "claimantReferenceNumber", "12345",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "08:30am",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            PARTY_REFERENCES, is1v2 ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
+            PARTY_REFERENCES, is1v2
+                ? "Claimant reference: 12345 - Defendant 1 reference: 6789 - Defendant 2 reference: Not provided"
                 : "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeOtherHearingTypeDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
-            "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022",
-            "hearingTime", "08:30am", "hearingDueDate", "",
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "hearingFee", "£0.00",
+            "claimantReferenceNumber", "12345",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "08:30am",
+            "hearingDueDate", "",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDataMapHMC(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "06-10-2022",
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "hearingFee", "£0.00",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "08:30am",
+            "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationFeeDatePMDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            "claimantReferenceNumber", "", "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
+            "claimantReferenceNumber", "",
+            "hearingFee", "£300.00",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "03:30pm",
+            "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDatePMDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm",
+            "claimantReferenceNumber", "",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "03:30pm",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             PARTY_REFERENCES, "Claimant reference: Not provided - Defendant reference: Not provided",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDateHearingOtherDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm",
+            "claimantReferenceNumber", "",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "03:30pm",
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            "hearingDate", "17-05-2023", "hearingTime", "10:30am",
+            "hearingDate", "17-05-2023",
+            "hearingTime", "10:30am",
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
         return expectedProperties;
     }
 
     @NotNull
     private Map<String, String> getNotificationNoFeeDatePMDataMapHMC(CaseData caseData) {
-        Map<String, String> expectedProperties = new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(), "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022",
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+        expectedProperties.putAll(Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            "hearingFee", "£0.00",
+            "hearingDate", "07-10-2022",
+            "hearingTime", "03:30pm",
+            "hearingDueDate", "06-10-2022",
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
             CASEMAN_REF, "000DC001"
         ));
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
         return expectedProperties;
     }
 

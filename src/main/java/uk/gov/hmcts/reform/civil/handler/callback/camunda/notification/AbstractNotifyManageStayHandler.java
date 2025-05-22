@@ -64,11 +64,15 @@ public abstract class AbstractNotifyManageStayHandler extends CallbackHandler im
     protected Map<String, String> addPropertiesForStayLifted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (isLiP(caseData)) {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, getPartyName(callbackParams),
                 CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData)
-            );
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
+            return properties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
