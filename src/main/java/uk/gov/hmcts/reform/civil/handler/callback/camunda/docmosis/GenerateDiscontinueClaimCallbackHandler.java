@@ -84,14 +84,15 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             respondent2DiscontinueDoc = generateForm(caseData.getRespondent2(), callbackParams);
         }
         if (featureToggleService.isGaForWelshEnabled()
-            && caseData.isRespondent1LiP() &&
-            caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE) &&
-            (caseData.isRespondentResponseBilingual()
+            && caseData.isRespondent1LiP()
+            && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            && (caseData.isRespondentResponseBilingual()
                 || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
-            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
-                .getPreTranslationDocuments();
+           
             applicant1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_CLAIMANT);
             respondent1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
+                .getPreTranslationDocuments();
             assignDiscontinuanceCategoryId(applicant1DiscontinueDoc);
             assignDiscontinuanceCategoryId(respondent1DiscontinueDoc);
             translatedDocuments.add(element(applicant1DiscontinueDoc));
@@ -140,8 +141,8 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             caseData.getBusinessProcess().getProcessInstanceId(),
             "WELSH_ENABLED",
             featureToggleService.isGaForWelshEnabled()
-                && caseData.isRespondent1LiP() &&
-                caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+                && caseData.isRespondent1LiP()
+                && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
                 && (caseData.isRespondentResponseBilingual()
                 || caseData.isLipDefendantSpecifiedBilingualDocuments())
         );
