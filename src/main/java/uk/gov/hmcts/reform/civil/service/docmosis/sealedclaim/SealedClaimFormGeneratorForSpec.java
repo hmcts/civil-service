@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCc
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<SealedClaimFormForSpec> {
 
     private final DocumentManagementService documentManagementService;
@@ -261,7 +263,9 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 .calculateFirstWorkingDay(isAfterFourPM(localDateTime) ? date.plusDays(29) : date.plusDays(28)),
             DATE
         );
-        return END_OF_BUSINESS_DAY + notificationDeadline;
+        String responseDeadline = END_OF_BUSINESS_DAY + notificationDeadline;
+        log.info("Response deadline: {} for caseID {} for claim form generation", responseDeadline, caseData.getCcdCaseReference());
+        return responseDeadline;
     }
 
     private List<SpecifiedParty> getRespondents(CaseData caseData) {

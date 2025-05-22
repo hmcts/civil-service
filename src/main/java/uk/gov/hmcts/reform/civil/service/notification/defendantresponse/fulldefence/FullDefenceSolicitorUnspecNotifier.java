@@ -4,13 +4,18 @@ import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -20,6 +25,8 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
     //NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public void notifySolicitorForDefendantResponse(CaseData caseData) {
@@ -41,16 +48,20 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE) || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
+            ));
+            addCommonFooterSignature(properties, configuration);
+            addSpecAndUnspecContact(caseData, properties, configuration,
+                                    featureToggleService.isQueryManagementLRsEnabled());
+            return properties;
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 RESPONDENT_NAME,
                 getPartyNameBasedOnType(caseData.getRespondent1())
@@ -59,7 +70,11 @@ public abstract class  FullDefenceSolicitorUnspecNotifier extends FullDefenceSol
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
-            );
+            ));
+            addCommonFooterSignature(properties, configuration);
+            addSpecAndUnspecContact(caseData, properties, configuration,
+                                    featureToggleService.isQueryManagementLRsEnabled());
+            return properties;
         }
     }
 }
