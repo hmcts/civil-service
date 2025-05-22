@@ -12,7 +12,8 @@ public class ClaimDismissedRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
     protected static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED = "claim-dismissed-respondent-notification-%s";
 
     public ClaimDismissedRespSolOneEmailDTOGenerator(OrganisationService organisationService,
-                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
+                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater
+    ) {
         super(organisationService);
         this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
     }
@@ -25,6 +26,11 @@ public class ClaimDismissedRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
     @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED;
+    }
+
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return !caseData.isRespondent1LiP() && caseData.getClaimDismissedDate() != null;
     }
 
 }
