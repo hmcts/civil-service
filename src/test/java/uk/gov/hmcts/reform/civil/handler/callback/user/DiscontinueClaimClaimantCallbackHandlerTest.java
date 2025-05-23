@@ -66,8 +66,9 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
             + "Any listed hearings will still proceed as normal.\n\n"
             + "All other parties will be notified.";
     public static final String NO_COURT_PERMISSION_FULL_DISCONTINUE_ANYONE_BODY = "### Next step \n "
-            + "This will now be reviewed and the claim will proceed offline and your online account will not "
-            + "be updated for this claim.Any updates will be sent by post.";
+        + "This will now be reviewed and the claim will proceed offline and your online account will not "
+        + "be updated for this claim.\n\n"
+        + "Any updates will be sent by post.";
 
     @Nested
     class AboutToStartCallback {
