@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CCJ_REQUEST_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
@@ -78,10 +79,12 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
-                if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
-                    Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
-                    List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-                    systemGeneratedDocuments.add(originalSdo);
+                if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
+                    if (Objects.nonNull(sdoOrderDocuments) && sdoOrderDocuments.size() > 0) {
+                        Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
+                        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+                        systemGeneratedDocuments.add(originalSdo);
+                    }
                 } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
@@ -92,11 +95,19 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     }
                 } else if (document.getValue().getDocumentType().equals(MANUAL_DETERMINATION)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
-                        Optional<Element<CaseDocument>> preTranslationManualDeterminationDoc = preTranslationDocuments.stream()
+                        Optional<Element<CaseDocument>> preTranslationManualDetermination = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.LIP_MANUAL_DETERMINATION)
                             .findFirst();
-                        preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
-                        preTranslationManualDeterminationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                        preTranslationManualDetermination.ifPresent(preTranslationDocuments::remove);
+                        preTranslationManualDetermination.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
+                } else if (document.getValue().getDocumentType().equals(CCJ_REQUEST_DETERMINATION)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationReqDetermination = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.CCJ_REQUEST_DETERMINATION)
+                            .findFirst();
+                        preTranslationReqDetermination.ifPresent(preTranslationDocuments::remove);
+                        preTranslationReqDetermination.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
                 }  else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
@@ -111,10 +122,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
                     if (originalDocument.getValue().getDocumentName().contains("claimant")) {
                         CaseDocument claimantSealedCopy = CaseDocument.toCaseDocument(originalDocument.getValue().getDocumentLink(),
-                                                                                originalDocument.getValue().getDocumentType());
+                                                                                      originalDocument.getValue().getDocumentType());
                         systemGeneratedDocuments.add(element(claimantSealedCopy));
                         assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
                     }
+                    systemGeneratedDocuments.add(originalDocument);
                 }
             });
         }
@@ -132,7 +144,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 }
             });
         }
-        return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocuments, callbackParams);
+        return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            translatedDocuments,
+            callbackParams
+        );
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
@@ -146,8 +161,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
             } else if (Objects.nonNull(translatedDocuments)
-                && (translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)
-                || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION)))) {
+                && ((translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT))
+                || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION))
+                || (translatedDocuments.get(0).getValue().getDocumentType().equals(CCJ_REQUEST_DETERMINATION)))) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
@@ -156,14 +172,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
 
         if ((caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
-                || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData))) {
+            || (caseData.isLipvLROneVOne() && featureToggleService.isDefendantNoCOnlineForCase(caseData))) {
             if (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
             } else if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION;
             }
         }
-
         return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
     }
 }

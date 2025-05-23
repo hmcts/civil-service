@@ -11,6 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
@@ -22,6 +25,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType.CCJ_REQUEST_ADMISSION;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType.CCJ_REQUEST_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +43,7 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
     private final ObjectMapper objectMapper;
     private final RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator requestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final FeatureToggleService featureToggleService;
 
     private CallbackResponse generateResponseDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -48,15 +55,34 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             );
-            updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                claimantResponseDoc,
-                caseData
-            ));
-
+            if (featureToggleService.isGaForWelshEnabled()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+                || caseData.isLipClaimantSpecifiedBilingualDocuments()
+                || caseData.isLipDefendantSpecifiedBilingualDocuments())
+                && !caseEvent.equals(GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC)) {
+                List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
+                    .getPreTranslationDocuments();
+                translatedDocuments.add(element(claimantResponseDoc));
+                updatedCaseDataBuilder.preTranslationDocuments(translatedDocuments);
+                updatedCaseDataBuilder.preTranslationDocumentType(getTranslatedDocumentType(caseEvent));
+            } else {
+                updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                    claimantResponseDoc,
+                    caseData
+                ));
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private PreTranslationDocumentType getTranslatedDocumentType(CaseEvent caseEvent) {
+        return switch (caseEvent) {
+            case GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC -> CCJ_REQUEST_ADMISSION;
+            case GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC -> CCJ_REQUEST_DETERMINATION;
+            default -> null;
+        };
     }
 
     private boolean shouldGenerateJudgmentDoc(CaseEvent caseEvent, CaseData caseData) {
