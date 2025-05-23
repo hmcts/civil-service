@@ -53,23 +53,24 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         EmailDTO appSolEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
         StateFlow stateFlow = mock(StateFlow.class);
+        String taskId = "task id";
 
         when(caseData.isRespondent1NotRepresented()).thenReturn(false);
 
-        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
-        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
+        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(appSolEmail);
+        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolOneEmail);
 
         when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
         when(stateFlowEngine.evaluate(caseData)
                  .isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail);
-        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 
     @Test
@@ -79,12 +80,13 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolTwoEmail = mock(EmailDTO.class);
         StateFlow stateFlow = mock(StateFlow.class);
+        String taskId = "task id";
 
         when(caseData.isRespondent1NotRepresented()).thenReturn(false);
 
-        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
-        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
-        when(respSolTwoEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolTwoEmail);
+        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(appSolEmail);
+        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolOneEmail);
+        when(respSolTwoEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolTwoEmail);
 
         when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
         when(stateFlowEngine.evaluate(caseData)
@@ -93,15 +95,15 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic = Mockito.mockStatic(MultiPartyScenario.class);
         multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         multiPartyScenarioMockedStatic.close();
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail, respSolTwoEmail);
-        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolTwoEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 
     @Test
@@ -110,22 +112,23 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         EmailDTO appSolEmail = mock(EmailDTO.class);
         EmailDTO defendantEmail = mock(EmailDTO.class);
         StateFlow stateFlow = mock(StateFlow.class);
+        String taskId = "task id";
 
         when(caseData.isRespondent1NotRepresented()).thenReturn(true);
 
-        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(appSolEmail);
-        when(defendantEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(defendantEmail);
+        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(appSolEmail);
+        when(defendantEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(defendantEmail);
 
         when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
         when(stateFlowEngine.evaluate(caseData)
                  .isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, defendantEmail);
-        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(defendantEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(defendantEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 }

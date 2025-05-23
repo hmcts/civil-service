@@ -39,7 +39,9 @@ import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +105,9 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Mock
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
+    @Mock
+    private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
+
     private final LocalDateTime localDateTime = now();
 
     private ObjectMapper objectMapper;
@@ -117,7 +122,8 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      locationHelper, caseFlagsInitialiser,
                                                      caseDetailsConverter, frcDocumentsUtils,
                                                      dqResponseDocumentUtils, determineNextState,
-                                                     Optional.of(updateWaCourtLocationsService)
+                                                     Optional.of(updateWaCourtLocationsService),
+                                                     requestedCourtForClaimDetailsTab
         );
 
         Address address = Address.builder()
@@ -246,7 +252,8 @@ class AboutToSubmitRespondToDefenceTaskTest {
                                                      locationHelper, caseFlagsInitialiser,
                                                      caseDetailsConverter, frcDocumentsUtils,
                                                      dqResponseDocumentUtils, determineNextState,
-                                                     Optional.empty()
+                                                     Optional.empty(),
+                                                     requestedCourtForClaimDetailsTab
         );
 
         CaseData caseData = CaseDataBuilder.builder()
@@ -306,6 +313,22 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         assertNotNull(response);
         assertThat(getCaseData(response)).extracting("respondForImmediateOption").asString().isEqualTo("YES");
+    }
+
+    @Test
+    void shouldRemoveNextDeadlin_whenRespondedToDefence() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1DQWithExperts()
+            .applicant1DQWithWitnesses()
+            .atState(FULL_DEFENCE_PROCEED)
+            .nextDeadline(LocalDate.now())
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        assertNotNull(response);
+        assertThat(getCaseData(response)).extracting("nextDeadline").isNull();
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
