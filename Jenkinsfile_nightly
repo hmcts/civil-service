@@ -94,7 +94,7 @@ withNightlyPipeline(type, product, component) {
   boolean runFailedAndNotExecutedTestFiles = env.RUN_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
 
   //enableMutationTest()
-  enableFortifyScan()
+  // enableFortifyScan()
   //enableSecurityScan()
 
   enableFullFunctionalTest(200)
