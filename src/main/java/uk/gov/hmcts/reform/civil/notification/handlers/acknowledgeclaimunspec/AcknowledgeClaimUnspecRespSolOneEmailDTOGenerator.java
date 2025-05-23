@@ -13,14 +13,12 @@ public class AcknowledgeClaimUnspecRespSolOneEmailDTOGenerator extends RespSolOn
 
     protected static final String REF_SOL_ONE_REF_TEMPLATE = "acknowledge-claim-respondent-notification-%s";
 
-    private final NotificationsProperties notificationsProperties;
     private final AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper;
 
     public AcknowledgeClaimUnspecRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
                                                              OrganisationService organisationService,
                                                              AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
+        super(notificationsProperties, organisationService);
         this.acknowledgeClaimUnspecHelper = acknowledgeClaimUnspecHelper;
     }
 

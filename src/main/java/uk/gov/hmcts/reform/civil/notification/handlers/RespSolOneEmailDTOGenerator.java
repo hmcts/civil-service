@@ -1,17 +1,21 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
-import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
-@AllArgsConstructor
 public abstract class RespSolOneEmailDTOGenerator extends EmailDTOGenerator {
 
-    private final OrganisationService organisationService;
+    protected final OrganisationService organisationService;
+
+    protected RespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
+        super(notificationsProperties);
+        this.organisationService = organisationService;
+    }
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
