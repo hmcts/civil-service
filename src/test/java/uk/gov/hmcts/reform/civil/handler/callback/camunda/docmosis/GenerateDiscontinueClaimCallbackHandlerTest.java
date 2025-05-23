@@ -16,20 +16,28 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -56,6 +64,9 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
     @MockBean
     private RuntimeService runTimeService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
     @Nested
@@ -123,6 +134,35 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
             assertThat(updatedData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
         }
+    }
+
+    @Test
+    void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(formGenerator.generateDocs(
+            any(CaseData.class),
+            any(Party.class),
+            anyString()
+        )).thenReturn(getCaseDocument());
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent1(getRespondent1PartyDetails())
+            .applicant1(getApplicant1PartyDetails())
+            .respondent1Represented(YesOrNo.NO)
+            .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH")
+                                                         .build()).build())
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        List<Element<CaseDocument>> translatedDocuments = updatedData.getPreTranslationDocuments();
+        assertEquals(2, translatedDocuments.size());
+        assertEquals(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE, updatedData.getPreTranslationDocumentType());
     }
 
     @Test
