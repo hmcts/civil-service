@@ -13,17 +13,22 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,6 +61,10 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
     private ArgumentCaptor<String> targetEmail;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
     @Captor
     private ArgumentCaptor<String> emailTemplate;
     @Captor
@@ -74,6 +83,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         private static final String EMAIL_WELSH_TEMPLATE = "test-notification-welsh-id";
         private static final String CLAIMANT_ORG_NAME = "Org Name";
         private static final String APPLICANT_SOLICITOR_TEMPLATE = "applicant1-solicitor-id";
+        private static final String OTHER_SOLICITOR = "Other solicitor";
 
         @Test
         void shouldSendNotificationToDefendantLip_whenEventIsCalledAndDefendantHasEmail() {
@@ -83,6 +93,7 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
                 .legacyCaseReference(REFERENCE_NUMBER)
+                .respondent1Represented(YesOrNo.NO)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -90,6 +101,44 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED.name()).build()).build();
             //When
             given(notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate()).willReturn(EMAIL_TEMPLATE);
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                           emailTemplate.capture(),
+                                                           notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+        }
+
+        @Test
+        void shouldSendNotificationToDefendantLR_whenEventIsCalledAndDefendantHasEmail() {
+            //Given
+            when(organisationService.findOrganisationById("QWERTY A"))
+                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name(OTHER_SOLICITOR)
+                                            .build()));
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
+                    DEFENDANT_EMAIL_ADDRESS).build())
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .respondent1Represented(YesOrNo.YES)
+                .respondentSolicitor1EmailAddress(DEFENDANT_EMAIL_ADDRESS)
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .issueDate(LocalDate.now())
+                .ccdCaseReference(Long.valueOf(123456344))
+                .changeOfRepresentation(ChangeOfRepresentation.builder().organisationToAddID("QWERTY A")
+                                            .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("QWERTY A")
+                                                                     .build()).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED.name()).build())
+                .build();
+            //When
+            given(notificationsProperties.getNoticeOfChangeOtherParties()).willReturn(EMAIL_TEMPLATE);
             notificationHandler.handle(params);
             //Then
             verify(notificationService, times(1)).sendMail(targetEmail.capture(),
@@ -185,6 +234,12 @@ class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSendNotificationToApplicantSolicitorAfterNoc() {
             //Given
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             CaseData caseData = CaseData.builder()
                     .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                             DEFENDANT_EMAIL_ADDRESS).build())
