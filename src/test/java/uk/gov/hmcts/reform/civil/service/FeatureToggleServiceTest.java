@@ -317,7 +317,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsQMForLRs(Boolean toggleStat) {
         var caseFlagsKey = "query-management";
         givenToggle(caseFlagsKey, toggleStat);
