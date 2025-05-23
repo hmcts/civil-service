@@ -9,7 +9,6 @@ import java.util.Map;
 
 public abstract class EmailDTOGenerator implements NotificationData {
 
-    @Autowired
     protected TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     protected abstract Boolean getShouldNotify(CaseData caseData);
