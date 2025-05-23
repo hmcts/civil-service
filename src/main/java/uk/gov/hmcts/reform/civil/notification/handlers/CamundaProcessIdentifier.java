@@ -6,5 +6,5 @@ public enum CamundaProcessIdentifier {
     AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
-    HwFOutcomeNotify
+    HwFOutcomeNotifyParties
 }

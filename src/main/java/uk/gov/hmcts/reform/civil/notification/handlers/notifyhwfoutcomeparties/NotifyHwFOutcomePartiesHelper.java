@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimanthwfoutcome;
+package uk.gov.hmcts.reform.civil.notification.handlers.notifyhwfoutcomeparties;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -29,49 +29,33 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
-public class NotifyClaimantHwFOutcomeHelper {
-    private Map<CaseEvent, String> emailTemplates;
-    private Map<CaseEvent, String> emailTemplatesBilingual;
+public class NotifyHwFOutcomePartiesHelper {
     private final NotificationsProperties notificationsProperties;
 
-    public NotifyClaimantHwFOutcomeHelper(NotificationsProperties notificationsProperties) {
+    public NotifyHwFOutcomePartiesHelper(NotificationsProperties notificationsProperties) {
         this.notificationsProperties = notificationsProperties;
     }
 
     public String getTemplate(CaseEvent hwfEvent) {
-        if (emailTemplates == null) {
-            emailTemplates = Map.of(
-                CaseEvent.INVALID_HWF_REFERENCE,
-                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber(),
-                CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemission(),
-                CaseEvent.MORE_INFORMATION_HWF,
-                notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded(),
-                CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
-                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
-                CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
-                notificationsProperties.getNotifyApplicantForHwfPartialRemission()
-            );
-        }
-        return emailTemplates.get(hwfEvent);
+        return switch (hwfEvent) {
+            case INVALID_HWF_REFERENCE -> notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber();
+            case NO_REMISSION_HWF -> notificationsProperties.getNotifyApplicantForHwfNoRemission();
+            case MORE_INFORMATION_HWF -> notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded();
+            case UPDATE_HELP_WITH_FEE_NUMBER -> notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber();
+            case PARTIAL_REMISSION_HWF_GRANTED -> notificationsProperties.getNotifyApplicantForHwfPartialRemission();
+            default -> null;
+        };
     }
 
     public String getTemplateBilingual(CaseEvent hwfEvent) {
-        if (emailTemplatesBilingual == null) {
-            emailTemplatesBilingual = Map.of(
-                CaseEvent.INVALID_HWF_REFERENCE,
-                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual(),
-                CaseEvent.MORE_INFORMATION_HWF,
-                notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh(),
-                CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
-                CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
-                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual(),
-                CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
-                notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual()
-            );
-        }
-        return emailTemplatesBilingual.get(hwfEvent);
+        return switch (hwfEvent) {
+            case INVALID_HWF_REFERENCE -> notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual();
+            case MORE_INFORMATION_HWF -> notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh();
+            case NO_REMISSION_HWF -> notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh();
+            case UPDATE_HELP_WITH_FEE_NUMBER -> notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual();
+            case PARTIAL_REMISSION_HWF_GRANTED -> notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual();
+            default -> null;
+        };
     }
 
     public Map<String, String> getCommonProperties(CaseData caseData) {
@@ -127,7 +111,7 @@ public class NotifyClaimantHwFOutcomeHelper {
         );
     }
 
-    private String getHwFNoRemissionReason(CaseData caseData) {
+    public String getHwFNoRemissionReason(CaseData caseData) {
         if (caseData.isHWFTypeHearing()) {
             return caseData.getHearingHwfDetails().getNoRemissionDetailsSummary().getLabel();
         }
@@ -137,7 +121,7 @@ public class NotifyClaimantHwFOutcomeHelper {
         return "";
     }
 
-    private String getHwFNoRemissionReasonWelsh(CaseData caseData) {
+    public String getHwFNoRemissionReasonWelsh(CaseData caseData) {
         if (caseData.isHWFTypeHearing()) {
             return caseData.getHearingHwfDetails().getNoRemissionDetailsSummary().getLabelWelsh();
         }
@@ -147,7 +131,7 @@ public class NotifyClaimantHwFOutcomeHelper {
         return "";
     }
 
-    private String getMoreInformationDocumentList(List<HwFMoreInfoRequiredDocuments> list) {
+    public String getMoreInformationDocumentList(List<HwFMoreInfoRequiredDocuments> list) {
         StringBuilder documentList = new StringBuilder();
         for (HwFMoreInfoRequiredDocuments doc : list) {
             documentList.append(doc.getName());
@@ -161,7 +145,7 @@ public class NotifyClaimantHwFOutcomeHelper {
         return documentList.toString();
     }
 
-    private String getMoreInformationDocumentListWelsh(List<HwFMoreInfoRequiredDocuments> list) {
+    public String getMoreInformationDocumentListWelsh(List<HwFMoreInfoRequiredDocuments> list) {
         StringBuilder documentList = new StringBuilder();
         for (HwFMoreInfoRequiredDocuments doc : list) {
             documentList.append(doc.getNameBilingual());

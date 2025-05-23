@@ -1,30 +1,22 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimanthwfoutcome;
+package uk.gov.hmcts.reform.civil.notification.handlers.notifyhwfoutcomeparties;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class NotifyClaimantHwFOutcomeAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
+@Component
+public class NotifyHwFOutcomePartiesClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "hwf-outcome-notification-%s";
-    private final NotifyClaimantHwFOutcomeHelper notifyClaimantHwFOutcomeHelper;
+    private final NotifyHwFOutcomePartiesHelper notifyClaimantHwFOutcomeHelper;
 
-    public NotifyClaimantHwFOutcomeAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(null);
-        this.notifyClaimantHwFOutcomeHelper = new NotifyClaimantHwFOutcomeHelper(notificationsProperties);
-    }
-
-    @Override
-    public String getEmailAddress(CaseData caseData) {
-        if (caseData.isApplicantLiP()){
-            return caseData.getApplicant1Email();
-        }
-        return caseData.getApplicantSolicitor1UserDetails().getEmail();
+    public NotifyHwFOutcomePartiesClaimantEmailDTOGenerator(NotifyHwFOutcomePartiesHelper notifyClaimantHwFOutcomeHelper) {
+        this.notifyClaimantHwFOutcomeHelper = notifyClaimantHwFOutcomeHelper;
     }
 
     @Override
