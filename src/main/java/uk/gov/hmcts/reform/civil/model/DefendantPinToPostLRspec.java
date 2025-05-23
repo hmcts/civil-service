@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ public class DefendantPinToPostLRspec {
 
     private final String accessCode;
     private final String respondentCaseRole;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDate expiryDate;
     private final String citizenCaseRole;
 
