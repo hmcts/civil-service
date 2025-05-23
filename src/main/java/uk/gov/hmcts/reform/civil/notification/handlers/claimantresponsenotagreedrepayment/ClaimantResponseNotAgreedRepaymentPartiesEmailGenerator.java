@@ -21,19 +21,19 @@ public class ClaimantResponseNotAgreedRepaymentPartiesEmailGenerator implements 
     private final ClaimantResponseNotAgreedRepaymentRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator;
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
+    public Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
         if (caseData.isApplicantLiP()) {
-            partiesToEmail.add(claimantEmailDTOGenerator.buildEmailDTO(caseData));
+            partiesToEmail.add(claimantEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         } else {
-            partiesToEmail.add(appSolOneEmailDTOGenerator.buildEmailDTO(caseData));
+            partiesToEmail.add(appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         }
 
         if (caseData.isRespondent1NotRepresented()) {
-            partiesToEmail.add(defendantEmailDTOGenerator.buildEmailDTO(caseData));
+            partiesToEmail.add(defendantEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         } else {
-            partiesToEmail.add(respSolOneEmailDTOGenerator.buildEmailDTO(caseData));
+            partiesToEmail.add(respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         }
 
         return partiesToEmail;

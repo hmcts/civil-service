@@ -37,14 +37,15 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         }
         sb.append("<br>We've emailed ").append(applicantName)
             .append(" to say you've suggested paying by instalments.")
-            .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.")
-            .append(String
+            .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.");
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            sb.append(String
                         .format(
                             "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-                        ))
-
-            .append("<h3 class=\"govuk-heading-m\">If ")
+                        ));
+        }
+        sb.append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName);
         if (caseData.getApplicant2() != null) {
             sb.append(" accept your offer</h3>");
