@@ -126,7 +126,7 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
               .append(featureToggleService.isLrAdmissionBulkEnabled()
                             ? " plus the claim fee and any costs and further interest claimed"
                             : "")
-              .append(P_TAG);
+                  .append(P_TAG);
         }
         sb.append(headingThreeText)
             .append(applicantName)
