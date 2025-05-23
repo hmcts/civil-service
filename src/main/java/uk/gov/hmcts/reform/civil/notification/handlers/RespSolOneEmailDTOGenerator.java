@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @AllArgsConstructor
 public abstract class RespSolOneEmailDTOGenerator extends EmailDTOGenerator {
 
-    private final OrganisationService organisationService;
+    protected final OrganisationService organisationService;
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
