@@ -26,10 +26,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
+public class DefendantSignSettlementDefendantEmailDTOGeneratorTest {
 
     @InjectMocks
-    private DefendantSignSettlementClaimantEmailDTOGenerator emailDTOGenerator;
+    private DefendantSignSettlementDefendantEmailDTOGenerator emailDTOGenerator;
 
     @Mock
     private PinInPostConfiguration pipInPostConfiguration;
