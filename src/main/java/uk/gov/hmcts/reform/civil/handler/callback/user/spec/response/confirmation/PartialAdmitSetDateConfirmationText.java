@@ -122,7 +122,11 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
                 .append(P_TAG);
         } else {
             sb.append("<p>The court will review the case for the full amount of &#163;")
-              .append(totalClaimAmount).append(P_TAG);
+              .append(totalClaimAmount)
+              .append(featureToggleService.isLrAdmissionBulkEnabled()
+                            ? " plus the claim fee and any costs and further interest claimed"
+                            : "")
+              .append(P_TAG);
         }
         sb.append(headingThreeText)
             .append(applicantName)
