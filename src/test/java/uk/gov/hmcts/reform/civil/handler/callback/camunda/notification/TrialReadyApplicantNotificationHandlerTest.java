@@ -151,28 +151,27 @@ class TrialReadyApplicantNotificationHandlerTest {
         }
 
         private Map<String, String> getNotificationDataMapLiPvLiP(CaseData caseData) {
-
-            return Map.of(
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_NAME, caseData.getApplicant1().getPartyName(),
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
                 CASEMAN_REF, "000DC001"
-            );
+            ));
+            return expectedProperties;
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            expectedProperties.putAll(Map.of(
                 HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                CASEMAN_REF, "000DC001",
-                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-            );
+                CASEMAN_REF, "000DC001"
+            ));
+            return expectedProperties;
         }
 
         @NotNull

@@ -60,10 +60,14 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     public Map<String, String> addProperties(CaseData caseData) {
 
         if (caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()) {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-            );
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
+            return properties;
         }
         HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),

@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.YamlNotificationTestUtil;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.argThat;
@@ -50,12 +52,16 @@ class BreathingSpaceEnterNotificationHandlerTest {
 
     @BeforeEach
     void setUp() {
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
 
     @Test
@@ -102,11 +108,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
-                    && map.get(NotificationData.PHONE_CONTACT).equals("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050")
-                    && map.get(NotificationData.OPENING_HOURS).equals("Monday to Friday, 8.30am to 5pm")
-                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                                + "\n Email for Damages Claims: damagesclaims@justice.gov.uk")
-                    && map.get(NotificationData.HMCTS_SIGNATURE).equals("Online Civil Claims \n HM Courts & Tribunal Service")
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -156,11 +166,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
-                    && map.get(NotificationData.PHONE_CONTACT).equals("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050")
-                    && map.get(NotificationData.OPENING_HOURS).equals("Monday to Friday, 8.30am to 5pm")
-                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                                + "\n Email for Damages Claims: damagesclaims@justice.gov.uk")
-                    && map.get(NotificationData.HMCTS_SIGNATURE).equals("Online Civil Claims \n HM Courts & Tribunal Service")
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -212,11 +226,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
-                    && map.get(NotificationData.PHONE_CONTACT).equals("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050")
-                    && map.get(NotificationData.OPENING_HOURS).equals("Monday to Friday, 8.30am to 5pm")
-                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                                + "\n Email for Damages Claims: damagesclaims@justice.gov.uk")
-                    && map.get(NotificationData.HMCTS_SIGNATURE).equals("Online Civil Claims \n HM Courts & Tribunal Service")
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -268,11 +286,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
-                    && map.get(NotificationData.PHONE_CONTACT).equals("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050")
-                    && map.get(NotificationData.OPENING_HOURS).equals("Monday to Friday, 8.30am to 5pm")
-                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                                + "\n Email for Damages Claims: damagesclaims@justice.gov.uk")
-                    && map.get(NotificationData.HMCTS_SIGNATURE).equals("Online Civil Claims \n HM Courts & Tribunal Service")
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -322,11 +344,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             eq(templateId),
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
-                    && map.get(NotificationData.PHONE_CONTACT).equals("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050")
-                    && map.get(NotificationData.OPENING_HOURS).equals("Monday to Friday, 8.30am to 5pm")
-                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                                + "\n Email for Damages Claims: damagesclaims@justice.gov.uk")
-                    && map.get(NotificationData.HMCTS_SIGNATURE).equals("Online Civil Claims \n HM Courts & Tribunal Service")
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC).equals(solicitorName)),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );

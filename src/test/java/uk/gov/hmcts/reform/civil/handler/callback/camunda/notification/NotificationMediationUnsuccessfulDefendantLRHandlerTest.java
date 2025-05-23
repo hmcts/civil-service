@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.YamlNotificationTestUtil;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
@@ -27,6 +30,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,11 +53,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,349 +106,401 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     private static final String DEFENDANT_2_EMAIL_ADDRESS = "defendant2email@hmcts.net";
     private static final String DEFENDANTS_TEXT = "'s claim against you";
 
-    @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
-        "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
-    void shouldSendNotificationToDefendant1LR(MediationUnsuccessfulReason reason) {
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
+    @Nested
+    class AboutToSubmitCallback {
 
-        //When
-        given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
-        given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
+        @BeforeEach
+        void setUp() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        }
 
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+        @ParameterizedTest
+        @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
+            "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
+        void shouldSendNotificationToDefendant1LR(MediationUnsuccessfulReason reason) {
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+                .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                .build();
 
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+            //When
+            given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
+            given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
 
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD1PropertyMap(caseData));
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
-    }
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
-    @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
-        "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
-    void shouldSendNotificationToDefendant2LR(MediationUnsuccessfulReason reason) {
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
-        given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
-        given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD1PropertyMap(caseData));
 
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+        }
 
-        //When
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD2PropertyMap(caseData));
-    }
+        @ParameterizedTest
+        @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
+            "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
+        void shouldSendNotificationToDefendant2LR(MediationUnsuccessfulReason reason) {
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+                .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                .build();
+            given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
+            given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
 
-    @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
-        "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
-    void shouldSendNotificationToDefendantLR_2v1(MediationUnsuccessfulReason reason) {
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicant2(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_2_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.YES)
-            .addRespondent2(YesOrNo.NO)
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
-        given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
-        given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
 
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+            //When
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD2PropertyMap(caseData));
+        }
 
-        //When
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
-        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarm2v1PropertyMap(caseData));
-    }
+        @ParameterizedTest
+        @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT",
+            "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
+        void shouldSendNotificationToDefendantLR_2v1(MediationUnsuccessfulReason reason) {
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicant2(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_2_PARTY_NAME).build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+                .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.YES)
+                .addRespondent2(YesOrNo.NO)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                .build();
+            given(notificationsProperties.getMediationUnsuccessfulLRTemplate()).willReturn(EMAIL_TEMPLATE);
+            given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
 
-    @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_DEFENDANT_ONE"})
-    void shouldSendNotificationToDefendant1LRNoAttendance(MediationUnsuccessfulReason reason) {
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_1_PARTY_NAME).individualLastName(
-                "Lea").build())
-            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
-        //When
-        given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
-            EMAIL_NO_ATTENDANCE_TEMPLATE);
-        given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
+            //When
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarm2v1PropertyMap(caseData));
+        }
 
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+        @ParameterizedTest
+        @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_DEFENDANT_ONE"})
+        void shouldSendNotificationToDefendant1LRNoAttendance(MediationUnsuccessfulReason reason) {
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_1_PARTY_NAME).individualLastName(
+                    "Lea").build())
+                .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                .build();
 
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
-        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD1NoAttendancePropertyMap(caseData));
-    }
+            //When
+            given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                EMAIL_NO_ATTENDANCE_TEMPLATE);
+            given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
 
-    @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_DEFENDANT_TWO"})
-    void shouldSendNotificationToDefendant2LRNoAttendance(MediationUnsuccessfulReason reason) {
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_2_PARTY_NAME).individualLastName(
-                "Lea").build())
-            .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.YES)
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-            .build();
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
 
-        //When
-        given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
-            EMAIL_NO_ATTENDANCE_TEMPLATE);
-        given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD1NoAttendancePropertyMap(caseData));
+        }
 
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+        @ParameterizedTest
+        @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_DEFENDANT_TWO"})
+        void shouldSendNotificationToDefendant2LRNoAttendance(MediationUnsuccessfulReason reason) {
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_2_PARTY_NAME).individualLastName(
+                    "Lea").build())
+                .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.YES)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+                .build();
 
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
-        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD2NoAttendancePropertyMap(caseData));
+            //When
+            given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                EMAIL_NO_ATTENDANCE_TEMPLATE);
+            given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD2NoAttendancePropertyMap(caseData));
+        }
+
+        @Test
+        void shouldSendNotificationToDefendant1LRNoAttendance_whenMoreThan1Reason() {
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+                .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                   NOT_CONTACTABLE_CLAIMANT_ONE,
+                                   NOT_CONTACTABLE_DEFENDANT_ONE
+                               )).build())
+                .build();
+
+            //When
+            given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                EMAIL_NO_ATTENDANCE_TEMPLATE);
+            given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD1NoAttendancePropertyMap(caseData));
+        }
+
+        @Test
+        void shouldSendNotificationToDefendant2LRNoAttendance_whenMoreThan1Reason() {
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_2_PARTY_NAME).individualLastName(
+                    "Lea").build())
+                .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.YES)
+                .mediation(Mediation.builder()
+                               .mediationUnsuccessfulReasonsMultiSelect(List.of(
+                                   PARTY_WITHDRAWS,
+                                   NOT_CONTACTABLE_DEFENDANT_ONE,
+                                   NOT_CONTACTABLE_DEFENDANT_TWO
+                               )).build())
+                .build();
+
+            //When
+            given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
+                EMAIL_NO_ATTENDANCE_TEMPLATE);
+            given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
+
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD2NoAttendancePropertyMap(caseData));
+        }
+
+        @Test
+        void shouldSendNotificationToDefendant1LRforLiPvLrCase() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+                .applicant1Represented(NO)
+                .specRespondent1Represented(YES)
+                .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
+                .legacyCaseReference("123456")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .build();
+
+            //When
+            given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
+            given(notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr()).willReturn(
+                EMAIL_TEMPLATE_LIP_V_LR);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE_LIP_V_LR);
+        }
+
+        @NotNull
+        private Map<String, String> getCarmD1PropertyMap(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1);
+            properties.put(PARTY_NAME, APPLICANT_PARTY_NAME + DEFENDANTS_TEXT);
+            properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            return properties;
+        }
+
+
+        @NotNull
+        private Map<String, String> getCarmD2PropertyMap(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_2);
+            properties.put(PARTY_NAME, APPLICANT_PARTY_NAME + DEFENDANTS_TEXT);
+            properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            return properties;
+        }
+
+        @NotNull
+        private Map<String, String> getCarm2v1PropertyMap(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1);
+            properties.put(PARTY_NAME, APPLICANT_PARTY_NAME + " and " + APPLICANT_2_PARTY_NAME + DEFENDANTS_TEXT);
+            properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            return properties;
+        }
+
+        @NotNull
+        private Map<String, String> getCarmD1NoAttendancePropertyMap(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1);
+            properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            return properties;
+        }
+
+        @NotNull
+        private Map<String, String> getCarmD2NoAttendancePropertyMap(CaseData caseData) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_2);
+            properties.put(CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            return properties;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties() {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            return expectedProperties;
+        }
     }
 
     @Test
-    void shouldSendNotificationToDefendant1LRNoAttendance_whenMoreThan1Reason() {
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                               NOT_CONTACTABLE_CLAIMANT_ONE,
-                               NOT_CONTACTABLE_DEFENDANT_ONE
-                           )).build())
-            .build();
-
-        //When
-        given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
-            EMAIL_NO_ATTENDANCE_TEMPLATE);
-        given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
-
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
-
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
-        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD1NoAttendancePropertyMap(caseData));
-    }
-
-    @Test
-    void shouldSendNotificationToDefendant2LRNoAttendance_whenMoreThan1Reason() {
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName(DEFENDANT_2_PARTY_NAME).individualLastName(
-                "Lea").build())
-            .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.YES)
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(
-                               PARTY_WITHDRAWS,
-                               NOT_CONTACTABLE_DEFENDANT_ONE,
-                               NOT_CONTACTABLE_DEFENDANT_TWO
-                           )).build())
-            .build();
-
-        //When
-        given(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate()).willReturn(
-            EMAIL_NO_ATTENDANCE_TEMPLATE);
-        given(organisationDetailsService.getRespondent2LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_2);
-
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR.name()).build()).build();
-
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_NO_ATTENDANCE_TEMPLATE);
-        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getCarmD2NoAttendancePropertyMap(caseData));
-    }
-
-    @Test
-    void shouldSendNotificationToDefendant1LRforLiPvLrCase() {
+    void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_applicantRepresented() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicant1Represented(NO)
-            .specRespondent1Represented(YES)
-            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
-            .ccdCaseReference(CCD_REFERENCE_NUMBER)
-            .legacyCaseReference("123456")
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
-            .build();
-
-        //When
-        given(organisationDetailsService.getRespondent1LegalOrganisationName(any())).willReturn(ORGANISATION_NAME_1);
-        given(notificationsProperties.getMediationUnsuccessfulLRTemplateForLipVLr()).willReturn(EMAIL_TEMPLATE_LIP_V_LR);
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
-
-        notificationHandler.handle(params);
-        //Then
-        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                       emailTemplate.capture(),
-                                                       notificationDataMap.capture(), reference.capture()
-        );
-        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
-        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE_LIP_V_LR);
-    }
-
-    @Test
-    void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_LipVLipIsNotSet() {
-        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicant1Represented(NO)
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+            .applicant1Represented(YES)
             .specRespondent1Represented(YES)
             .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
             .ccdCaseReference(CCD_REFERENCE_NUMBER)
@@ -458,13 +519,12 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     }
 
     @Test
-    void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_applicantRepresented() {
+    void shouldNotSendNotificationToDefendant1LRforLiPvLrCase_LipVLipIsNotSet() {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-            .applicant1Represented(YES)
+            .applicant1Represented(NO)
             .specRespondent1Represented(YES)
             .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
             .ccdCaseReference(CCD_REFERENCE_NUMBER)
@@ -505,79 +565,6 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             params);
         //Then
         assertThat(response.getErrors()).isNull();
-    }
-
-    @NotNull
-    private Map<String, String> getCarmD1PropertyMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1,
-            PARTY_NAME, APPLICANT_PARTY_NAME + DEFENDANTS_TEXT,
-            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
-    }
-
-    @NotNull
-    private Map<String, String> getCarmD2PropertyMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_2,
-            PARTY_NAME, APPLICANT_PARTY_NAME + DEFENDANTS_TEXT,
-            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
-    }
-
-    @NotNull
-    private Map<String, String> getCarm2v1PropertyMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1,
-            PARTY_NAME, APPLICANT_PARTY_NAME + " and " + APPLICANT_2_PARTY_NAME + DEFENDANTS_TEXT,
-            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
-    }
-
-    @NotNull
-    private Map<String, String> getCarmD1NoAttendancePropertyMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_1,
-            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
-    }
-
-    @NotNull
-    private Map<String, String> getCarmD2NoAttendancePropertyMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME_2,
-            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
     }
 
 }
