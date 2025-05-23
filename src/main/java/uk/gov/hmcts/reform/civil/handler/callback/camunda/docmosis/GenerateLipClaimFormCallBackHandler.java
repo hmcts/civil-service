@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_FORM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT1_DETAILS_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -77,6 +80,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     }
 
     private CaseData buildClaimFormData(CaseData caseData, CaseDocument caseDocument, CaseEvent event) {
+        List<Element<CaseDocument>> translatedDocuments = null;
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
             caseDocument,
             caseData
@@ -86,9 +90,14 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
             systemGeneratedCaseDocuments = systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
                 .toList();
+        } else if (featureToggleService.isGaForWelshEnabled() && caseData.isClaimantBilingual()
+            && event == GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC) {
+            translatedDocuments = caseData.getPreTranslationDocuments();
+            translatedDocuments.add(element(caseDocument));
         }
 
         return caseData.toBuilder()
+            .preTranslationDocuments(translatedDocuments)
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
             .build();
     }
