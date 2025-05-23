@@ -10,18 +10,14 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 @Component
 public class ClaimantDefendantAgreedMediationRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
-    private final FeatureToggleService featureToggleService;
-
     public ClaimantDefendantAgreedMediationRespSolTwoEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties,
                                                                        FeatureToggleService featureToggleService) {
         super(notificationsProperties, organisationService);
-        this.featureToggleService = featureToggleService;
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return featureToggleService.isCarmEnabledForCase(caseData) ? notificationsProperties.getNotifyDefendantLRForMediation() :
-            notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate();
+        return notificationsProperties.getNotifyDefendantLRForMediation();
     }
 
     @Override

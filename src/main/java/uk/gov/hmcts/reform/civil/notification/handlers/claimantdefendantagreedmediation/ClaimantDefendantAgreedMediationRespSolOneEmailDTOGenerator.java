@@ -25,8 +25,7 @@ public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGenerator extends
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return featureToggleService.isCarmEnabledForCase(caseData) ? notificationsProperties.getNotifyDefendantLRForMediation() :
-            notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate();
+        return notificationsProperties.getNotifyDefendantLRForMediation();
     }
 
     @Override
