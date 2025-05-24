@@ -80,9 +80,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> courtOfficerOrderDocuments = new ArrayList<>();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
-                if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
-                    Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
-                    systemGeneratedDocuments.add(originalSdo);
+                if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
+                    if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
+                        Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
+                        systemGeneratedDocuments.add(originalSdo);
+                    }
                 } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
