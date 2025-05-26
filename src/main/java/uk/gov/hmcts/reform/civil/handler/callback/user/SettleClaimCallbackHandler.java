@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
@@ -28,7 +29,7 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
 
     protected final ObjectMapper objectMapper;
     private final DashboardNotificationService dashboardNotificationService;
-
+    private final FeatureToggleService  featureToggleService;
     private static final List<CaseEvent> EVENTS = List.of(SETTLE_CLAIM);
     private final TaskListService taskListService;
 
@@ -59,17 +60,35 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse inactivateTaskListAndBuildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean isLrQmEnabled = featureToggleService.isQueryManagementLRsEnabled();
+
         if (caseData.isApplicantLiP()) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                   "CLAIMANT",
-                                                                                                   "Application.View"
-            );
+            if (!isLrQmEnabled) {
+                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
+                                                                                                       "CLAIMANT",
+                                                                                                       "Application.View"
+                );
+            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())){
+                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
+                                                                                                       "CLAIMANT",
+                                                                                                       "Application.View"
+                );
+            }
+
         }
         if (caseData.isRespondent1LiP()) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                   "DEFENDANT",
-                                                                                                   "Application.View"
-            );
+            if (!isLrQmEnabled) {
+                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
+                                                                                                       "DEFENDANT",
+                                                                                                       "Application.View"
+                );
+            } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())){
+                taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
+                                                                                                       "DEFENDANT",
+                                                                                                       "Application.View"
+                );
+            }
+
         }
         return SubmittedCallbackResponse.builder()
             .confirmationHeader("# Claim marked as settled")

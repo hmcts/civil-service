@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
@@ -39,6 +40,9 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private DashboardNotificationService dashboardNotificationService;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
