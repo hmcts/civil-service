@@ -4,6 +4,8 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Setter
 @Component
 public class GenerateOrderCOOAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
@@ -15,10 +17,10 @@ public class GenerateOrderCOOAllPartiesEmailGenerator extends AllPartiesEmailGen
         GenerateOrderCOOClaimantEmailDTOGenerator claimantEmailDTOGenerator,
         GenerateOrderCOODefendantEmailDTOGenerator defendantEmailDTOGenerator
     ) {
-        super(appSolEmailDTOGenerator,
+        super(List.of(appSolEmailDTOGenerator,
               resp1EmailDTOGenerator,
               resp2EmailDTOGenerator,
               claimantEmailDTOGenerator,
-              defendantEmailDTOGenerator);
+              defendantEmailDTOGenerator));
     }
 }
