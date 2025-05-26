@@ -27,6 +27,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 @RequiredArgsConstructor
 public class SettleClaimCallbackHandler extends CallbackHandler {
 
+    public static final String CLAIMANT = "CLAIMANT";
+    public static final String APPLICATION_VIEW = "Application.View";
+    public static final String DEFENDANT = "DEFENDANT";
     protected final ObjectMapper objectMapper;
     private final DashboardNotificationService dashboardNotificationService;
     private final FeatureToggleService  featureToggleService;
@@ -65,13 +68,13 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
         if (caseData.isApplicantLiP()) {
             if (!isLrQmEnabled) {
                 taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       "CLAIMANT",
-                                                                                                       "Application.View"
+                                                                                                       CLAIMANT,
+                                                                                                       APPLICATION_VIEW
                 );
             } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
                 taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       "CLAIMANT",
-                                                                                                       "Application.View"
+                                                                                                       CLAIMANT,
+                                                                                                       APPLICATION_VIEW
                 );
             }
 
@@ -79,13 +82,13 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
         if (caseData.isRespondent1LiP()) {
             if (!isLrQmEnabled) {
                 taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       "DEFENDANT",
-                                                                                                       "Application.View"
+                                                                                                       DEFENDANT,
+                                                                                                       APPLICATION_VIEW
                 );
             } else if (!featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())) {
                 taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(caseData.getCcdCaseReference().toString(),
-                                                                                                       "DEFENDANT",
-                                                                                                       "Application.View"
+                                                                                                       DEFENDANT,
+                                                                                                       APPLICATION_VIEW
                 );
             }
 
@@ -99,11 +102,11 @@ public class SettleClaimCallbackHandler extends CallbackHandler {
     private void deleteMainCaseDashboardNotifications(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseDataBuilder.build().isApplicantLiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                caseDataBuilder.build().getCcdCaseReference().toString(), "CLAIMANT");
+                caseDataBuilder.build().getCcdCaseReference().toString(), CLAIMANT);
         }
         if (caseDataBuilder.build().isRespondent1LiP()) {
             dashboardNotificationService.deleteByReferenceAndCitizenRole(
-                caseDataBuilder.build().getCcdCaseReference().toString(), "DEFENDANT");
+                caseDataBuilder.build().getCcdCaseReference().toString(), DEFENDANT);
         }
     }
 }
