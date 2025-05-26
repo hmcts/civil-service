@@ -21,7 +21,10 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
@@ -93,6 +96,62 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void should_disable_task_list_items() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData = caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
+                .handle(params);
+            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "Application.View"
+            );
+            verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "Application.View"
+            );
+            Assertions.assertTrue(response.getConfirmationHeader().contains("# Claim marked as settled"));
+            Assertions.assertTrue(response.getConfirmationBody().contains("<br />"));
+        }
+
+        @Test
+        void should_not_disable_task_list_items_when_qmlr_is_on_and_eacourt() {
+            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData = caseData.toBuilder()
+                .ccdCaseReference(1234L)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
+                .handle(params);
+            verify(taskListService, times(0)).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                "CLAIMANT",
+                "Application.View"
+            );
+            verify(taskListService, times(0)).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+                caseData.getCcdCaseReference().toString(),
+                "DEFENDANT",
+                "Application.View"
+            );
+            Assertions.assertTrue(response.getConfirmationHeader().contains("# Claim marked as settled"));
+            Assertions.assertTrue(response.getConfirmationBody().contains("<br />"));
+        }
+
+        @Test
+        void should_disable_task_list_items_when_qmlr_is_on_and_non_eaCourt() {
+            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData = caseData.toBuilder()
                 .ccdCaseReference(1234L)
