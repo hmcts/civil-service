@@ -68,6 +68,24 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
     @InjectMocks
     private EvidenceUploadApplicantNotificationHandler handler;
 
+    private CaseData createCaseDataWithText() {
+        return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText(EvidenceUploadApplicantNotificationHandlerTest.NOTIFICATION_TEXT)
+            .build();
+    }
+
+    private CaseData createCaseDataForLip(String notificationText) {
+        return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText(notificationText)
+            .applicant1Represented(YesOrNo.NO)
+            .applicant1(Party.builder()
+                            .individualFirstName("John")
+                            .individualLastName("Doe")
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Billy").partyEmail(APPLICANT_LIP_EMAIL).build())
+            .build();
+    }
+
     @Nested
     class AboutToSubmitCallback {
 
@@ -134,40 +152,6 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             );
         }
 
-        @Test
-        void shouldNotNotifyApplicantLip_whenInvokedAndNoNotificationContent() {
-            CaseData caseData = createCaseDataForLip("NULLED");
-
-            handler.notifyApplicantEvidenceUpload(caseData);
-            verifyNoInteractions(notificationService);
-        }
-
-        @Test
-        void shouldNotNotifyApplicantLip_whenInvokedAndNoNotificationContentNull() {
-            CaseData caseData = createCaseDataForLip(null);
-
-            handler.notifyApplicantEvidenceUpload(caseData);
-            verifyNoInteractions(notificationService);
-        }
-
-        private CaseData createCaseDataWithText() {
-            return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .notificationText(EvidenceUploadApplicantNotificationHandlerTest.NOTIFICATION_TEXT)
-                .build();
-        }
-
-        private CaseData createCaseDataForLip(String notificationText) {
-            return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .notificationText(notificationText)
-                .applicant1Represented(YesOrNo.NO)
-                .applicant1(Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .type(Party.Type.INDIVIDUAL)
-                                .partyName("Billy").partyEmail(APPLICANT_LIP_EMAIL).build())
-                .build();
-        }
-
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
@@ -213,5 +197,21 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             return expectedProperties;
         }
+    }
+
+    @Test
+    void shouldNotNotifyApplicantLip_whenInvokedAndNoNotificationContent() {
+        CaseData caseData = createCaseDataForLip("NULLED");
+
+        handler.notifyApplicantEvidenceUpload(caseData);
+        verifyNoInteractions(notificationService);
+    }
+
+    @Test
+    void shouldNotNotifyApplicantLip_whenInvokedAndNoNotificationContentNull() {
+        CaseData caseData = createCaseDataForLip(null);
+
+        handler.notifyApplicantEvidenceUpload(caseData);
+        verifyNoInteractions(notificationService);
     }
 }

@@ -7,6 +7,11 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public class YamlNotificationTestUtil {
+
+    private YamlNotificationTestUtil() {
+        // Utility class
+    }
+
     public static Map<String, Object> loadNotificationsConfig() {
         try {
             Yaml yaml = new Yaml();

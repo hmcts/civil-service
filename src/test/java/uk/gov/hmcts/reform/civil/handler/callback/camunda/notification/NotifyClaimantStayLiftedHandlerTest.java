@@ -147,6 +147,7 @@ class NotifyClaimantStayLiftedHandlerTest {
         when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
 
         CallbackResponse response = handler.sendNotification(params);
+        assertNotNull(response);
 
         Map<String, String> commonProps = addCommonProperties();
 
@@ -163,7 +164,6 @@ class NotifyClaimantStayLiftedHandlerTest {
             notificationData,
             "stay-lifted-claimant-notification-1594901956117591"
         );
-        assertNotNull(response);
     }
 
     @ParameterizedTest
@@ -189,7 +189,7 @@ class NotifyClaimantStayLiftedHandlerTest {
             when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
         }
 
-        CallbackResponse response = handler.sendNotification(params);
+        final CallbackResponse response = handler.sendNotification(params);
 
         Map<String, String> commonProps = addCommonProperties();
         Map<String, String> notificationData = new HashMap<>(commonProps);

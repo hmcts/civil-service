@@ -96,7 +96,7 @@ class NotifyClaimantCaseStayedHandlerTest {
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(email).build())
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        final CallbackParams params = CallbackParams.builder().caseData(caseData).build();
 
         if (isApplicantLiP && isClaimantBilingual) {
             when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("bilingual-template");
@@ -106,8 +106,6 @@ class NotifyClaimantCaseStayedHandlerTest {
             when(notificationsProperties.getNotifyLRCaseStayed()).thenReturn("solicitor-template");
         }
 
-        CallbackResponse response = handler.sendNotification(params);
-
         Map<String, String> commonProps = addCommonProperties();
 
         Map<String, String> notificationData = new HashMap<>(commonProps);
@@ -116,6 +114,8 @@ class NotifyClaimantCaseStayedHandlerTest {
         notificationData.put("claimantvdefendant", "John Doe V Jack Jackson");
         notificationData.put("partyReferences", buildPartiesReferencesEmailSubject(caseData));
         notificationData.put("casemanRef", caseData.getLegacyCaseReference());
+
+        CallbackResponse response = handler.sendNotification(params);
 
         verify(notificationService).sendMail(
             email,

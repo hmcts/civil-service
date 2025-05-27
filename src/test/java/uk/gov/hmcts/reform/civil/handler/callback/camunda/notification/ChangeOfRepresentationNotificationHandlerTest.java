@@ -373,6 +373,7 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+            handler.handle(params);
 
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "Defendant Name",
@@ -394,8 +395,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-
-            handler.handle(params);
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
@@ -415,6 +414,7 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+            handler.handle(params);
 
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "Defendant Name",
@@ -436,8 +436,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
             expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-
-            handler.handle(params);
 
             verify(notificationService).sendMail(
                 "rambo@email.com",

@@ -201,7 +201,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     }
 
     @NotNull
-    private Map<String, String> propertiesLip( ) {
+    private Map<String, String> propertiesLip() {
         Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
         expectedProperties.putAll(Map.of(
             "claimantvdefendant", "Mr. John Rambo V Jack Jackson",
