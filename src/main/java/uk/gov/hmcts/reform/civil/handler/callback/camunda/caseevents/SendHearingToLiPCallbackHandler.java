@@ -63,6 +63,7 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse sendHearingLetter(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         String task = camundaActivityId(callbackParams);
         sendHearingBulkPrintService.sendHearingToLIP(

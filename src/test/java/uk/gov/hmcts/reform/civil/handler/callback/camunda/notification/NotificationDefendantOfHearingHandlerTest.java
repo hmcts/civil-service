@@ -160,7 +160,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "respondent1email@hmcts.net",
                 "test-template-no-fee-defendant-id",
-                getNotificationDataMapNoReference(),
+                getNotificationDataMapNoReference(caseData),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -197,7 +197,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "respondent1email@hmcts.net",
                 "test-template-no-fee-defendant-id",
-                getNotificationDataMapNoReference(),
+                getNotificationDataMapNoReference(caseData),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -723,7 +723,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapNoReference() {
+        private Map<String, String> getNotificationDataMapNoReference(CaseData caseData) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 "defendantReferenceNumber", "", "hearingDate", "07-10-2022",
