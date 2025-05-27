@@ -172,6 +172,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .legacyCaseReference(REFERENCE_NUMBER)
             .totalClaimAmount(BigDecimal.ONE)
             .issueDate(DATE)
+            .respondent1ResponseDeadline(LocalDateTime.now())
             .build();
         when(docmosisApiClient.createDocument(any(DocmosisRequest.class)))
             .thenReturn(bytes);
