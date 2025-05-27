@@ -42,7 +42,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -162,7 +165,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "respondent1email@hmcts.net",
                 "test-template-no-fee-defendant-id",
-                getNotificationDataMapNoReference(caseData),
+                getNotificationDataMapNoReference(),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -199,7 +202,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             verify(notificationService).sendMail(
                 "respondent1email@hmcts.net",
                 "test-template-no-fee-defendant-id",
-                getNotificationDataMapNoReference(caseData),
+                getNotificationDataMapNoReference(),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -745,7 +748,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapNoReference(CaseData caseData) {
+        private Map<String, String> getNotificationDataMapNoReference() {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 "defendantReferenceNumber", "", "hearingDate", "07-10-2022",
