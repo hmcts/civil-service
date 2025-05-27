@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -31,6 +32,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_LIP_SOLICITOR;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -144,7 +148,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
     }
 
     public Map<String, String> addPropertiesForDefendantSolicitor(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CASEMAN_REF, caseData.getLegacyCaseReference(),
             CASE_NAME, NocNotificationUtils.getCaseName(caseData),
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
@@ -152,7 +156,12 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
             OTHER_SOL_NAME, getLegalOrganizationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)),
             NEW_SOL, getLegalOrganizationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     public Map<String, String> getEmailProperties(CaseData caseData, boolean isDefendantEvent,
