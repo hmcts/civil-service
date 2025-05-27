@@ -206,7 +206,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .thenThrow(DocumentUploadException.class);
 
         MvcResult result = doPost(BEARER_TOKEN, caseData, GENERATE_SEALED_DOC_URL)
-            .andExpect(status().isInternalServerError()).andReturn();
+            .andExpect(status().isBadRequest()).andReturn();
 
         assertEquals("Document upload unsuccessful", result.getResponse().getContentAsString());
         //then
