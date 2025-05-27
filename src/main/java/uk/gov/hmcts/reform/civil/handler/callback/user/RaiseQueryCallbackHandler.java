@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -49,6 +50,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     protected final UserService userService;
     protected final CoreCaseUserService coreCaseUserService;
+    protected final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
@@ -81,19 +83,31 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseMessage latestCaseMessage = getLatestQuery(caseData);
 
         List<String> roles = retrieveUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+
+        // Once QM Lip goes live stop retrieving the latest query by role as we will only be using a single queries collection.
+        CaseMessage latestCaseMessage = featureToggleService.isLipQueryManagementEnabled(caseData)
+            ? caseData.getQueries().latest() : getUserQueriesByRole(caseData, roles).latest();
+
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
             buildLatestQuery(latestCaseMessage));
 
-        // Since this query collection is no longer tied to a specific user we need to ensure
-        // we clear the partyName field that EXUI populates with the logged in user's name.
-        caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName("").build());
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            // Since this query collection is no longer tied to a specific user we need to ensure
+            // we clear the partyName field that EXUI populates with the logged in user's name.
+            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName("").build());
+        } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+            updateQueryCollectionPartyName(
+                roles,
+                MultiPartyScenario.getMultiPartyScenario(caseData),
+                caseDataBuilder
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
