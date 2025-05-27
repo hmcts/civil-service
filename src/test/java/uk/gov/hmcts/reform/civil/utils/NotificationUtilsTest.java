@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignatureWelsh;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addLipContactWelsh;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 
@@ -532,7 +533,7 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
                 when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, false);
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, false, false);
                 assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
             }
 
@@ -541,7 +542,7 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
                 when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, true);
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, false, true);
                 assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
             }
 
@@ -552,7 +553,7 @@ class NotificationUtilsTest {
                     .respondent1Represented(NO)
                     .ccdState(Enum.valueOf(CaseState.class, caseState)).build();
                 when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true, true);
                 assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
             }
 
@@ -561,7 +562,7 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
                 when(configuration.getRaiseQueryLipWelsh()).thenReturn("I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd.");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true, true);
                 assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd.");
             }
 
