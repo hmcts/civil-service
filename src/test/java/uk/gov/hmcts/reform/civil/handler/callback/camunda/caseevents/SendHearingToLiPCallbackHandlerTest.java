@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -165,26 +164,4 @@ class SendHearingToLiPCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getErrors()).isNull();
         verify(sendHearingBulkPrintService).sendHearingToLIP(any(), any(), eq(TASK_ID_CLAIMANT_HMC), eq(true));
     }
-
-    @Test
-    void shouldNotPrintTheLettersIfNeedsTranslationOfHearingForm() {
-        //Given
-        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .preTranslationDocuments(wrapElements(CaseDocument.builder()
-                                                      .documentType(HEARING_FORM)
-                                                      .build()))
-            .preTranslationDocumentType(PreTranslationDocumentType.HEARING_FORM)
-            .addApplicant2(YesOrNo.NO)
-            .addRespondent2(YesOrNo.NO)
-            .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder().eventId("SEND_HEARING_TO_LIP_CLAIMANT").build()).build();
-        // When
-        handler.handle(params);
-        // Then
-        verifyNoInteractions(sendHearingBulkPrintService);
-    }
-
 }

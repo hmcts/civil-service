@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
@@ -65,13 +64,6 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
     private CallbackResponse sendHearingLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isGaForWelshEnabled()
-            && caseData.getPreTranslationDocuments() != null
-            && caseData.getPreTranslationDocumentType().equals(PreTranslationDocumentType.HEARING_FORM)) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
-        }
-
         String task = camundaActivityId(callbackParams);
         sendHearingBulkPrintService.sendHearingToLIP(
             callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,

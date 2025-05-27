@@ -12,12 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -42,12 +40,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -62,7 +58,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT1_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationDefendantOfHearingHandler.TASK_ID_DEFENDANT2_HMC;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
@@ -688,26 +683,6 @@ public class NotificationDefendantOfHearingHandlerTest {
                 getNotificationDataMapHMC(caseData, true),
                 "notification-of-hearing-123456"
             );
-        }
-
-        @Test
-        void shouldNotSendNotificationIfNeedsTranslationOfHearingForm() {
-            //Given
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .preTranslationDocuments(wrapElements(CaseDocument.builder()
-                                                          .documentType(HEARING_FORM)
-                                                          .build()))
-                .preTranslationDocumentType(PreTranslationDocumentType.HEARING_FORM)
-                .addApplicant2(YesOrNo.NO)
-                .addRespondent2(YesOrNo.NO)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
-            // When
-            handler.handle(params);
-            // Then
-            verifyNoInteractions(notificationService);
         }
 
         @NotNull

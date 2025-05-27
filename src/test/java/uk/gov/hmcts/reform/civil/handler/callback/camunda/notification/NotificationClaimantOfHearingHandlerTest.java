@@ -54,7 +54,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.mockStatic;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT_HMC;
@@ -66,10 +65,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class NotificationClaimantOfHearingHandlerTest {
 
     @Mock
@@ -683,26 +680,6 @@ class NotificationClaimantOfHearingHandlerTest {
                 getNotificationLipDataMap(caseData),
                 "notification-of-hearing-lip-000HN001"
             );
-        }
-
-        @Test
-        void shouldNotSendNotificationIfNeedsTranslationOfHearingForm() {
-            //Given
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .preTranslationDocuments(wrapElements(CaseDocument.builder()
-                                                          .documentType(HEARING_FORM)
-                                                          .build()))
-                .preTranslationDocumentType(PreTranslationDocumentType.HEARING_FORM)
-                .addApplicant2(YesOrNo.NO)
-                .addRespondent2(YesOrNo.NO)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
-            // When
-            handler.handle(params);
-            // Then
-            verifyNoInteractions(notificationService);
         }
     }
 

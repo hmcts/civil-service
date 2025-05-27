@@ -86,12 +86,6 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
 
     private CallbackResponse notifyDefendantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (featureToggleService.isGaForWelshEnabled()
-            && caseData.getPreTranslationDocuments() != null
-            && caseData.getPreTranslationDocumentType().equals(PreTranslationDocumentType.HEARING_FORM)) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
-        }
         boolean isRespondent1Lip = isRespondent1Lip(caseData);
         boolean isDefendant1 = isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING) || isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING_HMC);
         boolean isHmc = isEvent(callbackParams, NOTIFY_DEFENDANT1_HEARING_HMC) || isEvent(callbackParams, NOTIFY_DEFENDANT2_HEARING_HMC);

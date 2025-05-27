@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -39,6 +40,7 @@ public class GenerateHearingFormHandler extends CallbackHandler {
     private final HearingFormGenerator hearingFormGenerator;
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
+    private final RuntimeService runTimeService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -57,12 +59,23 @@ public class GenerateHearingFormHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        updateCamundaVars(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateCamundaVars(CaseData caseData) {
+        runTimeService.setVariable(
+            caseData.getBusinessProcess().getProcessInstanceId(),
+            "WELSH_ENABLED",
+            featureToggleService.isGaForWelshEnabled()
+                && isWelshHearingTemplate(caseData)
+                && Objects.nonNull(caseData.getInformation())
+        );
     }
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,

@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -92,12 +91,6 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = isApplicantLip(caseData);
         boolean isHmcEvent = isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC);
-        if (featureToggleService.isGaForWelshEnabled()
-            && caseData.getPreTranslationDocuments() != null
-            && caseData.getPreTranslationDocumentType().equals(PreTranslationDocumentType.HEARING_FORM)) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
-        }
         if (isHmcEvent && !isApplicantLip) {
             String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             sendEmailHMC(caseData, recipient);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -51,11 +53,14 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
     private HearingFormGenerator hearingFormGenerator;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private RuntimeService runtimeService;
+    public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateHearingFormHandler(hearingFormGenerator, mapper, featureToggleService);
+        handler = new GenerateHearingFormHandler(hearingFormGenerator, mapper, featureToggleService, runtimeService);
         mapper.registerModule(new JavaTimeModule());
     }
 
@@ -82,6 +87,7 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
@@ -119,6 +125,7 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
             .respondent1Represented(YesOrNo.NO)
             .information("test")
             .claimantBilingualLanguagePreference("WELSH")
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
@@ -159,6 +166,7 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
             .claimantBilingualLanguagePreference("ENGLISH")
             .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
                 Language.BOTH).build()).build())
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
@@ -198,6 +206,7 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
             .hearingDocuments(systemGeneratedCaseDocuments)
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
