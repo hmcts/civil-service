@@ -142,11 +142,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                     document.getValue().getFile().setCategoryID("caseManagementOrders");
                 } else if (document.getValue().getDocumentType().equals(HEARING_FORM)) {
-                document.getValue().getFile().setCategoryID("hearingNotices");
+                    document.getValue().getFile().setCategoryID("hearingNotices");
                     addToHearingDocuments.add(document);
-            } else {
-                addToSystemGenerated.add(document);
-            }
+                } else {
+                    addToSystemGenerated.add(document);
+                }
             });
         }
         List<Element<CaseDocument>> updatedSystemGeneratedDocuments =
