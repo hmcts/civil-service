@@ -21,14 +21,17 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,8 +43,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.QUERY_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -62,10 +69,14 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     private CoreCaseUserService coreCaseUserService;
     @Mock
     private QueryManagementCamundaService runtimeService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
     @InjectMocks
     private QueryResponseSolicitorNotificationHandler handler;
 
-    private CaseData createCaseDataWithMultipleFollowUpQueries(LocalDateTime now) {
+    private CaseData createCaseDataWithMultipleFollowUpQueries(OffsetDateTime now) {
         CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
             .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
             .caseMessages(wrapElements(
@@ -223,7 +234,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             .build();
     }
 
-    private CaseData createCaseDataWithQueries(LocalDateTime now) {
+    private CaseData createCaseDataWithQueries(OffsetDateTime now) {
         CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
             .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
             .caseMessages(wrapElements(
@@ -352,7 +363,11 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             "claimReferenceNumber",
             "1594901956117591",
             "casemanRef",
-            "000DC001"
+            "000DC001",
+            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
         );
     }
 
@@ -363,7 +378,11 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
             CASEMAN_REF, "000DC001",
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            QUERY_DATE, formatLocalDate(now.toLocalDate(), DATE)
+            QUERY_DATE, formatLocalDate(now.toLocalDate(), DATE),
+            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
         );
     }
 
@@ -374,6 +393,12 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             when(organisationService.findOrganisationById(any()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             when(notificationsProperties.getQueryResponseReceived()).thenReturn(TEMPLATE_ID);
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         }
 
         @Test
@@ -386,7 +411,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -395,7 +420,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "applicant@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1)),
+                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -410,7 +435,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -419,7 +444,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent1@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1)),
+                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -434,7 +459,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -443,7 +468,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent2@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now.minusHours(1)),
+                getNotificationDataMap(caseData, now.minusHours(1).toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -458,7 +483,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -467,7 +492,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "applicant@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now),
+                getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -482,7 +507,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -491,7 +516,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent1@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now),
+                getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -506,7 +531,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any(),
                 any()
             )).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -515,7 +540,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "respondent2@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMap(caseData, now),
+                getNotificationDataMap(caseData, now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -525,6 +550,13 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     class EmailNotificationsForLip {
         @Test
         void shouldNotifyClaimantLip_whenResponseToQueryReceivedNoFollowUpQueries() {
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("5")
@@ -534,7 +566,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -559,7 +591,14 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.CLAIMANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder().claimantBilingualLanguagePreference(Language.BOTH.toString()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -585,7 +624,14 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedEnglish()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build()).build();
@@ -604,7 +650,11 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     "claimReferenceNumber",
                     "1594901956117591",
                     "casemanRef",
-                    "000DC001"
+                    "000DC001",
+                    PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                    OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                    SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                    HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
                 ),
                 "response-to-query-notification-000DC001"
             );
@@ -621,7 +671,14 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now();
+            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                                 + "\n For all other matters, call 0300 123 7050");
+            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
@@ -643,7 +700,11 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     "claimReferenceNumber",
                     "1594901956117591",
                     "casemanRef",
-                    "000DC001"
+                    "000DC001",
+                    PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                    OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                    SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                    HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
                 ),
                 "response-to-query-notification-000DC001"
             );
