@@ -15,9 +15,9 @@ public class GenerateDJFormNotifier extends Notifier {
     public GenerateDJFormNotifier(
         NotificationService notificationService,
         CaseTaskTrackingService caseTaskTrackingService,
-        GenerateDJFormAllLegalRepsEmailGenerator generateDJFormAllLegalRepsEmailGenerator
+        GenerateDJFormAllPartiesEmailGenerator generateDJFormAllPartiesEmailGenerator
     ) {
-        super(notificationService, caseTaskTrackingService, generateDJFormAllLegalRepsEmailGenerator);
+        super(notificationService, caseTaskTrackingService, generateDJFormAllPartiesEmailGenerator);
     }
 
     @Override

@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
-class GenerateDJFormAllLegalRepsEmailGeneratorTest {
+class GenerateDJFormAllPartiesEmailGeneratorTest {
 
     @Mock
     private GenerateDJFormApprovedAppSolOneEmailDTOGenerator approvedAppSolOneEmailDTOGenerator;
@@ -53,7 +53,7 @@ class GenerateDJFormAllLegalRepsEmailGeneratorTest {
     private static final String TASK_ID = "taskId";
 
     @InjectMocks
-    private GenerateDJFormAllLegalRepsEmailGenerator generator;
+    private GenerateDJFormAllPartiesEmailGenerator generator;
 
     private MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic;
 
