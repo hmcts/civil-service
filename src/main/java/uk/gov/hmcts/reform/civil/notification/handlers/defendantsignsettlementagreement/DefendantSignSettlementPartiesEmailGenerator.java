@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.civil.notification.handlers.defendantsignsettlementa
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Component
 public class DefendantSignSettlementPartiesEmailGenerator extends AllPartiesEmailGenerator {
     public DefendantSignSettlementPartiesEmailGenerator(DefendantSignSettlementClaimantEmailDTOGenerator claimantEmailDTOGenerator, DefendantSignSettlementDefendantEmailDTOGenerator defendantEmailDTOGenerator) {
-        super(null, null, null, claimantEmailDTOGenerator, defendantEmailDTOGenerator);
+        super(List.of(claimantEmailDTOGenerator, defendantEmailDTOGenerator));
     }
 }
