@@ -700,7 +700,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 any()
             )).thenReturn(List.of(CaseRole.DEFENDANT.toString()));
             when(notificationsProperties.getQueryLipResponseReceivedWelsh()).thenReturn(TEMPLATE_ID);
-
+            OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
