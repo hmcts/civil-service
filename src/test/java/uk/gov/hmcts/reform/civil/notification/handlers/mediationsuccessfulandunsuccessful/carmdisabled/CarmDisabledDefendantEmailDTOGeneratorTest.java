@@ -34,14 +34,16 @@ class CarmDisabledDefendantEmailDTOGeneratorTest {
         caseData = CaseData.builder()
             .legacyCaseReference("CASE123456")
             .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
                             .individualFirstName("Alice")
                             .individualLastName("Smith")
-                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mrs")
                             .build())
             .respondent1(Party.builder()
                              .individualFirstName("Bob")
                              .individualLastName("Brown")
                              .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr")
                              .build())
             .build();
     }
@@ -105,7 +107,7 @@ class CarmDisabledDefendantEmailDTOGeneratorTest {
 
         assertThat(result)
             .containsEntry(CLAIM_REFERENCE_NUMBER, "CASE123456")
-            .containsEntry(CLAIMANT_NAME, "Alice Smith")
-            .containsEntry(DEFENDANT_NAME, "Bob Brown");
+            .containsEntry(CLAIMANT_NAME, "Mrs Alice Smith")
+            .containsEntry(DEFENDANT_NAME, "Mr Bob Brown");
     }
 }

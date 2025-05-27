@@ -21,6 +21,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 
@@ -51,22 +53,22 @@ class CarmAppSolOneEmailDTOGeneratorTest {
                              .individualFirstName("James")
                              .individualLastName("John")
                              .build())
-            .respondent2(Party.builder().partyName("Respondent Two").build())
+            .respondent2(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr")
+                             .individualFirstName("Respondent")
+                             .individualLastName("Two").build())
             .build();
     }
 
     @Test
     void shouldReturnSuccessfulTemplate_whenTaskIdMatches_andMultiPartyScenarioIsOneVTwo() {
-        try (MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic = mockStatic(MultiPartyScenario.class)) {
-            multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoLegalRep(caseData)).thenReturn(true);
-            multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
 
-            when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn("one-v-two-template");
+        when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn("one-v-two-template");
 
-            String templateId = generator.getEmailTemplateId(caseData, MediationSuccessfulNotifyParties.toString());
+        String templateId = generator.getEmailTemplateId(caseData, MediationSuccessfulNotifyParties.toString());
 
-            assertEquals("one-v-two-template", templateId);
-        }
+        assertEquals("one-v-two-template", templateId);
     }
 
     @Test
@@ -123,54 +125,38 @@ class CarmAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties_whenOneVTwoScenario() {
-        try (MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic = mockStatic(MultiPartyScenario.class);
-             MockedStatic<NotificationUtils> notificationUtilsMockedStatic = mockStatic(NotificationUtils.class);
-             MockedStatic<PartyUtils> partyUtilsMockedStatic = mockStatic(PartyUtils.class)) {
-
-            multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoLegalRep(caseData)).thenReturn(true);
-            multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = mockStatic(NotificationUtils.class)) {
 
             notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
                 .thenReturn(LEGAL_ORG_NAME);
 
-            partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(caseData.getRespondent1()))
-                .thenReturn("James John");
-
-            partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(caseData.getRespondent2()))
-                .thenReturn("Respondent Two");
-
             Map<String, String> properties = new HashMap<>();
             Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-            assertEquals("your claim against James John and Respondent Two", result.get(PARTY_NAME));
+            assertEquals("your claim against Mr James John and Mr Respondent Two", result.get(PARTY_NAME));
             assertEquals(LEGAL_ORG_NAME, result.get(CLAIM_LEGAL_ORG_NAME_SPEC));
-            assertEquals("James John", result.get(DEFENDANT_NAME_ONE));
-            assertEquals("Respondent Two", result.get(DEFENDANT_NAME_TWO));
+            assertEquals("Mr James John", result.get(DEFENDANT_NAME_ONE));
+            assertEquals("Mr Respondent Two", result.get(DEFENDANT_NAME_TWO));
         }
     }
 
     @Test
     void shouldAddCustomProperties_whenNotOneVTwoScenario() {
-        try (MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic = mockStatic(MultiPartyScenario.class);
-             MockedStatic<NotificationUtils> notificationUtilsMockedStatic = mockStatic(NotificationUtils.class);
-             MockedStatic<PartyUtils> partyUtilsMockedStatic = mockStatic(PartyUtils.class)) {
+        CaseData baseCaseData = caseData.toBuilder()
+            .respondent2(null)
+            .build();
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = mockStatic(NotificationUtils.class)) {
 
-            multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoLegalRep(caseData)).thenReturn(false);
-            multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(false);
-
-            notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+            notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(baseCaseData, organisationService))
                 .thenReturn(LEGAL_ORG_NAME);
 
-            partyUtilsMockedStatic.when(() -> PartyUtils.getPartyNameBasedOnType(caseData.getRespondent1()))
-                .thenReturn("James John");
-
             Map<String, String> properties = new HashMap<>();
-            Map<String, String> result = generator.addCustomProperties(properties, caseData);
+            Map<String, String> result = generator.addCustomProperties(properties, baseCaseData);
 
-            assertEquals("your claim against James John", result.get(PARTY_NAME));
+            assertEquals("your claim against Mr James John", result.get(PARTY_NAME));
             assertEquals(LEGAL_ORG_NAME, result.get(CLAIM_LEGAL_ORG_NAME_SPEC));
             assertEquals("12345", result.get(CLAIM_REFERENCE_NUMBER));
-            assertEquals("James John", result.get(DEFENDANT_NAME));
+            assertEquals("Mr James John", result.get(DEFENDANT_NAME));
         }
     }
 }

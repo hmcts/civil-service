@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME_TWO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.MediationSuccessfulNotifyParties;
 
 @ExtendWith(MockitoExtension.class)
 class CarmRespSolOneEmailDTOGeneratorTest {
@@ -55,7 +56,7 @@ class CarmRespSolOneEmailDTOGeneratorTest {
         when(notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation()).thenReturn(TEMPLATE_NOTIFY_TWO_V_ONE);
         try (MockedStatic<MultiPartyScenario> mockStatic = mockStatic(MultiPartyScenario.class)) {
             mockStatic.when(() -> MultiPartyScenario.isTwoVOne(caseData)).thenReturn(true);
-            String template = generator.getEmailTemplateId(caseData, "mediationSuccessfulNotifyParties");
+            String template = generator.getEmailTemplateId(caseData, MediationSuccessfulNotifyParties.toString());
             assertThat(template).isEqualTo(TEMPLATE_NOTIFY_TWO_V_ONE);
         }
     }
@@ -66,7 +67,7 @@ class CarmRespSolOneEmailDTOGeneratorTest {
         when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_NOTIFY_LR_SUCCESS);
         try (MockedStatic<MultiPartyScenario> mockStatic = mockStatic(MultiPartyScenario.class)) {
             mockStatic.when(() -> MultiPartyScenario.isTwoVOne(caseData)).thenReturn(false);
-            String template = generator.getEmailTemplateId(caseData, "MediationSuccessfulNotifyParties");
+            String template = generator.getEmailTemplateId(caseData, MediationSuccessfulNotifyParties.toString());
             assertThat(template).isEqualTo(TEMPLATE_NOTIFY_LR_SUCCESS);
         }
     }
@@ -113,13 +114,11 @@ class CarmRespSolOneEmailDTOGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         when(notificationsProperties.getMediationUnsuccessfulLRTemplate()).thenReturn(TEMPLATE_MED_UNSUCCESSFUL);
         try (
-            MockedStatic<MediationUtils> mediationUtilsMock = mockStatic(MediationUtils.class);
-            MockedStatic<MultiPartyScenario> multiPartyMock = mockStatic(MultiPartyScenario.class)
+            MockedStatic<MediationUtils> mediationUtilsMock = mockStatic(MediationUtils.class)
         ) {
             mediationUtilsMock.when(() ->
                                         MediationUtils.findMediationUnsuccessfulReason(eq(caseData), any())
             ).thenReturn(false);
-            multiPartyMock.when(() -> MultiPartyScenario.isOneVTwoLegalRep(caseData)).thenReturn(false);
 
             String template = generator.getEmailTemplateId(caseData, "someOtherTask");
             assertThat(template).isEqualTo(TEMPLATE_MED_UNSUCCESSFUL);
@@ -142,11 +141,8 @@ class CarmRespSolOneEmailDTOGeneratorTest {
 
         Map<String, String> props = new HashMap<>();
 
-        try (
-            MockedStatic<MultiPartyScenario> multiPartyMock = mockStatic(MultiPartyScenario.class);
-            MockedStatic<NotificationUtils> notifUtilsMock = mockStatic(NotificationUtils.class)
+        try (MockedStatic<NotificationUtils> notifUtilsMock = mockStatic(NotificationUtils.class)
         ) {
-            multiPartyMock.when(() -> MultiPartyScenario.isTwoVOne(caseData)).thenReturn(true);
             notifUtilsMock.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, true, organisationService))
                 .thenReturn(CLAIM_LEGAL_ORG_NAME);
 

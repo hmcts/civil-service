@@ -44,8 +44,10 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
     void setUp() {
         caseData = CaseData.builder()
             .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
                             .individualFirstName("Alice")
                             .individualLastName("Smith")
+                            .individualTitle("Mrs")
                             .build())
             .build();
     }
@@ -122,7 +124,7 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
 
             assertThat(result)
                 .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, RESPONDENT_LEGAL_ORG_NAME)
-                .containsEntry(CLAIMANT_NAME, "Alice Smith");
+                .containsEntry(CLAIMANT_NAME, "Mrs Alice Smith");
         }
     }
 }

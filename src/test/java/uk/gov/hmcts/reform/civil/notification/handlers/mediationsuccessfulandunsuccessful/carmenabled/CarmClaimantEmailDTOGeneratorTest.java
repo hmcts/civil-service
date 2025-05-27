@@ -44,6 +44,7 @@ class CarmClaimantEmailDTOGeneratorTest {
         caseData = CaseData.builder()
             .ccdCaseReference(Long.valueOf(CASE_REFERENCE))
             .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
                             .individualTitle("Mr")
                             .individualFirstName("John")
                             .individualLastName("Doe")
@@ -56,6 +57,9 @@ class CarmClaimantEmailDTOGeneratorTest {
         CaseData updatedData = caseData.toBuilder()
             .claimantBilingualLanguagePreference(null)
             .build();
+
+        when(notificationsProperties.getNotifyLipSuccessfulMediation())
+            .thenReturn(TEMPLATE_SUCCESSFUL_EN);
 
         String templateId = generator.getEmailTemplateId(updatedData, MediationSuccessfulNotifyParties.toString());
 
