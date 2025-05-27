@@ -20,16 +20,20 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
+
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_FORM;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -46,7 +50,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         updateSystemGeneratedDocumentsWithOriginalDocuments(callbackParams);
-        List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updateDocumentCollectionsWithTranslationDocuments(
             callbackParams);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
@@ -56,9 +60,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataLip.setTranslatedDocuments(null);
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().systemGeneratedCaseDocuments(
-                updatedDocumentList)
-            .caseDataLiP(caseDataLip);
+        caseDataBuilder.caseDataLiP(caseDataLip);;
 
         if (businessProcessEvent != null) {
             caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
@@ -98,13 +100,21 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationManualDeterminationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
-                }  else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
+                } else if (document.getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.SETTLEMENT_AGREEMENT)
                             .findFirst();
                         preTranslationSettlementAgreement.ifPresent(preTranslationDocuments::remove);
                         preTranslationSettlementAgreement.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
+                    }
+                } else if (document.getValue().getDocumentType().equals(HEARING_FORM)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.HEARING_FORM)
+                            .findFirst();
+                        preTranslationSettlementAgreement.ifPresent(preTranslationDocuments::remove);
+                        preTranslationSettlementAgreement.ifPresent(caseData.getHearingDocuments()::add);
                     }
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
@@ -120,19 +130,33 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
     }
 
-    private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocuments(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder<?, ?> updateDocumentCollectionsWithTranslationDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        List<Element<TranslatedDocument>> addToSystemGenerated = new ArrayList<>();
+        List<Element<TranslatedDocument>> addToHearingDocuments = new ArrayList<>();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
                     document.getValue().getFile().setCategoryID("orders");
                 } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                     document.getValue().getFile().setCategoryID("caseManagementOrders");
-                }
+                } else if (document.getValue().getDocumentType().equals(HEARING_FORM)) {
+                document.getValue().getFile().setCategoryID("hearingNotices");
+                    addToHearingDocuments.add(document);
+            } else {
+                addToSystemGenerated.add(document);
+            }
             });
         }
-        return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocuments, callbackParams);
+        List<Element<CaseDocument>> updatedSystemGeneratedDocuments =
+            systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, callbackParams);
+        List<Element<CaseDocument>> updatedHearingDocuments =
+            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocument(addToHearingDocuments, callbackParams);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
+            .systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments)
+            .hearingDocuments(updatedHearingDocuments);
+        return caseDataBuilder;
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
@@ -152,6 +176,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                 return UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
+            } else if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_FORM)) {
+                return UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
             }
         }
 
