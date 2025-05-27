@@ -29,7 +29,7 @@ public class SystemGeneratedDocumentService {
     }
 
     public List<Element<CaseDocument>> getHearingDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
-        List<Element<CaseDocument>> hearingDocuments =caseData.getHearingDocuments();
+        List<Element<CaseDocument>> hearingDocuments = caseData.getHearingDocuments();
         return addToDocumentCollection(hearingDocuments, translatedDocuments);
     }
 
