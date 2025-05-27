@@ -50,8 +50,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         updateSystemGeneratedDocumentsWithOriginalDocuments(callbackParams);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updateDocumentCollectionsWithTranslationDocuments(
-            callbackParams);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updateDocumentCollectionsWithTranslationDocuments(caseData);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
         CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
@@ -130,8 +129,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
     }
 
-    private CaseData.CaseDataBuilder<?, ?> updateDocumentCollectionsWithTranslationDocuments(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    private CaseData.CaseDataBuilder<?, ?> updateDocumentCollectionsWithTranslationDocuments(CaseData caseData) {
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<TranslatedDocument>> addToSystemGenerated = new ArrayList<>();
         List<Element<TranslatedDocument>> addToHearingDocuments = new ArrayList<>();
@@ -150,9 +148,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             });
         }
         List<Element<CaseDocument>> updatedSystemGeneratedDocuments =
-            systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, callbackParams);
+            systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, caseData);
         List<Element<CaseDocument>> updatedHearingDocuments =
-            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocument(addToHearingDocuments, callbackParams);
+            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocument(addToHearingDocuments, caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments)
             .hearingDocuments(updatedHearingDocuments);

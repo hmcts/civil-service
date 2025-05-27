@@ -31,13 +31,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIMANT_INTENTION;
 
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.*;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -99,7 +94,11 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName(FILE_NAME_1).build()),
             element(CaseDocument.builder().documentName(FILE_NAME_2).build()));
-        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(), any(CallbackParams.class))).willReturn(documents);
+        @SuppressWarnings("unchecked")
+        List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
+        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(expectedTranslatedDocs,
+                                                                                          any(CaseData.class)))
+            .willReturn(documents);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -147,12 +146,18 @@ class UploadTranslatedDocumentDefaultStrategyTest {
                              .translatedDocuments(translatedDocument)
                              .build())
             .build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData.toBuilder().preTranslationDocuments(preTranslatedDocuments).build()).build();
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData.toBuilder()
+                                                                              .preTranslationDocuments(preTranslatedDocuments)
+                                                                              .build()).build();
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName(FILE_NAME_1).build()),
             element(CaseDocument.builder().documentName("claimant response").build()),
             element(CaseDocument.builder().documentName("claimant response").build()));
-        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(), any(CallbackParams.class))).willReturn(documents);
+        @SuppressWarnings("unchecked")
+        List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
+        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(expectedTranslatedDocs,
+                                                                                          any(CaseData.class)))
+            .willReturn(documents);
         when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
@@ -442,5 +447,47 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .extracting("businessProcess")
             .extracting("camundaEvent")
             .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT.name());
+    }
+
+    @Test
+    void shouldUpdateBusinessProcess_WhenDocumentTypeIsHearingForm() {
+        //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(HEARING_FORM)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().documentFileName("hearing_small_claim.pdf").build(),
+                                                                        DocumentType.HEARING_FORM)));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocuments(translatedDocument)
+                             .build())
+            .preTranslationDocuments(preTranslationDocuments)
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .ccdCaseReference(123L)
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE.name());
     }
 }
