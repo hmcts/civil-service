@@ -20,6 +20,7 @@ class DefendantResponseDeadlineCheckSearchServiceTest extends ElasticSearchServi
 
     @Mock
     private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
         searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService, featureToggleService);
@@ -43,7 +44,6 @@ class DefendantResponseDeadlineCheckSearchServiceTest extends ElasticSearchServi
 
         return new Query(query, List.of("reference"), fromValue);
     }
-
 
     @Override
     protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
