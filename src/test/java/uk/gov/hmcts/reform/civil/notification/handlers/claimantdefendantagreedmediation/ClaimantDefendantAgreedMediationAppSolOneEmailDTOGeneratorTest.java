@@ -9,7 +9,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
@@ -29,9 +28,6 @@ public class ClaimantDefendantAgreedMediationAppSolOneEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     private OrganisationService organisationService;
 
     @InjectMocks
@@ -43,23 +39,10 @@ public class ClaimantDefendantAgreedMediationAppSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectEmailTemplateIdWhenCarmIsEnabled() {
+    void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
-        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);
         when(notificationsProperties.getNotifyApplicantLRMediationTemplate()).thenReturn(expectedTemplateId);
-
-        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnCorrectEmailTemplateIdWhenCarmIsNotEnabled() {
-        CaseData caseData = CaseData.builder().build();
-        String expectedTemplateId = "template-id";
-        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(false);
-        when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 

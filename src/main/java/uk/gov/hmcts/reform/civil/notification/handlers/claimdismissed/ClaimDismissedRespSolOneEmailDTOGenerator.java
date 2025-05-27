@@ -29,4 +29,9 @@ public class ClaimDismissedRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
         return REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED;
     }
 
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return !caseData.isRespondent1LiP() && caseData.getClaimDismissedDate() != null;
+    }
+
 }

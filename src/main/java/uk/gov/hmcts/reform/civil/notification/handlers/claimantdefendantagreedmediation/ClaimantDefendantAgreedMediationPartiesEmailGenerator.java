@@ -26,14 +26,14 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGenerator extends AllLe
     }
 
     @Override
-    protected Set<EmailDTO> getRespondents(CaseData caseData) {
+    protected Set<EmailDTO> getRespondents(CaseData caseData, String taskId) {
         Set<EmailDTO> recipients = new HashSet<>();
         if (caseData.isRespondent1NotRepresented()) {
-            recipients.add(claimantDefendantAgreedMediationDefendantEmailDTOGenerator.buildEmailDTO(caseData));
+            recipients.add(claimantDefendantAgreedMediationDefendantEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         } else {
-            recipients.add(respSolOneEmailGenerator.buildEmailDTO(caseData));
+            recipients.add(respSolOneEmailGenerator.buildEmailDTO(caseData, taskId));
             if (isOneVTwoTwoLegalRep(caseData)) {
-                recipients.add(respSolTwoEmailGenerator.buildEmailDTO(caseData));
+                recipients.add(respSolTwoEmailGenerator.buildEmailDTO(caseData, taskId));
             }
         }
 
