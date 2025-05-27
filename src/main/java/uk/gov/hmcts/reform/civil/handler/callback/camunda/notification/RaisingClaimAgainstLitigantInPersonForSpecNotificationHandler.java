@@ -36,7 +36,7 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
         List.of(
             NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON_SPEC
         );
-    public static final String TASK_ID = "RaisingClaimAgainstSpecLitigantInPersonForNotifier";
+    public static final String TASK_ID = "CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForSpec";
     private static final String REFERENCE_TEMPLATE = "applicant-create-case-handed-offline-notification-%s";
 
     private final NotificationService notificationService;
