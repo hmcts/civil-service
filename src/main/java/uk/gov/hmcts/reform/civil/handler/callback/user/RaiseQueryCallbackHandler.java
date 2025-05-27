@@ -91,7 +91,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         // Once QM Lip goes live stop retrieving the latest query by role as we will only be using a single queries collection.
         CaseMessage latestCaseMessage = featureToggleService.isLipQueryManagementEnabled(caseData)
-            ? caseData.getQueries().latest() : getUserQueriesByRole(caseData, roles).latest();
+            ? getLatestQuery(caseData) : getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
@@ -99,8 +99,8 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
             // Since this query collection is no longer tied to a specific user we need to ensure
-            // we clear the partyName field that EXUI populates with the logged in user's name.
-            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName("").build());
+            // we update the partyName field that EXUI populates with the logged in user's name, with something more generic.
+            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName("Queries").build());
         } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
             updateQueryCollectionPartyName(
                 roles,

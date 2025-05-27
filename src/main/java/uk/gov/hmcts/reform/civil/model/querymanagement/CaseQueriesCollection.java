@@ -36,8 +36,14 @@ public class CaseQueriesCollection {
     }
 
     @JsonIgnore
-    public List<Element<CaseMessage>> messageThread(String parentQueryId) {
-        if (isNull(caseMessages) || caseMessages.isEmpty() || isNull(parentQueryId)) {
+    public CaseMessage getMessage(String messageId) {
+        return unwrapElements(ofNullable(getCaseMessages()).orElse(new ArrayList<>())).stream().filter(m -> m.getId().equals(messageId)).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No query found with messageID: " + messageId));
+    }
+
+    @JsonIgnore
+    public List<Element<CaseMessage>> messageThread(String messageId) {
+        if (isNull(caseMessages) || caseMessages.isEmpty() || isNull(messageId)) {
             return Collections.emptyList();
         }
 
@@ -45,8 +51,8 @@ public class CaseQueriesCollection {
             .filter(message ->
                         nonNull(message.getValue())
                             && (nonNull(message.getValue().getParentId())
-                            ? message.getValue().getParentId().equals(parentQueryId)
-                            : message.getValue().getId().equals(parentQueryId)))
+                            ? message.getValue().getParentId().equals(messageId)
+                            : message.getValue().getId().equals(messageId)))
             .sorted(Comparator.comparing(message -> message.getValue().getCreatedOn()))
             .collect(Collectors.toList());
     }

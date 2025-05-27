@@ -68,9 +68,12 @@ public class CaseQueriesUtil {
             .orElse(null);
     }
 
-    //ToDo: Remove after QM Lip Release.
     public static CaseMessage getLatestQuery(CaseData caseData) {
         List<CaseMessage> latestQueries = new ArrayList<>();
+        if (caseData.getQueries() != null) {
+            latestQueries.add(caseData.getQueries().latest());
+        }
+        //ToDo: Remove after QM Lip Release.
         if (caseData.getQmApplicantSolicitorQueries() != null) {
             latestQueries.add(caseData.getQmApplicantSolicitorQueries().latest());
         }
@@ -123,6 +126,15 @@ public class CaseQueriesUtil {
         return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
     }
 
+    public static List<String> retrieveUserRoleForQuery(CaseData caseData,
+                                                        CoreCaseUserService coreCaseUserService, String queryId) {
+        String createdBy = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
+            .filter(m -> m.getId().equals(queryId)).findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId))
+            .getCreatedBy();
+        return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
+    }
+
     //ToDo: Remove this and all its usages after LIP QM release.
     public static void updateQueryCollectionPartyName(List<String> roles, MultiPartyScenario scenario, CaseData.CaseDataBuilder builder) {
         CaseData caseData = builder.build();
@@ -159,8 +171,12 @@ public class CaseQueriesUtil {
         }
     }
 
+    //ToDo: Remove this and it's usages after LIP QM release.
     public static CaseMessage getQueryById(CaseData caseData, String queryId) {
         List<CaseMessage> latestQueries = new ArrayList<>();
+        if (caseData.getQueries() != null) {
+            latestQueries.addAll(unwrapElements(caseData.getQueries().getCaseMessages()));
+        }
         if (caseData.getQmApplicantSolicitorQueries() != null) {
             latestQueries.addAll(unwrapElements(caseData.getQmApplicantSolicitorQueries().getCaseMessages()));
         }

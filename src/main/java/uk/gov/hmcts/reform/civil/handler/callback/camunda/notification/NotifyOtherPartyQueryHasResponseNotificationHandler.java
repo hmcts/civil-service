@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.EMAIL;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LEGAL_ORG;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetails;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyRecipientList;
 
 @Service
 @RequiredArgsConstructor
@@ -82,10 +83,15 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String responseQueryId = processVariables.getQueryId();
-        CaseMessage responseQuery = getQueryById(caseData, responseQueryId);
+
+        boolean isLipQueryManagementEnabled = featureToggleService.isLipQueryManagementEnabled(caseData);
+        CaseMessage responseQuery = isLipQueryManagementEnabled ? caseData.getQueries().getMessage(responseQueryId)
+            : getQueryById(caseData, responseQueryId);
         String parentQueryId = responseQuery.getParentId();
 
-        List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, parentQueryId);
+        List<Map<String, String>> emailDetailsList = isLipQueryManagementEnabled
+            ? getOtherPartyRecipientList(caseData, organisationService, coreCaseUserService, parentQueryId)
+            : getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, parentQueryId);
 
         emailDetailsList.forEach(otherPartyEmailDetails -> {
             notificationService.sendMail(

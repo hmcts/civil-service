@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONSE_TO_QUERY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -83,16 +85,19 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         CaseData caseData = callbackParams.getCaseData();
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
-        String responseQueryId = processVariables.getQueryId();
-        CaseMessage responseQuery = getQueryById(caseData, responseQueryId);
-        String parentQueryId = responseQuery.getParentId();
-        CaseMessage parentQuery = getQueryById(caseData, parentQueryId);
+        boolean isQMForLipsEnabled = featureToggleService.isLipQueryManagementEnabled(caseData);
+        CaseMessage parentQuery = null;
+        CaseMessage responseQuery = null;
 
-        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
+        String responseQueryId = processVariables.getQueryId();
+        responseQuery = getQueryById(caseData, responseQueryId);
+        String parentQueryId = responseQuery.getParentId();
+        parentQuery = getQueryById(caseData, parentQueryId);
+
+        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQuery.getId());
         String email = getEmail(caseData, roles);
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
-                                                       organisationService
-        );
+                                                       organisationService);
         LocalDate queryDate = getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery);
         if (queryDate != null) {
             properties.put(QUERY_DATE, formatLocalDate(queryDate, DATE));
@@ -110,7 +115,14 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
     private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
                                                   CaseMessage parentQuery) {
-        if (isApplicantSolicitor(roles)) {
+        if(nonNull(caseData.getQueries())) {
+            return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQueries(),
+                                                            parentQuery, responseQuery
+            );
+        }
+
+        //ToDo: Remove
+        else if (isApplicantSolicitor(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmApplicantSolicitorQueries(),
                                                             parentQuery, responseQuery
             );
@@ -123,6 +135,7 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
                                                             parentQuery, responseQuery
             );
         }
+        //========
         return null;
     }
 
