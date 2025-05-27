@@ -126,6 +126,7 @@ class NotifyDefendantCaseStayedHandlerTest {
         }
 
         CallbackResponse response = handler.sendNotification(params);
+        assertNotNull(response);
 
         Map<String, String> commonProps = addCommonProperties();
 
@@ -145,7 +146,6 @@ class NotifyDefendantCaseStayedHandlerTest {
             "case-stayed-defendant-notification-1594901956117591"
         );
 
-        assertNotNull(response);
     }
 
     @NotNull

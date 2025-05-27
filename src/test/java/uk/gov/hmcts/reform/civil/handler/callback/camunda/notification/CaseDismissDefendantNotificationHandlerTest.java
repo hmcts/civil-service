@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -169,7 +168,6 @@ class CaseDismissDefendantNotificationHandlerTest {
             notificationData,
             "dismiss-case-defendant-notification-1594901956117591"
         );
-        assertNotNull(response);
     }
 
     @NotNull

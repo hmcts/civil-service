@@ -188,7 +188,7 @@ class NotifyDefendantStayLiftedHandlerTest {
                 .builder()
                 .eventId(CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name())
                 .build();
-            CallbackParams params = CallbackParams.builder()
+            final CallbackParams params = CallbackParams.builder()
                 .request(callbackRequest)
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
@@ -202,12 +202,12 @@ class NotifyDefendantStayLiftedHandlerTest {
                 when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
             }
 
-            CallbackResponse response = handler.sendNotification(params);
-
             Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
             expectedProperties.put("claimReferenceNumber", "1594901956117591");
             expectedProperties.put("name", "Jack Jackson");
             expectedProperties.put("claimantvdefendant", "John Doe V Jack Jackson");
+
+            CallbackResponse response = handler.sendNotification(params);
 
             verify(notificationService).sendMail(
                 isRespondentLiP ? "defendant@hmcts.net" : "solicitor@example.com",
