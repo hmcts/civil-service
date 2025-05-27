@@ -127,7 +127,6 @@ class FullDefenceApplicantSolicitorOneCCUnspecNotifierTest {
         return expectedProperties;
     }
 
-
     @NotNull
     public Map<String, String> addCommonProperties() {
         Map<String, String> expectedProperties = new HashMap<>();
