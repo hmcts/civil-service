@@ -83,12 +83,12 @@ public class DefendantResponseClaimantNotificationHandler extends DashboardCallb
     public Map<String, Boolean> getScenarios(CaseData caseData) {
         return Map.of(
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
-            featureToggleService.isGaForLipsEnabled() && caseData.getRespondent1ClaimResponseTypeForSpec().equals(
-                RespondentResponseTypeSpec.COUNTER_CLAIM) && caseData.isApplicant1NotRepresented(),
+            featureToggleService.isGaForLipsEnabled() && RespondentResponseTypeSpec.COUNTER_CLAIM.equals(
+                caseData.getRespondent1ClaimResponseTypeForSpec()) && caseData.isApplicant1NotRepresented(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
             featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0
-                && caseData.getRespondent1ClaimResponseTypeForSpec().equals(
-                    RespondentResponseTypeSpec.COUNTER_CLAIM) && caseData.isApplicant1NotRepresented()
+                && ((RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && caseData.isApplicant1NotRepresented()) || caseData.nocApplyForLiPDefendant())
         );
     }
 

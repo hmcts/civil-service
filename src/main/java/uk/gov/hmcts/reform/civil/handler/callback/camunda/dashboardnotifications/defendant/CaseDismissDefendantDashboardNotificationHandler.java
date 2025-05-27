@@ -58,8 +58,7 @@ public class CaseDismissDefendantDashboardNotificationHandler extends DashboardC
 
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             caseId,
-            role,
-            null
+            role
         );
     }
 }

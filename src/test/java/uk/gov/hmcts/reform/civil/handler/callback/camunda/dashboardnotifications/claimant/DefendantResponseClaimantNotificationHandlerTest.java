@@ -260,12 +260,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
             when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
             when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
-            String caseId = "12345673";
-            LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(caseId))
+                .ccdCaseReference(Long.valueOf("12345673"))
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -304,12 +302,10 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         void shouldNotTriggerForDashboardNotificationsForDefendantResponseForFullDefenceCounterClaimantForLrVsLr() {
             //given
             HashMap<String, Object> params = new HashMap<>();
-            String caseId = "12345678";
-            LocalDate paymentDate = OffsetDateTime.now().toLocalDate().minusDays(5);
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build()
                 .toBuilder()
                 .legacyCaseReference("reference")
-                .ccdCaseReference(Long.valueOf(caseId))
+                .ccdCaseReference(Long.valueOf("12345678"))
                 .applicant1Represented(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
@@ -537,6 +533,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         HashMap<String, Object> params = new HashMap<>();
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isGaForLipsEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()
@@ -550,6 +547,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             .respondToClaim(RespondToClaim.builder()
                                 .howMuchWasPaid(new BigDecimal(100000))
                                 .build())
+            .generalApplications(List.of(Element.<GeneralApplication>builder().build()))
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 
@@ -561,6 +559,13 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
             SCENARIO_AAA6_DEFENDANT_NOC_MOVES_OFFLINE_CLAIMANT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(params).build()
+        );
+
+        verify(dashboardScenariosService).recordScenarios(
+            "BEARER_TOKEN",
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_CLAIMANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );

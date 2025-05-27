@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -37,11 +39,13 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @RunWith(MockitoJUnitRunner.class)
 public class EditJudgmentsOnlineMapperTest {
 
-    private InterestCalculator interestCalculator;
+    private FeatureToggleService featureToggleService;
+    private InterestCalculator interestCalculator = new InterestCalculator();
+    private JudgementService judgementService = new JudgementService(featureToggleService);
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
     private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
     private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper);
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
     private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
 
     private Time time;
@@ -49,7 +53,6 @@ public class EditJudgmentsOnlineMapperTest {
     @BeforeEach
     public void setUpTest() {
         time = Mockito.mock(Time.class);
-        interestCalculator = new InterestCalculator();
         defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 

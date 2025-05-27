@@ -59,7 +59,7 @@ public class StayCaseClaimantNotificationHandler extends DashboardCallbackHandle
             "CLAIMANT"
         );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseId,
             "CLAIMANT",
             GA

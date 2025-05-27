@@ -107,7 +107,7 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             "DEFENDANT"
         );
 
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseId,
             "DEFENDANT",
             GA

@@ -99,21 +99,34 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
-                       .summary(getSummary(startEventResponse.getEventId(), flowState))
+                       .summary(getSummary(startEventResponse.getEventId(), flowState, caseData))
                        .description(getDescription(startEventResponse.getEventId(), data, flowState, caseData))
                        .build())
             .data(data)
             .build();
     }
 
-    private String getSummary(String eventId, String state) {
+    private String getFullOrPartAdmission(CaseData caseData, String state) {
+        FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
+        if (caseData.isLipvLROneVOne()) {
+            return "RPA Reason: LiP vs LR - full/part admission received.";
+        } else {
+            if (flowState.equals(FlowState.Main.FULL_ADMISSION)) {
+                return "RPA Reason: Defendant fully admits.";
+            } else {
+                return "RPA Reason: Defendant partial admission.";
+            }
+        }
+    }
+
+    private String getSummary(String eventId, String state, CaseData caseData) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             return switch (flowState) {
                 case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE ->
                     "RPA Reason: Divergent respond.";
-                case FULL_ADMISSION -> "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION -> "RPA Reason: Defendant partial admission.";
+                case FULL_ADMISSION -> getFullOrPartAdmission(caseData, state);
+                case PART_ADMISSION -> getFullOrPartAdmission(caseData, state);
                 case COUNTER_CLAIM -> "RPA Reason: Defendant rejects and counter claims.";
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
                     "RPA Reason: Unrepresented defendant(s).";

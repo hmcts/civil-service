@@ -12,9 +12,14 @@ import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
@@ -44,9 +49,18 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff)), transitions)
+        this.moveTo(IN_MEDIATION, transitions).onlyWhen(agreedToMediation.and(not(takenOfflineByStaff))
+                                                            .and(not(partAdmitPayImmediately))
+                                                            .and(not(acceptRepaymentPlan))
+                                                            .and(not(rejectRepaymentPlan)), transitions)
+            .moveTo(IN_MEDIATION, transitions).onlyWhen(isClaimantNotSettlePartAdmitClaim
+                                                            .and(agreedToMediation.negate())
+                                                            .and(isCarmApplicableCase.or(isCarmApplicableLipCase))
+                                                            .and(not(takenOfflineByStaff)), transitions)
             .moveTo(PART_ADMIT_NOT_SETTLED_NO_MEDIATION, transitions)
-            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(takenOfflineByStaff)), transitions)
+            .onlyWhen(isClaimantNotSettlePartAdmitClaim.and(not(agreedToMediation)).and(not(isCarmApplicableCase))
+                          .and(not(isCarmApplicableLipCase))
+                          .and(not(takenOfflineByStaff)), transitions)
             .set((c, flags) -> {
                 flags.put(FlowFlag.SDO_ENABLED.name(),
                     JudicialReferralUtils.shouldMoveToJudicialReferral(c, featureToggleService.isMultiOrIntermediateTrackEnabled(c)));
@@ -70,4 +84,36 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     public static final Predicate<CaseData> partAdmitPayImmediately = CaseData::isPartAdmitPayImmediatelyAccepted;
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim = CaseData::isClaimantNotSettlePartAdmitClaim;
+
+    public static final Predicate<CaseData> isCarmApplicableCase = caseData ->
+        Optional.ofNullable(caseData)
+            .filter(PartAdmissionTransitionBuilder::getCarmEnabledForCase)
+            .filter(PartAdmissionTransitionBuilder::isSpecSmallClaim)
+            .filter(data -> YES.equals(data.getRespondent1Represented()) && !NO.equals(data.getApplicant1Represented()))
+            .isPresent();
+
+    public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
+        Optional.ofNullable(caseData)
+            .filter(PartAdmissionTransitionBuilder::getCarmEnabledForLipCase)
+            .filter(PartAdmissionTransitionBuilder::isSpecSmallClaim)
+            .filter(data -> data.getRespondent2() == null)
+            .filter(data -> NO.equals(data.getApplicant1Represented()) || NO.equals(data.getRespondent1Represented()))
+            .isPresent();
+
+    public static boolean isSpecSmallClaim(CaseData caseData) {
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
+    }
+
+    public static boolean getCarmEnabledForLipCase(CaseData caseData) {
+        return caseData.getCaseDataLiP() != null
+            && (caseData.getCaseDataLiP().getApplicant1LiPResponseCarm() != null
+            || caseData.getCaseDataLiP().getRespondent1MediationLiPResponseCarm() != null);
+    }
+
+    public static boolean getCarmEnabledForCase(CaseData caseData) {
+        return caseData.getApp1MediationContactInfo() != null
+            || caseData.getResp1MediationContactInfo() != null
+            || caseData.getResp2MediationContactInfo() != null;
+    }
 }

@@ -1,17 +1,22 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,11 +25,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CNBC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.RAISE_QUERY_LR;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantEmail;
 
 class NotificationUtilsTest {
 
     private OrganisationService organisationService = mock(OrganisationService.class);
+    private NotificationsSignatureConfiguration configuration = mock(NotificationsSignatureConfiguration.class);
 
     @Test
     void shouldReturnReferences_when1v1NoReferencesProvided() {
@@ -358,6 +373,117 @@ class NotificationUtilsTest {
             assertThat(getApplicantEmail(caseData, isApplicantLip)).isNull();
         } else {
             assertThat(getApplicantEmail(caseData, isApplicantLip)).isEqualTo("lipapplicant@example.com");
+        }
+    }
+
+    @Nested
+    class EmailSignatures {
+
+        @Nested
+        class CnbcContact {
+
+            @Test
+            void shouldAddCnbcContactWhenLRQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, false);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @ParameterizedTest()
+            @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
+            void shouldAddCnbcContactWhenCaseInQueryNotAllowedState(String caseState) {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().ccdState(Enum.valueOf(CaseState.class, caseState)).build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @Test
+            void shouldAddCnbcContactWhenApplicantLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().applicant1Represented(NO).build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @Test
+            void shouldAddCnbcContactWhenRespondentLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getCnbcContact()).thenReturn("cnbcEmail");
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo("cnbcEmail");
+            }
+
+            @Test
+            void shouldAddQueryStringWhenAllConditionsTrue() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getCnbcContact()).thenReturn(RAISE_QUERY_LR);
+                Map<String, String> actual = addCnbcContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(CNBC_CONTACT)).isEqualTo(RAISE_QUERY_LR);
+            }
+        }
+
+        @Nested
+        class SpecAndUnspecContact {
+
+            @Test
+            void shouldAddSpecAndUnspecContactWhenLRQmNotEnabled() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, false);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @ParameterizedTest()
+            @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
+            void shouldAddSpecAndUnspecContactWhenCaseInQueryNotAllowedState(String caseState) {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().ccdState(Enum.valueOf(CaseState.class, caseState)).build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @Test
+            void shouldAddSpecAndUnspecContactWhenApplicantLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().applicant1Represented(NO).build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @Test
+            void shouldAddCnbcContactWhenRespondentLip() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
+                    .toBuilder().respondent1Represented(NO).build();
+                when(configuration.getSpecUnspecContact()).thenReturn("specUnspecEmail");
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo("specUnspecEmail");
+            }
+
+            @Test
+            void shouldAddQueryStringWhenAllConditionsTrue() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+                when(configuration.getSpecUnspecContact()).thenReturn(RAISE_QUERY_LR);
+                Map<String, String> actual = addSpecAndUnspecContact(caseData, new HashMap<>(), configuration, true);
+                assertThat(actual.get(SPEC_UNSPEC_CONTACT)).isEqualTo(RAISE_QUERY_LR);
+            }
+        }
+
+        @Test
+        void shouldAddCommonFooterSignatureWhenInvoked() {
+            when(configuration.getHmctsSignature()).thenReturn("hmctsSignature");
+            when(configuration.getPhoneContact()).thenReturn("phoneContact");
+            when(configuration.getOpeningHours()).thenReturn("openingHours");
+            Map<String, String> actual = addCommonFooterSignature(new HashMap<>(), configuration);
+            assertThat(actual.get(HMCTS_SIGNATURE)).isEqualTo("hmctsSignature");
+            assertThat(actual.get(PHONE_CONTACT)).isEqualTo("phoneContact");
+            assertThat(actual.get(OPENING_HOURS)).isEqualTo("openingHours");
         }
     }
 }

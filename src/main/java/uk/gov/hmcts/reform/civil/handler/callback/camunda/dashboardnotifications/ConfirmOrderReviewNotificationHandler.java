@@ -66,7 +66,7 @@ public abstract class ConfirmOrderReviewNotificationHandler extends DashboardCal
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
 
         if (shouldRecordScenario(caseData)) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseId,
                 role,
                 "Applications"

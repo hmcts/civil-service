@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDate;
 
@@ -42,7 +43,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
     RecordJudgmentCallbackHandler.class,
     JacksonAutoConfiguration.class,
     RoboticsAddressMapper.class,
-    AddressLinesMapper.class
+    AddressLinesMapper.class,
+    InterestCalculator.class
 })
 class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -54,6 +56,9 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private RoboticsAddressMapper addressMapper;
+
+    @Autowired
+    private InterestCalculator interestCalculator;
 
     @Test
     public void handleEventsReturnsTheExpectedCallbackEvents() {

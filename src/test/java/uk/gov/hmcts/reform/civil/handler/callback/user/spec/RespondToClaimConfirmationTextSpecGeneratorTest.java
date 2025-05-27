@@ -102,6 +102,7 @@ public class RespondToClaimConfirmationTextSpecGeneratorTest
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .applicant1Represented(YesOrNo.NO)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondToAdmittedClaimOwingAmountPounds(admitted)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()

@@ -13,9 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.QueryCollectionType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -24,11 +23,14 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -75,6 +77,38 @@ class CaseQueriesUtilTest {
     }
 
     @Test
+    void shouldReturnRespondentCitizenQueries_WhenRoleIsDefendant() {
+        CaseQueriesCollection respondentCitizenQueries = CaseQueriesCollection.builder()
+            .partyName("Jane Smith")
+            .roleOnCase("[DEFENDANT]")
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmRespondentCitizenQueries(respondentCitizenQueries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getUserQueriesByRole(caseData, List.of("[DEFENDANT]"));
+
+        assertEquals(respondentCitizenQueries, result);
+    }
+
+    @Test
+    void shouldReturnApplicantCitizenQueries_WhenRoleIsClaimant() {
+        CaseQueriesCollection applicantCitizenQueries = CaseQueriesCollection.builder()
+            .partyName("Jane Smith")
+            .roleOnCase("[CLAIMANT]")
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantCitizenQueries(applicantCitizenQueries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getUserQueriesByRole(caseData, List.of("[CLAIMANT]"));
+
+        assertEquals(applicantCitizenQueries, result);
+    }
+
+    @Test
     void shouldReturnRespondentSolicitor2Queries_WhenRoleIsRespondentSolicitor2() {
         CaseQueriesCollection respondentSolicitor2Queries = CaseQueriesCollection.builder()
             .partyName("Jane Smith")
@@ -98,7 +132,7 @@ class CaseQueriesUtilTest {
 
     @Test
     void shouldBuildLatestQueryFromCaseMessage() {
-        LocalDateTime createdOn = LocalDateTime.now();
+        OffsetDateTime createdOn = OffsetDateTime.now();
         CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
             .toBuilder()
             .createdOn(createdOn)
@@ -124,7 +158,7 @@ class CaseQueriesUtilTest {
     void shouldAssignCategoryIDToAttachments_whenApplicantUploadsAttachment() {
         CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
             .toBuilder()
-            .createdOn(LocalDateTime.now())
+            .createdOn(OffsetDateTime.now())
             .attachments(wrapElements(
                 Document.builder().documentFileName("a").build(),
                 Document.builder().documentFileName("b").build()))
@@ -135,15 +169,57 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenDefendantUploadsAttachment() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(OffsetDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()
+            ))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                      List.of(CaseRole.DEFENDANT.toString())
+        );
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
+    }
+
+    @Test
+    void shouldAssignCategoryIDToAttachments_whenClaimantUploadsAttachment() {
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(OffsetDateTime.now())
+            .attachments(wrapElements(
+                Document.builder().documentFileName("a").build(),
+                Document.builder().documentFileName("b").build()
+            ))
+            .build();
+
+        CaseQueriesUtil.assignCategoryIdToAttachments(caseMessage, assignCategoryId,
+                                                      List.of(CaseRole.CLAIMANT.toString())
+        );
+
+        List<Document> documents = unwrapElements(caseMessage.getAttachments());
+
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent1UploadsAttachment() {
         CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
             .toBuilder()
-            .createdOn(LocalDateTime.now())
+            .createdOn(OffsetDateTime.now())
             .attachments(wrapElements(
                 Document.builder().documentFileName("a").build(),
                 Document.builder().documentFileName("b").build()))
@@ -154,15 +230,15 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
     void shouldAssignCategoryIDToAttachments_whenRespondent2UploadsAttachment() {
         CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
             .toBuilder()
-            .createdOn(LocalDateTime.now())
+            .createdOn(OffsetDateTime.now())
             .attachments(wrapElements(
                 Document.builder().documentFileName("a").build(),
                 Document.builder().documentFileName("b").build()))
@@ -173,15 +249,15 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(caseMessage.getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
     void shouldThrowError_whenUserHasUnsupportedRole() {
         CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
             .toBuilder()
-            .createdOn(LocalDateTime.now())
+            .createdOn(OffsetDateTime.now())
             .attachments(wrapElements(
                 Document.builder().documentFileName("a").build(),
                 Document.builder().documentFileName("b").build()))
@@ -213,8 +289,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -235,8 +311,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -257,8 +333,8 @@ class CaseQueriesUtilTest {
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(0).getCategoryID());
-        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue(), documents.get(1).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
 
     @Test
@@ -297,10 +373,10 @@ class CaseQueriesUtilTest {
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now())
+                                           .createdOn(OffsetDateTime.now())
                                            .build(),
                                        CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusDays(1))
+                                           .createdOn(OffsetDateTime.now().minusDays(1))
                                            .build()))
             .build();
 
@@ -308,7 +384,7 @@ class CaseQueriesUtilTest {
             .partyName("John Smith")
             .roleOnCase("respondent-solicitor-1")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusDays(2))
+                                           .createdOn(OffsetDateTime.now().minusDays(2))
                                            .build()))
             .build();
 
@@ -328,10 +404,10 @@ class CaseQueriesUtilTest {
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusDays(2))
+                                           .createdOn(OffsetDateTime.now().minusDays(2))
                                            .build(),
                                        CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusDays(1))
+                                           .createdOn(OffsetDateTime.now().minusDays(1))
                                            .build()))
             .build();
 
@@ -339,10 +415,10 @@ class CaseQueriesUtilTest {
             .partyName("John Smith")
             .roleOnCase("respondent-solicitor-1")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now())
+                                           .createdOn(OffsetDateTime.now())
                                            .build(),
                                        CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusMinutes(1))
+                                           .createdOn(OffsetDateTime.now().minusMinutes(1))
                                            .build()))
             .build();
 
@@ -350,7 +426,7 @@ class CaseQueriesUtilTest {
             .partyName("Jane Doe")
             .roleOnCase("respondent-solicitor-2")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusMinutes(2))
+                                           .createdOn(OffsetDateTime.now().minusMinutes(2))
                                            .build()))
             .build();
 
@@ -371,10 +447,10 @@ class CaseQueriesUtilTest {
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusDays(2))
+                                           .createdOn(OffsetDateTime.now().minusDays(2))
                                            .build(),
                                        CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusDays(1))
+                                           .createdOn(OffsetDateTime.now().minusDays(1))
                                            .build()))
             .build();
 
@@ -382,7 +458,7 @@ class CaseQueriesUtilTest {
             .partyName("John Smith")
             .roleOnCase("respondent-solicitor-1")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusHours(2))
+                                           .createdOn(OffsetDateTime.now().minusHours(2))
                                            .build()))
             .build();
 
@@ -390,10 +466,10 @@ class CaseQueriesUtilTest {
             .partyName("Jane Doe")
             .roleOnCase("respondent-solicitor-2")
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now().minusMinutes(2))
+                                           .createdOn(OffsetDateTime.now().minusMinutes(2))
                                            .build(),
                                        CaseMessage.builder()
-                                           .createdOn(LocalDateTime.now())
+                                           .createdOn(OffsetDateTime.now())
                                            .build()))
             .build();
 
@@ -447,6 +523,91 @@ class CaseQueriesUtilTest {
         CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "1");
 
         assertThat(latestQuery).isEqualTo(applicantQuery.getCaseMessages().get(0).getValue());
+    }
+
+    @Test
+    void shouldReturnClaimantLipQuery_whenQueryFoundForId() {
+        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(
+                CaseMessage.builder()
+                    .id("1")
+                    .build(),
+                CaseMessage.builder()
+                    .id("4")
+                    .build()
+            ))
+            .build();
+
+        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("2")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("3")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection claimantLip = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("4")
+                                           .build()))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQuery)
+            .qmRespondentSolicitor1Queries(respondent1Query)
+            .qmRespondentSolicitor2Queries(respondent2Query).qmApplicantCitizenQueries(claimantLip)
+            .build();
+
+        CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "4");
+
+        assertThat(latestQuery).isEqualTo(claimantLip.getCaseMessages().get(0).getValue());
+    }
+
+    @Test
+    void shouldReturnDefendantLipQuery_whenQueryFoundForId() {
+        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(
+                CaseMessage.builder()
+                    .id("1")
+                    .build(),
+                CaseMessage.builder()
+                    .id("4")
+                    .build()
+            ))
+            .build();
+
+        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("2")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("3")
+                                           .build()))
+            .build();
+
+        CaseQueriesCollection defendantLip = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("4")
+                                           .build()))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQuery)
+            .qmRespondentSolicitor1Queries(respondent1Query)
+            .qmRespondentSolicitor2Queries(respondent2Query)
+            .qmRespondentCitizenQueries(defendantLip)
+            .build();
+
+        CaseMessage latestQuery = CaseQueriesUtil.getQueryById(caseData, "4");
+
+        assertThat(latestQuery).isEqualTo(defendantLip.getCaseMessages().get(0).getValue());
     }
 
     @Test
@@ -616,18 +777,82 @@ class CaseQueriesUtilTest {
         assertThat(roles).containsOnly(CaseRole.RESPONDENTSOLICITORTWO.toString());
     }
 
-    private CaseMessage buildCaseMessageAt(String id, String subject, LocalDateTime createdDate) {
-        return CaseMessage.builder()
-            .id(id)
-            .subject(subject)
-            .name("John Doe")
-            .body("Sample body text")
-            .attachments(List.of())
-            .isHearingRelated(NO)
-            .hearingDate(LocalDate.now())
-            .createdOn(createdDate)
-            .createdBy("System")
-            .build();
+    @Test
+    void shouldUpdateApplicantSolicitorQueries_WhenRoleIsApplicantSolicitor() {
+        List<String> roles = List.of("APPLICANTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmApplicantSolicitorQueries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Claimant", updatedCaseData.getQmApplicantSolicitorQueries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1() {
+        List<String> roles = List.of("RESPONDENTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Diff() {
+        List<String> roles = List.of("RESPONDENTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant 1", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor2Queries_WhenRoleIsRespondentSolicitor2() {
+        List<String> roles = List.of("RESPONDENTSOLICITORTWO");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant 2", updatedCaseData.getQmRespondentSolicitor2Queries().getPartyName());
+    }
+
+    @Test
+    void shouldUpdateRespondentSolicitor1Queries_WhenRoleIsRespondentSolicitor1_1v2Same() {
+        List<String> roles = List.of("RESPONDENTSOLICITORONE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+        CaseData.CaseDataBuilder builder = CaseData.builder()
+            .qmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Old Name").build());
+
+        CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder);
+        CaseData updatedCaseData = builder.build();
+
+        assertEquals("Defendant", updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName());
+    }
+
+    @Test
+    void shouldThrowException_WhenRoleIsUnsupported() {
+        List<String> roles = List.of("UNSUPPORTEDROLE");
+        MultiPartyScenario scenario = MultiPartyScenario.ONE_V_ONE;
+        CaseData.CaseDataBuilder builder = CaseData.builder();
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            CaseQueriesUtil.updateQueryCollectionPartyName(roles, scenario, builder)
+        );
+
+        assertEquals("Unsupported case role for query management.", exception.getMessage());
     }
 
     private CaseMessage buildCaseMessage(String id, String subject) {
@@ -639,7 +864,7 @@ class CaseQueriesUtilTest {
             .attachments(List.of())
             .isHearingRelated(NO)
             .hearingDate(LocalDate.now())
-            .createdOn(LocalDateTime.now())
+            .createdOn(OffsetDateTime.now())
             .createdBy("System")
             .build();
     }
@@ -656,7 +881,7 @@ class CaseQueriesUtilTest {
                     Document.builder().documentFileName("b").build()))
                 .isHearingRelated(NO)
                 .hearingDate(LocalDate.now())
-                .createdOn(LocalDateTime.now())
+                .createdOn(OffsetDateTime.now())
                 .createdBy("System")
                 .build(),
             CaseMessage.builder()
@@ -669,9 +894,173 @@ class CaseQueriesUtilTest {
                     Document.builder().documentFileName("d").build()))
                 .isHearingRelated(NO)
                 .hearingDate(LocalDate.now())
-                .createdOn(LocalDateTime.now())
+                .createdOn(OffsetDateTime.now())
                 .createdBy("System")
                 .parentId("id")
                 .build());
     }
+
+    @Test
+    void shouldReturnMatchingCollection_WhenMessageExistsInApplicantSolicitorQueries() {
+        OffsetDateTime createdOn = OffsetDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 1")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection applicantSolicitorQueries = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(caseMessage))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantSolicitorQueries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertEquals(applicantSolicitorQueries, result);
+    }
+
+    @Test
+    void shouldReturnMatchingCollection_WhenMessageExistsInRespondentSolicitor1Queries() {
+        OffsetDateTime createdOn = OffsetDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 2")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection respondentSolicitor1Queries = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(caseMessage))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor1Queries(respondentSolicitor1Queries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertEquals(respondentSolicitor1Queries, result);
+    }
+
+    @Test
+    void shouldReturnMatchingCollection_WhenMessageExistsInRespondentSolicitor2Queries() {
+        OffsetDateTime createdOn = OffsetDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 3")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection respondentSolicitor2Queries = CaseQueriesCollection.builder()
+            .caseMessages(wrapElements(caseMessage))
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor2Queries(respondentSolicitor2Queries)
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertEquals(respondentSolicitor2Queries, result);
+    }
+
+    @Test
+    void shouldReturnNull_WhenMessageDoesNotExistInAnyCollection() {
+        OffsetDateTime createdOn = OffsetDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 4")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseData caseData = CaseData.builder().build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertNull(result);
+    }
+
+    @Test
+    void shouldReturnNull_WhenCaseMessagesAreNull() {
+        OffsetDateTime createdOn = OffsetDateTime.now();
+        CaseMessage caseMessage = buildCaseMessage("id", "Query 5")
+            .toBuilder()
+            .createdOn(createdOn)
+            .build();
+
+        CaseQueriesCollection emptyCollection = CaseQueriesCollection.builder().build();
+
+        CaseData caseData = CaseData.builder()
+            .build();
+
+        CaseQueriesCollection result = CaseQueriesUtil.getCollectionByMessage(caseData, caseMessage);
+
+        assertNull(result);
+    }
+
+    @Test
+    void shouldReturnClaimantQueryDocuments_whenCollectionTypeIsApplicantSolicitorQueries() {
+        DocCategory result = CaseQueriesUtil.getQueryDocumentCategory(APPLICANT_SOLICITOR_QUERIES);
+
+        assertEquals(DocCategory.CLAIMANT_QUERY_DOCUMENTS, result);
+    }
+
+    @Test
+    void shouldReturnDefendantQueryDocuments_whenCollectionTypeIsRespondentSolicitorOneQueries() {
+        DocCategory result = CaseQueriesUtil.getQueryDocumentCategory(RESPONDENT_SOLICITOR_ONE_QUERIES);
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS, result);
+    }
+
+    @Test
+    void shouldReturnDefendantQueryDocuments_whenCollectionTypeIsRespondentSolicitorTwoQueries() {
+        DocCategory result = CaseQueriesUtil.getQueryDocumentCategory(RESPONDENT_SOLICITOR_TWO_QUERIES);
+
+        assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENTS, result);
+    }
+
+    @Test
+    void shouldReturnApplicantSolicitorQueries_whenQueriesMatchApplicantSolicitorCollection() {
+        CaseQueriesCollection applicantQueries = CaseQueriesCollection.builder().partyName("app 1").build();
+        CaseData caseData = CaseData.builder()
+            .qmApplicantSolicitorQueries(applicantQueries)
+            .build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(applicantQueries, caseData);
+
+        assertEquals(APPLICANT_SOLICITOR_QUERIES, result);
+    }
+
+    @Test
+    void shouldReturnRespondentSolicitorOneQueries_whenQueriesMatchRespondentSolicitorOneCollection() {
+        CaseQueriesCollection respondent1Queries = CaseQueriesCollection.builder().partyName("res 1").build();
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor1Queries(respondent1Queries)
+            .build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(respondent1Queries, caseData);
+
+        assertEquals(RESPONDENT_SOLICITOR_ONE_QUERIES, result);
+    }
+
+    @Test
+    void shouldReturnRespondentSolicitorTwoQueries_whenQueriesMatchRespondentSolicitorTwoCollection() {
+        CaseQueriesCollection respondent2Queries = CaseQueriesCollection.builder().partyName("res 2").build();
+        CaseData caseData = CaseData.builder()
+            .qmRespondentSolicitor2Queries(respondent2Queries)
+            .build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(respondent2Queries, caseData);
+
+        assertEquals(RESPONDENT_SOLICITOR_TWO_QUERIES, result);
+    }
+
+    @Test
+    void shouldReturnNull_whenQueriesDoNotMatchAnyCollection() {
+        CaseQueriesCollection someQueries = CaseQueriesCollection.builder().build();
+        CaseData caseData = CaseData.builder().build();
+
+        QueryCollectionType result = CaseQueriesUtil.getCollectionType(someQueries, caseData);
+
+        assertNull(result);
+    }
+
 }

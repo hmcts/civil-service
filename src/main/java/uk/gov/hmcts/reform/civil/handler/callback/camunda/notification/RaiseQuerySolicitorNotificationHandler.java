@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
@@ -24,9 +26,13 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RAISED_QUERY;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getProperties;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +48,8 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
     private final OrganisationService organisationService;
     private final CoreCaseUserService coreCaseUserService;
     private final QueryManagementCamundaService runtimeService;
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -60,7 +68,9 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String queryId = processVariables.getQueryId();
-
+        if (queryId == null) {
+            queryId = caseData.getQmLatestQuery().getQueryId();
+        }
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         String email = getEmail(caseData, roles);
         Map<String, String> properties = getProperties(caseData, roles, addProperties(caseData),
@@ -68,7 +78,7 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
 
         notificationService.sendMail(
             email,
-            notificationsProperties.getQueryRaised(),
+            getEmailTemplate(caseData, roles),
             properties,
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -76,14 +86,28 @@ public class RaiseQuerySolicitorNotificationHandler extends CallbackHandler impl
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    private String getEmailTemplate(CaseData caseData, List<String> roles) {
+        if ((isLIPClaimant(roles) && caseData.isClaimantBilingual())
+            || (isLIPDefendant(roles) && caseData.isRespondentResponseBilingual())) {
+            return notificationsProperties.getQueryRaisedLipBilingual();
+        }
+        if (isLIPClaimant(roles) || isLIPDefendant(roles)) {
+            return notificationsProperties.getQueryRaisedLip();
+        }
+        return notificationsProperties.getQueryRaised();
+    }
+
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
-        return new HashMap<>(Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
+        addCommonFooterSignature(properties, configuration);
+        addSpecAndUnspecContact(caseData, properties, configuration,
+                                featureToggleService.isQueryManagementLRsEnabled());
+        return properties;
     }
 
     @Override

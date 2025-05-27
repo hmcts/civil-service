@@ -35,3 +35,8 @@ variable "send_grid_subscription" {
 variable "custom_alerts_enabled" {
   default = 0
 }
+
+variable "ccd_service_bus_status" {
+  type = string
+  default = "Active"
+}

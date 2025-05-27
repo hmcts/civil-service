@@ -18,7 +18,9 @@ public enum DocCategory {
     CLAIMANT1_DETAILS_OF_CLAIM("detailsOfClaim"),
     PARTICULARS_OF_CLAIM("particularsOfClaim"),
     CLAIMANT_QUERY_DOCUMENTS("ClaimantQueryDocuments"),
-    DEFENDANT_QUERY_DOCUMENTS("DefendantQueryDocuments");
+    CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS("ClaimantQueryDocumentAttachments"),
+    DEFENDANT_QUERY_DOCUMENTS("DefendantQueryDocuments"),
+    DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS("DefendantQueryDocumentAttachments");
 
     private final String value;
 }

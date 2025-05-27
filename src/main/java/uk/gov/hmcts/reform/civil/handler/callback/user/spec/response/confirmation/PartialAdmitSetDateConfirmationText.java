@@ -76,21 +76,24 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             sb.append(" accepts your offer</h3>");
         }
         sb.append("<ul>")
-            .append("<li>pay ").append(applicantName).append("</li>")
-            .append("<li>make sure any cheques or bank transfers are clear in their account by the deadline</li>")
-            .append("<li>keep proof of any payments you make</li>")
+            .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName).append("</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">make sure any cheques or bank transfers are clear in their account by the deadline</p></li>")
+            .append("<li><p class=\"govuk-!-margin-0\">keep proof of any payments you make</p></li>")
             .append("</ul>")
             .append("<p>Contact ")
             .append(applicantName);
-        if (applicantName.endsWith("s")) {
-            sb.append("'");
+        if (!caseData.isApplicant1NotRepresented()) {
+            if (applicantName.endsWith("s")) {
+                sb.append("'");
+            } else {
+                sb.append("'s");
+            }
+            sb.append(" legal representative if you need details on how to pay.</p>");
         } else {
-            sb.append("'s");
+            sb.append(" if you need details on how to pay.</p>");
         }
         final String P_TAG = ".</p>";
-        sb.append(" legal representative if you need details on how to pay.</p>")
-
-            .append("<p>Because you've said you will not pay immediately, ")
+        sb.append("<p>Because you've said you will not pay immediately, ")
             .append(applicantName)
             .append(" can request a county court judgment against you for &#163;")
             .append(admitOwed).append(P_TAG)
