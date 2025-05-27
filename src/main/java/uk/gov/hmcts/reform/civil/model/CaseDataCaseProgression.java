@@ -428,6 +428,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private final CaseQueriesCollection qmRespondentSolicitor2Queries;
     private final CaseQueriesCollection qmApplicantCitizenQueries;
     private final CaseQueriesCollection qmRespondentCitizenQueries;
+    private final CaseQueriesCollection queries;
     private final CaseMessage caseMessage;
     private final LatestQuery qmLatestQuery;
 

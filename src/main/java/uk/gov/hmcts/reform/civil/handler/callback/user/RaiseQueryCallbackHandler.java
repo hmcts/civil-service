@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -80,21 +81,19 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseMessage latestCaseMessage = getLatestQuery(caseData);
 
         List<String> roles = retrieveUserCaseRoles(
             caseData.getCcdCaseReference().toString(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-
-        CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
-
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
             buildLatestQuery(latestCaseMessage));
 
-        if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
-            updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
-        }
+        // Since this query collection is no longer tied to a specific user we need to ensure
+        // we clear the partyName field that EXUI populates with the logged in user's name.
+        caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName("").build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder
