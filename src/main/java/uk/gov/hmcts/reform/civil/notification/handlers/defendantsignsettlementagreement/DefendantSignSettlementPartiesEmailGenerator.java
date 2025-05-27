@@ -7,7 +7,9 @@ import java.util.List;
 
 @Component
 public class DefendantSignSettlementPartiesEmailGenerator extends AllPartiesEmailGenerator {
-    public DefendantSignSettlementPartiesEmailGenerator(DefendantSignSettlementClaimantEmailDTOGenerator claimantEmailDTOGenerator, DefendantSignSettlementDefendantEmailDTOGenerator defendantEmailDTOGenerator) {
+
+    public DefendantSignSettlementPartiesEmailGenerator(DefendantSignSettlementClaimantEmailDTOGenerator claimantEmailDTOGenerator,
+                                                        DefendantSignSettlementDefendantEmailDTOGenerator defendantEmailDTOGenerator) {
         super(List.of(claimantEmailDTOGenerator, defendantEmailDTOGenerator));
     }
 }

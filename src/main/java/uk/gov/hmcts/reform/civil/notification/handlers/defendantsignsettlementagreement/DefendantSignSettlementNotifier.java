@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIden
 
 @Component
 public class DefendantSignSettlementNotifier extends Notifier {
+
     public DefendantSignSettlementNotifier(NotificationService notificationService, CaseTaskTrackingService caseTaskTrackingService,
                                            DefendantSignSettlementPartiesEmailGenerator partiesNotifier) {
         super(notificationService, caseTaskTrackingService, partiesNotifier);
