@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.amendrestitchbundle;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Component
 public class AmendRestitchBundleAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
@@ -13,12 +15,10 @@ public class AmendRestitchBundleAllPartiesEmailGenerator extends AllPartiesEmail
         AmendRestitchBundleClaimantEmailDTOGenerator claimantEmailDTOGenerator,
         AmendRestitchBundleDefendantEmailDTOGenerator defendantEmailDTOGenerator
     ) {
-        super(
-            appSolOneEmailGenerator,
+        super(List.of(appSolOneEmailGenerator,
             respSolOneEmailGenerator,
             respSolTwoEmailGenerator,
             claimantEmailDTOGenerator,
-            defendantEmailDTOGenerator
-        );
+            defendantEmailDTOGenerator));
     }
 }
