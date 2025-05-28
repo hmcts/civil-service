@@ -7,12 +7,13 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
@@ -56,19 +57,23 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -138,6 +143,7 @@ public class EventHistoryMapper {
     public static final String QUERIES_ON_CASE = "There has been a query on this case";
     static final String ENTER = "Enter";
     static final String LIFTED = "Lifted";
+    static final Set<CaseState> OFFLINE_STATES = EnumSet.of(CASE_DISMISSED, PROCEEDS_IN_HERITAGE_SYSTEM, CASE_DISCONTINUED);
 
     public EventHistory buildEvents(CaseData caseData) {
         return buildEvents(caseData, null);
@@ -297,6 +303,7 @@ public class EventHistoryMapper {
         buildSetAsideJudgment(builder, caseData);
         buildCoscEvent(builder, caseData);
         buildTakenOfflineAfterDefendantNoCDeadlinePassed(builder, caseData);
+        buildQueriesEvent(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
@@ -316,8 +323,6 @@ public class EventHistoryMapper {
                 nocDeadlinePassed = true;
             }
             if (nocDeadlinePassed) {
-                buildQueriesEvent(builder, caseData, takenOfflineDate);
-
                 String miscText = "RPA Reason: Claim moved offline after defendant NoC deadline has passed";
                 builder.miscellaneous(
                     Event.builder()
@@ -691,11 +696,6 @@ public class EventHistoryMapper {
         } else {
             respondent2ResponseDate = caseData.getRespondent2ResponseDate();
         }
-        if (goingOffline) {
-            LocalDateTime queryDate = respondent1ResponseDate.isAfter(respondent2ResponseDate)
-                        ? respondent1ResponseDate : respondent2ResponseDate;
-            buildQueriesEvent(builder, caseData, queryDate);
-        }
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
@@ -1046,7 +1046,6 @@ public class EventHistoryMapper {
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
                                                              CaseData caseData) {
-        buildQueriesEvent(builder, caseData, caseData.getTakenOfflineDate());
         String detailsText = "RPA Reason: Claim moved offline after no response from applicant past response deadline.";
         builder.miscellaneous(
             Event.builder()
@@ -1062,7 +1061,6 @@ public class EventHistoryMapper {
 
     private void buildClaimDismissedPastNotificationsDeadline(EventHistory.EventHistoryBuilder builder,
                                                               CaseData caseData, String miscText) {
-        buildQueriesEvent(builder, caseData, caseData.getClaimDismissedDate());
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -1077,7 +1075,6 @@ public class EventHistoryMapper {
 
     private void buildClaimDismissedPastDeadline(EventHistory.EventHistoryBuilder builder,
                                                  CaseData caseData, List<State> stateHistory) {
-        buildQueriesEvent(builder, caseData, caseData.getClaimDismissedDate());
         State previousState = getPreviousState(stateHistory);
         FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(previousState.getName());
         builder.miscellaneous(
@@ -1112,7 +1109,6 @@ public class EventHistoryMapper {
     }
 
     private void buildTakenOfflineByStaff(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        buildQueriesEvent(builder, caseData, caseData.getTakenOfflineByStaffDate());
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -1125,30 +1121,39 @@ public class EventHistoryMapper {
                 .build());
     }
 
-    private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
-                                   LocalDateTime dateReceived) {
-        log.info("at buildQueriesEvent in history mapper");
-        if (featureToggleService.isQueryManagementLRsEnabled()) {
-            boolean queryOnCase = caseData.getQmApplicantSolicitorQueries() != null
-                || caseData.getQmRespondentSolicitor1Queries() != null
-                || caseData.getQmRespondentSolicitor2Queries() != null
-                || caseData.getQmApplicantCitizenQueries() != null
-                || caseData.getQmRespondentCitizenQueries() != null;
-
-            if (queryOnCase) {
-                log.info("at buildQueriesEvent in history mapper, QUERY ON CASE");
-                builder.miscellaneous(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(MISCELLANEOUS.getCode())
-                        .dateReceived(dateReceived)
-                        .eventDetailsText(QUERIES_ON_CASE)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(QUERIES_ON_CASE)
-                                          .build())
-                        .build());
-            }
+    private void buildQueriesEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (!isCaseOffline(caseData) || !featureToggleService.isQueryManagementLRsEnabled()) {
+            return;
         }
+        if (!hasActiveQueries(caseData)) {
+            return;
+        }
+
+        LocalDateTime dateReceived = Optional.ofNullable(caseData.getTakenOfflineDate())
+            .orElseGet(LocalDateTime::now);
+
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(dateReceived)
+                .eventDetailsText(QUERIES_ON_CASE)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(QUERIES_ON_CASE)
+                                  .build())
+                .build());
+    }
+
+    private boolean hasActiveQueries(CaseData caseData) {
+        return caseData.getQmApplicantSolicitorQueries() != null
+            || caseData.getQmRespondentSolicitor1Queries() != null
+            || caseData.getQmRespondentSolicitor2Queries() != null
+            || caseData.getQmApplicantCitizenQueries() != null
+            || caseData.getQmRespondentCitizenQueries() != null;
+    }
+
+    private boolean isCaseOffline(CaseData caseData) {
+        return OFFLINE_STATES.contains(caseData.getCcdState()) || caseData.getTakenOfflineDate() != null;
     }
 
     private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
@@ -1318,7 +1323,6 @@ public class EventHistoryMapper {
     static final String RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED = "RPA Reason: Only one of the respondent is notified.";
 
     private void buildTakenOfflineAfterClaimNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        buildQueriesEvent(builder, caseData, caseData.getSubmittedDate());
         builder.miscellaneous(
             List.of(
                 Event.builder()
@@ -1894,7 +1898,6 @@ public class EventHistoryMapper {
     }
 
     private void buildOfflineAfterClaimsDetailsNotified(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        buildQueriesEvent(builder, caseData, caseData.getSubmittedDate());
         builder.miscellaneous(
             List.of(
                 Event.builder()
@@ -2356,8 +2359,6 @@ public class EventHistoryMapper {
 
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
-
-        buildQueriesEvent(builder, caseData, caseData.getUnsuitableSDODate());
         String miscText = left(format(
             "RPA Reason: Case proceeds offline. "
                 + "Judge / Legal Advisor did not draw a Direction's Order: %s",
@@ -2375,7 +2376,6 @@ public class EventHistoryMapper {
 
     private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
                                                 CaseData caseData) {
-        buildQueriesEvent(builder, caseData, caseData.getUnsuitableSDODate());
         String detailsText = "RPA Reason: Case Proceeds in Caseman.";
         builder.miscellaneous(
             Event.builder()
@@ -2584,7 +2584,6 @@ public class EventHistoryMapper {
     }
 
     private void buildTakenOfflineDueToDefendantNoc(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        buildQueriesEvent(builder, caseData, caseData.getUnsuitableSDODate());
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
