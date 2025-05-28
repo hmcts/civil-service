@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.service;
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -40,6 +40,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardMapperTestConfiguration;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -67,22 +69,22 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEAD
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = {DashboardMapperTestConfiguration.class})
 public class DashboardNotificationsParamsMapperTest {
-
-    private DashboardNotificationsParamsMapper mapper;
 
     private CaseData caseData;
 
-    @Mock
+    @MockBean
     private FeatureToggleService featureToggleService;
 
-    @Mock
+    @MockBean
     private ClaimantResponseUtils claimantResponseUtils;
+
+    @Autowired
+    private DashboardNotificationsParamsMapper mapper;
 
     @BeforeEach
     void setup() {
-        mapper = new DashboardNotificationsParamsMapper(featureToggleService, claimantResponseUtils);
         caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
     }
 
