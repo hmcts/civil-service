@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISCONTINUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 
 @Service
@@ -37,7 +36,6 @@ public class LocationService {
     public static final Set<CaseState> statesBeforeSDO = EnumSet.of(PENDING_CASE_ISSUED, CASE_ISSUED,
                                                                     AWAITING_CASE_DETAILS_NOTIFICATION,
                                                                     AWAITING_RESPONDENT_ACKNOWLEDGEMENT,
-                                                                    IN_MEDIATION,
                                                                     AWAITING_APPLICANT_INTENTION);
 
     public static final Set<CaseState> settleDiscontinueStates = EnumSet.of(CASE_SETTLED,
