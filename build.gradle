@@ -247,7 +247,7 @@ task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nig
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
   }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nightly-prod'
+  commandLine './bin/run-nightly-api-tests.sh'
 }
 
 def inStrictOrder(Task... tasks) {
