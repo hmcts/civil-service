@@ -25,15 +25,17 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +52,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_PARTY_QU
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
@@ -72,6 +78,12 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
     @Mock
     private QueryManagementCamundaService runtimeService;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
 
     @Captor
     private ArgumentCaptor<String> targetEmail;
@@ -95,6 +107,13 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         when(organisationService.findOrganisationById(any()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
+        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                             + "\n For all other matters, call 0300 123 7050");
+        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
+                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+
     }
 
     @Nested
@@ -222,32 +241,32 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("5")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(3))
+                                               .createdOn(OffsetDateTime.now().minusHours(3))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("6")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("7")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("7")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
 
@@ -260,26 +279,26 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("9")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("10")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("11")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
 
@@ -292,26 +311,26 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("13")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("3")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("14")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("3")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("15")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("3")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
             return CaseDataBuilder.builder().atStateClaimIssued().build()
@@ -344,32 +363,32 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("5")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(3))
+                                               .createdOn(OffsetDateTime.now().minusHours(3))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("6")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("7")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("7")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
 
@@ -382,26 +401,26 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("9")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("10")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("11")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
 
@@ -429,32 +448,32 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("5")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(3))
+                                               .createdOn(OffsetDateTime.now().minusHours(3))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("6")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("7")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("7")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("1")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
 
@@ -467,26 +486,26 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("9")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("10")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("11")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("2")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
 
@@ -499,26 +518,26 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                                            CaseMessage.builder()
                                                .id("13")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now().minusHours(2))
+                                               .createdOn(OffsetDateTime.now().minusHours(2))
                                                .parentId("3")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("14")
                                                .createdBy("LR")
-                                               .createdOn(LocalDateTime.now().minusHours(1))
+                                               .createdOn(OffsetDateTime.now().minusHours(1))
                                                .parentId("3")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("15")
                                                .createdBy("admin")
-                                               .createdOn(LocalDateTime.now())
+                                               .createdOn(OffsetDateTime.now())
                                                .parentId("3")
                                                .build(),
                                            CaseMessage.builder()
                                                .id("8")
                                                .createdBy("LR")
                                                .parentId("80")
-                                               .createdOn(LocalDateTime.now().plusDays(1))
+                                               .createdOn(OffsetDateTime.now().plusDays(1))
                                                .build()))
                 .build();
             return CaseDataBuilder.builder().atStateClaimIssued().build()
@@ -547,7 +566,12 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 CLAIM_REFERENCE_NUMBER, "1594901956117591",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 CASEMAN_REF, "000DC001",
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
+                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
+                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
+                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
+
             );
         }
 

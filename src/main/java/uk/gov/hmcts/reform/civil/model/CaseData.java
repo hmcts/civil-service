@@ -298,6 +298,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
      */
     private BigDecimal totalClaimAmount;
     private BigDecimal totalInterest;
+    private BigDecimal totalClaimAmountPlusInterestAdmitPart;
+    private BigDecimal totalClaimAmountPlusInterest;
     private final YesOrNo claimInterest;
     private final InterestClaimOptions interestClaimOptions;
     private final SameRateInterestSelection sameRateInterestSelection;
@@ -615,6 +617,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo isGaRespondentTwoLip;
 
     private List<DocumentToKeepCollection> documentToKeepCollection;
+
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsApp;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes1;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes2;
 
     private final ChangeLanguagePreference changeLanguagePreference;
     private final PreferredLanguage claimantLanguagePreferenceDisplay;
@@ -1097,9 +1103,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Optional<Element<CaseDocument>> getSDODocument() {
+        return getLatestDocumentOfType(DocumentType.SDO_ORDER);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getTranslatedSDODocument() {
+        return getLatestDocumentOfType(DocumentType.SDO_TRANSLATED_DOCUMENT);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getLatestDocumentOfType(DocumentType documentType) {
         return ofNullable(systemGeneratedCaseDocuments)
             .flatMap(docs -> docs.stream()
-                .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
+                .filter(doc -> doc.getValue().getDocumentType().equals(documentType))
                 .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
     }
 

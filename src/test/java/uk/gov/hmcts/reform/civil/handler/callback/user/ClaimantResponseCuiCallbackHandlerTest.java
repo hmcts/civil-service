@@ -53,6 +53,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -105,6 +106,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private OrganisationService organisationService;
     @Mock
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    @Mock
+    private RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Mock
     private Time time;
@@ -128,7 +131,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                          judgementService, mapper,
                                                          time,
                                                          updateCaseManagementLocationDetailsService, deadlinesCalculator,
-                                                         caseFlagsInitialiser, judgmentByAdmissionOnlineMapper
+                                                         caseFlagsInitialiser, judgmentByAdmissionOnlineMapper, requestedCourtForClaimDetailsTab
         );
     }
 
