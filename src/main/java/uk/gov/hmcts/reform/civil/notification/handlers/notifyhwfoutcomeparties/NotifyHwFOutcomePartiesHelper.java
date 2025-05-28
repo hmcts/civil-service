@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Component
 public class NotifyHwFOutcomePartiesHelper {
+
     private final NotificationsProperties notificationsProperties;
 
     public NotifyHwFOutcomePartiesHelper(NotificationsProperties notificationsProperties) {
