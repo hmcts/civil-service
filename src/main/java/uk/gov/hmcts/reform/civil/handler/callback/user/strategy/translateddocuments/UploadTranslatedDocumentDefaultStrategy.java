@@ -109,11 +109,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     }
                 } else if (document.getValue().getDocumentType().equals(HEARING_FORM)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
-                        Optional<Element<CaseDocument>> preTranslationSettlementAgreement = preTranslationDocuments.stream()
+                        Optional<Element<CaseDocument>> preTranslationHearingForm = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.HEARING_FORM)
                             .findFirst();
-                        preTranslationSettlementAgreement.ifPresent(preTranslationDocuments::remove);
-                        preTranslationSettlementAgreement.ifPresent(caseData.getHearingDocuments()::add);
+                        preTranslationHearingForm.ifPresent(preTranslationDocuments::remove);
+                        preTranslationHearingForm.ifPresent(caseData.getHearingDocuments()::add);
                     }
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
@@ -153,7 +153,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             systemGeneratedDocumentService.getHearingDocumentsWithAddedDocument(addToHearingDocuments, caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments)
-            .hearingDocuments(updatedHearingDocuments);
+            .hearingDocumentsWelsh(updatedHearingDocuments);
         return caseDataBuilder;
     }
 

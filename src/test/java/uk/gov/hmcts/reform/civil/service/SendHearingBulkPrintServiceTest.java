@@ -36,6 +36,9 @@ class SendHearingBulkPrintServiceTest {
 
     @InjectMocks
     private SendHearingBulkPrintService sendHearingBulkPrintService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+
 
     private static final String SDO_HEARING_PACK_LETTER_TYPE = "hearing-document-pack";
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";

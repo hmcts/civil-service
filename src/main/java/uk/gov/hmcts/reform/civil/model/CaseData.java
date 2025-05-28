@@ -1111,6 +1111,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return getLatestDocumentOfType(DocumentType.SDO_TRANSLATED_DOCUMENT);
     }
 
+
     @JsonIgnore
     public Optional<Element<CaseDocument>> getLatestDocumentOfType(DocumentType documentType) {
         return ofNullable(systemGeneratedCaseDocuments)
