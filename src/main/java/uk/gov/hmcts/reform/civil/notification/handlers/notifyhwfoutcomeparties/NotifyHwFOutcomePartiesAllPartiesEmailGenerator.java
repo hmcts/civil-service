@@ -7,6 +7,7 @@ import java.util.List;
 
 @Component
 public class NotifyHwFOutcomePartiesAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
+
     public NotifyHwFOutcomePartiesAllPartiesEmailGenerator(
         NotifyHwFOutcomePartiesClaimantEmailDTOGenerator notifyHwFOutcomePartiesClaimantEmailDTOGenerator
     ) {

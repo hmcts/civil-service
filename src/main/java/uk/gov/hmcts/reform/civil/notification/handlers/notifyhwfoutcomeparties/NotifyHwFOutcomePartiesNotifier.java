@@ -15,7 +15,7 @@ public class NotifyHwFOutcomePartiesNotifier extends Notifier {
     public NotifyHwFOutcomePartiesNotifier(NotificationService notificationService,
                                            CaseTaskTrackingService caseTaskTrackingService,
                                            NotifyHwFOutcomePartiesAllPartiesEmailGenerator allPartiesEmailGenerator) {
-            super(notificationService, caseTaskTrackingService, allPartiesEmailGenerator);
+        super(notificationService, caseTaskTrackingService, allPartiesEmailGenerator);
     }
 
     @Override
