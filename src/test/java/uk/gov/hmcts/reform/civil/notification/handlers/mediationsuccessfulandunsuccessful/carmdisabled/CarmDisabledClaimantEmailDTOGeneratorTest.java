@@ -53,7 +53,7 @@ class CarmDisabledClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnMediationSuccessfulWelshTemplate_whenTaskIdMatches_andClaimantIsBilingual() {
-       CaseData updatedData = caseData.toBuilder()
+        CaseData updatedData = caseData.toBuilder()
             .claimantBilingualLanguagePreference(Language.WELSH.getDisplayedValue()).build();
         when(notificationsProperties.getNotifyApplicantLiPMediationSuccessfulWelshTemplate())
             .thenReturn("template-success-welsh");
