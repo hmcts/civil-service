@@ -34,7 +34,7 @@ class CarmRespSolTwoEmailDTOGeneratorTest {
     private static final String TEMPLATE_UNSUCCESSFUL_NO_ATTENDANCE = "med-unsuccessful-no-attendance";
     private static final String TEMPLATE_UNSUCCESSFUL = "med-unsuccessful";
     private static final String ORG_NAME = "Some Legal Org";
-    private static final String CLAIMANT_PARTY_NAME = "John Smith";
+    private static final String CLAIMANT_PARTY_NAME = "Mr John Smith";
 
     @Mock
     private OrganisationService organisationService;
@@ -91,8 +91,8 @@ class CarmRespSolTwoEmailDTOGeneratorTest {
         Party applicant1 = Party.builder()
             .type(Party.Type.INDIVIDUAL)
             .individualTitle("Mr")
-            .individualFirstName("Applicant")
-            .individualLastName("One")
+            .individualFirstName("John")
+            .individualLastName("Smith")
             .partyName(CLAIMANT_PARTY_NAME).build();
         when(caseData.getApplicant1()).thenReturn(applicant1);
 
