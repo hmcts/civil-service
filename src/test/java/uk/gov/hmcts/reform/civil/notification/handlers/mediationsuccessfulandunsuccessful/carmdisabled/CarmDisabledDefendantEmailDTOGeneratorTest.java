@@ -29,24 +29,26 @@ class CarmDisabledDefendantEmailDTOGeneratorTest {
     @InjectMocks
     private CarmDisabledDefendantEmailDTOGenerator generator;
 
+    @Mock
     private CaseData caseData;
+
+    private Party applicant1;
+    private Party respondent1;
 
     @BeforeEach
     void setUp() {
-        caseData = CaseData.builder()
-            .legacyCaseReference("CASE123456")
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("Alice")
-                            .individualLastName("Smith")
-                            .individualTitle("Mrs")
-                            .build())
-            .respondent1(Party.builder()
-                             .individualFirstName("Bob")
-                             .individualLastName("Brown")
-                             .type(Party.Type.INDIVIDUAL)
-                             .individualTitle("Mr")
-                             .build())
+        applicant1 = Party.builder()
+            .type(Party.Type.INDIVIDUAL)
+            .individualFirstName("Alice")
+            .individualLastName("Smith")
+            .individualTitle("Mrs")
+            .build();
+
+        respondent1 = Party.builder()
+            .type(Party.Type.INDIVIDUAL)
+            .individualFirstName("Bob")
+            .individualLastName("Brown")
+            .individualTitle("Mr")
             .build();
     }
 
@@ -105,6 +107,9 @@ class CarmDisabledDefendantEmailDTOGeneratorTest {
     void shouldAddCustomPropertiesToMap() {
         Map<String, String> props = new HashMap<>();
 
+        when(caseData.getLegacyCaseReference()).thenReturn("CASE123456");
+        when(caseData.getApplicant1()).thenReturn(applicant1);
+        when(caseData.getRespondent1()).thenReturn(respondent1);
         Map<String, String> result = generator.addCustomProperties(props, caseData);
 
         assertThat(result)
