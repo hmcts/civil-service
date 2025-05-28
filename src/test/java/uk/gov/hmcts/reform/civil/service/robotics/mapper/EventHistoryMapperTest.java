@@ -5738,7 +5738,7 @@ class EventHistoryMapperTest {
             if (queryType.equals("LR_QUERY")) {
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
-                    .takenOfflineDate(LocalDateTime.now())
+                    .takenOfflineDate(time.now())
                     .build().toBuilder()
                     .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
                                                      .roleOnCase("APPLICANT")
@@ -5747,7 +5747,7 @@ class EventHistoryMapperTest {
             } else {
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
-                    .takenOfflineDate(LocalDateTime.now())
+                    .takenOfflineDate(time.now())
                     .build().toBuilder()
                     .qmApplicantCitizenQueries(CaseQueriesCollection.builder()
                                                    .roleOnCase("APPLICANT")
