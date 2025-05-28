@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.o
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
-import uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.spec.offline.lipvlrfulladmitpartadmit.LipvLrSpecDefRespAllPartiesEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
@@ -13,7 +12,7 @@ public class SpecOneDefRespDefResponseNotifier extends Notifier {
 
     public SpecOneDefRespDefResponseNotifier(NotificationService notificationService,
                                              CaseTaskTrackingService caseTaskTrackingService,
-                                             LipvLrSpecDefRespAllPartiesEmailDTOGenerator allPartiesEmailDTOGenerator) {
+                                             SpecOneDefRespAllPartiesEmailDTOGenerator allPartiesEmailDTOGenerator) {
         super(notificationService, caseTaskTrackingService, allPartiesEmailDTOGenerator);
     }
 
