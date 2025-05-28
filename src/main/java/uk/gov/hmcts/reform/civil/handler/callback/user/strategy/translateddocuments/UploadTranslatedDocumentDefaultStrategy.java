@@ -109,11 +109,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-                    if (originalDocument.getValue().getDocumentName().contains("claimant")) {
+                    if (Objects.nonNull(originalDocument.getValue().getDocumentName()) && originalDocument.getValue().getDocumentName().contains("claimant")) {
                         CaseDocument claimantSealedCopy = CaseDocument.toCaseDocument(originalDocument.getValue().getDocumentLink(),
                                                                                 originalDocument.getValue().getDocumentType());
                         systemGeneratedDocuments.add(element(claimantSealedCopy));
                         assignCategoryId.assignCategoryIdToCaseDocument(claimantSealedCopy, DocCategory.APP1_DQ.getValue());
+                    } else if (originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM) {
+                        systemGeneratedDocuments.add(originalDocument);
                     }
                 }
             });
