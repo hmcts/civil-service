@@ -166,71 +166,56 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
             expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
             return expectedProperties;
         }
-    }
 
-    @Test
-    void shouldNotifyApplicantLip_whenInvoked() {
-        when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+        @NotNull
+        private Map<String, String> getNotificationDataMapLip() {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.put(PARTY_NAME, "Mr. John Rambo");
+            properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            properties.put(CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader");
+            return properties;
+        }
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("applicantLip@example.com").build())
-            .applicant1Represented(YesOrNo.NO)
-            .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+        @Test
+        void shouldNotifyApplicantLip_whenInvoked() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
 
-        handler.handle(params);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("applicantLip@example.com").build())
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-        verify(notificationService).sendMail(
-            "applicantLip@example.com",
-            "template-id-lip",
-            getNotificationDataMapLip(),
-            "create-sdo-applicants-notification-000DC001"
-        );
-    }
+            handler.handle(params);
 
-    @Test
-    void shouldNotifyApplicantLip_whenInvokedBilingual() {
-        when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("template-id-lip-bilingual");
+            verify(notificationService).sendMail(
+                "applicantLip@example.com",
+                "template-id-lip",
+                getNotificationDataMapLip(),
+                "create-sdo-applicants-notification-000DC001"
+            );
+        }
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("applicantLip@example.com").build())
-            .applicant1Represented(YesOrNo.NO)
-            .claimantBilingualLanguagePreference(Language.WELSH.toString())
-            .build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+        @Test
+        void shouldNotifyApplicantLip_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn("template-id-lip-bilingual");
 
-        handler.handle(params);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder().claimantUserDetails(IdamUserDetails.builder().email("applicantLip@example.com").build())
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-        verify(notificationService).sendMail(
-            "applicantLip@example.com",
-            "template-id-lip-bilingual",
-            getNotificationDataMapLip(),
-            "create-sdo-applicants-notification-000DC001"
-        );
-    }
+            handler.handle(params);
 
-    @NotNull
-    private Map<String, String> getNotificationDataMapLip() {
-        Map<String, String> properties = new HashMap<>(addCommonProperties());
-        properties.put(PARTY_NAME, "Mr. John Rambo");
-        properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
-        properties.put(CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader");
-        return properties;
-    }
-
-    @NotNull
-    public Map<String, String> addCommonProperties() {
-        Map<String, String> expectedProperties = new HashMap<>();
-        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
-        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
-        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
-        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
-        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
-        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
-        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
-        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
-        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
-        return expectedProperties;
+            verify(notificationService).sendMail(
+                "applicantLip@example.com",
+                "template-id-lip-bilingual",
+                getNotificationDataMapLip(),
+                "create-sdo-applicants-notification-000DC001"
+            );
+        }
     }
 
     @Test
