@@ -88,7 +88,12 @@ class CarmRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         CaseData caseData = mock(CaseData.class);
-        Party applicant1 = Party.builder().partyName(CLAIMANT_PARTY_NAME).build();
+        Party applicant1 = Party.builder()
+            .type(Party.Type.INDIVIDUAL)
+            .individualTitle("Mr")
+            .individualFirstName("Applicant")
+            .individualLastName("One")
+            .partyName(CLAIMANT_PARTY_NAME).build();
         when(caseData.getApplicant1()).thenReturn(applicant1);
 
         try (MockedStatic<NotificationUtils> notificationUtils = mockStatic(NotificationUtils.class)) {

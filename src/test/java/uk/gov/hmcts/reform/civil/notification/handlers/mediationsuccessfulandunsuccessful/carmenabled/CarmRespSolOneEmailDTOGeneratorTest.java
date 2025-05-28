@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -38,7 +39,7 @@ class CarmRespSolOneEmailDTOGeneratorTest {
     private static final String TEMPLATE_MED_UNSUCCESSFUL_NO_ATTENDANCE = "med-unsuccessful-no-attendance";
     private static final String TEMPLATE_MED_UNSUCCESSFUL = "med-unsuccessful";
     private static final String CLAIM_LEGAL_ORG_NAME = "Legal Org Name";
-    private static final String APPLICANT1_NAME = "Applicant One";
+    private static final String APPLICANT1_NAME = "Mr Applicant One";
     private static final String APPLICANT2_NAME = "Applicant Two";
 
     @Mock
@@ -95,6 +96,8 @@ class CarmRespSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnNoAttendanceTemplate_whenUnsuccessfulAndIsOneVTwoAndReasonMatchesForDefendantTwo() {
         CaseData caseData = mock(CaseData.class);
+        when(notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate())
+            .thenReturn(TEMPLATE_MED_UNSUCCESSFUL_NO_ATTENDANCE);
         try (
             MockedStatic<MediationUtils> mediationUtilsMock = mockStatic(MediationUtils.class);
             MockedStatic<MultiPartyScenario> multiPartyMock = mockStatic(MultiPartyScenario.class)
@@ -140,14 +143,11 @@ class CarmRespSolOneEmailDTOGeneratorTest {
         Party applicant2 = Party.builder().partyName(APPLICANT2_NAME).build();
         when(caseData.getApplicant1()).thenReturn(applicant1);
         when(caseData.getApplicant2()).thenReturn(applicant2);
+        when(caseData.getAddApplicant2()).thenReturn(YesOrNo.YES);
 
         Map<String, String> props = new HashMap<>();
 
-        try (
-            MockedStatic<MultiPartyScenario> multiPartyMock = mockStatic(MultiPartyScenario.class);
-            MockedStatic<NotificationUtils> notifUtilsMock = mockStatic(NotificationUtils.class)
-        ) {
-            multiPartyMock.when(() -> MultiPartyScenario.isTwoVOne(caseData)).thenReturn(true);
+        try (MockedStatic<NotificationUtils> notifUtilsMock = mockStatic(NotificationUtils.class)) {
             notifUtilsMock.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, true, organisationService))
                 .thenReturn(CLAIM_LEGAL_ORG_NAME);
 
@@ -162,16 +162,19 @@ class CarmRespSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomPropertiesForNonTwoVOneScenario() {
         CaseData caseData = mock(CaseData.class);
-        Party applicant1 = Party.builder().partyName(APPLICANT1_NAME).build();
+        Party applicant1 = Party.builder()
+            .type(Party.Type.INDIVIDUAL)
+            .individualTitle("Mr")
+            .individualFirstName("Applicant")
+            .individualLastName("One")
+            .partyName(APPLICANT1_NAME).build();
         when(caseData.getApplicant1()).thenReturn(applicant1);
 
         Map<String, String> props = new HashMap<>();
 
         try (
-            MockedStatic<MultiPartyScenario> multiPartyMock = mockStatic(MultiPartyScenario.class);
             MockedStatic<NotificationUtils> notifUtilsMock = mockStatic(NotificationUtils.class)
         ) {
-            multiPartyMock.when(() -> MultiPartyScenario.isTwoVOne(caseData)).thenReturn(false);
             notifUtilsMock.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, true, organisationService))
                 .thenReturn(CLAIM_LEGAL_ORG_NAME);
 
