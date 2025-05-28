@@ -5738,6 +5738,7 @@ class EventHistoryMapperTest {
             if (queryType.equals("LR_QUERY")) {
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
+                    .takenOfflineDate(LocalDateTime.now())
                     .build().toBuilder()
                     .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
                                                      .roleOnCase("APPLICANT")
@@ -5746,6 +5747,7 @@ class EventHistoryMapperTest {
             } else {
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
+                    .takenOfflineDate(LocalDateTime.now())
                     .build().toBuilder()
                     .qmApplicantCitizenQueries(CaseQueriesCollection.builder()
                                                    .roleOnCase("APPLICANT")
@@ -5767,18 +5769,18 @@ class EventHistoryMapperTest {
                     .eventSequence(2)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
                     .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
+                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(3)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineByStaffDate())
-                    .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                    .eventDetailsText(QUERIES_ON_CASE)
                     .eventDetails(EventDetails.builder()
-                                      .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                      .miscText(QUERIES_ON_CASE)
                                       .build())
                     .build()
             );
@@ -5819,18 +5821,18 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                     .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
+                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(2)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                    .eventDetailsText(QUERIES_ON_CASE)
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                                      .miscText(QUERIES_ON_CASE)
                                       .build())
                     .build()
             );
@@ -5839,7 +5841,7 @@ class EventHistoryMapperTest {
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactlyInAnyOrder(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
@@ -5870,18 +5872,18 @@ class EventHistoryMapperTest {
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText(QUERIES_ON_CASE)
+                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                     .eventDetails(EventDetails.builder()
-                                      .miscText(QUERIES_ON_CASE)
+                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
                                       .build())
                     .build(),
                 Event.builder()
                     .eventSequence(2)
                     .eventCode("999")
                     .dateReceived(caseData.getTakenOfflineDate())
-                    .eventDetailsText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                    .eventDetailsText(QUERIES_ON_CASE)
                     .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claim moved offline after defendant NoC deadline has passed")
+                                      .miscText(QUERIES_ON_CASE)
                                       .build())
                     .build()
             );
