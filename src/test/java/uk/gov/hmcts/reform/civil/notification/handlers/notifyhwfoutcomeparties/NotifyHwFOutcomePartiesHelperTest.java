@@ -21,8 +21,22 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mockStatic;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PART_AMOUNT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REMAINING_AMOUNT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE_WELSH;
 
 class NotifyHwFOutcomePartiesHelperTest {
 
@@ -125,8 +139,20 @@ class NotifyHwFOutcomePartiesHelperTest {
         Map<String, String> properties = helper.getFurtherProperties(caseData);
 
         assertThat(properties).containsEntry(HWF_MORE_INFO_DATE, "1 January 2023");
-        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS, "Child maintenance -  Evidence of being in receipt of Child Maintenance, such as a Child Support Agency assessment, sealed court order or letter of agreement showing how often and much you’re paid\n\n");
-        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS_WELSH, "Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant, megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu\n\n");
+        String documentDetails = """
+            Child maintenance - Evidence of being in receipt of Child Maintenance, \
+            such as a Child Support Agency assessment, sealed court order or letter of agreement \
+            showing how often and much you’re paid
+
+            """;
+        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS, documentDetails);
+        String documentDetailsWelsh = """
+            Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant, \
+            megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb \
+            yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu
+
+            """;
+        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS_WELSH, documentDetailsWelsh);
     }
 
     @Test
@@ -312,7 +338,19 @@ class NotifyHwFOutcomePartiesHelperTest {
         Map<String, String> properties = helper.getFurtherProperties(caseData);
 
         assertThat(properties).containsEntry(HWF_MORE_INFO_DATE, "1 January 2023");
-        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS, "Child maintenance -  Evidence of being in receipt of Child Maintenance, such as a Child Support Agency assessment, sealed court order or letter of agreement showing how often and much you’re paid\n\n");
-        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS_WELSH, "Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant, megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu\n\n");
+        String moreInfoDocumentDetails = """
+            Child maintenance - Evidence of being in receipt of Child Maintenance, \
+            such as a Child Support Agency assessment, sealed court order or letter of agreement \
+            showing how often and much you’re paid
+
+            """;
+        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS, moreInfoDocumentDetails);
+        String moreInfoDocumentDetailsWelsh = """
+            Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant, \
+            megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb \
+            yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu
+
+            """;
+        assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS_WELSH, moreInfoDocumentDetailsWelsh);
     }
 }
