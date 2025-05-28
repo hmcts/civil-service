@@ -211,11 +211,26 @@ class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHandlerTest
 
     @NotNull
     private Map<String, String> getNotificationDataMapLip() {
-        return Map.of(
-            PARTY_NAME, "Mr. John Rambo",
-            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-            CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader"
-        );
+        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        properties.put(PARTY_NAME, "Mr. John Rambo");
+        properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+        properties.put(CLAIMANT_V_DEFENDANT, "Mr. John Rambo V Mr. Sole Trader");
+        return properties;
+    }
+
+    @NotNull
+    public Map<String, String> addCommonProperties() {
+        Map<String, String> expectedProperties = new HashMap<>();
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        return expectedProperties;
     }
 
     @Test
