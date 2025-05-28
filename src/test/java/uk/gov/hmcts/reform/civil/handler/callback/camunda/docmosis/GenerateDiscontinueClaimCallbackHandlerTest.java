@@ -131,7 +131,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2() {
-            when(formGenerator.generateDocs(any(CaseData.class),anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -189,7 +189,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_noNames_1vs2() {
-            when(formGenerator.generateDocs(any(CaseData.class),anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -228,7 +228,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_LrVsLiP_1vs2() {
-            when(formGenerator.generateDocs(any(CaseData.class),anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -272,7 +272,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_serviceAddress() {
-            when(formGenerator.generateDocs(any(CaseData.class),anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
             Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
 
@@ -310,45 +310,45 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
         }
 
-    @Test
-    void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_correspondenceAddress() {
-        when(formGenerator.generateDocs(any(CaseData.class),anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
-        when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
-        Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
-        Address correspondenceAddress = Address.builder().addressLine1("Correspondence").postCode("C0RR 5P0N").build();
+        @Test
+        void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_correspondenceAddress() {
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString())).thenReturn(getCaseDocument());
+            when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
+            Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
+            Address correspondenceAddress = Address.builder().addressLine1("Correspondence").postCode("C0RR 5P0N").build();
 
-        CaseData caseData = CaseDataBuilder.builder().atStateSpec1v2ClaimSubmitted().build().toBuilder()
-            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-            .respondent1(getRespondent1PartyDetails())
-            .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .specApplicantCorrespondenceAddressdetails(correspondenceAddress)
-            .specRespondentCorrespondenceAddressdetails(correspondenceAddress)
-            .specRespondent2CorrespondenceAddressdetails(correspondenceAddress)
-            .respondent2(getRespondent2PartyDetails())
-            .respondentSolicitor1ServiceAddress(serviceAddress)
-            .applicantSolicitor1ServiceAddress(serviceAddress)
-            .applicant1(getApplicant1PartyDetails())
-            .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
-            .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
+            CaseData caseData = CaseDataBuilder.builder().atStateSpec1v2ClaimSubmitted().build().toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondent1(getRespondent1PartyDetails())
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
+                .specApplicantCorrespondenceAddressdetails(correspondenceAddress)
+                .specRespondentCorrespondenceAddressdetails(correspondenceAddress)
+                .specRespondent2CorrespondenceAddressdetails(correspondenceAddress)
+                .respondent2(getRespondent2PartyDetails())
+                .respondentSolicitor1ServiceAddress(serviceAddress)
+                .applicantSolicitor1ServiceAddress(serviceAddress)
+                .applicant1(getApplicant1PartyDetails())
+                .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
+                .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        if (getOrganisation().isPresent()) {
-            verify(formGenerator, times(3)).generateDocs(caseData,
-                                                         "Organisation name",
-                                                         correspondenceAddress,
-                                                         "BEARER_TOKEN");
+            if (getOrganisation().isPresent()) {
+                verify(formGenerator, times(3)).generateDocs(caseData,
+                                                             "Organisation name",
+                                                             correspondenceAddress,
+                                                             "BEARER_TOKEN");
+            }
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
+            assertThat(updatedData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
         }
-
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
-        assertThat(updatedData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
     }
-}
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
