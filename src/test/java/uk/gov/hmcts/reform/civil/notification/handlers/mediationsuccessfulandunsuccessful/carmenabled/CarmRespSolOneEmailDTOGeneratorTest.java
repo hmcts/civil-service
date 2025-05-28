@@ -40,7 +40,7 @@ class CarmRespSolOneEmailDTOGeneratorTest {
     private static final String TEMPLATE_MED_UNSUCCESSFUL = "med-unsuccessful";
     private static final String CLAIM_LEGAL_ORG_NAME = "Legal Org Name";
     private static final String APPLICANT1_NAME = "Mr Applicant One";
-    private static final String APPLICANT2_NAME = "Applicant Two";
+    private static final String APPLICANT2_NAME = "Mr Applicant Two";
 
     @Mock
     private OrganisationService organisationService;
@@ -139,8 +139,18 @@ class CarmRespSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomPropertiesForTwoVOneScenario() {
         CaseData caseData = mock(CaseData.class);
-        Party applicant1 = Party.builder().partyName(APPLICANT1_NAME).build();
-        Party applicant2 = Party.builder().partyName(APPLICANT2_NAME).build();
+        Party applicant1 = Party.builder()
+            .type(Party.Type.INDIVIDUAL)
+            .individualTitle("Mr")
+            .individualFirstName("Applicant")
+            .individualLastName("One")
+            .partyName(APPLICANT1_NAME).build();
+        Party applicant2 = Party.builder()
+            .type(Party.Type.INDIVIDUAL)
+            .individualTitle("Mr")
+            .individualFirstName("Applicant")
+            .individualLastName("Two")
+            .partyName(APPLICANT2_NAME).build();
         when(caseData.getApplicant1()).thenReturn(applicant1);
         when(caseData.getApplicant2()).thenReturn(applicant2);
         when(caseData.getAddApplicant2()).thenReturn(YesOrNo.YES);
