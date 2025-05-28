@@ -67,7 +67,6 @@ import java.util.stream.IntStream;
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
-import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
