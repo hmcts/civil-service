@@ -137,12 +137,12 @@ class NotifyHwFOutcomePartiesHelperTest {
         );
 
         String documentDetails = "Child maintenance -  Evidence of being in receipt of Child Maintenance," +
-        " such as a Child Support Agency assessment, sealed court order or letter of agreement" +
-        " showing how often and much you’re paid\n\n";
+            " such as a Child Support Agency assessment, sealed court order or letter of agreement" +
+            " showing how often and much you’re paid\n\n";
 
         String documentDetailsWelsh = "Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant," +
-        " megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb" +
-        " yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu\n\n";
+            " megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb" +
+            " yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu\n\n";
 
         Map<String, String> properties = helper.getFurtherProperties(caseData);
 
