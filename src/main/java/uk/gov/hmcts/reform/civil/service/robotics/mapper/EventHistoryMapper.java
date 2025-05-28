@@ -1131,7 +1131,7 @@ public class EventHistoryMapper {
         }
 
         LocalDateTime dateReceived = Optional.ofNullable(caseData.getTakenOfflineDate())
-            .orElseGet(LocalDateTime::now);
+            .orElseGet(time::now);
 
         builder.miscellaneous(
             Event.builder()
