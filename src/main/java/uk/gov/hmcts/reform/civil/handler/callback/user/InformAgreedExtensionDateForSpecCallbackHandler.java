@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -186,15 +187,20 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
                 .respondent1ResponseDeadline(newDeadline)
                 .respondent2TimeExtensionDate(time.now())
                 .respondent2ResponseDeadline(newDeadline)
-                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension());
+                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension())
+                .nextDeadline(newDeadline.toLocalDate());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseDataBuilder
                 .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline);
+                .respondent2ResponseDeadline(newDeadline)
+                .nextDeadline(deadlinesCalculator.nextDeadline(
+                    Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
         } else {
             caseDataBuilder.respondent1TimeExtensionDate(time.now())
                 .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC))
-                .respondent1ResponseDeadline(newDeadline);
+                .respondent1ResponseDeadline(newDeadline)
+                .nextDeadline(deadlinesCalculator.nextDeadline(
+                    Arrays.asList(newDeadline, caseData.getRespondent2ResponseDeadline())).toLocalDate());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

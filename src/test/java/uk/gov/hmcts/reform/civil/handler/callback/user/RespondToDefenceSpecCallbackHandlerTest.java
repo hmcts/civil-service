@@ -101,6 +101,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
@@ -182,7 +183,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     FrcDocumentsUtils.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
-    InterestCalculator.class
+    InterestCalculator.class,
+    RequestedCourtForClaimDetailsTab.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -2496,6 +2498,24 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventCallbackValidateAmountPaidFlag {
 
         private static final String PAGE_ID = "validate-amount-paid";
+
+        @Test
+        void shouldReturnError_whenPartialAmountPaid() {
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YES)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("This feature is currently not available, please see guidance below");
+        }
 
         @Test
         void shouldCheckValidateAmountPaid_withErrorMessage() {

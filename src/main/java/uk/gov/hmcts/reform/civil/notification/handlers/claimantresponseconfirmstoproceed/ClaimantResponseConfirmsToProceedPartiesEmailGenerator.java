@@ -33,38 +33,38 @@ public class ClaimantResponseConfirmsToProceedPartiesEmailGenerator implements P
     private final ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper;
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
+    public Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
-        partiesToEmail.add(getApplicant(caseData));
-        partiesToEmail.addAll(getRespondents(caseData));
+        partiesToEmail.add(getApplicant(caseData, taskId));
+        partiesToEmail.addAll(getRespondents(caseData, taskId));
 
         return partiesToEmail;
     }
 
-    private EmailDTO getApplicant(CaseData caseData) {
+    private EmailDTO getApplicant(CaseData caseData, String taskId) {
         if (claimantResponseConfirmsToProceedEmailHelper.isMultiPartyNotProceed(caseData, false)) {
-            return appSolOneEmailDTOGeneratorNTP.buildEmailDTO(caseData);
+            return appSolOneEmailDTOGeneratorNTP.buildEmailDTO(caseData, taskId);
         }
 
-        return appSolOneEmailDTOGenerator.buildEmailDTO(caseData);
+        return appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId);
     }
 
-    private Set<EmailDTO> getRespondents(CaseData caseData) {
+    private Set<EmailDTO> getRespondents(CaseData caseData, String taskId) {
         Set<EmailDTO> recipients = new HashSet<>();
         if (claimantResponseConfirmsToProceedEmailHelper.isMultiPartyNotProceed(caseData, false)) {
-            recipients.add(respSolOneEmailDTOGeneratorNTP.buildEmailDTO(caseData));
+            recipients.add(respSolOneEmailDTOGeneratorNTP.buildEmailDTO(caseData, taskId));
         } else if (isLRvLipToDefendant(caseData)) {
-            recipients.add(defendantEmailDTOGenerator.buildEmailDTO(caseData));
+            recipients.add(defendantEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         } else {
-            recipients.add(respSolOneEmailDTOGenerator.buildEmailDTO(caseData));
+            recipients.add(respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId));
         }
 
         if (isOneVTwoTwoLegalRep(caseData)) {
             if (claimantResponseConfirmsToProceedEmailHelper.isMultiPartyNotProceed(caseData, true)) {
-                recipients.add(respSolTwoEmailDTOGeneratorNTP.buildEmailDTO(caseData));
+                recipients.add(respSolTwoEmailDTOGeneratorNTP.buildEmailDTO(caseData, taskId));
             } else {
-                recipients.add(respSolTwoEmailDTOGenerator.buildEmailDTO(caseData));
+                recipients.add(respSolTwoEmailDTOGenerator.buildEmailDTO(caseData, taskId));
             }
         }
 
