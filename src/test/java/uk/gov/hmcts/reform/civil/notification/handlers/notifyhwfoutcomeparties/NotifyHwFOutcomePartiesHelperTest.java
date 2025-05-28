@@ -136,22 +136,18 @@ class NotifyHwFOutcomePartiesHelperTest {
             List.of(HwFMoreInfoRequiredDocuments.CHILD_MAINTENANCE)
         );
 
+        String documentDetails = "Child maintenance -  Evidence of being in receipt of Child Maintenance," +
+        " such as a Child Support Agency assessment, sealed court order or letter of agreement" +
+        " showing how often and much you’re paid\n\n";
+
+        String documentDetailsWelsh = "Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant," +
+        " megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb" +
+        " yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu\n\n";
+
         Map<String, String> properties = helper.getFurtherProperties(caseData);
 
         assertThat(properties).containsEntry(HWF_MORE_INFO_DATE, "1 January 2023");
-        String documentDetails = """
-            Child maintenance - Evidence of being in receipt of Child Maintenance, \
-            such as a Child Support Agency assessment, sealed court order or letter of agreement \
-            showing how often and much you’re paid
-
-            """;
         assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS, documentDetails);
-        String documentDetailsWelsh = """
-            Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant, \
-            megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb \
-            yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu
-
-            """;
         assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS_WELSH, documentDetailsWelsh);
     }
 
@@ -337,20 +333,16 @@ class NotifyHwFOutcomePartiesHelperTest {
 
         Map<String, String> properties = helper.getFurtherProperties(caseData);
 
+        String moreInfoDocumentDetails = "Child maintenance -  Evidence of being in receipt of Child Maintenance," +
+            " such as a Child Support Agency assessment, sealed court order or letter of agreement" +
+            " showing how often and much you’re paid\n\n";
+
+        String moreInfoDocumentDetailsWelsh = "Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant," +
+            " megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb" +
+            " yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu\n\n";
+
         assertThat(properties).containsEntry(HWF_MORE_INFO_DATE, "1 January 2023");
-        String moreInfoDocumentDetails = """
-            Child maintenance - Evidence of being in receipt of Child Maintenance, \
-            such as a Child Support Agency assessment, sealed court order or letter of agreement \
-            showing how often and much you’re paid
-
-            """;
         assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS, moreInfoDocumentDetails);
-        String moreInfoDocumentDetailsWelsh = """
-            Cynhaliaeth plant - Tystiolaeth o dderbyn Cynhaliaeth Plant, \
-            megis asesiad gan yr Asiantaeth Cynnal Plant, gorchymyn llys dan sêl; neu llythyr o gytundeb \
-            yn dangos pa mor aml rydych yn cael eich a faint rydych yn cael eich talu
-
-            """;
         assertThat(properties).containsEntry(HWF_MORE_INFO_DOCUMENTS_WELSH, moreInfoDocumentDetailsWelsh);
     }
 }
