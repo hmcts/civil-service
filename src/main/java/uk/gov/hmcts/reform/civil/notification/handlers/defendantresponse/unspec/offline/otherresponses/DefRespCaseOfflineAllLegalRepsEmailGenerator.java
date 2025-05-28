@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.defendantresponse.unspec.offline.otherresponses;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.notification.handlers.AllLegalRepsEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
 import java.util.List;
