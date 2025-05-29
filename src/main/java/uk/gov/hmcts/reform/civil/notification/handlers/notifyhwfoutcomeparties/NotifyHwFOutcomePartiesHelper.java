@@ -51,8 +51,8 @@ public class NotifyHwFOutcomePartiesHelper {
     public String getTemplateBilingual(CaseEvent hwfEvent) {
         return switch (hwfEvent) {
             case INVALID_HWF_REFERENCE -> notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual();
-            case MORE_INFORMATION_HWF -> notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh();
             case NO_REMISSION_HWF -> notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh();
+            case MORE_INFORMATION_HWF -> notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh();
             case UPDATE_HELP_WITH_FEE_NUMBER -> notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual();
             case PARTIAL_REMISSION_HWF_GRANTED -> notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual();
             default -> null;
