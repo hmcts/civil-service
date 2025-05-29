@@ -29,7 +29,7 @@ public class ClaimDismissedRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return !caseData.isRespondent1LiP() && caseData.getClaimDismissedDate() != null;
     }
 
