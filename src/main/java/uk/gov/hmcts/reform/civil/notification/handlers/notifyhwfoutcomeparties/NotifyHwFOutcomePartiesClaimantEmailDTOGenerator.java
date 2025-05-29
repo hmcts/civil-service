@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.notifyhwfoutcomeparties;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 
@@ -17,6 +18,14 @@ public class NotifyHwFOutcomePartiesClaimantEmailDTOGenerator extends ClaimantEm
 
     public NotifyHwFOutcomePartiesClaimantEmailDTOGenerator(NotifyHwFOutcomePartiesHelper notifyClaimantHwFOutcomeHelper) {
         this.notifyClaimantHwFOutcomeHelper = notifyClaimantHwFOutcomeHelper;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        if (caseData.getHwFEvent() != CaseEvent.FULL_REMISSION_HWF && caseData.isApplicantLiP()) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 
     @Override

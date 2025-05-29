@@ -27,6 +27,39 @@ class NotifyHwFOutcomePartiesClaimantEmailDTOGeneratorTest {
     }
 
     @Test
+    void shouldReturnTrue_whenEventIsNotFullRemissionAndApplicantIsLiP() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.getHwFEvent()).thenReturn(CaseEvent.MORE_INFORMATION_HWF);
+        when(caseData.isApplicantLiP()).thenReturn(true);
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenEventIsFullRemission() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.getHwFEvent()).thenReturn(CaseEvent.FULL_REMISSION_HWF);
+        when(caseData.isApplicantLiP()).thenReturn(true);
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenApplicantIsNotLiP() {
+        CaseData caseData = mock(CaseData.class);
+        when(caseData.getHwFEvent()).thenReturn(CaseEvent.MORE_INFORMATION_HWF);
+        when(caseData.isApplicantLiP()).thenReturn(false);
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
     void shouldReturnBilingualTemplateId_whenClaimantIsBilingual() {
         CaseData caseData = mock(CaseData.class);
         when(caseData.isClaimantBilingual()).thenReturn(true);
