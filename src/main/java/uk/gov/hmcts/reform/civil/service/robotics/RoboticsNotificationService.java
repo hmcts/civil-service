@@ -66,7 +66,7 @@ public class RoboticsNotificationService {
                                                               .caseData(caseData).authToken(authToken)
                                                               .isMultiParty(false).build());
         log.info(String.format("Start notifyDefaultJudgementLip and case data is not null %s", caseData.getLegacyCaseReference()));
-        emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
+        emailData.ifPresent(data -> sendGridClient.sendEmail("mark.drummond@hmcts.net", data));
     }
 
     private Optional<EmailData> prepareEmailData(RoboticsEmailParams params) {
