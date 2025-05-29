@@ -1,24 +1,19 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.generatedjform;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.PartiesEmailGenerator;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
 @Component
-@AllArgsConstructor
 @Slf4j
-public class GenerateDJFormAllPartiesEmailGenerator implements PartiesEmailGenerator {
+public class GenerateDJFormAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
     private final GenerateDJFormApprovedAppSolOneEmailDTOGenerator approvedAppSolOneEmailDTOGenerator;
     private final GenerateDJFormApprovedRespSolOneEmailDTOGenerator approvedRespSolOneEmailDTOGenerator;
@@ -29,6 +24,32 @@ public class GenerateDJFormAllPartiesEmailGenerator implements PartiesEmailGener
     private final GenerateDJFormRequestedRespSolTwoEmailDTOGenerator requestedRespSolTwoEmailDTOGenerator;
 
     private final GenerateDJFormHelper generateDJFormHelper;
+
+    public GenerateDJFormAllPartiesEmailGenerator(
+        GenerateDJFormApprovedAppSolOneEmailDTOGenerator approvedAppSolOneEmailDTOGenerator,
+        GenerateDJFormApprovedRespSolOneEmailDTOGenerator approvedRespSolOneEmailDTOGenerator,
+        GenerateDJFormApprovedRespSolTwoEmailDTOGenerator approvedRespSolTwoEmailDTOGenerator,
+        GenerateDJFormRequestedAppSolOneEmailDTOGenerator requestedAppSolOneEmailDTOGenerator,
+        GenerateDJFormRequestedRespSolOneEmailDTOGenerator requestedRespSolOneEmailDTOGenerator,
+        GenerateDJFormRequestedRespSolTwoEmailDTOGenerator requestedRespSolTwoEmailDTOGenerator,
+        GenerateDJFormHelper generateDJFormHelper
+    ) {
+        super(List.of(
+            approvedAppSolOneEmailDTOGenerator,
+            approvedRespSolOneEmailDTOGenerator,
+            approvedRespSolTwoEmailDTOGenerator,
+            requestedAppSolOneEmailDTOGenerator,
+            requestedRespSolOneEmailDTOGenerator,
+            requestedRespSolTwoEmailDTOGenerator
+        ));
+        this.approvedAppSolOneEmailDTOGenerator = approvedAppSolOneEmailDTOGenerator;
+        this.approvedRespSolOneEmailDTOGenerator = approvedRespSolOneEmailDTOGenerator;
+        this.approvedRespSolTwoEmailDTOGenerator = approvedRespSolTwoEmailDTOGenerator;
+        this.requestedAppSolOneEmailDTOGenerator = requestedAppSolOneEmailDTOGenerator;
+        this.requestedRespSolOneEmailDTOGenerator = requestedRespSolOneEmailDTOGenerator;
+        this.requestedRespSolTwoEmailDTOGenerator = requestedRespSolTwoEmailDTOGenerator;
+        this.generateDJFormHelper = generateDJFormHelper;
+    }
 
     @Override
     public Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId) {
