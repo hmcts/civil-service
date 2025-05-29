@@ -53,7 +53,6 @@ def copyPrevFailedAndNotExecutedTestFilesJson() {
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
       copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
-      sh "mv 'test-results/functional/testFilesReport.json' 'test-results/functional/prevTestFilesReport.json'"
       buildFound = true
     } catch (Exception error) {
       echo "artifact not found: " + error.toString()
@@ -95,7 +94,9 @@ withNightlyPipeline(type, product, component) {
   boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
 
   //enableMutationTest()
-  enableFortifyScan()
+  if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
+    enableFortifyScan()
+  }
   //enableSecurityScan()
 
   enableFullFunctionalTest(200)
