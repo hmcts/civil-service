@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.math.BigDecimal;
@@ -56,6 +57,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -93,11 +95,17 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
             caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, builder);
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!caseData.isRespondentResponseBilingual()) {
+        boolean needsTranslating = featureToggleService.isGaForWelshEnabled()
+            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments())
+            : caseData.isRespondentResponseBilingual();
+
+        if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
@@ -124,15 +132,19 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
+        LocalDateTime applicantDeadline = deadlinesCalculator.calculateApplicantResponseDeadline(
+            responseDate
+        );
+
         CaseData.CaseDataBuilder<?, ?> builder =  caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
             .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
-            .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
-                responseDate
-            ));
+            .applicant1ResponseDeadline(applicantDeadline)
+            .nextDeadline(applicantDeadline.toLocalDate());
+
         if (featureToggleService.isGaForWelshEnabled()) {
             String respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
                 .map(CaseDataLiP::getRespondent1LiPResponse)
