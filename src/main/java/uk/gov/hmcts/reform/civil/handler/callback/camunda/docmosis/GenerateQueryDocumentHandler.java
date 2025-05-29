@@ -82,7 +82,7 @@ public class GenerateQueryDocumentHandler extends CallbackHandler {
             queryDocumentCategory
         );
 
-        updateQueryDocument(messageThread.get(0).getValue().getCreatedOn(), caseDocument, builder);
+        updateQueryDocument(messageThread.get(0).getValue().getCreatedOn().toLocalDateTime(), caseDocument, builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper)).build();
@@ -92,7 +92,8 @@ public class GenerateQueryDocumentHandler extends CallbackHandler {
     private void updateQueryDocument(LocalDateTime timeQueryRaised, CaseDocument newQueryDocument, CaseData.CaseDataBuilder builder) {
         CaseData caseData = builder.build();
         Element<CaseDocument> existingQueryDocument = caseData.getQueryDocuments()
-                .stream().filter(doc -> doc.getValue().getCreatedDatetime().equals(timeQueryRaised)).findFirst()
+                .stream().filter(doc -> doc.getValue().getCreatedDatetime().withNano(0)
+                .equals(timeQueryRaised.withNano(0))).findFirst()
                 .orElse(null);
 
         boolean queryDocumentExists = nonNull(existingQueryDocument);
