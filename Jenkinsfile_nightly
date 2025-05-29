@@ -35,7 +35,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
-def ccdBranch = "nightly-dev"
+def ccdBranch = "DTSCCI-2243-2"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -47,12 +47,11 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 
 def copyPrevFailedAndNotExecutedTestFilesJson() {
   def buildFound = false
-  def buildNumber = currentBuild.previousBuild.number
+  def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
       copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
-      sh "mv 'test-results/functional/testFilesReport.json' 'test-results/functional/prevTestFilesReport.json'"
       buildFound = true
     } catch (Exception error) {
       echo "artifact not found: " + error.toString()
@@ -94,7 +93,9 @@ withNightlyPipeline(type, product, component) {
   boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
 
   //enableMutationTest()
-  // enableFortifyScan()
+  if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
+    // enableFortifyScan()
+  }
   //enableSecurityScan()
 
   enableFullFunctionalTest(200)
