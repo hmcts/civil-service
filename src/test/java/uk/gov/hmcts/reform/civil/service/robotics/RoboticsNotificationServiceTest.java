@@ -81,11 +81,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     },
     properties = {
         "sendgrid.api-key:some-key",
-        "robotics.notification.sender:mark.drummond@hmcts.net",
+        "robotics.notification.sender:no-reply@exaple.com",
         "robotics.notification.recipient:mark.drummond@hmcts.net",
         "robotics.notification.specRecipient:mark.drummond@hmcts.net",
         "robotics.notification.multipartyrecipient:mark.drummond@hmcts.net",
-        "robotics.notitfication.lipJRecipient:lipJ@example.com"
+        "robotics.notitfication.lipJRecipient:mark.drummond@hmcts.net"
     }
 )
 class RoboticsNotificationServiceTest {

@@ -66,7 +66,7 @@ public class RoboticsNotificationService {
                                                               .caseData(caseData).authToken(authToken)
                                                               .isMultiParty(false).build());
         log.info(String.format("Start notifyDefaultJudgementLip and case data is not null %s", caseData.getLegacyCaseReference()));
-        emailData.ifPresent(data -> sendGridClient.sendEmail("mark.drummond@hmcts.net", data));
+        emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
     private Optional<EmailData> prepareEmailData(RoboticsEmailParams params) {
@@ -221,7 +221,7 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to(roboticsEmailConfiguration.getLipJRecipient())
+                                   .to("mark.drummond@hmcts.net")
                                    .attachments(of(json(
                                        roboticsCaseDataDTO.getJsonRawData(),
                                        getFileName(params.getCaseData())

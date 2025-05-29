@@ -2367,12 +2367,16 @@ public class EventHistoryMapper {
         ), 250);
 
         LocalDateTime eventDate = caseData.getUnsuitableSDODate();
-
-        List<String> miscTextList = new ArrayList<>();
-        miscTextList.add(miscText);
-
-        List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList, eventDate);
-        builder.miscellaneous(miscTextEvent);
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(eventDate)
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
     }
 
     private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
