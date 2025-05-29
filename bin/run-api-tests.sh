@@ -68,7 +68,7 @@ run_failed_not_executed_functional_tests() {
   export PREV_NOT_EXECUTED_TEST_FILES="$PREV_NOT_EXECUTED_TEST_FILES"
   
   if [ -z "$PR_FT_GROUPS" ]; then
-    yarn test:non-prod-e2e-ft
+    yarn test:api-nonprod
   else 
     run_functional_test_groups
   fi
