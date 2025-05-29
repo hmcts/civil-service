@@ -424,7 +424,7 @@ notifications:
   notifyClaimantLipForNoLongerAccessTemplate: "9ecadff1-aa52-4d0a-ba74-f63cc73b8112"
   notifyClaimantLipForNoLongerAccessWelshTemplate: "1aea520a-4640-487c-87e9-291516d139c6"
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "0948a7ae-f389-4dc7-aaa5-c67768922813"
-  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "99305059-7b05-47f2-90fa-01fb4366fb56"
   notifyClaimantLipForClaimSubmissionTemplate: "e4cd677a-b3b8-4d63-84a3-89907d505e8e"
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "5e9238b4-aa44-4d7f-966e-aa3cd592209d"
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "4a9fb225-0321-4308-b541-beba45aaf94c"
