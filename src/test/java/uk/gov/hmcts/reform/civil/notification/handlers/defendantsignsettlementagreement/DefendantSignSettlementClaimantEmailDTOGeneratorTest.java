@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
@@ -48,7 +49,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).build();
         String expectedTemplateId = "template-id";
 
-        when(notificationsProperties.getNotifyRespondentForSignedSettlementAgreement()).thenReturn(expectedTemplateId);
+        when(notificationsProperties.getNotifyApplicantForSignedSettlementAgreement()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
@@ -61,7 +62,33 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).build();
         String expectedTemplateId = "template-id";
 
-        when(notificationsProperties.getNotifyRespondentForNotAgreedSignSettlement()).thenReturn(expectedTemplateId);
+        when(notificationsProperties.getNotifyApplicantForNotAgreedSignSettlement()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
+
+    @Test
+    void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementAgreementBilingual() {
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(YES).build();
+        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).claimantBilingualLanguagePreference(BOTH.toString()).build();
+        String expectedTemplateId = "template-id";
+
+        when(notificationsProperties.getNotifyApplicantLipForSignedSettlementAgreementInBilingual()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
+
+    @Test
+    void shouldReturnCorrectEmailTemplateIdWhenDefendantSignedSettlementNotAgreedBilingual() {
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(NO).build();
+        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).claimantBilingualLanguagePreference(BOTH.toString()).build();
+        String expectedTemplateId = "template-id";
+
+        when(notificationsProperties.getNotifyApplicantLipForNotAgreedSignSettlementInBilingual()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
