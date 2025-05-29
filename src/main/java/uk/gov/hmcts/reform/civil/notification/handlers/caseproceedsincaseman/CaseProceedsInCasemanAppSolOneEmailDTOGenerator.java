@@ -24,4 +24,9 @@ public class CaseProceedsInCasemanAppSolOneEmailDTOGenerator extends AppSolOneEm
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
     }
+
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() ? Boolean.FALSE : Boolean.TRUE;
+    }
 }
