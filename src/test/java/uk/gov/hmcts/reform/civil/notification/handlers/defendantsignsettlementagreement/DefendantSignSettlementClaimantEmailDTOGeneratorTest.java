@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -105,7 +106,8 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = Party.builder().build();
-        CaseData caseData = CaseData.builder().applicant1(party).respondent1(party).build();
+        String caseReference = "caseReference";
+        CaseData caseData = CaseData.builder().applicant1(party).respondent1(party).legacyCaseReference(caseReference).build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 
         String partyName = "party name";
@@ -118,7 +120,8 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
         partyUtilsMockedStatic.close();
 
-        assertThat(updatedProperties.size()).isEqualTo(3);
+        assertThat(updatedProperties.size()).isEqualTo(4);
+        assertThat(updatedProperties).containsEntry(CLAIM_REFERENCE_NUMBER, caseReference);
         assertThat(updatedProperties).containsEntry(CLAIMANT_NAME, partyName);
         assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, partyName);
         assertThat(updatedProperties).containsEntry(FRONTEND_URL, url);
