@@ -7,7 +7,11 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
