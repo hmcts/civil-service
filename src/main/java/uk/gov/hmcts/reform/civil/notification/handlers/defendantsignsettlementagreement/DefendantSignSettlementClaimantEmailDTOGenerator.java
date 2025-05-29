@@ -27,7 +27,7 @@ public class DefendantSignSettlementClaimantEmailDTOGenerator extends ClaimantEm
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
         boolean isAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
 
-        if (caseData.isClaimantBilingual()){
+        if (caseData.isClaimantBilingual()) {
             return isAgreed ? notificationsProperties.getNotifyApplicantLipForSignedSettlementAgreementInBilingual() :
                 notificationsProperties.getNotifyApplicantLipForNotAgreedSignSettlementInBilingual();
         }
