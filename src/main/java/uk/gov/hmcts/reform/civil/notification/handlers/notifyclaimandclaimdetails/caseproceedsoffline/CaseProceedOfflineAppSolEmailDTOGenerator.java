@@ -11,12 +11,8 @@ public class CaseProceedOfflineAppSolEmailDTOGenerator extends AppSolOneEmailDTO
 
     protected static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-applicant-notification-%s";
 
-    private final NotificationsProperties notificationsProperties;
-
-    public CaseProceedOfflineAppSolEmailDTOGenerator(OrganisationService organisationService,
-                                                     NotificationsProperties notificationsProperties) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
+    protected CaseProceedOfflineAppSolEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
+        super(notificationsProperties, organisationService);
     }
 
     @Override
