@@ -125,8 +125,8 @@ genApp:
     ccmcc:
 #      claims with value under this amount in pounds are assigned to CCMCC
       amountPounds: 1000
-      epimsId: 420219
-      regionId: 2
+      epimsId: 192280
+      regionId: 4
   jrd:
     endpoint: /refdata/judicial/users/search
 
@@ -520,8 +520,8 @@ court-location:
     region-id: "2"
     epimms-id: "420219"
   unspecified-claim:
-    region-id: "2"
-    epimms-id: "420219"
+    region-id: "4"
+    epimms-id: "192280"
 
 role-initialisation:
   enabled: ${ASSIGN_ROLES_ON_STARTUP:false}
