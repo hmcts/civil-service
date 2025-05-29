@@ -48,7 +48,7 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 
 def copyPrevFailedAndNotExecutedTestFilesJson() {
   def buildFound = false
-  def buildNumber = currentBuild.previousBuild.number
+  def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
   def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
   while (!buildFound && buildNumber > minBuildNumber) {
     try {
