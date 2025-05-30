@@ -6,10 +6,10 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import java.util.List;
 
 @Component
-public class ClaimantLipHelpWithFeesPartiesEmailGenerator extends AllPartiesEmailGenerator {
+public class ClaimantLipHelpWithFeesAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
-    public ClaimantLipHelpWithFeesPartiesEmailGenerator(
-            ClaimantLipHelpWithFeesEmailDTOGenerator claimantEmailDTOGenerator
+    public ClaimantLipHelpWithFeesAllPartiesEmailGenerator(
+            ClaimantLipHelpWithFeesClaimantEmailDTOGenerator claimantEmailDTOGenerator
     ) {
         super(List.of(claimantEmailDTOGenerator));
     }

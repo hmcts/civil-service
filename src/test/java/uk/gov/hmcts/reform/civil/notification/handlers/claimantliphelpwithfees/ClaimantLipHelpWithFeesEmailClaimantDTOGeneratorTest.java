@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-class ClaimantLipHelpWithFeesEmailDTOGeneratorTest {
+class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
 
     private static final String EMAIL = "claimant@hmcts.net";
     private static final String ENGLISH_TEMPLATE = "english-template";
@@ -38,7 +38,7 @@ class ClaimantLipHelpWithFeesEmailDTOGeneratorTest {
     private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     @InjectMocks
-    private ClaimantLipHelpWithFeesEmailDTOGenerator generator;
+    private ClaimantLipHelpWithFeesClaimantEmailDTOGenerator generator;
 
     private CaseData caseData;
 

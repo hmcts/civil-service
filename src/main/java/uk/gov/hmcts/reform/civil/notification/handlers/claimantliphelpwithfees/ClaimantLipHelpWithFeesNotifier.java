@@ -12,7 +12,7 @@ public class ClaimantLipHelpWithFeesNotifier extends Notifier {
     public ClaimantLipHelpWithFeesNotifier(
             NotificationService notificationService,
             CaseTaskTrackingService caseTaskTrackingService,
-            ClaimantLipHelpWithFeesPartiesEmailGenerator partiesGenerator
+            ClaimantLipHelpWithFeesAllPartiesEmailGenerator partiesGenerator
     ) {
         super(notificationService, caseTaskTrackingService, partiesGenerator);
     }

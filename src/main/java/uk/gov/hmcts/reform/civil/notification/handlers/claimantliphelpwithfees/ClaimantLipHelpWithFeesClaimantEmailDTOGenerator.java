@@ -7,13 +7,13 @@ import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesH
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 @Component
-public class ClaimantLipHelpWithFeesEmailDTOGenerator extends ClaimantEmailDTOGenerator {
+public class ClaimantLipHelpWithFeesClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "notify-claimant-lip-help-with-fees-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
-    public ClaimantLipHelpWithFeesEmailDTOGenerator(NotificationsProperties notificationsProperties, TemplateCommonPropertiesHelper templateCommonPropertiesHelper) {
+    public ClaimantLipHelpWithFeesClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties, TemplateCommonPropertiesHelper templateCommonPropertiesHelper) {
         this.notificationsProperties = notificationsProperties;
         this.templateCommonPropertiesHelper = templateCommonPropertiesHelper;
     }
