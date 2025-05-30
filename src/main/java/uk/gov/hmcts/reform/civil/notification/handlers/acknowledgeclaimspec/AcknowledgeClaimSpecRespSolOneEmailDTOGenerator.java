@@ -6,19 +6,21 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class AcknowledgeClaimSpecRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    protected static final String REFERENCE_TEMPLATE = "acknowledge-claim-respondent-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "acknowledge-claim-respondent-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     public AcknowledgeClaimSpecRespSolOneEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
@@ -27,11 +29,12 @@ public class AcknowledgeClaimSpecRespSolOneEmailDTOGenerator extends RespSolOneE
     ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
+        this.organisationService = organisationService;
         this.templateCommonPropertiesHelper = templateCommonPropertiesHelper;
     }
 
     @Override
-    protected String getEmailTemplateId(CaseData caseData) {
+    public String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getRespondentSolicitorAcknowledgeClaimForSpec();
     }
 
@@ -41,15 +44,26 @@ public class AcknowledgeClaimSpecRespSolOneEmailDTOGenerator extends RespSolOneE
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(
-            Map<String, String> properties,
-            CaseData caseData
-    ) {
-        Map<String, String> updated = super.addCustomProperties(properties, caseData);
-        updated.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-        updated.put(RESPONSE_DEADLINE,
-                formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        String orgId = caseData.getRespondent1OrganisationPolicy()
+                .getOrganisation()
+                .getOrganisationID();
+        Optional<Organisation> maybeOrg = organisationService.findOrganisationById(orgId);
+        String orgName = maybeOrg.map(Organisation::getName)
+                .orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, orgName);
+
+        String deadline = formatLocalDate(
+                caseData.getRespondent1ResponseDeadline().toLocalDate(),
+                DATE
         );
-        return updated;
+        properties.put(RESPONSE_DEADLINE, deadline);
+
+        return properties;
+    }
+
+    @Override
+    protected Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE;
     }
 }

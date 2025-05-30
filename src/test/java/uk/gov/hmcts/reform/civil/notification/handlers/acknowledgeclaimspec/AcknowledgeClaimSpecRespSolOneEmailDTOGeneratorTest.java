@@ -9,16 +9,19 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -36,6 +39,9 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
 
     @Mock
     private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
+
+    @Mock
+    private OrganisationService organisationService;
 
     @InjectMocks
     private AcknowledgeClaimSpecRespSolOneEmailDTOGenerator emailGenerator;
@@ -59,6 +65,7 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
                 .build();
 
         Organisation organisation = Organisation.builder()
+                .organisationID("Org123")
                 .build();
 
         CaseData caseData = CaseData.builder()
@@ -66,15 +73,20 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
                 .legacyCaseReference("ref1")
                 .respondent1(respondent1)
                 .respondent1ResponseDeadline(deadline)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build()
-                )
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().build())
                 .build();
+
+        when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("org name").build()));
 
         EmailDTO dto = emailGenerator.buildEmailDTO(caseData, TASK_ID);
         Map<String, String> params = dto.getParameters();
 
+        System.out.println("Parameters: " + params);
+
         assertThat(params)
-                .containsEntry(RESPONDENT_NAME, "John Doe")
+                .containsEntry("legalOrgName", "org name")
                 .containsEntry(RESPONSE_DEADLINE, formatLocalDate(deadline.toLocalDate(), DATE));
     }
 
@@ -82,5 +94,12 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
     void shouldReturnCorrectReferenceTemplate() {
         String ref = emailGenerator.getReferenceTemplate();
         assertThat(ref).isEqualTo(ACKNOWLEDGE_CLAIM_RESPONDENT_NOTIFICATION);
+    }
+
+    @Test
+    void shouldAlwaysReturnTrueForGetShouldNotify() {
+        CaseData caseData = CaseData.builder().build();
+        Boolean result = emailGenerator.getShouldNotify(caseData);
+        assertThat(result).isTrue();
     }
 }

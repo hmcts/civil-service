@@ -9,12 +9,17 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,6 +30,9 @@ class AcknowledgeClaimSpecAppSolOneEmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationService organisationService;
 
     @InjectMocks
     private AcknowledgeClaimSpecAppSolOneEmailDTOGenerator emailGenerator;
@@ -41,20 +49,31 @@ class AcknowledgeClaimSpecAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
+        uk.gov.hmcts.reform.ccd.model.Organisation organisation = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("Org123")
+                .build();
+
         Map<String, String> properties = new HashMap<>(Map.of("existingKey", "existingValue"));
+        LocalDateTime deadline = LocalDateTime.of(2025, 5, 30, 12, 39, 18);
         CaseData caseData = CaseData.builder()
                 .issueDate(LocalDate.of(2025, 1, 1))
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
                 .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
                         .name("John Doe")
                         .build())
+                .respondent1ResponseDeadline(deadline)
                 .build();
+
+        when(organisationService.findOrganisationById(anyString()))
+                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 
         Map<String, String> updatedProps = emailGenerator.addCustomProperties(properties, caseData);
 
+        System.out.println("Parameters: " + updatedProps);
+
         assertThat(updatedProps)
                 .containsEntry("existingKey", "existingValue")
-                .containsEntry("issuedOn", "1 January 2025");
+                .containsEntry("responseDeadline", "30 May 2025");
     }
 
     @Test
