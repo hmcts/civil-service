@@ -161,7 +161,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         List<Element<CaseDocument>> translatedDocuments = updatedData.getPreTranslationDocuments();
-        assertEquals(2, translatedDocuments.size());
+        assertEquals(1, translatedDocuments.size());
         assertEquals(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE, updatedData.getPreTranslationDocumentType());
     }
 

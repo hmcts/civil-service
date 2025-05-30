@@ -31,12 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+
 import static uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList.NO;
 import static uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList.YES;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.NOTICE_OF_DISCONTINUANCE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
-
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIMANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
@@ -329,24 +328,14 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
-            .documentType(NOTICE_OF_DISCONTINUANCE_CLAIMANT)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-        TranslatedDocument translatedDocument2 = TranslatedDocument
-            .builder()
             .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)
             .file(Document.builder().documentFileName(FILE_NAME_2).build())
             .build();
 
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1),
-            element(translatedDocument2)
-        );
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(translatedDocument1)
+        ));
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
-            DocumentType.NOTICE_OF_DISCONTINUANCE_CLAIMANT
-        )));
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
             Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
             DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT
@@ -382,24 +371,14 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
-            .documentType(NOTICE_OF_DISCONTINUANCE_CLAIMANT)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-        TranslatedDocument translatedDocument2 = TranslatedDocument
-            .builder()
             .documentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT)
             .file(Document.builder().documentFileName(FILE_NAME_2).build())
             .build();
 
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1),
-            element(translatedDocument2)
-        );
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(translatedDocument1)
+        ));
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
-        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
-            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
-            DocumentType.NOTICE_OF_DISCONTINUANCE_CLAIMANT
-        )));
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
             Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
             DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT
@@ -423,11 +402,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
-        List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
-        assertThat(documentsList)
-            .extracting("value")
-            .extracting("documentName")
-            .isNotNull();
+        var caseDocument = response.getData().get("respondent1NoticeOfDiscontinueAllPartyTranslatedDoc");
+        assertThat(caseDocument).isNotNull();
     }
 
     @Test
