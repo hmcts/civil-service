@@ -691,8 +691,11 @@ public class EventHistoryMapper {
             respondent2ResponseDate = caseData.getRespondent2ResponseDate();
         }
         if (goingOffline) {
-            LocalDateTime queryDate = respondent1ResponseDate.isAfter(respondent2ResponseDate)
-                        ? respondent1ResponseDate : respondent2ResponseDate;
+            LocalDateTime queryDate = respondent1ResponseDate;
+            if (!MultiPartyScenario.isTwoVOne(caseData)) {
+                queryDate = respondent1ResponseDate.isAfter(respondent2ResponseDate)
+                    ? respondent1ResponseDate : respondent2ResponseDate;
+            }
             buildQueriesEvent(builder, caseData, queryDate);
         }
         String miscText;
