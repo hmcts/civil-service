@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -48,6 +50,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     protected final UserService userService;
     protected final CoreCaseUserService coreCaseUserService;
+    protected final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
@@ -86,14 +89,24 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
+        // Once QM Lip goes live stop retrieving the latest query by role as we will only be using a single queries collection.
+        CaseMessage latestCaseMessage = featureToggleService.isLipQueryManagementEnabled(caseData)
+            ? getLatestQuery(caseData) : getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
             buildLatestQuery(latestCaseMessage));
 
-        if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
-            updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            // Since this query collection is no longer tied to a specific user we need to ensure
+            // we update the partyName field that EXUI populates with the logged in user's name, with something more generic.
+            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName("Queries").build());
+        } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+            updateQueryCollectionPartyName(
+                roles,
+                MultiPartyScenario.getMultiPartyScenario(caseData),
+                caseDataBuilder
+            );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
