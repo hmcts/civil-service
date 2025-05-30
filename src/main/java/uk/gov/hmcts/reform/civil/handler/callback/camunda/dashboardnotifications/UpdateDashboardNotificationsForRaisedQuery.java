@@ -67,12 +67,9 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
         String queryId = processVariables.getQueryId();
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
-        if (queryId == null) {
-            queryId = caseData.getQmLatestQuery().getQueryId();
-        }
+
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
-        if (isLIPClaimant(roles) && caseData.getQmApplicantCitizenQueries() != null
-            && caseData.getQmApplicantCitizenQueries().getCaseMessages().size() == 1) {
+        if (isLIPClaimant(roles) && caseData.getQueries().messageThread(queryId).stream().count() == 1) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
@@ -80,8 +77,7 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
                 notificationParams
             );
         }
-        if (isLIPDefendant(roles) && caseData.getQmRespondentCitizenQueries() != null
-            && caseData.getQmRespondentCitizenQueries().getCaseMessages().size() == 1) {
+        if (isLIPDefendant(roles) && caseData.getQueries().messageThread(queryId).stream().count() == 1) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),

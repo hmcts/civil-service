@@ -160,7 +160,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             objectMapper.registerModule(new JavaTimeModule());
             when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_ID).build());
             handler = new RaiseQueryCallbackHandler(
-                objectMapper, userService, coreCaseUserService, assignCategoryId
+                objectMapper, userService, coreCaseUserService, null, assignCategoryId
             );
         }
 
