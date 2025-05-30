@@ -21,8 +21,14 @@ class ClaimContinuingOnlineSpecEmailGeneratorTest {
     @Mock
     private ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator respTwoGen;
 
+    @Mock
+    private ClaimContinuingOnlineSpecClaimantEmailDTOGenerator claimantGen;
+
+    @Mock
+    private ClaimContinuingOnlineSpecDefendantEmailDTOGenerator defendantGen;
+
     @InjectMocks
-    private ClaimContinuingOnlineSpecEmailGenerator emailGenerator;
+    private ClaimContinuingOnlineSpecAllPartiesEmailGenerator emailGenerator;
 
     @Test
     void shouldInitializeParentClassWithCorrectArguments() {

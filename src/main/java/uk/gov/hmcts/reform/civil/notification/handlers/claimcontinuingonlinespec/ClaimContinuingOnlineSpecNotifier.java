@@ -13,7 +13,7 @@ public class ClaimContinuingOnlineSpecNotifier extends Notifier {
     public ClaimContinuingOnlineSpecNotifier(
             NotificationService notificationService,
             CaseTaskTrackingService caseTaskTrackingService,
-            ClaimContinuingOnlineSpecEmailGenerator partiesGenerator
+            ClaimContinuingOnlineSpecAllPartiesEmailGenerator partiesGenerator
     ) {
         super(notificationService, caseTaskTrackingService, partiesGenerator);
     }
