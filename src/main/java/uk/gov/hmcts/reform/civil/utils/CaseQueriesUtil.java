@@ -46,10 +46,6 @@ public class CaseQueriesUtil {
             return caseData.getQmRespondentSolicitor1Queries();
         } else if (isRespondentSolicitorTwo(roles)) {
             return caseData.getQmRespondentSolicitor2Queries();
-        } else if (isLIPClaimant(roles)) {
-            return caseData.getQmApplicantCitizenQueries();
-        } else if (isLIPDefendant(roles)) {
-            return caseData.getQmRespondentCitizenQueries();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
@@ -82,12 +78,6 @@ public class CaseQueriesUtil {
         }
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.add(caseData.getQmRespondentSolicitor2Queries().latest());
-        }
-        if (caseData.getQmApplicantCitizenQueries() != null) {
-            latestQueries.add(caseData.getQmApplicantCitizenQueries().latest());
-        }
-        if (caseData.getQmRespondentCitizenQueries() != null) {
-            latestQueries.add(caseData.getQmRespondentCitizenQueries().latest());
         }
         // =====================================================================
         return latestQueries.stream().max(Comparator.comparing(CaseMessage::getCreatedOn))
@@ -185,12 +175,6 @@ public class CaseQueriesUtil {
         }
         if (caseData.getQmRespondentSolicitor2Queries() != null) {
             latestQueries.addAll(unwrapElements(caseData.getQmRespondentSolicitor2Queries().getCaseMessages()));
-        }
-        if (caseData.getQmApplicantCitizenQueries() != null) {
-            latestQueries.addAll(unwrapElements(caseData.getQmApplicantCitizenQueries().getCaseMessages()));
-        }
-        if (caseData.getQmRespondentCitizenQueries() != null) {
-            latestQueries.addAll(unwrapElements(caseData.getQmRespondentCitizenQueries().getCaseMessages()));
         }
         return latestQueries.stream().filter(m -> m.getId().equals(queryId)).findFirst()
             .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));

@@ -67,7 +67,6 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
         String queryId = processVariables.getQueryId();
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
-
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         if (isLIPClaimant(roles) && caseData.getQueries().messageThread(queryId).stream().count() == 1) {
             dashboardScenariosService.recordScenarios(

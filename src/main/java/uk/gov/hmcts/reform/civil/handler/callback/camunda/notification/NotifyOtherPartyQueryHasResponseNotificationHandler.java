@@ -83,12 +83,10 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String responseQueryId = processVariables.getQueryId();
-
-        boolean isLipQueryManagementEnabled = featureToggleService.isLipQueryManagementEnabled(caseData);
-        CaseMessage responseQuery = isLipQueryManagementEnabled ? caseData.getQueries().getMessage(responseQueryId)
-            : getQueryById(caseData, responseQueryId);
+        CaseMessage responseQuery = getQueryById(caseData, responseQueryId);
         String parentQueryId = responseQuery.getParentId();
 
+        boolean isLipQueryManagementEnabled = featureToggleService.isLipQueryManagementEnabled(caseData);
         List<Map<String, String>> emailDetailsList = isLipQueryManagementEnabled
             ? getOtherPartyRecipientList(caseData, organisationService, coreCaseUserService, parentQueryId)
             : getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, parentQueryId);

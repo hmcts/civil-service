@@ -85,14 +85,10 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
         CaseData caseData = callbackParams.getCaseData();
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
-        boolean isQMForLipsEnabled = featureToggleService.isLipQueryManagementEnabled(caseData);
-        CaseMessage parentQuery = null;
-        CaseMessage responseQuery = null;
-
         String responseQueryId = processVariables.getQueryId();
-        responseQuery = getQueryById(caseData, responseQueryId);
+        CaseMessage responseQuery = getQueryById(caseData, responseQueryId);
         String parentQueryId = responseQuery.getParentId();
-        parentQuery = getQueryById(caseData, parentQueryId);
+        CaseMessage parentQuery = getQueryById(caseData, parentQueryId);
 
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQuery.getId());
         String email = getEmail(caseData, roles);
