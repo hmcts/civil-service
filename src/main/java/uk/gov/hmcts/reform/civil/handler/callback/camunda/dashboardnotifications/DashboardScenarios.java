@@ -240,8 +240,6 @@ public enum DashboardScenarios {
         "Scenario.AAA6.DefendantNoticeOfChange.ClaimRemainsOnline.Claimant"),
     SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT("Scenario.AAA6.ViewMessages.Available.Claimant"),
     SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT("Scenario.AAA6.ViewMessages.Available.Defendant"),
-    SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_CLAIMANT("Scenario.AAA6.ViewOtherMessages.Available.Claimant"),
-    SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_DEFENDANT("Scenario.AAA6.ViewOtherMessages.Available.Defendant"),
     SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT("Scenario.AAA6.LiPQM.QueryResponded.Claimant"),
     SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT("Scenario.AAA6.LiPQM.QueryResponded.Defendant"),
     SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE("Scenario.AAA6.LiPQM.QueryResponded.Claimant.Delete"),
