@@ -19,7 +19,6 @@ public class AcknowledgeClaimSpecAppSolOneEmailDTOGenerator extends AppSolOneEma
     private static final String REFERENCE_TEMPLATE = "acknowledge-claim-applicant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     public AcknowledgeClaimSpecAppSolOneEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
@@ -27,7 +26,6 @@ public class AcknowledgeClaimSpecAppSolOneEmailDTOGenerator extends AppSolOneEma
     ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.organisationService = organisationService;
     }
 
     @Override

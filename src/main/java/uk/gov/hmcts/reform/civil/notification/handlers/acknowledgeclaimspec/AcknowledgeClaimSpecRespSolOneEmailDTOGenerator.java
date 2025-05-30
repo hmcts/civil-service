@@ -20,7 +20,6 @@ public class AcknowledgeClaimSpecRespSolOneEmailDTOGenerator extends RespSolOneE
     private static final String REFERENCE_TEMPLATE = "acknowledge-claim-respondent-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     public AcknowledgeClaimSpecRespSolOneEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
@@ -29,7 +28,6 @@ public class AcknowledgeClaimSpecRespSolOneEmailDTOGenerator extends RespSolOneE
     ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.organisationService = organisationService;
         this.templateCommonPropertiesHelper = templateCommonPropertiesHelper;
     }
 
