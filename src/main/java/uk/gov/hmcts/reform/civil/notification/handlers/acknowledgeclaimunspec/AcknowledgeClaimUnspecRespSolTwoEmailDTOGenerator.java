@@ -13,14 +13,12 @@ public class AcknowledgeClaimUnspecRespSolTwoEmailDTOGenerator extends RespSolTw
 
     protected static final String REF_SOL_TWO_REF_TEMPLATE = "acknowledge-claim-respondent-notification-%s";
 
-    private final NotificationsProperties notificationsProperties;
     private final AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper;
 
     public AcknowledgeClaimUnspecRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties,
                                                              OrganisationService organisationService,
                                                              AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
+        super(notificationsProperties, organisationService);
         this.acknowledgeClaimUnspecHelper = acknowledgeClaimUnspecHelper;
     }
 
