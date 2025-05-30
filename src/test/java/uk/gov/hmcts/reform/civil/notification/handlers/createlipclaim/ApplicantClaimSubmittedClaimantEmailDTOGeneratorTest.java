@@ -22,7 +22,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class NotifyApplicantClaimSubmittedEmailDTOGeneratorTest {
+public class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
+
+    public static final String APPLICANT1_EMAIL = "test@example.com";
+    public static final String CLAIM_SUBMITTED_NOTIFICATION = "claim-submitted-notification-%s";
+    public static final String TEMPLATE_HWF = "template-hwf";
+    public static final String TEMPLATE_BILINGUAL = "template-bilingual";
+    public static final String CLAIMANT_NAME = "Claimant Name";
+    public static final String DEFENDANT_NAME = "Defendant Name";
+    public static final String BILINGUAL_HWF_TEMPLATE = "bilingual-hwf-template";
+    public static final String HELP_WITH_FEES_REFERENCE_NUMBER = "1111";
+    public static final String PAY_CLAIM_FEE_TEMPLATE = "pay-claim-fee-template";
+    public static final String URL = "http://frontend.url";
 
     @Mock
     private PinInPostConfiguration pinInPostConfiguration;
@@ -34,24 +45,24 @@ public class NotifyApplicantClaimSubmittedEmailDTOGeneratorTest {
     private FeatureToggleService toggleService;
 
     @InjectMocks
-    private NotifyApplicantClaimSubmittedEmailDTOGenerator generator;
+    private ApplicantClaimSubmittedClaimantEmailDTOGenerator generator;
 
     @Test
     void shouldReturnApplicant1Email_whenGetEmailAddressIsCalled() {
         CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().partyEmail("test@example.com").build())
+                .applicant1(Party.builder().partyEmail(APPLICANT1_EMAIL).build())
                 .build();
 
         String emailAddress = generator.getEmailAddress(caseData);
 
-        assertThat(emailAddress).isEqualTo("test@example.com");
+        assertThat(emailAddress).isEqualTo(APPLICANT1_EMAIL);
     }
 
     @Test
     void shouldReturnReferenceTemplate_whenGetReferenceTemplateIsCalled() {
         String referenceTemplate = generator.getReferenceTemplate();
 
-        assertThat(referenceTemplate).isEqualTo("claim-submitted-notification-%s");
+        assertThat(referenceTemplate).isEqualTo(CLAIM_SUBMITTED_NOTIFICATION);
     }
 
     @Test
@@ -59,7 +70,7 @@ public class NotifyApplicantClaimSubmittedEmailDTOGeneratorTest {
         CaseData caseData = mock(CaseData.class);
 
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.getApplicant1Email()).thenReturn("test@example.com");
+        when(caseData.getApplicant1Email()).thenReturn(APPLICANT1_EMAIL);
         when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
         boolean shouldNotify = generator.getShouldNotify(caseData);
@@ -106,15 +117,15 @@ public class NotifyApplicantClaimSubmittedEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailTemplateId_whenHWFReferenceNumberIsPresent() {
         CaseData caseData = CaseData.builder()
-                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("1111").build()).build())
+                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(HELP_WITH_FEES_REFERENCE_NUMBER).build()).build())
                 .build();
 
         when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate())
-                .thenReturn("template-hwf");
+                .thenReturn(TEMPLATE_HWF);
 
         String templateId = generator.getEmailTemplateId(caseData);
 
-        assertThat(templateId).isEqualTo("template-hwf");
+        assertThat(templateId).isEqualTo(TEMPLATE_HWF);
     }
 
     @Test
@@ -124,29 +135,29 @@ public class NotifyApplicantClaimSubmittedEmailDTOGeneratorTest {
                 .build();
 
         when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate())
-                .thenReturn("template-bilingual");
+                .thenReturn(TEMPLATE_BILINGUAL);
 
         String templateId = generator.getEmailTemplateId(caseData);
 
-        assertThat(templateId).isEqualTo("template-bilingual");
+        assertThat(templateId).isEqualTo(TEMPLATE_BILINGUAL);
     }
 
     @Test
     void shouldAddCustomPropertiesCorrectly() {
         CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().companyName("Claimant Name").type(Party.Type.COMPANY).build())
-                .respondent1(Party.builder().companyName("Defendant Name").type(Party.Type.COMPANY).build())
+                .applicant1(Party.builder().companyName(CLAIMANT_NAME).type(Party.Type.COMPANY).build())
+                .respondent1(Party.builder().companyName(DEFENDANT_NAME).type(Party.Type.COMPANY).build())
                 .build();
 
-        when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://frontend.url");
+        when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(URL);
 
         Map<String, String> initialProperties = new HashMap<>();
 
         Map<String, String> properties = generator.addCustomProperties(initialProperties, caseData);
 
-        assertThat(properties).containsEntry("claimantName", "Claimant Name");
-        assertThat(properties).containsEntry("DefendantName", "Defendant Name");
-        assertThat(properties).containsEntry("frontendBaseUrl", "http://frontend.url");
+        assertThat(properties).containsEntry("claimantName", CLAIMANT_NAME);
+        assertThat(properties).containsEntry("DefendantName", DEFENDANT_NAME);
+        assertThat(properties).containsEntry("frontendBaseUrl", URL);
     }
 
     @Test
@@ -155,17 +166,17 @@ public class NotifyApplicantClaimSubmittedEmailDTOGeneratorTest {
                 .claimantBilingualLanguagePreference(Language.WELSH.name())
                 .caseDataLiP(CaseDataLiP.builder()
                         .helpWithFees(HelpWithFees.builder()
-                                .helpWithFeesReferenceNumber("1111")
+                                .helpWithFeesReferenceNumber(HELP_WITH_FEES_REFERENCE_NUMBER)
                                 .build())
                         .build())
                 .build();
 
         when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate())
-                .thenReturn("bilingual-hwf-template");
+                .thenReturn(BILINGUAL_HWF_TEMPLATE);
 
         String templateId = generator.getEmailTemplateId(caseData);
 
-        assertThat(templateId).isEqualTo("bilingual-hwf-template");
+        assertThat(templateId).isEqualTo(BILINGUAL_HWF_TEMPLATE);
     }
 
     @Test
@@ -180,10 +191,10 @@ public class NotifyApplicantClaimSubmittedEmailDTOGeneratorTest {
                 .build();
 
         when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate())
-                .thenReturn("pay-claim-fee-template");
+                .thenReturn(PAY_CLAIM_FEE_TEMPLATE);
 
         String templateId = generator.getEmailTemplateId(caseData);
 
-        assertThat(templateId).isEqualTo("pay-claim-fee-template");
+        assertThat(templateId).isEqualTo(PAY_CLAIM_FEE_TEMPLATE);
     }
 }

@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
 @Component
-public class NotifyApplicantClaimSubmittedEmailGenerator extends AllPartiesEmailGenerator {
+public class ApplicantClaimSubmittedAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
-    public NotifyApplicantClaimSubmittedEmailGenerator(
-            NotifyApplicantClaimSubmittedEmailDTOGenerator applicantGenerator
+    public ApplicantClaimSubmittedAllPartiesEmailGenerator(
+            ApplicantClaimSubmittedClaimantEmailDTOGenerator applicantGenerator
     ) {
         super(List.of(applicantGenerator));
     }

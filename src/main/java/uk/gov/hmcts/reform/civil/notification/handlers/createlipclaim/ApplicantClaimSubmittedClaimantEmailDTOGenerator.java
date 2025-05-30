@@ -12,7 +12,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
-public class NotifyApplicantClaimSubmittedEmailDTOGenerator extends EmailDTOGenerator {
+public class ApplicantClaimSubmittedClaimantEmailDTOGenerator extends EmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claim-submitted-notification-%s";
 
@@ -20,7 +20,7 @@ public class NotifyApplicantClaimSubmittedEmailDTOGenerator extends EmailDTOGene
     private final NotificationsProperties notificationsProperties;
     private final FeatureToggleService toggleService;
 
-    public NotifyApplicantClaimSubmittedEmailDTOGenerator(
+    public ApplicantClaimSubmittedClaimantEmailDTOGenerator(
             PinInPostConfiguration pipInPostConfiguration,
             NotificationsProperties notificationsProperties,
             FeatureToggleService toggleService
