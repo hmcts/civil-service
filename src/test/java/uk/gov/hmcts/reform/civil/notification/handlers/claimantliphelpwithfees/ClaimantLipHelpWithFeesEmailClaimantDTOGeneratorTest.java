@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -67,6 +68,12 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
                                 .build()
                 )
                 .build();
+
+        ReflectionTestUtils.setField(
+                generator,
+                "templateCommonPropertiesHelper",
+                templateCommonPropertiesHelper
+        );
     }
 
     @Test
