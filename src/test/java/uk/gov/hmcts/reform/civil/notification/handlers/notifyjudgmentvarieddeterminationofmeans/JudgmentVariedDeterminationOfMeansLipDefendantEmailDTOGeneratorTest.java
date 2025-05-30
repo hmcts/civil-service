@@ -123,14 +123,14 @@ class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
-        Map<String,String> props = generator.addProperties(caseData);
+        Map<String, String> props = generator.addProperties(caseData);
         assertThat(props).containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_REF);
         assertThat(props).containsEntry(PARTY_NAME, RESPONDENT_NAME);
     }
 
     @Test
     void shouldNotModifyCustomProperties() {
-        Map<String,String> p = Map.of("a","b");
+        Map<String, String> p = Map.of("a", "b");
         assertThat(generator.addCustomProperties(p, CaseData.builder().build())).isEqualTo(p);
     }
 }
