@@ -17,7 +17,6 @@ class ClaimContinuingOnlineSpecNotifierTest extends NotifierTestBase {
 
     @Test
     void shouldReturnCorrectTaskId() {
-        assertThat(notifier.getTaskId())
-                .isEqualTo(ContinuingOnlineSpecClaimNotifier.toString());
+        assertThat(notifier.getTaskId()).isEqualTo(ContinuingOnlineSpecClaimNotifier.toString());
     }
 }

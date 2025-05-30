@@ -13,10 +13,7 @@ public class ClaimContinuingOnlineSpecEmailGenerator extends AllPartiesEmailGene
             ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator respOneGen,
             ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator respTwoGen
     ) {
-        super(List.of(
-                appGen,
-                respOneGen,
-                respTwoGen
+        super(List.of(appGen, respOneGen, respTwoGen
         ));
     }
 }

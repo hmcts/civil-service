@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
@@ -61,7 +61,6 @@ class ClaimContinuingOnlineSpecRespSolOneEmailDTOGeneratorTest {
         Map<String, String> initial = new HashMap<>();
         Map<String, String> result = emailGenerator.addCustomProperties(initial, caseData);
 
-        assertThat(result)
-                .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME);
+        assertThat(result).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, ORG_NAME);
     }
 }

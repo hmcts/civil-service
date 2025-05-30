@@ -16,14 +16,11 @@ public class ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator extends RespSo
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     public ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator(OrganisationService organisationService,
-                                                                NotificationsProperties notificationsProperties,
-                                                                OrganisationService organisationService1) {
+                                                                NotificationsProperties notificationsProperties) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.organisationService = organisationService1;
     }
 
     @Override

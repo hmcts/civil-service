@@ -30,10 +30,10 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @ExtendWith(MockitoExtension.class)
 class ClaimContinuingOnlineSpecAppSolOneEmailDTOGeneratorTest {
 
-    private static final String TEMPLATE_SINGLE     = "template-single";
-    private static final String TEMPLATE_MULTI      = "template-multi";
-    private static final String ORG_NAME            = "Legal Org";
-    private static final String REFERENCE_TEMPLATE  = "claim-continuing-online-notification-%s";
+    private static final String TEMPLATE_SINGLE = "template-single";
+    private static final String TEMPLATE_MULTI = "template-multi";
+    private static final String ORG_NAME = "Legal Org";
+    private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
     public static final String ISSUED_ON = "issuedOn";
     public static final String CLAIM_DETAILS_NOTIFICATION_DEADLINE = "claimDetailsNotificationDeadline";
     public static final String PARTY_REFERENCES = "partyReferences";
