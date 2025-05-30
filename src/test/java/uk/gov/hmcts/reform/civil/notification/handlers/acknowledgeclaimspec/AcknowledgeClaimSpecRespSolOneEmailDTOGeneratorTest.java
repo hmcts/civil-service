@@ -83,8 +83,6 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
         EmailDTO dto = emailGenerator.buildEmailDTO(caseData, TASK_ID);
         Map<String, String> params = dto.getParameters();
 
-        System.out.println("Parameters: " + params);
-
         assertThat(params)
                 .containsEntry("legalOrgName", "org name")
                 .containsEntry(RESPONSE_DEADLINE, formatLocalDate(deadline.toLocalDate(), DATE));

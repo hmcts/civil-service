@@ -69,8 +69,6 @@ class AcknowledgeClaimSpecAppSolOneEmailDTOGeneratorTest {
 
         Map<String, String> updatedProps = emailGenerator.addCustomProperties(properties, caseData);
 
-        System.out.println("Parameters: " + updatedProps);
-
         assertThat(updatedProps)
                 .containsEntry("existingKey", "existingValue")
                 .containsEntry("responseDeadline", "30 May 2025");
