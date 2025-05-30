@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
+import static uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection.REPAYMENT_PLAN;
+import static uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection.SET_DATE;
 
 @Service
 @RequiredArgsConstructor
@@ -83,6 +86,13 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
+        if (caseData.isPartAdmitClaimSpec() && (IMMEDIATELY.equals(caseData.getPaymentTypeSelection())
+                                || SET_DATE.equals(caseData.getPaymentTypeSelection())
+                                ||  REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection()))) {
+            return ccjJudgmentClaimAmount(caseData)
+                .add(ccjJudgmentClaimFee(caseData))
+                .add(ccjJudgmentFixedCost(caseData));
+        }
         return ccjJudgmentClaimAmount(caseData)
             .add(ccjJudgmentClaimFee(caseData))
             .add(ccjJudgmentInterest(caseData))
