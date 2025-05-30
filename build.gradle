@@ -324,6 +324,7 @@ configurations.all {
         'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
         'netty-common', 'netty-handler', 'netty-handler-proxy',
         'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
+        'netty-resolver-dns-native-macos',
         'netty-transport', 'netty-transport-classes-epoll',
         'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
         'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
