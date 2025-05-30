@@ -60,14 +60,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (Objects.nonNull(caseDataLip)) {
             caseDataLip.setTranslatedDocuments(null);
         }
-
+        if (businessProcessEvent != null) {
+            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
+        }
         caseDataBuilder.systemGeneratedCaseDocuments(
                 updatedDocumentList)
             .caseDataLiP(caseDataLip);
 
-        if (businessProcessEvent != null) {
-            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
-        }
         CaseData updatedCaseData = caseDataBuilder.build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -92,8 +91,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationInterlocJudgment =
                             preTranslationDocuments.stream()
-                                .filter(item -> item.getValue().getDocumentType() ==
-                                    DocumentType.INTERLOCUTORY_JUDGEMENT)
+                                .filter(item -> item.getValue().getDocumentType()
+                                    == DocumentType.INTERLOCUTORY_JUDGEMENT)
                                 .findFirst();
                         preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
                         preTranslationInterlocJudgment.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
@@ -102,8 +101,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationManualDeterminationDoc =
                             preTranslationDocuments.stream()
-                                .filter(item -> item.getValue().getDocumentType() ==
-                                    DocumentType.LIP_MANUAL_DETERMINATION)
+                                .filter(item -> item.getValue().getDocumentType()
+                                    == DocumentType.LIP_MANUAL_DETERMINATION)
                                 .findFirst();
                         preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationManualDeterminationDoc.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
@@ -133,8 +132,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-                    if (Objects.nonNull(originalDocument.getValue().getDocumentName()) &&
-                        originalDocument.getValue().getDocumentName().contains("claimant")) {
+                    if (Objects.nonNull(originalDocument.getValue().getDocumentName())
+                        && originalDocument.getValue().getDocumentName().contains("claimant")) {
                         CaseDocument claimantSealedCopy = CaseDocument.toCaseDocument(
                             originalDocument.getValue().getDocumentLink(),
                             originalDocument.getValue().getDocumentType()
