@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class JudgementService {
     private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
     private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
+    private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s which include the amounts shown:";
     private final FeatureToggleService featureToggleService;
 
     public CCJPaymentDetails buildJudgmentAmountSummaryDetails(CaseData caseData) {
@@ -103,7 +105,20 @@ public class JudgementService {
             }
             return JUDGEMENT_BY_COURT;
         } else {
-            return String.format(JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
+            return String.format(
+                isLrPayImmediatelyPlan(caseData)
+                    ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
         }
+    }
+
+    public boolean isLrPayImmediatelyPlan(CaseData caseData) {
+        return caseData.isPayImmediately()
+            && isOneVOne(caseData)
+            && isLRvLR(caseData)
+            && featureToggleService.isLrAdmissionBulkEnabled();
+    }
+
+    private boolean isLRvLR(CaseData caseData) {
+        return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
     }
 }
