@@ -5,21 +5,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -42,6 +39,11 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
     @InjectMocks
     private AcknowledgeClaimSpecRespSolOneEmailDTOGenerator emailGenerator;
 
+    private static final String ORG_ID = "ORG123";
+    private static final String ORG_NAME = "Test Organisation";
+    private static final String FALLBACK_NAME = "Fallback Solicitor Name";
+    private static final LocalDateTime DEADLINE = LocalDateTime.of(2025, 6, 1, 23, 59);
+
     @Test
     void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
@@ -53,35 +55,61 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldIncludeRespondent1NameAndDeadlineInParameters() {
-        Party respondent1 = Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("John")
-                .individualLastName("Doe")
-                .build();
+    void shouldAddOrgNameAndDeadline_WhenOrganisationFound() {
+        // Given
+        uk.gov.hmcts.reform.ccd.model.Organisation ccdOrg =
+            uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID(ORG_ID).build();
 
-        Organisation organisation = Organisation.builder()
-                .organisationID("Org123")
-                .build();
+        OrganisationPolicy policy = OrganisationPolicy.builder().organisation(ccdOrg).build();
+        StatementOfTruth statement = StatementOfTruth.builder().name(FALLBACK_NAME).build();
 
         CaseData caseData = CaseData.builder()
-                .ccdCaseReference(1L)
-                .legacyCaseReference("ref1")
-                .respondent1(respondent1)
-                .respondent1ResponseDeadline(deadline)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
-                .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().build())
-                .build();
+            .respondent1OrganisationPolicy(policy)
+            .applicantSolicitor1ClaimStatementOfTruth(statement)
+            .respondent1ResponseDeadline(DEADLINE)
+            .build();
 
-        when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("org name").build()));
+        when(organisationService.findOrganisationById(ORG_ID))
+            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
+                                        .name(ORG_NAME).build()));
 
-        EmailDTO dto = emailGenerator.buildEmailDTO(caseData, TASK_ID);
-        Map<String, String> params = dto.getParameters();
+        Map<String, String> properties = new HashMap<>();
 
-        assertThat(params)
-                .containsEntry("legalOrgName", "org name")
-                .containsEntry(RESPONSE_DEADLINE, formatLocalDate(deadline.toLocalDate(), DATE));
+        // When
+        Map<String, String> result = emailGenerator.addCustomProperties(properties, caseData);
+
+        // Then
+        assertThat(result)
+            .containsEntry("legalOrgName", ORG_NAME)
+            .containsEntry(RESPONSE_DEADLINE, formatLocalDate(DEADLINE.toLocalDate(), DATE));
+    }
+
+    @Test
+    void shouldUseFallbackName_WhenOrganisationNotFound() {
+        // Given
+        uk.gov.hmcts.reform.ccd.model.Organisation ccdOrg =
+            uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID(ORG_ID).build();
+
+        OrganisationPolicy policy = OrganisationPolicy.builder().organisation(ccdOrg).build();
+        StatementOfTruth statement = StatementOfTruth.builder().name(FALLBACK_NAME).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1OrganisationPolicy(policy)
+            .applicantSolicitor1ClaimStatementOfTruth(statement)
+            .respondent1ResponseDeadline(DEADLINE)
+            .build();
+
+        when(organisationService.findOrganisationById(ORG_ID)).thenReturn(Optional.empty());
+
+        Map<String, String> properties = new HashMap<>();
+
+        // When
+        Map<String, String> result = emailGenerator.addCustomProperties(properties, caseData);
+
+        // Then
+        assertThat(result)
+            .containsEntry("legalOrgName", FALLBACK_NAME)
+            .containsEntry(RESPONSE_DEADLINE, formatLocalDate(DEADLINE.toLocalDate(), DATE));
     }
 
     @Test
