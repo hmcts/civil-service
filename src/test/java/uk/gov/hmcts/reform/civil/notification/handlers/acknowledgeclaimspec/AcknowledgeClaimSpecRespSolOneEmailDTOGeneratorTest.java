@@ -38,9 +38,6 @@ class AcknowledgeClaimSpecRespSolOneEmailDTOGeneratorTest {
     private NotificationsProperties notificationsProperties;
 
     @Mock
-    private TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
-
-    @Mock
     private OrganisationService organisationService;
 
     @InjectMocks
