@@ -32,6 +32,9 @@ public abstract class EmailDTOGenerator implements NotificationData {
         templateCommonPropertiesHelper.addCommonFooterSignature(properties);
         templateCommonPropertiesHelper.addCnbcContact(caseData, properties);
         templateCommonPropertiesHelper.addSpecAndUnspecContact(caseData, properties);
+        templateCommonPropertiesHelper.addCommonFooterSignatureWelsh(properties);
+        templateCommonPropertiesHelper.addLipContact(caseData, properties);
+        templateCommonPropertiesHelper.addLipContactWelsh(caseData, properties);
         return properties;
     }
 
