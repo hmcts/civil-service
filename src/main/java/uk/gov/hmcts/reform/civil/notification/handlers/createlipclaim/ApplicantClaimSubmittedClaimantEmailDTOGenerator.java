@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -18,22 +17,18 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGenerator extends EmailDTOGe
 
     private final PinInPostConfiguration pipInPostConfiguration;
     private final NotificationsProperties notificationsProperties;
-    private final FeatureToggleService toggleService;
 
     public ApplicantClaimSubmittedClaimantEmailDTOGenerator(
             PinInPostConfiguration pipInPostConfiguration,
-            NotificationsProperties notificationsProperties,
-            FeatureToggleService toggleService
+            NotificationsProperties notificationsProperties
     ) {
         this.pipInPostConfiguration = pipInPostConfiguration;
         this.notificationsProperties = notificationsProperties;
-        this.toggleService = toggleService;
     }
 
     @Override
     protected Boolean getShouldNotify(CaseData caseData) {
         return caseData.isLipvLipOneVOne()
-                && toggleService.isLipVLipEnabled()
                 && caseData.getApplicant1Email() != null;
     }
 
@@ -68,13 +63,19 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGenerator extends EmailDTOGe
     }
 
     @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return Map.of(
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
+        );
+    }
+
+    @Override
     protected Map<String, String> addCustomProperties(
             Map<String, String> properties,
             CaseData caseData
     ) {
-        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
-        properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-        properties.put(FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl());
         return properties;
     }
 }

@@ -12,9 +12,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,27 +20,25 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
+class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
     public static final String APPLICANT1_EMAIL = "test@example.com";
     public static final String CLAIM_SUBMITTED_NOTIFICATION = "claim-submitted-notification-%s";
     public static final String TEMPLATE_HWF = "template-hwf";
     public static final String TEMPLATE_BILINGUAL = "template-bilingual";
-    public static final String CLAIMANT_NAME = "Claimant Name";
-    public static final String DEFENDANT_NAME = "Defendant Name";
+    public static final String CLAIMANT_NAME = "claimantName";
+    public static final String DEFENDANT_NAME = "DefendantName";
     public static final String BILINGUAL_HWF_TEMPLATE = "bilingual-hwf-template";
     public static final String HELP_WITH_FEES_REFERENCE_NUMBER = "1111";
     public static final String PAY_CLAIM_FEE_TEMPLATE = "pay-claim-fee-template";
     public static final String URL = "http://frontend.url";
+    public static final String FRONTEND_BASE_URL = "frontendBaseUrl";
 
     @Mock
     private PinInPostConfiguration pinInPostConfiguration;
 
     @Mock
     private NotificationsProperties notificationsProperties;
-
-    @Mock
-    private FeatureToggleService toggleService;
 
     @InjectMocks
     private ApplicantClaimSubmittedClaimantEmailDTOGenerator generator;
@@ -71,7 +67,6 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(caseData.getApplicant1Email()).thenReturn(APPLICANT1_EMAIL);
-        when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
         boolean shouldNotify = generator.getShouldNotify(caseData);
 
@@ -95,7 +90,6 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
         when(caseData.getApplicant1Email()).thenReturn(null);
-        when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
         boolean shouldNotify = generator.getShouldNotify(caseData);
 
@@ -107,7 +101,6 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
         CaseData caseData = mock(CaseData.class);
 
         when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(toggleService.isLipVLipEnabled()).thenReturn(false);
 
         boolean shouldNotify = generator.getShouldNotify(caseData);
 
@@ -143,21 +136,31 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldAddCustomPropertiesCorrectly() {
+    void shouldAddPropertiesCorrectly() {
         CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().companyName(CLAIMANT_NAME).type(Party.Type.COMPANY).build())
-                .respondent1(Party.builder().companyName(DEFENDANT_NAME).type(Party.Type.COMPANY).build())
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("John").individualLastName("Doe").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("Jane").individualLastName("Smith").build())
                 .build();
 
         when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(URL);
 
-        Map<String, String> initialProperties = new HashMap<>();
+        Map<String, String> properties = generator.addProperties(caseData);
 
-        Map<String, String> properties = generator.addCustomProperties(initialProperties, caseData);
+        assertThat(properties).containsExactlyInAnyOrderEntriesOf(Map.of(
+                CLAIMANT_NAME, "John Doe",
+                DEFENDANT_NAME, "Jane Smith",
+                FRONTEND_BASE_URL, URL
+        ));
+    }
 
-        assertThat(properties).containsEntry("claimantName", CLAIMANT_NAME);
-        assertThat(properties).containsEntry("DefendantName", DEFENDANT_NAME);
-        assertThat(properties).containsEntry("frontendBaseUrl", URL);
+    @Test
+    void shouldReturnSamePropertiesMap() {
+        Map<String, String> properties = Map.of("key1", "value1", "key2", "value2");
+        CaseData caseData = CaseData.builder().build();
+
+        Map<String, String> result = generator.addCustomProperties(properties, caseData);
+
+        assertThat(result).isSameAs(properties);
     }
 
     @Test

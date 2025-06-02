@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimantLipHelpWithFeesNotifier;
 
 @ExtendWith(MockitoExtension.class)
-public class ApplicantClaimSubmittedNotifierTest extends NotifierTestBase {
+class ApplicantClaimSubmittedNotifierTest extends NotifierTestBase {
 
     @InjectMocks
     private ApplicantClaimSubmittedNotifier notifier;
