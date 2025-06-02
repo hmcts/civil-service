@@ -2,40 +2,32 @@ package uk.gov.hmcts.reform.civil.notification.handlers.notifyjudgmentvarieddete
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 
 @Component
-public class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator extends EmailDTOGenerator {
+public class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claimant-judgment-varied-determination-of-means-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     public JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
             OrganisationService organisationService
     ) {
+        super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.organisationService = organisationService;
     }
 
     @Override
     protected Boolean getShouldNotify(CaseData caseData) {
-        return nonNull(caseData.getApplicantSolicitor1UserDetails().getEmail());
-    }
-
-    @Override
-    protected String getEmailAddress(CaseData caseData) {
-        return caseData.getApplicantSolicitor1UserDetails().getEmail();
+        return caseData.getApplicantSolicitor1UserDetails().getEmail() != null;
     }
 
     @Override
@@ -53,9 +45,7 @@ public class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator extend
             Map<String, String> properties,
             CaseData caseData
     ) {
-        properties.put(LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.put(DEFENDANT_NAME, getDefendantNameBasedOnCaseType(caseData));
         return properties;
     }
-
 }

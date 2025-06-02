@@ -19,7 +19,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
@@ -96,7 +95,6 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
         Map<String, String> expectedProps = Map.of(
-                LEGAL_ORG_NAME, "Legal Org Name",
                 DEFENDANT_NAME, "Respondent 1"
         );
 
