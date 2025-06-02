@@ -95,14 +95,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationManualDeterminationDoc.ifPresent(systemGeneratedDocuments::add);
                     }
-                } else if (document.getValue().getDocumentType().equals(CCJ_REQUEST_DETERMINATION)) {
-                    if (Objects.nonNull(preTranslationDocuments)) {
-                        Optional<Element<CaseDocument>> preTranslationReqDetermination = preTranslationDocuments.stream()
-                            .filter(item -> item.getValue().getDocumentType() == DocumentType.CCJ_REQUEST_DETERMINATION)
-                            .findFirst();
-                        preTranslationReqDetermination.ifPresent(preTranslationDocuments::remove);
-                        preTranslationReqDetermination.ifPresent(systemGeneratedDocuments::add);
-                    }
                 } else if (document.getValue().getDocumentType().equals(FINAL_ORDER)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationFinalOrderDoc = preTranslationDocuments.stream()
@@ -209,8 +201,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
             } else if (Objects.nonNull(translatedDocuments)
                 && ((translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT))
-                || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION))
-                || (translatedDocuments.get(0).getValue().getDocumentType().equals(CCJ_REQUEST_DETERMINATION)))) {
+                || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION)))) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
             } else if (Objects.nonNull(translatedDocuments)
                 && (translatedDocuments.get(0).getValue().getDocumentType().equals(FINAL_ORDER))) {
