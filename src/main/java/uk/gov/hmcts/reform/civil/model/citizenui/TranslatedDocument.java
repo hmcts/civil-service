@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.COURT_OFFICER_ORDER_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.FINAL_ORDER_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_ISSUE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
@@ -38,6 +40,8 @@ public class TranslatedDocument {
             case STANDARD_DIRECTION_ORDER -> SDO_TRANSLATED_DOCUMENT;
             case INTERLOCUTORY_JUDGMENT -> INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
             case MANUAL_DETERMINATION -> MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
+            case FINAL_ORDER -> FINAL_ORDER_TRANSLATED_DOCUMENT;
+            case COURT_OFFICER_ORDER -> COURT_OFFICER_ORDER_TRANSLATED_DOCUMENT;
             case SETTLEMENT_AGREEMENT -> SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
             case HEARING_NOTICE -> TRANSLATED_HEARING_NOTICE;
             default -> throw new DocumentUploadException("No document file type found for Translated document");

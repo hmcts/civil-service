@@ -28,6 +28,11 @@ public class SystemGeneratedDocumentService {
         return addToDocumentCollection(systemGeneratedDocument, translatedDocuments);
     }
 
+    public List<Element<CaseDocument>> getFinalOrderDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
+        List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
+        return addToDocumentCollection(finalOrderDocuments, translatedDocuments);
+    }
+
     public List<Element<CaseDocument>> getHearingDocumentsWithAddedDocumentWelsh(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
         List<Element<CaseDocument>> hearingDocuments = caseData.getHearingDocumentsWelsh();
         return addToDocumentCollection(hearingDocuments, translatedDocuments);
