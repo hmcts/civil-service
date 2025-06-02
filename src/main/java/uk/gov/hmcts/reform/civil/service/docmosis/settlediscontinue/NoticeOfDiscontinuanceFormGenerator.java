@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue.NoticeOfDiscontinuanceForm;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -30,6 +31,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final FeatureToggleService featureToggleService;
 
     public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String partyType, String authorisation) {
         NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address);
@@ -48,7 +50,11 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate, String partyType) {
-        return String.format(docmosisTemplate.getDocumentTitle(), partyType, caseData.getLegacyCaseReference());
+        String partyTypeAndCaseRef =
+            featureToggleService.isGaForWelshEnabled()
+                ? partyType + "_" + caseData.getLegacyCaseReference()
+                : caseData.getLegacyCaseReference();
+        return String.format(docmosisTemplate.getDocumentTitle(), partyTypeAndCaseRef);
     }
 
     private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address) {
