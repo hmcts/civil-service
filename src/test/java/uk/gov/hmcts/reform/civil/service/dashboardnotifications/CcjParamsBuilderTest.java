@@ -64,7 +64,6 @@ class CcjParamsBuilderTest {
         when(instalmentDetails.getAmount()).thenReturn("2000");
         when(instalmentDetails.getStartDate()).thenReturn(LocalDate.of(2023, 1, 1));
 
-
         HashMap<String, Object> params = new HashMap<>();
         builder.addParams(caseData, params);
 

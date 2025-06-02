@@ -28,7 +28,7 @@ class ClaimSettledAmountParamsBuilderTest {
 
     @Test
     void shouldAddClaimSettledAmountWhenPresent() {
-         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondToClaim(RespondToClaim.builder()
                 .howMuchWasPaid(new BigDecimal("10000"))

@@ -23,7 +23,7 @@ public class HearingDocumentDeadlineParamsBuilder extends DashboardNotifications
         });
     }
 
-    private Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
+    Optional<LocalDate> getHearingDocumentDeadline(CaseData caseData) {
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             return Optional.empty();
         } else if (SdoHelper.isFastTrack(caseData)) {

@@ -16,7 +16,6 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
 
 class ClaimSettledDateParamsBuilderTest {
 
@@ -33,7 +32,7 @@ class ClaimSettledDateParamsBuilderTest {
 
     @Test
     void shouldAddClaimSettledDateParamsWhenPresent() {
-        LocalDate settledDate = LocalDate.parse("2023-03-29");
+
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondToClaim(RespondToClaim.builder()
@@ -51,10 +50,11 @@ class ClaimSettledDateParamsBuilderTest {
         assertThat(params).extracting("claimSettledObjectionsDeadline").isEqualTo(
             LocalDate.parse("2023-04-17").atTime(LocalTime.of(23, 59, 59))
         );
-
+        LocalDate settledDate = LocalDate.parse("2023-03-29");
         assertThat(params).containsEntry("claimSettledDateEn", DateUtils.formatDate(settledDate));
         assertThat(params).containsEntry("claimSettledDateCy", DateUtils.formatDateInWelsh(settledDate, false));
     }
+
     @Test
     void shouldNotAddClaimSettledDateParamsWhenNotPresent() {
         // Arrange
