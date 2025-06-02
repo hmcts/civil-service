@@ -6,16 +6,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.Notificat
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Component
@@ -24,19 +19,13 @@ public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator exten
     private static final String REFERENCE_TEMPLATE = "defendant-judgment-varied-determination-of-means-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final NotificationsSignatureConfiguration signatureConfig;
-    private final FeatureToggleService featureToggleService;
 
     public JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
-            OrganisationService organisationService,
-            NotificationsSignatureConfiguration signatureConfig,
-            FeatureToggleService featureToggleService
+            OrganisationService organisationService
     ) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.signatureConfig = signatureConfig;
-        this.featureToggleService = featureToggleService;
     }
 
     @Override
@@ -60,13 +49,6 @@ public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator exten
         props.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         props.put(DEFENDANT_NAME_SPEC,
                 getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
-        );
-        props.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
-        props.put(CASEMAN_REF, caseData.getLegacyCaseReference());
-        addCommonFooterSignature(props, signatureConfig);
-        addSpecAndUnspecContact(
-                caseData, props, signatureConfig,
-                featureToggleService.isQueryManagementLRsEnabled()
         );
         return props;
     }

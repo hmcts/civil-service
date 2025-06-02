@@ -5,48 +5,32 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
 class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
 
     private static final String APPLICANT_LIP_EMAIL = "applicantLip@example.com";
-    private static final String SOLICITOR_EMAIL = "solicitor@example.com";
     private static final String LIP_TEMPLATE_ID = "lip-template-id";
     private static final String BIL_LIP_TEMPLATE = "bilingual-lip-template-id";
-    private static final String SOLICITOR_TEMPLATE = "sol-template-id";
     private static final String LEGACY_REF = "000DC001";
-    private static final long CCD_REF = 12345L;
     public static final String CLAIMANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS = "claimant-judgment-varied-determination-of-means-%s";
 
     @Mock
     private NotificationsProperties notificationsProperties;
-
-    @Mock
-    private NotificationsSignatureConfiguration configuration;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator generator;
@@ -67,28 +51,12 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyWhenSolicitorEmailPresent() {
-        CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.YES)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(SOLICITOR_EMAIL).build())
-                .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
     void shouldReturnCorrectAddress() {
-        CaseData lip = CaseData.builder()
+        CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.NO)
                 .applicant1(Party.builder().partyEmail(APPLICANT_LIP_EMAIL).build())
                 .build();
-        assertThat(generator.getEmailAddress(lip)).isEqualTo(APPLICANT_LIP_EMAIL);
-
-        CaseData sol = CaseData.builder()
-                .applicant1Represented(YesOrNo.YES)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(SOLICITOR_EMAIL).build())
-                .build();
-        assertThat(generator.getEmailAddress(sol)).isEqualTo(SOLICITOR_EMAIL);
+        assertThat(generator.getEmailAddress(caseData)).isEqualTo(APPLICANT_LIP_EMAIL);
     }
 
     @Test
@@ -109,14 +77,6 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldUseSolicitorTemplate() {
-        when(notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate())
-                .thenReturn(SOLICITOR_TEMPLATE);
-        assertThat(generator.getEmailTemplateId(CaseData.builder().build()))
-                .isEqualTo(SOLICITOR_TEMPLATE);
-    }
-
-    @Test
     void shouldAddLiPProperties() {
         CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().companyName("Applicant").partyEmail(APPLICANT_LIP_EMAIL).type(Party.Type.COMPANY).build())
@@ -133,33 +93,6 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
 
         Map<String, String> props = generator.addProperties(caseData);
         assertThat(props).containsExactlyInAnyOrderEntriesOf(expectedProps);
-    }
-
-    @Test
-    void shouldAddSolicitorProperties() {
-        CaseData caseData = CaseData.builder()
-                .ccdCaseReference(CCD_REF)
-                .applicant1(Party.builder().partyEmail(APPLICANT_LIP_EMAIL).type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().partyEmail("r@example.com").type(Party.Type.INDIVIDUAL).build())
-                .applicant1Represented(YesOrNo.YES)
-                .legacyCaseReference(LEGACY_REF)
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().build())
-                .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().build())
-                .build();
-
-        when(configuration.getOpeningHours()).thenReturn("HOURS");
-        when(configuration.getHmctsSignature()).thenReturn("SIGNATURE");
-        when(configuration.getPhoneContact()).thenReturn("PHONE");
-        when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-
-        Map<String, String> expectedProps = Map.of(
-                CLAIM_REFERENCE_NUMBER, String.valueOf(CCD_REF),
-                CASEMAN_REF, LEGACY_REF,
-                PHONE_CONTACT, "PHONE"
-        );
-
-        Map<String, String> props = generator.addProperties(caseData);
-        assertThat(props).containsAllEntriesOf(expectedProps);
     }
 
     @Test

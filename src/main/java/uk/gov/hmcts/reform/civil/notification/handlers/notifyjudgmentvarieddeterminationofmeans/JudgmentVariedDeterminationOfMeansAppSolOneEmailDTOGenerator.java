@@ -4,40 +4,43 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 
 @Component
-public class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator extends EmailDTOGenerator {
+public class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator extends EmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claimant-judgment-varied-determination-of-means-%s";
 
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
-    public JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator(
-            NotificationsProperties notificationsProperties
+    public JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator(
+            NotificationsProperties notificationsProperties,
+            OrganisationService organisationService
     ) {
         this.notificationsProperties = notificationsProperties;
+        this.organisationService = organisationService;
     }
 
     @Override
     protected Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isApplicantLiP()
-                && nonNull(caseData.getApplicant1Email());
+        return nonNull(caseData.getApplicantSolicitor1UserDetails().getEmail());
     }
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
-        return caseData.getApplicant1Email();
+        return caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.isClaimantBilingual()
-                ? notificationsProperties.getNotifyLipUpdateTemplateBilingual()
-                : notificationsProperties.getNotifyLipUpdateTemplate();
+        return notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate();
     }
 
     @Override
@@ -46,19 +49,13 @@ public class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator extends
     }
 
     @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-                CLAIMANT_V_DEFENDANT,   getAllPartyNames(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                PARTY_NAME,            caseData.getApplicant1().getPartyName()
-        );
-    }
-
-    @Override
     protected Map<String, String> addCustomProperties(
             Map<String, String> properties,
             CaseData caseData
     ) {
+        properties.put(LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService));
+        properties.put(DEFENDANT_NAME, getDefendantNameBasedOnCaseType(caseData));
         return properties;
     }
+
 }
