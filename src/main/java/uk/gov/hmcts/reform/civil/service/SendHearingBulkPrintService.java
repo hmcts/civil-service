@@ -7,19 +7,21 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_NOTICE;
+import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
+import static uk.gov.hmcts.reform.civil.enums.dq.Language.ENGLISH;
+import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_CLAIMANT_HMC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_DEFENDANT_HMC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendSDOToLiPDefendantCallbackHandler.TASK_ID_CLAIMANT;
 
 @Service
 @RequiredArgsConstructor
@@ -35,20 +37,18 @@ public class SendHearingBulkPrintService {
     public void sendHearingToLIP(String authorisation, CaseData caseData, String task, boolean welshDocument) {
         List<CaseDocument> caseDocuments = new ArrayList<>();
         Language language = determineLanguageForBulkPrint(caseData, task, welshDocument);
-        caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
-        CaseDocument caseDocumentEnglish = caseData.getHearingDocuments().get(0).getValue();
-        switch (language) {
-            case ENGLISH -> {
-                if (Objects.nonNull(caseDocumentEnglish)) {
-                    caseDocuments.add(caseDocumentEnglish);
+        if (checkHearingDocumentAvailable(caseData) || checkWelshHearingDocumentAvailable(caseData)) {
+            switch (language) {
+                case ENGLISH -> caseDocuments.add(caseData.getHearingDocuments().get(0).getValue());
+                case WELSH -> {
+                    caseDocuments.add(caseData.getHearingDocumentsWelsh().get(0).getValue());
+                }
+                case BOTH -> {
+                    caseDocuments.add(caseData.getHearingDocuments().get(0).getValue());
+                    caseDocuments.add(caseData.getHearingDocumentsWelsh().get(0).getValue());            }
+                default -> {
                 }
             }
-            case WELSH -> caseDocuments.add(caseData.getHearingDocumentsWelsh().get(0).getValue());
-            case BOTH -> {
-                caseDocuments.add(caseData.getHearingDocuments().get(0).getValue());
-                caseDocuments.add(caseData.getHearingDocumentsWelsh().get(0).getValue());
-            }
-            default -> { }
         }
 
         if (!caseDocuments.isEmpty()) {
@@ -88,20 +88,21 @@ public class SendHearingBulkPrintService {
 
     private Language determineLanguageForBulkPrint(CaseData caseData, String taskId, boolean welshDocument) {
         if (!featureToggleService.isGaForWelshEnabled() && !welshDocument) {
-            return Language.ENGLISH;
+            return ENGLISH;
         } else if (!featureToggleService.isGaForWelshEnabled() && welshDocument) {
-            return Language.BOTH;
+            return BOTH;
         }
 
-        if (TASK_ID_CLAIMANT.equals(taskId)) {
+        if (TASK_ID_CLAIMANT.equals(taskId)
+            || TASK_ID_CLAIMANT_HMC.equals(taskId)) {
             if (caseData.getApplicant1DQ() != null
                 && caseData.getApplicant1DQ().getApplicant1DQLanguage() != null
                 && (caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments() != null)) {
                 return caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments();
             } else {
                 return switch (caseData.getClaimantBilingualLanguagePreference()) {
-                    case "WELSH" -> Language.WELSH;
-                    case "BOTH" -> Language.BOTH;
+                    case "WELSH" -> WELSH;
+                    case "BOTH" -> BOTH;
                     default -> Language.ENGLISH;
                 };
             }
@@ -112,8 +113,8 @@ public class SendHearingBulkPrintService {
                 return caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments();
             } else {
                 return switch (caseData.getDefendantBilingualLanguagePreference()) {
-                    case "WELSH" -> Language.WELSH;
-                    case "BOTH" -> Language.BOTH;
+                    case "WELSH" -> WELSH;
+                    case "BOTH" -> BOTH;
                     default -> Language.ENGLISH;
                 };
             }

@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.O
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -79,11 +79,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
-                if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
+               /* if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
                     Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
                     List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
                     systemGeneratedDocuments.add(originalSdo);
-                } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
+                } else*/ if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.INTERLOCUTORY_JUDGEMENT)
@@ -107,7 +107,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationSettlementAgreement.ifPresent(preTranslationDocuments::remove);
                         preTranslationSettlementAgreement.ifPresent(caseData.getSystemGeneratedCaseDocuments()::add);
                     }
-                } else if (document.getValue().getDocumentType().equals(HEARING_FORM)) {
+                } else if (document.getValue().getDocumentType().equals(HEARING_NOTICE)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationHearingForm = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.HEARING_FORM)
@@ -141,7 +141,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     document.getValue().getFile().setCategoryID("orders");
                 } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                     document.getValue().getFile().setCategoryID("caseManagementOrders");
-                } else if (document.getValue().getDocumentType().equals(HEARING_FORM)) {
+                } else if (document.getValue().getDocumentType().equals(HEARING_NOTICE)) {
                     document.getValue().getFile().setCategoryID("hearingNotices");
                     addToHearingDocuments.add(document);
                 } else {
@@ -151,12 +151,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
         List<Element<CaseDocument>> updatedSystemGeneratedDocuments =
             systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, caseData);
-        List<Element<CaseDocument>> updatedHearingDocuments =
-            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocument(addToHearingDocuments, caseData);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
+        List<Element<CaseDocument>> updatedHearingDocumentsWelsh =
+            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocumentWelsh(addToHearingDocuments, caseData);
+        return caseData.toBuilder()
             .systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments)
-            .hearingDocumentsWelsh(updatedHearingDocuments);
-        return caseDataBuilder;
+            .hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
@@ -177,7 +176,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                 return UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
             } else if (Objects.nonNull(translatedDocuments)
-                && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_FORM)) {
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_NOTICE)) {
                 return UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
             }
         }

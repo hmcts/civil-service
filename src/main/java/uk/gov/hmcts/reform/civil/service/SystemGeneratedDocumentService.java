@@ -28,7 +28,7 @@ public class SystemGeneratedDocumentService {
         return addToDocumentCollection(systemGeneratedDocument, translatedDocuments);
     }
 
-    public List<Element<CaseDocument>> getHearingDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
+    public List<Element<CaseDocument>> getHearingDocumentsWithAddedDocumentWelsh(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
         List<Element<CaseDocument>> hearingDocuments = caseData.getHearingDocumentsWelsh();
         return addToDocumentCollection(hearingDocuments, translatedDocuments);
     }

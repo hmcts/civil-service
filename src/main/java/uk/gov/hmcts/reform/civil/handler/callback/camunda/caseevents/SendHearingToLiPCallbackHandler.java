@@ -78,11 +78,4 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
             || HmcDataUtils.isWelshHearingTemplateDefendant(caseData);
     }
 
-    private boolean isClaimantHMC(String task) {
-        return TASK_ID_CLAIMANT_HMC.equals(task);
-    }
-
-    private boolean isDefendantHMC(String task) {
-        return TASK_ID_DEFENDANT_HMC.equals(task);
-    }
 }

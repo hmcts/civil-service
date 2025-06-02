@@ -55,10 +55,11 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     private FeatureToggleService featureToggleService;
     @Mock
     private AssignCategoryId assignCategoryId;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
                                                                                               objectMapper, assignCategoryId,
@@ -489,7 +490,9 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
         //Then
+        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")

@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingFormGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -59,23 +58,12 @@ public class GenerateHearingFormHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        updateCamundaVars(caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         buildDocument(callbackParams, caseDataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private void updateCamundaVars(CaseData caseData) {
-        runTimeService.setVariable(
-            caseData.getBusinessProcess().getProcessInstanceId(),
-            "WELSH_ENABLED",
-            featureToggleService.isGaForWelshEnabled()
-                && isWelshHearingTemplate(caseData)
-                && Objects.nonNull(caseData.getInformation())
-        );
     }
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
@@ -85,19 +73,17 @@ public class GenerateHearingFormHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
         if (!isEmpty(caseData.getHearingDocuments())) {
             systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
         }
         if (featureToggleService.isGaForWelshEnabled() && isWelshHearingTemplate(caseData)) {
-            if (Objects.nonNull(caseData.getInformation())) {
                 List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                     .getPreTranslationDocuments();
                 translatedDocuments.add(element(caseDocuments.get(0)));
                 caseDataBuilder.preTranslationDocuments(translatedDocuments);
-                caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.HEARING_FORM);
-            }
+                caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
         } else {
+            systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
             caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
         }
     }
