@@ -96,7 +96,6 @@ public class RequestedCourtForClaimDetailsTab {
             .map(CaseLocationCivil::getBaseLocation)
             .orElse(null);
         if (preferredBaseLocation == null) {
-            System.out.println("HEREEEEEEEEEEEEEEEEEE");
             return null;
         }
 
