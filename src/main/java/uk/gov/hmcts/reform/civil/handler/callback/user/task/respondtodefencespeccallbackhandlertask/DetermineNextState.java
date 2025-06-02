@@ -58,6 +58,8 @@ public class DetermineNextState  {
                 nextState = CaseState.CASE_SETTLED.name();
             } else if (isLipVLipOneVOne(caseData)) {
                 nextState = CaseState.CASE_STAYED.name();
+            } else if (needsTranslation(caseData)) {
+                nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
             }
         }
 
