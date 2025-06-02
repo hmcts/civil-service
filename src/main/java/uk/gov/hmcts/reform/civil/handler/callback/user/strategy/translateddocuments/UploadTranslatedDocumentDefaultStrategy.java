@@ -200,10 +200,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataBuilder.translatedCourtOfficerOrder(translatedCourtOfficerOrder);
         }
 
-        return caseData.toBuilder()
-            .systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments)
-            .finalOrderDocumentCollection(updatedFinalOrderDocuments)
-            .hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
+        caseDataBuilder.systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments);
+        caseDataBuilder.finalOrderDocumentCollection(updatedFinalOrderDocuments);
+        caseDataBuilder.hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
+        return caseDataBuilder;
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
