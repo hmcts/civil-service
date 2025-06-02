@@ -85,7 +85,9 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         Optional<Organisation> applicantLegalOrganisation = getLegalOrganization(caseData.getApplicant1OrganisationPolicy()
                                                                                      .getOrganisation().getOrganisationID());
         String appSolOrgName = getLegalName(applicantLegalOrganisation,
-                                            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
+                                            caseData.getApplicantSolicitor1ClaimStatementOfTruth() != null
+                                                ? caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName()
+                                                : null);
         Address applicant1SolicitorAddress = getLegalAddress(applicantLegalOrganisation,
                                                              caseData.getApplicantSolicitor1ServiceAddress(),
                                                              caseData.getSpecApplicantCorrespondenceAddressdetails(),
