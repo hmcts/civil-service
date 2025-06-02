@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
@@ -57,6 +58,8 @@ public class DetermineNextState  {
                 nextState = CaseState.CASE_SETTLED.name();
             } else if (isLipVLipOneVOne(caseData)) {
                 nextState = CaseState.CASE_STAYED.name();
+            } else if (needsTranslation(caseData)) {
+                nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
             }
         }
 
@@ -100,7 +103,7 @@ public class DetermineNextState  {
     private String getNextState(CaseData caseData) {
         if ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || (caseData.isPartAdmitImmediatePaymentClaimSettled())) {
-            return CaseState.AWAITING_APPLICANT_INTENTION.name();
+            return AWAITING_APPLICANT_INTENTION.name();
         }
         return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }
@@ -134,5 +137,15 @@ public class DetermineNextState  {
         }
 
         return Pair.of(nextState, businessProcess);
+    }
+
+    private boolean needsTranslation(CaseData caseData) {
+        if (!featureToggleService.isGaForWelshEnabled()) {
+            return false;
+        }
+        log.info("PAUSE CLAIM TRANSLATION RESPONDENT WELSH");
+        return caseData.isLRvLipOneVOne()
+            && (caseData.isRespondentResponseBilingual()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments());
     }
 }
