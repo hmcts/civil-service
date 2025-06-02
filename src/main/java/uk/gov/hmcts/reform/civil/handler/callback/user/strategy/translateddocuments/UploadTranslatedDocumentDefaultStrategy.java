@@ -57,15 +57,15 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams, caseDataBuilder);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
+        if (businessProcessEvent != null) {
+            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
+        }
+
         if (Objects.nonNull(caseDataLip)) {
             caseDataLip.setTranslatedDocuments(null);
         }
 
         caseDataBuilder.caseDataLiP(caseDataLip);
-
-        if (businessProcessEvent != null) {
-            caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
-        }
         CaseData updatedCaseData = caseDataBuilder.build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -94,8 +94,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationInterlocJudgment =
                             preTranslationDocuments.stream()
-                                .filter(item -> item.getValue().getDocumentType() ==
-                                    DocumentType.INTERLOCUTORY_JUDGEMENT)
+                                .filter(item -> item.getValue().getDocumentType()
+                                    == DocumentType.INTERLOCUTORY_JUDGEMENT)
                                 .findFirst();
                         preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
                         preTranslationInterlocJudgment.ifPresent(systemGeneratedDocuments::add);
@@ -104,8 +104,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationManualDeterminationDoc =
                             preTranslationDocuments.stream()
-                                .filter(item -> item.getValue().getDocumentType() ==
-                                    DocumentType.LIP_MANUAL_DETERMINATION)
+                                .filter(item -> item.getValue().getDocumentType()
+                                    == DocumentType.LIP_MANUAL_DETERMINATION)
                                 .findFirst();
                         preTranslationManualDeterminationDoc.ifPresent(preTranslationDocuments::remove);
                         preTranslationManualDeterminationDoc.ifPresent(systemGeneratedDocuments::add);
@@ -173,6 +173,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
         }
     }
+    
     private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams,
                                                            CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = callbackParams.getCaseData();

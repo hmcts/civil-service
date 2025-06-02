@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
