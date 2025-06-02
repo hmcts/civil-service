@@ -109,20 +109,24 @@ class JudgmentVariedDeterminationOfMeansRespSolTwoEmailDTOGeneratorTest {
         when(signatureConfiguration.getOpeningHours()).thenReturn(HOURS);
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
 
-        CaseData cd = CaseData.builder()
+        CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CLAIM_REF)
                 .legacyCaseReference(LEGACY_REF)
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
                 .build();
 
         Map<String, String> properties = new HashMap<>();
-        Map<String, String> result = generator.addCustomProperties(properties, cd);
+        Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
-        assertThat(result).containsEntry(CLAIM_REFERENCE_NUMBER, String.valueOf(CLAIM_REF));
-        assertThat(result).containsEntry(CASEMAN_REF, LEGACY_REF);
-        assertThat(result).containsEntry(HMCTS_SIGNATURE, SIGNATURE);
-        assertThat(result).containsEntry(PHONE_CONTACT, PHONE);
-        assertThat(result).containsEntry(OPENING_HOURS, HOURS);
+        Map<String, String> expectedProps = Map.of(
+                CLAIM_REFERENCE_NUMBER, String.valueOf(CLAIM_REF),
+                CASEMAN_REF, LEGACY_REF,
+                HMCTS_SIGNATURE, SIGNATURE,
+                PHONE_CONTACT, PHONE,
+                OPENING_HOURS, HOURS
+        );
+
+        assertThat(result).containsAllEntriesOf(expectedProps);
         assertThat(result).containsKey(SPEC_UNSPEC_CONTACT);
     }
 }

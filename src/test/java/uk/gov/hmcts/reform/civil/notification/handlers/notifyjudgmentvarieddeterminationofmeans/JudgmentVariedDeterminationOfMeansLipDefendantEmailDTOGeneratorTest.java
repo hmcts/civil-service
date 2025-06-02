@@ -32,6 +32,8 @@ class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
     public static final String APPLICANT_EMAIL = "applicant@example.com";
     public static final String APPLICANT_NAME = "Applicant";
     public static final String RESPONDENT_NAME = "Respondent";
+    public static final String CLAIMANTVDEFENDANT = "claimantvdefendant";
+    public static final String APPLICANT_V_RESPONDENT = "Applicant V Respondent";
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -123,14 +125,20 @@ class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
+
+        Map<String, String> expectedProps = Map.of(
+                CLAIMANTVDEFENDANT, APPLICANT_V_RESPONDENT,
+                CLAIM_REFERENCE_NUMBER, LEGACY_REF,
+                PARTY_NAME, RESPONDENT_NAME
+        );
+
         Map<String, String> props = generator.addProperties(caseData);
-        assertThat(props).containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_REF);
-        assertThat(props).containsEntry(PARTY_NAME, RESPONDENT_NAME);
+        assertThat(props).containsExactlyInAnyOrderEntriesOf(expectedProps);
     }
 
     @Test
     void shouldNotModifyCustomProperties() {
-        Map<String, String> p = Map.of("a", "b");
-        assertThat(generator.addCustomProperties(p, CaseData.builder().build())).isEqualTo(p);
+        Map<String, String> properties = Map.of("a", "b");
+        assertThat(generator.addCustomProperties(properties, CaseData.builder().build())).isEqualTo(properties);
     }
 }

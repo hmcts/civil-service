@@ -125,10 +125,14 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
                 .legacyCaseReference(LEGACY_REF)
                 .build();
 
+        Map<String, String> expectedProps = Map.of(
+                CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
+                CLAIM_REFERENCE_NUMBER, LEGACY_REF,
+                PARTY_NAME, "Applicant"
+        );
+
         Map<String, String> props = generator.addProperties(caseData);
-        assertThat(props).containsEntry(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
-        assertThat(props).containsEntry(CLAIM_REFERENCE_NUMBER, LEGACY_REF);
-        assertThat(props).containsEntry(PARTY_NAME, "Applicant");
+        assertThat(props).containsExactlyInAnyOrderEntriesOf(expectedProps);
     }
 
     @Test
@@ -148,10 +152,14 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
         when(configuration.getPhoneContact()).thenReturn("PHONE");
         when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
 
+        Map<String, String> expectedProps = Map.of(
+                CLAIM_REFERENCE_NUMBER, String.valueOf(CCD_REF),
+                CASEMAN_REF, LEGACY_REF,
+                PHONE_CONTACT, "PHONE"
+        );
+
         Map<String, String> props = generator.addProperties(caseData);
-        assertThat(props).containsEntry(CLAIM_REFERENCE_NUMBER, String.valueOf(CCD_REF));
-        assertThat(props).containsEntry(CASEMAN_REF, LEGACY_REF);
-        assertThat(props).containsEntry(PHONE_CONTACT, "PHONE");
+        assertThat(props).containsAllEntriesOf(expectedProps);
     }
 
     @Test
