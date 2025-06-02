@@ -46,6 +46,7 @@ public class ResetPinCUICallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse resetPinExpiryDate(CallbackParams callbackParams) {
+        log.info("Resetting pin expiry date for case id: {}", callbackParams.getCaseData().getCcdCaseReference());
         CaseData updatedCase = callbackParams.getCaseData().toBuilder()
             .respondent1PinToPostLRspec(defendantPinToPostLRspecService
                 .resetPinExpiryDate(callbackParams

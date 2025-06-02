@@ -57,6 +57,10 @@ run_functional_tests() {
 
 run_failed_not_executed_functional_tests() {
   echo "Running failed and not executed functional test files on ${ENVIRONMENT} env"
+
+  #Move testFilesReport.json to prevTestFilesReport.json
+  mv "$TEST_FILES_REPORT" "$PREV_TEST_FILES_REPORT"
+
   # Collect array elements into a comma-separated string
   PREV_FAILED_TEST_FILES=$(jq -r '.failedTestFiles[]' "$PREV_TEST_FILES_REPORT" | paste -sd "," -)
 
@@ -68,7 +72,7 @@ run_failed_not_executed_functional_tests() {
   export PREV_NOT_EXECUTED_TEST_FILES="$PREV_NOT_EXECUTED_TEST_FILES"
   
   if [ -z "$PR_FT_GROUPS" ]; then
-    yarn test:non-prod-e2e-ft
+    yarn test:api-nonprod
   else 
     run_functional_test_groups
   fi
@@ -94,15 +98,8 @@ if [ "$RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES" = "true" ]; then
   elif ! compare_ft_groups; then
     echo "ftGroups do NOT match PR_FT_GROUPS"
     run_functional_tests
-
-  # Check if the JSON array inside prevTestFilesReport.json is empty
-  elif [ "$(jq '.failedTestFiles | length' "$TEST_FILES_REPORT")" -eq 0 ]; then
-    echo "failedTestFiles in testFilesReport.json contains an empty array."
-    run_functional_tests
   
   else
-    #Move testFilesReport.json to prevTestFilesReport.json
-    mv "$TEST_FILES_REPORT" "$PREV_TEST_FILES_REPORT"
     run_failed_not_executed_functional_tests
   fi
 
