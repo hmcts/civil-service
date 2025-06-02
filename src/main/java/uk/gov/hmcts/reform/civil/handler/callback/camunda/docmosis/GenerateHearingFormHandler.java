@@ -77,11 +77,10 @@ public class GenerateHearingFormHandler extends CallbackHandler {
             systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
         }
         if (featureToggleService.isGaForWelshEnabled() && isWelshHearingTemplate(caseData)) {
-                List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
-                    .getPreTranslationDocuments();
-                translatedDocuments.add(element(caseDocuments.get(0)));
-                caseDataBuilder.preTranslationDocuments(translatedDocuments);
-                caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
+            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData().getPreTranslationDocuments();
+            translatedDocuments.add(element(caseDocuments.get(0)));
+            caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
         } else {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
             caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);

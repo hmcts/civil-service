@@ -42,7 +42,6 @@ class SendHearingBulkPrintServiceTest {
     @Mock
     private FeatureToggleService featureToggleService;
 
-
     private static final String SDO_HEARING_PACK_LETTER_TYPE = "hearing-document-pack";
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendHearingToClaimantLIP";
@@ -52,8 +51,8 @@ class SendHearingBulkPrintServiceTest {
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
-    private CaseData buildCaseData(Party party, uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType documentType, boolean addHearingDocuments, String respondentResponse,
-                                   String claimIssueLang) {
+    private CaseData buildCaseData(Party party, DocumentType documentType, boolean addHearingDocuments,
+                                   String respondentResponse, String claimIssueLang) {
         CaseDocument caseDocument = CaseDocument.builder().documentType(documentType).documentLink(DOCUMENT_LINK).build();
         CaseDataBuilder caseDataBuilder = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(caseDocument))

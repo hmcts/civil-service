@@ -191,8 +191,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> updatedFinalOrderDocuments =
             systemGeneratedDocumentService.getFinalOrderDocumentsWithAddedDocument(addToFinalOrders, caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        List<Element<CaseDocument>> updatedHearingDocumentsWelsh =
-            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocumentWelsh(addToHearingDocuments, caseData);
         if (!addToCourtOfficerOrders.isEmpty()) {
             CaseDocument translatedCourtOfficerOrder = CaseDocument.toCaseDocument(addToCourtOfficerOrders.get(0).getValue().getFile(),
                                                                     addToCourtOfficerOrders.get(0).getValue().getCorrespondingDocumentType(
@@ -200,9 +198,17 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataBuilder.translatedCourtOfficerOrder(translatedCourtOfficerOrder);
         }
 
+        if (!addToHearingDocuments.isEmpty()) {
+            List<Element<CaseDocument>> updatedHearingDocumentsWelsh =
+                systemGeneratedDocumentService.getHearingDocumentsWithAddedDocumentWelsh(
+                    addToHearingDocuments,
+                    caseData
+                );
+            caseDataBuilder.hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
+        }
+
         caseDataBuilder.systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments);
         caseDataBuilder.finalOrderDocumentCollection(updatedFinalOrderDocuments);
-        caseDataBuilder.hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
         return caseDataBuilder;
     }
 
