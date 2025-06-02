@@ -77,7 +77,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        if (isLIPClaimant(roles) && caseData.getQueries().messageThread(queryId).stream().count() > 0) {
+        if (isLIPClaimant(roles)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
@@ -91,7 +91,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
                 notificationParams
             );
         }
-        if (isLIPDefendant(roles) && caseData.getQueries().messageThread(queryId).stream().count() > 0) {
+        if (isLIPDefendant(roles)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
