@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
@@ -41,7 +42,7 @@ public class GenerateDJFormApprovedAppSolOneEmailDTOGenerator extends AppSolOneE
         properties.put(LEGAL_REP_CLAIMANT, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName());
-        if (isOneVTwoTwoLegalRep(caseData)
+        if (isOneVTwoLegalRep(caseData) || isOneVTwoTwoLegalRep(caseData)
             && (generateDJFormHelper.checkDefendantRequested(caseData, false))) {
             properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName());
         }

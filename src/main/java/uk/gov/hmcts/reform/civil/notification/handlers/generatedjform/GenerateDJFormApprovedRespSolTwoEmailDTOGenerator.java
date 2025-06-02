@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
@@ -30,6 +31,13 @@ public class GenerateDJFormApprovedRespSolTwoEmailDTOGenerator extends RespSolTw
     @Override
     public String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getInterimJudgmentApprovalDefendant();
+    }
+
+    @Override
+    protected String getEmailAddress(CaseData caseData) {
+        //To cover 1v2 same solicitor or 1v2 lip lr journeys
+        return Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress())
+            .orElse(caseData.getRespondentSolicitor1EmailAddress());
     }
 
     @Override

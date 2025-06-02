@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 
 @Component
@@ -69,7 +70,7 @@ public class GenerateDJFormAllPartiesEmailGenerator extends AllPartiesEmailGener
 
     public Set<EmailDTO> getRespondents(CaseData caseData, String taskId) {
         Set<EmailDTO> recipients = new HashSet<>();
-        if (isOneVTwoTwoLegalRep(caseData)) {
+        if (isOneVTwoLegalRep(caseData) || isOneVTwoTwoLegalRep(caseData)) {
             if (generateDJFormHelper.checkDefendantRequested(caseData, true)) {
                 addIfPartyNeedsNotification(caseData,
                                             taskId,
@@ -101,7 +102,7 @@ public class GenerateDJFormAllPartiesEmailGenerator extends AllPartiesEmailGener
 
     public Set<EmailDTO> getApplicant(CaseData caseData, String taskId) {
         Set<EmailDTO> recipients = new HashSet<>();
-        if (isOneVTwoTwoLegalRep(caseData)) {
+        if (isOneVTwoLegalRep(caseData) || isOneVTwoTwoLegalRep(caseData)) {
             if (generateDJFormHelper.checkDefendantRequested(caseData, true)
                 || generateDJFormHelper.checkDefendantRequested(caseData, false)) {
                 recipients.add(requestedAppSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId));
