@@ -31,6 +31,7 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
     private static final String NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION = "notify-claimant-lip-help-with-fees-notification-%s";
     private static final String LEGACY_REFERENCE = "1594901956117591";
     public static final String TASK_ID = "reference";
+    public static final String CLAIMANT_EMAIL = "claimant@example.com";
 
     @Mock
     private NotificationsProperties notificationsProperties;
@@ -106,5 +107,27 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
     void shouldReturnCorrectReferenceTemplate() {
         assertThat(generator.getReferenceTemplate())
                 .isEqualTo(NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES_NOTIFICATION);
+    }
+
+    @Test
+    void shouldReturnTrueWhenClaimantEmailIsNotNull() {
+        CaseData caseData = CaseData.builder()
+                .claimantUserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL).build())
+                .build();
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalseWhenClaimantEmailIsNull() {
+        CaseData caseData = CaseData.builder()
+                .claimantUserDetails(IdamUserDetails.builder().email(null).build())
+                .build();
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isFalse();
     }
 }
