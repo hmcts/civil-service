@@ -31,7 +31,7 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
-    public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String authorisation) {
+    public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String partyType, String authorisation) {
         NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address);
         DocmosisTemplates docmosisTemplate = isBilingual(caseData) ? NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
@@ -40,15 +40,15 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
         return documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(
-                        getFileName(caseData, docmosisTemplate),
+                        getFileName(caseData, docmosisTemplate, partyType),
                         docmosisDocument.getBytes(),
                         DocumentType.NOTICE_OF_DISCONTINUANCE
                 )
         );
     }
 
-    private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
-        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate, String partyType) {
+        return String.format(docmosisTemplate.getDocumentTitle(), partyType, caseData.getLegacyCaseReference());
     }
 
     private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address) {

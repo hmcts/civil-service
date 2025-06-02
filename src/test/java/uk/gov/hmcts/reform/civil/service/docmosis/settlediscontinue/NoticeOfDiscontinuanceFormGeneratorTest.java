@@ -42,6 +42,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String REFERENCE_NUMBER = "000MC015";
+    private static final String PARTY_TYPE = "claimant";
     @Mock
     private DocumentGeneratorService documentGeneratorService;
     @Mock
@@ -52,7 +53,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     @Test
     void shouldGenerateRespondent1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
         String fileName = String.format(
-                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), PARTY_TYPE, REFERENCE_NUMBER);
 
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
@@ -71,6 +72,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
         CaseDocument caseDoc = formGenerator.generateDocs(caseData,
                                                           caseData.getRespondent1().getPartyName(),
                                                           caseData.getRespondent1().getPrimaryAddress(),
+                                                          "claimant",
                                                           BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
@@ -81,7 +83,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     @Test
     void shouldGenerateWelshDiscontinuanceDoc_whenValidDataIsProvided() {
         String fileName = String.format(
-            NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+            NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF.getDocumentTitle(), PARTY_TYPE, REFERENCE_NUMBER);
 
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
@@ -104,6 +106,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
         CaseDocument caseDoc = formGenerator.generateDocs(caseData,
                                                           caseData.getRespondent1().getPartyName(),
                                                           caseData.getRespondent1().getPrimaryAddress(),
+                                                          "claimant",
                                                           BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
@@ -114,7 +117,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     @Test
     void shouldGenerateApplicant1NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
         String fileName = String.format(
-                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), PARTY_TYPE, REFERENCE_NUMBER);
 
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
@@ -133,6 +136,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
         CaseDocument caseDoc = formGenerator.generateDocs(caseData,
                                                           caseData.getApplicant1().getPartyName(),
                                                           caseData.getApplicant1().getPrimaryAddress(),
+                                                          "claimant",
                                                           BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
@@ -143,7 +147,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
     @Test
     void shouldGenerateRespondent2NoticeOfDiscontinuanceDoc_whenValidDataIsProvided() {
         String fileName = String.format(
-                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), REFERENCE_NUMBER);
+                NOTICE_OF_DISCONTINUANCE_PDF.getDocumentTitle(), PARTY_TYPE, REFERENCE_NUMBER);
 
         CaseDocument caseDocument = CaseDocumentBuilder.builder()
                 .documentName(fileName)
@@ -162,6 +166,7 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
         CaseDocument caseDoc = formGenerator.generateDocs(caseData,
                                                           caseData.getRespondent2().getPartyName(),
                                                           caseData.getRespondent2().getPrimaryAddress(),
+                                                          "claimant",
                                                           BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
