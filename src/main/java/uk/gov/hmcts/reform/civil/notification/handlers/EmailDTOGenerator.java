@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -8,6 +9,7 @@ import java.util.Map;
 
 public abstract class EmailDTOGenerator implements NotificationData {
 
+    @Autowired
     protected TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
     public abstract Boolean getShouldNotify(CaseData caseData);
