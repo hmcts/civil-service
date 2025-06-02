@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.IN
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.TRANSLATED_HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.TRANSLATED_HEARING_NOTICE;
 
 @Data
 @AllArgsConstructor
@@ -30,17 +30,17 @@ public class TranslatedDocument {
 
     @JsonIgnore
     public DocumentType getCorrespondingDocumentType(TranslatedDocumentType documentType) {
-        switch (documentType) {
-            case DEFENDANT_RESPONSE : return DEFENCE_TRANSLATED_DOCUMENT;
-            case CLAIM_ISSUE : return CLAIM_ISSUE_TRANSLATED_DOCUMENT;
-            case CLAIMANT_INTENTION : return CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
-            case ORDER_NOTICE : return ORDER_NOTICE_TRANSLATED_DOCUMENT;
-            case STANDARD_DIRECTION_ORDER: return SDO_TRANSLATED_DOCUMENT;
-            case INTERLOCUTORY_JUDGMENT: return INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
-            case MANUAL_DETERMINATION: return MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
-            case SETTLEMENT_AGREEMENT: return SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
-            case HEARING_FORM: return TRANSLATED_HEARING_FORM;
-            default: throw new DocumentUploadException("No document file type found for Translated document");
-        }
+        return switch (documentType) {
+            case DEFENDANT_RESPONSE -> DEFENCE_TRANSLATED_DOCUMENT;
+            case CLAIM_ISSUE -> CLAIM_ISSUE_TRANSLATED_DOCUMENT;
+            case CLAIMANT_INTENTION -> CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
+            case ORDER_NOTICE -> ORDER_NOTICE_TRANSLATED_DOCUMENT;
+            case STANDARD_DIRECTION_ORDER -> SDO_TRANSLATED_DOCUMENT;
+            case INTERLOCUTORY_JUDGMENT -> INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
+            case MANUAL_DETERMINATION -> MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
+            case SETTLEMENT_AGREEMENT -> SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
+            case HEARING_NOTICE -> TRANSLATED_HEARING_NOTICE;
+            default -> throw new DocumentUploadException("No document file type found for Translated document");
+        };
     }
 }

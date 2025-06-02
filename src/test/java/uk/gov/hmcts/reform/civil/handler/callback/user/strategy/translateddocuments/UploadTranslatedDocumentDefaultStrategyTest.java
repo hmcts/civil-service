@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.O
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIMANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -460,7 +460,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
-            .documentType(HEARING_FORM)
+            .documentType(HEARING_NOTICE)
             .file(Document.builder().documentFileName(FILE_NAME_1).build())
             .build();
 
