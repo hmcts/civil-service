@@ -32,10 +32,6 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.O
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
-
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
@@ -56,9 +52,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData caseData = updateSystemGeneratedDocumentsWithOriginalDocuments(callbackParams);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updateDocumentCollectionsWithTranslationDocuments(
             caseData);
-        CaseData caseData = callbackParams.getCaseData();
-        updateSystemGeneratedDocumentsWithOriginalDocuments(callbackParams);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updateDocumentCollectionsWithTranslationDocuments(caseData);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
         CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
@@ -67,7 +60,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataLip.setTranslatedDocuments(null);
         }
 
-        caseDataBuilder.caseDataLiP(caseDataLip);;
+        caseDataBuilder.caseDataLiP(caseDataLip);
 
         if (businessProcessEvent != null) {
             caseDataBuilder = caseDataBuilder.businessProcess(BusinessProcess.ready(businessProcessEvent));
@@ -88,6 +81,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
         List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
         List<Element<CaseDocument>> courtOfficerOrderDocuments = new ArrayList<>();
+        List<Element<CaseDocument>> hearingDocuments = caseData.getHearingDocuments();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
@@ -141,7 +135,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.HEARING_FORM)
                             .findFirst();
                         preTranslationHearingForm.ifPresent(preTranslationDocuments::remove);
-                        preTranslationHearingForm.ifPresent(caseData.getHearingDocuments()::add);
+                        preTranslationHearingForm.ifPresent(hearingDocuments::add);
                     }
                 } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
@@ -161,6 +155,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (!courtOfficerOrderDocuments.isEmpty()) {
             caseData = caseData.toBuilder().previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue()).build();
         }
+
         return caseData;
     }
 
@@ -168,7 +163,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<TranslatedDocument>> addToSystemGenerated = new ArrayList<>();
         List<Element<TranslatedDocument>> addToHearingDocuments = new ArrayList<>();
-        List<Element<TranslatedDocument>> addToSystemGenerated = new ArrayList<>();
         List<Element<TranslatedDocument>> addToFinalOrders = new ArrayList<>();
         List<Element<TranslatedDocument>> addToCourtOfficerOrders = new ArrayList<>();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
@@ -197,22 +191,18 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> updatedFinalOrderDocuments =
             systemGeneratedDocumentService.getFinalOrderDocumentsWithAddedDocument(addToFinalOrders, caseData);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        List<Element<CaseDocument>> updatedHearingDocumentsWelsh =
+            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocumentWelsh(addToHearingDocuments, caseData);
         if (!addToCourtOfficerOrders.isEmpty()) {
             CaseDocument translatedCourtOfficerOrder = CaseDocument.toCaseDocument(addToCourtOfficerOrders.get(0).getValue().getFile(),
                                                                     addToCourtOfficerOrders.get(0).getValue().getCorrespondingDocumentType(
                                                                         addToCourtOfficerOrders.get(0).getValue().getDocumentType()));
             caseDataBuilder.translatedCourtOfficerOrder(translatedCourtOfficerOrder);
         }
-        caseDataBuilder
-            .systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments)
-            .finalOrderDocumentCollection(updatedFinalOrderDocuments);
-        return caseDataBuilder;
-        List<Element<CaseDocument>> updatedSystemGeneratedDocuments =
-            systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, caseData);
-        List<Element<CaseDocument>> updatedHearingDocumentsWelsh =
-            systemGeneratedDocumentService.getHearingDocumentsWithAddedDocumentWelsh(addToHearingDocuments, caseData);
+
         return caseData.toBuilder()
             .systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments)
+            .finalOrderDocumentCollection(updatedFinalOrderDocuments)
             .hearingDocumentsWelsh(updatedHearingDocumentsWelsh);
     }
 
@@ -237,12 +227,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(SETTLEMENT_AGREEMENT)) {
                 return UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
             } else if (Objects.nonNull(translatedDocuments)
-                && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_NOTICE)) {
-                return UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
-                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
-            }  else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(COURT_OFFICER_ORDER)) {
                 return CaseEvent.COURT_OFFICER_ORDER;
+            } else if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_NOTICE)) {
+                return UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
             }
         }
 
