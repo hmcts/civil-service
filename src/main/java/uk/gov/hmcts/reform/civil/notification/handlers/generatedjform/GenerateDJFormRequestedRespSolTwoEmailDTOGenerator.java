@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
@@ -47,5 +49,10 @@ public class GenerateDJFormRequestedRespSolTwoEmailDTOGenerator extends RespSolT
     @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE_REQUEST_DEF;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return isOneVTwoLegalRep(caseData) || isOneVTwoTwoLegalRep(caseData) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

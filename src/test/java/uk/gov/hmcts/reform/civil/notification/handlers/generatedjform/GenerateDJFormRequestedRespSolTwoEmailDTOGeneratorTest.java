@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -89,5 +90,41 @@ class GenerateDJFormRequestedRespSolTwoEmailDTOGeneratorTest {
         assertThat(result.get(LEGAL_ORG_DEF)).isEqualTo(DEFENDANT_LEGAL_ORG_NAME);
         assertThat(result.get(CLAIM_NUMBER_INTERIM)).isEqualTo("1234567890123456");
         assertThat(result.get(DEFENDANT_NAME_INTERIM)).isEqualTo("Respondent 2");
+    }
+
+    @Test
+    void shouldReturnTrue_whenIsOneVTwoLegalRepIsTrue() {
+        Party respondent2Party = Party.builder()
+            .build();
+        CaseData caseData = CaseData.builder().respondent2(respondent2Party)
+            .respondent2Copy(respondent2Party)
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .build();
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenIsOneVTwoTwoLegalRepIsTrue() {
+        Party respondent2Party = Party.builder()
+            .build();
+        CaseData caseData = CaseData.builder().respondent2(respondent2Party)
+            .respondent2Copy(respondent2Party)
+            .build();
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenBothConditionsAreFalse() {
+        CaseData caseData = mock(CaseData.class);
+
+        Boolean result = generator.getShouldNotify(caseData);
+
+        assertThat(result).isFalse();
     }
 }

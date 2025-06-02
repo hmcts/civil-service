@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
@@ -35,7 +37,7 @@ public class GenerateDJFormApprovedRespSolTwoEmailDTOGenerator extends RespSolTw
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
-        //To cover 1v2 same solicitor or 1v2 lip lr journeys
+        //To cover 1v2 same solicitor
         return Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress())
             .orElse(caseData.getRespondentSolicitor1EmailAddress());
     }
@@ -47,5 +49,10 @@ public class GenerateDJFormApprovedRespSolTwoEmailDTOGenerator extends RespSolTw
         properties.put(CLAIM_NUMBER_INTERIM, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName());
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return isOneVTwoLegalRep(caseData) || isOneVTwoTwoLegalRep(caseData) ? Boolean.TRUE : Boolean.FALSE;
     }
 }
