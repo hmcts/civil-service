@@ -214,7 +214,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData) {
-        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
             return orderAmount.toString();
         } else {
             return orderAmount.add(totalInterest).toString();
