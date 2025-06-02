@@ -243,7 +243,7 @@ task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features
   commandLine './bin/run-api-tests.sh'
 }
 
-task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
+task runNightlyApiTests(type: Exec, description: 'Runs nightly tests.') {
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
   }
