@@ -38,7 +38,7 @@ class SystemGeneratedDocumentServiceTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
-            .getSystemGeneratedDocumentsWithAddedDocument(translatedDocument, callbackParams);
+            .getSystemGeneratedDocumentsWithAddedDocument(translatedDocument, callbackParams.getCaseData());
 
         //Then
         assertThat(result.get(0)).isNotNull();
