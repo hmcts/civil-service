@@ -87,6 +87,7 @@ public class SendHearingBulkPrintService {
     }
 
     private Language determineLanguageForBulkPrint(CaseData caseData, String taskId, boolean welshDocument) {
+        //TODO: refactor this method when Welsh feature goes live
         if (!featureToggleService.isGaForWelshEnabled() && !welshDocument) {
             return ENGLISH;
         } else if (!featureToggleService.isGaForWelshEnabled() && welshDocument) {
@@ -103,7 +104,7 @@ public class SendHearingBulkPrintService {
                 return switch (caseData.getClaimantBilingualLanguagePreference()) {
                     case "WELSH" -> WELSH;
                     case "BOTH" -> BOTH;
-                    default -> Language.ENGLISH;
+                    default -> ENGLISH;
                 };
             }
         } else {
@@ -115,7 +116,7 @@ public class SendHearingBulkPrintService {
                 return switch (caseData.getDefendantBilingualLanguagePreference()) {
                     case "WELSH" -> WELSH;
                     case "BOTH" -> BOTH;
-                    default -> Language.ENGLISH;
+                    default -> ENGLISH;
                 };
             }
         }
