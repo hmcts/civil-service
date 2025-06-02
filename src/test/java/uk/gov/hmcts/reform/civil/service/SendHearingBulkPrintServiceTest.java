@@ -45,6 +45,7 @@ class SendHearingBulkPrintServiceTest {
     private static final String SDO_HEARING_PACK_LETTER_TYPE = "hearing-document-pack";
     public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendHearingToClaimantLIP";
+    public static final String TASK_ID_DEFENDANT_HMC = "SendAutomaticHearingToDefendantLIP";
     private static final String TEST = "test";
     private static final String UPLOAD_TIMESTAMP = "14 Apr 2024 00:00:00";
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST, UPLOAD_TIMESTAMP);
@@ -91,6 +92,21 @@ class SendHearingBulkPrintServiceTest {
 
         // when
         sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT, false);
+
+        // then
+        verifyPrintLetter(caseData, respondent1);
+    }
+
+    @Test
+    void shouldDownloadDocumentAndPrintLetterSuccessfullyHMC() {
+        // given
+        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        CaseData caseData = buildCaseData(respondent1, HEARING_FORM, true, null, null);
+        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
+            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
+
+        // when
+        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT_HMC, false);
 
         // then
         verifyPrintLetter(caseData, respondent1);
