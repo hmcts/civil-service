@@ -25,8 +25,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.*;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DECISION_MADE_ON_APPLICATIONS;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.COURT_OFFICER_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
@@ -37,6 +43,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private final ObjectMapper objectMapper;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
+
+    private static final String CATEGORY_ID = "caseManagementOrders";
 
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
@@ -159,13 +167,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     document.getValue().getFile().setCategoryID("orders");
                     addToSystemGenerated.add(document);
                 } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
-                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    document.getValue().getFile().setCategoryID(CATEGORY_ID);
                     addToSystemGenerated.add(document);
                 } else if (document.getValue().getDocumentType().equals(FINAL_ORDER)) {
-                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    document.getValue().getFile().setCategoryID(CATEGORY_ID);
                     addToFinalOrders.add(document);
                 } else if (document.getValue().getDocumentType().equals(COURT_OFFICER_ORDER)) {
-                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    document.getValue().getFile().setCategoryID(CATEGORY_ID);
                     addToCourtOfficerOrders.add(document);
                 } else {
                     addToSystemGenerated.add(document);
