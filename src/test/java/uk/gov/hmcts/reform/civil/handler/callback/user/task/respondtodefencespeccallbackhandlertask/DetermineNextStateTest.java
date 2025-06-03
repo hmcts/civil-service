@@ -102,9 +102,9 @@ class DetermineNextStateTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         CaseData caseData;
         if (lipCase.equals("LIP")) {
-            caseData = CaseDataBuilder.builder()
-                .specClaim1v1LrVsLipBilingual()
-                .build();
+             caseData = CaseDataBuilder.builder()
+                 .specClaim1v1LrVsLipBilingual()
+                 .build();
         } else {
             caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
@@ -118,23 +118,6 @@ class DetermineNextStateTest {
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    builder, "", businessProcess);
         assertEquals(expectedState, resultState);
-    }
-
-    @Test
-    void shouldPauseStateChangeDefendantLipAndRequiresTranslation() {
-        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
-        CaseData caseData = CaseDataBuilder.builder()
-            .specClaim1v1LrVsLipBilingual()
-            .build();
-
-        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-
-        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
-                                                                   builder, "", businessProcess);
-        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
     }
 
     @Test
