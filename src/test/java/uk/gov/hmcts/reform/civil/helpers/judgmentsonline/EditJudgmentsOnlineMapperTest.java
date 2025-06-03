@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -39,20 +40,30 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @RunWith(MockitoJUnitRunner.class)
 public class EditJudgmentsOnlineMapperTest {
 
+    @Mock
     private FeatureToggleService featureToggleService;
-    private InterestCalculator interestCalculator = new InterestCalculator();
-    private JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
-    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private EditJudgmentOnlineMapper editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
-    private RecordJudgmentOnlineMapper recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
-    private DefaultJudgmentOnlineMapper defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
 
+    private InterestCalculator interestCalculator;
+    private JudgementService judgementService;
+    private RoboticsAddressMapper addressMapper;
+    private EditJudgmentOnlineMapper editJudgmentOnlineMapper;
+    private RecordJudgmentOnlineMapper recordJudgmentMapper;
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionMapper;
+    private DefaultJudgmentOnlineMapper defaultJudgmentMapper;
+
+    @Mock
     private Time time;
 
     @BeforeEach
-    public void setUpTest() {
-        time = Mockito.mock(Time.class);
+    public void setUp() {
+        Mockito.when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
+
+        interestCalculator = new InterestCalculator();
+        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        editJudgmentOnlineMapper = new EditJudgmentOnlineMapper();
+        recordJudgmentMapper = new RecordJudgmentOnlineMapper(addressMapper);
+        judgmentByAdmissionMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
         defaultJudgmentMapper = new DefaultJudgmentOnlineMapper(interestCalculator, addressMapper);
     }
 
