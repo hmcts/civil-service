@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -42,18 +42,29 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 class JudgmentByAdmissionMapperTest {
 
-    private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private LDClientInterface ldClientInterface;
-    private FeatureToggleApi featureToggleApi = new FeatureToggleApi(ldClientInterface, null);
-    private FeatureToggleService featureToggleService = new FeatureToggleService(featureToggleApi);
-    private InterestCalculator interestCalculator = new InterestCalculator();
-    private JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
-    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
+    private RoboticsAddressMapper addressMapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    private InterestCalculator interestCalculator;
+    private JudgementService judgementService;
+    private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+
+    @BeforeEach
+    void setUp() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
+
+        addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
+        interestCalculator = new InterestCalculator();
+        judgementService = new JudgementService(featureToggleService, interestCalculator);
+        judgmentByAdmissionOnlineMapper =
+            new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
+    }
 
     @Test
     void testIfJudgmentByAdmission() {
