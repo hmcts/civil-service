@@ -146,6 +146,7 @@ public class DetermineNextState  {
             return false;
         }
         log.info("PAUSE CLAIM TRANSLATION RESPONDENT WELSH");
+
         return caseData.isLRvLipOneVOne()
             && (caseData.isRespondentResponseBilingual()
             || caseData.isLipDefendantSpecifiedBilingualDocuments());
