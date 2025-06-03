@@ -68,7 +68,10 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent1(), BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData,
+                                                          caseData.getRespondent1().getPartyName(),
+                                                          caseData.getRespondent1().getPrimaryAddress(),
+                                                          BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -98,7 +101,10 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                                .build())
             .build();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent1(), BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData,
+                                                          caseData.getRespondent1().getPartyName(),
+                                                          caseData.getRespondent1().getPrimaryAddress(),
+                                                          BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -124,7 +130,10 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getApplicant1(), BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData,
+                                                          caseData.getApplicant1().getPartyName(),
+                                                          caseData.getApplicant1().getPrimaryAddress(),
+                                                          BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)
@@ -150,7 +159,10 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
 
         CaseData caseData = getCaseData();
 
-        CaseDocument caseDoc = formGenerator.generateDocs(caseData, caseData.getRespondent2(), BEARER_TOKEN);
+        CaseDocument caseDoc = formGenerator.generateDocs(caseData,
+                                                          caseData.getRespondent2().getPartyName(),
+                                                          caseData.getRespondent2().getPrimaryAddress(),
+                                                          BEARER_TOKEN);
         assertThat(caseDoc).isNotNull();
 
         verify(documentManagementService)

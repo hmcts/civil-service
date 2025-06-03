@@ -694,6 +694,7 @@ public class CaseDataBuilder {
     private YesOrNo anyRepresented;
 
     private String partialPaymentAmount;
+    private LocalDate nextDeadline;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
@@ -2506,6 +2507,23 @@ public class CaseDataBuilder {
                 .build())
             .build();
         return this;
+    }
+
+    public CaseDataBuilder atStateClaimDraftMock() {
+        CaseDataBuilder caseDataBuilder = atStateClaimDraft();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region("2").baseLocation("41112").build());
+        caseDataBuilder.applicant1DQ(Applicant1DQ.builder()
+            .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
+                                            .caseLocation(CaseLocationCivil.builder()
+                                                              .baseLocation("dummy base").region("dummy region")
+                                                              .build())
+                                            .responseCourtName("testCourt")
+                                            .responseCourtCode("0000")
+                                            .reasonForHearingAtSpecificCourt("reason")
+                                            .otherPartyPreferredSite("site")
+                                            .build())
+                .build());
+        return caseDataBuilder;
     }
 
     public CaseDataBuilder atStateClaimDraft() {
@@ -7998,6 +8016,7 @@ public class CaseDataBuilder {
             .joJudgmentPaidInFull(judgmentPaidInFull)
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
+            .nextDeadline(nextDeadline)
             .build();
     }
 
@@ -8014,6 +8033,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder anyRepresented(YesOrNo anyRepresented) {
         this.anyRepresented = anyRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder nextDeadline(LocalDate nextDeadline) {
+        this.nextDeadline = nextDeadline;
         return this;
     }
 
