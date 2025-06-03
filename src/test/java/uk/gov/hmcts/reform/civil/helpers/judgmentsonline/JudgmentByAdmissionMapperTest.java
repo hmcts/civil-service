@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
+import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -46,14 +48,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 class JudgmentByAdmissionMapperTest {
 
     private RoboticsAddressMapper addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
-    private FeatureToggleService featureToggleService;
+    private LDClientInterface ldClientInterface;
+    private FeatureToggleApi featureToggleApi = new FeatureToggleApi(ldClientInterface, null);
+    private FeatureToggleService featureToggleService = new FeatureToggleService(featureToggleApi);
     private InterestCalculator interestCalculator = new InterestCalculator();
     private JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
-
-    JudgmentByAdmissionMapperTest(FeatureToggleService featureToggleService) {
-        this.featureToggleService = featureToggleService;
-    }
 
     @Test
     void testIfJudgmentByAdmission() {
