@@ -6,6 +6,12 @@ import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerat
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+
 @Component
 public class ClaimantResponseConfirmsToProceedRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
@@ -20,6 +26,18 @@ public class ClaimantResponseConfirmsToProceedRespSolOneEmailDTOGenerator extend
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return claimantResponseConfirmsToProceedEmailHelper.getTemplate(caseData, false);
+    }
+
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData, true, organisationService));
+
+        if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+        }
+
+        return properties;
     }
 
     @Override
