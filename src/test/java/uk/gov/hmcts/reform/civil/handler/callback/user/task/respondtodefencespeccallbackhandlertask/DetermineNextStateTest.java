@@ -102,9 +102,9 @@ class DetermineNextStateTest {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         CaseData caseData;
         if (lipCase.equals("LIP")) {
-             caseData = CaseDataBuilder.builder()
-                 .specClaim1v1LrVsLipBilingual()
-                 .build();
+            caseData = CaseDataBuilder.builder()
+                .specClaim1v1LrVsLipBilingual()
+                .build();
         } else {
             caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
