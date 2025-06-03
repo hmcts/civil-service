@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.amendrestitchbundle;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
+@Component
 public class AmendRestitchBundleRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "amend-restitch-bundle-defendant-notification-%s";
