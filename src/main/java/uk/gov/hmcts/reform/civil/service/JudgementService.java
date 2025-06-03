@@ -133,18 +133,20 @@ public class JudgementService {
         }
     }
 
-    public boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
-        return caseData.isFullAdmitClaimSpec()
-            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+    private boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled()
             && isLRvLR(caseData)
-            && featureToggleService.isLrAdmissionBulkEnabled();
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
+    }
+
+    public boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
+        return isLRAdmissionRepaymentPlan(caseData)
+            && caseData.isFullAdmitClaimSpec();
     }
 
     public boolean isLRPartAdmitRepaymentPlan(CaseData caseData) {
-        return caseData.isPartAdmitClaimSpec()
-            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-            && isLRvLR(caseData)
-            && featureToggleService.isLrAdmissionBulkEnabled();
+        return isLRAdmissionRepaymentPlan(caseData)
+            && caseData.isPartAdmitClaimSpec();
     }
 
     private boolean isLRvLR(CaseData caseData) {
