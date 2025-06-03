@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -14,13 +15,18 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class ClaimantDefendantAgreedMediationRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    public ClaimantDefendantAgreedMediationRespSolOneEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties) {
+    private final FeatureToggleService featureToggleService;
+
+    public ClaimantDefendantAgreedMediationRespSolOneEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties,
+                                                                       FeatureToggleService featureToggleService) {
         super(notificationsProperties, organisationService);
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyDefendantLRForMediation();
+        return featureToggleService.isCarmEnabledForCase(caseData) ? notificationsProperties.getNotifyDefendantLRForMediation() :
+            notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate();
     }
 
     @Override

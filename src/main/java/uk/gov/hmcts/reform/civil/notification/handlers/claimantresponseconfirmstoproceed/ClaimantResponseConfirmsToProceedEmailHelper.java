@@ -46,7 +46,8 @@ public class ClaimantResponseConfirmsToProceedEmailHelper {
     }
 
     private boolean rejectedAll(CaseData caseData) {
-        return caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
+        return caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
     }
 
     private boolean mediationRejected(CaseData caseData) {
