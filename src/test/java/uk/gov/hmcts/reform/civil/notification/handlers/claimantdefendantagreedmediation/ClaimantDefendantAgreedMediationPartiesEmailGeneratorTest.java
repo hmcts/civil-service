@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
@@ -39,6 +40,9 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
     @Mock
     private SimpleStateFlowEngine stateFlowEngine;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private ClaimantDefendantAgreedMediationPartiesEmailGenerator emailGenerator;
 
@@ -63,6 +67,8 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         when(stateFlowEngine.evaluate(caseData)).thenReturn(stateFlow);
         when(stateFlowEngine.evaluate(caseData)
                  .isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
+
+        when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(false);
 
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
@@ -92,12 +98,9 @@ public class ClaimantDefendantAgreedMediationPartiesEmailGeneratorTest {
         when(stateFlowEngine.evaluate(caseData)
                  .isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
 
-        MockedStatic<MultiPartyScenario> multiPartyScenarioMockedStatic = Mockito.mockStatic(MultiPartyScenario.class);
-        multiPartyScenarioMockedStatic.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
+
 
         Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
-
-        multiPartyScenarioMockedStatic.close();
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolEmail, respSolOneEmail, respSolTwoEmail);
         verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
