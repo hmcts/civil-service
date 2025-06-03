@@ -133,7 +133,7 @@ public class JudgementService {
         }
     }
 
-    private boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
+    public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
         return featureToggleService.isLrAdmissionBulkEnabled()
             && isLRvLR(caseData)
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment());

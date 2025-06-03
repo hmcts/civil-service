@@ -51,6 +51,10 @@ class JudgmentByAdmissionMapperTest {
     private JudgementService judgementService = new JudgementService(featureToggleService, interestCalculator);
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper = new JudgmentByAdmissionOnlineMapper(addressMapper, judgementService, interestCalculator);
 
+    JudgmentByAdmissionMapperTest(FeatureToggleService featureToggleService) {
+        this.featureToggleService = featureToggleService;
+    }
+
     @Test
     void testIfJudgmentByAdmission() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
