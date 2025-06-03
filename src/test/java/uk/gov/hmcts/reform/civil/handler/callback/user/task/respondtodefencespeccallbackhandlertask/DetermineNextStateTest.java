@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespe
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -91,21 +93,32 @@ class DetermineNextStateTest {
         assertEquals(CLAIMANT_RESPONSE_SPEC.name(), builtCaseData.getBusinessProcess().getCamundaEvent());
     }
 
-    @Test
-    void shouldPauseStateChangeDefendantLipAndRequiresTranslation() {
+    @ParameterizedTest
+    @CsvSource({
+        "LIP, AWAITING_APPLICANT_INTENTION",
+        "NON_LIP, IN_MEDIATION",
+    })
+    void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         BusinessProcess businessProcess = BusinessProcess.builder().build();
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .specClaim1v1LrVsLipBilingual()
-            .build();
+        CaseData caseData;
+        if (lipCase.equals("LIP")) {
+             caseData = CaseDataBuilder.builder()
+                .specClaim1v1LrVsLipBilingual()
+                .build();
+        } else {
+             caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build();
+        }
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
 
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    builder, "", businessProcess);
-        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
+        assertEquals(expectedState, resultState);
     }
 
     @Test
