@@ -93,6 +93,7 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
         Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
         notificationUtilsMockedStatic.close();
+        partyUtilsMockedStatic.close();
 
         assertThat(updatedProperties.size()).isEqualTo(3);
         assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrg);
