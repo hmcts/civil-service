@@ -34,7 +34,6 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,8 +55,6 @@ public class EditJudgmentsOnlineMapperTest {
 
     @BeforeEach
     public void setUp() {
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
-
         interestCalculator = new InterestCalculator();
         judgementService = new JudgementService(featureToggleService, interestCalculator);
         addressMapper = new RoboticsAddressMapper(new AddressLinesMapper());
