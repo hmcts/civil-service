@@ -66,16 +66,32 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String task = camundaActivityId(callbackParams);
-        sendHearingBulkPrintService.sendHearingToLIP(
-            callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
-            featureToggleService.isHmcForLipEnabled() && sendWelshHearingToLip(caseData));
+        if (featureToggleService.isGaForWelshEnabled()) {
+            sendHearingBulkPrintService.sendHearingToLIP(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
+                false);
+
+        } else {
+            sendHearingBulkPrintService.sendHearingToLIP(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
+                featureToggleService.isHmcForLipEnabled() && sendWelshHearingToLip(task, caseData)
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
-    private boolean sendWelshHearingToLip(CaseData caseData) {
-        return HmcDataUtils.isWelshHearingTemplateClaimant(caseData)
-            || HmcDataUtils.isWelshHearingTemplateDefendant(caseData);
+    private boolean sendWelshHearingToLip(String task, CaseData caseData) {
+        return (isClaimantHMC(task) && HmcDataUtils.isWelshHearingTemplateClaimant(caseData))
+            || (isDefendantHMC(task) && HmcDataUtils.isWelshHearingTemplateDefendant(caseData));
+    }
+
+    private boolean isClaimantHMC(String task) {
+        return TASK_ID_CLAIMANT_HMC.equals(task);
+    }
+
+    private boolean isDefendantHMC(String task) {
+        return TASK_ID_DEFENDANT_HMC.equals(task);
     }
 
 }
