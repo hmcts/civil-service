@@ -45,9 +45,9 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::test,
             callbackKey(ABOUT_TO_SUBMIT), this::moveNotesIntoList,
-            callbackKey(SUBMITTED), this::test
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
