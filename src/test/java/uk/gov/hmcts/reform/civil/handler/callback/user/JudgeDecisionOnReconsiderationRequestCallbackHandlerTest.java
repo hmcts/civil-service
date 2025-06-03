@@ -173,7 +173,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                 .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                                       .reasonForReconsiderationTxtYes("Reason1").build()).decisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.YES).build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -215,7 +214,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                 .extracting("camundaEvent", "status")
                 .containsOnly(DECISION_ON_RECONSIDERATION_REQUEST.name(), "READY");
         }
-
 
         @ParameterizedTest
         @CsvSource({"ENGLISH, ENGLISH, ENGLISH, ENGLISH"})
@@ -334,86 +332,6 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isZero();
             assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.DECISION_MADE_ON_APPLICATIONS);
             assertThat(updatedData.getDecisionOnReconsiderationDocument()).isNull();
-            assertThat(response.getData())
-                .extracting("businessProcess").isNull();
-        }
-
-        @ParameterizedTest
-        @CsvSource({"ENGLISH, ENGLISH, WELSH, ENGLISH"})
-        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedClaimantDocLang(String claimantLang, String respondentLang,
-                                                                                                          Language claimantDocLang, Language respondentDocLang) {
-
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            //Given : Casedata
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
-
-                .systemGeneratedCaseDocuments(new ArrayList<>()).decisionOnReconsiderationDocument(document)
-                .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                  .reasonForReconsiderationTxtYes("Reason1").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(respondentLang).build())
-
-                                 .build())
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    respondentDocLang).build()).build())
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang).build()).build())
-                .claimantBilingualLanguagePreference(claimantLang)
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then: should generate doc and start business process
-            assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
-                .extracting("reasonForReconsiderationTxtYes")
-                .isEqualTo("Reason1");
-            assertThat(response.getData()).extracting("decisionOnRequestReconsiderationOptions")
-                .isEqualTo(DecisionOnRequestReconsiderationOptions.YES.name());
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isZero();
-            assertThat(updatedData.getDecisionOnReconsiderationDocument()).isNull();
-            assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.DECISION_MADE_ON_APPLICATIONS);
-            assertThat(response.getData())
-                .extracting("businessProcess").isNull();
-        }
-
-        @ParameterizedTest
-        @CsvSource({"ENGLISH, ENGLISH, ENGLISH, WELSH"})
-        void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedRespondentDocLang(String claimantLang, String respondentLang,
-                                                                                                          Language claimantDocLang, Language respondentDocLang) {
-
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            //Given : Casedata
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .build().toBuilder()
-
-                .systemGeneratedCaseDocuments(new ArrayList<>()).decisionOnReconsiderationDocument(document)
-                .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                  .reasonForReconsiderationTxtYes("Reason1").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(respondentLang).build())
-
-                                 .build())
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    respondentDocLang).build()).build())
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(claimantDocLang).build()).build())
-                .claimantBilingualLanguagePreference(claimantLang)
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then: should generate doc and start business process
-            assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
-                .extracting("reasonForReconsiderationTxtYes")
-                .isEqualTo("Reason1");
-            assertThat(response.getData()).extracting("decisionOnRequestReconsiderationOptions")
-                .isEqualTo(DecisionOnRequestReconsiderationOptions.YES.name());
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isZero();
-            assertThat(updatedData.getDecisionOnReconsiderationDocument()).isNull();
-            assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.DECISION_MADE_ON_APPLICATIONS);
             assertThat(response.getData())
                 .extracting("businessProcess").isNull();
         }
