@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
+import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,6 +47,8 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private CaseNoteService caseNoteService;
+    @Mock
+    private SimpleStateFlowEngine stateFlowEngine;
 
     @Nested
     class AboutToStartCallback {
