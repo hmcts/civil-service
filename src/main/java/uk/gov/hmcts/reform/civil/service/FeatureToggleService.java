@@ -166,7 +166,7 @@ public class FeatureToggleService {
     }
 
     public boolean isLipQueryManagementEnabled(CaseData caseData) {
-        return true;
+        return false;
     }
 
     public boolean isLrAdmissionBulkEnabled() {
