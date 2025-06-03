@@ -13,16 +13,16 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
 
-    public static final String APPLICANT1_EMAIL = "test@example.com";
     public static final String CLAIM_SUBMITTED_NOTIFICATION = "claim-submitted-notification-%s";
     public static final String TEMPLATE_HWF = "template-hwf";
     public static final String TEMPLATE_BILINGUAL = "template-bilingual";
@@ -31,8 +31,6 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
     public static final String BILINGUAL_HWF_TEMPLATE = "bilingual-hwf-template";
     public static final String HELP_WITH_FEES_REFERENCE_NUMBER = "1111";
     public static final String PAY_CLAIM_FEE_TEMPLATE = "pay-claim-fee-template";
-    public static final String URL = "http://frontend.url";
-    public static final String FRONTEND_BASE_URL = "frontendBaseUrl";
 
     @Mock
     private PinInPostConfiguration pinInPostConfiguration;
@@ -44,67 +42,10 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
     private ApplicantClaimSubmittedClaimantEmailDTOGenerator generator;
 
     @Test
-    void shouldReturnApplicant1Email_whenGetEmailAddressIsCalled() {
-        CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().partyEmail(APPLICANT1_EMAIL).build())
-                .build();
-
-        String emailAddress = generator.getEmailAddress(caseData);
-
-        assertThat(emailAddress).isEqualTo(APPLICANT1_EMAIL);
-    }
-
-    @Test
     void shouldReturnReferenceTemplate_whenGetReferenceTemplateIsCalled() {
         String referenceTemplate = generator.getReferenceTemplate();
 
         assertThat(referenceTemplate).isEqualTo(CLAIM_SUBMITTED_NOTIFICATION);
-    }
-
-    @Test
-    void shouldReturnTrue_whenAllConditionsForNotificationAreMet() {
-        CaseData caseData = mock(CaseData.class);
-
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.getApplicant1Email()).thenReturn(APPLICANT1_EMAIL);
-
-        boolean shouldNotify = generator.getShouldNotify(caseData);
-
-        assertThat(shouldNotify).isTrue();
-    }
-
-    @Test
-    void shouldReturnFalse_whenLipvLipOneVOneIsFalseAndEmailIsNull() {
-        CaseData caseData = mock(CaseData.class);
-
-        when(caseData.isLipvLipOneVOne()).thenReturn(false);
-
-        boolean shouldNotify = generator.getShouldNotify(caseData);
-
-        assertThat(shouldNotify).isFalse();
-    }
-
-    @Test
-    void shouldReturnFalse_whenEmailIsNullAndLipvLipOneVOneIsTrue() {
-        CaseData caseData = mock(CaseData.class);
-
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-        when(caseData.getApplicant1Email()).thenReturn(null);
-
-        boolean shouldNotify = generator.getShouldNotify(caseData);
-
-        assertThat(shouldNotify).isFalse();
-    }
-
-    @Test
-    void shouldReturnFalse_whenEmailIsNullAndToggleIsDisabled() {
-        CaseData caseData = mock(CaseData.class);
-
-        when(caseData.isLipvLipOneVOne()).thenReturn(true);
-
-        boolean shouldNotify = generator.getShouldNotify(caseData);
-
-        assertThat(shouldNotify).isFalse();
     }
 
     @Test
@@ -133,34 +74,6 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
         String templateId = generator.getEmailTemplateId(caseData);
 
         assertThat(templateId).isEqualTo(TEMPLATE_BILINGUAL);
-    }
-
-    @Test
-    void shouldAddPropertiesCorrectly() {
-        CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("John").individualLastName("Doe").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("Jane").individualLastName("Smith").build())
-                .build();
-
-        when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(URL);
-
-        Map<String, String> properties = generator.addProperties(caseData);
-
-        assertThat(properties).containsExactlyInAnyOrderEntriesOf(Map.of(
-                CLAIMANT_NAME, "John Doe",
-                DEFENDANT_NAME, "Jane Smith",
-                FRONTEND_BASE_URL, URL
-        ));
-    }
-
-    @Test
-    void shouldReturnSamePropertiesMap() {
-        Map<String, String> properties = Map.of("key1", "value1", "key2", "value2");
-        CaseData caseData = CaseData.builder().build();
-
-        Map<String, String> result = generator.addCustomProperties(properties, caseData);
-
-        assertThat(result).isSameAs(properties);
     }
 
     @Test
@@ -199,5 +112,23 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
         String templateId = generator.getEmailTemplateId(caseData);
 
         assertThat(templateId).isEqualTo(PAY_CLAIM_FEE_TEMPLATE);
+    }
+
+    @Test
+    void shouldAddCustomProperties() {
+        Map<String, String> properties = new HashMap<>();
+
+        CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().companyName("Claimant Name").type(Party.Type.COMPANY).build())
+                .respondent1(Party.builder().companyName("Defendant Name").type(Party.Type.COMPANY).build())
+                .build();
+
+        when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://frontend.url");
+
+        Map<String, String> result = generator.addCustomProperties(properties, caseData);
+
+        assertThat(result).containsEntry(CLAIMANT_NAME, "Claimant Name");
+        assertThat(result).containsEntry(DEFENDANT_NAME, "Defendant Name");
+        assertThat(result).containsEntry(FRONTEND_URL, "http://frontend.url");
     }
 }

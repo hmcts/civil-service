@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.createlipclaim;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
-public class ApplicantClaimSubmittedClaimantEmailDTOGenerator extends EmailDTOGenerator {
+public class ApplicantClaimSubmittedClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claim-submitted-notification-%s";
 
@@ -24,17 +24,6 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGenerator extends EmailDTOGe
     ) {
         this.pipInPostConfiguration = pipInPostConfiguration;
         this.notificationsProperties = notificationsProperties;
-    }
-
-    @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isLipvLipOneVOne()
-                && caseData.getApplicant1Email() != null;
-    }
-
-    @Override
-    protected String getEmailAddress(CaseData caseData) {
-        return caseData.getApplicant1Email();
     }
 
     @Override
@@ -63,19 +52,10 @@ public class ApplicantClaimSubmittedClaimantEmailDTOGenerator extends EmailDTOGe
     }
 
     @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
-        );
-    }
-
-    @Override
-    protected Map<String, String> addCustomProperties(
-            Map<String, String> properties,
-            CaseData caseData
-    ) {
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+        properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+        properties.put(FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl());
         return properties;
     }
 }
