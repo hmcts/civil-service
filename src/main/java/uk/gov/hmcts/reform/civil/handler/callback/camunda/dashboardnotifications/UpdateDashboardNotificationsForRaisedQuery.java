@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_NOTIFICATIONS_RAISED_QUERY;
@@ -73,7 +75,8 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
 
-        if (caseData.getQueries().messageThread(queryId).size() == 1) {
+
+        if (nonNull(caseData.getQueries()) && caseData.getQueries().messageThread(queryId).size() == 1) {
             if (isLIPClaimant(roles)) {
                 dashboardScenariosService.recordScenarios(
                     authToken,
