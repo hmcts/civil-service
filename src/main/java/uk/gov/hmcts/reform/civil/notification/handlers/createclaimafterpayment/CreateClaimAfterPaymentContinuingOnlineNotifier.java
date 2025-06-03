@@ -12,7 +12,7 @@ public class CreateClaimAfterPaymentContinuingOnlineNotifier extends Notifier {
     public CreateClaimAfterPaymentContinuingOnlineNotifier(
             NotificationService notificationService,
             CaseTaskTrackingService caseTaskTrackingService,
-            CreateClaimAfterPaymentContinuingOnlineEmailGenerator emailGenerator
+            CreateClaimAfterPaymentContinuingOnlineAllPartiesEmailGenerator emailGenerator
     ) {
         super(notificationService, caseTaskTrackingService, emailGenerator);
     }

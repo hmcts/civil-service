@@ -6,9 +6,9 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import java.util.List;
 
 @Component
-public class CreateClaimAfterPaymentContinuingOnlineEmailGenerator extends AllPartiesEmailGenerator {
+public class CreateClaimAfterPaymentContinuingOnlineAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
-    public CreateClaimAfterPaymentContinuingOnlineEmailGenerator(
+    public CreateClaimAfterPaymentContinuingOnlineAllPartiesEmailGenerator(
             CreateClaimAfterPaymentContinuingOnlineAppSolOneEmailDTOGenerator appSolOneGenerator
     ) {
         super(List.of(appSolOneGenerator));

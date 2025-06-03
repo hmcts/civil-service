@@ -10,13 +10,13 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class CreateClaimAfterPaymentContinuingOnlineEmailGeneratorTest {
+class CreateClaimAfterPaymentContinuingOnlineAllPartiesEmailGeneratorTest {
 
     @Mock
     private CreateClaimAfterPaymentContinuingOnlineAppSolOneEmailDTOGenerator appSolOneGenerator;
 
     @InjectMocks
-    private CreateClaimAfterPaymentContinuingOnlineEmailGenerator emailGenerator;
+    private CreateClaimAfterPaymentContinuingOnlineAllPartiesEmailGenerator emailGenerator;
 
     @Test
     void shouldExtendAllPartiesEmailGenerator() {
