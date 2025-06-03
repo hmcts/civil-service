@@ -100,8 +100,6 @@ class DetermineNextStateTest {
     })
     void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
-        BusinessProcess businessProcess = BusinessProcess.builder().build();
-
         CaseData caseData;
         if (lipCase.equals("LIP")) {
              caseData = CaseDataBuilder.builder()
@@ -115,6 +113,7 @@ class DetermineNextStateTest {
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
 
         String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
                                                                    builder, "", businessProcess);
