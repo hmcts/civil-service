@@ -141,7 +141,8 @@ public class UpdateWaCourtLocationsService {
         if (!foundLocations.isEmpty()) {
             courtTypeLocationDetails = foundLocations.get(0);
         } else {
-            throw new IllegalArgumentException("Court Location not found, in location data for court type " + courtType);
+            throw new IllegalArgumentException(
+                "Court Location not found, in location data for court type %s epimms_id %s".formatted(courtType, court));
         }
         return courtTypeLocationDetails;
     }
