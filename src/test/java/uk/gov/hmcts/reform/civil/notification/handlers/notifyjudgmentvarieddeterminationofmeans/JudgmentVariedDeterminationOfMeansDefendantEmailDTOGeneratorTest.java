@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 
 @ExtendWith(MockitoExtension.class)
-class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
+class JudgmentVariedDeterminationOfMeansDefendantEmailDTOGeneratorTest {
 
     private static final String TEMPLATE_ID = "template-id";
     private static final String LEGACY_REF = "000DC001";
@@ -39,31 +40,11 @@ class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
     private NotificationsProperties notificationsProperties;
 
     @InjectMocks
-    private JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGenerator generator;
+    private JudgmentVariedDeterminationOfMeansDefendantEmailDTOGenerator generator;
 
     @Test
     void shouldReturnCorrectReferenceTemplate() {
         assertThat(generator.getReferenceTemplate()).isEqualTo(DEFENDANT_JUDGMENT_VARIED_DETERMINATION_OF_MEANS);
-    }
-
-    @Test
-    void shouldReturnTrueWhenRespondentIsLiPAndEmailIsPresent() {
-        CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().partyEmail(RESPONDENT_EMAIL).build())
-                .respondent1Represented(YesOrNo.NO)
-                .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
-    void shouldReturnFalseWhenRespondentEmailIsNull() {
-        CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().partyEmail(null).build())
-                .respondent1Represented(YesOrNo.NO)
-                .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
@@ -84,16 +65,6 @@ class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnFalseWhenRespondentIsRepresented() {
-        CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().partyEmail(RESPONDENT_EMAIL).build())
-                .respondent1Represented(YesOrNo.YES)
-                .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isFalse();
-    }
-
-    @Test
     void shouldReturnRespondent1EmailAddress() {
         CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder().partyEmail(RESPONDENT_EMAIL).build())
@@ -103,18 +74,7 @@ class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyOnlyWhenLiPAndEmailPresent() {
-        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-        caseData = caseData.toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .respondent1(Party.builder().partyEmail(RESPONDENT_EMAIL).build())
-                .legacyCaseReference(LEGACY_REF)
-                .build();
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
-    void shouldPickCorrectTemplateAndProperties() {
+    void shouldPickCorrectTemplateAndCustomProperties() {
         CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
         caseData = caseData.toBuilder()
                 .applicant1(Party.builder().partyEmail(APPLICANT_EMAIL).companyName(APPLICANT_NAME).type(Party.Type.COMPANY).build())
@@ -126,19 +86,16 @@ class JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGeneratorTest {
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
 
+        Map<String, String> properties = new HashMap<>();
+
+        Map<String, String> result = generator.addCustomProperties(properties, caseData);
+
         Map<String, String> expectedProps = Map.of(
                 CLAIMANTVDEFENDANT, APPLICANT_V_RESPONDENT,
                 CLAIM_REFERENCE_NUMBER, LEGACY_REF,
                 PARTY_NAME, RESPONDENT_NAME
         );
 
-        Map<String, String> props = generator.addProperties(caseData);
-        assertThat(props).containsExactlyInAnyOrderEntriesOf(expectedProps);
-    }
-
-    @Test
-    void shouldNotModifyCustomProperties() {
-        Map<String, String> properties = Map.of("a", "b");
-        assertThat(generator.addCustomProperties(properties, CaseData.builder().build())).isEqualTo(properties);
+        assertThat(result).containsAllEntriesOf(expectedProps);
     }
 }

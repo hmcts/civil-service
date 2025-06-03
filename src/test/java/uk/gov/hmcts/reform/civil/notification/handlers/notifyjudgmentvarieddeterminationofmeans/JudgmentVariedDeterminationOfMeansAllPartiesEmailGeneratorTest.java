@@ -25,7 +25,7 @@ class JudgmentVariedDeterminationOfMeansAllPartiesEmailGeneratorTest {
     private JudgmentVariedDeterminationOfMeansRespSolTwoEmailDTOGenerator sol2Gen;
 
     @Mock
-    private JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGenerator lipGen;
+    private JudgmentVariedDeterminationOfMeansDefendantEmailDTOGenerator lipGen;
 
     @InjectMocks
     private JudgmentVariedDeterminationOfMeansAllPartiesEmailGenerator emailGenerator;

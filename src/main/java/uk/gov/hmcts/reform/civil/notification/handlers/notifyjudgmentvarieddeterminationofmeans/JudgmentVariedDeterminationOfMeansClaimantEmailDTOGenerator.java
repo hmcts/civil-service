@@ -2,15 +2,15 @@ package uk.gov.hmcts.reform.civil.notification.handlers.notifyjudgmentvarieddete
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
-import static java.util.Objects.nonNull;
+
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Component
-public class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator extends EmailDTOGenerator {
+public class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claimant-judgment-varied-determination-of-means-%s";
 
@@ -20,17 +20,6 @@ public class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator extends
             NotificationsProperties notificationsProperties
     ) {
         this.notificationsProperties = notificationsProperties;
-    }
-
-    @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isApplicantLiP()
-                && nonNull(caseData.getApplicant1Email());
-    }
-
-    @Override
-    protected String getEmailAddress(CaseData caseData) {
-        return caseData.getApplicant1Email();
     }
 
     @Override
@@ -46,19 +35,10 @@ public class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGenerator extends
     }
 
     @Override
-    public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-                CLAIMANT_V_DEFENDANT,   getAllPartyNames(caseData),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                PARTY_NAME,            caseData.getApplicant1().getPartyName()
-        );
-    }
-
-    @Override
-    protected Map<String, String> addCustomProperties(
-            Map<String, String> properties,
-            CaseData caseData
-    ) {
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIMANT_V_DEFENDANT,   getAllPartyNames(caseData));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
         return properties;
     }
 }

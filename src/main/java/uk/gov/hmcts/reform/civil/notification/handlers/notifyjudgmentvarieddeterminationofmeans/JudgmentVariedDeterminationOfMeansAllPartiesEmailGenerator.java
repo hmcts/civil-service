@@ -13,7 +13,7 @@ public class JudgmentVariedDeterminationOfMeansAllPartiesEmailGenerator extends 
             JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator appSol1Gen,
             JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator respSol1Gen,
             JudgmentVariedDeterminationOfMeansRespSolTwoEmailDTOGenerator respSGen,
-            JudgmentVariedDeterminationOfMeansLipDefendantEmailDTOGenerator defendantGen
+            JudgmentVariedDeterminationOfMeansDefendantEmailDTOGenerator defendantGen
     ) {
         super(List.of(claimantGen, appSol1Gen, respSol1Gen, respSGen, defendantGen));
     }

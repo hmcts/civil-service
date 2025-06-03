@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,16 +42,6 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyWhenLiPEmailPresent() {
-        CaseData caseData = CaseData.builder()
-                .applicant1Represented(YesOrNo.NO)
-                .applicant1(Party.builder().partyEmail(APPLICANT_LIP_EMAIL).build())
-                .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
     void shouldReturnCorrectAddress() {
         CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.NO)
@@ -77,7 +68,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldAddLiPProperties() {
+    void shouldAddCustomProperties() {
         CaseData caseData = CaseData.builder()
                 .applicant1(Party.builder().companyName("Applicant").partyEmail(APPLICANT_LIP_EMAIL).type(Party.Type.COMPANY).build())
                 .respondent1(Party.builder().companyName("Respondent").partyEmail("respondent@example.com").type(Party.Type.COMPANY).build())
@@ -85,19 +76,16 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
                 .legacyCaseReference(LEGACY_REF)
                 .build();
 
+        Map<String, String> properties = new HashMap<>();
+
+        Map<String, String> result = generator.addCustomProperties(properties, caseData);
+
         Map<String, String> expectedProps = Map.of(
                 CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData),
                 CLAIM_REFERENCE_NUMBER, LEGACY_REF,
                 PARTY_NAME, "Applicant"
         );
 
-        Map<String, String> props = generator.addProperties(caseData);
-        assertThat(props).containsExactlyInAnyOrderEntriesOf(expectedProps);
-    }
-
-    @Test
-    void shouldNotModifyCustomProperties() {
-        Map<String, String> p = Map.of("k", "v");
-        assertThat(generator.addCustomProperties(p, CaseData.builder().build())).isEqualTo(p);
+        assertThat(result).containsAllEntriesOf(expectedProps);
     }
 }

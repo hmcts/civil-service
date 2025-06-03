@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getDefendantNameBasedOnCaseType;
 
 @Component
@@ -26,11 +27,6 @@ public class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator extend
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
-        return caseData.getApplicantSolicitor1UserDetails().getEmail() != null;
-    }
-
-    @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getNotifyClaimantJudgmentVariedDeterminationOfMeansTemplate();
     }
@@ -41,10 +37,8 @@ public class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGenerator extend
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(
-            Map<String, String> properties,
-            CaseData caseData
-    ) {
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.put(DEFENDANT_NAME, getDefendantNameBasedOnCaseType(caseData));
         return properties;
     }

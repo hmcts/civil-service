@@ -19,6 +19,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
@@ -36,24 +37,6 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectReferenceTemplate() {
         assertThat(generator.getReferenceTemplate()).isEqualTo("claimant-judgment-varied-determination-of-means-%s");
-    }
-
-    @Test
-    void shouldNotifyWhenApplicantSolicitorEmailIsPresent() {
-        CaseData caseData = CaseData.builder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
-                .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
-    void shouldNotNotifyWhenApplicantSolicitorEmailIsNull() {
-        CaseData caseData = CaseData.builder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
-                .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
@@ -95,7 +78,8 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
         Map<String, String> expectedProps = Map.of(
-                DEFENDANT_NAME, "Respondent 1"
+                DEFENDANT_NAME, "Respondent 1",
+                LEGAL_ORG_NAME, "Legal Org Name"
         );
 
         assertThat(result).containsAllEntriesOf(expectedProps);

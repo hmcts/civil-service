@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.notifyjudgmentvarieddeterminationofmeans;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -10,11 +8,10 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Component
-public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator implements NotificationData {
+public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "defendant-judgment-varied-determination-of-means-%s";
 
@@ -29,12 +26,6 @@ public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator exten
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
-        return nonNull(caseData.getRespondentSolicitor1EmailAddress())
-                && YesOrNo.YES.equals(caseData.getRespondent1Represented());
-    }
-
-    @Override
     public String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getNotifyDefendantJudgmentVariedDeterminationOfMeansTemplate();
     }
@@ -45,11 +36,9 @@ public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator exten
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> props, CaseData caseData) {
-        props.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
-        props.put(DEFENDANT_NAME_SPEC,
-                getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
-        );
-        return props;
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(DEFENDANT_NAME_SPEC,
+                getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService));
+        return properties;
     }
 }
