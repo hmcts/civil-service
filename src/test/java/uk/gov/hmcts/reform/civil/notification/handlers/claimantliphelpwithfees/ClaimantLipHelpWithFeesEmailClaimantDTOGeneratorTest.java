@@ -111,7 +111,7 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
 
     @Test
     void shouldReturnTrueWhenClaimantEmailIsNotNull() {
-         caseData = CaseData.builder()
+        caseData = CaseData.builder()
                 .claimantUserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL).build())
                 .build();
 
@@ -122,7 +122,7 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
 
     @Test
     void shouldReturnFalseWhenClaimantEmailIsNull() {
-         caseData = CaseData.builder()
+        caseData = CaseData.builder()
                 .claimantUserDetails(IdamUserDetails.builder().email(null).build())
                 .build();
 
