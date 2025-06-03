@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIMANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CCJ_REQUEST_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
@@ -43,7 +43,6 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.S
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIM_ISSUE;
-
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -539,11 +538,11 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
-    void shouldSetBusinessProcess_WhenDocumentTypeIsJudgementByDetermination() {
+    void shouldSetBusinessProcess_WhenDocumentTypeIsDecisionMadeOnApplications() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
-            .documentType(CCJ_REQUEST_DETERMINATION)
+            .documentType(DECISION_MADE_ON_APPLICATIONS)
             .file(Document.builder().documentFileName(FILE_NAME_1).build())
             .build();
 
@@ -553,7 +552,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
 
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().build(),
-                                                                        DocumentType.CCJ_REQUEST_DETERMINATION)));
+                                                                        DocumentType.DECISION_MADE_ON_APPLICATIONS)));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
@@ -577,7 +576,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN.name());
+            .isEqualTo(CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST.name());
     }
 
     @Test
