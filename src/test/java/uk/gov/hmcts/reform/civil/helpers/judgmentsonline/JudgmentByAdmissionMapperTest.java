@@ -43,6 +43,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -103,6 +104,33 @@ class JudgmentByAdmissionMapperTest {
 
         assertEquals("Mr. John Rambo", caseData.getJoDefendantName1());
         assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
+
+    }
+
+    @Test
+    void testIfJudgmentByAdmissionLrBulkAdmission() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
 
     }
 
