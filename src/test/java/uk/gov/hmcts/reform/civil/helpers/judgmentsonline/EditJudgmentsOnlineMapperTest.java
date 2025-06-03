@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -35,9 +34,10 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EditJudgmentsOnlineMapperTest {
 
     @Mock
@@ -56,7 +56,7 @@ public class EditJudgmentsOnlineMapperTest {
 
     @BeforeEach
     public void setUp() {
-        Mockito.when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
 
         interestCalculator = new InterestCalculator();
         judgementService = new JudgementService(featureToggleService, interestCalculator);
