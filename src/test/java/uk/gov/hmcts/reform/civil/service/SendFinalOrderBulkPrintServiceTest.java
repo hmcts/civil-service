@@ -90,7 +90,6 @@ class SendFinalOrderBulkPrintServiceTest {
         return caseDataBuilder.build();
     }
 
-
     private CaseData buildCaseDataForTranslatedOrder(Party party) {
         CaseDocument translatedDocument = CaseDocument.builder()
             .documentType(DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT).documentLink(DOCUMENT_LINK).build();
