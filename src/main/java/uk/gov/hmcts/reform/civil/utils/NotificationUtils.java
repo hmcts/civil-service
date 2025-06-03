@@ -54,7 +54,7 @@ public class NotificationUtils {
 
     public static String REFERENCE_NOT_PROVIDED = "Not provided";
     public static String RAISE_QUERY_LR = "Contact us about your claim by selecting "
-        + "Raise a query from the next steps menu in case file view.";
+        + "Raise a query from the next steps menu.";
 
     public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
