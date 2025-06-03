@@ -135,7 +135,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationDecisionReconsideration.ifPresent(preTranslationDocuments::remove);
                         preTranslationDecisionReconsideration.ifPresent(systemGeneratedDocuments::add);
                     }
-                }else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
+                } else if ((Objects.nonNull(preTranslatedDocuments) && !preTranslatedDocuments.isEmpty())) {
                     Element<CaseDocument> originalDocument = preTranslatedDocuments.remove(0);
                     if (Objects.nonNull(originalDocument.getValue().getDocumentName())
                         && originalDocument.getValue().getDocumentName().contains("claimant")) {
