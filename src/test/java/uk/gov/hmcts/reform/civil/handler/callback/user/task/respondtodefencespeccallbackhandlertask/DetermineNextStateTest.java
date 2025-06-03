@@ -92,6 +92,23 @@ class DetermineNextStateTest {
     }
 
     @Test
+    void shouldPauseStateChangeDefendantLipAndRequiresTranslation() {
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .specClaim1v1LrVsLipBilingual()
+            .build();
+
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+        assertEquals(AWAITING_APPLICANT_INTENTION.name(), resultState);
+    }
+
+    @Test
     void shouldSetStateInMediationWhenClaimantAgreeToFreeMediation() {
 
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
