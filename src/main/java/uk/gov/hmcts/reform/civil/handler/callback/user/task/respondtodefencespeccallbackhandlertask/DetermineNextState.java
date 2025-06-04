@@ -25,7 +25,11 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 
 @Component
@@ -168,10 +172,10 @@ public class DetermineNextState  {
 
     public boolean translationRequiredInFlowState(CaseData caseData) {
         FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-        return flowState.equals(FULL_DEFENCE_PROCEED) ||
-            flowState.equals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION) ||
-            flowState.equals(FULL_ADMIT_PROCEED) ||
-            flowState.equals(PART_ADMIT_PROCEED) ||
-            flowState.equals(IN_MEDIATION);
+        return flowState.equals(FULL_DEFENCE_PROCEED)
+            || flowState.equals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+            || flowState.equals(FULL_ADMIT_PROCEED)
+            || flowState.equals(PART_ADMIT_PROCEED)
+            || flowState.equals(IN_MEDIATION);
     }
 }
