@@ -123,7 +123,7 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                 ),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 erbyn " +
-                        DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". Mae'r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach. " +
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". Mae’r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach. " +
                         "Rhaid i’r taliad fod yng nghyfrif Claimant John erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )

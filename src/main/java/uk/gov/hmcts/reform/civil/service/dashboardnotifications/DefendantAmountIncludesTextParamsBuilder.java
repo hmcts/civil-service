@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.HashMap;
 
 @Component
-public class PayBySetDateDefendantAmountIncludesTextParamsBuilder extends DashboardNotificationsParamsBuilder {
+public class DefendantAmountIncludesTextParamsBuilder extends DashboardNotificationsParamsBuilder {
 
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
@@ -16,7 +16,7 @@ public class PayBySetDateDefendantAmountIncludesTextParamsBuilder extends Dashbo
                 params.put("defendantAmountIncludesTextEn",
                     "(this amount includes interest if it has been claimed which will continue to accrue to the date of Judgment, settlement agreement or earlier payment)");
                 params.put("defendantAmountIncludesTextCy",
-                    "(mae'r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach)");
+                    "(mae’r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach)");
             } else if (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
                 {
                     params.put("defendantAmountIncludesTextEn",

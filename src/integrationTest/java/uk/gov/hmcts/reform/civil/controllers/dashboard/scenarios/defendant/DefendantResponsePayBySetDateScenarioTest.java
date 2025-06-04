@@ -113,7 +113,7 @@ public class DefendantResponsePayBySetDateScenarioTest extends DashboardBaseInte
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 (mae'r swm hwn yn cynnwys llog " +
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 (mae’r swm hwn yn cynnwys llog " +
                         "os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach) erbyn " +
                         DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". " +
                         "Byddwn yn cysylltu â chi pan fydd yr hawlydd yn ymateb i’ch cynnig.</p>" +

@@ -118,7 +118,7 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                      +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                jsonPath("$[0].descriptionCy").value(
-                   "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi cynnig talu £1001 (mae'r swm hwn yn cynnwys llog os hawlir" +
+                   "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi cynnig talu £1001 (mae’r swm hwn yn cynnwys llog os hawlir" +
                        " a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach) i chi erbyn "
                     +   DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ".</p><p class=\"govuk-body\">"
                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
