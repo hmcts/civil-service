@@ -225,9 +225,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
-                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader represented by Litigation Friend (litigation friend), John Rambo");
             assertThat(response.getData()).extracting("caseNamePublic")
-                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader represented by Litigation Friend (litigation friend), John Rambo");
 
         }
 
@@ -254,9 +254,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
-                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader represented by Litigation Friend (litigation friend), John Rambo");
             assertThat(response.getData()).extracting("caseNamePublic")
-                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader represented by Litigation Friend (litigation friend), John Rambo");
             verify(coreCaseDataService).triggerGeneralApplicationEvent(eq(1234L), eq(UPDATE_GA_CASE_DATA), anyMap());
         }
 
@@ -279,9 +279,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
-                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by 'Litigation Friend' (litigation friend)");
+                .isEqualTo("John Rambo v Sole Trader, John Rambo represented by Litigation Friend (litigation friend)");
             assertThat(response.getData()).extracting("caseNamePublic")
-                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by 'Litigation Friend' (litigation friend)");
+                .isEqualTo("John Rambo v Sole Trader, John Rambo represented by Litigation Friend (litigation friend)");
         }
 
         @Test
@@ -325,11 +325,11 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
-                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by "
-                    + "'Litigation Friend' (litigation friend)");
+                .isEqualTo("John Rambo v Sole Trader, John Rambo represented by "
+                    + "Litigation Friend (litigation friend)");
             assertThat(response.getData()).extracting("caseNamePublic")
-                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by "
-                    + "'Litigation Friend' (litigation friend)");
+                .isEqualTo("John Rambo v Sole Trader, John Rambo represented by "
+                    + "Litigation Friend (litigation friend)");
         }
 
         @Test
@@ -350,9 +350,9 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
-                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader represented by Litigation Friend (litigation friend), John Rambo");
             assertThat(response.getData()).extracting("caseNamePublic")
-                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader represented by Litigation Friend (litigation friend), John Rambo");
 
         }
 
@@ -430,7 +430,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
-                .isEqualTo("'John Rambo' v 'Sole Trader' represented by 'Litigation Friend' (litigation friend), 'John Rambo'");
+                .isEqualTo("John Rambo v Sole Trader represented by Litigation Friend (litigation friend), John Rambo");
         }
 
         @Test
@@ -455,7 +455,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
             assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
             assertThat(response.getData()).extracting("caseNameHmctsInternal")
-                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo' represented by 'Litigation Friend' (litigation friend)");
+                .isEqualTo("John Rambo v Sole Trader, John Rambo represented by Litigation Friend (litigation friend)");
         }
 
     }

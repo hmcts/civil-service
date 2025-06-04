@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.EnumSet;
 import java.util.Optional;
@@ -19,7 +20,7 @@ public class AdmitProceedConfText implements RespondToResponseConfirmationTextGe
     );
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (caseData.getApplicant1ProceedsWithClaimSpec() == null
             || YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
             || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())

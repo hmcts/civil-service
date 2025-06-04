@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmationTextSpecGenerator {
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || !YesOrNo.NO.equals(caseData.getSpecDefenceFullAdmittedRequired())
             || !RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE.equals(
