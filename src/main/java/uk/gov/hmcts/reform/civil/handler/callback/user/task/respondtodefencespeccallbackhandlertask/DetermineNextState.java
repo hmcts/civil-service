@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
@@ -85,9 +84,6 @@ public class DetermineNextState  {
 
         if (claimantIntentionNeedsTranslation(caseData)) {
             nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
-            // when translation is required, we only generate DQ
-            businessProcess = null;
-            directionsQuestionnairePreparer.prepareDirectionsQuestionnaire(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         }
 
         builder.businessProcess(businessProcess);
