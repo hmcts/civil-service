@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -39,7 +38,6 @@ public class GenerateHearingFormHandler extends CallbackHandler {
     private final HearingFormGenerator hearingFormGenerator;
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
-    private final RuntimeService runTimeService;
 
     @Override
     protected Map<String, Callback> callbacks() {

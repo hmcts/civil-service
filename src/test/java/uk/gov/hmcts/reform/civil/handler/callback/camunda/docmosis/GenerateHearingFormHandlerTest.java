@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,14 +52,12 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
     private HearingFormGenerator hearingFormGenerator;
     @Mock
     private FeatureToggleService featureToggleService;
-    @Mock
-    private RuntimeService runtimeService;
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new GenerateHearingFormHandler(hearingFormGenerator, mapper, featureToggleService, runtimeService);
+        handler = new GenerateHearingFormHandler(hearingFormGenerator, mapper, featureToggleService);
         mapper.registerModule(new JavaTimeModule());
     }
 
