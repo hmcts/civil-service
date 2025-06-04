@@ -59,7 +59,7 @@ public class SendFinalOrderBulkPrintService {
             .map(Element::getValue)
             .filter(caseDocument -> caseDocument.getDocumentType() == documentType)
             .findFirst()
-            .get();
+            .orElse(null);
     }
 
     public void sendTranslatedFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
