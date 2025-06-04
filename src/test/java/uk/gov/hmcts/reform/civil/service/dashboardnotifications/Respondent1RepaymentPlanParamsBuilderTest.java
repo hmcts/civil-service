@@ -45,7 +45,7 @@ class Respondent1RepaymentPlanParamsBuilderTest {
         assertThat(params).containsEntry("instalmentStartDateEn", "15 October 2023");
         assertThat(params).containsEntry("instalmentStartDateCy", "15 Hydref 2023");
         assertThat(params).containsEntry("paymentFrequency", "every month");
-        assertThat(params).containsEntry("paymentFrequencyWelsh", "bob mis37");
+        assertThat(params).containsEntry("paymentFrequencyWelsh", "bob mis");
         assertThat(params).containsEntry("firstRepaymentDateEn", "15 October 2023");
         assertThat(params).containsEntry("firstRepaymentDateCy", "15 Hydref 2023");
     }

@@ -60,13 +60,13 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1000 by " +
-                        DateUtils.formatDate(responseDeadline) + ". " +
+                        DateUtils.formatDate(responseDeadline) + " plus the claim fee and any fixed costs claimed. " +
                         "The payment must be received in Claimant John's account by then, if not they can request a county court judgment.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 ),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi cynnig talu £1000 erbyn " +
-                        DateUtils.formatDateInWelsh(responseDeadline, false) + ". " +
+                        DateUtils.formatDateInWelsh(responseDeadline, false) + " ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir. " +
                         "Rhaid i’r taliad fod yng nghyfrif Claimant John erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
@@ -117,13 +117,13 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1001 by " +
-                        DateUtils.formatDate(admitPaymentDeadline) + ". " +
+                        DateUtils.formatDate(admitPaymentDeadline) + ". This amount includes interest if it has been claimed which will continue to accrue to the date of Judgment, settlement agreement or earlier payment. " +
                         "The payment must be received in Claimant John's account by then, if not they can request a county court judgment.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 ),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 erbyn " +
-                        DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". " +
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". Mae'r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach. " +
                         "Rhaid i’r taliad fod yng nghyfrif Claimant John erbyn y dyddiad hwnnw. Os nad yw, yna gallant wneud cais am ddyfarniad llys sirol.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">Gweld eich ymateb</a></p>"
                 )
