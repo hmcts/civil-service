@@ -35,11 +35,10 @@ class AmountIncludesTextParamsBuilderTest {
 
         // Assert
         assertThat(params).containsEntry("amountIncludesTextEn",
-            ". This amount includes interest if it has been claimed which will continue to accrue to the date of Judgment,"
-                + " settlement agreement or earlier payment.");
+            ". This amount includes interest if it has been claimed which will continue to accrue to the date of Judgment, settlement agreement or earlier payment");
         assertThat(params).containsEntry("amountIncludesTextCy",
             ". Mae'r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad,"
-                + " cytundeb setlo neu daliad cynharach.");
+                + " cytundeb setlo neu daliad cynharach");
     }
 
     @Test
@@ -56,8 +55,8 @@ class AmountIncludesTextParamsBuilderTest {
         builder.addParams(caseData, params);
 
         // Assert
-        assertThat(params).containsEntry("amountIncludesTextEn", " plus the claim fee and any fixed costs claimed.");
-        assertThat(params).containsEntry("amountIncludesTextCy", " ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir.");
+        assertThat(params).containsEntry("amountIncludesTextEn", " plus the claim fee and any fixed costs claimed");
+        assertThat(params).containsEntry("amountIncludesTextCy", " ynghyd â ffi’r hawliad ac unrhyw gostau sefydlog a hawlir");
     }
 
     @Test
