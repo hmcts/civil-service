@@ -2056,7 +2056,12 @@ public class FlowStateAllowedEventService {
                 ORDER_REVIEW_OBLIGATION_CHECK,
                 INITIATE_GENERAL_APPLICATION_COSC,
                 JUDGMENT_PAID_IN_FULL,
-                CHANGE_LANGUAGE_PREFERENCE
+                CHANGE_LANGUAGE_PREFERENCE,
+                MEDIATION_UNSUCCESSFUL,
+                MEDIATION_SUCCESSFUL,
+                TRANSFER_ONLINE_CASE,
+                RESET_PIN,
+                ADD_UNAVAILABLE_DATES
             )
         ),
         entry(
