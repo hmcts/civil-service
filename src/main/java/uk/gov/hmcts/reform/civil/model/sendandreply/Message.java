@@ -53,4 +53,20 @@ public class Message {
             .recipientRoleType(reply.getRecipientRoleType())
             .build();
     }
+
+    public LatestMessage toLatestMessage(Element<Message> messageElement) {
+        Message value = messageElement.getValue();
+        return LatestMessage.builder()
+            .sentTime(value.getSentTime())
+            .updatedTime(value.getUpdatedTime())
+            .senderRoleType(value.getSenderRoleType())
+            .senderName(value.getSenderName())
+            .recipientRoleType(value.getRecipientRoleType())
+            .subjectType(value.getSubjectType())
+            .subject(value.getSubject())
+            .messageContent(value.getMessageContent())
+            .isUrgent(value.getIsUrgent())
+            .messageId(messageElement.getId().toString())
+            .build();
+    }
 }
