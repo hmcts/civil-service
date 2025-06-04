@@ -145,7 +145,11 @@ public class DetermineNextState  {
         if (!featureToggleService.isGaForWelshEnabled()) {
             return false;
         }
+        boolean test = caseData.isLRvLipOneVOne()
+            && (caseData.isRespondentResponseBilingual()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments());
         log.info("PAUSE CLAIM TRANSLATION RESPONDENT WELSH");
+        log.info("NEEDS TRANSLATION RESPONDENT WELSH, {}", test);
 
         return caseData.isLRvLipOneVOne()
             && (caseData.isRespondentResponseBilingual()
