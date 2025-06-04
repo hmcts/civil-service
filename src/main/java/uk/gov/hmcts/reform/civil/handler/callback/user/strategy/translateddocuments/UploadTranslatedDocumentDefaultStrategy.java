@@ -51,10 +51,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         updateSystemGeneratedDocumentsWithOriginalDocuments(callbackParams, caseDataBuilder);
-        updateDocumentCollectionsWithTranslationDocuments(
-            caseData, caseDataBuilder);
         CaseEvent businessProcessEvent = getBusinessProcessEvent(caseData);
         updateNoticeOfDiscontinuanceTranslatedDoc(callbackParams, caseDataBuilder);
+        updateDocumentCollectionsWithTranslationDocuments(
+            caseData, caseDataBuilder);
         CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
 
         if (businessProcessEvent != null) {
@@ -173,7 +173,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
         }
     }
-    
+
     private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams,
                                                            CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = callbackParams.getCaseData();
