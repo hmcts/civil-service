@@ -2059,9 +2059,19 @@ public class FlowStateAllowedEventService {
                 CHANGE_LANGUAGE_PREFERENCE,
                 MEDIATION_UNSUCCESSFUL,
                 MEDIATION_SUCCESSFUL,
+                RESET_PIN,
+                ADD_UNAVAILABLE_DATES,
                 TRANSFER_ONLINE_CASE,
                 RESET_PIN,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_RESPONSE_CUI,
+                CLAIMANT_RESPONSE_SPEC,
+                CREATE_SDO,
+                HEARING_SCHEDULED,
+                DEFAULT_JUDGEMENT,
+                NotSuitable_SDO,
+                CASE_PROCEEDS_IN_CASEMAN
             )
         ),
         entry(
