@@ -23,7 +23,10 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -52,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 
 @ExtendWith(MockitoExtension.class)
 class DetermineNextStateTest {
@@ -61,6 +65,12 @@ class DetermineNextStateTest {
 
     @Mock
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+
+    @Mock
+    private FlowStateAllowedEventService flowStateAllowedEventService;
+
+    @Mock
+    private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
 
     @InjectMocks
     private DetermineNextState determineNextState;
@@ -99,6 +109,7 @@ class DetermineNextStateTest {
         "NON_LIP, IN_MEDIATION",
     })
     void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState) {
+        when(flowStateAllowedEventService.getFlowState(any())).thenReturn(FULL_DEFENCE_PROCEED);
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         CaseData caseData;
         if (lipCase.equals("LIP")) {
