@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimantLipHelpWithFeesNotifier;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimSubmittedApplicantNotifier;
 
 @Component
 public class ApplicantClaimSubmittedNotifier extends Notifier {
@@ -21,6 +21,6 @@ public class ApplicantClaimSubmittedNotifier extends Notifier {
 
     @Override
     protected String getTaskId() {
-        return ClaimantLipHelpWithFeesNotifier.toString();
+        return ClaimSubmittedApplicantNotifier.toString();
     }
 }

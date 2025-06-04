@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.notification.handlers.NotifierTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimantLipHelpWithFeesNotifier;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.ClaimSubmittedApplicantNotifier;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicantClaimSubmittedNotifierTest extends NotifierTestBase {
@@ -18,6 +18,6 @@ class ApplicantClaimSubmittedNotifierTest extends NotifierTestBase {
     @Test
     void shouldReturnCorrectTaskId() {
         assertThat(notifier.getTaskId())
-                .isEqualTo(ClaimantLipHelpWithFeesNotifier.toString());
+                .isEqualTo(ClaimSubmittedApplicantNotifier.toString());
     }
 }
