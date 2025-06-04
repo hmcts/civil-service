@@ -54,4 +54,10 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
             .map(State::getName)
             .anyMatch(name -> name.equals(state.fullName()));
     }
+
+    public boolean hasTransitionedTo(CaseData caseData, FlowState.Main state) {
+        return evaluate(caseData).getStateHistory().stream()
+            .map(State::getName)
+            .anyMatch(name -> name.equals(state.fullName()));
+    }
 }
