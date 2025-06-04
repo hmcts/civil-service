@@ -137,7 +137,7 @@ public class UpdateWaCourtLocationsService {
 
         LocationRefData courtTypeLocationDetails;
         var foundLocations = locationRefDataList.stream()
-            .filter(location -> court.equals(location.getEpimmsId())).toList();
+            .filter(location -> location.getEpimmsId().equals(court)).toList();
         if (!foundLocations.isEmpty()) {
             courtTypeLocationDetails = foundLocations.get(0);
         } else {
