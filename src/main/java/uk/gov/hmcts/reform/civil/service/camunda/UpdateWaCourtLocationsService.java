@@ -127,7 +127,7 @@ public class UpdateWaCourtLocationsService {
     private LocationRefData courtLocationDetails(List<LocationRefData> locationRefDataList, String court, String courtType) {
 
         // CNBC will not be returned by ref data call, so populate details manually
-        if (court.equals(cnbcEpimmId) || court.equals(ccmccEpimmId)) {
+        if (cnbcEpimmId.equals(court) || ccmccEpimmId.equals(court)) {
             return LocationRefData.builder()
                 .region("Midlands")
                 .regionId("2")
@@ -137,7 +137,7 @@ public class UpdateWaCourtLocationsService {
 
         LocationRefData courtTypeLocationDetails;
         var foundLocations = locationRefDataList.stream()
-            .filter(location -> location.getEpimmsId().equals(court)).toList();
+            .filter(location -> court.equals(location.getEpimmsId())).toList();
         if (!foundLocations.isEmpty()) {
             courtTypeLocationDetails = foundLocations.get(0);
         } else {
@@ -148,9 +148,9 @@ public class UpdateWaCourtLocationsService {
     }
 
     private String getClaimTrack(CaseData caseData) {
-        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return caseData.getAllocatedTrack().name();
-        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return caseData.getResponseClaimTrack();
         }
         return null;
