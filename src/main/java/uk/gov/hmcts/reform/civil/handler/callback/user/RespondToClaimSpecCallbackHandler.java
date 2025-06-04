@@ -1916,13 +1916,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         String body = CaseDataToTextGenerator.getTextFor(
             confirmationTextSpecGenerators.stream(),
             () -> getDefaultConfirmationBody(caseData),
-            caseData
+            caseData,
+            featureToggleService
         );
 
         String header = CaseDataToTextGenerator.getTextFor(
             confirmationHeaderGenerators.stream(),
             () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
-            caseData
+            caseData,
+            featureToggleService
         );
 
         return SubmittedCallbackResponse.builder()
