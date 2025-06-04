@@ -5,21 +5,21 @@ import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.RaisingClaimAgainstSpecLitigantInPersonForNotifier;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.TakenOfflineCaseForSpecNotifier;
 
 @Component
-public class RaisingClaimAgainstLitigantInPersonForSpecNotifier extends Notifier {
+public class CaseTakenOfflineForSpecNotifier extends Notifier {
 
-    public RaisingClaimAgainstLitigantInPersonForSpecNotifier(
+    public CaseTakenOfflineForSpecNotifier(
             NotificationService notificationService,
             CaseTaskTrackingService caseTaskTrackingService,
-            RaisingClaimAgainstLitigantInPersonForSpecAllPartiesEmailGenerator partiesGenerator
+            CaseTakenOfflineForSpecAllPartiesEmailGenerator partiesGenerator
     ) {
         super(notificationService, caseTaskTrackingService, partiesGenerator);
     }
 
     @Override
     protected String getTaskId() {
-        return RaisingClaimAgainstSpecLitigantInPersonForNotifier.toString();
+        return TakenOfflineCaseForSpecNotifier.toString();
     }
 }

@@ -7,13 +7,12 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 @Component
-public class RaisingClaimAgainstLitigantInPersonForSpecAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
+public class CaseTakenOfflineForSpecAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "applicant-create-case-handed-offline-notification-%s";
-
+    private static final String REFERENCE_TEMPLATE = "case-taken-offline-spec-applicant-notification-%s";
     private final NotificationsProperties notificationsProperties;
 
-    public RaisingClaimAgainstLitigantInPersonForSpecAppSolOneEmailDTOGenerator(
+    public CaseTakenOfflineForSpecAppSolOneEmailDTOGenerator(
             NotificationsProperties notificationsProperties,
             OrganisationService organisationService
     ) {
@@ -23,7 +22,7 @@ public class RaisingClaimAgainstLitigantInPersonForSpecAppSolOneEmailDTOGenerato
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline();
+        return notificationsProperties.getSolicitorCaseTakenOfflineForSpec();
     }
 
     @Override
