@@ -54,7 +54,7 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
     private CallbackResponse test(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         log.info("STATE HISTORY: {}", stateFlowEngine.evaluate(caseData).getStateHistory().toString());
-
+        log.info("FLOW FLAG HISTORY: {}", stateFlowEngine.evaluate(caseData).getFlags());
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
