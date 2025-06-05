@@ -109,6 +109,7 @@ class CoreCaseDataServiceV2Test {
             service.triggerUpdateLocationEpimdsIdEvent(Long.valueOf(CASE_ID),
                                                        CaseEvent.valueOf(EVENT_ID),
                                                        "12345",
+                                                       "2",
                                                         "yes",
                                                        "yes",
                                                        "yes",
