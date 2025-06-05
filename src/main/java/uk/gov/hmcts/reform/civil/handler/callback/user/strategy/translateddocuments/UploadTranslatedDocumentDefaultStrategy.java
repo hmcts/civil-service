@@ -235,7 +235,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
         List<Element<CaseDocument>> updatedSystemGeneratedDocuments =
             systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(addToSystemGenerated, caseData);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (!addToCourtOfficerOrders.isEmpty()) {
             CaseDocument translatedCourtOfficerOrder = CaseDocument.toCaseDocument(
