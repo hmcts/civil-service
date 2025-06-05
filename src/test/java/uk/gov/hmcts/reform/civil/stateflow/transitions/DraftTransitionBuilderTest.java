@@ -78,8 +78,7 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
-            entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+            entry(FlowFlag.WELSH_ENABLED.name(), false)
         );
     }
 
@@ -98,8 +97,7 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
-            entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+            entry(FlowFlag.WELSH_ENABLED.name(), false)
         );
     }
 
@@ -176,8 +174,7 @@ public class DraftTransitionBuilderTest {
             entry("ONE_RESPONDENT_REPRESENTATIVE", false),
             entry("TWO_RESPONDENT_REPRESENTATIVES", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
-            entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+            entry(FlowFlag.WELSH_ENABLED.name(), false)
         );
     }
 
@@ -215,8 +212,7 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry("UNREPRESENTED_DEFENDANT_TWO", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
-            entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+            entry(FlowFlag.WELSH_ENABLED.name(), false)
         );
     }
 
@@ -264,8 +260,7 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
-            entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+            entry(FlowFlag.WELSH_ENABLED.name(), false)
         );
     }
 
@@ -297,8 +292,7 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry("UNREPRESENTED_DEFENDANT_TWO", false),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
-            entry(FlowFlag.WELSH_ENABLED.name(), false),
-            entry(FlowFlag.BILINGUAL_DOCS.name(), false)
+            entry(FlowFlag.WELSH_ENABLED.name(), false)
         );
     }
 

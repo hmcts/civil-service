@@ -59,31 +59,12 @@ public class SendSDOBulkPrintService {
         if (!featureToggleService.isGaForWelshEnabled()) {
             return Language.ENGLISH;
         }
-        if (TASK_ID_CLAIMANT.equals(taskId)) {
-            if (caseData.getApplicant1DQ() != null
-                && caseData.getApplicant1DQ().getApplicant1DQLanguage() != null
-                && (caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments() != null)) {
-                return caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments();
-            } else {
-                return switch (caseData.getClaimantBilingualLanguagePreference()) {
-                    case "WELSH" -> Language.WELSH;
-                    case "BOTH" -> Language.BOTH;
-                    default -> Language.ENGLISH;
-                };
-            }
-        } else {
-            if (caseData.getRespondent1DQ() != null
-                && caseData.getRespondent1DQ().getRespondent1DQLanguage() != null
-                && (caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments() != null)) {
-                return caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments();
-            } else {
-                return switch (caseData.getDefendantBilingualLanguagePreference()) {
-                    case "WELSH" -> Language.WELSH;
-                    case "BOTH" -> Language.BOTH;
-                    default -> Language.ENGLISH;
-                };
-            }
-        }
+        String languageString = TASK_ID_CLAIMANT.equals(taskId) ? caseData.getClaimantBilingualLanguagePreference() : caseData.getDefendantBilingualLanguagePreference();
+        return switch (languageString) {
+            case "WELSH" -> Language.WELSH;
+            case "BOTH" -> Language.BOTH;
+            default -> Language.ENGLISH;
+        };
     }
 
     private List<String> getRecipientsList(CaseData caseData, String taskId) {

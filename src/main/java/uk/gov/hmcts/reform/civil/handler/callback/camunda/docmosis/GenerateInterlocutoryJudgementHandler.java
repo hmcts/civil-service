@@ -67,8 +67,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
         );
         CaseData updatedCaseData;
         if (featureToggleService.isGaForWelshEnabled()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
-            || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(interlocutoryJudgementDoc));
             updatedCaseData = caseData.toBuilder()
