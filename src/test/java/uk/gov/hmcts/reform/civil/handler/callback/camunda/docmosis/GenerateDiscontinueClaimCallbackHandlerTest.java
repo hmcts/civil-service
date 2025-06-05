@@ -31,9 +31,14 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -42,6 +47,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -67,6 +73,9 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
     @MockBean
     private RuntimeService runTimeService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @MockBean
     private OrganisationService organisationService;
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
@@ -104,7 +113,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent1(getRespondent1PartyDetails())
                     .applicant1(getApplicant1PartyDetails())
                     .courtPermissionNeeded(SettleDiscontinueYesOrNoList.YES)
-                    .respondent1DQ(Respondent1DQ.builder().build())
+                .respondent1DQ(Respondent1DQ.builder().build())
                     .isPermissionGranted(SettleDiscontinueYesOrNoList.YES)
                     .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
                     .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
@@ -145,18 +154,18 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .respondent1(getRespondent1PartyDetails())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQStatementOfTruth(StatementOfTruth.builder()
-                                                                          .name("Signer 2 Name")
-                                                                          .build())
-                                       .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQStatementOfTruth(StatementOfTruth.builder()
-                                                                          .name("Signer 3 Name")
-                                                                          .build())
-                                       .build())
-                    .addRespondent2(YesOrNo.YES)
-                    .respondent2SameLegalRepresentative(YesOrNo.NO)
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQStatementOfTruth(StatementOfTruth.builder()
+                                                                      .name("Signer 2 Name")
+                                                                      .build())
+                                   .build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQStatementOfTruth(StatementOfTruth.builder()
+                                                                      .name("Signer 3 Name")
+                                                                      .build())
+                                   .build())
+                .addRespondent2(YesOrNo.YES)
+                .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .applicant1(getApplicant1PartyDetails())
                     .courtPermissionNeeded(SettleDiscontinueYesOrNoList.NO)
                     .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
@@ -339,7 +348,8 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
             Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
-            Address correspondenceAddress = Address.builder().addressLine1("Correspondence").postCode("C0RR 5P0N").build();
+            Address correspondenceAddress =
+                Address.builder().addressLine1("Correspondence").postCode("C0RR 5P0N").build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateSpec1v2ClaimSubmitted().build().toBuilder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -383,6 +393,34 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getApplicant1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
             assertThat(updatedData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc()).isNotNull();
         }
+    }
+
+    @Test
+    void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(formGenerator.generateDocs(
+            any(CaseData.class),
+            anyString(), any(Address.class), anyString(), anyString()
+        )).thenReturn(getCaseDocument());
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .respondent1(getRespondent1PartyDetails())
+            .applicant1(getApplicant1PartyDetails())
+            .respondent1Represented(YesOrNo.NO)
+            .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH")
+                                                         .build()).build())
+            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        params.getRequest().setEventId(GEN_NOTICE_OF_DISCONTINUANCE.name());
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        List<Element<CaseDocument>> translatedDocuments = updatedData.getPreTranslationDocuments();
+        assertEquals(1, translatedDocuments.size());
+        assertEquals(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE, updatedData.getPreTranslationDocumentType());
     }
 
     @Test
