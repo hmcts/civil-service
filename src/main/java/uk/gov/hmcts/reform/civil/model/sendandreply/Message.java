@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
@@ -18,6 +19,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class Message {
 
     private LocalDateTime sentTime;
@@ -56,6 +58,7 @@ public class Message {
 
     public LatestMessage toLatestMessage(Element<Message> messageElement) {
         Message value = messageElement.getValue();
+        log.info("uuid " + messageElement.getId().toString());
         return LatestMessage.builder()
             .sentTime(value.getSentTime())
             .updatedTime(value.getUpdatedTime())
