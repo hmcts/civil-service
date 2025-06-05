@@ -92,7 +92,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenWelshParty() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseDocument caseDocument = CaseDocument.builder().documentType(DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).documentLink(DOCUMENT_LINK).build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
@@ -118,7 +118,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenMainCaseHasBilingualParty() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseDocument caseDocument = CaseDocument.builder().documentType(DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).documentLink(DOCUMENT_LINK).build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()

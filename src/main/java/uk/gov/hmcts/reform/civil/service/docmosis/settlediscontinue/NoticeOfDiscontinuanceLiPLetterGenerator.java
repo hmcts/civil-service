@@ -45,7 +45,9 @@ public class NoticeOfDiscontinuanceLiPLetterGenerator {
 
             List<String> recipient = getRecipientsList(caseData);
             byte[] letterContent;
-            letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, caseData.getRespondent1(), NOTICE_OF_DISCONTINUANCE, caseDocuments.toArray(new CaseDocument[0]));
+            letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation,
+                                                                          caseData.getRespondent1(), NOTICE_OF_DISCONTINUANCE,
+                                                                          caseDocuments.toArray(new CaseDocument[0]));
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                     caseData.getLegacyCaseReference(), NOTICE_OF_DISCONTINUANCE_LETTER, recipient);
         }
