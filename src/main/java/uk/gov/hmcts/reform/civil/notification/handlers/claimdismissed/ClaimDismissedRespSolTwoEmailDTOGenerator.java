@@ -30,7 +30,7 @@ public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.getClaimDismissedDate() != null && isOneVTwoTwoLegalRep(caseData);
     }
 }
