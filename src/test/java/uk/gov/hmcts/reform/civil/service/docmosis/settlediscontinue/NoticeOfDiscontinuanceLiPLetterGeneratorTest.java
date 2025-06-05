@@ -29,7 +29,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
@@ -146,7 +148,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
         // then
         verifyPrintLetter(caseData, respondent1);
     }
-
 
     @Test
     void shouldNotDownloadDocumentAndPrintLetterSuccessfully() {
