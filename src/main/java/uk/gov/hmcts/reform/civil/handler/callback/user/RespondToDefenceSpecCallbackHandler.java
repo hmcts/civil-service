@@ -328,16 +328,21 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+
         if (caseData.getCcjPaymentDetails() != null
             && YES.equals(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
                 .build();
+        } else if (caseData.getFixedCosts() != null && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
+
         List<String> errors = judgementService.validateAmountPaid(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? updatedCaseData.build().toMap(objectMapper) : null)
             .build();
     }
 
