@@ -40,7 +40,7 @@ public class DismissCaseRespSolOneEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
-        when(notificationsProperties.getNotifyLRBundleRestitched()).thenReturn(expectedTemplateId);
+        when(notificationsProperties.getNotifyLRCaseDismissed()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 

@@ -24,7 +24,7 @@ public class DismissCaseRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGe
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyLRBundleRestitched();
+        return notificationsProperties.getNotifyLRCaseDismissed();
     }
 
     @Override
