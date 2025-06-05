@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
@@ -28,11 +29,22 @@ public class DismissCaseRespSolOneEmailDTOGeneratorTest {
     private NotificationsProperties notificationsProperties;
 
     @InjectMocks
-    private DismissCaseDefendantEmailDTOGenerator emailDTOGenerator;
+    private DismissCaseRespSolOneEmailDTOGenerator emailDTOGenerator;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void shouldReturnCorrectEmailTemplateId() {
+        CaseData caseData = CaseData.builder().build();
+        String expectedTemplateId = "template-id";
+        when(notificationsProperties.getNotifyLRBundleRestitched()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
     }
 
     @Test
