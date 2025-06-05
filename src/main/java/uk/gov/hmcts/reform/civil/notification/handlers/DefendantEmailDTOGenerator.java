@@ -15,7 +15,7 @@ public abstract class DefendantEmailDTOGenerator extends EmailDTOGenerator {
         return caseData.getRespondent1PartyEmail();
     }
 
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isRespondent1LiP() ? Boolean.TRUE : Boolean.FALSE;
     }
 
