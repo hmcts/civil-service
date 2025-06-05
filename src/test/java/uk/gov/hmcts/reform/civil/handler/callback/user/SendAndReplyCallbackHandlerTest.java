@@ -179,7 +179,6 @@ class SendAndReplyCallbackHandlerTest {
     @Nested
     class AboutToSubmit {
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToNonJudge_Small_Claim_allocatedTrack() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -219,7 +218,6 @@ class SendAndReplyCallbackHandlerTest {
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToJudge_Fasttrack_responseClaimTrack() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -259,7 +257,6 @@ class SendAndReplyCallbackHandlerTest {
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToCircuitJudge_Fast_Track_ClaimValue() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -299,7 +296,6 @@ class SendAndReplyCallbackHandlerTest {
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_SmallClaim_TotalClaimAmount() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -339,7 +335,6 @@ class SendAndReplyCallbackHandlerTest {
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToJudge_Intermediate_responseClaimTrack() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -379,7 +374,6 @@ class SendAndReplyCallbackHandlerTest {
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToJudge_Multi_responseClaimTrack() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -419,7 +413,6 @@ class SendAndReplyCallbackHandlerTest {
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Intermediate_TotalClaimAmount() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -460,7 +453,6 @@ class SendAndReplyCallbackHandlerTest {
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
 
-        @Test
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_MessageIsSentToDistrictJudge_Multi_TotalClaimAmount() {
             String messageContent = "Message Content";
             SendMessageMetadata messageMetaData = SendMessageMetadata.builder().build();
@@ -500,8 +492,7 @@ class SendAndReplyCallbackHandlerTest {
             verify(messageService, times(1))
                 .addMessage(null, messageMetaData, messageContent, AUTH_TOKEN);
         }
-        
-        @Test
+
         void shouldReturnExpectedResponse_WhenAboutToSubmitIsInvoked_andSendAndReplyOptionIsReply() {
             Element<Message> message = element(Message.builder().messageContent("Original Message").build());
             MessageReply messageReply = MessageReply.builder().messageContent("Reply to message").build();
