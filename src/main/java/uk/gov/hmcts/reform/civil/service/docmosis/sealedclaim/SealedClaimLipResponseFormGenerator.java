@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipRespon
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.util.List;
 
@@ -29,16 +30,17 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final FeatureToggleService featureToggleService;
+    private final InterestCalculator interestCalculator;
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
         log.info("Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
+        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
+            SealedClaimLipResponseForm.toTemplate(caseData).toBuilder();
+        responseFormBuilder.admittedAmount(interestCalculator.claimAmountPlusInterestToDate(caseData));
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             log.info("If Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-            SealedClaimLipResponseForm.toTemplate(caseData);
-            SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
-                SealedClaimLipResponseForm.toTemplate(caseData).toBuilder()
-                    .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
+            responseFormBuilder.checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
                     .defendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
                     .defendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
                     .defendant1MediationEmail(getDefendant1MediationEmail(caseData))
@@ -48,7 +50,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
         } else {
             log.info("Else Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-            return  SealedClaimLipResponseForm.toTemplate(caseData);
+            return  responseFormBuilder.build();
         }
     }
 
