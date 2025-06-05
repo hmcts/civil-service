@@ -32,8 +32,6 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.N
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
@@ -288,7 +286,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.COURT_OFFICER_ORDER;
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_NOTICE)) {
-                return UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
             }
         }
 
