@@ -81,11 +81,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
-                        Optional<Element<CaseDocument>> preTranslationInterlocJudgment = preTranslationDocuments.stream()
+                        Optional<Element<CaseDocument>> preTranslationStandardDirectionOrder = preTranslationDocuments.stream()
                             .filter(item -> item.getValue().getDocumentType() == DocumentType.SDO_ORDER)
                             .findFirst();
-                        preTranslationInterlocJudgment.ifPresent(preTranslationDocuments::remove);
-                        preTranslationInterlocJudgment.ifPresent(systemGeneratedDocuments::add);
+                        preTranslationStandardDirectionOrder.ifPresent(preTranslationDocuments::remove);
+                        preTranslationStandardDirectionOrder.ifPresent(systemGeneratedDocuments::add);
                     }
                 } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
