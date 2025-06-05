@@ -349,6 +349,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
+            updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
