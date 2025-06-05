@@ -69,11 +69,11 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
             .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
             .issueDate(LocalDate.now())
-            .orderedAmount(orderAmount.add(totalInterest).toString())
+            .orderedAmount(addInterest(orderAmount, totalInterest, caseData))
             .costs(costs.toString())
             .claimFeeAmount(claimFeeAmount.toString())
             .amountAlreadyPaid(amountAlreadyPaid.toString())
-            .totalAmount(orderAmount.add(costs).add(claimFeeAmount).add(totalInterest).toString())
+            .totalAmount(generateTotalAmount(orderAmount, totalInterest, claimFeeAmount, costs, caseData))
             .build();
 
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
@@ -84,7 +84,10 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {
         JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
         builder.activeJudgment(activeJudgmentDetails);
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        CaseData data = builder.build();
+        BigDecimal interest = (!judgementService.isLrFullAdmitRepaymentPlan(data)
+            && !judgementService.isLRPartAdmitRepaymentPlan(data))
+            ? interestCalculator.calculateInterest(data) : null;
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder, interest);
         return builder;
     }
@@ -208,5 +211,24 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
             return PaymentPlanSelection.PAY_BY_DATE;
         }
         return PaymentPlanSelection.PAY_IMMEDIATELY;
+    }
+
+    private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
+            return orderAmount.toString();
+        } else {
+            return orderAmount.add(totalInterest).toString();
+        }
+    }
+
+    private String generateTotalAmount(BigInteger orderAmount, BigInteger totalInterest,
+                                       BigInteger claimFeeAmount, BigInteger costs, CaseData caseData) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
+            return orderAmount.add(claimFeeAmount).add(costs).toString();
+        } else {
+            return orderAmount.add(totalInterest).add(claimFeeAmount).add(costs).toString();
+        }
     }
 }
