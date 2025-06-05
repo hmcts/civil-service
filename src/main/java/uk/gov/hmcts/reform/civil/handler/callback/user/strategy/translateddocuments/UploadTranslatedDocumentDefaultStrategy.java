@@ -258,7 +258,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
         caseDataBuilder.systemGeneratedCaseDocuments(updatedSystemGeneratedDocuments);
         caseDataBuilder.finalOrderDocumentCollection(updatedFinalOrderDocuments);
-        return caseDataBuilder;
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
