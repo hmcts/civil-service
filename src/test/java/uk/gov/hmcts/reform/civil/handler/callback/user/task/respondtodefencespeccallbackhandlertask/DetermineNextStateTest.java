@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 
 import java.time.LocalDate;
@@ -55,7 +56,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 
 @ExtendWith(MockitoExtension.class)
 class DetermineNextStateTest {
@@ -105,11 +105,18 @@ class DetermineNextStateTest {
 
     @ParameterizedTest
     @CsvSource({
-        "LIP, AWAITING_APPLICANT_INTENTION",
-        "NON_LIP, IN_MEDIATION",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.FULL_DEFENCE_PROCEED",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.FULL_ADMIT_PROCEED",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.PART_ADMIT_PROCEED",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.IN_MEDIATION",
+        "NON_LIP, IN_MEDIATION, MAIN.FULL_DEFENCE_PROCEED"
     })
-    void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState) {
-        when(flowStateAllowedEventService.getFlowState(any())).thenReturn(FULL_DEFENCE_PROCEED);
+    void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState, String flowState) {
+        FlowState flowStateTest = FlowState.fromFullName(flowState);
+
+        when(flowStateAllowedEventService.getFlowState(any())).thenReturn(flowStateTest);
+
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
         CaseData caseData;
         if (lipCase.equals("LIP")) {
