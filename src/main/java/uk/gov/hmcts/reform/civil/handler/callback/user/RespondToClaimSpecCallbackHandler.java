@@ -67,6 +67,7 @@ import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -156,6 +157,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
     private static final String DEF2 = "Defendant 2";
     public static final String ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED = "There is a problem \n You have already submitted the defendant's response";
+    public static final String ERROR_RESPONSE_TO_CLAIM_OWING_AMOUNT = "This amount equals or exceeds the claim amount plus interest.";
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
     private final ObjectMapper objectMapper;
@@ -178,6 +180,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final FeatureToggleService featureToggleService;
     private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
+    private final InterestCalculator interestCalculator;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -284,6 +287,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                                                                 .orElseGet(() -> RespondToClaim.builder().build()));
+        if (featureToggleService.isLrAdmissionBulkEnabled()) {
+            validateAdmittedClaimOwingAmount(errors, caseData);
+        }
         if (!errors.isEmpty()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
@@ -1197,6 +1203,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
         if (toggleService.isLrAdmissionBulkEnabled()) {
             updatedCaseData.totalClaimAmountPlusInterest(caseData.getClaimAmountInPounds());
+            BigDecimal interest = interestCalculator.calculateInterest(caseData);
+            BigDecimal totalAmountWithInterest = caseData.getTotalClaimAmount().add(interest);
+            updatedCaseData.totalClaimAmountPlusInterestAdmitPart(totalAmountWithInterest);
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
@@ -1902,13 +1911,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         String body = CaseDataToTextGenerator.getTextFor(
             confirmationTextSpecGenerators.stream(),
             () -> getDefaultConfirmationBody(caseData),
-            caseData
+            caseData,
+            featureToggleService
         );
 
         String header = CaseDataToTextGenerator.getTextFor(
             confirmationHeaderGenerators.stream(),
             () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
-            caseData
+            caseData,
+            featureToggleService
         );
 
         return SubmittedCallbackResponse.builder()
@@ -2057,5 +2068,35 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             userInfo.getUid(),
             caseRole
         );
+    }
+
+    private void validateAdmittedClaimOwingAmount(List<String> errors, CaseData caseData) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            && caseData.getSpecDefenceAdmittedRequired() == NO
+            && YES.equals(caseData.getIsRespondent1())
+            && nonNull(caseData.getRespondToAdmittedClaimOwingAmount())) {
+            validateClaimOwingAmount(
+                errors,
+                caseData.getRespondToAdmittedClaimOwingAmount(),
+                caseData.getTotalClaimAmountPlusInterestAdmitPart()
+            );
+        }
+        if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            && caseData.getSpecDefenceAdmitted2Required() == NO
+            && YES.equals(caseData.getIsRespondent2())
+            && nonNull(caseData.getRespondToAdmittedClaimOwingAmount2())) {
+            validateClaimOwingAmount(
+                errors,
+                caseData.getRespondToAdmittedClaimOwingAmount2(),
+                caseData.getTotalClaimAmountPlusInterestAdmitPart()
+            );
+        }
+    }
+
+    private void validateClaimOwingAmount(List<String> errors, BigDecimal admittedClaimOwingAmount, BigDecimal claimAmountWithInterest) {
+        BigDecimal claimAmountWithInterestMinusPence = claimAmountWithInterest.subtract(BigDecimal.valueOf(0.01));
+        if (MonetaryConversions.penniesToPounds(admittedClaimOwingAmount).compareTo(claimAmountWithInterestMinusPence) > 0) {
+            errors.add(ERROR_RESPONSE_TO_CLAIM_OWING_AMOUNT);
+        }
     }
 }

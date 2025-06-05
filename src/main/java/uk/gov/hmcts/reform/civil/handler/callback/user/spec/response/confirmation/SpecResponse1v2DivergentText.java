@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 public class SpecResponse1v2DivergentText implements RespondToClaimConfirmationTextSpecGenerator {
 
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
         if (!isDivergentResponse1v2SameSolicitor(caseData)) {
             return Optional.empty();
         }
