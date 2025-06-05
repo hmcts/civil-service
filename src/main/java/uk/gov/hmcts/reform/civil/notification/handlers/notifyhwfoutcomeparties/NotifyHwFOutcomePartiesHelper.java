@@ -71,7 +71,9 @@ public class NotifyHwFOutcomePartiesHelper {
 
     public Map<String, String> getFurtherProperties(CaseData caseData) {
         if (caseData.getHwFEvent() == null) {
-            throw new IllegalArgumentException("HwFEvent is null in CaseData");
+            throw new IllegalArgumentException(
+                String.format("HwFEvent is null for case ID: %s", caseData.getCcdCaseReference())
+            );
         }
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);

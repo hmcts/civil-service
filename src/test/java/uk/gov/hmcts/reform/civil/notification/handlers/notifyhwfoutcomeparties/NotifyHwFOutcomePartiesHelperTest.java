@@ -305,7 +305,7 @@ class NotifyHwFOutcomePartiesHelperTest {
 
         assertThatThrownBy(() -> helper.getFurtherProperties(caseData))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("HwFEvent is null in CaseData");
+            .hasMessage("HwFEvent is null for case ID: 0");
     }
 
     @Test
