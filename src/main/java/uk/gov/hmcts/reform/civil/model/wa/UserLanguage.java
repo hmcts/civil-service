@@ -10,10 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientContext {
+public class UserLanguage {
 
-    @JsonProperty("user_task")
-    private UserTask userTask;
-    @JsonProperty("user_language")
-    private UserLanguage userLanguage;
+    @JsonProperty("language")
+    private String language;
 }
