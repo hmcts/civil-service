@@ -50,11 +50,17 @@ public abstract class CallbackHandler {
     }
 
     public boolean isEventAlreadyProcessed(CallbackParams callbackParams, BusinessProcess businessProcess) {
-        if (camundaActivityIds(callbackParams).contains(DEFAULT)) {
+        List<String> currentActivityId = camundaActivityIds(callbackParams);
+        if (currentActivityId.contains(DEFAULT)) {
             return false;
         }
 
-        return businessProcess != null && camundaActivityIds(callbackParams).contains(businessProcess.getActivityId());
+        String lastExecutedActivityId = businessProcess.getActivityId();
+        log.info("Last executed activity id was: %s and current activity id for this request is: %s",
+                 lastExecutedActivityId, currentActivityId
+        );
+
+        return businessProcess != null && currentActivityId.contains(lastExecutedActivityId);
     }
 
     public void register(Map<String, CallbackHandler> handlers) {
