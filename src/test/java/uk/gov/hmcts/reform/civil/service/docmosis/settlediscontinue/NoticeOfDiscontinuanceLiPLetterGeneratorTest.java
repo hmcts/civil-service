@@ -9,6 +9,7 @@ import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,14 +23,13 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
@@ -37,7 +37,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     @Mock
     private BulkPrintService bulkPrintService;
     @Mock
-    private CoverLetterAppendService coverLetterAppendService;
+    private DocumentDownloadService documentDownloadService;
     @InjectMocks
     private NoticeOfDiscontinuanceLiPLetterGenerator liPLetterGenerator;
     private static final String NOTICE_OF_DISCONTINUANCE_LETTER = "notice-of-discontinuance";
@@ -69,7 +69,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        CaseDocument caseDocument = CaseDocument.builder().documentType(DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).documentLink(DOCUMENT_LINK).build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(CaseDataLiP.builder()
@@ -80,8 +79,11 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
                                                           .documents(Language.ENGLISH).build()).build())
             .respondent1(respondent1)
             .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument).build();
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
-            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
+
+        given(documentDownloadService.downloadDocument(
+            any(),
+            any()
+        )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
         liPLetterGenerator.printNoticeOfDiscontinuanceLetter(caseData, BEARER_TOKEN);
@@ -94,7 +96,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenWelshParty() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        CaseDocument caseDocument = CaseDocument.builder().documentType(DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).documentLink(DOCUMENT_LINK).build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(CaseDataLiP.builder()
@@ -104,10 +105,13 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
                                .respondent1DQLanguage(WelshLanguageRequirements.builder()
                                                           .documents(Language.WELSH).build()).build())
             .respondent1(respondent1)
+            .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument)
             .respondent1NoticeOfDiscontinueAllPartyTranslatedDoc(caseDocument).build();
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
-            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
+        given(documentDownloadService.downloadDocument(
+            any(),
+            any()
+        )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         // when
         liPLetterGenerator.printNoticeOfDiscontinuanceLetter(caseData, BEARER_TOKEN);
 
@@ -119,7 +123,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenMainCaseHasBilingualParty() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        CaseDocument caseDocument = CaseDocument.builder().documentType(DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT).documentLink(DOCUMENT_LINK).build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(CaseDataLiP.builder()
@@ -131,13 +134,36 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
             .respondent1(respondent1)
             .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument)
             .respondent1NoticeOfDiscontinueAllPartyTranslatedDoc(caseDocument).build();
-        given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
-            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
+
+        given(documentDownloadService.downloadDocument(
+            any(),
+            any()
+        )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
         liPLetterGenerator.printNoticeOfDiscontinuanceLetter(caseData, BEARER_TOKEN);
 
         // then
         verifyPrintLetter(caseData, respondent1);
+    }
+
+
+    @Test
+    void shouldNotDownloadDocumentAndPrintLetterSuccessfully() {
+        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(respondent1)
+            .respondent1NoticeOfDiscontinueAllPartyViewDoc(null).build();
+
+        liPLetterGenerator.printNoticeOfDiscontinuanceLetter(caseData, BEARER_TOKEN);
+        // then
+        verify(bulkPrintService, never()).printLetter(
+            LETTER_CONTENT,
+            caseData.getLegacyCaseReference(),
+            caseData.getLegacyCaseReference(),
+            NOTICE_OF_DISCONTINUANCE_LETTER,
+            List.of(respondent1.getPartyName())
+        );
     }
 }
