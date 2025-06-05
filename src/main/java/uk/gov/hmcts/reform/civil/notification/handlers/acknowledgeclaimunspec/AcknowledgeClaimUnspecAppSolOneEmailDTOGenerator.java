@@ -15,14 +15,12 @@ public class AcknowledgeClaimUnspecAppSolOneEmailDTOGenerator extends AppSolOneE
 
     protected static final String APP_SOL_REF_TEMPLATE = "acknowledge-claim-applicant-notification-%s";
 
-    NotificationsProperties notificationsProperties;
     private final AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper;
 
     public AcknowledgeClaimUnspecAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
                                                             OrganisationService organisationService,
                                                             AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
+        super(notificationsProperties, organisationService);
         this.acknowledgeClaimUnspecHelper = acknowledgeClaimUnspecHelper;
     }
 
