@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserTask {
+
     @JsonProperty("task_data")
     private TaskData taskData;
     @JsonProperty("complete_task")

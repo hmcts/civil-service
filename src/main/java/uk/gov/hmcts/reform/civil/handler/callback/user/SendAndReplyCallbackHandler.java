@@ -106,7 +106,6 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
             .build();
     }
 
-
     private CallbackResponse populateMessageHistory(CallbackParams params) {
         CaseData caseData = params.getCaseData();
 

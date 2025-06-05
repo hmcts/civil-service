@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

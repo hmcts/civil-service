@@ -15,6 +15,7 @@ import lombok.extern.jackson.Jacksonized;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskData {
+
     @JsonProperty("id")
     private String id;
     @JsonProperty("name")
