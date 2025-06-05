@@ -83,6 +83,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         log.info("wa mapper " + waMapper);
         if (waMapper != null) {
             ClientContext clientContext = waMapper.getClientContext();
+            log.info("handler client context " + clientContext);
             if (clientContext != null) {
                 UserTask userTask = clientContext.getUserTask();
                 log.info("user task " + userTask);
