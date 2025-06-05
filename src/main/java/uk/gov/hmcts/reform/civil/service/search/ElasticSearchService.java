@@ -45,18 +45,14 @@ public abstract class ElasticSearchService {
      * queries are paginated, the value of the last case is used for the search_after property in the query to
      * ensure that cases are returned in the right order of pages to prevent duplication.
      *
-     * @param claimMovedDate claimMovedDate
-     * @param carmEnabled    carmEnabled
+     * @param carmEnabled carmEnabled
      * @return caseDetails
      */
-    public List<CaseDetails> getInMediationCases(LocalDate claimMovedDate, boolean carmEnabled) {
-
-        if (claimMovedDate == null) {
-            claimMovedDate = LocalDate.now().minusDays(7);
-        }
+    public List<CaseDetails> getInMediationCases(boolean carmEnabled) {
+        LocalDate claimMovedDateFrom = LocalDate.now().minusDays(8);
         if (carmEnabled) {
             SearchResult searchResult =
-                coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDate,
+                coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX, claimMovedDateFrom,
                                                                                carmEnabled, true,
                                                                                null
                 ));
@@ -69,11 +65,12 @@ public abstract class ElasticSearchService {
                 String searchAfterValue = searchResult.getCases().get(searchResult.getCases().size() - 1).getId().toString();
                 for (int i = 1; i < pages; i++) {
                     // use the query again passing in the search after value
-                    SearchResult result = coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX,
-                                                                                                         claimMovedDate,
-                                                                                                         carmEnabled,
-                                                                                                         false,
-                                                                                                         searchAfterValue
+                    SearchResult result = coreCaseDataService.searchMediationCases(queryInMediationCases(
+                        START_INDEX,
+                        claimMovedDateFrom,
+                        carmEnabled,
+                        false,
+                        searchAfterValue
                     ));
                     logMediationCaseIds(caseDetails, String.valueOf(i));
                     caseDetails.addAll(result.getCases());
@@ -83,20 +80,22 @@ public abstract class ElasticSearchService {
             }
             return caseDetails;
         } else {
-            SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX,
-                                                                                              claimMovedDate,
-                                                                                              carmEnabled,
-                                                                                              false,
-                                                                                              null
+            SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(
+                START_INDEX,
+                claimMovedDateFrom,
+                carmEnabled,
+                false,
+                null
             ));
             int pages = calculatePages(searchResult);
             List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());
             for (int i = 1; i < pages; i++) {
-                SearchResult result = coreCaseDataService.searchCases(queryInMediationCases(i * ES_DEFAULT_SEARCH_LIMIT,
-                                                                                            claimMovedDate,
-                                                                                            carmEnabled,
-                                                                                            false,
-                                                                                            null
+                SearchResult result = coreCaseDataService.searchCases(queryInMediationCases(
+                    i * ES_DEFAULT_SEARCH_LIMIT,
+                    claimMovedDateFrom,
+                    carmEnabled,
+                    false,
+                    null
                 ));
                 caseDetails.addAll(result.getCases());
             }

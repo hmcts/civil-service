@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,13 +52,8 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        LocalDate claimMovedDate;
-        if (externalTask.getVariable("claimMovedDate") != null) {
-            claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
-        } else {
-            claimMovedDate = LocalDate.now().minusDays(7);
-        }
-        List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, false);
+
+        List<CaseDetails> cases = caseSearchService.getInMediationCases(false);
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
         if (!cases.isEmpty()) {
             StringBuilder sb = new StringBuilder().append("CSV case IDs: ");

@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.mediation.MediationDTO;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationJsonService;
 import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,13 +55,8 @@ public class GenerateMediationJsonAndTransferTaskHandler extends GenerateMediati
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
-        LocalDate claimMovedDate;
-        if (externalTask.getVariable("claimMovedDate") != null) {
-            claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
-        } else {
-            claimMovedDate = LocalDate.now().minusDays(7);
-        }
-        List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, true);
+
+        List<CaseDetails> cases = caseSearchService.getInMediationCases(true);
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
         if (!cases.isEmpty()) {
             StringBuilder sb = new StringBuilder().append("JSON case IDs: ");
@@ -101,7 +95,7 @@ public class GenerateMediationJsonAndTransferTaskHandler extends GenerateMediati
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
         return Optional.of(EmailData.builder()
-                               .to("pettedson.john1@hmcts.net")
+                               .to(mediationCSVEmailConfiguration.getJsonRecipient())
                                .subject(SUBJECT)
                                .attachments(of(json(mediationDTO.getJsonRawData(), FILENAME)))
                                .build());

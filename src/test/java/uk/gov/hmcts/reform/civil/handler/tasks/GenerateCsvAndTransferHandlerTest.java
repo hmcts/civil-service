@@ -20,16 +20,13 @@ import uk.gov.hmcts.reform.civil.service.search.MediationCasesSearchService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,13 +51,13 @@ class GenerateCsvAndTransferHandlerTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
-    private  MediationCsvServiceFactory mediationCsvServiceFactory;
+    private MediationCsvServiceFactory mediationCsvServiceFactory;
 
     @Mock
-    private  SendGridClient sendGridClient;
+    private SendGridClient sendGridClient;
 
     @Mock
-    private  MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    private MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
 
     @Mock
     private MediationCSVLrvLipService mediationCSVLrvLipService;
@@ -71,7 +68,7 @@ class GenerateCsvAndTransferHandlerTest {
     private CaseData caseDataInMediationNotToProcess;
     private static final String SENDER = "sender@gmail.com";
     private static final String RECIPIENT = "recipient@gmail.com";
-    private final LocalDate claimToBeProcessed = LocalDate.now().minusDays(7);
+    private final LocalDate claimToBeProcessed = LocalDate.now().minusDays(8);
     private final LocalDate claimNotToBeProcessed = LocalDate.now();
 
     @BeforeEach
@@ -84,14 +81,14 @@ class GenerateCsvAndTransferHandlerTest {
 
     @Test
     void shouldGenerateCsvAndSendEmailSuccessfully() {
-        when(searchService.getInMediationCases(claimToBeProcessed, false)).thenReturn(List.of(caseDetailsWithInMediationState));
+        when(searchService.getInMediationCases(false)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLrvLipService);
         when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(SENDER);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
 
         inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimToBeProcessed, false);
+        verify(searchService).getInMediationCases(false);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask, null);
@@ -100,33 +97,12 @@ class GenerateCsvAndTransferHandlerTest {
     @Test
     void shouldNotGenerateCsvAndSendEmail() {
         List<CaseDetails> cases = new ArrayList<>();
-        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
-        when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(cases);
+        when(searchService.getInMediationCases(anyBoolean())).thenReturn(cases);
 
         inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimNotToBeProcessed, false);
+        verify(searchService).getInMediationCases(false);
         verify(mediationCsvServiceFactory, times(0)).getMediationCSVService(any());
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
-        verify(externalTaskService).complete(externalTask, null);
-    }
-
-    @Test
-    void should_handle_task_from_external_variable() {
-
-        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK)));
-        when(externalTask.getVariable(eq("claimMovedDate"))).thenReturn(date);
-        when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
-        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
-        when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLrvLipService);
-        when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(SENDER);
-        when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
-
-        inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getInMediationCases(claimNotToBeProcessed, false);
-        verify(sendGridClient).sendEmail(anyString(), any());
-        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask, null);
     }
 
