@@ -104,7 +104,6 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
                                .respondent1DQLanguage(WelshLanguageRequirements.builder()
                                                           .documents(Language.WELSH).build()).build())
             .respondent1(respondent1)
-            .respondent1NoticeOfDiscontinueAllPartyViewDoc(caseDocument)
             .respondent1NoticeOfDiscontinueAllPartyTranslatedDoc(caseDocument).build();
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
