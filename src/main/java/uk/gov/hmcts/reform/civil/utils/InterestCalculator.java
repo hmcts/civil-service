@@ -29,6 +29,10 @@ public class InterestCalculator {
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
 
+    public BigDecimal claimAmountPlusInterestToDate(CaseData caseData) {
+        return caseData.getTotalClaimAmount().add(calculateInterest(caseData));
+    }
+
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
     }

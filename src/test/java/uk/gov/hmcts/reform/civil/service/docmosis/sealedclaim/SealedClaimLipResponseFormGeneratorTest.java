@@ -60,6 +60,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -101,6 +102,8 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private InterestCalculator interestCalculator;
     @Captor
     ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
 
