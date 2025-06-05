@@ -12,7 +12,7 @@ public abstract class EmailDTOGenerator implements NotificationData {
     @Autowired
     protected TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
 
-    protected abstract Boolean getShouldNotify(CaseData caseData);
+    public abstract Boolean getShouldNotify(CaseData caseData);
 
     public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
         Map<String, String> properties = addProperties(caseData);
