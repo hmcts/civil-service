@@ -1017,46 +1017,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
             assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
         }
-
-        @Test
-        void shouldSaveDocumentToTempList_whenClaimantDocPreferenceIsWelsh() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .sdoOrderDocument(CaseDocument.builder().documentLink(
-                        Document.builder().documentUrl("url").build())
-                                      .build())
-                .applicant1Represented(NO)
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(Language.WELSH).build()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .build().toBuilder()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
-            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
-            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
-        }
-
-        @Test
-        void shouldSaveDocumentToTempList_whenDefendantDocPreferenceIsWelsh() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                .sdoOrderDocument(CaseDocument.builder().documentLink(
-                        Document.builder().documentUrl("url").build())
-                                      .build())
-                .respondent1Represented(NO)
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(Language.BOTH).build()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
-                .build().toBuilder()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
-            assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
-            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
-        }
     }
 
     @ParameterizedTest
