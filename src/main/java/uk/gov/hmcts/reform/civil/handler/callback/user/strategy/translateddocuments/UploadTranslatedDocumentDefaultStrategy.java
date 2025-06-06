@@ -67,6 +67,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             caseDataLip.setTranslatedDocuments(null);
         }
 
+        if (Objects.nonNull(caseData.getPreTranslationDocumentType())) {
+            caseDataBuilder = caseDataBuilder.preTranslationDocumentType(null);
+        }
+
         caseDataBuilder.caseDataLiP(caseDataLip);
         CaseData updatedCaseData = caseDataBuilder.build();
 
