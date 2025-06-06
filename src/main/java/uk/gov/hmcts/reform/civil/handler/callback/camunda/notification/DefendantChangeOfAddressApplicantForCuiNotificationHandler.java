@@ -9,13 +9,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +24,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CONTACT_DETAILS_CHANGE;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -80,13 +79,17 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
     }
 
     private Map<String, String> addPropertiesForLiPClaimant(CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
             EXTERNAL_ID, caseData.getCcdCaseReference().toString()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return properties;
     }
 
     @Override
@@ -98,9 +101,9 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 
