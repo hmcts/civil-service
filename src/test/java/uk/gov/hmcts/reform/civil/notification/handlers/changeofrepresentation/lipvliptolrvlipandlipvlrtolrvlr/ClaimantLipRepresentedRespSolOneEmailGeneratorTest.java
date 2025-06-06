@@ -78,17 +78,18 @@ class ClaimantLipRepresentedRespSolOneEmailGeneratorTest {
         Organisation org = Organisation.builder().name("New Org Ltd").build();
         when(organisationService.findOrganisationById("org-123")).thenReturn(Optional.of(org));
 
-        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.TRUE, organisationService))
-            .thenReturn("Resp Org Name");
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
+            notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.TRUE, organisationService))
+                .thenReturn("Resp Org Name");
 
-        Map<String, String> props = generator.addCustomProperties(new HashMap<>(), caseData);
+            Map<String, String> props = generator.addCustomProperties(new HashMap<>(), caseData);
 
-        assertEquals("New Org Ltd", props.get(NEW_SOL));
-        assertEquals("1234567890123456", props.get(CCD_REF));
-        assertEquals("15 January 2023", props.get(ISSUE_DATE));
-        assertTrue(props.containsKey(OTHER_SOL_NAME));
-        assertTrue(props.containsKey(CASE_NAME));
+            assertEquals("New Org Ltd", props.get(NEW_SOL));
+            assertEquals("1234567890123456", props.get(CCD_REF));
+            assertEquals("15 January 2023", props.get(ISSUE_DATE));
+            assertTrue(props.containsKey(OTHER_SOL_NAME));
+            assertTrue(props.containsKey(CASE_NAME));
+        }
     }
 
     @Test
