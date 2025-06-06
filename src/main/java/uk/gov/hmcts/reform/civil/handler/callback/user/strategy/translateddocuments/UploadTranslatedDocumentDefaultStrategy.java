@@ -363,7 +363,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             log.info("UNPAUSE CLAIMANT INTENTION PROCESS");
             if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
                 log.info("UNPAUSE CLAIMANT INTENTION PROCESS");
-                return CaseEvent.CLAIMANT_LR_RESPONSE_SPEC_POST_TRANSLATION;
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION;
             }
         }
 
