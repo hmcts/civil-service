@@ -697,7 +697,10 @@ public class EventHistoryMapper {
                 .filter(Objects::nonNull)
                 .max(LocalDateTime::compareTo)
                 .orElse(null);
-
+            if (!MultiPartyScenario.isTwoVOne(caseData)) {
+                queryDate = respondent1ResponseDate.isAfter(respondent2ResponseDate)
+                    ? respondent1ResponseDate : respondent2ResponseDate;
+            }
             buildQueriesEvent(builder, caseData, queryDate);
         }
         String miscText;

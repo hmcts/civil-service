@@ -65,12 +65,14 @@ public class CaseHandledOfflineRespondentSolicitorUnspecNotifier extends CaseHan
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent1OrganisationPolicy(), organisationService,
-                                                                      featureToggleService.isQueryManagementLRsEnabled(), configuration);
+                                                                      featureToggleService.isQueryManagementLRsEnabled(),
+                                                                      featureToggleService.isLipQueryManagementEnabled(caseData), configuration);
     }
 
     public Map<String, String> addPropertiesRespondent2(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent2OrganisationPolicy(), organisationService,
-                                                                      featureToggleService.isQueryManagementLRsEnabled(), configuration);
+                                                                      featureToggleService.isQueryManagementLRsEnabled(),
+                                                                      featureToggleService.isLipQueryManagementEnabled(caseData), configuration);
     }
 
 }
