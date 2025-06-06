@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
-import uk.gov.hmcts.reform.civil.notification.handlers.claimantliphelpwithfees.ClaimantLipHelpWithFeesAllPartiesEmailGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
