@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -20,14 +21,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_NOTIFICATIONS_RAISED_QUERY;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 
 @Service
 @RequiredArgsConstructor
@@ -67,27 +73,56 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
         String queryId = processVariables.getQueryId();
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
-        if (queryId == null) {
-            queryId = caseData.getQmLatestQuery().getQueryId();
-        }
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
-        if (isLIPClaimant(roles) && caseData.getQmApplicantCitizenQueries() != null
-            && caseData.getQmApplicantCitizenQueries().getCaseMessages().size() == 1) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                notificationParams
-            );
-        }
-        if (isLIPDefendant(roles) && caseData.getQmRespondentCitizenQueries() != null
-            && caseData.getQmRespondentCitizenQueries().getCaseMessages().size() == 1) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                notificationParams
-            );
+
+        if (nonNull(caseData.getQueries()) && caseData.getQueries().messageThread(queryId).size() == 1) {
+            if (isLIPClaimant(roles)) {
+                dashboardScenariosService.recordScenarios(
+                    authToken,
+                    SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
+                    caseData.getCcdCaseReference().toString(),
+                    notificationParams
+                );
+
+                if (caseData.isRespondent1LiP()) {
+                    dashboardScenariosService.recordScenarios(
+                        authToken,
+                        SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
+                        caseData.getCcdCaseReference().toString(),
+                        notificationParams
+                    );
+                }
+            } else if (isLIPDefendant(roles)) {
+                dashboardScenariosService.recordScenarios(
+                    authToken,
+                    SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
+                    caseData.getCcdCaseReference().toString(),
+                    notificationParams
+                );
+
+                if (caseData.isApplicantLiP()) {
+                    dashboardScenariosService.recordScenarios(
+                        authToken,
+                        SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
+                        caseData.getCcdCaseReference().toString(),
+                        notificationParams
+                    );
+                }
+            } else if (isApplicantSolicitor(roles) && caseData.isRespondent1LiP()) {
+                dashboardScenariosService.recordScenarios(
+                    authToken,
+                    SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
+                    caseData.getCcdCaseReference().toString(),
+                    notificationParams
+                );
+            } else if (isRespondentSolicitorOne(roles) && caseData.isApplicantLiP()) {
+                dashboardScenariosService.recordScenarios(
+                    authToken,
+                    SCENARIO_AAA6_VIEW_OTHER_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
+                    caseData.getCcdCaseReference().toString(),
+                    notificationParams
+                );
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }

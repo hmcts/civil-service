@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.retrieveUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
@@ -78,14 +79,25 @@ public class QueryNotificationUtils {
         return properties;
     }
 
+    //ToDo: Remove this and it's usages after LIP QM Release
     public static List<Map<String, String>> getOtherPartyEmailDetails(
         CaseData caseData, OrganisationService organisationService,
         CoreCaseUserService coreCaseUserService, String queryId) {
-
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
-        List<Map<String, String>> emailDetailsList = new ArrayList<>();
+        return getOtherPartyRecipientList(caseData, roles, organisationService);
+    }
 
+    public static List<Map<String, String>> getOtherPartyRecipientList(
+        CaseData caseData, OrganisationService organisationService,
+        CoreCaseUserService coreCaseUserService, String queryId) {
+        List<String> roles = retrieveUserRoleForQuery(caseData, coreCaseUserService, queryId);
+        return getOtherPartyRecipientList(caseData, roles, organisationService);
+    }
+
+    private static List<Map<String, String>> getOtherPartyRecipientList(CaseData caseData, List<String> roles,
+                                                                        OrganisationService organisationService) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        List<Map<String, String>> emailDetailsList = new ArrayList<>();
         switch (multiPartyScenario) {
             case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP -> {
                 // When 1v1, 2v1,  or 1v2 same solicitor, "other party" will either be applicant 1, or respondent 1
@@ -122,7 +134,6 @@ public class QueryNotificationUtils {
         }
         return emailDetailsList;
     }
-
     private static Map<String, String> createEmailDetails(String email, String legalOrg) {
         Map<String, String> details = new HashMap<>();
         details.put(EMAIL, email);

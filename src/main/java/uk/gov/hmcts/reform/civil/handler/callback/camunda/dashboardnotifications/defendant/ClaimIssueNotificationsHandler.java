@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
+import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT;
 
@@ -49,6 +51,12 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
     @Override
     public String getExtraScenario() {
         return SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario();
+    }
+
+    @Override
+    public Map<String, Boolean> getScenarios(CaseData caseData) {
+        return Map.of(SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT.getScenario(),
+                      featureToggleService.isLipQueryManagementEnabled(caseData));
     }
 
     @Override
