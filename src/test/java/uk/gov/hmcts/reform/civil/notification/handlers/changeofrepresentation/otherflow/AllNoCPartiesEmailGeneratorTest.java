@@ -32,7 +32,7 @@ class AllNoCPartiesEmailGeneratorTest {
     private NoCLipVLRNewDefendantEmailDTOGenerator newDefendantEmailDTOGenerator;
 
     @InjectMocks
-    private ClaimantLipHelpWithFeesAllPartiesEmailGenerator emailGenerator;
+    private AllNoCPartiesEmailGenerator emailGenerator;
 
     @Test
     void shouldInitializeParentClassWithCorrectArguments() {
