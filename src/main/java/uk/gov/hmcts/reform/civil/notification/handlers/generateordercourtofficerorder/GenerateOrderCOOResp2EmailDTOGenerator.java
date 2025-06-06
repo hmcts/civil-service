@@ -11,8 +11,6 @@ public class GenerateOrderCOOResp2EmailDTOGenerator extends RespSolTwoEmailDTOGe
 
     protected static final String COO_RESP_SOL_TWO_REFERENCE_TEMPLATE = "generate-order-notification-%s";
 
-    NotificationsProperties notificationsProperties;
-
     public GenerateOrderCOOResp2EmailDTOGenerator(OrganisationService organisationService,
                                                   NotificationsProperties notificationsProperties) {
         super(notificationsProperties, organisationService);
