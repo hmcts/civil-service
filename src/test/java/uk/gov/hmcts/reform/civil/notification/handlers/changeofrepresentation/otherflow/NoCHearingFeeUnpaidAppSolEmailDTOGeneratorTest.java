@@ -6,11 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -33,6 +35,9 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private TemplateCommonPropertiesHelper helper;
 
     @InjectMocks
     private NoCHearingFeeUnpaidAppSolEmailDTOGenerator generator;
@@ -93,6 +98,12 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
         when(notificationsProperties.getHearingFeeUnpaidNoc()).thenReturn(TEMPLATE_ID);
         when(noCHelper.getHearingFeeEmailProperties(caseData)).thenReturn(EMAIL_PROPS);
 
+        ReflectionTestUtils.setField(
+            generator,
+            "templateCommonPropertiesHelper",
+            helper
+        );
+        
         EmailDTO result = generator.buildEmailDTO(caseData, "taskId");
 
         assertThat(result.getTargetEmail()).isEqualTo(SOLICITOR_EMAIL);
