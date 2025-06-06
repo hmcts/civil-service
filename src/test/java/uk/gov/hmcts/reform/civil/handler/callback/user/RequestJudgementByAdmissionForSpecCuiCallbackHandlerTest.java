@@ -468,6 +468,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .totalInterest(BigDecimal.valueOf(100))
                 .build();
             when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -483,6 +484,30 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal);
+        }
+
+        @Test
+        void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenYesFixedCosts() {
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(1500))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1Represented(YES)
+                .specRespondent1Represented(YES)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(new BigDecimal(1000))
+                .fixedCosts(FixedCosts.builder().claimFixedCosts(YES).build())
+                .build();
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
