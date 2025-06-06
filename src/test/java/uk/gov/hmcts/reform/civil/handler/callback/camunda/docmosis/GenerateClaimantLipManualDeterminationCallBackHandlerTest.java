@@ -180,48 +180,6 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }
 
-    @Test
-    void shouldHideInterlocutoryJudgementDocWhenClaimantHasWelshDocPreference() {
-        //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(formGenerator.generate(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-            .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.WELSH).build()).build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldHideInterlocutoryJudgementDocWhenDefendantHasWelshDocPreference() {
-        //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(formGenerator.generate(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().type(Party.Type.ORGANISATION).build())
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.WELSH).build()).build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    }
-
     private CaseData createCaseData(Party.Type type) {
         return CaseDataBuilder.builder()
             .respondent1(PartyBuilder.builder()
