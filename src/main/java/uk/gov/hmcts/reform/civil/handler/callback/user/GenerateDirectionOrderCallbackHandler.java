@@ -624,9 +624,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         } else {
             if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
                 finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
-                caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
-                caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
             }
+            caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
+            caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
         }
 
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
