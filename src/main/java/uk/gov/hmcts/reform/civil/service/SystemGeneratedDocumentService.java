@@ -33,6 +33,11 @@ public class SystemGeneratedDocumentService {
         return addToDocumentCollection(finalOrderDocuments, translatedDocuments);
     }
 
+    public List<Element<CaseDocument>> getHearingDocumentsWithAddedDocumentWelsh(List<Element<TranslatedDocument>> translatedDocuments, CaseData caseData) {
+        List<Element<CaseDocument>> hearingDocuments = caseData.getHearingDocumentsWelsh();
+        return addToDocumentCollection(hearingDocuments, translatedDocuments);
+    }
+
     private List<Element<CaseDocument>> addToDocumentCollection(List<Element<CaseDocument>> documentCollection, List<Element<TranslatedDocument>> translatedDocuments) {
         if (Objects.nonNull(translatedDocuments)) {
             for (Element<TranslatedDocument> translateDocument : translatedDocuments) {

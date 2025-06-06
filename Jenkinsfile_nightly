@@ -1,7 +1,7 @@
 #!groovy
 
 properties([
-  pipelineTriggers([cron('H 8 * * 1-5')]),
+  pipelineTriggers([cron('H 17 * * 1-5')]),
   copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
     string(name: 'FORCE_GREEN_BUILD', defaultValue: 'false', description: 'Should force pipeline to go green by not running any functional tests'),

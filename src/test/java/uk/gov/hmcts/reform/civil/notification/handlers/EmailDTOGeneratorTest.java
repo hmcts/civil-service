@@ -40,7 +40,7 @@ class EmailDTOGeneratorTest {
         emailDTOGenerator = new EmailDTOGenerator() {
 
             @Override
-            protected Boolean getShouldNotify(CaseData caseData) {
+            public Boolean getShouldNotify(CaseData caseData) {
                 return Boolean.TRUE;
             }
 
@@ -88,5 +88,8 @@ class EmailDTOGeneratorTest {
         verify(helper).addCommonFooterSignature(any());
         verify(helper).addCnbcContact(eq(caseData), any());
         verify(helper).addSpecAndUnspecContact(eq(caseData), any());
+        verify(helper).addCommonFooterSignatureWelsh(any());
+        verify(helper).addLipContact(eq(caseData), any());
+        verify(helper).addLipContactWelsh(eq(caseData), any());
     }
 }

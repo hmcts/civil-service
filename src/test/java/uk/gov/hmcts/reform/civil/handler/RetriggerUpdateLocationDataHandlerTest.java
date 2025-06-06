@@ -33,6 +33,7 @@ class RetriggerUpdateLocationDataHandlerTest {
     void testHandleTask_RetriggerUpdateCaseData() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        when(externalTask.getVariable("region")).thenReturn("2");
         when(externalTask.getVariable("ePimId")).thenReturn("123456");
         when(externalTask.getVariable("caseManagementLocation")).thenReturn(YES);
         when(externalTask.getVariable("courtLocation")).thenReturn(YES);
@@ -45,6 +46,7 @@ class RetriggerUpdateLocationDataHandlerTest {
             1L,
             CaseEvent.UPDATE_CASE_DATA,
             "123456",
+            "2",
             YES,
             YES,
             YES,
@@ -55,6 +57,7 @@ class RetriggerUpdateLocationDataHandlerTest {
             2L,
             CaseEvent.UPDATE_CASE_DATA,
             "123456",
+            "2",
             YES,
             YES,
             YES,

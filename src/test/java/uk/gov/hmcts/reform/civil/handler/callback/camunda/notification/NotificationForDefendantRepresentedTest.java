@@ -9,6 +9,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -48,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_AFTE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_SOLICITOR_AFTER_NOC_APPROVAL;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
 
     private NotificationForDefendantRepresented notificationHandler;
@@ -90,6 +93,16 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
             notificationsProperties,
             configuration, featureToggleService
         );
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
 
     @ParameterizedTest
@@ -175,12 +188,6 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
 
     @Test
     void notificationForLRAfterDefendantNOCApproval() {
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
@@ -229,12 +236,6 @@ class NotificationForDefendantRepresentedTest extends BaseCallbackHandlerTest {
         when(organisationService.findOrganisationById("OrgId")).thenReturn(Optional.ofNullable(Organisation.builder()
                                                                                                    .name("test appl org")
                                                                                                    .build()));
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(

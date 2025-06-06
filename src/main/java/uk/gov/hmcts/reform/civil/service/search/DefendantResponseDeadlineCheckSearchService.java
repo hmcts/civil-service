@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,11 +19,30 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 @Service
 public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchService {
 
-    public DefendantResponseDeadlineCheckSearchService(CoreCaseDataService coreCaseDataService) {
+    private final FeatureToggleService featureToggleService;
+
+    public DefendantResponseDeadlineCheckSearchService(CoreCaseDataService coreCaseDataService,
+                                                       FeatureToggleService featureToggleService) {
         super(coreCaseDataService);
+        this.featureToggleService = featureToggleService;
     }
 
     public Query query(int startIndex) {
+        if (featureToggleService.isGaForWelshEnabled()) {
+            return new Query(
+                boolQuery()
+                    .minimumShouldMatch(1)
+                    .should(boolQuery()
+                                .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
+                                .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
+                                .mustNot(existsQuery("data.respondent1ResponseDate"))
+                                .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
+                                .must(haveNoOngoingBusinessProcess())
+                    ),
+                List.of("reference"),
+                startIndex
+            );
+        }
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)

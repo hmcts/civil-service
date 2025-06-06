@@ -399,6 +399,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private CaseDocument applicant1NoticeOfDiscontinueAllPartyViewDoc;
     private CaseDocument respondent1NoticeOfDiscontinueAllPartyViewDoc;
     private CaseDocument respondent2NoticeOfDiscontinueAllPartyViewDoc;
+    private CaseDocument respondent1NoticeOfDiscontinueAllPartyTranslatedDoc;
 
     @JsonUnwrapped
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;

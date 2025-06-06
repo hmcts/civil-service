@@ -2,21 +2,29 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.search.Query;
+
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.mockito.Mockito.when;
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 class DefendantResponseDeadlineCheckSearchServiceTest extends ElasticSearchServiceTest {
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setup() {
-        searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService);
+        searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService, featureToggleService);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
     }
 
     @Override

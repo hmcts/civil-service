@@ -16,9 +16,11 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.MA
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_ISSUE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.TRANSLATED_HEARING_NOTICE;
 
 @Data
 @AllArgsConstructor
@@ -40,8 +42,11 @@ public class TranslatedDocument {
             case INTERLOCUTORY_JUDGMENT: return INTERLOC_JUDGMENT_TRANSLATED_DOCUMENT;
             case MANUAL_DETERMINATION: return MANUAL_DETERMINATION_TRANSLATED_DOCUMENT;
             case FINAL_ORDER: return FINAL_ORDER_TRANSLATED_DOCUMENT;
+            case NOTICE_OF_DISCONTINUANCE_DEFENDANT:
+                return NOTICE_OF_DISCONTINUANCE_DEFENDANT_TRANSLATED_DOCUMENT;
             case SETTLEMENT_AGREEMENT: return SETTLEMENT_AGREEMENT_TRANSLATED_DOCUMENT;
             case COURT_OFFICER_ORDER: return COURT_OFFICER_ORDER_TRANSLATED_DOCUMENT;
+            case HEARING_NOTICE: return TRANSLATED_HEARING_NOTICE;
             default: throw new DocumentUploadException("No document file type found for Translated document");
         }
     }
