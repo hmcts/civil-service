@@ -6,9 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
@@ -40,6 +42,9 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
     @Mock
     private ChangeOfRepresentation changeOfRepresentation;
 
+    @Mock
+    private TemplateCommonPropertiesHelper helper;
+
     @Test
     void shouldNotify_WhenOrganisationToRemoveIdIsPresent() {
         when(changeOfRepresentation.getOrganisationToRemoveID()).thenReturn("OrgToRemove");
@@ -67,6 +72,12 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
         try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
             mockedStatic.when(() -> NotificationHelper.getPreviousSolicitorEmail(caseData))
                 .thenReturn(FORMER_SOLICITOR_EMAIL);
+
+            ReflectionTestUtils.setField(
+                generator,
+                "templateCommonPropertiesHelper",
+                helper
+            );
 
             when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
 

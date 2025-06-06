@@ -6,8 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.notification.handlers.TemplateCommonPropertiesHelper;
 import uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.common.NotificationHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
@@ -37,6 +39,9 @@ class NoCClaimantLipEmailDTOGeneratorTest {
     @Mock
     private CaseData caseData;
 
+    @Mock
+    private TemplateCommonPropertiesHelper helper;
+
     @Test
     void shouldReturnTrueWhenApplicantIsLipForRespondentSolicitorChange() {
         try (MockedStatic<NotificationHelper> mockedStatic = mockStatic(NotificationHelper.class)) {
@@ -56,6 +61,12 @@ class NoCClaimantLipEmailDTOGeneratorTest {
         when(caseData.getLegacyCaseReference()).thenReturn(CASE_REFERENCE);
         when(noCHelper.getClaimantLipProperties(caseData)).thenReturn(Map.of("key1", "val1"));
 
+        ReflectionTestUtils.setField(
+            generator,
+            "templateCommonPropertiesHelper",
+            helper
+        );
+
         EmailDTO result = generator.buildEmailDTO(caseData, "taskId");
 
         assertThat(result.getTargetEmail()).isEqualTo(CLAIMANT_EMAIL);
@@ -72,6 +83,12 @@ class NoCClaimantLipEmailDTOGeneratorTest {
             .thenReturn(BILINGUAL_TEMPLATE_ID);
         when(caseData.getLegacyCaseReference()).thenReturn(CASE_REFERENCE);
         when(noCHelper.getClaimantLipProperties(caseData)).thenReturn(Map.of("key2", "val2"));
+
+        ReflectionTestUtils.setField(
+            generator,
+            "templateCommonPropertiesHelper",
+            helper
+        );
 
         EmailDTO result = generator.buildEmailDTO(caseData, "taskId");
 
