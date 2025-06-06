@@ -13,10 +13,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.verify;
@@ -28,8 +31,17 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
@@ -47,6 +59,12 @@ class HearingFeeUnpaidApplicantNotificationHandlerTest {
     @Mock
     private OrganisationService organisationService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private HearingFeeUnpaidApplicantNotificationHandler handler;
 
@@ -58,6 +76,16 @@ class HearingFeeUnpaidApplicantNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getApplicantHearingFeeUnpaid()).thenReturn(TEMPLATE_ID);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -75,6 +103,16 @@ class HearingFeeUnpaidApplicantNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantLip_whenInvoked() {
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(TEMPLATE_ID);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
 
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build()
@@ -108,22 +146,37 @@ class HearingFeeUnpaidApplicantNotificationHandlerTest {
 
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-            CASEMAN_REF, "000DC001"
-        );
+        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+        properties.put(HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE));
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name");
+        properties.put(CASEMAN_REF, "000DC001");
+        return properties;
     }
 
     @NotNull
     private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-            CLAIMANT_V_DEFENDANT, "Rambo v Trader",
-            PARTY_NAME, caseData.getApplicant1().getPartyName()
-        );
+        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        properties.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+        properties.put(CLAIMANT_V_DEFENDANT, "Rambo v Trader");
+        properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
+        return properties;
+    }
+
+    @NotNull
+    public Map<String, String> addCommonProperties() {
+        Map<String, String> expectedProperties = new HashMap<>();
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        return expectedProperties;
     }
 
 }

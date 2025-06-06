@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.EnumSet;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
      * @return if suitable, the summary text for repayment plan offer
      */
     @Override
-    public Optional<String> generateTextFor(CaseData caseData) {
+    public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
 
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())
@@ -37,14 +38,15 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         }
         sb.append("<br>We've emailed ").append(applicantName)
             .append(" to say you've suggested paying by instalments.")
-            .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.")
-            .append(String
+            .append("<br><br>We'll contact you when ").append(applicantName).append(" responds.");
+        if (!RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            sb.append(String
                         .format(
                             "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                             format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-                        ))
-
-            .append("<h3 class=\"govuk-heading-m\">If ")
+                        ));
+        }
+        sb.append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName);
         if (caseData.getApplicant2() != null) {
             sb.append(" accept your offer</h3>");

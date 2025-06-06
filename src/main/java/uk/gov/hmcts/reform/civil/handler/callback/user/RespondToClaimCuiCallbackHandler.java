@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.math.BigDecimal;
@@ -56,6 +57,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -93,6 +95,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
             caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, builder);
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));

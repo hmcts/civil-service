@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.auth.checker.spring.useronly.AuthCheckerUserOnlyFilte
 import uk.gov.hmcts.reform.auth.checker.core.user.User;
 import uk.gov.hmcts.reform.civil.filters.CustomAuthCheckerUserOnlyFilter;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -74,6 +76,10 @@ public class SecurityConfiguration {
             .oauth2Client();
 
         return http.build();
+    }
+
+    public static String[] getAuthWhitelist() {
+        return Arrays.copyOf(AUTH_WHITELIST, AUTH_WHITELIST.length);
     }
 }
 

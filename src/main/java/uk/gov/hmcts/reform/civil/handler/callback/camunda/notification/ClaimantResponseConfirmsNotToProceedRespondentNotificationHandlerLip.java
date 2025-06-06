@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -13,13 +13,16 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED_LIP;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -34,6 +37,7 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
     public static final String TASK_ID_LIP = "ClaimantConfirmsNotToProceedNotifyRespondentSolicitor1Lip";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final NotificationsSignatureConfiguration configuration;
     private final FeatureToggleService featureToggleService;
 
     @Override
@@ -89,16 +93,25 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLi
     public Map<String, String> addProperties(CaseData caseData) {
         if (caseData.isPartAdmitPayImmediatelyAccepted()
             || (featureToggleService.isLipVLipEnabled() && caseData.isClaimantDontWantToProceedWithFulLDefenceFD())) {
-            return Map.of(
+            HashMap<String, String> properties = new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-            );
+            ));
+            addAllFooterItems(caseData, properties, configuration,
+                              featureToggleService.isQueryManagementLRsEnabled(),
+                              featureToggleService.isLipQueryManagementEnabled(caseData));
+            return properties;
         }
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getRespondent1().getPartyName(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
+        return properties;
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,10 +16,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,8 +36,17 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -57,6 +70,12 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
     @MockBean
     private OrganisationService organisationService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private NotificationsSignatureConfiguration configuration;
+
     @Autowired
     private NotifyClaimantJudgmentByAdmissionNotificationHandler handler;
 
@@ -67,6 +86,16 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
         void setup() {
             when(notificationsProperties.getNotifyClaimantLRJudgmentByAdmissionTemplate()).thenReturn(
                 TEMPLATE_ID);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Test
@@ -98,23 +127,40 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
         }
     }
 
-    public Map<String, String> getNotificationDataMap(CaseData caseData) {
+    @NotNull
+    private Map<String, String> getNotificationDataMap(CaseData caseData) {
+        Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
         String defendantName = "";
-        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)
-            || getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+        var scenario = getMultiPartyScenario(caseData);
+        if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             defendantName = getPartyNameBasedOnType(caseData.getRespondent1());
         } else {
             defendantName = getPartyNameBasedOnType(caseData.getRespondent1())
-                .concat(" and ")
-                .concat(getPartyNameBasedOnType(caseData.getRespondent2()));
+                + " and " + getPartyNameBasedOnType(caseData.getRespondent2());
         }
-        return Map.of(
+        expectedProperties.putAll(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData),
-            DEFENDANT_NAME,  defendantName,
+            DEFENDANT_NAME, defendantName,
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        return expectedProperties;
+    }
+
+    @NotNull
+    public Map<String, String> addCommonProperties() {
+        Map<String, String> expectedProperties = new HashMap<>();
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        return expectedProperties;
     }
 
     public String getApplicantLegalOrganizationName(CaseData caseData) {
