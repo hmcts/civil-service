@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers;
 public enum CamundaProcessIdentifier {
     ClaimDismissedNotifyParties,
     LitigationFriendAddedNotifier,
+    GenerateDJFormNotifyParties,
     ClaimProceedsOfflineUnspecNotifyApplicantSolicitor,
     UnspecNotifyClaimNotifier,
     UnspecNotifyClaimDetailsNotifier,
@@ -10,5 +11,7 @@ public enum CamundaProcessIdentifier {
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
     CreateClaimAfterPaymentContinuingOfflineNotifier,
-    CreateClaimAfterPaymentContinuingOnlineNotifier
+    CreateClaimAfterPaymentContinuingOnlineNotifier,
+    ClaimSubmittedApplicantNotifier,
+    ClaimantLipHelpWithFeesNotifier
 }
