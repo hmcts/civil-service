@@ -19,7 +19,7 @@ public class NoCLipVLRNewDefendantEmailDTOGenerator extends EmailDTOGenerator {
     private final NoCHelper noCHelper;
 
     @Override
-    public boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return featureToggleService.isDefendantNoCOnlineForCase(caseData)
             && NotificationHelper.isApplicantLipForRespondentSolicitorChange(caseData);
     }
