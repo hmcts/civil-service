@@ -39,9 +39,9 @@ public class HearingFeeUnpaidRespSolOneEmailDTOGenerator extends RespSolOneEmail
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                 true, organisationService));
-        properties.put(HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE));
         return properties;
     }
 }
