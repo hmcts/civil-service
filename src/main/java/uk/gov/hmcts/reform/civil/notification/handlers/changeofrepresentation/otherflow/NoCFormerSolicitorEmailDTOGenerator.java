@@ -17,7 +17,7 @@ public class NoCFormerSolicitorEmailDTOGenerator extends EmailDTOGenerator {
     private final NoCHelper noCHelper;
 
     @Override
-    public boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.getChangeOfRepresentation().getOrganisationToRemoveID() != null;
     }
 

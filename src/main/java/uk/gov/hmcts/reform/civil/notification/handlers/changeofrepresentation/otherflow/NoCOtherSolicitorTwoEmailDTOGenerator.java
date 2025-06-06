@@ -19,7 +19,7 @@ public class NoCOtherSolicitorTwoEmailDTOGenerator extends EmailDTOGenerator {
     private final NoCHelper noCHelper;
 
     @Override
-    public boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return !(isOneVTwoTwoLegalRep(caseData) || NotificationHelper.isOtherParty2Lip(caseData));
     }
 

@@ -19,7 +19,7 @@ public class NoCHearingFeeUnpaidAppSolEmailDTOGenerator extends EmailDTOGenerato
     private final NotificationsProperties notificationsProperties;
 
     @Override
-    public boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return isInHearingReadiness.test(caseData)
             && !noCHelper.isHearingFeePaid(caseData)
             && nonNull(caseData.getHearingFee());

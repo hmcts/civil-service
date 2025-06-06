@@ -56,7 +56,7 @@ class NoCClaimantLipEmailDTOGeneratorTest {
         when(caseData.getLegacyCaseReference()).thenReturn(CASE_REFERENCE);
         when(noCHelper.getClaimantLipProperties(caseData)).thenReturn(Map.of("key1", "val1"));
 
-        EmailDTO result = generator.buildEmailDTO(caseData);
+        EmailDTO result = generator.buildEmailDTO(caseData, "taskId");
 
         assertThat(result.getTargetEmail()).isEqualTo(CLAIMANT_EMAIL);
         assertThat(result.getEmailTemplate()).isEqualTo(ENGLISH_TEMPLATE_ID);
@@ -73,7 +73,7 @@ class NoCClaimantLipEmailDTOGeneratorTest {
         when(caseData.getLegacyCaseReference()).thenReturn(CASE_REFERENCE);
         when(noCHelper.getClaimantLipProperties(caseData)).thenReturn(Map.of("key2", "val2"));
 
-        EmailDTO result = generator.buildEmailDTO(caseData);
+        EmailDTO result = generator.buildEmailDTO(caseData, "taskId");
 
         assertThat(result.getTargetEmail()).isEqualTo(CLAIMANT_EMAIL);
         assertThat(result.getEmailTemplate()).isEqualTo(BILINGUAL_TEMPLATE_ID);

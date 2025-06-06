@@ -93,7 +93,7 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
         when(notificationsProperties.getHearingFeeUnpaidNoc()).thenReturn(TEMPLATE_ID);
         when(noCHelper.getHearingFeeEmailProperties(caseData)).thenReturn(EMAIL_PROPS);
 
-        EmailDTO result = generator.buildEmailDTO(caseData);
+        EmailDTO result = generator.buildEmailDTO(caseData, "taskId");
 
         assertThat(result.getTargetEmail()).isEqualTo(SOLICITOR_EMAIL);
         assertThat(result.getEmailTemplate()).isEqualTo(TEMPLATE_ID);
