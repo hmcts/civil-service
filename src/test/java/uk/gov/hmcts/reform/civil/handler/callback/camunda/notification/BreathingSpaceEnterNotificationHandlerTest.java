@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,19 +13,23 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 
 @ExtendWith(SpringExtension.class)
@@ -39,6 +44,24 @@ class BreathingSpaceEnterNotificationHandlerTest {
     private NotificationsProperties notificationsProperties;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
+    @BeforeEach
+    void setUp() {
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+    }
 
     @Test
     void notifyRespondent1_enter() {
@@ -84,6 +107,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -133,6 +165,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -184,6 +225,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -235,6 +285,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
                     && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get("defendantName").equals(caseData.getRespondent2().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
@@ -284,6 +343,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
             eq(templateId),
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getCcdCaseReference().toString())
+                    && map.get(NotificationData.PHONE_CONTACT).equals(configuration.getPhoneContact())
+                    && map.get(NotificationData.OPENING_HOURS).equals(configuration.getOpeningHours())
+                    && map.get(NotificationData.SPEC_UNSPEC_CONTACT).equals(configuration.getSpecUnspecContact())
+                    && map.get(NotificationData.HMCTS_SIGNATURE).equals(configuration.getHmctsSignature())
+                    && map.get(NotificationData.WELSH_PHONE_CONTACT).equals(configuration.getWelshPhoneContact())
+                    && map.get(NotificationData.WELSH_OPENING_HOURS).equals(configuration.getWelshOpeningHours())
+                    && map.get(NotificationData.WELSH_HMCTS_SIGNATURE).equals(configuration.getWelshHmctsSignature())
+                    && map.get(NotificationData.LIP_CONTACT).equals(configuration.getLipContactEmail())
+                    && map.get(NotificationData.LIP_CONTACT_WELSH).equals(configuration.getLipContactEmailWelsh())
                     && map.get(NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC).equals(solicitorName)),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );

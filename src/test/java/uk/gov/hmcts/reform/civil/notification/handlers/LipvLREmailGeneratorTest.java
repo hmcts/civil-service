@@ -33,16 +33,17 @@ abstract class LipvLREmailGeneratorTest {
     @Test
     void shouldNotifyAllParties_whenTwoRespondentRepresentativesFlagIsSet() {
         CaseData caseData = mock(CaseData.class);
+        String taskId = "someTaskId";
         EmailDTO claimantEmail = mock(EmailDTO.class);
         EmailDTO respSolEmail = mock(EmailDTO.class);
-        when(claimantEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(claimantEmail);
-        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolEmail);
+        when(claimantEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(claimantEmail);
+        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolEmail);
 
-        Set<EmailDTO> partiesToNotify = lipvLipEmailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = lipvLipEmailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(claimantEmail, respSolEmail);
-        verify(claimantEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
+        verify(claimantEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
     }
 }
 

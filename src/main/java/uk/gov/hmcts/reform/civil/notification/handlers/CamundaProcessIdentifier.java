@@ -7,5 +7,14 @@ public enum CamundaProcessIdentifier {
     //NoC - Lip v Lip to LR v Lip
     ClaimantLipRepresentedWithNoCNotifier,
     //NoC - Lip v Lip to Lip v Lr or Lr v Lip to Lr v Lr
-    DefendantLipRepresentedWithNoCNotifier
+    DefendantLipRepresentedWithNoCNotifier,
+    GenerateDJFormNotifyParties,
+    ClaimProceedsOfflineUnspecNotifyApplicantSolicitor,
+    UnspecNotifyClaimNotifier,
+    UnspecNotifyClaimDetailsNotifier,
+    AcknowledgeClaimUnspecNotifyParties,
+    GenerateOrderNotifyPartiesCourtOfficerOrder,
+    GenerateOrderNotifyParties,
+    ClaimSubmittedApplicantNotifier,
+    ClaimantLipHelpWithFeesNotifier
 }
