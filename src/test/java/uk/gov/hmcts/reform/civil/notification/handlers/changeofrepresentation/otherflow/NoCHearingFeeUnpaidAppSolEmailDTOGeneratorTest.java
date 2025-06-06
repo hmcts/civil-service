@@ -103,7 +103,7 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
             "templateCommonPropertiesHelper",
             helper
         );
-        
+
         EmailDTO result = generator.buildEmailDTO(caseData, "taskId");
 
         assertThat(result.getTargetEmail()).isEqualTo(SOLICITOR_EMAIL);
