@@ -70,7 +70,7 @@ class NoCFormerSolicitorEmailDTOGeneratorTest {
 
             when(noCHelper.getProperties(caseData, false)).thenReturn(Map.of("key", "value"));
 
-            EmailDTO emailDTO = generator.buildEmailDTO(caseData);
+            EmailDTO emailDTO = generator.buildEmailDTO(caseData, "taskId");
 
             assertThat(emailDTO.getTargetEmail()).isEqualTo(FORMER_SOLICITOR_EMAIL);
             assertThat(emailDTO.getEmailTemplate()).isEqualTo(TEMPLATE_ID);
