@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -25,6 +28,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -46,15 +50,21 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
@@ -83,15 +93,23 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     class AboutToSubmitCallback {
         private static final String ORGANISATION_NAME = "Org Name";
 
+        @BeforeEach
+        void setUp() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        }
+
         @Test
         void shouldNotifyRespondent_whenInvoked() {
             //Given
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -121,12 +139,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         @Test
         void shouldNotifyBilingualRespondent_whenInvoked() {
             //Given
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -208,12 +220,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyDefendantCarmLRvLRNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .setClaimTypeToSpecClaim()
@@ -243,12 +249,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyClaimantCarm1V2SameSolicitorNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
@@ -274,12 +274,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyClaimantCarm1V2DifferentSolicitorNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
@@ -305,12 +299,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         void shouldNotifyClaimantCarm1V2DifferentSolicitorNotifyApplicantEmailSecondDefendant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
@@ -334,12 +322,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
         @Test
         void shouldNotifyClaimantCarmTwoVOneNotifyApplicant_whenInvoked() {
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
@@ -437,12 +419,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .setClaimTypeToSpecClaim()
@@ -475,12 +451,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -512,12 +483,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
@@ -547,53 +512,55 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
 
         @NotNull
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-                OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-                SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-                HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-            );
+            Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
+            expectedProperties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+            expectedProperties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+            expectedProperties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+            return expectedProperties;
         }
 
     }
 
     public Map<String, String> lrDefendantProperties(CaseData caseData) {
-
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
+        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        return properties;
     }
 
     public Map<String, String> twoVOneDefendantProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_NAME_ONE, caseData.getApplicant1().getPartyName(),
-            CLAIMANT_NAME_TWO, caseData.getApplicant2().getPartyName(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference(),
-            PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050",
-            OPENING_HOURS, "Monday to Friday, 8.30am to 5pm",
-            SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk",
-            HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service"
-        );
+        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        properties.put(CLAIMANT_NAME_ONE, caseData.getApplicant1().getPartyName());
+        properties.put(CLAIMANT_NAME_TWO, caseData.getApplicant2().getPartyName());
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        return properties;
     }
 
     public Map<String, String> lipDefendantProperties(CaseData caseData) {
-        return Map.of(
-            PARTY_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-        );
+        Map<String, String> properties = new HashMap<>(addCommonProperties());
+        properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        return properties;
+    }
+
+    @NotNull
+    public Map<String, String> addCommonProperties() {
+        Map<String, String> expectedProperties = new HashMap<>();
+        expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+        expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+        expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+        expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+        expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+        expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+        expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+        expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+        expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+        return expectedProperties;
     }
 }

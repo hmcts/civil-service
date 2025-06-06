@@ -44,7 +44,8 @@ public abstract class CaseHandledOfflineRespondentSolicitorNotifier implements N
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData, caseData.getRespondent1OrganisationPolicy(), organisationService,
-                                                                      featureToggleService.isQueryManagementLRsEnabled(), configuration);
+                                                                      featureToggleService.isQueryManagementLRsEnabled(),
+                                                                      featureToggleService.isLipQueryManagementEnabled(caseData), configuration);
     }
 
     public abstract void notifyRespondentSolicitorForCaseHandedOffline(CaseData caseData,
