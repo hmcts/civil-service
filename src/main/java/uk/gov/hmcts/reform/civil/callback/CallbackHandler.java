@@ -56,7 +56,7 @@ public abstract class CallbackHandler {
         }
 
         String lastExecutedActivityId = businessProcess.getActivityId();
-        log.info("Last executed activity id was: %s and current activity id for this request is: %s",
+        log.info("Last executed activity id was: {} and current activity id for this request is: {}",
                  lastExecutedActivityId, currentActivityId
         );
 
