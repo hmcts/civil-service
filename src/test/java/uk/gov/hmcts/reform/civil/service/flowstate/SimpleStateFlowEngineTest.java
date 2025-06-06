@@ -3055,7 +3055,7 @@ class SimpleStateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(10).contains(
+            assertThat(stateFlow.getFlags()).hasSize(11).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
