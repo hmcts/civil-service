@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.l
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 
+import java.util.List;
+
 @Component
 public class DefRepresentedAllPartiesEmailDTOGenerator extends AllPartiesEmailGenerator {
 
@@ -10,10 +12,9 @@ public class DefRepresentedAllPartiesEmailDTOGenerator extends AllPartiesEmailGe
                                                      DefRepresentedNewRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator,
                                                      DefRepresentedClaimantLipEmailDTOGenerator claimantLipEmailDTOGenerator,
                                                      DefRepresentedDefendantLipEmailDTOGenerator defendantLipEmailDTOGenerator) {
-        super(applicantSolEmailDTOGenerator,
-              respSolOneEmailDTOGenerator,
-              null,
-              claimantLipEmailDTOGenerator,
-              defendantLipEmailDTOGenerator);
+        super(List.of(applicantSolEmailDTOGenerator,
+                      respSolOneEmailDTOGenerator,
+                      claimantLipEmailDTOGenerator,
+                      defendantLipEmailDTOGenerator));
     }
 }
