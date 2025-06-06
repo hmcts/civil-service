@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -692,12 +693,18 @@ public class CaseDataBuilder {
     private String claimantBilingualLanguagePreference;
     private JudgmentPaidInFull judgmentPaidInFull;
     private YesOrNo anyRepresented;
+    private FixedCosts fixedCosts;
 
     private String partialPaymentAmount;
     private LocalDate nextDeadline;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
+        return this;
+    }
+
+    public CaseDataBuilder fixedCosts(FixedCosts fixedCosts) {
+        this.fixedCosts = fixedCosts;
         return this;
     }
 
@@ -8017,6 +8024,7 @@ public class CaseDataBuilder {
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
             .nextDeadline(nextDeadline)
+            .fixedCosts(fixedCosts)
             .build();
     }
 
