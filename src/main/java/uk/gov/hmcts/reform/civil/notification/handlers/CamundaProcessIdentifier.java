@@ -11,5 +11,6 @@ public enum CamundaProcessIdentifier {
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
     ClaimSubmittedApplicantNotifier,
-    ClaimantLipHelpWithFeesNotifier
+    ClaimantLipHelpWithFeesNotifier,
+    UnpaidHearingFeeNotifier
 }
