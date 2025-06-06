@@ -79,6 +79,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -212,6 +213,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String personalInjuryTypeOther;
     private final StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     private final StatementOfTruth uiStatementOfTruth;
+    private final StatementOfTruth respondent1LiPStatementOfTruth;
     private final String legacyCaseReference;
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
@@ -234,6 +236,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @Builder.Default
     private final List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
     private final List<Element<ManageDocument>> manageDocuments;
     private final Document specClaimTemplateDocumentFiles;
     private final Document specClaimDetailsDocumentFiles;
@@ -293,6 +298,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
      */
     private BigDecimal totalClaimAmount;
     private BigDecimal totalInterest;
+    private BigDecimal totalClaimAmountPlusInterestAdmitPart;
+    private BigDecimal totalClaimAmountPlusInterest;
     private final YesOrNo claimInterest;
     private final InterestClaimOptions interestClaimOptions;
     private final SameRateInterestSelection sameRateInterestSelection;
@@ -527,6 +534,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDate repaymentDate;
     private final String caseNameHmctsInternal;
     private final String caseNamePublic;
+    private final YesOrNo ccjJudgmentAmountShowInterest;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -611,12 +619,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private List<DocumentToKeepCollection> documentToKeepCollection;
 
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsApp;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes1;
+    private RequestedCourtForTabDetails requestedCourtForTabDetailsRes2;
+
     private final ChangeLanguagePreference changeLanguagePreference;
     private final PreferredLanguage claimantLanguagePreferenceDisplay;
     private final PreferredLanguage defendantLanguagePreferenceDisplay;
 
     @Builder.Default
     private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
+
+    private final PreTranslationDocumentType preTranslationDocumentType;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1090,9 +1104,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public Optional<Element<CaseDocument>> getSDODocument() {
+        return getLatestDocumentOfType(DocumentType.SDO_ORDER);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getTranslatedSDODocument() {
+        return getLatestDocumentOfType(DocumentType.SDO_TRANSLATED_DOCUMENT);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getLatestDocumentOfType(DocumentType documentType) {
         return ofNullable(systemGeneratedCaseDocuments)
             .flatMap(docs -> docs.stream()
-                .filter(doc -> doc.getValue().getDocumentType().equals(DocumentType.SDO_ORDER))
+                .filter(doc -> doc.getValue().getDocumentType().equals(documentType))
                 .max(Comparator.comparing(doc -> doc.getValue().getCreatedDatetime())));
     }
 
@@ -1227,6 +1251,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRespondentSolicitorRegistered() {
         return YesOrNo.YES.equals(getRespondent1OrgRegistered());
+    }
+
+    @JsonIgnore
+    public boolean isRespondentTwoSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent2OrgRegistered());
     }
 
     @JsonIgnore

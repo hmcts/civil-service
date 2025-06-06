@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.CaseTask;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class BuildConfirmationTask implements CaseTask {
     private final List<RespondToResponseConfirmationHeaderGenerator> confirmationHeaderGenerators;
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
 
-    public SubmittedCallbackResponse execute(CallbackParams callbackParams) {
+    public SubmittedCallbackResponse execute(CallbackParams callbackParams, FeatureToggleService featureToggleService) {
 
         CaseData caseData = callbackParams.getCaseData();
         log.info("Executing SubmittedCallbackResponse for Case : {} ", caseData.getCcdCaseReference());
@@ -47,13 +48,15 @@ public class BuildConfirmationTask implements CaseTask {
                 CaseDataToTextGenerator.getTextFor(
                     confirmationTextGenerators.stream(),
                     () -> getDefaultConfirmationText(caseData),
-                    caseData
+                    caseData,
+                    featureToggleService
                 ))
             .confirmationHeader(
                 CaseDataToTextGenerator.getTextFor(
                     confirmationHeaderGenerators.stream(),
                     () -> getDefaultConfirmationHeader(caseData),
-                    caseData
+                    caseData,
+                    featureToggleService
                 ));
 
         return responseBuilder.build();
