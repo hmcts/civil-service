@@ -46,6 +46,8 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.S
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
+
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,10 +65,11 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     private FeatureToggleService featureToggleService;
     @Mock
     private AssignCategoryId assignCategoryId;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         uploadTranslatedDocumentDefaultStrategy = new UploadTranslatedDocumentDefaultStrategy(systemGeneratedDocumentService,
                                                                                               objectMapper, assignCategoryId,
@@ -784,6 +787,49 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
+    void shouldUpdateBusinessProcess_WhenDocumentTypeIsHearingNotice() {
+        //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(HEARING_NOTICE)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(Document.builder().documentFileName("hearing_small_claim.pdf").build(),
+                                                                        DocumentType.HEARING_FORM)));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build().toBuilder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocuments(translatedDocument)
+                             .build())
+            .preTranslationDocuments(preTranslationDocuments)
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .ccdCaseReference(123L)
+            .build();
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams); 
+        CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+        //Then
+        assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE.name());
+    }
+
+    @Test  
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claim() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
