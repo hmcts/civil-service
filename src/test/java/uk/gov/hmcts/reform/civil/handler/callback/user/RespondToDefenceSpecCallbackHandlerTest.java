@@ -2633,8 +2633,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .build())
                 .claimFee(fee)
                 .totalInterest(interestAmount)
-                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
 
