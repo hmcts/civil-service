@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlip;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlipandlipvlrtolrvlr;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -8,9 +8,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
-public class ClaimantLipNocHelper {
+public class ClaimantLipRepresentedNocHelper {
 
-    private ClaimantLipNocHelper() {
+    private ClaimantLipRepresentedNocHelper() {
         //NO-OP
     }
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlip;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlipandlipvlrtolrvlr;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +51,7 @@ class NewApplicantSolEmailDTOGeneratorTest {
     void shouldReturnReferenceTemplate() {
         String result = generator.getReferenceTemplate();
 
-        assertThat(result).isEqualTo(ClaimantLipNocHelper.REFERENCE_TEMPLATE);
+        assertThat(result).isEqualTo(ClaimantLipRepresentedNocHelper.REFERENCE_TEMPLATE);
     }
 
     @Test

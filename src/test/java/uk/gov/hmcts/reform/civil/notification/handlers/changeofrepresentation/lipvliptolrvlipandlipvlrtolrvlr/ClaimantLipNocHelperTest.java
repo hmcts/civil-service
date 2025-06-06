@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlip;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlipandlipvlrtolrvlr;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -34,7 +34,7 @@ class ClaimantLipNocHelperTest {
             .legacyCaseReference("000MC001")
             .build();
 
-        Map<String, String> result = ClaimantLipNocHelper.getLipProperties(caseData);
+        Map<String, String> result = ClaimantLipRepresentedNocHelper.getLipProperties(caseData);
 
         assertThat(result).containsOnly(
             entry(RESPONDENT_NAME, "Jane Defendant"),
@@ -45,7 +45,7 @@ class ClaimantLipNocHelperTest {
 
     @Test
     void shouldMatchReferenceTemplateFormat() {
-        String reference = String.format(ClaimantLipNocHelper.REFERENCE_TEMPLATE, "12345");
+        String reference = String.format(ClaimantLipRepresentedNocHelper.REFERENCE_TEMPLATE, "12345");
         assertThat(reference).isEqualTo("notify-lip-after-noc-approval-12345");
     }
 }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlip;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlipandlipvlrtolrvlr;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +42,7 @@ class DefendantLipEmailDTOGeneratorTest {
     void shouldReturnReferenceTemplate() {
         String reference = defendantLipEmailDTOGenerator.getReferenceTemplate();
 
-        assertThat(reference).isEqualTo(ClaimantLipNocHelper.REFERENCE_TEMPLATE);
+        assertThat(reference).isEqualTo(ClaimantLipRepresentedNocHelper.REFERENCE_TEMPLATE);
     }
 
     @Test
@@ -51,13 +51,13 @@ class DefendantLipEmailDTOGeneratorTest {
         Map<String, String> baseProperties = new HashMap<>();
         Map<String, String> helperProperties = Map.of("respondentName", "Jane Doe");
 
-        try (MockedStatic<ClaimantLipNocHelper> mockedStatic = mockStatic(ClaimantLipNocHelper.class)) {
-            mockedStatic.when(() -> ClaimantLipNocHelper.getLipProperties(caseData)).thenReturn(helperProperties);
+        try (MockedStatic<ClaimantLipRepresentedNocHelper> mockedStatic = mockStatic(ClaimantLipRepresentedNocHelper.class)) {
+            mockedStatic.when(() -> ClaimantLipRepresentedNocHelper.getLipProperties(caseData)).thenReturn(helperProperties);
 
             Map<String, String> result = defendantLipEmailDTOGenerator.addCustomProperties(baseProperties, caseData);
 
             assertThat(result).containsExactlyEntriesOf(helperProperties);
-            mockedStatic.verify(() -> ClaimantLipNocHelper.getLipProperties(caseData), times(1));
+            mockedStatic.verify(() -> ClaimantLipRepresentedNocHelper.getLipProperties(caseData), times(1));
         }
     }
 }

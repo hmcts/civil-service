@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlip;
+package uk.gov.hmcts.reform.civil.notification.handlers.changeofrepresentation.lipvliptolrvlipandlipvlrtolrvlr;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,12 +21,12 @@ public class DefendantLipEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
     @Override
     protected String getReferenceTemplate() {
-        return ClaimantLipNocHelper.REFERENCE_TEMPLATE;
+        return ClaimantLipRepresentedNocHelper.REFERENCE_TEMPLATE;
     }
 
     @Override
     public Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.putAll(ClaimantLipNocHelper.getLipProperties(caseData));
+        properties.putAll(ClaimantLipRepresentedNocHelper.getLipProperties(caseData));
         return properties;
     }
 }
