@@ -11,14 +11,24 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 
 @Component
@@ -28,6 +38,8 @@ public class DetermineNextState  {
 
     private final FeatureToggleService featureToggleService;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final FlowStateAllowedEventService flowStateAllowedEventService;
+    private final DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
 
     public String determineNextState(CaseData caseData,
                                      CallbackParams callbackParams,
@@ -70,6 +82,10 @@ public class DetermineNextState  {
             nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
         }
 
+        if (claimantIntentionNeedsTranslation(caseData)) {
+            nextState = CaseState.AWAITING_APPLICANT_INTENTION.name();
+        }
+
         builder.businessProcess(businessProcess);
         return nextState;
     }
@@ -100,7 +116,7 @@ public class DetermineNextState  {
     private String getNextState(CaseData caseData) {
         if ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || (caseData.isPartAdmitImmediatePaymentClaimSettled())) {
-            return CaseState.AWAITING_APPLICANT_INTENTION.name();
+            return AWAITING_APPLICANT_INTENTION.name();
         }
         return CaseState.All_FINAL_ORDERS_ISSUED.name();
     }
@@ -134,5 +150,28 @@ public class DetermineNextState  {
         }
 
         return Pair.of(nextState, businessProcess);
+    }
+
+    private boolean claimantIntentionNeedsTranslation(CaseData caseData) {
+        if (!featureToggleService.isGaForWelshEnabled()) {
+            return false;
+        }
+        boolean bilingualRequested = caseData.isLRvLipOneVOne()
+            && (caseData.isRespondentResponseBilingual()
+            || caseData.isLipDefendantSpecifiedBilingualDocuments());
+
+        log.info("PAUSE CLAIM TRANSLATION RESPONDENT WELSH");
+        log.info("NEEDS TRANSLATION RESPONDENT WELSH, {}", bilingualRequested);
+        log.info("TRANSLATION REQUIRED IN FLOW STATE, {}", translationRequiredInFlowState(caseData));
+        return bilingualRequested && translationRequiredInFlowState(caseData);
+    }
+
+    public boolean translationRequiredInFlowState(CaseData caseData) {
+        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
+        return flowState.equals(FULL_DEFENCE_PROCEED)
+            || flowState.equals(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+            || flowState.equals(FULL_ADMIT_PROCEED)
+            || flowState.equals(PART_ADMIT_PROCEED)
+            || flowState.equals(IN_MEDIATION);
     }
 }

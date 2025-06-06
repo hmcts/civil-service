@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespe
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -21,7 +23,11 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -60,6 +66,12 @@ class DetermineNextStateTest {
     @Mock
     private JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
 
+    @Mock
+    private FlowStateAllowedEventService flowStateAllowedEventService;
+
+    @Mock
+    private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
+
     @InjectMocks
     private DetermineNextState determineNextState;
 
@@ -89,6 +101,41 @@ class DetermineNextStateTest {
 
         assertEquals(IN_MEDIATION.name(), resultState);
         assertEquals(CLAIMANT_RESPONSE_SPEC.name(), builtCaseData.getBusinessProcess().getCamundaEvent());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.FULL_DEFENCE_PROCEED",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.PART_ADMIT_NOT_SETTLED_NO_MEDIATION",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.FULL_ADMIT_PROCEED",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.PART_ADMIT_PROCEED",
+        "LIP, AWAITING_APPLICANT_INTENTION, MAIN.IN_MEDIATION",
+        "NON_LIP, IN_MEDIATION, MAIN.FULL_DEFENCE_PROCEED"
+    })
+    void shouldPauseStateChangeDefendantLipAndRequiresTranslation(String lipCase, String expectedState, String flowState) {
+        FlowState flowStateTest = FlowState.fromFullName(flowState);
+
+        when(flowStateAllowedEventService.getFlowState(any())).thenReturn(flowStateTest);
+
+        CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder();
+        CaseData caseData;
+        if (lipCase.equals("LIP")) {
+            caseData = CaseDataBuilder.builder()
+                .specClaim1v1LrVsLipBilingual()
+                .build();
+        } else {
+            caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build();
+        }
+
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        BusinessProcess businessProcess = BusinessProcess.builder().build();
+
+        String resultState = determineNextState.determineNextState(caseData, callbackParams(caseData),
+                                                                   builder, "", businessProcess);
+        assertEquals(expectedState, resultState);
     }
 
     @Test
