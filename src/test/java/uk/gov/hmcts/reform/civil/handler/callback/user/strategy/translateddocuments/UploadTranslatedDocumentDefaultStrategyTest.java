@@ -363,7 +363,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
                              .builder()
                              .translatedDocuments(translatedDocument)
                              .build())
-            .preTranslationSdoOrderDocuments(preTranslationDocuments)
+            .preTranslationDocuments(preTranslationDocuments)
             .systemGeneratedCaseDocuments(new ArrayList<>())
             .ccdCaseReference(123L)
             .build();
