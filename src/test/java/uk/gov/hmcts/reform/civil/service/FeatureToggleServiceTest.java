@@ -165,11 +165,9 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive(Boolean toggleStat) {
-        var isJudgmentOnlineLiveKey = "isJudgmentOnlineLive";
-        givenToggle(isJudgmentOnlineLiveKey, toggleStat);
+    @Test
+    void shouldReturnCorrectValue_whenIsJudgmentOnlineLive() {
+        Boolean toggleStat = false;
 
         assertThat(featureToggleService.isJudgmentOnlineLive()).isEqualTo(toggleStat);
     }
@@ -250,11 +248,9 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isDashboardEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCoSCEnabled(Boolean toggleStat) {
-        var isCoSCEnabledKey = "isCoSCEnabled";
-        givenToggle(isCoSCEnabledKey, toggleStat);
+    @Test
+    void shouldReturnCorrectValue_whenIsCoSCEnabled() {
+        Boolean toggleStat = true;
 
         assertThat(featureToggleService.isCoSCEnabled()).isEqualTo(toggleStat);
     }
@@ -282,12 +278,10 @@ class FeatureToggleServiceTest {
         assertEquals(expected, result);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenisJOLiveFeedActive(Boolean toggleStat) {
+    @Test
+    void shouldReturnCorrectValue_whenisJOLiveFeedActive() {
+        Boolean toggleStat = false;
         when(featureToggleService.isJudgmentOnlineLive())
-            .thenReturn(toggleStat);
-        when(featureToggleService.isJOLiveFeedActive())
             .thenReturn(toggleStat);
         assertThat(featureToggleService.isJOLiveFeedActive()).isEqualTo(toggleStat);
     }

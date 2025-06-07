@@ -68,7 +68,7 @@ public class FeatureToggleService {
     }
 
     public boolean isJudgmentOnlineLive() {
-        return featureToggleApi.isFeatureEnabled("isJudgmentOnlineLive");
+        return false;
     }
 
     public boolean isCjesServiceAvailable() {
@@ -122,7 +122,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCoSCEnabled() {
-        return featureToggleApi.isFeatureEnabled("isCoSCEnabled");
+        return true;
     }
 
     public boolean isCaseProgressionEnabledAndLocationWhiteListed(String location) {
