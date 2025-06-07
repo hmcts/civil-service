@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.RegistrationInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -79,6 +80,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String PARTIAL_PAYMENT_OFFLINE = "This feature is currently not available, please see guidance below";
     public static final String DJ_NOT_VALID_FOR_THIS_LIP_CLAIM = "The Claim is not eligible for Default Judgment.";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
+    private static final int DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS = 24;
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
@@ -87,6 +89,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     BigDecimal theOverallTotal;
     private final Time time;
     private final FeatureToggleService featureToggleService;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -199,7 +202,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty()
-                ? caseDataBuilder.build().toMap(objectMapper) : null)
+                      ? caseDataBuilder.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -251,7 +254,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                + "- if they do not apply, close this page and apply for default judgment when they do");
+                               + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -316,7 +319,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
                 // calculate repayment breakdown
                 StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
                     caseData,
-                    callbackParams);
+                    callbackParams
+                );
 
                 caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
             }
@@ -352,7 +356,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
         StringBuilder repaymentBreakdown = buildRepaymentBreakdown(
             caseData,
-            callbackParams);
+            callbackParams
+        );
 
         caseDataBuilder.repaymentSummaryObject(repaymentBreakdown.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -411,7 +416,12 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
 
         repaymentBreakdown.append("\n ## Total still owed \n £").append(theOverallTotal.setScale(2));
-        log.info("Case {} with calculated interest: {} and Repayment Breakdown details: {}", caseData.getCcdCaseReference(), interest, repaymentBreakdown);
+        log.info(
+            "Case {} with calculated interest: {} and Repayment Breakdown details: {}",
+            caseData.getCcdCaseReference(),
+            interest,
+            repaymentBreakdown
+        );
         return repaymentBreakdown;
     }
 
@@ -420,7 +430,10 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         if (caseData.getFixedCosts() == null) {
             fixedCost = calculateFixedCosts(caseData);
         } else if (caseData.getFixedCosts() != null && caseData.getFixedCosts().getFixedCostAmount() != null) {
-            fixedCost = calculateFixedCostsOnEntry(caseData, JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator));
+            fixedCost = calculateFixedCostsOnEntry(
+                caseData,
+                JudgmentsOnlineHelper.getJudgmentAmount(caseData, interestCalculator)
+            );
         }
 
         return fixedCost;
@@ -494,13 +507,20 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             JudgmentDetails activeJudgment = djOnlineMapper.addUpdateActiveJudgment(caseData);
             caseData.setActiveJudgment(activeJudgment);
             BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest));
+            caseData.setJoRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(
+                activeJudgment,
+                interest
+            ));
             caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.totalInterest(interestCalculator.calculateInterest(caseData));
+        caseDataBuilder.claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            DEFAULT_JUDGEMENT_SPEC_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
         String nextState;
 
         if (featureToggleService.isJudgmentOnlineLive() && JudgmentsOnlineHelper.isNonDivergentForDJ(caseData)) {
