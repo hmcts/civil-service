@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SubjectOption;
@@ -18,6 +19,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class Message {
 
     private LocalDateTime sentTime;
@@ -51,6 +53,23 @@ public class Message {
             .isUrgent(reply.getIsUrgent())
             .messageContent(reply.getMessageContent())
             .recipientRoleType(reply.getRecipientRoleType())
+            .build();
+    }
+
+    public LatestMessage toLatestMessage(Element<Message> messageElement) {
+        Message value = messageElement.getValue();
+        log.info("uuid " + messageElement.getId().toString());
+        return LatestMessage.builder()
+            .sentTime(value.getSentTime())
+            .updatedTime(value.getUpdatedTime())
+            .senderRoleType(value.getSenderRoleType())
+            .senderName(value.getSenderName())
+            .recipientRoleType(value.getRecipientRoleType())
+            .subjectType(value.getSubjectType())
+            .subject(value.getSubject())
+            .messageContent(value.getMessageContent())
+            .isUrgent(value.getIsUrgent())
+            .messageId(messageElement.getId().toString())
             .build();
     }
 }

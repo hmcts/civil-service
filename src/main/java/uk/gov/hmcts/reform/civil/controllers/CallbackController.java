@@ -20,7 +20,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.utils.WaMapperUtils;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -52,6 +54,7 @@ public class CallbackController {
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
         @PathVariable("version") Optional<CallbackVersion> version,
+        @RequestHeader(value = WorkAllocationConstants.CLIENT_CONTEXT_HEADER_PARAMETER, required = false) String clientContext,
         @PathVariable("page-id") Optional<String> pageId
     ) {
         final CaseDetails caseDetails = callback.getCaseDetails();
@@ -61,6 +64,8 @@ public class CallbackController {
             callback.getEventId(), callbackType, pageId, version
         );
 
+        log.info("client context " + clientContext);
+
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
@@ -69,6 +74,7 @@ public class CallbackController {
             .pageId(pageId.orElse(null))
             .caseData(caseDetailsConverter.toCaseData(caseDetails))
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
+            .waMapper(WaMapperUtils.getWaMapper(clientContext))
             .build();
 
         return callbackHandlerFactory.dispatch(callbackParams);
