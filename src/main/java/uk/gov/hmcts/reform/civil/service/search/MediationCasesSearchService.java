@@ -21,7 +21,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 public class MediationCasesSearchService extends ElasticSearchService {
 
     private static final LocalDateTime CARM_DATE = LocalDateTime.of(2024, 11, 5,
-                                                                    7, 28, 35);
+                                                                    7, 28, 35
+    );
 
     public MediationCasesSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
@@ -49,16 +50,20 @@ public class MediationCasesSearchService extends ElasticSearchService {
 
     @Override
     Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
-        String targetDateString =
+                                    String searchAfterValue) {
+        String targetDateFromString =
             claimMovedDate.format(DateTimeFormatter.ISO_DATE);
+        String targetDateToString =
+            LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         if (carmEnabled) {
             return new Query(
                 boolQuery()
                     .must(matchAllQuery())
                     .must(beState(IN_MEDIATION))
                     .must(submittedDate(carmEnabled))
-                    .must(matchQuery("data.claimMovedToMediationOn", targetDateString)),
+                    .must(rangeQuery("data.claimMovedToMediationOn")
+                              .gte(targetDateFromString).lt(targetDateToString))
+                    .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
                 emptyList(),
                 startIndex,
                 initialSearch,
@@ -71,7 +76,9 @@ public class MediationCasesSearchService extends ElasticSearchService {
                 .should(boolQuery()
                             .must(beState(IN_MEDIATION))
                             .must(submittedDate(carmEnabled))
-                            .must(matchQuery("data.claimMovedToMediationOn", targetDateString))),
+                            .must(rangeQuery("data.claimMovedToMediationOn")
+                                      .gte(targetDateFromString).lt(targetDateToString)))
+                .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
             emptyList(),
             startIndex
         );

@@ -32,14 +32,18 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
     protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
                                           boolean initialSearch,
                                           String searchAfterValue) {
-        String targetDateString =
+        String targetDateFromString =
             date.format(DateTimeFormatter.ISO_DATE);
+        String targetDateToString =
+            LocalDate.now().format(DateTimeFormatter.ISO_DATE);
         if (carmEnabled) {
             BoolQueryBuilder query = boolQuery()
                 .must(matchAllQuery())
                 .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                 .must(boolQuery().must(rangeQuery("data.submittedDate").gte(CARM_DATE)))
-                .must(matchQuery("data.claimMovedToMediationOn", targetDateString));
+                .must(rangeQuery("data.claimMovedToMediationOn")
+                          .gte(targetDateFromString).lt(targetDateToString))
+                .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
             return new Query(query, Collections.emptyList(), fromValue, initialSearch, searchAfterValue);
         } else {
             BoolQueryBuilder query = boolQuery()
@@ -47,7 +51,9 @@ public class MediationCasesSearchServiceTest extends ElasticSearchServiceTest {
                 .should(boolQuery()
                             .must(boolQuery().must(matchQuery("state", "IN_MEDIATION")))
                             .must(boolQuery().must(rangeQuery("data.submittedDate").lt(CARM_DATE)))
-                            .must(matchQuery("data.claimMovedToMediationOn", targetDateString)));
+                            .must(rangeQuery("data.claimMovedToMediationOn")
+                                      .gte(targetDateFromString).lt(targetDateToString)))
+                .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes"));
 
             return new Query(query, Collections.emptyList(), fromValue);
         }
