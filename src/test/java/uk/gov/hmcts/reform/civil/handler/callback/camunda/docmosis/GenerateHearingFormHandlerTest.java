@@ -137,47 +137,6 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldGenerateForm_when1v1ButHideIt_IfDefendantDQLangIsWelsh() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        CaseDocument document = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("document name")
-            .documentSize(0L)
-            .documentType(HEARING_FORM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
-
-        List<CaseDocument> documents = new ArrayList<>();
-        documents.add(document);
-        when(hearingFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .information("test")
-            .claimantBilingualLanguagePreference("ENGLISH")
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.BOTH).build()).build())
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        params.getRequest().setEventId(GENERATE_HEARING_FORM.name());
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        verify(hearingFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"));
-
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getHearingDocuments()).hasSize(0);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-    }
-
-    @Test
     void shouldGenerate2Forms_whenListHave1PreviousForm() {
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")

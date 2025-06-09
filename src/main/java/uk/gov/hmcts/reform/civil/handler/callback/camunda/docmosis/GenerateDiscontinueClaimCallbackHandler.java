@@ -141,8 +141,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         if (featureToggleService.isGaForWelshEnabled()
             && caseData.isRespondent1LiP()
             && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-            && (caseData.isRespondentResponseBilingual()
-                || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            && caseData.isRespondentResponseBilingual()) {
             respondent1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                 .getPreTranslationDocuments();
