@@ -77,7 +77,6 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
-import uk.gov.hmcts.reform.civil.model.sendandreply.LatestMessage;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
@@ -422,7 +421,6 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private List<Element<Message>> messages;
     private ObligationWAFlag obligationWAFlag;
     private Message lastMessage;
-    private LatestMessage latestMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
 
