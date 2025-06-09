@@ -60,7 +60,7 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(CONTACT_DETAILS_CHANGE, transitions).onlyWhen(contactDetailsChange, transitions)
             .set(flags -> flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true), transitions)
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions)
-            .onlyWhen(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)), transitions)
+            .onlyWhen(isRespondentResponseLangIsBilingual.and(not(contactDetailsChange)).and(not(changeLanguagePreferenceEvent)), transitions)
             .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true), transitions)
             .moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(isRespondentResponseLangIsBilingual))
                 .and(not(pastClaimNotificationDeadline)), transitions)
@@ -79,7 +79,9 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions)
             .onlyWhen(divergentRespondWithDQAndGoOfflineSpec.and(specClaim), transitions)
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
-            .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim), transitions);
+            .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim), transitions)
+            .set((c, flags) ->
+                 {if (isRespondentResponseLangIsBilingual.test(c)) {flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);}}, transitions);
     }
 
     public static final Predicate<CaseData> claimNotified = caseData ->
@@ -147,4 +149,7 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
 
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
+
+    public static final Predicate<CaseData> changeLanguagePreferenceEvent = caseData ->
+        caseData.getChangeLanguagePreference() != null;
 }
