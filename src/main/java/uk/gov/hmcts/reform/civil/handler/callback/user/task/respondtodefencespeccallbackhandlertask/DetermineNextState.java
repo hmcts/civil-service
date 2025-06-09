@@ -47,7 +47,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 @Slf4j
 public class DetermineNextState extends CallbackHandler {
 
-    private final List<CaseEvent> Events = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED);
+    private final List<CaseEvent> events = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED);
     private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimStatePostTranslation);
     private static final String TASK_ID = "UpdateClaimStateAfterClaimantIntentionLrTranslatedDocUploaded";
     private final ObjectMapper objectMapper;
@@ -62,7 +62,7 @@ public class DetermineNextState extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return Events;
+        return events;
     }
 
     @Override
