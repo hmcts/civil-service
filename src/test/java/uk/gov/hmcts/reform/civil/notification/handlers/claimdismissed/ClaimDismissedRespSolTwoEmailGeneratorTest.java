@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
@@ -83,6 +84,19 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
     void shouldNotNotifyWhen1V2AndSameLegalRepAndClaimDismissedDateIsNotGiven() {
         CaseData caseData = CaseData.builder()
             .claimDismissedDate(null)
+            .build();
+        multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
+
+        boolean shouldNotify = emailGenerator.getShouldNotify(caseData);
+
+        assertThat(shouldNotify).isFalse();
+    }
+
+    @Test
+    void shouldNotNotifyWhenClaimDismissedDateGivenAnd1V2DiffRepsButResp2IsLiP() {
+        CaseData caseData = CaseData.builder()
+            .claimDismissedDate(LocalDateTime.now())
+            .respondent2Represented(YesOrNo.YES)
             .build();
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
 

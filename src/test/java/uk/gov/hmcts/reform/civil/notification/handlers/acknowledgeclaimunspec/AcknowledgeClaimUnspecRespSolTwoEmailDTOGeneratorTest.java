@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
@@ -74,17 +75,49 @@ class AcknowledgeClaimUnspecRespSolTwoEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyReturnTrue_whenResp2Acknowledged() {
-        CaseData caseData = CaseData.builder().build();
-        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(false);
-        assertThat(emailGenerator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
     void shouldNotifyReturnFalse_whenResp2IsNotAcknowledged() {
         CaseData caseData = CaseData.builder().build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
         assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
+    }
 
+    @Test
+    void shouldNotifyReturnTrue_whenResp1NotAcknowledgedAndResp2NotLiP() {
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YesOrNo.NO)
+            .build();
+        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(false);
+
+        assertThat(emailGenerator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotifyReturnFalse_whenResp1AcknowledgedAndResp2NotLiP() {
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YesOrNo.NO)
+            .build();
+        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
+
+        assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotifyReturnFalse_whenResp1NotAcknowledgedAndResp2IsLiP() {
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YesOrNo.YES)
+            .build();
+        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(false);
+
+        assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotifyReturnFalse_whenResp1AcknowledgedAndResp2IsLiP() {
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YesOrNo.YES)
+            .build();
+        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
+
+        assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
     }
 }

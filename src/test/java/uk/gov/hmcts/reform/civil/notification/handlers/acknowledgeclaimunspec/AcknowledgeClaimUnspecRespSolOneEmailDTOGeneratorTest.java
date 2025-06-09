@@ -13,6 +13,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
@@ -74,17 +76,23 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyReturnTrue_whenResp1Acknowledged() {
-        CaseData caseData = CaseData.builder().build();
-        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
-        assertThat(emailGenerator.getShouldNotify(caseData)).isTrue();
-    }
-
-    @Test
     void shouldNotifyReturnFalse_whenResp1IsNotAcknowledged() {
         CaseData caseData = CaseData.builder().build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(false);
         assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
+    }
 
+    @Test
+    void shouldNotifyReturnFalse_whenResp1IsAcknowledgedButIsLiP() {
+        CaseData caseData = CaseData.builder().respondent1Represented(YES).build();
+        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
+        assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotifyReturnTrue_whenResp1AcknowledgedAndNotLiP() {
+        CaseData caseData = CaseData.builder().respondent1Represented(NO).build();
+        when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
+        assertThat(emailGenerator.getShouldNotify(caseData)).isTrue();
     }
 }
