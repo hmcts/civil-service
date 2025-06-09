@@ -38,7 +38,10 @@ public class ContactDetailsChangeTransitionBuilder extends MidTransitionBuilder 
             .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
             .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaimSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions).onlyWhen(isRespondentResponseLangIsBilingual.and(not(changeLanguagePreferenceEvent)), transitions)
-            .set((c, flags) ->
-                 {if (isRespondentResponseLangIsBilingual.test(c)) {flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);}}, transitions);
+            .set((c, flags) -> {
+                if (isRespondentResponseLangIsBilingual.test(c)) {
+                    flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
+                }
+            }, transitions);
     }
 }
