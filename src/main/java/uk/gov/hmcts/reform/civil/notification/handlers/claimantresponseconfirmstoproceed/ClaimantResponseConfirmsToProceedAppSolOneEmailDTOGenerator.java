@@ -42,6 +42,6 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator extends
 
     @Override
     protected String getReferenceTemplate() {
-        return "claimant-confirms-to-proceed-respondent-notification-%s";
+        return "claimant-confirms-to-proceed-applicant-notification%s";
     }
 }
