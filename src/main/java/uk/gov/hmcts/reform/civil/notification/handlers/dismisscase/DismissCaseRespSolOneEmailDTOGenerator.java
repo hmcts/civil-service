@@ -13,7 +13,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 @Component
 public class DismissCaseRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    protected static final String REFERENCE_TEMPLATE = "dismiss-case-defendant-notification-%s";
+    protected static final String REFERENCE_RESP_SOL_ONE_TEMPLATE = "dismiss-case-defendant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -29,7 +29,7 @@ public class DismissCaseRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGe
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_RESP_SOL_ONE_TEMPLATE;
     }
 
     @Override
