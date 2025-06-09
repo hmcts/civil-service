@@ -117,6 +117,7 @@ public class SendAndReplyMessageService {
 
         //Move current base message to history
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
+        log.info("message for history id  " + messageForHistory.getMessageID());
         Element<MessageReply> newHistoryMessage = element(messageForHistory);
 
         //Switch out current base message with reply info

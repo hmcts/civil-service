@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.wa.AdditionalProperties;
 import uk.gov.hmcts.reform.civil.model.wa.ClientContext;
 import uk.gov.hmcts.reform.civil.model.wa.TaskData;
@@ -34,7 +35,7 @@ public class WaMapperUtils {
         return null;
     }
 
-    public static MultiValueMap<String, String> createClientContext(WaMapper waMapper) {
+    public static MultiValueMap<String, String> createClientContext(WaMapper waMapper, CaseData caseData) {
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         if (waMapper != null) {
             ClientContext clientContext = waMapper.getClientContext() != null
@@ -46,11 +47,11 @@ public class WaMapperUtils {
                 .clientContext(clientContext.toBuilder()
                                    .userTask(userTask.toBuilder()
                                                  .taskData(taskData.toBuilder()
-                                                               .id("9080cb8c-4508-11f0-8184-9abc4f7e3527")
+                                                               .id("afde168c-4521-11f0-93fd-c2213aaead2c")
                                                                .name("Review message")
                                                                .additionalProperties(AdditionalProperties.builder()
                                                                                          .messageId(
-                                                                                             "e7c91c75-89b3-4d1f-bd50-3cf6c44d150c")
+                                                                                             "c80aacaa-0d97-4d")
                                                                                          .build())
                                                                .build())
                                                  .completeTask(true)
