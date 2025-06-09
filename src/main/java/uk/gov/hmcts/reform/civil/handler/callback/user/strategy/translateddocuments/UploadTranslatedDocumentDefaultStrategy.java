@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
@@ -72,7 +73,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData updatedCaseData = caseDataBuilder.build();
         updatedCaseData.getSystemGeneratedCaseDocuments().stream().map(Element::getValue).forEach(
             caseDocument -> log.info(String.format("Case ref %s: Has doc type %s, document name %s", caseData.getCcdCaseReference(),
-                                                   caseDocument.getDocumentType().name(), caseDocument.getDocumentName()))
+                                                   Optional.of(caseDocument.getDocumentType()).map(DocumentType::name).orElse(null), caseDocument.getDocumentName()))
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -222,7 +223,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<TranslatedDocument>> addToCourtOfficerOrders = new ArrayList<>();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
-                log.info(String.format("Case ref %s: Doc type %s", caseData.getCcdCaseReference(), document.getValue().getDocumentType().name()));
+                log.info(String.format("Case ref %s: Doc type %s", caseData.getCcdCaseReference(),
+                                       Optional.of(document.getValue().getDocumentType()).map(TranslatedDocumentType::name).orElse(null)));
                 if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
                     document.getValue().getFile().setCategoryID("orders");
                     addToSystemGenerated.add(document);
