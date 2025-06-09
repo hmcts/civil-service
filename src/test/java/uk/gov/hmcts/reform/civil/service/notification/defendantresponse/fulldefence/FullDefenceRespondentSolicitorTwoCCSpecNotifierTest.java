@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.YamlNotificationTestUtil;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,12 +50,16 @@ class FullDefenceRespondentSolicitorTwoCCSpecNotifierTest {
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
-        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                             + "\n For all other matters, call 0300 123 7050");
-        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-        when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                  + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+        Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+        when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+        when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+        when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+        when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+        when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+        when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+        when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+        when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+        when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
     }
 
     @Test

@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
@@ -128,26 +129,35 @@ public class JudgementService {
             return JUDGEMENT_BY_COURT;
         } else {
             return String.format(
-                isLrFullAdmitRepaymentPlan(caseData)
+                isLrFullAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)
                     ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
         }
     }
 
-    public boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
-        return caseData.isFullAdmitClaimSpec()
-            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+    public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled()
             && isLRvLR(caseData)
-            && featureToggleService.isLrAdmissionBulkEnabled();
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
+    }
+
+    public boolean isLrFullAdmitRepaymentPlan(CaseData caseData) {
+        return isLRAdmissionRepaymentPlan(caseData)
+            && caseData.isFullAdmitClaimSpec();
     }
 
     public boolean isLRPartAdmitRepaymentPlan(CaseData caseData) {
-        return caseData.isPartAdmitClaimSpec()
-            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-            && isLRvLR(caseData)
-            && featureToggleService.isLrAdmissionBulkEnabled();
+        return isLRAdmissionRepaymentPlan(caseData)
+            && caseData.isPartAdmitClaimSpec();
     }
 
     private boolean isLRvLR(CaseData caseData) {
         return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
+    }
+
+    public boolean isLrPayImmediatelyPlan(CaseData caseData) {
+        return caseData.isPayImmediately()
+            && isOneVOne(caseData)
+            && isLRvLR(caseData)
+            && featureToggleService.isLrAdmissionBulkEnabled();
     }
 }
