@@ -35,16 +35,16 @@ public class DefRespCaseOfflineRespSolOneEmailDTOGenerator extends RespSolOneEma
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
-    }
-
-    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         boolean isRespondent1 = true;
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                                                                                         isRespondent1, organisationService));
         properties.putAll(caseOfflineNotificationProperties(caseData));
         return properties;
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE;
     }
 }

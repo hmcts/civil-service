@@ -26,15 +26,6 @@ public class DefRespCaseOfflineAppSolOneEmailDTOGenerator extends AppSolOneEmail
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        if (is1v1Or2v1Case(caseData)) {
-            return notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
-        } else {
-            return notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
-        }
-    }
-
-    @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
     }
@@ -45,5 +36,14 @@ public class DefRespCaseOfflineAppSolOneEmailDTOGenerator extends AppSolOneEmail
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         properties.putAll(caseOfflineNotificationProperties(caseData));
         return properties;
+    }
+
+    @Override
+    public String getEmailTemplateId(CaseData caseData) {
+        if (is1v1Or2v1Case(caseData)) {
+            return notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
+        } else {
+            return notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
+        }
     }
 }

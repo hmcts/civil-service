@@ -25,11 +25,6 @@ public class DefendantResponseAppSolOneEmailDTOGenerator extends AppSolOneEmailD
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
-    }
-
-    @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
     }
@@ -45,5 +40,10 @@ public class DefendantResponseAppSolOneEmailDTOGenerator extends AppSolOneEmailD
         properties.put(RESPONDENT_NAME, respondentName);
         properties.put(ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack()));
         return properties;
+    }
+
+    @Override
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence();
     }
 }
