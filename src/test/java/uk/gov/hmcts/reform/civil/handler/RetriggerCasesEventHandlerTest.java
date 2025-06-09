@@ -213,7 +213,6 @@ class RetriggerCasesEventHandlerTest {
         CaseDetails caseDetails = CaseDetails.builder().data(Map.of("finalOrderDocumentCollection", List.of(Element.<CaseDocument>builder().id(
             UUID.randomUUID()).value(CaseDocument.builder().documentSize(123L).build()).build()))).build();
 
-
         when(externalTask.getVariable("caseEvent")).thenReturn("UPDATE_CASE_DATA");
         when(externalTask.getVariable("caseIds")).thenReturn("1");
         when(externalTask.getVariable("caseData")).thenReturn(null);
@@ -232,7 +231,6 @@ class RetriggerCasesEventHandlerTest {
                                                                   "      \"createdDatetime\" : \"2025-05-30T17:36:30.513000\"\n" +
                                                                   "    }");
         when(externalTask.getProcessInstanceId()).thenReturn("1");
-
         when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
 
         handler.handleTask(externalTask);
@@ -242,7 +240,6 @@ class RetriggerCasesEventHandlerTest {
         JavaType listType = mapper.getTypeFactory()
             .constructCollectionType(List.class,
                                      mapper.getTypeFactory().constructParametricType(Element.class, CaseDocument.class));
-
         List<Element<CaseDocument>> finalOrderDocumentCollection = caseDataMap.getValue().get("finalOrderDocumentCollection") != null
             ? mapper.convertValue(caseDataMap.getValue().get("finalOrderDocumentCollection"), listType)
             : emptyList();
@@ -273,7 +270,6 @@ class RetriggerCasesEventHandlerTest {
                                                                   "      \"createdDatetime\" : \"2025-05-30T17:36:30.513000\"\n" +
                                                                   "    }");
         when(externalTask.getProcessInstanceId()).thenReturn("1");
-
         when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
 
         handler.handleTask(externalTask);
@@ -283,7 +279,6 @@ class RetriggerCasesEventHandlerTest {
         JavaType listType = mapper.getTypeFactory()
             .constructCollectionType(List.class,
                                      mapper.getTypeFactory().constructParametricType(Element.class, CaseDocument.class));
-
         List<Element<CaseDocument>> finalOrderDocumentCollection = caseDataMap.getValue().get("finalOrderDocumentCollection") != null
             ? mapper.convertValue(caseDataMap.getValue().get("finalOrderDocumentCollection"), listType)
             : emptyList();
