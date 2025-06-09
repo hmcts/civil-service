@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 class GenerateMediationJsonAndTransferHandlerTest {
 
     @InjectMocks
-    private GenerateMediationJsonAndTransferTaskHandler mediationJsonHandler;
+    private GenerateJsonAndTransferTaskHandler mediationJsonHandler;
 
     @Mock
     private ExternalTask externalTask;

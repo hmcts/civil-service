@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,6 @@ public class MediationCasesSearchService extends ElasticSearchService {
      * @return caseDetails
      */
     public List<CaseDetails> getInMediationCases(boolean carmEnabled) {
-        LocalDate claimMovedDateFrom = LocalDate.now().minusDays(8);
         if (carmEnabled) {
             SearchResult searchResult =
                 coreCaseDataService.searchMediationCases(queryInMediationCases(START_INDEX,
@@ -124,7 +122,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
                     .must(beState(IN_MEDIATION))
                     .must(submittedDate(carmEnabled))
                     .must(rangeQuery("data.claimMovedToMediationOn")
-                              .gte("now-8d/d").lt("now-1d/d"))
+                              .gte("now-8d/d").lt("now/d"))
                     .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
                 emptyList(),
                 startIndex,
@@ -139,7 +137,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
                             .must(beState(IN_MEDIATION))
                             .must(submittedDate(carmEnabled))
                             .must(rangeQuery("data.claimMovedToMediationOn")
-                                      .gte("now-8d/d").lt("now-1d/d")))
+                                      .gte("now-8d/d").lt("now/d")))
                 .mustNot(matchQuery("data.mediationFileSentToMmt", "Yes")),
             emptyList(),
             startIndex

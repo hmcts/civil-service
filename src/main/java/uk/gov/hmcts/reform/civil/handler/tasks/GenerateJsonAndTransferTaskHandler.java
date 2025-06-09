@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 
 @Component
 @Slf4j
-public class GenerateMediationJsonAndTransferTaskHandler extends GenerateMediationFileAndTransferTaskHandler {
+public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAndTransferTaskHandler {
 
     private final MediationJsonService mediationJsonService;
 
@@ -35,13 +35,13 @@ public class GenerateMediationJsonAndTransferTaskHandler extends GenerateMediati
 
     private static final String FILENAME = "ocmc_mediation_data.json";
 
-    protected GenerateMediationJsonAndTransferTaskHandler(MediationCasesSearchService caseSearchService,
-                                                          CoreCaseDataService coreCaseDataService,
-                                                          CaseDetailsConverter caseDetailsConverter,
-                                                          SendGridClient sendGridClient,
-                                                          MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
-                                                          MediationJsonService mediationJsonService,
-                                                          MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
+    protected GenerateJsonAndTransferTaskHandler(MediationCasesSearchService caseSearchService,
+                                                 CoreCaseDataService coreCaseDataService,
+                                                 CaseDetailsConverter caseDetailsConverter,
+                                                 SendGridClient sendGridClient,
+                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration,
+                                                 MediationJsonService mediationJsonService,
+                                                 MediationCSVEmailConfiguration mediationCSVEmailConfiguration1) {
         super(
             caseSearchService,
             coreCaseDataService,
