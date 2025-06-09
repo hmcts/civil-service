@@ -165,6 +165,6 @@ public class JudgementService {
             || YesOrNo.YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
             return YesOrNo.YES;
         }
-        return YesOrNo.NO;
+        return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }
 }
