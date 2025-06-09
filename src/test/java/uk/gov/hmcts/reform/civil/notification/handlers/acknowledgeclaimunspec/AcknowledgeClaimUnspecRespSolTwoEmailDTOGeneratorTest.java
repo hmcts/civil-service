@@ -84,7 +84,7 @@ class AcknowledgeClaimUnspecRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldNotifyReturnTrue_whenResp1NotAcknowledgedAndResp2NotLiP() {
         CaseData caseData = CaseData.builder()
-            .respondent2Represented(YesOrNo.NO)
+            .respondent2Represented(YesOrNo.YES)
             .build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(false);
 
@@ -94,7 +94,7 @@ class AcknowledgeClaimUnspecRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldNotifyReturnFalse_whenResp1AcknowledgedAndResp2NotLiP() {
         CaseData caseData = CaseData.builder()
-            .respondent2Represented(YesOrNo.NO)
+            .respondent2Represented(YesOrNo.YES)
             .build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
 
@@ -104,7 +104,7 @@ class AcknowledgeClaimUnspecRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldNotifyReturnFalse_whenResp1NotAcknowledgedAndResp2IsLiP() {
         CaseData caseData = CaseData.builder()
-            .respondent2Represented(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.NO)
             .build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(false);
 
@@ -114,7 +114,7 @@ class AcknowledgeClaimUnspecRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldNotifyReturnFalse_whenResp1AcknowledgedAndResp2IsLiP() {
         CaseData caseData = CaseData.builder()
-            .respondent2Represented(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.NO)
             .build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
 

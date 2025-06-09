@@ -96,7 +96,7 @@ class ClaimDismissedRespSolTwoEmailGeneratorTest {
     void shouldNotNotifyWhenClaimDismissedDateGivenAnd1V2DiffRepsButResp2IsLiP() {
         CaseData caseData = CaseData.builder()
             .claimDismissedDate(LocalDateTime.now())
-            .respondent2Represented(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.NO)
             .build();
         multiPartyScenarioMock.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
 

@@ -84,14 +84,14 @@ class AcknowledgeClaimUnspecRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldNotifyReturnFalse_whenResp1IsAcknowledgedButIsLiP() {
-        CaseData caseData = CaseData.builder().respondent1Represented(YES).build();
+        CaseData caseData = CaseData.builder().respondent1Represented(NO).build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
         assertThat(emailGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
     void shouldNotifyReturnTrue_whenResp1AcknowledgedAndNotLiP() {
-        CaseData caseData = CaseData.builder().respondent1Represented(NO).build();
+        CaseData caseData = CaseData.builder().respondent1Represented(YES).build();
         when(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)).thenReturn(true);
         assertThat(emailGenerator.getShouldNotify(caseData)).isTrue();
     }
