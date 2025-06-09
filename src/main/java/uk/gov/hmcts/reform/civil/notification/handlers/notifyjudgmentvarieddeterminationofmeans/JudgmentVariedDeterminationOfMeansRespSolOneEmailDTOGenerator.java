@@ -13,7 +13,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLeg
 @Component
 public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "defendant-judgment-varied-determination-of-means-%s";
+    private static final String REFERENCE_RESP_SOL_ONE_TEMPLATE = "defendant-judgment-varied-determination-of-means-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -32,7 +32,7 @@ public class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGenerator exten
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_RESP_SOL_ONE_TEMPLATE;
     }
 
     @Override
