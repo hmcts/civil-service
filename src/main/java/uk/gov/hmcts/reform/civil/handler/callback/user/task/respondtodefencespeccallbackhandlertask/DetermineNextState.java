@@ -95,10 +95,10 @@ public class DetermineNextState extends CallbackHandler {
                 nextState = getNextState(caseData);
             } else if (caseData.hasApplicantRejectedRepaymentPlan()) {
                 nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
-            } else if (isClaimNotSettled(caseData)) {
-                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (caseData.isPartAdmitClaimSettled()) {
                 nextState = CaseState.CASE_SETTLED.name();
+            } else if (isClaimNotSettled(caseData)) {
+                nextState = CaseState.JUDICIAL_REFERRAL.name();
             } else if (isLipVLipOneVOne(caseData)) {
                 nextState = CaseState.CASE_STAYED.name();
             }
