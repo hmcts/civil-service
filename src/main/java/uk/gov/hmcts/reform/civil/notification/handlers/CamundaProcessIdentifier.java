@@ -16,6 +16,8 @@ public enum CamundaProcessIdentifier {
     DefendantResponseSpecFullDefenceFullPartAdmitNotifyParties,
     DefendantResponseSpecOneRespRespondedNotifyParties,
     DefendantResponseSpecLipvLRFullOrPartAdmit,
+    CreateClaimAfterPaymentContinuingOfflineNotifier,
+    CreateClaimAfterPaymentContinuingOnlineNotifier,
     ClaimSubmittedApplicantNotifier,
     ClaimantLipHelpWithFeesNotifier
 }
