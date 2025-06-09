@@ -80,8 +80,11 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(divergentRespondWithDQAndGoOfflineSpec.and(specClaim), transitions)
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
             .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim), transitions)
-            .set((c, flags) ->
-                 {if (isRespondentResponseLangIsBilingual.test(c)) {flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);}}, transitions);
+            .set((c, flags) -> {
+                if (isRespondentResponseLangIsBilingual.test(c)) {
+                    flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
+                }
+            }, transitions);
     }
 
     public static final Predicate<CaseData> claimNotified = caseData ->
