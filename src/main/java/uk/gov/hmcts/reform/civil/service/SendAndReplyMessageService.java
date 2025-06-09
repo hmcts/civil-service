@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.model.wa.SearchOperator;
 import uk.gov.hmcts.reform.civil.model.wa.SearchParameterKey;
 import uk.gov.hmcts.reform.civil.model.wa.SearchParameterList;
 import uk.gov.hmcts.reform.civil.model.wa.SearchTaskRequest;
-import uk.gov.hmcts.reform.civil.model.wa.UserTask;
+import uk.gov.hmcts.reform.civil.model.wa.TaskData;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -146,7 +146,7 @@ public class SendAndReplyMessageService {
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
         log.info("message for history id  add task info" + messageForHistory.getMessageID());
 
-        ResponseEntity<GetTasksResponse<UserTask>> response = waTaskManagementApiClient.searchWithCriteria(
+        ResponseEntity<GetTasksResponse<TaskData>> response = waTaskManagementApiClient.searchWithCriteria(
             userAuth,
             SearchTaskRequest.builder()
                 .requestContext(RequestContext.AVAILABLE_TASKS)
@@ -159,18 +159,18 @@ public class SendAndReplyMessageService {
 
         log.info("response from wa api " + response);
 
-        GetTasksResponse<UserTask> body = response.getBody();
+        GetTasksResponse<TaskData> body = response.getBody();
         log.info("body " + body);
         if (body != null) {
-            List<UserTask> tasks = body.getTasks();
+            List<TaskData> tasks = body.getTasks();
             log.info("tasks from wa api " + tasks);
             if (!tasks.isEmpty()) {
-                List<UserTask> task = tasks.stream().filter(t -> t.getTaskData().getAdditionalProperties().getMessageId().equals(
+                List<TaskData> task = tasks.stream().filter(t -> t.getAdditionalProperties().getMessageId().equals(
                     messageForHistory.getMessageID())).toList();
                 log.info("filtered tasks " + task);
                 if (!task.isEmpty()) {
                     return MessageWaTaskDetails.builder()
-                        .taskId(task.get(0).getTaskData().getId())
+                        .taskId(task.get(0).getId())
                         .messageID(messageForHistory.getMessageID())
                         .build();
                 }

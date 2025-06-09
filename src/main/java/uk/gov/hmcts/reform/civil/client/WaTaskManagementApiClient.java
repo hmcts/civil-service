@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.civil.model.wa.GetTasksResponse;
 import uk.gov.hmcts.reform.civil.model.wa.SearchTaskRequest;
-import uk.gov.hmcts.reform.civil.model.wa.UserTask;
+import uk.gov.hmcts.reform.civil.model.wa.TaskData;
 
 import javax.validation.Valid;
 
@@ -17,7 +17,7 @@ import javax.validation.Valid;
 public interface WaTaskManagementApiClient {
 
     @PostMapping(value = "/task", consumes = "application/json")
-    ResponseEntity<GetTasksResponse<UserTask>> searchWithCriteria(
+    ResponseEntity<GetTasksResponse<TaskData>> searchWithCriteria(
         @RequestHeader("Authorization") String authorization,
         @Valid @RequestBody SearchTaskRequest searchTaskRequest
     );
