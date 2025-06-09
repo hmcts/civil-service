@@ -46,11 +46,11 @@ public class WaMapperUtils {
                 .clientContext(clientContext.toBuilder()
                                    .userTask(userTask.toBuilder()
                                                  .taskData(taskData.toBuilder()
-                                                               .id("5066e242-4508-11f0-a2ec-a2a527580a08")
+                                                               .id("9080cb8c-4508-11f0-8184-9abc4f7e3527")
                                                                .name("Review message")
                                                                .additionalProperties(AdditionalProperties.builder()
                                                                                          .messageId(
-                                                                                             "dce04dbb-9518-4683-ad79-0aea8d22962d")
+                                                                                             "e7c91c75-89b3-4d1f-bd50-3cf6c44d150c")
                                                                                          .build())
                                                                .build())
                                                  .completeTask(true)

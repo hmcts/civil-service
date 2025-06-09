@@ -20,7 +20,7 @@ public class TaskData {
     private String id;
     @JsonProperty("name")
     private String name;
-    /*private String assignee;
+    private String assignee;
     private String type;
     private String taskState;
     private String taskSystem;
@@ -43,7 +43,7 @@ public class TaskData {
     private int minorPriority;
     private int majorPriority;
     private String priorityDate;
-    private boolean completeTask;*/
+    private boolean completeTask;
     @JsonProperty("additional_properties")
     private AdditionalProperties additionalProperties;
 }
