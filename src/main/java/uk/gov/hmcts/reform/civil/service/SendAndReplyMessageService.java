@@ -146,37 +146,42 @@ public class SendAndReplyMessageService {
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
         log.info("message for history id  add task info " + messageForHistory.getMessageID());
 
-        ResponseEntity<GetTasksResponse<Task>> response = waTaskManagementApiClient.searchWithCriteria(
-            userAuth,
-            SearchTaskRequest.builder()
-                .requestContext(RequestContext.AVAILABLE_TASKS)
-                .searchParameters(List.of(new SearchParameterList(
-                    SearchParameterKey.CASE_ID, SearchOperator.IN,
-                    List.of(String.valueOf(caseData.getCcdCaseReference()))
-                )))
-                .build()
-        );
+        try {
+            ResponseEntity<GetTasksResponse<Task>> response = waTaskManagementApiClient.searchWithCriteria(
+                userAuth,
+                SearchTaskRequest.builder()
+                    .requestContext(RequestContext.AVAILABLE_TASKS)
+                    .searchParameters(List.of(new SearchParameterList(
+                        SearchParameterKey.CASE_ID, SearchOperator.IN,
+                        List.of(String.valueOf(caseData.getCcdCaseReference()))
+                    )))
+                    .build()
+            );
+            log.info("response from wa api " + response);
 
-        log.info("response from wa api " + response);
-
-        GetTasksResponse<Task> body = response.getBody();
-        log.info("body " + body);
-        if (body != null) {
-            List<Task> tasks = body.getTasks();
-            log.info("tasks from wa api " + tasks);
-            if (!tasks.isEmpty()) {
-                List<Task> task = tasks.stream().filter(t -> t.getAdditionalProperties().entrySet().stream()
-                    .anyMatch(e -> e.getKey().equals("messageId") && e.getValue().equals(
-                    messageForHistory.getMessageID()))).toList();
-                log.info("filtered tasks " + task);
-                if (!task.isEmpty()) {
-                    return MessageWaTaskDetails.builder()
-                        .taskId(task.get(0).getId())
-                        .messageID(messageForHistory.getMessageID())
-                        .build();
+            GetTasksResponse<Task> body = response.getBody();
+            log.info("body " + body);
+            if (body != null) {
+                List<Task> tasks = body.getTasks();
+                log.info("tasks from wa api " + tasks);
+                if (!tasks.isEmpty()) {
+                    List<Task> task = tasks.stream().filter(t -> t.getAdditionalProperties().entrySet().stream()
+                        .anyMatch(e -> e.getKey().equals("messageId") && e.getValue().equals(
+                            messageForHistory.getMessageID()))).toList();
+                    log.info("filtered tasks " + task);
+                    if (!task.isEmpty()) {
+                        return MessageWaTaskDetails.builder()
+                            .taskId(task.get(0).getId())
+                            .messageID(messageForHistory.getMessageID())
+                            .build();
+                    }
                 }
             }
+        } catch (HttpClientErrorException e) {
+            log.error("failed call wa api " + e.getMessage());
+            throw e;
         }
+
         return null;
     }
 
