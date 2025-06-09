@@ -5,10 +5,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class NotifyHwFOutcomePartiesClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
@@ -42,11 +39,11 @@ public class NotifyHwFOutcomePartiesClaimantEmailDTOGenerator extends ClaimantEm
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        Map<String, String> commonProperties = notifyClaimantHwFOutcomeHelper.getCommonProperties(caseData);
-        Map<String, String> furtherProperties = notifyClaimantHwFOutcomeHelper.getFurtherProperties(caseData);
-        return Collections.unmodifiableMap(
-            Stream.concat(commonProperties.entrySet().stream(), furtherProperties.entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-        );
+        Map<String, String> mutableProperties = new java.util.HashMap<>(Map.copyOf(properties));
+
+        mutableProperties.putAll(notifyClaimantHwFOutcomeHelper.getCommonProperties(caseData));
+        mutableProperties.putAll(notifyClaimantHwFOutcomeHelper.getFurtherProperties(caseData));
+
+        return mutableProperties;
     }
 }
