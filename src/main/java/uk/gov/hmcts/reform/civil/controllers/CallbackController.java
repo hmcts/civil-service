@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,11 +24,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.wa.WaMapper;
 import uk.gov.hmcts.reform.civil.utils.WaMapperUtils;
 
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
+
+import static uk.gov.hmcts.reform.civil.utils.WaMapperUtils.createClientContext;
 
 @Tag(name = "Callback Controller")
 @Slf4j
@@ -49,7 +54,7 @@ public class CallbackController {
         "/version/{version}/{callback-type}/{page-id}"
     })
     @Operation(summary = "Handles all callbacks from CCD")
-    public CallbackResponse callback(
+    public ResponseEntity<CallbackResponse> callback(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
@@ -65,6 +70,7 @@ public class CallbackController {
         );
 
         log.info("client context " + clientContext);
+        WaMapper waMapper = WaMapperUtils.getWaMapper(clientContext);
 
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
@@ -74,9 +80,13 @@ public class CallbackController {
             .pageId(pageId.orElse(null))
             .caseData(caseDetailsConverter.toCaseData(caseDetails))
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
-            .waMapper(WaMapperUtils.getWaMapper(clientContext))
+            .waMapper(waMapper)
             .build();
 
-        return callbackHandlerFactory.dispatch(callbackParams);
+        log.info("event id " + callback.getEventId());
+
+        return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
+                                  createClientContext(waMapper),
+                                  HttpStatus.OK);
     }
 }
