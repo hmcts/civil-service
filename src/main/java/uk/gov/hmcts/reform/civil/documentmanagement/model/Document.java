@@ -13,11 +13,17 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Document {
 
+    @JsonProperty("document_url")
     String documentUrl;
+    @JsonProperty("document_binary_url")
     String documentBinaryUrl;
+    @JsonProperty("document_filename")
     String documentFileName;
+    @JsonProperty("document_hash")
     String documentHash;
+    @JsonProperty("category_id")
     String categoryID;
+    @JsonProperty("upload_timestamp")
     String uploadTimestamp;
 
     @JsonCreator

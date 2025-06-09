@@ -2,12 +2,16 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.businessprocess;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,14 +43,7 @@ import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    StartGeneralApplicationBusinessProcessCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    SimpleStateFlowEngine.class,
-    SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
@@ -55,15 +52,19 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
     private ExternalTask mockTask;
     @Mock
     private ExternalTaskService externalTaskService;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
-    private StartGeneralApplicationBusinessProcessCallbackHandler handler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @InjectMocks
+    private StartGeneralApplicationBusinessProcessCallbackHandler handler;
 
     private CaseData getTestCaseDataWithNullBusinessProcessGA(CaseData caseData) {
         GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();

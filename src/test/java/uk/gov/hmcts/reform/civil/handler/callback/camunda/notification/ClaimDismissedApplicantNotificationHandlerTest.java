@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.notification.handlers.claimdismissed.ClaimDismissedEmailTemplater;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -20,15 +24,16 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
-import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
+import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,33 +53,37 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 
-@SpringBootTest(classes = {
-    ClaimDismissedApplicantNotificationHandler.class,
-    NotificationsProperties.class,
-    CaseDetailsConverter.class,
-    SimpleStateFlowEngine.class,
-    SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class,
-    JacksonAutoConfiguration.class,
-    ClaimDismissedEmailTemplater.class
-})
+@ExtendWith(MockitoExtension.class)
 class ClaimDismissedApplicantNotificationHandlerTest {
 
     public static final String TEMPLATE_ID_1 = "template-id-1";
     public static final String TEMPLATE_ID_2 = "template-id-2";
     public static final String TEMPLATE_ID_3 = "template-id-3";
-    @MockBean
+
+    @Mock
+    private IStateFlowEngine stateFlowEngine;
+
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private OrganisationService organisationService;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private NotificationsSignatureConfiguration configuration;
 
-    @Autowired
+    @Mock
+    private ClaimDismissedEmailTemplater claimDismissedEmailTemplater;
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @InjectMocks
     private ClaimDismissedApplicantNotificationHandler handler;
 
     @BeforeEach
@@ -89,18 +98,16 @@ class ClaimDismissedApplicantNotificationHandlerTest {
         when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
         when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
         when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
+                                                                               .state(State.from("MAIN.DRAFT"))
+                                                                               .stateHistory(List.of(State.from("MAIN.DRAFT")))
+                                                                               .flags(Map.of())
+                                                                               .build());
     }
 
     @Nested
     class AboutToSubmitCallback {
-
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getSolicitorClaimDismissedWithinDeadline()).thenReturn(TEMPLATE_ID_1);
-            when(notificationsProperties.getSolicitorClaimDismissedWithin14Days()).thenReturn(TEMPLATE_ID_3);
-            when(notificationsProperties.getSolicitorClaimDismissedWithin4Months()).thenReturn(TEMPLATE_ID_2);
-
-        }
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
@@ -108,6 +115,8 @@ class ClaimDismissedApplicantNotificationHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+
+            when(claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(any(), any())).thenReturn(TEMPLATE_ID_1);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -127,9 +136,9 @@ class ClaimDismissedApplicantNotificationHandlerTest {
             .build();
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-        when(notificationsProperties.getSolicitorClaimDismissedWithinDeadline()).thenReturn(TEMPLATE_ID_1);
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+        when(claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(any(), any())).thenReturn(TEMPLATE_ID_1);
         handler.handle(params);
 
         verify(notificationService).sendMail(
@@ -147,9 +156,10 @@ class ClaimDismissedApplicantNotificationHandlerTest {
             .build();
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-        when(notificationsProperties.getSolicitorClaimDismissedWithin4Months()).thenReturn(TEMPLATE_ID_2);
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+        when(claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(any(), any())).thenReturn(TEMPLATE_ID_2);
+
 
         handler.handle(params);
 
@@ -168,7 +178,7 @@ class ClaimDismissedApplicantNotificationHandlerTest {
             .build();
 
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-        when(notificationsProperties.getSolicitorClaimDismissedWithin14Days()).thenReturn(TEMPLATE_ID_3);
+        when(claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(any(), any())).thenReturn(TEMPLATE_ID_3);
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
 

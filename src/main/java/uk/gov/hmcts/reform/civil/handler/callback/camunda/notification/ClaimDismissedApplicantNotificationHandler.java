@@ -94,10 +94,11 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler 
 
     private String getSolicitorClaimDismissedProperty(CaseData caseData) {
         return claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(
-            stateFlowEngine.evaluate(caseData)
+            stateFlowEngine.getStateFlow(caseData)
                 .getStateHistory()
                 .stream()
                 .map(State::getName)
+                .peek(System.out::println)
                 .toList(),
             notificationsProperties
         );

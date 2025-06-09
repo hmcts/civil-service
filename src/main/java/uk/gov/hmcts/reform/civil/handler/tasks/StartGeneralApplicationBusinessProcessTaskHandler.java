@@ -43,7 +43,9 @@ public class StartGeneralApplicationBusinessProcessTaskHandler extends BaseExter
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         CaseData caseData = startGeneralApplicationBusinessProcess(externalTask);
         var variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(caseData);
+        var stateFlow = stateFlowEngine.getStateFlow(caseData);
+        System.out.println(stateFlow.getState().getName());
+        System.out.println(stateFlow.getFlags());
         variables.putValue(FLOW_STATE, stateFlow.getState().getName());
         variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
         return ExternalTaskData.builder().variables(variables).build();
