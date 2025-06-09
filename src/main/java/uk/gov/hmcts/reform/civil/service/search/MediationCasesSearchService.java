@@ -114,7 +114,7 @@ public class MediationCasesSearchService extends ElasticSearchService {
         return null;
     }
 
-    Query queryInMediationCases(int startIndex, boolean carmEnabled, boolean initialSearch,
+    private Query queryInMediationCases(int startIndex, boolean carmEnabled, boolean initialSearch,
                                 String searchAfterValue) {
 
         if (carmEnabled) {
