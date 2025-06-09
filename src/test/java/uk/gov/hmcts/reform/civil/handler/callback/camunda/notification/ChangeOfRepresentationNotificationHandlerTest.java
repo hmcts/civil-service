@@ -48,12 +48,17 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUE_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_REP_NAME_WITH_SPACE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NEW_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OTHER_SOL_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -105,11 +110,16 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 .thenReturn(Optional.of(Organisation.builder().name(PREVIOUS_SOL).build()));
             when(organisationService.findOrganisationById("New-sol-id"))
                 .thenReturn(Optional.of(Organisation.builder().name(NEW_SOLICITOR).build()));
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
-                                                                      + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Nested
@@ -139,10 +149,16 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     "reference", "1594901956117591"
                 ));
 
-                expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-                expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-                expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+                expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+                expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+                expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+                expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+                expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
                                  .eventId(NOTIFY_FORMER_SOLICITOR.name()).build()).build();
@@ -205,10 +221,16 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     "reference", "1594901956117591"
                 ));
 
-                expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-                expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-                expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+                expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+                expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+                expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+                expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+                expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
 
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
@@ -247,10 +269,16 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     "reference", "1594901956117591"
                 ));
 
-                expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-                expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-                expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+                expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+                expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+                expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+                expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+                expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
                                  .eventId(NOTIFY_NEW_DEFENDANT_SOLICITOR.name()).build()).build();
@@ -289,10 +317,16 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                     "reference", "1594901956117591"
                 ));
 
-                expectedProperties.put(PHONE_CONTACT, "For anything related to hearings, call 0300 123 5577 \n For all other matters, call 0300 123 7050");
-                expectedProperties.put(OPENING_HOURS, "Monday to Friday, 8.30am to 5pm");
-                expectedProperties.put(SPEC_UNSPEC_CONTACT, "Email for Specified Claims: contactocmc@justice.gov.uk \n Email for Damages Claims: damagesclaims@justice.gov.uk");
-                expectedProperties.put(HMCTS_SIGNATURE, "Online Civil Claims \n HM Courts & Tribunal Service");
+                expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+                expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+                expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+                expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+                expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+                expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+                expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+                expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
 
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
@@ -314,6 +348,20 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
     @Nested
     class AboutToSubmitCallbackLip {
 
+        @BeforeEach
+        void setup() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        }
+
         @Test
         void shouldNotifyForOtherPartiesLipBilingualForRespondentSolicitorChange() {
             when(notificationsProperties.getNotifyClaimantLipBilingualAfterDefendantNOC()).thenReturn(
@@ -325,8 +373,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+            handler.handle(params);
 
-            Map<String, String> expectedProperties = Map.of(
+            Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "Defendant Name",
                 "Mr. Sole Trader",
                 "claim16DigitNumber",
@@ -335,9 +384,17 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 "Mr. John Rambo",
                 "claimnumber",
                 "000DC001"
-            );
-
-            handler.handle(params);
+            ));
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
@@ -357,8 +414,9 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+            handler.handle(params);
 
-            Map<String, String> expectedProperties = Map.of(
+            Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "Defendant Name",
                 "Mr. Sole Trader",
                 "claim16DigitNumber",
@@ -367,9 +425,17 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 "Mr. John Rambo",
                 "claimnumber",
                 "000DC001"
-            );
-
-            handler.handle(params);
+            ));
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
