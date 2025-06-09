@@ -26,7 +26,7 @@ public abstract class RespSolOneEmailDTOGenerator extends EmailDTOGenerator {
         return properties;
     }
 
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isRespondent1LiP() ? Boolean.FALSE : Boolean.TRUE;
     }
 }
