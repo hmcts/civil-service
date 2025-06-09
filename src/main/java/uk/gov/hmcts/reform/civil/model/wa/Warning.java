@@ -13,6 +13,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Warning {
+
     @Schema(
         name = "warning_code",
         description = "A code that distinguishes which Warning is to be applied ")
