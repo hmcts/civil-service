@@ -7,7 +7,7 @@ import java.util.List;
 
 @EqualsAndHashCode
 @ToString
-public class GetTasksResponse<T extends TaskData> {
+public class GetTasksResponse<T extends Task> {
 
     private final List<T> tasks;
 

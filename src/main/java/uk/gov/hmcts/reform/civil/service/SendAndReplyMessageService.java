@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.model.wa.SearchOperator;
 import uk.gov.hmcts.reform.civil.model.wa.SearchParameterKey;
 import uk.gov.hmcts.reform.civil.model.wa.SearchParameterList;
 import uk.gov.hmcts.reform.civil.model.wa.SearchTaskRequest;
-import uk.gov.hmcts.reform.civil.model.wa.TaskData;
+import uk.gov.hmcts.reform.civil.model.wa.Task;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -144,9 +144,9 @@ public class SendAndReplyMessageService {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
 
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
-        log.info("message for history id  add task info" + messageForHistory.getMessageID());
+        log.info("message for history id  add task info " + messageForHistory.getMessageID());
 
-        ResponseEntity<GetTasksResponse<TaskData>> response = waTaskManagementApiClient.searchWithCriteria(
+        ResponseEntity<GetTasksResponse<Task>> response = waTaskManagementApiClient.searchWithCriteria(
             userAuth,
             SearchTaskRequest.builder()
                 .requestContext(RequestContext.AVAILABLE_TASKS)
@@ -159,14 +159,15 @@ public class SendAndReplyMessageService {
 
         log.info("response from wa api " + response);
 
-        GetTasksResponse<TaskData> body = response.getBody();
+        GetTasksResponse<Task> body = response.getBody();
         log.info("body " + body);
         if (body != null) {
-            List<TaskData> tasks = body.getTasks();
+            List<Task> tasks = body.getTasks();
             log.info("tasks from wa api " + tasks);
             if (!tasks.isEmpty()) {
-                List<TaskData> task = tasks.stream().filter(t -> t.getAdditionalProperties().getMessageId().equals(
-                    messageForHistory.getMessageID())).toList();
+                List<Task> task = tasks.stream().filter(t -> t.getAdditionalProperties().entrySet().stream()
+                    .anyMatch(e -> e.getKey().equals("messageId") && e.getValue().equals(
+                    messageForHistory.getMessageID()))).toList();
                 log.info("filtered tasks " + task);
                 if (!task.isEmpty()) {
                     return MessageWaTaskDetails.builder()
