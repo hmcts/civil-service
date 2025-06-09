@@ -15,7 +15,7 @@ public class SpecOneDefRespRespSolOneEmailDTOGenerator extends SpecDefRespRespSo
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.getRespondent1DQ() != null
             && caseData.getRespondent1ClaimResponseTypeForSpec() != null;
     }
