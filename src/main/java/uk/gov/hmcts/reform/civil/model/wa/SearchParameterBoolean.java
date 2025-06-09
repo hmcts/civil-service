@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.wa;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.launchdarkly.shaded.org.jetbrains.annotations.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
@@ -18,21 +19,15 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 public class SearchParameterBoolean implements SearchParameter<Boolean> {
 
     @Schema(requiredMode = REQUIRED)
-    @NotNull(
-        message = "Each search_parameter element must have 'key', 'value' and 'operator' fields present and populated."
-    )
+    @NotNull()
     private final SearchParameterKey key;
 
     @Schema(allowableValues = "BOOLEAN", example = "BOOLEAN")
-    @NotNull(
-        message = "Each search_parameter element must have 'key', 'value' and 'operator' fields present and populated."
-    )
+    @NotNull()
     private final SearchOperator operator;
 
     @Schema(requiredMode = REQUIRED, example = "true")
-    @NotNull(
-        message = "Each search_parameter element must have 'key', 'value' and 'operator' fields present and populated."
-    )
+    @NotNull()
     private final boolean values;
 
     @JsonCreator
@@ -57,3 +52,4 @@ public class SearchParameterBoolean implements SearchParameter<Boolean> {
     public Boolean getValues() {
         return values;
     }
+}
