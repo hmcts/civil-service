@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Component
 public class HearingFeeUnpaidRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "hearing-fee-unpaid-respondent-notification-%s";
+    private static final String REFERENCE_RESP_SOL_TWO_TEMPLATE = "hearing-fee-unpaid-respondent-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -34,7 +34,7 @@ public class HearingFeeUnpaidRespSolTwoEmailDTOGenerator extends RespSolTwoEmail
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_RESP_SOL_TWO_TEMPLATE;
     }
 
     @Override

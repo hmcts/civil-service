@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Component
 public class HearingFeeUnpaidRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "hearing-fee-unpaid-respondent-notification-%s";
+    private static final String REFERENCE_RESP_SOL_ONETEMPLATE = "hearing-fee-unpaid-respondent-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -34,14 +34,14 @@ public class HearingFeeUnpaidRespSolOneEmailDTOGenerator extends RespSolOneEmail
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_RESP_SOL_ONETEMPLATE;
     }
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE));
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
                 true, organisationService));
+        properties.put(HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE));
         return properties;
     }
 }
