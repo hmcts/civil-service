@@ -121,6 +121,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
@@ -2540,7 +2541,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts() {
+        void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts_BulkAdmissionsEnabled() {
+
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
@@ -2570,6 +2573,36 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
             assertThat(finalTotal).isEqualTo(subTotal);
+        }
+
+        @Test
+        void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts_BulkAdmissionsDisabled() {
+
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(false);
+
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YesOrNo.NO)
+                .build();
+
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .claimFee(fee)
+                .fixedCosts(FixedCosts.builder().claimFixedCosts(NO).build())
+                .totalInterest(interestAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
+            assertNull(claimFee);
+            BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
+            assertNull(subTotal);
+            BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
+            assertNull(finalTotal);
         }
     }
 
