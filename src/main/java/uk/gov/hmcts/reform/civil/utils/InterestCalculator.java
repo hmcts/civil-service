@@ -33,6 +33,10 @@ public class InterestCalculator {
         return caseData.getTotalClaimAmount().add(calculateInterest(caseData));
     }
 
+    public BigDecimal calculateInterestForJO(CaseData caseData) {
+        return this.calculateInterest(caseData, getToDateForJO(caseData));
+    }
+
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
@@ -66,6 +70,16 @@ public class InterestCalculator {
                 caseData.getInterestFromSpecificDate(), interestToDate);
         }
         return ZERO;
+    }
+
+    private LocalDate getToDateForJO(CaseData caseData) {
+        if (Objects.isNull(caseData.getInterestClaimUntil())) {
+            return LocalDate.now();
+        } else if (caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+            return getSubmittedDate(caseData);
+        } else {
+            return LocalDate.now().minusDays(1);
+        }
     }
 
     private LocalDate getToDate(CaseData caseData) {
