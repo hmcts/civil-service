@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.model.wa.SystemDateProvider.DATE_TIME_FO
     "PMD.ExcessiveParameterList", "PMD.ShortClassName", "PMD.LinguisticNaming"})
 @Schema(allowableValues = "Task")
 public class Task {
+
     public static final String SAMPLE_ISO_DATE_TIME = "2020-09-05T14:47:01.250542+01:00";
     @Schema(
         requiredMode = REQUIRED,
