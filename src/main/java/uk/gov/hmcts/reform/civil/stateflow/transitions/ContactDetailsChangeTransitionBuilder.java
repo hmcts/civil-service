@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.changeLanguagePreferenceEvent;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -36,7 +37,8 @@ public class ContactDetailsChangeTransitionBuilder extends MidTransitionBuilder 
             .moveTo(PART_ADMISSION, transitions).onlyWhen(partAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
             .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
             .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaimSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
-            .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions).onlyWhen(isRespondentResponseLangIsBilingual, transitions)
-            .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true), transitions);
+            .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions).onlyWhen(isRespondentResponseLangIsBilingual.and(not(changeLanguagePreferenceEvent)), transitions)
+            .set((c, flags) ->
+                 {if (isRespondentResponseLangIsBilingual.test(c)) {flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);}}, transitions);
     }
 }
