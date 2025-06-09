@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
@@ -47,7 +46,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
-    private final FeatureToggleService featureToggleService;
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -210,6 +208,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .orElse("0");
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
+
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         return builder
             .claimReferenceNumber(caseData.getLegacyCaseReference())
@@ -319,7 +318,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getClaimCosts(CaseData caseData) {
-        return judgementService.isLrFullAdmitRepaymentPlan(caseData)
+        return (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData))
             ? (getClaimFee(caseData).add(judgementService.ccjJudgmentFixedCost(caseData))).toString()
             : getClaimFee(caseData).toString();
     }
