@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.wa.WaMapper;
@@ -85,8 +86,14 @@ public class CallbackController {
 
         log.info("event id " + callback.getEventId());
 
-        return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
-                                  createClientContext(waMapper),
-                                  HttpStatus.OK);
+        if (CaseEvent.valueOf(callback.getEventId()).equals(CaseEvent.SEND_AND_REPLY)) {
+            log.info("updating client context callback controller");
+            return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
+                                        createClientContext(waMapper),
+                                        HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
+                                        HttpStatus.OK);
+        }
     }
 }

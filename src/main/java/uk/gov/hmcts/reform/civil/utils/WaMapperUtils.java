@@ -42,26 +42,28 @@ public class WaMapperUtils {
             UserTask userTask = clientContext.getUserTask() != null
                 ? clientContext.getUserTask() : UserTask.builder().build();
             TaskData taskData = userTask.getTaskData() != null ? userTask.getTaskData() : TaskData.builder().build();
-            waMapper.toBuilder()
+            waMapper = waMapper.toBuilder()
                 .clientContext(clientContext.toBuilder()
                                    .userTask(userTask.toBuilder()
                                                  .taskData(taskData.toBuilder()
                                                                .id("5066e242-4508-11f0-a2ec-a2a527580a08")
                                                                .name("Review message")
                                                                .additionalProperties(AdditionalProperties.builder()
-                                                                                         .messageId("dce04dbb-9518-4683-ad79-0aea8d22962d")
+                                                                                         .messageId(
+                                                                                             "dce04dbb-9518-4683-ad79-0aea8d22962d")
                                                                                          .build())
                                                                .build())
                                                  .completeTask(true)
                                                  .build())
                                    .build())
                 .build();
+            log.info("updated wa mapper " + waMapper);
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 String jsonString = objectMapper.writeValueAsString(waMapper);
                 byte[] encodedBytes = Base64.getEncoder().encode(jsonString.getBytes());
                 String encodedString = new String(encodedBytes);
-
+                log.info("encoded string wa mapper " + encodedString);
                 multiValueMap.add(WorkAllocationConstants.CLIENT_CONTEXT_HEADER_PARAMETER, encodedString);
 
             } catch (Exception ex) {
