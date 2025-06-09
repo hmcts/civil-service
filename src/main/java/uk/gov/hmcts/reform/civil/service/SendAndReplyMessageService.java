@@ -157,6 +157,8 @@ public class SendAndReplyMessageService {
                 .build()
         );
 
+        log.info("response from wa api " + response);
+
         GetTasksResponse<UserTask> body = response.getBody();
         log.info("body " + body);
         if (body != null) {

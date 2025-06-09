@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
+import uk.gov.hmcts.reform.civil.model.sendandreply.MessageWaTaskDetails;
 import uk.gov.hmcts.reform.civil.model.wa.AdditionalProperties;
 import uk.gov.hmcts.reform.civil.model.wa.ClientContext;
 import uk.gov.hmcts.reform.civil.model.wa.TaskData;
@@ -163,6 +164,12 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 .sendMessageMetadata(null)
                 .sendMessageContent(null);
         } else {
+            MessageWaTaskDetails messageWaTaskDetails = messageService.addTaskInfo(
+                caseData.getMessages(),
+                caseData.getMessagesToReplyTo().getValue().getCode(),
+                userAuth,
+                caseData
+            );
             messagesNew = messageService.addReplyToMessage(
                 caseData.getMessages(),
                 caseData.getMessagesToReplyTo().getValue().getCode(),
@@ -170,10 +177,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 userAuth
             );
             builder.messages(messagesNew)
-                .messageWaTaskDetails(messageService.addTaskInfo(caseData.getMessages(),
-                                                                 caseData.getMessagesToReplyTo().getValue().getCode(),
-                                                                 userAuth,
-                                                                 caseData))
+                .messageWaTaskDetails(messageWaTaskDetails)
                 .messagesToReplyTo(null)
                 .messageReplyMetadata(null)
                 .messageHistory(null);
