@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,12 +20,15 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,8 +48,17 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
 
 @ExtendWith(MockitoExtension.class)
 class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -59,6 +72,12 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private OrganisationService organisationService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
+    private NotificationsSignatureConfiguration configuration;
+
     @InjectMocks
     private BundleCreatedNotificationHandler handler;
 
@@ -68,12 +87,25 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
+        @BeforeEach
+        void setup() {
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+        }
+
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-
             //Given: Case data at hearing scheduled state and callback param with Notify applicant event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -97,7 +129,6 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-
             //Given: Case data at hearing scheduled state and callback param with Notify respondent1 event
             CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -121,7 +152,6 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
             when(notificationsProperties.getBundleCreationTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
-
             //Given: Case data at hearing scheduled state and callback param with Notify respondent2 event and
             // different solicitor for respondent2
             CaseData caseData = CaseDataBuilder.builder()
@@ -142,25 +172,6 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
                 getNotificationDataMap(caseData),
                 "bundle-created-respondent-notification-000DC001"
             );
-        }
-
-        @Test
-        void shouldNotNotifyRespondentSolicitorTwo_whenInvokedWithSameSol() {
-            //Given: Case data at hearing scheduled state and callback param with Notify respondent2 event and
-            // same solicitor for respondent2
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateHearingDateScheduled()
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com").build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED.name()).build()
-            ).build();
-
-            //When: handler is called
-            handler.handle(params);
-
-            //Then: Email should not be sent to respondent2
-            verifyNoInteractions(notificationService);
         }
 
         @Test
@@ -225,80 +236,114 @@ class BundleCreatedNotificationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
-                CallbackRequest.builder().eventId(
-                    NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()).build()))
-                .isEqualTo(TASK_ID_APPLICANT);
+        void addPropertiesLipForApplicant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+                .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                                .type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
+                                 .type(Party.Type.INDIVIDUAL).build()).build();
 
-            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
-                CallbackRequest.builder().eventId(
-                    NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()).build()))
-                .isEqualTo(TASK_ID_DEFENDANT1);
+            Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_APPLICANT);
 
-            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
-                CallbackRequest.builder().eventId(
-                    NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED.name()).build()).build()))
-                .isEqualTo(TASK_ID_DEFENDANT2);
+            assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
+            assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
+            assertThat(properties).containsEntry("name", "John Doe");
         }
 
         @Test
-        void handleEventsReturnsTheExpectedCallbackEvent() {
-            assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED);
-            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED);
-            assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED);
+        void addPropertiesLipForRespondent() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+                .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
+                                .type(Party.Type.INDIVIDUAL).build())
+                .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
+                                 .type(Party.Type.INDIVIDUAL).build()).build();
+
+            Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_DEFENDANT1);
+
+            assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
+            assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
+            assertThat(properties).containsEntry("name", "Jack Jackson");
         }
 
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-                PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789",
-                CLAIM_LEGAL_ORG_NAME_SPEC, "org name",
-                CASEMAN_REF, "000DC001"
-            );
+            Map<String, String> notificationData = new HashMap<>(addCommonProperties());
+            notificationData.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            notificationData.put(CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData));
+            notificationData.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            notificationData.put(CLAIM_LEGAL_ORG_NAME_SPEC, "org name");
+            notificationData.put(CASEMAN_REF, "000DC001");
+            return notificationData;
         }
 
         @NotNull
         private Map<String, String> getNotificationLipDataMap(CaseData caseData) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
-                CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData),
-                PARTY_NAME, "John Doe"
-            );
+            Map<String, String> notificationData = new HashMap<>(addCommonProperties());
+            notificationData.put(CLAIM_REFERENCE_NUMBER, CASE_ID.toString());
+            notificationData.put(CLAIMANT_V_DEFENDANT, PartyUtils.getAllPartyNames(caseData));
+            notificationData.put(PARTY_NAME, "John Doe");
+            return notificationData;
+        }
+
+        @NotNull
+        public Map<String, String> addCommonProperties() {
+            Map<String, String> expectedProperties = new HashMap<>();
+            expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
+            expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
+            expectedProperties.put(HMCTS_SIGNATURE, configuration.getHmctsSignature());
+            expectedProperties.put(WELSH_PHONE_CONTACT, configuration.getWelshPhoneContact());
+            expectedProperties.put(WELSH_OPENING_HOURS, configuration.getWelshOpeningHours());
+            expectedProperties.put(WELSH_HMCTS_SIGNATURE, configuration.getWelshHmctsSignature());
+            expectedProperties.put(SPEC_UNSPEC_CONTACT, configuration.getSpecUnspecContact());
+            expectedProperties.put(LIP_CONTACT, configuration.getLipContactEmail());
+            expectedProperties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
+            return expectedProperties;
         }
     }
 
     @Test
-    void addPropertiesLipForApplicant() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).build()).build();
+    void shouldNotNotifyRespondentSolicitorTwo_whenInvokedWithSameSol() {
+        //Given: Case data at hearing scheduled state and callback param with Notify respondent2 event and
+        // same solicitor for respondent2
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateHearingDateScheduled()
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
+            .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com").build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED.name()).build()
+        ).build();
 
-        Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_APPLICANT);
+        //When: handler is called
+        handler.handle(params);
 
-        assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
-        assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
-        assertThat(properties).containsEntry("name", "John Doe");
+        //Then: Email should not be sent to respondent2
+        verifyNoInteractions(notificationService);
     }
 
     @Test
-    void addPropertiesLipForRespondent() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).build()).build();
+    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+            CallbackRequest.builder().eventId(
+                NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()).build()))
+            .isEqualTo(TASK_ID_APPLICANT);
 
-        Map<String, String> properties = handler.addPropertiesLip(caseData, TASK_ID_DEFENDANT1);
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+            CallbackRequest.builder().eventId(
+                NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED.name()).build()).build()))
+            .isEqualTo(TASK_ID_DEFENDANT1);
 
-        assertThat(properties).containsEntry("claimReferenceNumber", "1594901956117591");
-        assertThat(properties).containsEntry("claimantvdefendant", "John Doe V Jack Jackson");
-        assertThat(properties).containsEntry("name", "Jack Jackson");
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+            CallbackRequest.builder().eventId(
+                NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED.name()).build()).build()))
+            .isEqualTo(TASK_ID_DEFENDANT2);
+    }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
+        assertThat(handler.handledEvents()).contains(NOTIFY_APPLICANT_SOLICITOR1_FOR_BUNDLE_CREATED);
+        assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR1_FOR_BUNDLE_CREATED);
+        assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT_SOLICITOR2_FOR_BUNDLE_CREATED);
     }
 }

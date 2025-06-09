@@ -1,16 +1,18 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
-
 public abstract class EmailDTOGenerator implements NotificationData {
 
-    protected abstract Boolean getShouldNotify(CaseData caseData);
+    @Autowired
+    protected TemplateCommonPropertiesHelper templateCommonPropertiesHelper;
+
+    public abstract Boolean getShouldNotify(CaseData caseData);
 
     public EmailDTO buildEmailDTO(CaseData caseData, String taskId) {
         Map<String, String> properties = addProperties(caseData);
@@ -25,11 +27,15 @@ public abstract class EmailDTOGenerator implements NotificationData {
     }
 
     public Map<String, String> addProperties(CaseData caseData) {
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()
-        ));
+        HashMap<String, String> properties = new HashMap<>();
+        templateCommonPropertiesHelper.addBaseProperties(caseData, properties);
+        templateCommonPropertiesHelper.addCommonFooterSignature(properties);
+        templateCommonPropertiesHelper.addCnbcContact(caseData, properties);
+        templateCommonPropertiesHelper.addSpecAndUnspecContact(caseData, properties);
+        templateCommonPropertiesHelper.addCommonFooterSignatureWelsh(properties);
+        templateCommonPropertiesHelper.addLipContact(caseData, properties);
+        templateCommonPropertiesHelper.addLipContactWelsh(caseData, properties);
+        return properties;
     }
 
     protected abstract String getEmailAddress(CaseData caseData);
