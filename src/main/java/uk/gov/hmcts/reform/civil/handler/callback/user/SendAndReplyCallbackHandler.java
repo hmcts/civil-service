@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.sendandreply.LatestMessage;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.wa.AdditionalProperties;
 import uk.gov.hmcts.reform.civil.model.wa.ClientContext;
@@ -179,10 +178,8 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 .max(Comparator.comparing(message -> message.getValue().getUpdatedTime()))
                 .orElse(element(Message.builder().build()));
         Message lastMessage = lastMessageElement.getValue();
-        LatestMessage latestMessage = lastMessageElement.getValue().toLatestMessage(lastMessageElement);
 
-        builder.lastMessage(lastMessage)
-            .latestMessage(latestMessage);
+        builder.lastMessage(lastMessage);
 
         AllocatedTrack allocatedTrack;
         if (Objects.nonNull(caseData.getAssignedTrackType())) {

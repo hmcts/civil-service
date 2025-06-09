@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Map.entry;
@@ -93,6 +94,7 @@ public class SendAndReplyMessageService {
                 .subjectType(messageMetaData.getSubjectType())
                 .subject(messageMetaData.getSubject())
                 .messageContent(messageContent)
+                .messageID(UUID.randomUUID().toString().substring(0, 16))
                 .build())
         );
         return messageList;
@@ -196,6 +198,7 @@ public class SendAndReplyMessageService {
             .recipientRoleType(message.getRecipientRoleType())
             .subject(message.getSubject())
             .subjectType(message.getSubjectType())
+            .messageID(message.getMessageID())
             .build();
     }
 }

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
@@ -31,6 +32,7 @@ public class Message {
     private String subject;
     private String messageContent;
     private YesOrNo isUrgent;
+    private String messageID;
 
     @Builder.Default
     private List<Element<MessageReply>> history = new ArrayList<>();
@@ -43,6 +45,7 @@ public class Message {
             .messageContent(reply.getMessageContent())
             .recipientRoleType(this.senderRoleType)
             .updatedTime(time.now())
+            .messageID(UUID.randomUUID().toString().substring(0, 16))
             .build();
     }
 
@@ -53,23 +56,6 @@ public class Message {
             .isUrgent(reply.getIsUrgent())
             .messageContent(reply.getMessageContent())
             .recipientRoleType(reply.getRecipientRoleType())
-            .build();
-    }
-
-    public LatestMessage toLatestMessage(Element<Message> messageElement) {
-        Message value = messageElement.getValue();
-        log.info("uuid " + messageElement.getId().toString());
-        return LatestMessage.builder()
-            .sentTime(value.getSentTime())
-            .updatedTime(value.getUpdatedTime())
-            .senderRoleType(value.getSenderRoleType())
-            .senderName(value.getSenderName())
-            .recipientRoleType(value.getRecipientRoleType())
-            .subjectType(value.getSubjectType())
-            .subject(value.getSubject())
-            .messageContent(value.getMessageContent())
-            .isUrgent(value.getIsUrgent())
-            .messageId(messageElement.getId().toString())
             .build();
     }
 }
