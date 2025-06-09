@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocum
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
 
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
@@ -68,6 +70,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
         caseDataBuilder.caseDataLiP(caseDataLip);
         CaseData updatedCaseData = caseDataBuilder.build();
+        updatedCaseData.getSystemGeneratedCaseDocuments().stream().map(Element::getValue).forEach(
+            caseDocument -> log.info(String.format("Case ref %s: Has doc type %s, document name %s", caseData.getCcdCaseReference(),
+                                                   caseDocument.getDocumentType().name(), caseDocument.getDocumentName()))
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
@@ -77,6 +83,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private void updateSystemGeneratedDocumentsWithOriginalDocuments(CallbackParams callbackParams,
                                                                      CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info(String.format("Case ref %s: In updateSystemGeneratedDocumentsWithOriginalDocuments()", caseData.getCcdCaseReference()));
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslatedDocuments = caseData.getPreTranslationDocuments();
         List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
@@ -207,6 +214,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private void updateDocumentCollectionsWithTranslationDocuments(CaseData caseData,
                                                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        log.info(String.format("Case ref %s: In updateDocumentCollectionsWithTranslationDocuments()", caseData.getCcdCaseReference()));
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<TranslatedDocument>> addToSystemGenerated = new ArrayList<>();
         List<Element<TranslatedDocument>> addToHearingDocuments = new ArrayList<>();
@@ -214,11 +222,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<TranslatedDocument>> addToCourtOfficerOrders = new ArrayList<>();
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
+                log.info(String.format("Case ref %s: Doc type %s", caseData.getCcdCaseReference(), document.getValue().getDocumentType().name()));
                 if (document.getValue().getDocumentType().equals(ORDER_NOTICE)) {
                     document.getValue().getFile().setCategoryID("orders");
                     addToSystemGenerated.add(document);
                 } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                     document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    addToSystemGenerated.add(document);
+                    log.info(String.format("Case ref %s: SDO added to system generated documents", caseData.getCcdCaseReference()));
                 } else if (document.getValue().getDocumentType().equals(HEARING_NOTICE)) {
                     document.getValue().getFile().setCategoryID("hearingNotices");
                     addToHearingDocuments.add(document);
