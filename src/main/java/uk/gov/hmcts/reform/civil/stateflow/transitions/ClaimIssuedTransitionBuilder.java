@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow.transitions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.changeLanguagePreferenceEvent;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
@@ -43,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPOND
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
+@Slf4j
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
@@ -53,6 +56,8 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
+
+        log.info("changeLanguagePreferenceEvent, {}", changeLanguagePreferenceEvent);
         this.moveTo(CLAIM_NOTIFIED, transitions).onlyWhen(claimNotified, transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimIssue, transitions)
             .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, transitions).onlyWhen(takenOfflineAfterClaimNotified, transitions)
@@ -152,7 +157,4 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
 
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
-
-    public static final Predicate<CaseData> changeLanguagePreferenceEvent = caseData ->
-        caseData.getChangeLanguagePreference() != null;
 }
