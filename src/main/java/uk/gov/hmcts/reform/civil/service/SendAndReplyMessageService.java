@@ -129,7 +129,7 @@ public class SendAndReplyMessageService {
 
         //Move current base message to history
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
-        log.info("message for history id  " + messageForHistory.getMessageID());
+        log.info("message for history id add reply " + messageForHistory.getMessageID());
         Element<MessageReply> newHistoryMessage = element(messageForHistory);
 
         //Switch out current base message with reply info
@@ -144,7 +144,7 @@ public class SendAndReplyMessageService {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
 
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
-        log.info("message for history id  " + messageForHistory.getMessageID());
+        log.info("message for history id  add task info" + messageForHistory.getMessageID());
 
         ResponseEntity<GetTasksResponse<UserTask>> response = waTaskManagementApiClient.searchWithCriteria(
             userAuth,
