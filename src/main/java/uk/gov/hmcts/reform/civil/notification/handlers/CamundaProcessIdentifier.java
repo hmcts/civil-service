@@ -14,5 +14,6 @@ public enum CamundaProcessIdentifier {
     ClaimantDefendantAgreedMediationNotify,
     ClaimantResponseNotAgreedRepaymentNotify,
     ClaimantResponseAgreedRepaymentNotify,
-    ClaimantResponseAgreedSettledPartAdmitNotify
+    ClaimantResponseAgreedSettledPartAdmitNotify,
+    ClaimantResponseConfirmsNotToProceedLipNotify,
 }
