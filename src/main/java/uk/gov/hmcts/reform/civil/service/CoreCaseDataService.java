@@ -70,6 +70,7 @@ public class CoreCaseDataService {
 
     public void triggerUpdateLocationEpimdsIdEvent(Long caseId, CaseEvent eventName,
                                                    String epimdsId,
+                                                   String region,
                                                    String caseManagementLocationObj,
                                                    String courtLocationObj,
                                                    String applicant1DQRequestedCourtObj,
@@ -81,9 +82,8 @@ public class CoreCaseDataService {
         if ("Yes".equalsIgnoreCase(caseManagementLocationObj)) {
             Object caseManagementLocation = payload.get("caseManagementLocation");
             if (caseManagementLocation != null) {
-                CaseLocationCivil existingLocation = getCaseManagementLocationObj(caseManagementLocation);
                 CaseLocationCivil newCmLocation = CaseLocationCivil.builder()
-                    .region(existingLocation.getRegion()).baseLocation(epimdsId).build();
+                    .region(region).baseLocation(epimdsId).build();
                 payload.put("caseManagementLocation", newCmLocation);
             }
         }
@@ -94,7 +94,7 @@ public class CoreCaseDataService {
                 CourtLocation existingCourtLocation = getCourtLocationObj(courtLocation);
                 CourtLocation newCourtLocation = CourtLocation.builder()
                     .caseLocation(CaseLocationCivil.builder()
-                                      .region(existingCourtLocation.getCaseLocation().getRegion())
+                                      .region(region)
                                       .baseLocation(epimdsId).build())
                     .applicantPreferredCourt(existingCourtLocation.getApplicantPreferredCourt())
                     .reasonForHearingAtSpecificCourt(existingCourtLocation.getReasonForHearingAtSpecificCourt())
@@ -109,7 +109,7 @@ public class CoreCaseDataService {
                 RequestedCourt existingRequestedCourt = getRequestedCourtObj(applicant1DQRequestedCourt);
                 RequestedCourt newRequestedCourt = RequestedCourt.builder()
                     .caseLocation(CaseLocationCivil.builder()
-                                      .region(existingRequestedCourt.getCaseLocation().getRegion())
+                                      .region(region)
                                       .baseLocation(epimdsId).build())
                     .responseCourtCode(existingRequestedCourt.getResponseCourtCode())
                     .responseCourtName(existingRequestedCourt.getResponseCourtName())

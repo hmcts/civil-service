@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -30,8 +30,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT1_HEARING_HMC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT2_HEARING_HMC;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
@@ -134,12 +133,16 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
                 .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
             hearingTime = NotificationUtils.getFormattedHearingTime(hearingStartDateTime.toLocalTime().toString());
         }
-        HashMap<String, String> properties = new HashMap<>(Map.of(CLAIM_REFERENCE_NUMBER, legacyCaseRef, HEARING_DATE, hearingDate, HEARING_TIME, hearingTime,
-                                    CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                                    CASEMAN_REF, caseData.getLegacyCaseReference()));
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER, legacyCaseRef,
+            HEARING_DATE, hearingDate,
+            HEARING_TIME, hearingTime,
+            CLAIM_LEGAL_ORG_NAME_SPEC, orgName,
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -159,9 +162,10 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             CLAIM_LEGAL_ORG_NAME_SPEC, orgName, PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
         return properties;
     }
 
