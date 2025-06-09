@@ -73,7 +73,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData updatedCaseData = caseDataBuilder.build();
         updatedCaseData.getSystemGeneratedCaseDocuments().stream().map(Element::getValue).forEach(
             caseDocument -> log.info(String.format("Case ref %s: Has doc type %s, document name %s", caseData.getCcdCaseReference(),
-                                                   Optional.of(caseDocument.getDocumentType()).map(DocumentType::name).orElse(null), caseDocument.getDocumentName()))
+                                                   Optional.of(caseDocument)
+                                                       .map(CaseDocument::getDocumentType)
+                                                       .map(DocumentType::name).orElse(null), caseDocument.getDocumentName()))
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
