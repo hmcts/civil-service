@@ -38,10 +38,10 @@ public class AcknowledgeClaimUnspecRespSolTwoEmailDTOGenerator extends RespSolTw
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         return acknowledgeClaimUnspecHelper.addTemplateProperties(properties, caseData);
     }
-    
+
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return !(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData)) &&
-            !caseData.isRespondent2LiP();
+        return !(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData))
+            && !caseData.isRespondent2LiP();
     }
 }
