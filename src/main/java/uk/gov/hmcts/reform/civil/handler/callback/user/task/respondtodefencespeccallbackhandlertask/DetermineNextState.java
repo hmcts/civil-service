@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGEMENT_BY_ADMISSION_NON_DIVERGENT_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.INTERMEDIATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
@@ -47,7 +47,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 @Slf4j
 public class DetermineNextState extends CallbackHandler {
 
-    private final List<CaseEvent> Events = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED);
+    private final List<CaseEvent> Events = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_CLAIMANT_INTENTION_LR_DOC_UPLOADED);
     private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimStatePostTranslation);
     private static final String TASK_ID = "UpdateClaimStateAfterClaimantIntentionLrTranslatedDocUploaded";
     private final ObjectMapper objectMapper;
