@@ -2,15 +2,26 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
+import uk.gov.hmcts.reform.civil.model.sendandreply.MessageWaTaskDetails;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
+import uk.gov.hmcts.reform.civil.model.wa.GetTasksResponse;
+import uk.gov.hmcts.reform.civil.model.wa.RequestContext;
+import uk.gov.hmcts.reform.civil.model.wa.SearchOperator;
+import uk.gov.hmcts.reform.civil.model.wa.SearchParameterKey;
+import uk.gov.hmcts.reform.civil.model.wa.SearchParameterList;
+import uk.gov.hmcts.reform.civil.model.wa.SearchTaskRequest;
+import uk.gov.hmcts.reform.civil.model.wa.UserTask;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -23,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Map.entry;
@@ -77,6 +89,7 @@ public class SendAndReplyMessageService {
     private final TableMarkupService tableMarkupService;
     private final UserService userService;
     private final Time time;
+    private final WaTaskManagementApiClient waTaskManagementApiClient;
 
     public List<Element<Message>> addMessage(
         List<Element<Message>> messages,
@@ -126,6 +139,43 @@ public class SendAndReplyMessageService {
         messageToReplace.getValue().getHistory().add(0, newHistoryMessage);
 
         return messages;
+    }
+
+    public MessageWaTaskDetails addTaskInfo(List<Element<Message>> messages, String messageId, String userAuth, CaseData caseData) {
+        Element<Message> messageToReplace = getMessageById(messages, messageId);
+
+        MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
+        log.info("message for history id  " + messageForHistory.getMessageID());
+
+        ResponseEntity<GetTasksResponse<UserTask>> response = waTaskManagementApiClient.searchWithCriteria(
+            userAuth,
+            SearchTaskRequest.builder()
+                .requestContext(RequestContext.AVAILABLE_TASKS)
+                .searchParameters(List.of(new SearchParameterList(
+                    SearchParameterKey.CASE_ID, SearchOperator.IN,
+                    List.of(String.valueOf(caseData.getCcdCaseReference()))
+                )))
+                .build()
+        );
+
+        GetTasksResponse<UserTask> body = response.getBody();
+        log.info("body " + body);
+        if (body != null) {
+            List<UserTask> tasks = body.getTasks();
+            log.info("tasks from wa api " + tasks);
+            if (!tasks.isEmpty()) {
+                List<UserTask> task = tasks.stream().filter(t -> t.getTaskData().getAdditionalProperties().getMessageId().equals(
+                    messageForHistory.getMessageID())).toList();
+                log.info("filtered tasks " + task);
+                if (!task.isEmpty()) {
+                    return MessageWaTaskDetails.builder()
+                        .taskId(task.get(0).getTaskData().getId())
+                        .messageID(messageForHistory.getMessageID())
+                        .build();
+                }
+            }
+        }
+        return null;
     }
 
     public Element<Message> getMessageById(List<Element<Message>> messages, String code) {

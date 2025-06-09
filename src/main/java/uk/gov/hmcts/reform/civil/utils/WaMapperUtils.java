@@ -6,6 +6,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.sendandreply.MessageWaTaskDetails;
 import uk.gov.hmcts.reform.civil.model.wa.AdditionalProperties;
 import uk.gov.hmcts.reform.civil.model.wa.ClientContext;
 import uk.gov.hmcts.reform.civil.model.wa.TaskData;
@@ -35,9 +36,11 @@ public class WaMapperUtils {
         return null;
     }
 
-    public static MultiValueMap<String, String> createClientContext(WaMapper waMapper, CaseData caseData) {
+    public static MultiValueMap<String, String> createClientContext(WaMapper waMapper,
+                                                                    CaseData caseData) {
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-        if (waMapper != null) {
+        MessageWaTaskDetails messageWaTaskDetails = caseData.getMessageWaTaskDetails();
+        if (waMapper != null && messageWaTaskDetails != null) {
             ClientContext clientContext = waMapper.getClientContext() != null
                 ? waMapper.getClientContext() : ClientContext.builder().build();
             UserTask userTask = clientContext.getUserTask() != null
@@ -47,11 +50,10 @@ public class WaMapperUtils {
                 .clientContext(clientContext.toBuilder()
                                    .userTask(userTask.toBuilder()
                                                  .taskData(taskData.toBuilder()
-                                                               .id("afde168c-4521-11f0-93fd-c2213aaead2c")
-                                                               .name("Review message")
+                                                               .id(messageWaTaskDetails.getTaskId())
                                                                .additionalProperties(AdditionalProperties.builder()
                                                                                          .messageId(
-                                                                                             "c80aacaa-0d97-4d")
+                                                                                             messageWaTaskDetails.getMessageID())
                                                                                          .build())
                                                                .build())
                                                  .completeTask(true)

@@ -82,6 +82,9 @@ serviceRequestClaimIssued:
 
 wa:
   feature-toggle: ${WA_TOGGLE:Prod}
+  task-management:
+    api:
+      url: http://wa-task-management-api-demo.service.core-compute-demo.internal
 
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}

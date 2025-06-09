@@ -135,7 +135,8 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.sendAndReplyOption(null).build().toMap(objectMapper)).build();
+            .data(builder.sendAndReplyOption(null)
+                      .messageWaTaskDetails(null).build().toMap(objectMapper)).build();
     }
 
     private Element<Message> getMessageToReplyTo(CaseData caseData) {
@@ -169,6 +170,10 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 userAuth
             );
             builder.messages(messagesNew)
+                .messageWaTaskDetails(messageService.addTaskInfo(caseData.getMessages(),
+                                                                 caseData.getMessagesToReplyTo().getValue().getCode(),
+                                                                 userAuth,
+                                                                 caseData))
                 .messagesToReplyTo(null)
                 .messageReplyMetadata(null)
                 .messageHistory(null);
