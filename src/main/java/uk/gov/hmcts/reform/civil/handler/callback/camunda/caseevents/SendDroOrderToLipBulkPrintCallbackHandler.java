@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.SendDecisionReconsiderationOrderBulkPrintService;
+import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandler extends CallbackHandler {
                                                           SEND_DRO_ORDER_TO_LIP_DEFENDANT);
     public static final String TASK_ID_DEFENDANT_DRO = "SendToDefendantLIP";
     public static final String TASK_ID_CLAIMANT_DRO = "SendDORToClaimantLIP";
-    private final SendDecisionReconsiderationOrderBulkPrintService sendDroBulkPrintService;
+    private final SendHearingBulkPrintService sendDroBulkPrintService;
     private final FeatureToggleService featureToggleService;
 
     @Override

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.SendDecisionReconsiderationOrderBulkPrintService;
+import uk.gov.hmcts.reform.civil.service.SendHearingBulkPrintService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +39,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
     @MockBean
     private FeatureToggleService featureToggleService;
     @MockBean
-    private SendDecisionReconsiderationOrderBulkPrintService sendDROBulkPrintService;
+    private SendHearingBulkPrintService sendDROBulkPrintService;
 
     public static final String TASK_ID_DEFENDANT = "SendToDefendantLIP";
     public static final String TASK_ID_CLAIMANT = "SendDORToClaimantLIP";
