@@ -3,7 +3,4 @@
   <suppress until="2025-07-04">
     <cve>CVE-2024-38820</cve>
   </suppress>
-  <suppress until="2025-07-10">
-    <cve>CVE-2025-48734</cve>
-  </suppress>
 </suppressions>
