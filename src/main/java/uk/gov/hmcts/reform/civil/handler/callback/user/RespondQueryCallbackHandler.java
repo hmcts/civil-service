@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +35,13 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     private final ObjectMapper mapper;
     private final AssignCategoryId assignCategoryId;
     private final CoreCaseUserService coreCaseUserService;
+    private final FeatureToggleService featureToggleService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::aboutToStart,
             callbackKey(ABOUT_TO_SUBMIT), this::setManagementQuery,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
@@ -47,6 +50,18 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse aboutToStart(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            migrateAllQueries(caseDataBuilder);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private CallbackResponse setManagementQuery(CallbackParams callbackParams) {
@@ -58,7 +73,7 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
                                                 coreCaseUserService, parentQueryId);
 
         caseData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
+            // .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
