@@ -15,6 +15,6 @@ public class DismissCaseNotifierTest extends NotifierTestBase {
     void shouldReturnCorrectTaskId() {
         String taskId = notifier.getTaskId();
 
-        assertThat(taskId).isEqualTo("DismissCaseNotify");
+        assertThat(taskId).isEqualTo("DismissCaseNotifier");
     }
 }

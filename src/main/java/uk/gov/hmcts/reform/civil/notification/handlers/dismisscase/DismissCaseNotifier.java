@@ -2,11 +2,10 @@ package uk.gov.hmcts.reform.civil.notification.handlers.dismisscase;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
-
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.DismissCaseNotify;
 
 @Component
 @Slf4j
@@ -18,6 +17,6 @@ public class DismissCaseNotifier extends Notifier {
 
     @Override
     protected String getTaskId() {
-        return DismissCaseNotify.toString();
+        return CamundaProcessIdentifier.DismissCaseNotifier.toString();
     }
 }
