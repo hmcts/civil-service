@@ -39,11 +39,8 @@ public class NotifyHwFOutcomePartiesClaimantEmailDTOGenerator extends ClaimantEm
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        Map<String, String> mutableProperties = new java.util.HashMap<>(Map.copyOf(properties));
-
-        mutableProperties.putAll(notifyClaimantHwFOutcomeHelper.getCommonProperties(caseData));
-        mutableProperties.putAll(notifyClaimantHwFOutcomeHelper.getFurtherProperties(caseData));
-
-        return mutableProperties;
+        properties.putAll(notifyClaimantHwFOutcomeHelper.getCommonProperties(caseData));
+        properties.putAll(notifyClaimantHwFOutcomeHelper.getFurtherProperties(caseData));
+        return properties;
     }
 }
