@@ -5,12 +5,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
-import java.util.Map;
-
 @Component
 public class DismissCaseClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
-    protected static final String REFERENCE_TEMPLATE = "dismiss-case-claimant-notification-%s";
+    protected static final String REFERENCE_CLAIMANT_TEMPLATE = "dismiss-case-claimant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -26,12 +24,7 @@ public class DismissCaseClaimantEmailDTOGenerator extends ClaimantEmailDTOGenera
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
-    }
-
-    @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        return super.addCustomProperties(properties, caseData);
+        return REFERENCE_CLAIMANT_TEMPLATE;
     }
 
 }
