@@ -110,9 +110,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = judgementService.validateAmountPaid(caseData);
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+        if (judgementService.isLrPayImmediatelyPlan(caseData)) {
+            updatedCaseData.ccjJudgmentAmountShowInterest(YesOrNo.NO);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? updatedCaseData.build().toMap(objectMapper) : null)
             .build();
     }
 
@@ -145,7 +149,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             caseDataBuilder
                 .activeJudgment(activeJudgment)
                 .joIsLiveJudgmentExists(YesOrNo.YES)
-                .joRepaymentSummaryObject(JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest))
+                .joRepaymentSummaryObject(getJudgmentRepaymentSummaryObject(data, interest, activeJudgment))
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
 
@@ -153,6 +157,12 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
             .build();
+    }
+
+    private String getJudgmentRepaymentSummaryObject(CaseData caseData, BigDecimal interest, JudgmentDetails activeJudgment) {
+        return judgementService.isLrPayImmediatelyPlan(caseData)
+            ? JudgmentsOnlineHelper.calculateRepaymentBreakdownSummaryForLRImmediatePlan(activeJudgment)
+            : JudgmentsOnlineHelper.calculateRepaymentBreakdownSummary(activeJudgment, interest);
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
