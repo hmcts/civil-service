@@ -93,34 +93,13 @@ public class SendHearingBulkPrintService {
         } else if (!featureToggleService.isGaForWelshEnabled() && welshDocument) {
             return BOTH;
         }
-
-        if (TASK_ID_CLAIMANT.equals(taskId)
-            || TASK_ID_CLAIMANT_HMC.equals(taskId)) {
-            if (!featureToggleService.isGaForWelshEnabled()
-                && caseData.getApplicant1DQ() != null
-                && caseData.getApplicant1DQ().getApplicant1DQLanguage() != null
-                && (caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments() != null)) {
-                return caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments();
-            } else {
-                return switch (caseData.getClaimantBilingualLanguagePreference()) {
-                    case "WELSH" -> WELSH;
-                    case "BOTH" -> BOTH;
-                    default -> ENGLISH;
-                };
-            }
-        } else {
-            if (!featureToggleService.isGaForWelshEnabled()
-                && caseData.getRespondent1DQ() != null
-                && caseData.getRespondent1DQ().getRespondent1DQLanguage() != null
-                && (caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments() != null)) {
-                return caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments();
-            } else {
-                return switch (caseData.getDefendantBilingualLanguagePreference()) {
-                    case "WELSH" -> WELSH;
-                    case "BOTH" -> BOTH;
-                    default -> ENGLISH;
-                };
-            }
-        }
+        String languagePreference = (TASK_ID_CLAIMANT.equals(taskId) || TASK_ID_CLAIMANT_HMC.equals(taskId))
+            ? caseData.getClaimantBilingualLanguagePreference()
+            : caseData.getDefendantBilingualLanguagePreference();
+        return switch (languagePreference) {
+            case "WELSH" -> WELSH;
+            case "BOTH" -> BOTH;
+            default -> ENGLISH;
+        };
     }
 }
