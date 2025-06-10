@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HE
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.ENGLISH;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendDroOrderToLipBulkPrintCallbackHandler.TASK_ID_CLAIMANT_DRO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendDroOrderToLipBulkPrintCallbackHandler.TASK_ID_DEFENDANT_DRO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_CLAIMANT_HMC;
@@ -32,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.Send
 @Slf4j
 public class SendHearingBulkPrintService {
 
-    private static final String DECISION_PACK_LETTER_TYPE = "decision-document-pack";
+    private static final String DECISION_PACK_LETTER_TYPE = "decision-reconsider-document-pack";
     private final BulkPrintService bulkPrintService;
     private final DocumentDownloadService documentDownloadService;
     private final CoverLetterAppendService coverLetterAppendService;
@@ -113,7 +114,8 @@ public class SendHearingBulkPrintService {
         }
 
         if (TASK_ID_CLAIMANT.equals(taskId)
-            || TASK_ID_CLAIMANT_HMC.equals(taskId)) {
+            || TASK_ID_CLAIMANT_HMC.equals(taskId)
+            || TASK_ID_CLAIMANT_DRO.equals(taskId)) {
             return getClaimantLanguagePreference(caseData);
         } else {
             return getDefendantLanguagePreference(caseData);

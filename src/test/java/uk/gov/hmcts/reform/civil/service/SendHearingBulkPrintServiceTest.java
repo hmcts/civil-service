@@ -97,6 +97,16 @@ class SendHearingBulkPrintServiceTest {
         );
     }
 
+    private void verifyDecisionPrintLetter(CaseData caseData, Party party) {
+        verify(bulkPrintService).printLetter(
+            LETTER_CONTENT,
+            caseData.getLegacyCaseReference(),
+            caseData.getLegacyCaseReference(),
+            DECISION_PACK_LETTER_TYPE,
+            List.of(party.getPartyName())
+        );
+    }
+
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
@@ -326,7 +336,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendDecisionReconsiderationToLip(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT_DRO);
 
         // then
-        verifyPrintLetter(caseData, respondent1);
+        verifyDecisionPrintLetter(caseData, respondent1);
     }
 
     @Test
@@ -341,7 +351,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendDecisionReconsiderationToLip(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT_DRO);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyDecisionPrintLetter(caseData, claimant);
     }
 
     @Test
@@ -449,7 +459,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendDecisionReconsiderationToLip(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT_DRO);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyDecisionPrintLetter(caseData, claimant);
     }
 
     @Test
@@ -465,7 +475,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendDecisionReconsiderationToLip(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT_DRO);
 
         // then|
-        verifyPrintLetter(caseData, claimant);
+        verifyDecisionPrintLetter(caseData, claimant);
     }
 
     @Test
@@ -473,7 +483,7 @@ class SendHearingBulkPrintServiceTest {
         // given
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
-        CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS, false, null, "BOTH", null, null);
+        CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS_TRANSLATED, false, null, "BOTH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -481,7 +491,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendDecisionReconsiderationToLip(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT_DRO);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyDecisionPrintLetter(caseData, claimant);
     }
 
     @Test
@@ -497,7 +507,7 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendDecisionReconsiderationToLip(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT_DRO);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyDecisionPrintLetter(caseData, claimant);
     }
 
     @Test
@@ -513,6 +523,6 @@ class SendHearingBulkPrintServiceTest {
         sendHearingBulkPrintService.sendDecisionReconsiderationToLip(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT_DRO);
 
         // then
-        verifyPrintLetter(caseData, claimant);
+        verifyDecisionPrintLetter(caseData, claimant);
     }
 }
