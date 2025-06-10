@@ -85,7 +85,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         JudgmentDetails activeJudgmentDetails = addUpdateActiveJudgment(caseData);
         builder.activeJudgment(activeJudgmentDetails);
         CaseData data = builder.build();
-        BigDecimal interest = !judgementService.isLrFullAdmitRepaymentPlan(data)
+        BigDecimal interest = (!judgementService.isLrFullAdmitRepaymentPlan(data)
+            && !judgementService.isLRPartAdmitRepaymentPlan(data))
             ? interestCalculator.calculateInterest(data) : null;
         super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, builder, interest);
         return builder;
@@ -213,7 +214,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private String addInterest(BigInteger orderAmount, BigInteger totalInterest, CaseData caseData) {
-        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
             return orderAmount.toString();
         } else {
             return orderAmount.add(totalInterest).toString();
@@ -222,7 +224,8 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     private String generateTotalAmount(BigInteger orderAmount, BigInteger totalInterest,
                                        BigInteger claimFeeAmount, BigInteger costs, CaseData caseData) {
-        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)) {
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
             return orderAmount.add(claimFeeAmount).add(costs).toString();
         } else {
             return orderAmount.add(totalInterest).add(claimFeeAmount).add(costs).toString();
