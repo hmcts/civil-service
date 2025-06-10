@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.onlyInitialRespondentResponseLangIsBilingual;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
@@ -38,10 +37,6 @@ public class ContactDetailsChangeTransitionBuilder extends MidTransitionBuilder 
             .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmissionSpec.and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
             .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaimSpec.and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions).onlyWhen(onlyInitialRespondentResponseLangIsBilingual, transitions)
-            .set((c, flags) -> {
-                if (isRespondentResponseLangIsBilingual.test(c)) {
-                    flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
-                }
-            }, transitions);
+            .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true), transitions);
     }
 }
