@@ -45,7 +45,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPOND
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 
-@Slf4j
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
@@ -85,7 +84,6 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim), transitions)
             .set((c, flags) -> {
                 if (isRespondentResponseLangIsBilingual.test(c)) {
-                    log.info("changeLanguagePreferenceEvent, {}", changeLanguagePreferenceEvent.test(c));
                     flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
                 }
             }, transitions);
