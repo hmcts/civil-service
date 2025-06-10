@@ -96,7 +96,8 @@ public class SendHearingBulkPrintService {
 
         if (TASK_ID_CLAIMANT.equals(taskId)
             || TASK_ID_CLAIMANT_HMC.equals(taskId)) {
-            if (caseData.getApplicant1DQ() != null
+            if (!featureToggleService.isGaForWelshEnabled()
+                && caseData.getApplicant1DQ() != null
                 && caseData.getApplicant1DQ().getApplicant1DQLanguage() != null
                 && (caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments() != null)) {
                 return caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments();
@@ -108,7 +109,8 @@ public class SendHearingBulkPrintService {
                 };
             }
         } else {
-            if (caseData.getRespondent1DQ() != null
+            if (!featureToggleService.isGaForWelshEnabled()
+                && caseData.getRespondent1DQ() != null
                 && caseData.getRespondent1DQ().getRespondent1DQLanguage() != null
                 && (caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments() != null)) {
                 return caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments();

@@ -196,8 +196,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             featureToggleService.isGaForWelshEnabled()
                 && caseData.isRespondent1LiP()
                 && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
-                && (caseData.isRespondentResponseBilingual()
-                || caseData.isLipDefendantSpecifiedBilingualDocuments())
+                && caseData.isRespondentResponseBilingual()
         );
     }
 
