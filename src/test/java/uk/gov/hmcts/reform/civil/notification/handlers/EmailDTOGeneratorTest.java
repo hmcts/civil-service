@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
@@ -25,7 +24,6 @@ class EmailDTOGeneratorTest {
     protected static final String CUSTOM_VALUE = "customValue";
 
     private EmailDTOGenerator emailDTOGenerator;
-    private NotificationsProperties notificationsProperties;
     String taskId = "someTaskId";
 
     @Mock
@@ -39,10 +37,10 @@ class EmailDTOGeneratorTest {
         MockitoAnnotations.openMocks(this);
 
         // Create a concrete implementation of the abstract class for testing
-        emailDTOGenerator = new EmailDTOGenerator(notificationsProperties) {
+        emailDTOGenerator = new EmailDTOGenerator() {
 
             @Override
-            protected Boolean getShouldNotify(CaseData caseData) {
+            public Boolean getShouldNotify(CaseData caseData) {
                 return Boolean.TRUE;
             }
 
@@ -90,5 +88,8 @@ class EmailDTOGeneratorTest {
         verify(helper).addCommonFooterSignature(any());
         verify(helper).addCnbcContact(eq(caseData), any());
         verify(helper).addSpecAndUnspecContact(eq(caseData), any());
+        verify(helper).addCommonFooterSignatureWelsh(any());
+        verify(helper).addLipContact(eq(caseData), any());
+        verify(helper).addLipContactWelsh(eq(caseData), any());
     }
 }

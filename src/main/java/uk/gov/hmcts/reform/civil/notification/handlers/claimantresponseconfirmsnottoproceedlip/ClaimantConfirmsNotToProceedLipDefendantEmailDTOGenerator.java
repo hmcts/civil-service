@@ -13,11 +13,13 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
+    private final NotificationsProperties notificationsProperties;
+
     private final FeatureToggleService featureToggleService;
 
     protected ClaimantConfirmsNotToProceedLipDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties, FeatureToggleService featureToggleService) {
-        super(notificationsProperties);
         this.featureToggleService = featureToggleService;
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

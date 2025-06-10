@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -17,9 +16,9 @@ public class NotifyClaimRespOneSolEmailDTOGenerator extends RespSolOneEmailDTOGe
 
     private final NotifyClaimHelper notifyClaimHelper;
 
-    protected NotifyClaimRespOneSolEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService,
-                                                     NotifyClaimHelper notifyClaimHelper) {
-        super(notificationsProperties, organisationService);
+    public NotifyClaimRespOneSolEmailDTOGenerator(OrganisationService organisationService,
+                                             NotifyClaimHelper notifyClaimHelper) {
+        super(organisationService);
         this.notifyClaimHelper = notifyClaimHelper;
     }
 

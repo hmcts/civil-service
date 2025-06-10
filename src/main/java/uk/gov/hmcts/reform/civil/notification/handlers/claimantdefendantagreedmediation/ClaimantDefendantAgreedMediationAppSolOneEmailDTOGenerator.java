@@ -17,10 +17,13 @@ public class ClaimantDefendantAgreedMediationAppSolOneEmailDTOGenerator extends 
 
     private final FeatureToggleService featureToggleService;
 
+    private final NotificationsProperties notificationsProperties;
+
     public ClaimantDefendantAgreedMediationAppSolOneEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties,
                                                                       FeatureToggleService featureToggleService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
         this.featureToggleService = featureToggleService;
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

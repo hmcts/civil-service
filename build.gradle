@@ -138,7 +138,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.21.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.22.0"
     }
   }
 
@@ -356,7 +356,8 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
-
+  // CVE-2025-48734 force update of commons-beanutils.
+  implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
@@ -431,7 +432,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.55.4'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.11'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox

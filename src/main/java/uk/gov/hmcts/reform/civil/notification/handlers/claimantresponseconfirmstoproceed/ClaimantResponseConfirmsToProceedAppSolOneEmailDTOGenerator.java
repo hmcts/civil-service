@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.claimantresponseconfirms
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
@@ -17,9 +16,9 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator extends
 
     private final ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper;
 
-    protected ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService,
+    protected ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGenerator(OrganisationService organisationService,
                                                                           ClaimantResponseConfirmsToProceedEmailHelper claimantResponseConfirmsToProceedEmailHelper) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
         this.claimantResponseConfirmsToProceedEmailHelper = claimantResponseConfirmsToProceedEmailHelper;
     }
 

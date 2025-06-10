@@ -9,8 +9,11 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 @Component
 public class ClaimantDefendantAgreedMediationRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
+    private final NotificationsProperties notificationsProperties;
+
     public ClaimantDefendantAgreedMediationRespSolTwoEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override
