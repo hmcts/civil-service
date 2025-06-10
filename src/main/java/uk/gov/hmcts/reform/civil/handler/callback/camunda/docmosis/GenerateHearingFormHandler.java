@@ -24,7 +24,6 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 
 @Service
 @RequiredArgsConstructor
