@@ -14,9 +14,9 @@ public class ClaimDismissedRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
     protected static final String REFERENCE_TEMPLATE_RESPONDENT_FOR_CLAIM_DISMISSED = "claim-dismissed-respondent-notification-%s";
 
     public ClaimDismissedRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
-                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
+                                                     ClaimDismissedEmailTemplater claimDismissedEmailHelper) {
         super(organisationService);
-        this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
+        this.claimDismissedEmailTemplater = claimDismissedEmailHelper;
     }
 
     @Override

@@ -17,7 +17,7 @@ public class NotifyClaimRespOneSolEmailDTOGenerator extends RespSolOneEmailDTOGe
     private final NotifyClaimHelper notifyClaimHelper;
 
     public NotifyClaimRespOneSolEmailDTOGenerator(OrganisationService organisationService,
-                                             NotifyClaimHelper notifyClaimHelper) {
+                                              NotifyClaimHelper notifyClaimHelper) {
         super(organisationService);
         this.notifyClaimHelper = notifyClaimHelper;
     }

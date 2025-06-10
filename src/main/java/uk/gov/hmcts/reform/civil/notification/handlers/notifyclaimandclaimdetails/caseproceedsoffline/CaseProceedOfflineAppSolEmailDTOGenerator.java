@@ -13,8 +13,8 @@ public class CaseProceedOfflineAppSolEmailDTOGenerator extends AppSolOneEmailDTO
 
     private final NotificationsProperties notificationsProperties;
 
-    protected CaseProceedOfflineAppSolEmailDTOGenerator(OrganisationService organisationService,
-                                                        NotificationsProperties notificationsProperties) {
+    public CaseProceedOfflineAppSolEmailDTOGenerator(OrganisationService organisationService,
+                                                  NotificationsProperties notificationsProperties) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }

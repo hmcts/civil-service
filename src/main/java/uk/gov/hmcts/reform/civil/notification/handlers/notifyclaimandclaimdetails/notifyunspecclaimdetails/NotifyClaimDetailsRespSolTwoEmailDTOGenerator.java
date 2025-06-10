@@ -18,9 +18,9 @@ public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEma
     private final NotifyClaimDetailsHelper notifyClaimDetailsHelper;
 
     public NotifyClaimDetailsRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
-                                                  NotifyClaimDetailsHelper notifyClaimDetailsHelper) {
+                                                  NotifyClaimDetailsHelper notifyClaimHelper) {
         super(organisationService);
-        this.notifyClaimDetailsHelper = notifyClaimDetailsHelper;
+        this.notifyClaimDetailsHelper = notifyClaimHelper;
     }
 
     @Override
