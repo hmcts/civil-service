@@ -11,10 +11,10 @@ import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 import java.util.List;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.changeLanguagePreferenceEvent;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.onlyInitialRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
@@ -33,11 +33,11 @@ public class ContactDetailsChangeTransitionBuilder extends MidTransitionBuilder 
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
-            .moveTo(PART_ADMISSION, transitions).onlyWhen(partAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
-            .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmissionSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
-            .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaimSpec.and(not(isRespondentResponseLangIsBilingual)), transitions)
-            .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions).onlyWhen(isRespondentResponseLangIsBilingual.and(not(changeLanguagePreferenceEvent)), transitions)
+        this.moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
+            .moveTo(PART_ADMISSION, transitions).onlyWhen(partAdmissionSpec.and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
+            .moveTo(FULL_ADMISSION, transitions).onlyWhen(fullAdmissionSpec.and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
+            .moveTo(COUNTER_CLAIM, transitions).onlyWhen(counterClaimSpec.and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
+            .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions).onlyWhen(onlyInitialRespondentResponseLangIsBilingual, transitions)
             .set((c, flags) -> {
                 if (isRespondentResponseLangIsBilingual.test(c)) {
                     flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
