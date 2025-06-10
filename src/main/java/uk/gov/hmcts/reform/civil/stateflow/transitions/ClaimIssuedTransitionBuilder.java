@@ -56,8 +56,6 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-
-        log.info("changeLanguagePreferenceEvent, {}", changeLanguagePreferenceEvent);
         this.moveTo(CLAIM_NOTIFIED, transitions).onlyWhen(claimNotified, transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimIssue, transitions)
             .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, transitions).onlyWhen(takenOfflineAfterClaimNotified, transitions)
@@ -87,6 +85,7 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
             .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim), transitions)
             .set((c, flags) -> {
                 if (isRespondentResponseLangIsBilingual.test(c)) {
+                    log.info("changeLanguagePreferenceEvent, {}", changeLanguagePreferenceEvent.test(c));
                     flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true);
                 }
             }, transitions);
