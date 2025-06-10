@@ -113,12 +113,15 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
         CaseDocument applicant1DiscontinueDoc = generateForm(appSolOrgName,
                                                              applicant1SolicitorAddress,
+                                                             "claimant",
                                                              callbackParams);
-        CaseDocument respondent1DiscontinueDoc = generateForm(respondent1Name, respondent1Address, callbackParams);
+        boolean generateRespondent2Form = (YES.equals(caseData.getAddRespondent2())
+            && !YES.equals(caseData.getRespondent2SameLegalRepresentative()));
+        CaseDocument respondent1DiscontinueDoc = generateForm(respondent1Name, respondent1Address,
+                                                              generateRespondent2Form ? "defendant1" : "defendant", callbackParams);
         CaseDocument respondent2DiscontinueDoc = null;
 
-        if (YES.equals(caseData.getAddRespondent2())
-            && !YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
+        if (generateRespondent2Form) {
             String respondent2Name;
             Address respondent2Address;
             if (!caseData.isRespondent2LiP()) {
@@ -136,7 +139,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
                 respondent2Name = caseData.getRespondent2().getPartyName();
                 respondent2Address = caseData.getRespondent2().getPrimaryAddress();
             }
-            respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, callbackParams);
+            respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, "defendant2", callbackParams);
         }
         if (featureToggleService.isGaForWelshEnabled()
             && caseData.isRespondent1LiP()
@@ -175,9 +178,9 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseDocument generateForm(String partyName, Address address, CallbackParams callbackParams) {
+    private CaseDocument generateForm(String partyName, Address address, String partyType, CallbackParams callbackParams) {
         return formGenerator.generateDocs(
-            callbackParams.getCaseData(), partyName, address, callbackParams.getParams().get(BEARER_TOKEN).toString());
+            callbackParams.getCaseData(), partyName, address, partyType, callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {

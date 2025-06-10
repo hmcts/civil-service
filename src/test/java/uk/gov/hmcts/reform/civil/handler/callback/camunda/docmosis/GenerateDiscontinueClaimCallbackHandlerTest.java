@@ -106,12 +106,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForCW_whenCourtPermissionRequired() {
-            when(formGenerator.generateDocs(
-                any(CaseData.class),
-                anyString(),
-                any(Address.class),
-                anyString()
-            )).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -129,15 +124,22 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             if (getOrganisation().isPresent()) {
-                verify(formGenerator, times(2)).generateDocs(
-                    caseData,
-                    getOrganisation().get().getName(),
-                    Address.fromContactInformation(getOrganisation()
-                                                       .get()
-                                                       .getContactInformation()
-                                                       .get(0)),
-                    "BEARER_TOKEN"
-                );
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             getOrganisation().get().getName(),
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "claimant",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             getOrganisation().get().getName(),
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "defendant",
+                                                             "BEARER_TOKEN");
             }
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -147,12 +149,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2() {
-            when(formGenerator.generateDocs(
-                any(CaseData.class),
-                anyString(),
-                any(Address.class),
-                anyString()
-            )).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -180,33 +177,30 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             if (getOrganisation().isPresent()) {
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    "Signer Name",
-                    Address.fromContactInformation(getOrganisation()
-                                                       .get()
-                                                       .getContactInformation()
-                                                       .get(0)),
-                    "BEARER_TOKEN"
-                );
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    "Signer 2 Name",
-                    Address.fromContactInformation(getOrganisation()
-                                                       .get()
-                                                       .getContactInformation()
-                                                       .get(0)),
-                    "BEARER_TOKEN"
-                );
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    "Signer 3 Name",
-                    Address.fromContactInformation(getOrganisation()
-                                                       .get()
-                                                       .getContactInformation()
-                                                       .get(0)),
-                    "BEARER_TOKEN"
-                );
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer Name",
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "claimant",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer 2 Name",
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "defendant1",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer 3 Name",
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "defendant2",
+                                                             "BEARER_TOKEN");
             }
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -216,12 +210,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_noNames_1vs2() {
-            when(formGenerator.generateDocs(
-                any(CaseData.class),
-                anyString(),
-                any(Address.class),
-                anyString()
-            )).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -237,24 +226,22 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             if (getOrganisation().isPresent()) {
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    "Signer Name",
-                    Address.fromContactInformation(getOrganisation()
-                                                       .get()
-                                                       .getContactInformation()
-                                                       .get(0)),
-                    "BEARER_TOKEN"
-                );
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    "",
-                    Address.fromContactInformation(getOrganisation()
-                                                       .get()
-                                                       .getContactInformation()
-                                                       .get(0)),
-                    "BEARER_TOKEN"
-                );
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer Name",
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "claimant",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "",
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "defendant",
+                                                             "BEARER_TOKEN");
             }
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -264,12 +251,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_LrVsLiP_1vs2() {
-            when(formGenerator.generateDocs(
-                any(CaseData.class),
-                anyString(),
-                any(Address.class),
-                anyString()
-            )).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -289,27 +271,24 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             if (getOrganisation().isPresent()) {
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    "Signer Name",
-                    Address.fromContactInformation(getOrganisation()
-                                                       .get()
-                                                       .getContactInformation()
-                                                       .get(0)),
-                    "BEARER_TOKEN"
-                );
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    getRespondent1PartyDetails().getPartyName(),
-                    getRespondent1PartyDetails().getPrimaryAddress(),
-                    "BEARER_TOKEN"
-                );
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    getRespondent2PartyDetails().getPartyName(),
-                    getRespondent2PartyDetails().getPrimaryAddress(),
-                    "BEARER_TOKEN"
-                );
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer Name",
+                                                             Address.fromContactInformation(getOrganisation()
+                                                                                                .get()
+                                                                                                .getContactInformation()
+                                                                                                .get(0)),
+                                                             "claimant",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             getRespondent1PartyDetails().getPartyName(),
+                                                             getRespondent1PartyDetails().getPrimaryAddress(),
+                                                             "defendant1",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             getRespondent2PartyDetails().getPartyName(),
+                                                             getRespondent2PartyDetails().getPrimaryAddress(),
+                                                             "defendant2",
+                                                             "BEARER_TOKEN");
             }
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -319,12 +298,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_serviceAddress() {
-            when(formGenerator.generateDocs(
-                any(CaseData.class),
-                anyString(),
-                any(Address.class),
-                anyString()
-            )).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisationWithoutName());
             Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
 
@@ -347,18 +321,21 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             if (getOrganisation().isPresent()) {
-                verify(formGenerator, times(1)).generateDocs(
-                    caseData,
-                    "Signer Name",
-                    serviceAddress,
-                    "BEARER_TOKEN"
-                );
-                verify(formGenerator, times(2)).generateDocs(
-                    caseData,
-                    "",
-                    serviceAddress,
-                    "BEARER_TOKEN"
-                );
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Signer Name",
+                                                             serviceAddress,
+                                                             "claimant",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "",
+                                                             serviceAddress,
+                                                             "defendant1",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "",
+                                                             serviceAddress,
+                                                             "defendant2",
+                                                             "BEARER_TOKEN");
             }
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -368,12 +345,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldGenerateNoticeOfDiscontinueDocForAllParties_whenNoCourtPermissionRequired_1vs2_correspondenceAddress() {
-            when(formGenerator.generateDocs(
-                any(CaseData.class),
-                anyString(),
-                any(Address.class),
-                anyString()
-            )).thenReturn(getCaseDocument());
+            when(formGenerator.generateDocs(any(CaseData.class), anyString(), any(Address.class), anyString(), anyString())).thenReturn(getCaseDocument());
             when(organisationService.findOrganisationById(anyString())).thenReturn(getOrganisation());
             Address serviceAddress = Address.builder().addressLine1("Service").postCode("S3RV 1C3").build();
             Address correspondenceAddress =
@@ -400,12 +372,21 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             if (getOrganisation().isPresent()) {
-                verify(formGenerator, times(3)).generateDocs(
-                    caseData,
-                    "Organisation name",
-                    correspondenceAddress,
-                    "BEARER_TOKEN"
-                );
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Organisation name",
+                                                             correspondenceAddress,
+                                                             "claimant",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Organisation name",
+                                                             correspondenceAddress,
+                                                             "defendant1",
+                                                             "BEARER_TOKEN");
+                verify(formGenerator, times(1)).generateDocs(caseData,
+                                                             "Organisation name",
+                                                             correspondenceAddress,
+                                                             "defendant2",
+                                                             "BEARER_TOKEN");
             }
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
@@ -419,7 +400,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         when(formGenerator.generateDocs(
             any(CaseData.class),
-            anyString(), any(Address.class), anyString()
+            anyString(), any(Address.class), anyString(), anyString()
         )).thenReturn(getCaseDocument());
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .respondent1(getRespondent1PartyDetails())
