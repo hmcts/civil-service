@@ -40,6 +40,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Getter
@@ -79,6 +81,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final boolean checkCarmToggle;
     private final StatementOfTruth uiStatementOfTruth;
     private final BigDecimal admittedAmount;
+    private final String admittedContent;
+    private final String faContent;
 
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())
@@ -105,6 +109,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
             .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, false))
+            .admittedContent(getAdmittedContent())
+            .faContent(getAdditionContent(caseData))
             .uiStatementOfTruth(caseData.getRespondent1LiPStatementOfTruth());
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
@@ -113,6 +119,33 @@ public class SealedClaimLipResponseForm implements MappableObject {
         addCourtOrderDetails(caseData, builder);
         return builder.build();
 
+    }
+
+    private static String getAdmittedContent() {
+        return "\"This amount includes interest if it has been claimed which will continue to accrue on the amount outstanding up to the date of Judgment," +
+            " settlement agreement or earlier payment.\n" +
+            "The amount does not include the claim fee and any fixed costs which are payable in addition.\"";
+    }
+
+    private static String getAdditionContent(CaseData caseData) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+            if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                if (caseData.isPayByInstallment() || caseData.isPayBySetDate()) {
+                    return "This amount includes interest if it has been claimed which will continue to accrue on the" +
+                        " amount outstanding up to the date of Judgment, settlement agreement or earlier payment." +
+                        "\n" +
+                        "The amount does not include the claim fee and any fixed costs which are payable in addition.";
+
+                } else if (caseData.isPayByInstallment()) {
+                    return "The final payment date may be later to reflect any additional interest, " +
+                        "any fixed costs and claim fee added to the judgment, settlement agreement or earlier payment amount";
+                }
+            } else if (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                return "The claim fee and any fixed costs claimed are not included in this figure but are payable in addition and if judgment," +
+                    " settlement agreement or earlier payment is entered on an admission will be included in the total amount.";
+            }
+        }
+        return "";
     }
 
     private static void addSolicitorDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {

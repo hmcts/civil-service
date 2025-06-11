@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 
 @Getter
 @Builder(toBuilder = true)
@@ -93,6 +94,9 @@ public class ResponseRepaymentDetailsForm {
 
     private static BigDecimal getTotalClaimAmountWithInterest(CaseData caseData, boolean isLRAdmissionBulkToggleEnabled) {
         if (isLRAdmissionBulkToggleEnabled) {
+            return caseData.getTotalClaimAmountPlusInterest();
+        }
+        if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             return caseData.getTotalClaimAmountPlusInterest();
         }
         return caseData.getTotalClaimAmount();
