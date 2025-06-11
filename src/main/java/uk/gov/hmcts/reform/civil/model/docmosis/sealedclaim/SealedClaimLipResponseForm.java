@@ -95,7 +95,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     @JsonIgnore
-    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData) {
+    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData, BigDecimal claimAmountPlusInterestToDate) {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
             .ccdCaseReference(formatCcdCaseReference(caseData))
@@ -108,7 +108,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, false))
+            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, claimAmountPlusInterestToDate, false))
             .admittedContent(getAdmittedContent())
             .faContent(getAdditionContent(caseData))
             .uiStatementOfTruth(caseData.getRespondent1LiPStatementOfTruth());

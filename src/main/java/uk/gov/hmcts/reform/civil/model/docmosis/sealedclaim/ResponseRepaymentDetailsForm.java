@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -22,14 +21,11 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 
 @Getter
 @Builder(toBuilder = true)
@@ -62,7 +58,44 @@ public class ResponseRepaymentDetailsForm {
         return Optional.ofNullable(responseType).map(RespondentResponseTypeSpec::getDisplayedValue).orElse("");
     }
 
-    public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData, boolean isLRAdmissionBulkToggleEnabled) {
+    public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData,
+                                                                                  BigDecimal claimAmountPlusInterestToDate,
+                                                                                  boolean isLRAdmissionBulkToggleEnabled) {
+        ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder = ResponseRepaymentDetailsForm.builder();
+
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent1ClaimResponseTypeForSpec());
+            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder,
+                                                          isLRAdmissionBulkToggleEnabled ? caseData.getTotalClaimAmountPlusInterest() : claimAmountPlusInterestToDate);
+                case PART_ADMISSION -> partAdmissionData(caseData, builder);
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
+                default -> builder.whyReject(null);
+            }
+        } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent2ClaimResponseTypeForSpec());
+            switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder,
+                                                          isLRAdmissionBulkToggleEnabled ? caseData.getTotalClaimAmountPlusInterest() : claimAmountPlusInterestToDate);
+                case PART_ADMISSION -> partAdmissionData(caseData, builder);
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
+                default -> builder.whyReject(null);
+            }
+        }
+
+        return builder
+            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec())
+            .responseType(caseData.getRespondent1ClaimResponseTypeForSpec())
+            .mediation(caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES)
+            .build();
+    }
+
+    public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData,
+                                                                                  boolean isLRAdmissionBulkToggleEnabled) {
         ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder = ResponseRepaymentDetailsForm.builder();
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
@@ -97,10 +130,6 @@ public class ResponseRepaymentDetailsForm {
     private static BigDecimal getTotalClaimAmountWithInterest(CaseData caseData, boolean isLRAdmissionBulkToggleEnabled) {
         if (isLRAdmissionBulkToggleEnabled) {
             return caseData.getTotalClaimAmountPlusInterest();
-        }
-        if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            return nonNull(caseData.getTotalInterest()) ? caseData.getTotalClaimAmount()
-                .add(caseData.getTotalInterest()).setScale(2, RoundingMode.UNNECESSARY) : caseData.getTotalClaimAmount();
         }
         return caseData.getTotalClaimAmount();
     }
