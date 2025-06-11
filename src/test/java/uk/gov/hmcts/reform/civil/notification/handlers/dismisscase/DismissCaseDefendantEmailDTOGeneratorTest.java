@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.dismisscase;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@ExtendWith(MockitoExtension.class)
 public class DismissCaseDefendantEmailDTOGeneratorTest {
 
     @Mock
@@ -28,11 +29,6 @@ public class DismissCaseDefendantEmailDTOGeneratorTest {
 
     @InjectMocks
     private DismissCaseDefendantEmailDTOGenerator emailDTOGenerator;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
@@ -76,7 +72,6 @@ public class DismissCaseDefendantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = Party.builder().build();
-        CaseData caseData = CaseData.builder().respondent1(party).build();
 
         String allPartyNames = "all party names";
         String respondentName = "respondent name";

@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.dismisscase;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@ExtendWith(MockitoExtension.class)
 public class DismissCaseClaimantEmailDTOGeneratorTest {
 
     @Mock
@@ -26,11 +27,6 @@ public class DismissCaseClaimantEmailDTOGeneratorTest {
 
     @InjectMocks
     private DismissCaseClaimantEmailDTOGenerator emailDTOGenerator;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void shouldReturnCorrectReferenceTemplate() {
@@ -66,7 +62,6 @@ public class DismissCaseClaimantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = Party.builder().build();
-        CaseData caseData = CaseData.builder().applicant1(party).build();
 
         String allPartyNames = "all party names";
         String applicantName = "applicant name";

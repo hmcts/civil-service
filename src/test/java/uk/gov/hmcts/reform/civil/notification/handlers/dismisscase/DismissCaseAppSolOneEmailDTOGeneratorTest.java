@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.dismisscase;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@ExtendWith(MockitoExtension.class)
 public class DismissCaseAppSolOneEmailDTOGeneratorTest {
 
     @Mock
@@ -30,11 +31,6 @@ public class DismissCaseAppSolOneEmailDTOGeneratorTest {
 
     @InjectMocks
     private DismissCaseAppSolOneEmailDTOGenerator emailDTOGenerator;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
