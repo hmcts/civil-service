@@ -24,8 +24,12 @@ public class DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator extends RespSolT
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        properties.put(LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService));
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        return properties;
     }
 
     @Override
@@ -34,11 +38,7 @@ public class DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator extends RespSolT
     }
 
     @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
-        properties.put(LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService));
-        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
-        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
-        return properties;
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
     }
 }
