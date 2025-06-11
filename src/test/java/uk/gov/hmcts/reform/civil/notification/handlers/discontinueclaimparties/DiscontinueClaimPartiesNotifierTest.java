@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class DiscontinueClaimPartiesNotifierTest {
+
     @InjectMocks
     private DiscontinueClaimPartiesNotifier notifier;
 

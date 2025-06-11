@@ -8,7 +8,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.*;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
 @Component
 public class DiscontinueClaimPartiesRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -39,7 +40,9 @@ public class DiscontinueClaimPartiesRespSolOneEmailDTOGenerator extends RespSolO
     }
 
     @Override
-    protected String getReferenceTemplate() { return REFERENCE_TEMPLATE; }
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE;
+    }
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {

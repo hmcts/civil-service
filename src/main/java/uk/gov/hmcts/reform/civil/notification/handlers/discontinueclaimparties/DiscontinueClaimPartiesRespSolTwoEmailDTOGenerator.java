@@ -29,7 +29,9 @@ public class DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator extends RespSolT
     }
 
     @Override
-    protected String getReferenceTemplate() { return REFERENCE_TEMPLATE; }
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE;
+    }
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {

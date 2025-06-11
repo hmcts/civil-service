@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -27,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
 class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
+
     private static final String TEMPLATE_ID = "template-id";
     private static final String REFERENCE_NUMBER = "8372942374";
     protected static final String APPLICANT_LEGAL_ORG_NAME = "Test Legal Org";
@@ -40,7 +40,6 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
     private DiscontinueClaimPartiesRespSolOneEmailDTOGenerator generator;
 
     private MockedStatic<NotificationUtils> notificationUtilsMockedStatic;
-
 
     @BeforeEach
     void setUp() {
@@ -63,14 +62,14 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().build();
         String result = generator.getEmailTemplateId(caseData);
 
-        assertEquals(TEMPLATE_ID, result);
+        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
     void shouldReturnReferenceTemplate() {
         String result = generator.getReferenceTemplate();
 
-        assertEquals("defendant-claim-discontinued-%s", result);
+        assertThat(result).isEqualTo("defendant-claim-discontinued-%s");
     }
 
     @Test
@@ -101,7 +100,7 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
 
         String result = generator.getEmailAddress(caseData);
 
-        assertEquals("solicitor@example.com", result);
+        assertThat(result).isEqualTo("solicitor@example.com");
     }
 
     @Test
@@ -116,7 +115,7 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
 
         String result = generator.getEmailAddress(caseData);
 
-        assertEquals("party@example.com", result);
+        assertThat(result).isEqualTo("party@example.com");
     }
 
     @Test
@@ -129,7 +128,7 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
 
         String result = generator.getEmailTemplateId(caseData);
 
-        assertEquals(TEMPLATE_ID, result);
+        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
@@ -142,6 +141,6 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
 
         String result = generator.getEmailTemplateId(caseData);
 
-        assertEquals(TEMPLATE_ID, result);
+        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 }

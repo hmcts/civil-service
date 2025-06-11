@@ -16,13 +16,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
 class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
+
     private static final String TEMPLATE_ID = "template-id";
     private static final String REFERENCE_NUMBER = "8372942374";
     protected static final String APPLICANT_LEGAL_ORG_NAME = "Test Legal Org";
@@ -36,7 +39,6 @@ class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
     private DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator generator;
 
     private MockedStatic<NotificationUtils> notificationUtilsMockedStatic;
-
 
     @BeforeEach
     void setUp() {
@@ -59,14 +61,14 @@ class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder().build();
         String result = generator.getEmailTemplateId(caseData);
 
-        assertEquals(TEMPLATE_ID, result);
+        assertThat(TEMPLATE_ID).isEqualTo(result);
     }
 
     @Test
     void shouldReturnReferenceTemplate() {
         String result = generator.getReferenceTemplate();
 
-        assertEquals("defendant2-claim-discontinued-%s", result);
+        assertThat("defendant2-claim-discontinued-%s").isEqualTo(result);
     }
 
     @Test
@@ -98,7 +100,7 @@ class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
 
         String result = generator.getEmailTemplateId(caseData);
 
-        assertEquals(TEMPLATE_ID, result);
+        assertThat(TEMPLATE_ID).isEqualTo(result);
     }
 
 }
