@@ -124,6 +124,7 @@ public class InitiateGeneralApplicationService {
         setBusinessProcess(caseData, userDetails, applicationBuilder);
         setCaseNameGaInternal(caseData, applicationBuilder);
         setFeatureToggles(caseData, applicationBuilder);
+        setDates(caseData, applicationBuilder);
         return finalizeApplication(applicationBuilder.build(), caseData, userDetails);
     }
 
@@ -268,6 +269,10 @@ public class InitiateGeneralApplicationService {
     private void setCaseType(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
         final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ? CaseCategory.SPEC_CLAIM : CaseCategory.UNSPEC_CLAIM;
         applicationBuilder.generalAppSuperClaimType(caseType.name()).caseAccessCategory(caseType);
+    }
+
+    private void setDates(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
+        applicationBuilder.mainCaseSubmittedDate(caseData.getSubmittedDate());
     }
 
     private void setRespondentAgreement(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {

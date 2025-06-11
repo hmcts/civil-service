@@ -911,6 +911,7 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(claimType)
+            .submittedDate(LocalDateTime.of(2025, 5, 5, 0, 0, 0))
             .courtLocation(CourtLocation.builder()
                                .caseLocation(CaseLocationCivil.builder()
                                                  .region("2")
