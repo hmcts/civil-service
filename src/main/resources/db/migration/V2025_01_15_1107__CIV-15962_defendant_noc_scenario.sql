@@ -18,7 +18,7 @@ VALUES ('Scenario.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant',
           "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
           "Notice.AAA6.ClaimIssue.Response.Await",
           "Notice.AAA6.ClaimIssue.HWF.PhonePayment",
-          "Notice.AAA6.DefResponse.MoretimeRequested.Claimant",
+          "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant",
           "Notice.AAA6.ClaimIssue.HWF.FullRemission"}',
         '{"Notice.AAA6.DefendantNoticeOfChange.ClaimMovesOffline.Claimant" : ["respondent1PartyName", "applicant1ResponseDeadlineEn", "applicant1ResponseDeadlineCy"]}');
 

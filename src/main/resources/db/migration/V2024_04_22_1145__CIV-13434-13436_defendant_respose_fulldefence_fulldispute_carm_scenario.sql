@@ -4,7 +4,7 @@
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.CARM.Defendant',
         '{"Notice.AAA6.ClaimIssue.Response.Required",
-        "Notice.AAA6.DefResponse.MoretimeRequested.Defendant",
+        "Notice.AAA6.DefResponse.MoreTimeRequested.Defendant",
         "Notice.AAA6.DefResponse.ResponseTimeElapsed.Defendant",
         "Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Defendant",
         "Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Defendant",
@@ -41,7 +41,7 @@ INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create
 VALUES ('Scenario.AAA6.DefResponse.FullDefence.FullDispute.CARM.Claimant',
         '{"Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
         "Notice.AAA6.ClaimIssue.Response.Await",
-        "Notice.AAA6.ClaimIssue.HWF.PhonePayment", "Notice.AAA6.DefResponse.MoretimeRequested.Claimant", "Notice.AAA6.ClaimIssue.HWF.FullRemission",
+        "Notice.AAA6.ClaimIssue.HWF.PhonePayment", "Notice.AAA6.DefResponse.MoreTimeRequested.Claimant", "Notice.AAA6.ClaimIssue.HWF.FullRemission",
         "Notice.AAA6.DefResponse.FullDefence.FullDispute.RefusedMediation.Claimant",
         "Notice.AAA6.DefResponse.Full Defence.FullDispute.SuggestedMediation.Claimant",
         "Notice.AAA6.DefResponse.FullDefence.FullDispute.Multi.Int.Fast.Claimant"}',
