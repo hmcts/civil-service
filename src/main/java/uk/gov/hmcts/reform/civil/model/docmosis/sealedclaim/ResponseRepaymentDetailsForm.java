@@ -22,10 +22,12 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 
@@ -97,7 +99,8 @@ public class ResponseRepaymentDetailsForm {
             return caseData.getTotalClaimAmountPlusInterest();
         }
         if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            return caseData.getClaimAmountInPounds();
+            return nonNull(caseData.getTotalInterest()) ? caseData.getTotalClaimAmount()
+                .add(caseData.getTotalInterest()).setScale(2, RoundingMode.UNNECESSARY) : caseData.getTotalClaimAmount();
         }
         return caseData.getTotalClaimAmount();
     }
