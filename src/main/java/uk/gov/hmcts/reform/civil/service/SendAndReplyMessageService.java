@@ -126,6 +126,7 @@ public class SendAndReplyMessageService {
 
     public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply, String userAuth) {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
+        log.info("userAuth " + userAuth);
         Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
 
         //Move current base message to history
