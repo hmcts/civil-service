@@ -97,7 +97,7 @@ public class ResponseRepaymentDetailsForm {
             return caseData.getTotalClaimAmountPlusInterest();
         }
         if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            return caseData.getTotalClaimAmountPlusInterest();
+            return caseData.getClaimAmountInPounds();
         }
         return caseData.getTotalClaimAmount();
     }
