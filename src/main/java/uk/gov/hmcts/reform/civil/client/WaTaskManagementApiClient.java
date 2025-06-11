@@ -18,6 +18,7 @@ public interface WaTaskManagementApiClient {
 
     @PostMapping(value = "/task", consumes = "application/json")
     ResponseEntity<GetTasksResponse<Task>> searchWithCriteria(
+        @RequestHeader("ServiceAuthorization") String serviceAuthorisation,
         @RequestHeader("Authorization") String authorization,
         @Valid @RequestBody SearchTaskRequest searchTaskRequest
     );

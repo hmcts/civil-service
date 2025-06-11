@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
@@ -90,6 +91,7 @@ public class SendAndReplyMessageService {
     private final UserService userService;
     private final Time time;
     private final WaTaskManagementApiClient waTaskManagementApiClient;
+    private final AuthTokenGenerator authTokenGenerator;
 
     public List<Element<Message>> addMessage(
         List<Element<Message>> messages,
@@ -149,6 +151,7 @@ public class SendAndReplyMessageService {
 
         try {
             ResponseEntity<GetTasksResponse<Task>> response = waTaskManagementApiClient.searchWithCriteria(
+                authTokenGenerator.generate(),
                 userAuth,
                 SearchTaskRequest.builder()
                     .requestContext(RequestContext.AVAILABLE_TASKS)
