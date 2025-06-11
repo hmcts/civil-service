@@ -68,7 +68,6 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
         return caseData.isRespondent1NotRepresented();
     }
 
-
     @Override
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
