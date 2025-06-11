@@ -1522,9 +1522,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
                 || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
                 List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
-                    .getPreTranslationSdoOrderDocuments();
+                    .getPreTranslationDocuments();
                 sdoDocuments.add(element(document));
-                dataBuilder.preTranslationSdoOrderDocuments(sdoDocuments);
+                dataBuilder.preTranslationDocuments(sdoDocuments);
             } else {
                 List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
                     .getSystemGeneratedCaseDocuments();
