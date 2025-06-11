@@ -415,8 +415,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean defendantRespondedWithPreferredLanguageWelsh() {
-        return caseData.isRespondentResponseBilingual()
+    public boolean pausedForTranslationAfterDefendantResponse() {
+        return caseData.getRespondent1ClaimResponseTypeForSpec() != null
             && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
     }
 

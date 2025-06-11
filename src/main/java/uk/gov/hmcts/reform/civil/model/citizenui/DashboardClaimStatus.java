@@ -140,7 +140,7 @@ public enum DashboardClaimStatus {
         Claim::claimantRequestedCountyCourtJudgement
     ),
     CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
-        Claim::defendantRespondedWithPreferredLanguageWelsh
+        Claim::pausedForTranslationAfterDefendantResponse
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid

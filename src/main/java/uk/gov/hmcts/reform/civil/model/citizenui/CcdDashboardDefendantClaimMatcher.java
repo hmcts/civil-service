@@ -382,11 +382,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+    public boolean pausedForTranslationAfterDefendantResponse() {
         if (!featureToggleService.isLipVLipEnabled()) {
             return false;
         }
-        return caseData.isRespondentResponseBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return caseData.getRespondent1ClaimResponseTypeForSpec() != null && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
     }
 
     @Override
