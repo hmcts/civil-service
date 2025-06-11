@@ -126,7 +126,6 @@ public class SendAndReplyMessageService {
 
     public List<Element<Message>> addReplyToMessage(List<Element<Message>> messages, String messageId, MessageReply messageReply, String userAuth) {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
-        log.info("userAuth " + userAuth);
         Message baseMessageDetails = createBaseMessageWithSenderDetails(userAuth);
 
         //Move current base message to history
@@ -144,7 +143,7 @@ public class SendAndReplyMessageService {
 
     public MessageWaTaskDetails addTaskInfo(List<Element<Message>> messages, String messageId, String userAuth, CaseData caseData) {
         Element<Message> messageToReplace = getMessageById(messages, messageId);
-
+        log.info("userAuth " + userAuth);
         MessageReply messageForHistory = buildReplyOutOfMessage(messageToReplace.getValue());
         log.info("message for history id  add task info " + messageForHistory.getMessageID());
 
