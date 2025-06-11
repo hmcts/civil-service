@@ -79,7 +79,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         CaseData caseData = callbackParams.getCaseData();
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslatedDocuments = caseData.getPreTranslationDocuments();
-        List<Element<CaseDocument>> sdoOrderDocuments = caseData.getPreTranslationSdoOrderDocuments();
         List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
         List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
@@ -88,9 +87,12 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (featureToggleService.isCaseProgressionEnabled() && Objects.nonNull(translatedDocuments)) {
             translatedDocuments.forEach(document -> {
                 if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
-                    if (Objects.nonNull(sdoOrderDocuments) && !sdoOrderDocuments.isEmpty()) {
-                        Element<CaseDocument> originalSdo = sdoOrderDocuments.remove(0);
-                        systemGeneratedDocuments.add(originalSdo);
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationStandardDirectionOrder = preTranslationDocuments.stream()
+                            .filter(item -> item.getValue().getDocumentType() == DocumentType.SDO_ORDER)
+                            .findFirst();
+                        preTranslationStandardDirectionOrder.ifPresent(preTranslationDocuments::remove);
+                        preTranslationStandardDirectionOrder.ifPresent(systemGeneratedDocuments::add);
                     }
                 } else if (document.getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
@@ -217,6 +219,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     addToSystemGenerated.add(document);
                 } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                     document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    addToSystemGenerated.add(document);
                 } else if (document.getValue().getDocumentType().equals(HEARING_NOTICE)) {
                     document.getValue().getFile().setCategoryID("hearingNotices");
                     addToHearingDocuments.add(document);
