@@ -124,7 +124,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
             String indented = mapper.writeValueAsString(templateData);
             log.info("templateData {} for caseId {}", indented, caseData.getCcdCaseReference());
         } catch (JsonProcessingException e) {
-            log.info("getting error in template data generation  for caseId {}",caseData.getCcdCaseReference());
+            log.info("getting error in template data generation  for caseId {}", caseData.getCcdCaseReference());
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
