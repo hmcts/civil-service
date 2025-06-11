@@ -22,7 +22,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.queryManagementRespondQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.QUERY_COLLECTION_NAME;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
 
@@ -72,12 +74,16 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId,
                                                 coreCaseUserService, parentQueryId);
 
-        caseData = caseData.toBuilder()
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
             // .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
-            .build();
+
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName(QUERY_COLLECTION_NAME).build());
+            clearOldQueryCollections(caseDataBuilder);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(mapper))
+            .data(caseDataBuilder.build().toMap(mapper))
             .build();
 
     }

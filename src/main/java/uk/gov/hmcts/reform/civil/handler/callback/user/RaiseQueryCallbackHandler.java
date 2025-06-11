@@ -135,13 +135,4 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         return coreCaseUserService.getUserCaseRoles(caseReference, userInfo.getUid());
     }
 
-    private void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData.CaseDataBuilder builder) {
-        if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
-            CaseData caseData = builder.build();
-            List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
-            messages.addAll(collectionToMigrate.getCaseMessages());
-            builder.queries(caseData.getQueries().toBuilder().caseMessages(messages).build());
-        }
-    }
-
 }
