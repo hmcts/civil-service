@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -119,6 +120,8 @@ public class ClaimantResponseUtilsTest {
         assertThat(finalRepaymentDate).isNotNull();
     }
 
+
+
     @ParameterizedTest
     @CsvSource({"IMMEDIATELY,Immediately", "BY_SET_DATE,By a set date", "SUGGESTION_OF_REPAYMENT_PLAN,By instalments"})
     void shouldReturnDefendantRepaymentOption(RespondentResponsePartAdmissionPaymentTimeLRspec input, String expectedOutput) {
@@ -148,6 +151,26 @@ public class ClaimantResponseUtilsTest {
     }
 
     @Test
+    void shouldGetTheDefendantAdmittedAmountWithFixedCosts() {
+        when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
+        CaseData caseData = CaseData.builder()
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder().repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                .firstRepaymentDate(LocalDate.of(2024, 1, 1))
+                .paymentAmount(new BigDecimal(10000)).build())
+            .issueDate(LocalDate.now())
+            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .fixedCosts(FixedCosts.builder().claimFixedCosts(YesOrNo.YES).fixedCostAmount("5000").build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .build();
+
+        BigDecimal actualOutput = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
+        assertThat(actualOutput).isNotNull();
+        Assertions.assertEquals(new BigDecimal("1080.00"), actualOutput);
+    }
+
+
+    @Test
     void shouldGetTheDefendantAdmittedAmountWhenPartAdmit() {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
         CaseData caseData = CaseData.builder()
@@ -173,6 +196,7 @@ public class ClaimantResponseUtilsTest {
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(1000))
             .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.YES).build()).build())
             .hwfFeeType(FeeType.CLAIMISSUED)
+            .fixedCosts(FixedCosts.builder().claimFixedCosts(YesOrNo.NO).build())
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(BigDecimal.valueOf(100)).build())
             .build();
 

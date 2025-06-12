@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 import static java.util.Objects.nonNull;
@@ -18,11 +19,11 @@ public class DefendantAdmittedAmountParamsBuilder extends DashboardNotifications
 
     @Override
     public void addParams(CaseData caseData, HashMap<String, Object> params) {
-        if (nonNull(claimantResponseUtils.getDefendantAdmittedAmount(caseData))) {
+        BigDecimal defendantAdmittedAmount = claimantResponseUtils.getDefendantAdmittedAmount(caseData, true);
+        if (nonNull(defendantAdmittedAmount)) {
             params.put(
                 "defendantAdmittedAmount",
-                "£" + this.removeDoubleZeros(formatAmount(claimantResponseUtils.getDefendantAdmittedAmount(caseData)))
-            );
+                "£" + this.removeDoubleZeros(formatAmount(defendantAdmittedAmount)));
         }
     }
 }

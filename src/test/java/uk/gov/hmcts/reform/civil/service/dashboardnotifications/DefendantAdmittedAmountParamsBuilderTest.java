@@ -26,7 +26,7 @@ class DefendantAdmittedAmountParamsBuilderTest {
     @Test
     void shouldAddDefendantAdmittedAmountWhenPresent() {
         CaseData caseData = mock(CaseData.class);
-        when(claimantResponseUtils.getDefendantAdmittedAmount(caseData)).thenReturn(new BigDecimal("10000.00"));
+        when(claimantResponseUtils.getDefendantAdmittedAmount(caseData, true)).thenReturn(new BigDecimal("10000.00"));
 
         HashMap<String, Object> params = new HashMap<>();
         builder.addParams(caseData, params);
@@ -37,7 +37,7 @@ class DefendantAdmittedAmountParamsBuilderTest {
     @Test
     void shouldNotAddDefendantAdmittedAmountWhenNotPresent() {
         CaseData caseData = mock(CaseData.class);
-        when(claimantResponseUtils.getDefendantAdmittedAmount(caseData)).thenReturn(null);
+        when(claimantResponseUtils.getDefendantAdmittedAmount(caseData, true)).thenReturn(null);
 
         HashMap<String, Object> params = new HashMap<>();
 
