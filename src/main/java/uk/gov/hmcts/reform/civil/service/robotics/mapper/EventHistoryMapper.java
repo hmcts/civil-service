@@ -1474,8 +1474,7 @@ public class EventHistoryMapper {
                     && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                     && respondent1MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
-                )
-                ) {
+                )) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
                 } else {
@@ -1501,8 +1500,7 @@ public class EventHistoryMapper {
                     && respondent1MediationRequired == YesOrNo.YES
                     && respondent2MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
-                )
-                ) {
+                )) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
                 } else {
@@ -1525,8 +1523,7 @@ public class EventHistoryMapper {
                     && respondent1MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
                     && applicant2MediationRequired == YesOrNo.YES
-                )
-                ) {
+                )) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
                 } else {
