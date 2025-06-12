@@ -239,9 +239,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 } else if (document.getValue().getDocumentType().equals(COURT_OFFICER_ORDER)) {
                     document.getValue().getFile().setCategoryID("caseManagementOrders");
                     addToCourtOfficerOrders.add(document);
-                } else if (document.getValue().getDocumentType().equals(DEFENDANT_RESPONSE)
-                    && caseData.isLipvLROneVOne() &&
-                    featureToggleService.isGaForWelshEnabled()) {
+                } else if (isTranslationForLipVsLRDefendantSealedForm(document, caseData)) {
                     document.getValue().getFile().setCategoryID(DQ_DEF1.getValue());
                     addToSystemGenerated.add(document);
                 } else {
