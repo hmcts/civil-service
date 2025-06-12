@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.takecaseoffline;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
