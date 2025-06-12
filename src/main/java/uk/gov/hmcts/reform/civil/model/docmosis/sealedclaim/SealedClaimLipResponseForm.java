@@ -130,7 +130,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private static String getAdditionContent(CaseData caseData) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
             if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-                if (caseData.isPayByInstallment() || caseData.isPayBySetDate()) {
+                if (caseData.isPayImmediately() || caseData.isPayBySetDate()) {
                     return "This amount includes interest if it has been claimed which will continue to accrue on the" +
                         " amount outstanding up to the date of Judgment, settlement agreement or earlier payment." +
                         "\n" +

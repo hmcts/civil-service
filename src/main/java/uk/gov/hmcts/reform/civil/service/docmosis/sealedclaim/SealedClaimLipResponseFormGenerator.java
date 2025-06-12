@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_SPEC;
@@ -38,7 +37,8 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
         log.info("Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-        BigDecimal claimAmountPlusInterestToDate = interestCalculator.claimAmountPlusInterestToDate(caseData);
+        BigDecimal claimAmountPlusInterestToDate = interestCalculator.claimAmountPlusInterestToDate(caseData)
+            .setScale(2, RoundingMode.UNNECESSARY);
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
             SealedClaimLipResponseForm.toTemplate(caseData, claimAmountPlusInterestToDate).toBuilder();
         responseFormBuilder.admittedAmount(claimAmountPlusInterestToDate);
@@ -51,7 +51,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                     .defendant1MediationUnavailableDatesExists(checkDefendant1MediationHasUnavailabilityDates(caseData))
                     .defendant1UnavailableDatesList(getDefendant1FromDateUnavailableList(caseData));
             return responseFormBuilder.build();
-
         } else {
             log.info("Else Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
             return  responseFormBuilder.build();
@@ -121,14 +120,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     public CaseDocument generate(final CaseData caseData, final String authorization) {
         log.info("generate document for case {}", caseData.getCcdCaseReference());
         SealedClaimLipResponseForm templateData = getTemplateData(caseData);
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            String indented = mapper.writeValueAsString(templateData);
-            log.info("templateData {} for caseId {}", indented, caseData.getCcdCaseReference());
-        } catch (JsonProcessingException e) {
-            log.info("getting error in template data generation  for caseId {}", caseData.getCcdCaseReference());
-        }
-
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             DEFENDANT_RESPONSE_LIP_SPEC
