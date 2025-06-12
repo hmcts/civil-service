@@ -730,7 +730,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
-            callbackParams); 
+            callbackParams);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
         //Then
         assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
@@ -740,7 +740,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE.name());
     }
 
-    @Test  
+    @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claim() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
@@ -839,7 +839,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
         preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
             Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
-            DocumentType.DEFENCE_TRANSLATED_DOCUMENT
+            DocumentType.SEALED_CLAIM
         )));
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
