@@ -15,7 +15,8 @@ public class GenerateOrderCOOResp2EmailDTOGenerator extends RespSolTwoEmailDTOGe
 
     public GenerateOrderCOOResp2EmailDTOGenerator(OrganisationService organisationService,
                                                   NotificationsProperties notificationsProperties) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

@@ -10,8 +10,10 @@ public class TrialReadyDefendantTwoEmailDTOGenerator extends DefendantTwoEmailDT
 
     private static final String REFERENCE_TEMPLATE = "other-party-trial-ready-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected TrialReadyDefendantTwoEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

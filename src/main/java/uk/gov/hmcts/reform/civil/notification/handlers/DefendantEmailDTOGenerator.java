@@ -1,24 +1,21 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
+@AllArgsConstructor
 public abstract class DefendantEmailDTOGenerator extends EmailDTOGenerator {
-
-    protected DefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
-    }
 
     @Override
     public String getEmailAddress(CaseData caseData) {
         return caseData.getRespondent1PartyEmail();
     }
 
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isRespondent1LiP() ? Boolean.TRUE : Boolean.FALSE;
     }
 

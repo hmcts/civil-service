@@ -11,9 +11,12 @@ public class GenerateOrderCOOAppSolEmailDTOGenerator extends AppSolOneEmailDTOGe
 
     protected static final String COO_APP_SOL_REFERENCE_TEMPLATE = "generate-order-notification-%s";
 
+    NotificationsProperties notificationsProperties;
+
     public GenerateOrderCOOAppSolEmailDTOGenerator(OrganisationService organisationService,
                                                    NotificationsProperties notificationsProperties) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

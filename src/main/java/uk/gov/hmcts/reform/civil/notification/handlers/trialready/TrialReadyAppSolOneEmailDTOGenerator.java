@@ -17,8 +17,11 @@ public class TrialReadyAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGener
 
     private static final String REFERENCE_TEMPLATE = "other-party-trial-ready-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected TrialReadyAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

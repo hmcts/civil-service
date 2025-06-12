@@ -25,7 +25,7 @@ public class DefendantTwoEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        emailDTOGenerator = new DefendantTwoEmailDTOGenerator(notificationsProperties) {
+        emailDTOGenerator = new DefendantTwoEmailDTOGenerator() {
             @Override
             public String getEmailTemplateId(CaseData caseData) {
                 return "template-id";
