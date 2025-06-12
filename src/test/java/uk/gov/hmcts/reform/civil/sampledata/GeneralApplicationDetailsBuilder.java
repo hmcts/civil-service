@@ -487,6 +487,7 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .caseAccessCategory(SPEC_CLAIM)
+            .claimDismissedDeadline(LocalDateTime.now().plusMonths(6))
             .solicitorReferences(SolicitorReferences.builder().applicantSolicitor1Reference("AppSol1Ref").respondentSolicitor1Reference("RespSol1ref").build())
             .responseClaimTrack("MULTI_CLAIM")
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
