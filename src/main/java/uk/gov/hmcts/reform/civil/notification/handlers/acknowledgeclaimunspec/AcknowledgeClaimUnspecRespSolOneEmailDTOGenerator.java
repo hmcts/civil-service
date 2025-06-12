@@ -13,12 +13,14 @@ public class AcknowledgeClaimUnspecRespSolOneEmailDTOGenerator extends RespSolOn
 
     protected static final String REF_SOL_ONE_REF_TEMPLATE = "acknowledge-claim-respondent-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
     private final AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper;
 
     public AcknowledgeClaimUnspecRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
                                                              OrganisationService organisationService,
                                                              AcknowledgeClaimUnspecHelper acknowledgeClaimUnspecHelper) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
         this.acknowledgeClaimUnspecHelper = acknowledgeClaimUnspecHelper;
     }
 
@@ -38,7 +40,7 @@ public class AcknowledgeClaimUnspecRespSolOneEmailDTOGenerator extends RespSolOn
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData);
     }
 }

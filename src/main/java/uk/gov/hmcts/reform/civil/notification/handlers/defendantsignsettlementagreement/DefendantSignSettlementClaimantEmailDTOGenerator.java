@@ -17,8 +17,10 @@ public class DefendantSignSettlementClaimantEmailDTOGenerator extends ClaimantEm
 
     private final PinInPostConfiguration pipInPostConfiguration;
 
+    private final NotificationsProperties notificationsProperties;
+
     protected DefendantSignSettlementClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties, PinInPostConfiguration pipInPostConfiguration) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
         this.pipInPostConfiguration = pipInPostConfiguration;
     }
 
@@ -51,7 +53,7 @@ public class DefendantSignSettlementClaimantEmailDTOGenerator extends ClaimantEm
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
         boolean isAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
         boolean isNotAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementNotAgreed).orElse(false);

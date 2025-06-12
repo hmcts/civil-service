@@ -146,4 +146,37 @@ public class ClaimantResponseConfirmsToProceedEmailHelperTest {
 
         assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
     }
+
+    @Test
+    void shouldProceedWithActionWhenRespondent2ClaimResponseTypeForSpecIsFullDefence() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .allocatedTrack(SMALL_CLAIM)
+            .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .responseClaimMediationSpecRequired(NO)
+            .build();
+        String expectedTemplateId = "template-id";
+
+        when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpecWithAction()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = helper.getTemplate(caseData, false);
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
+
+    @Test
+    void shouldNotProceedWithActionWhenClaimResponseTypeIsNotFullDefence() {
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(SPEC_CLAIM)
+            .allocatedTrack(SMALL_CLAIM)
+            .responseClaimMediationSpecRequired(NO)
+            .build();
+        String expectedTemplateId = "template-id";
+
+        when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn(expectedTemplateId);
+
+        String actualTemplateId = helper.getTemplate(caseData, false);
+
+        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
+    }
 }

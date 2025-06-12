@@ -12,8 +12,10 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
+    private final NotificationsProperties notificationsProperties;
+
     protected ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

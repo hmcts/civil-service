@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.resetpin;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,18 +14,15 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
+@AllArgsConstructor
 public class ResetPinDefendantLipEmailDTOGenerator extends EmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "claim-reset-pin-notification-%s";
     private final PinInPostConfiguration pipInPostConfiguration;
-
-    protected ResetPinDefendantLipEmailDTOGenerator(PinInPostConfiguration pipInPostConfiguration, NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
-        this.pipInPostConfiguration = pipInPostConfiguration;
-    }
+    private final NotificationsProperties notificationsProperties;
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isRespondent1LiP() && caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null;
     }
 

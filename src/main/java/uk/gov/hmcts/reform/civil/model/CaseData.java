@@ -534,6 +534,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDate repaymentDate;
     private final String caseNameHmctsInternal;
     private final String caseNamePublic;
+    private final YesOrNo ccjJudgmentAmountShowInterest;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -1250,6 +1251,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRespondentSolicitorRegistered() {
         return YesOrNo.YES.equals(getRespondent1OrgRegistered());
+    }
+
+    @JsonIgnore
+    public boolean isRespondentTwoSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent2OrgRegistered());
     }
 
     @JsonIgnore
