@@ -120,8 +120,6 @@ public class ClaimantResponseUtilsTest {
         assertThat(finalRepaymentDate).isNotNull();
     }
 
-
-
     @ParameterizedTest
     @CsvSource({"IMMEDIATELY,Immediately", "BY_SET_DATE,By a set date", "SUGGESTION_OF_REPAYMENT_PLAN,By instalments"})
     void shouldReturnDefendantRepaymentOption(RespondentResponsePartAdmissionPaymentTimeLRspec input, String expectedOutput) {
@@ -168,7 +166,6 @@ public class ClaimantResponseUtilsTest {
         assertThat(actualOutput).isNotNull();
         Assertions.assertEquals(new BigDecimal("1080.00"), actualOutput);
     }
-
 
     @Test
     void shouldGetTheDefendantAdmittedAmountWhenPartAdmit() {
