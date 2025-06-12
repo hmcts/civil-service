@@ -95,8 +95,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
         return Optional.of(EmailData.builder()
-                               //.to(mediationCSVEmailConfiguration.getJsonRecipient())
-                               .to("pettedson.john1@hmcts.net")
+                               .to(mediationCSVEmailConfiguration.getJsonRecipient())
                                .subject(SUBJECT)
                                .attachments(of(json(mediationDTO.getJsonRawData(), FILENAME)))
                                .build());
