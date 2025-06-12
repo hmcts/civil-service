@@ -230,6 +230,9 @@ public class Task {
     )
     private ZonedDateTime lastReconfigurationTime;
 
+    @Schema(name = "termination_process", description = "Termination Process")
+    private String terminationProcess;
+
     public Task(String id,
                 String name,
                 String type,
@@ -338,41 +341,40 @@ public class Task {
                 ZonedDateTime priorityDate,
                 ZonedDateTime reconfigureRequestTime,
                 ZonedDateTime lastReconfigurationTime) {
-        this(
-            id,
-            name,
-            type,
-            taskState,
-            taskSystem,
-            securityClassification,
-            taskTitle,
-            createdDate,
-            dueDate,
-            assignee,
-            autoAssigned,
-            executionType,
-            jurisdiction,
-            region,
-            location,
-            locationName,
-            caseTypeId,
-            caseId,
-            caseCategory,
-            caseName,
-            warnings,
-            warningList,
-            caseManagementCategory,
-            workTypeId,
-            workTypeLabel,
-            taskPermissions,
-            roleCategory,
-            description,
-            additionalProperties,
-            nextHearingId,
-            nextHearingDate,
-            minorPriority,
-            majorPriority,
-            priorityDate
+        this(id,
+             name,
+             type,
+             taskState,
+             taskSystem,
+             securityClassification,
+             taskTitle,
+             createdDate,
+             dueDate,
+             assignee,
+             autoAssigned,
+             executionType,
+             jurisdiction,
+             region,
+             location,
+             locationName,
+             caseTypeId,
+             caseId,
+             caseCategory,
+             caseName,
+             warnings,
+             warningList,
+             caseManagementCategory,
+             workTypeId,
+             workTypeLabel,
+             taskPermissions,
+             roleCategory,
+             description,
+             additionalProperties,
+             nextHearingId,
+             nextHearingDate,
+             minorPriority,
+             majorPriority,
+             priorityDate
         );
         this.reconfigureRequestTime = reconfigureRequestTime;
         this.lastReconfigurationTime = lastReconfigurationTime;
@@ -520,5 +522,13 @@ public class Task {
 
     public ZonedDateTime getLastReconfigurationTime() {
         return lastReconfigurationTime;
+    }
+
+    public String getTerminationProcess() {
+        return terminationProcess;
+    }
+
+    public void setTerminationProcess(String terminationProcess) {
+        this.terminationProcess = terminationProcess;
     }
 }
