@@ -6,15 +6,13 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.DashboardBaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.DefendantResponseWelshClaimantDashboardNotificationHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class DefendantResponseWelshTranslationScenarioTest extends DashboardBaseIntegrationTest {
+public class EnglishDefendantResponseWelshTranslationScenarioTest extends DashboardBaseIntegrationTest {
 
     @Autowired
     private DefendantResponseWelshClaimantDashboardNotificationHandler handler;
@@ -22,15 +20,12 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
     @Test
     void should_create_defendant_response_claimant_dashboard_welsh_scenario() throws Exception {
 
-        String caseId = "123452";
+        String caseId = "123451";
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
-            .toBuilder()
-            .legacyCaseReference("reference")
-            .ccdCaseReference(Long.valueOf(caseId))
-            .caseDataLiP(CaseDataLiP.builder()
-                        .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                    .respondent1ResponseLanguage("WELSH").build()).build())
-            .build();
+                .toBuilder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(Long.valueOf(caseId))
+                .build();
 
         handler.handle(callbackParams(caseData));
 
@@ -39,14 +34,10 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("The defendant's response is being translated"),
-                jsonPath("$[0].descriptionEn").value(
-                    "<p class=\"govuk-body\">The defendant has chosen to respond to the claim in Welsh. " +
-                        "Their response is paused for translation into English. We will send it to you when it has been translated.</p>"),
-                jsonPath("$[0].titleCy").value("Mae ymateb y diffynnydd yn cael ei gyfieithu"),
-                jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Mae'r diffynnydd wedi dewis ymateb i'r cais yn Gymraeg. " +
-                        "Mae ei ymateb yn cael ei gyfieithu i'r Saesneg. Byddwn yn ei anfon atoch pan fydd wedi’i gyfieithu.</p>")
+                jsonPath("$[0].titleEn").doesNotExist(),
+                jsonPath("$[0].descriptionEn").doesNotExist(),
+                jsonPath("$[0].titleCy").doesNotExist(),
+                jsonPath("$[0].descriptionCy").doesNotExist()
             );
 
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
@@ -61,4 +52,5 @@ public class DefendantResponseWelshTranslationScenarioTest extends DashboardBase
                 jsonPath("$[0].currentStatusCy").value(TaskStatus.AVAILABLE.getWelshName())
             );
     }
+
 }
