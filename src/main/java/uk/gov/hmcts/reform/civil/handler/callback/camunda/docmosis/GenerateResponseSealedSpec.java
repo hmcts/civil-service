@@ -117,8 +117,9 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private void isLipWelshApplicant(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
                                      CaseDocument sealedForm,
                                      CaseDocument copy) {
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne() &&
-            caseData.isClaimantBilingual() && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT) {
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual()
+            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             List<Element<CaseDocument>> preTranslationDocs =
                 Optional.ofNullable(caseData.getPreTranslationDocuments()).orElseGet(ArrayList::new);
             preTranslationDocs.add(ElementUtils.element(sealedForm));
@@ -162,8 +163,9 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 LocalDate.now().toString()
             ));
         }
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne() &&
-            caseData.isClaimantBilingual() && caseData.getRespondent1OriginalDqDoc() != null) {
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual() && caseData.getRespondent1OriginalDqDoc() != null
+            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             documents.add(
                 new DocumentMetaData(
                     caseData.getRespondent1OriginalDqDoc().getDocumentLink(),

@@ -161,8 +161,8 @@ public class DirectionsQuestionnairePreparer {
             }
         }
         if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
-            && caseData.isClaimantBilingual() &&
-            caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT) {
+            && caseData.isClaimantBilingual()
+            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
             caseDataBuilder.respondent1OriginalDqDoc(directionsQuestionnaire);
         } else {
             List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
