@@ -77,7 +77,8 @@ class SendAndReplyMessageServiceTest {
         "national-business-centre",
         "circuit-judge",
         "district-judge",
-        "judge"
+        "judge",
+        "wlu-admin"
     );
 
     @Mock
@@ -435,6 +436,37 @@ class SendAndReplyMessageServiceTest {
                 buildRoleAssignmentsResponse(List.of(
                                                  RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
                                                  RoleAssignmentResponse.builder().roleName("judge").roleLabel("Judge").roleCategory("JUDICIAL").build()
+                                             )
+                )
+            );
+
+            List<Element<Message>> messages = new ArrayList<>();
+            messages.add(element(message));
+
+            List<Element<Message>> actual = messageService.addMessage(
+                messages,
+                MESSAGE_METADATA,
+                MESSAGE_CONTENT,
+                USER_AUTH
+            );
+
+            assertEquals(List.of(
+                message,
+                buildExpectedMessage(expectedSenderRoleCategory, expectedUserRoleLabel)
+            ), unwrapElements(actual));
+        }
+
+        @Test
+        void should_returnExpectedMessage_forWluAdmin() {
+            when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
+
+            RolePool expectedSenderRoleCategory = RolePool.WLU_ADMIN;
+            String expectedUserRoleLabel = "Welsh language unit";
+            when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
+                buildRoleAssignmentsResponse(List.of(
+                                                 RoleAssignmentResponse.builder().roleName("other").roleLabel("Other").roleCategory("OTHER").build(),
+                                                 RoleAssignmentResponse.builder().roleName("wlu-admin").roleLabel(
+                                                     "Welsh language unit").roleCategory("ADMIN").build()
                                              )
                 )
             );
