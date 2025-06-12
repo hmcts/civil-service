@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.discontinueclaimparties;
 
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -11,21 +10,23 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
-@Component
-public class DiscontinueClaimPartiesRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+public class DiscontinueClaimPartiesDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
-    private final NotificationsProperties notificationsProperties;
     private static final String REFERENCE_TEMPLATE = "defendant-claim-discontinued-%s";
 
-    public DiscontinueClaimPartiesRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
-                                                             OrganisationService organisationService) {
-        super(organisationService);
+    private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
+
+    public DiscontinueClaimPartiesDefendantEmailDTOGenerator(
+        NotificationsProperties notificationsProperties, OrganisationService organisationService
+    ) {
         this.notificationsProperties = notificationsProperties;
+        this.organisationService = organisationService;
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
+    protected String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
     }
 
     @Override

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -16,15 +15,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
-class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
+class DiscontinueClaimPartiesDefendantEmailDTOGeneratorTest {
 
     private static final String TEMPLATE_ID = "template-id";
     private static final String REFERENCE_NUMBER = "8372942374";
@@ -36,14 +31,14 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
     @Mock
     private OrganisationService organisationService;
 
-    private DiscontinueClaimPartiesRespSolOneEmailDTOGenerator generator;
+    private DiscontinueClaimPartiesDefendantEmailDTOGenerator generator;
 
     private MockedStatic<NotificationUtils> notificationUtilsMockedStatic;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        generator = new DiscontinueClaimPartiesRespSolOneEmailDTOGenerator(notificationsProperties, organisationService);
+        generator = new DiscontinueClaimPartiesDefendantEmailDTOGenerator(notificationsProperties, organisationService);
         notificationUtilsMockedStatic = mockStatic(NotificationUtils.class);
     }
 
@@ -56,7 +51,7 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnEmailTemplateId() {
-        when(notificationsProperties.getNotifyClaimDiscontinuedLRTemplate()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyClaimDiscontinuedLipTemplate()).thenReturn(TEMPLATE_ID);
 
         CaseData caseData = CaseData.builder().build();
         String result = generator.getEmailTemplateId(caseData);
@@ -88,18 +83,5 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
         assertThat(result.get(CLAIM_REFERENCE_NUMBER)).isEqualTo("12345");
         assertThat(result.get(PARTY_REFERENCES)).isEqualTo(NotificationUtils.buildPartiesReferencesEmailSubject(caseData));
         assertThat(result.get(CASEMAN_REF)).isEqualTo(REFERENCE_NUMBER);
-    }
-
-    @Test
-    void shouldReturnLRTemplateIdWhenShouldNotifyIsTrue() {
-        CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.YES)
-            .build();
-
-        when(notificationsProperties.getNotifyClaimDiscontinuedLRTemplate()).thenReturn(TEMPLATE_ID);
-
-        String result = generator.getEmailTemplateId(caseData);
-
-        assertThat(result).isEqualTo(TEMPLATE_ID);
     }
 }
