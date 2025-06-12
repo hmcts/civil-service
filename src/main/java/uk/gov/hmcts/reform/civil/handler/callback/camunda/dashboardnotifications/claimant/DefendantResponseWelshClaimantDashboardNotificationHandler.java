@@ -46,4 +46,9 @@ public class DefendantResponseWelshClaimantDashboardNotificationHandler extends 
             return SCENARIO_AAA6_ENGLISH_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT.getScenario();
         }
     }
+
+    @Override
+    protected boolean shouldRecordScenario(CaseData caseData) {
+        return caseData.isApplicantLiP();
+    }
 }
