@@ -44,8 +44,7 @@ public class JudgementService {
             .ccjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount())
             .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
             .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
-            .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails()
-                .getCcjJudgmentFixedCostOption())
+            .ccjJudgmentFixedCostOption(checkFixedCostOption(caseData))
             .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
             .ccjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())
             .ccjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest())
@@ -70,7 +69,6 @@ public class JudgementService {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
             }
         }
-
         return claimAmount;
     }
 
@@ -165,5 +163,14 @@ public class JudgementService {
             && isOneVOne(caseData)
             && isLRvLR(caseData)
             && featureToggleService.isLrAdmissionBulkEnabled();
+    }
+
+    private YesOrNo checkFixedCostOption(CaseData caseData) {
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            && (nonNull(caseData.getFixedCosts()) && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
+            || YesOrNo.YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+            return YesOrNo.YES;
+        }
+        return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }
 }
