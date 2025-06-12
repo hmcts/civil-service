@@ -60,7 +60,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
@@ -690,18 +689,6 @@ public class EventHistoryMapper {
             respondent2ResponseDate = caseData.getRespondent1ResponseDate();
         } else {
             respondent2ResponseDate = caseData.getRespondent2ResponseDate();
-        }
-        if (goingOffline) {
-            //Divergent response can occur in 2v1 where respondent2ResponseDate is not available.
-            LocalDateTime queryDate = Stream.of(respondent1ResponseDate, respondent2ResponseDate)
-                .filter(Objects::nonNull)
-                .max(LocalDateTime::compareTo)
-                .orElse(null);
-            if (!MultiPartyScenario.isTwoVOne(caseData)) {
-                queryDate = respondent1ResponseDate.isAfter(respondent2ResponseDate)
-                    ? respondent1ResponseDate : respondent2ResponseDate;
-            }
-            buildQueriesEvent(builder, caseData, queryDate);
         }
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
