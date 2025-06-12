@@ -25,6 +25,15 @@ public class DiscontinueClaimPartiesDefendantEmailDTOGenerator extends Defendant
     }
 
     @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
+        properties.put(LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService));
+        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+        return properties;
+    }
+
+    @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getNotifyClaimDiscontinuedLipTemplate();
     }
@@ -32,14 +41,5 @@ public class DiscontinueClaimPartiesDefendantEmailDTOGenerator extends Defendant
     @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
-    }
-
-    @Override
-    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
-        properties.put(LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService));
-        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
-        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
-        return properties;
     }
 }

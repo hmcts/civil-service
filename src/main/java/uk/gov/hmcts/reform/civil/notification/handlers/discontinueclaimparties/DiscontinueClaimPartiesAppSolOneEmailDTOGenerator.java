@@ -24,13 +24,13 @@ public class DiscontinueClaimPartiesAppSolOneEmailDTOGenerator extends AppSolOne
     }
 
     @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE;
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
     }
 
     @Override

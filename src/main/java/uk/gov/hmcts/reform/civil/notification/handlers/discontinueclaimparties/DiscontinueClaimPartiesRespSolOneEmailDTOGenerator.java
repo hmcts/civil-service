@@ -15,17 +15,13 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLeg
 public class DiscontinueClaimPartiesRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
+
     private static final String REFERENCE_TEMPLATE = "defendant-claim-discontinued-%s";
 
     public DiscontinueClaimPartiesRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
                                                              OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-    }
-
-    @Override
-    public String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
     }
 
     @Override
@@ -40,5 +36,10 @@ public class DiscontinueClaimPartiesRespSolOneEmailDTOGenerator extends RespSolO
         properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
         properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         return properties;
+    }
+
+    @Override
+    public String getEmailTemplateId(CaseData caseData) {
+        return notificationsProperties.getNotifyClaimDiscontinuedLRTemplate();
     }
 }
