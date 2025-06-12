@@ -84,7 +84,7 @@ wa:
   feature-toggle: ${WA_TOGGLE:Prod}
   task-management:
     api:
-      url: http://wa-task-management-api-demo.service.core-compute-demo.internal
+      url: http://wa-task-management-api-civil-ccd-pr-5784.preview.platform.hmcts.net
 
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
