@@ -81,7 +81,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final boolean checkCarmToggle;
     private final StatementOfTruth uiStatementOfTruth;
     private final BigDecimal admittedAmount;
-    private final String admittedContent;
     private final String faContent;
 
     public boolean isCurrentlyWorking() {
@@ -109,7 +108,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
             .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, claimAmountPlusInterestToDate, false))
-            .admittedContent(getAdmittedContent())
             .faContent(getAdditionContent(caseData))
             .uiStatementOfTruth(caseData.getRespondent1LiPStatementOfTruth());
         addSolicitorDetails(caseData, builder);
@@ -119,13 +117,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
         addCourtOrderDetails(caseData, builder);
         return builder.build();
 
-    }
-
-    private static String getAdmittedContent() {
-        return "This amount includes interest if it has been claimed which will continue to accrue on the amount " +
-            "outstanding up to the date of Judgment, settlement agreement or earlier payment." +
-            "\n" +
-            "The amount does not include the claim fee and any fixed costs which are payable in addition";
     }
 
     private static String getAdditionContent(CaseData caseData) {
