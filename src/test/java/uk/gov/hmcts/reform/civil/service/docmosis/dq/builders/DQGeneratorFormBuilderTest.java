@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -173,5 +174,17 @@ class DQGeneratorFormBuilderTest {
                     CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
         boolean result = dqGeneratorFormBuilder.isRespondentState(caseData);
         assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnForFalseForLipClaimantBilingual_ForOtherStates() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(state.getName()).thenReturn(FULL_ADMISSION.fullName());
+        CaseData caseData =
+            CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
+                    CaseState.CASE_DISMISSED).build();
+        boolean result = dqGeneratorFormBuilder.isRespondentState(caseData);
+        assertFalse(result);
     }
 }
