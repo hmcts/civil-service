@@ -122,9 +122,10 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     private static String getAdmittedContent() {
-        return "\"This amount includes interest if it has been claimed which will continue to accrue on the amount outstanding up to the date of Judgment," +
-            " settlement agreement or earlier payment.\n" +
-            "The amount does not include the claim fee and any fixed costs which are payable in addition.\"";
+        return "This amount includes interest if it has been claimed which will continue to accrue on the amount " +
+            "outstanding up to the date of Judgment, settlement agreement or earlier payment." +
+            "\n" +
+            "The amount does not include the claim fee and any fixed costs which are payable in addition";
     }
 
     private static String getAdditionContent(CaseData caseData) {
