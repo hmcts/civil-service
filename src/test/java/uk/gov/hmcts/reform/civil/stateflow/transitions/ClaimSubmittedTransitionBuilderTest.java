@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTran
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.takenOfflineByStaffBeforeClaimIssued;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimSubmittedTransitionBuilderTest {
+class ClaimSubmittedTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
