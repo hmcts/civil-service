@@ -15,9 +15,12 @@ public class CreateSDORespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGene
 
     private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-1-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected CreateSDORespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService,
                                                    FeatureToggleService featureToggleService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
         this.featureToggleService = featureToggleService;
     }
 

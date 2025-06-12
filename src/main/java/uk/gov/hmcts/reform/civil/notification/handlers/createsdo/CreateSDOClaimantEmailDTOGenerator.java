@@ -10,8 +10,10 @@ public class CreateSDOClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerato
 
     private static final String REFERENCE_TEMPLATE = "create-sdo-applicants-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected CreateSDOClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

@@ -10,8 +10,10 @@ public class CreateSDODefendantEmailDTOGenerator extends DefendantEmailDTOGenera
 
     private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-1-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected CreateSDODefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

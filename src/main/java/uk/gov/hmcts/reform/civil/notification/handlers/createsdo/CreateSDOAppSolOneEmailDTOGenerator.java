@@ -13,8 +13,11 @@ public class CreateSDOAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenera
 
     private static final String REFERENCE_TEMPLATE = "create-sdo-applicants-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected CreateSDOAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override
