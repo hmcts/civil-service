@@ -71,7 +71,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         Long caseId = caseData.getCcdCaseReference();
         log.info("Preparing response seal form for caseId {}", caseId);
         CaseDocument sealedForm = formGenerator.generate(
@@ -86,7 +85,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF2_DEFENSE_DQ.getValue());
             assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
         }
-
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("Calling civil stitch service for generate response sealed form for caseId {}", caseId);

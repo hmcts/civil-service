@@ -1203,7 +1203,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1ResponseDeadline(dateTime)
                 .build();
 
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
                 .thenReturn(dateTime);
