@@ -778,4 +778,54 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         var caseDocument = response.getData().get("respondent1NoticeOfDiscontinueAllPartyTranslatedDoc");
         assertThat(caseDocument).isNotNull();
     }
+
+    @Test
+    void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLr() {
+        //Given
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(DEFENDANT_RESPONSE)
+            .file(Document.builder().documentFileName(FILE_NAME_2).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = new ArrayList<>(List.of(
+            element(translatedDocument1)
+        ));
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+            DocumentType.DEFENCE_TRANSLATED_DOCUMENT
+        )));
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build().toBuilder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocuments(translatedDocument)
+                             .build())
+            .preTranslationDocuments(preTranslationDocuments)
+            .respondent1Represented(YesOrNo.YES)
+            .claimantBilingualLanguagePreference("BOTH")
+            .applicant1Represented(YesOrNo.NO)
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .ccdCaseReference(123L)
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
+        assertThat(documentsList)
+            .extracting("value")
+            .extracting("documentName")
+            .isNotNull();
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM.name());
+    }
 }

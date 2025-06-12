@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -27,6 +28,7 @@ public class DirectionsQuestionnairePreparer {
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     public CaseData prepareDirectionsQuestionnaire(CaseData caseData, String userToken) {
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
@@ -140,7 +142,6 @@ public class DirectionsQuestionnairePreparer {
             caseData,
             bearerToken
         );
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = caseData.getDuplicateSystemGeneratedCaseDocs();
         CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(directionsQuestionnaire, "");
         String claimant = "claimant";
@@ -159,8 +160,15 @@ public class DirectionsQuestionnairePreparer {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DQ_DEF2.getValue());
             }
         }
-        systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual() &&
+            caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT) {
+            caseDataBuilder.respondent1OriginalDqDoc(directionsQuestionnaire);
+        } else {
+            List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
+            systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+        }
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (directionsQuestionnaire.getDocumentName().contains(claimant)) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());
