@@ -19,8 +19,10 @@ public class AmendRestitchBundleDefendantEmailDTOGenerator extends DefendantEmai
 
     private static final String DATE_FORMAT = "dd-MM-yyyy";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected AmendRestitchBundleDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

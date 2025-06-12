@@ -12,8 +12,10 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class ClaimantDefendantAgreedMediationDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
+    private final NotificationsProperties notificationsProperties;
+
     protected ClaimantDefendantAgreedMediationDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override
@@ -31,6 +33,7 @@ public class ClaimantDefendantAgreedMediationDefendantEmailDTOGenerator extends 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         return properties;
     }
 }

@@ -55,7 +55,7 @@ public class ClaimantResponseConfirmsToProceedAppSolOneEmailDTOGeneratorTest {
     void shouldReturnCorrectReferenceTemplate() {
         String referenceTemplate = emailDTOGenerator.getReferenceTemplate();
 
-        assertThat(referenceTemplate).isEqualTo("claimant-confirms-to-proceed-respondent-notification-%s");
+        assertThat(referenceTemplate).isEqualTo("claimant-confirms-to-proceed-applicant-notification-%s");
     }
 
     @Test

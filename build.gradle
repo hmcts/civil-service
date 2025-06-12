@@ -123,7 +123,7 @@ allprojects {
         entry 'snakeyaml'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.39') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.40') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -138,7 +138,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.9'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.21.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.22.0"
     }
   }
 
@@ -318,6 +318,21 @@ configurations.all {
     if (details.requested.group == 'org.projectlombok') {
       details.useVersion versions.lombok
     }
+    if (details.requested.group == 'io.netty') {
+      if (details.requested.name in [
+        'netty-buffer', 'netty-codec', 'netty-codec-dns',
+        'netty-codec-http', 'netty-codec-http2', 'netty-codec-socks',
+        'netty-common', 'netty-handler', 'netty-handler-proxy',
+        'netty-resolver', 'netty-resolver-dns', 'netty-resolver-dns-classes-macos',
+        'netty-resolver-dns-native-macos',
+        'netty-transport', 'netty-transport-classes-epoll',
+        'netty-transport-classes-kqueue', 'netty-transport-native-epoll',
+        'netty-transport-native-kqueue', 'netty-transport-native-unix-common'
+      ]) {
+        details.useVersion('4.1.118.Final')
+        details.because('CVE-2025-25193')
+      }
+    }
   }
   exclude group: 'org.springframework.security', module: 'spring-security-rsa'
   exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
@@ -341,7 +356,8 @@ dependencies {
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
 
-
+  // CVE-2025-48734 force update of commons-beanutils.
+  implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.8.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
@@ -395,8 +411,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.102'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.39'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.104'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.40'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
@@ -416,8 +432,8 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.10'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.55.4'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.11'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox

@@ -20,8 +20,11 @@ public class AmendRestitchBundleRespSolOneEmailDTOGenerator extends RespSolOneEm
 
     private static final String DATE_FORMAT = "dd-MM-yyyy";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected AmendRestitchBundleRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

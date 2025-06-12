@@ -20,8 +20,11 @@ public class AmendRestitchBundleAppSolOneEmailDTOGenerator extends AppSolOneEmai
 
     private static final String DATE_FORMAT = "dd-MM-yyyy";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected AmendRestitchBundleAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override
