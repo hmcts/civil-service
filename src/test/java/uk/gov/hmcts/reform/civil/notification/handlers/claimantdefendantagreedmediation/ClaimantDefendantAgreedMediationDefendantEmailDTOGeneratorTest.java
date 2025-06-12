@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -88,7 +89,8 @@ public class ClaimantDefendantAgreedMediationDefendantEmailDTOGeneratorTest {
 
         partyUtilsMockedStatic.close();
 
-        assertThat(updatedProperties.size()).isEqualTo(1);
+        assertThat(updatedProperties.size()).isEqualTo(2);
         assertThat(updatedProperties).containsEntry(DEFENDANT_NAME, partyName);
+        assertThat(updatedProperties).containsEntry(CLAIMANT_NAME, partyName);
     }
 }

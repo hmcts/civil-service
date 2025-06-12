@@ -12,10 +12,14 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR;
@@ -25,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_TWO;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @Service
@@ -45,6 +50,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLRForMediationUnsuccessful
     );
+    private final NotificationsSignatureConfiguration configuration;
     private final FeatureToggleService featureToggleService;
     private final OrganisationDetailsService organisationDetailsService;
 
@@ -87,42 +93,64 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
             partyName = String.format("%s and %s", partyName, caseData.getApplicant2().getPartyName());
         }
 
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
             PARTY_NAME, partyName + DEFENDANTS_TEXT,
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     public Map<String, String> addPropertiesForDefendant2(final CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
             PARTY_NAME, caseData.getApplicant1().getPartyName() + DEFENDANTS_TEXT,
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     public Map<String, String> addPropertiesForDefendantLrForLipVLr(final CaseData caseData) {
-        return Map.of(
+        HashMap<String, String> properties = new HashMap<>(Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     public Map<String, String> addPropertiesNoAttendanceCARM(CaseData caseData, boolean isDefendant1) {
-        return Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, isDefendant1 ? organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
-                          : organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
+        HashMap<String, String> properties = new HashMap<>(Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, isDefendant1
+                ? organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
+                : organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
                       CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                       PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                       CASEMAN_REF, caseData.getLegacyCaseReference()
-        );
+        ));
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
+        return properties;
     }
 
     private void sendEmail(CallbackParams callbackParams) {

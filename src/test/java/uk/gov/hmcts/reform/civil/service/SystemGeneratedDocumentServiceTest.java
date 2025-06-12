@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 class SystemGeneratedDocumentServiceTest {
@@ -38,7 +39,7 @@ class SystemGeneratedDocumentServiceTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
-            .getSystemGeneratedDocumentsWithAddedDocument(translatedDocument, callbackParams);
+            .getSystemGeneratedDocumentsWithAddedDocument(translatedDocument, callbackParams.getCaseData());
 
         //Then
         assertThat(result.get(0)).isNotNull();
@@ -61,4 +62,29 @@ class SystemGeneratedDocumentServiceTest {
         assertThat(result.get(0)).isNotNull();
         assertThat(result.get(0).getValue().getDocumentName()).isEqualTo(FILE_NAME_1);
     }
+
+    @Test
+    void shouldGetHearingDocumentsDocumentToSystemGeneratedDocuments() {
+        //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(HEARING_NOTICE)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+        CaseData caseData = CaseData.builder().systemGeneratedCaseDocuments(new ArrayList<>())
+            .build();
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        List<Element<CaseDocument>> result = systemGeneratedDocumentService
+            .getHearingDocumentsWithAddedDocumentWelsh(translatedDocument, callbackParams.getCaseData());
+
+        //Then
+        assertThat(result.get(0)).isNotNull();
+        assertThat(result.get(0).getValue().getDocumentName()).isEqualTo(FILE_NAME_1);
+    }
+
 }

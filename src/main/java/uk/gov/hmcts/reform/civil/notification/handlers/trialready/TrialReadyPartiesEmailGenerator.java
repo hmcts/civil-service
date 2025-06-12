@@ -19,31 +19,31 @@ public abstract class TrialReadyPartiesEmailGenerator implements PartiesEmailGen
     protected final TrialReadyDefendantEmailDTOGenerator defendantEmailDTOGenerator;
     protected final TrialReadyDefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator;
 
-    protected EmailDTO getApplicant(CaseData caseData) {
+    protected EmailDTO getApplicant(CaseData caseData, String taskId) {
         if (caseData.getTrialReadyApplicant() != null) {
             return null;
         }
 
         boolean isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isApplicantNotRepresented();
-        return isLiP ? claimantEmailDTOGenerator.buildEmailDTO(caseData) : appSolOneEmailDTOGenerator.buildEmailDTO(caseData);
+        return isLiP ? claimantEmailDTOGenerator.buildEmailDTO(caseData, taskId) : appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId);
     }
 
-    protected EmailDTO getRespondentOne(CaseData caseData) {
+    protected EmailDTO getRespondentOne(CaseData caseData, String taskId) {
         if (caseData.getTrialReadyRespondent1() != null) {
             return null;
         }
 
         boolean isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent1LiP();
-        return isLiP ? defendantEmailDTOGenerator.buildEmailDTO(caseData) : respSolOneEmailDTOGenerator.buildEmailDTO(caseData);
+        return isLiP ? defendantEmailDTOGenerator.buildEmailDTO(caseData, taskId) : respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId);
     }
 
-    protected EmailDTO getRespondentTwo(CaseData caseData) {
+    protected EmailDTO getRespondentTwo(CaseData caseData, String taskId) {
         boolean isTwoLipDefendants = claimSubmittedRespondent2Unrepresented.test(caseData);
         if (caseData.getTrialReadyRespondent2() != null || !(isOneVTwoTwoLegalRep(caseData) || isTwoLipDefendants)) {
             return null;
         }
 
         boolean isLiP = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.isRespondent2LiP();
-        return isLiP ? defendantTwoEmailDTOGenerator.buildEmailDTO(caseData) : respSolTwoEmailDTOGenerator.buildEmailDTO(caseData);
+        return isLiP ? defendantTwoEmailDTOGenerator.buildEmailDTO(caseData, taskId) : respSolTwoEmailDTOGenerator.buildEmailDTO(caseData, taskId);
     }
 }

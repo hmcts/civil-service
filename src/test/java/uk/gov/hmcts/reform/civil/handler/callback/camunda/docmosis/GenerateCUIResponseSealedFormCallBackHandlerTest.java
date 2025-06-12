@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -138,6 +139,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabled() {
         //Given
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         List<Element<CaseDocument>> documents = List.of(
                 element(CaseDocument.builder().documentName("Stitched document").build()),
@@ -171,6 +173,7 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldGenerateForm_whenIsLipVLipEnabledStitchingEnabledButRespondent1ClaimResponseTypeForSpecIsFullAdmissionSoNoDqWillGenerate() {
         //Given
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         List<Element<CaseDocument>> documents = List.of(
             element(CaseDocument.builder().documentName("responseForm.pdf").build()));
         given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class))).willReturn(documents);
@@ -191,6 +194,34 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
                            .getDocumentName().equals("responseForm.pdf")).count()).isEqualTo(1);
+
+        verify(formGenerator).generate(caseData, BEARER_TOKEN);
+    }
+
+    @Test
+    void shouldGenerateForm_whenIsLipVLipEnabledStitchingBilingual() {
+        //Given
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .claimantBilingualLanguagePreference(Language.WELSH.toString())
+            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        //Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
+                       .filter(caseDocumentElement -> caseDocumentElement.getValue()
+                           .getDocumentName().equals("responseForm.pdf")).count()).isEqualTo(0);
+
+        assertThat(updatedData.getPreTranslationDocuments().size()).isEqualTo(1);
 
         verify(formGenerator).generate(caseData, BEARER_TOKEN);
     }

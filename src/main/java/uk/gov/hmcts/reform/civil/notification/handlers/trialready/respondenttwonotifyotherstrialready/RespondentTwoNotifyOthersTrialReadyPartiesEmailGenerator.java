@@ -37,16 +37,16 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGenerator extends Tr
     }
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(CaseData caseData) {
+    public Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
 
-        EmailDTO applicantEmailDTO = getApplicant(caseData);
+        EmailDTO applicantEmailDTO = getApplicant(caseData, taskId);
         if (applicantEmailDTO != null) {
             partiesToEmail.add(applicantEmailDTO);
         }
 
-        EmailDTO respondentEmailDTO = getRespondentOne(caseData);
+        EmailDTO respondentEmailDTO = getRespondentOne(caseData, taskId);
         if (respondentEmailDTO != null) {
             partiesToEmail.add(respondentEmailDTO);
         }

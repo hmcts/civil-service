@@ -58,21 +58,22 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         EmailDTO appSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
+        String taskId = "task id";
 
         when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(appSolOneEmail);
-        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
+        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(appSolOneEmail);
+        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolOneEmail);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolOneEmail, respSolOneEmail);
 
-        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(claimantEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(claimantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 
     @Test
@@ -80,23 +81,24 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         EmailDTO claimantEmail = mock(EmailDTO.class);
         EmailDTO defendantEmail = mock(EmailDTO.class);
+        String taskId = "task id";
 
         when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-        when(claimantEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(claimantEmail);
-        when(defendantEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(defendantEmail);
+        when(claimantEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(claimantEmail);
+        when(defendantEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(defendantEmail);
         when(caseData.isApplicantNotRepresented()).thenReturn(true);
         when(caseData.isRespondent1LiP()).thenReturn(true);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(claimantEmail, defendantEmail);
 
-        verify(claimantEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(defendantEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(appSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(claimantEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(defendantEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(appSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 
     @Test
@@ -104,39 +106,41 @@ public class RespondentTwoNotifyOthersTrialReadyPartiesEmailGeneratorTest {
         CaseData caseData = mock(CaseData.class);
         EmailDTO appSolOneEmail = mock(EmailDTO.class);
         EmailDTO respSolOneEmail = mock(EmailDTO.class);
+        String taskId = "task id";
 
         when(caseData.getCaseAccessCategory()).thenReturn(UNSPEC_CLAIM);
-        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(appSolOneEmail);
-        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData)).thenReturn(respSolOneEmail);
+        when(appSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(appSolOneEmail);
+        when(respSolOneEmailDTOGenerator.buildEmailDTO(caseData, taskId)).thenReturn(respSolOneEmail);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).containsExactlyInAnyOrder(appSolOneEmail, respSolOneEmail);
 
-        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData);
-        verify(claimantEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(appSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(respSolOneEmailDTOGenerator).buildEmailDTO(caseData, taskId);
+        verify(claimantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 
     @Test
     void shouldNotNotifyPartiesWhenTrialReadyRespondentIsSet() {
         CaseData caseData = mock(CaseData.class);
+        String taskId = "task id";
 
         when(caseData.getTrialReadyApplicant()).thenReturn(YES);
         when(caseData.getTrialReadyRespondent1()).thenReturn(YES);
 
-        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData);
+        Set<EmailDTO> partiesToNotify = emailGenerator.getPartiesToNotify(caseData, taskId);
 
         assertThat(partiesToNotify).isEmpty();
 
-        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(appSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData);
-        verify(claimantEmailDTOGenerator, never()).buildEmailDTO(caseData);
+        verify(respSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(respSolTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(defendantTwoEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(appSolOneEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
+        verify(claimantEmailDTOGenerator, never()).buildEmailDTO(caseData, taskId);
     }
 }
