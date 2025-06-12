@@ -853,6 +853,10 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .respondent1Represented(YesOrNo.YES)
             .claimantBilingualLanguagePreference("BOTH")
             .applicant1Represented(YesOrNo.NO)
+            .respondent1OriginalDqDoc(CaseDocument.toCaseDocument(
+                Document.builder().documentFileName("notice_of_discontinuance.pdf").build(),
+                DocumentType.DIRECTIONS_QUESTIONNAIRE
+            ))
             .systemGeneratedCaseDocuments(new ArrayList<>())
             .ccdCaseReference(123L)
             .build();
