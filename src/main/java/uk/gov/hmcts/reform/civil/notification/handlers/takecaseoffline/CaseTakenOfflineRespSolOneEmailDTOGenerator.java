@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerat
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
-
 @Component
 public class CaseTakenOfflineRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
