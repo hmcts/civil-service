@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JudgementService {
 
     private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
@@ -104,14 +106,26 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
+        final Long caseId = caseData.getCcdCaseReference();
+        log.info("ccjJudgementSubTotal respondent1ClaimResponseTestForSpec {} for caseId {}",
+                 caseData.getRespondent1ClaimResponseTestForSpec(), caseId);
+        log.info("ccjJudgementSubTotal respondent1ClaimResponseTypeForSpec {} for caseId {}",
+                 caseData.getRespondent1ClaimResponseTypeForSpec(), caseId);
+        log.info("caseData.isPartAdmitClaimSpec() {}  for caseId {}",
+                 caseData.isPartAdmitClaimSpec(), caseId);
+        log.info("caseData.getPaymentTypeSelection() {}  for caseId {}",
+                 caseData.getPaymentTypeSelection(), caseId);
+
         if ((caseData.isPartAdmitClaimSpec() && (IMMEDIATELY.equals(caseData.getPaymentTypeSelection())
             || SET_DATE.equals(caseData.getPaymentTypeSelection())
             || REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())))
             || (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData))) {
+            log.info("caseData.isPartAdmitClaimSpec() if  for caseId {}", caseId);
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
                 .add(ccjJudgmentFixedCost(caseData));
         }
+        log.info("caseData.isPartAdmitClaimSpec() else  for caseId {}", caseId);
         return ccjJudgmentClaimAmount(caseData)
             .add(ccjJudgmentClaimFee(caseData))
             .add(ccjJudgmentInterest(caseData))

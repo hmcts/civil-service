@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_SPEC;
@@ -35,9 +37,11 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
         log.info("Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
+        BigDecimal claimAmountPlusInterestToDate = interestCalculator.claimAmountPlusInterestToDate(caseData)
+            .setScale(2, RoundingMode.UNNECESSARY);
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
-            SealedClaimLipResponseForm.toTemplate(caseData).toBuilder();
-        responseFormBuilder.admittedAmount(interestCalculator.claimAmountPlusInterestToDate(caseData));
+            SealedClaimLipResponseForm.toTemplate(caseData, claimAmountPlusInterestToDate).toBuilder();
+        responseFormBuilder.admittedAmount(claimAmountPlusInterestToDate);
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             log.info("If Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
             responseFormBuilder.checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
@@ -47,7 +51,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
                     .defendant1MediationUnavailableDatesExists(checkDefendant1MediationHasUnavailabilityDates(caseData))
                     .defendant1UnavailableDatesList(getDefendant1FromDateUnavailableList(caseData));
             return responseFormBuilder.build();
-
         } else {
             log.info("Else Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
             return  responseFormBuilder.build();
