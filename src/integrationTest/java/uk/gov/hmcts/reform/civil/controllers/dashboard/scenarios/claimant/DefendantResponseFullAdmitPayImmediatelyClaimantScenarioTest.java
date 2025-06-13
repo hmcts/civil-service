@@ -70,7 +70,7 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae James John wedi cynnig talu £1001 erbyn " +
                         DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". Mae’r swm hwn yn cynnwys llog os hawlir a fydd" +
-                        " yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach</p>" +
+                        " yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach.</p>" +
                         "<p class=\"govuk-body\">Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais" +
                         " am ddyfarniad llys sirol.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">" +
