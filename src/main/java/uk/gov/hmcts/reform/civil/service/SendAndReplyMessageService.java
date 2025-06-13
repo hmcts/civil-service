@@ -102,6 +102,7 @@ public class SendAndReplyMessageService {
     }
 
     public Message createBaseMessageWithSenderDetails(String userAuth) {
+        log.info("USER DETAILS,  {}", userService.getUserDetails(userAuth));
         UserDetails details = userService.getUserDetails(userAuth);
         log.info("USER DETAILS,  {}", details);
         RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
