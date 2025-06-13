@@ -14,6 +14,7 @@ import static java.util.Objects.requireNonNull;
 public class DeadlineExtensionCalculatorService {
 
     private final WorkingDayIndicator workingDayIndicator;
+
     public LocalDate calculateExtendedDeadline(LocalDate responseDate, int plusDays) {
         int workingDaysCounter = 0;
         requireNonNull(responseDate);
@@ -26,10 +27,10 @@ public class DeadlineExtensionCalculatorService {
 
     public LocalDate calculateExtendedDeadline(LocalDateTime responseDate, int plusDays) {
         requireNonNull(responseDate);
-        if(is4pmOrAfter(responseDate)) {
+        if (is4pmOrAfter(responseDate)) {
             responseDate = responseDate.plusDays(1);
         }
-        return calculateWorkingDays(responseDate.toLocalDate().plusDays(1), plusDays,0);
+        return calculateWorkingDays(responseDate.toLocalDate().plusDays(1), plusDays, 0);
     }
 
     public LocalDate calculateWorkingDays(LocalDate responseDate, int plusDays, int workingDaysCounter) {
@@ -38,7 +39,6 @@ public class DeadlineExtensionCalculatorService {
         }
         return workingDaysCounter == plusDays ? responseDate : calculateWorkingDays(responseDate.plusDays(1), plusDays, workingDaysCounter);
     }
-
 
     private boolean is4pmOrAfter(LocalDateTime dateOfService) {
         return dateOfService.getHour() >= 16;
