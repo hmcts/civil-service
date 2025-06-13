@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.client.WaTaskManagementApiClient;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RecipientOption;
@@ -183,7 +182,7 @@ public class SendAndReplyMessageService {
                     }
                 }
             }
-        } catch (HttpClientErrorException e) {
+        } catch (Exception e) {
             log.error("failed call wa api " + e.getMessage());
             throw e;
         }
