@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocum
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
 
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
@@ -317,6 +319,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
             } else if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION;
+            }
+        }
+
+        if (caseData.isLRvLipOneVOne() && featureToggleService.isGaForWelshEnabled()) {
+            log.info("UNPAUSE CLAIMANT INTENTION PROCESS");
+            if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
+                log.info("UNPAUSE CLAIMANT INTENTION PROCESS");
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION;
             }
         }
 

@@ -81,6 +81,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.DirectionsQuestionnairePreparer;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -91,6 +92,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
@@ -244,6 +246,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
+    @MockBean
+    private  FlowStateAllowedEventService flowStateAllowedEventService;
+    @MockBean
+    private  DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
     @Autowired
     private RoboticsAddressMapper addressMapper;
     @Autowired

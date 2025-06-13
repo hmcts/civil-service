@@ -256,6 +256,30 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
+    void shouldUpdateBusinessProcess_WhenLrVsLipAndCcdState_In_Awaiting_Claimant_Response() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting1stRespondentResponse()
+            .build().toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.YES)
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .ccdCaseReference(123L)
+            .build();
+
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        //Then
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION.name());
+    }
+
+    @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeIsOrderNotice_ToggleEnabledCP() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
@@ -819,7 +843,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
-            callbackParams); 
+            callbackParams);
         CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
         //Then
         assertThat(updatedData.getHearingDocuments().size()).isEqualTo(1);
@@ -829,7 +853,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE.name());
     }
 
-    @Test  
+    @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentType_discontinue_claim() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
