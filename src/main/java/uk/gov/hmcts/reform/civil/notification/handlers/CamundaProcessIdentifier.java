@@ -5,7 +5,16 @@ public enum CamundaProcessIdentifier {
     ClaimantConfirmProceedNotifyParties,
     RejectRepaymentPlanNotifyParties,
     LitigationFriendAddedNotifier,
+    GenerateDJFormNotifyParties,
+    ClaimProceedsOfflineUnspecNotifyApplicantSolicitor,
+    UnspecNotifyClaimNotifier,
+    UnspecNotifyClaimDetailsNotifier,
     AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
+    CreateClaimAfterPaymentContinuingOfflineNotifier,
+    CreateClaimAfterPaymentContinuingOnlineNotifier,
+    JudgmentVariedDeterminationOfMeansNotifyParties,
+    ClaimSubmittedApplicantNotifier,
+    ClaimantLipHelpWithFeesNotifier
 }

@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @Slf4j
 public class InitiateGeneralApplicationService {
 
+    public static final int GA_CLAIM_DEADLINE_EXTENSION_MONTHS = 24;
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
@@ -85,6 +87,10 @@ public class InitiateGeneralApplicationService {
 
     private CaseData populateGeneralApplicationData(CaseData.CaseDataBuilder<?, ?> dataBuilder, List<Element<GeneralApplication>> applications) {
         return dataBuilder
+            .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                GA_CLAIM_DEADLINE_EXTENSION_MONTHS,
+                LocalDate.now()
+            ))
             .generalApplications(applications)
             .generalAppType(GAApplicationType.builder().build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
@@ -118,6 +124,7 @@ public class InitiateGeneralApplicationService {
         setBusinessProcess(caseData, userDetails, applicationBuilder);
         setCaseNameGaInternal(caseData, applicationBuilder);
         setFeatureToggles(caseData, applicationBuilder);
+        setDates(caseData, applicationBuilder);
         return finalizeApplication(applicationBuilder.build(), caseData, userDetails);
     }
 
@@ -262,6 +269,10 @@ public class InitiateGeneralApplicationService {
     private void setCaseType(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
         final var caseType = SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) ? CaseCategory.SPEC_CLAIM : CaseCategory.UNSPEC_CLAIM;
         applicationBuilder.generalAppSuperClaimType(caseType.name()).caseAccessCategory(caseType);
+    }
+
+    private void setDates(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
+        applicationBuilder.mainCaseSubmittedDate(caseData.getSubmittedDate());
     }
 
     private void setRespondentAgreement(CaseData caseData, GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
