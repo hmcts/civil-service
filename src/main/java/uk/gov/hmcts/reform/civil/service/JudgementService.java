@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -15,17 +16,22 @@ import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection.REPAYMENT_PLAN;
+import static uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection.SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JudgementService {
 
     private static final String JUDGEMENT_BY_COURT = "The Judgement request will be reviewed by the court,"
         + " this case will proceed offline, you will receive any further updates by post.";
     private static final String JUDGEMENT_BY_COURT_NOT_OFFLINE = "The judgment request will be processed and a County"
         + " Court Judgment (CCJ) will be issued, you will receive any further updates by email.";
-    private static final String JUDGEMENT_ORDER = "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
+    private static final String JUDGEMENT_ORDER =
+        "The judgment will order the defendant to pay £%s , including the claim fee and interest, if applicable, as shown:";
     private static final String JUDGEMENT_ORDER_V2 = "The judgment will order the defendant to pay £%s which include the amounts shown:";
     private final FeatureToggleService featureToggleService;
     private final InterestCalculator interestCalculator;
@@ -100,16 +106,30 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData)) {
+        final Long caseId = caseData.getCcdCaseReference();
+        log.info("ccjJudgementSubTotal respondent1ClaimResponseTestForSpec {} for caseId {}",
+                 caseData.getRespondent1ClaimResponseTestForSpec(), caseId);
+        log.info("ccjJudgementSubTotal respondent1ClaimResponseTypeForSpec {} for caseId {}",
+                 caseData.getRespondent1ClaimResponseTypeForSpec(), caseId);
+        log.info("caseData.isPartAdmitClaimSpec() {}  for caseId {}",
+                 caseData.isPartAdmitClaimSpec(), caseId);
+        log.info("caseData.getPaymentTypeSelection() {}  for caseId {}",
+                 caseData.getPaymentTypeSelection(), caseId);
+
+        if ((caseData.isPartAdmitClaimSpec() && (IMMEDIATELY.equals(caseData.getPaymentTypeSelection())
+            || SET_DATE.equals(caseData.getPaymentTypeSelection())
+            || REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())))
+            || (isLrFullAdmitRepaymentPlan(caseData) || isLRPartAdmitRepaymentPlan(caseData))) {
+            log.info("caseData.isPartAdmitClaimSpec() if  for caseId {}", caseId);
             return ccjJudgmentClaimAmount(caseData)
                 .add(ccjJudgmentClaimFee(caseData))
-                .add(ccjJudgmentFixedCost(caseData));
-        } else {
-            return ccjJudgmentClaimAmount(caseData)
-                .add(ccjJudgmentClaimFee(caseData))
-                .add(ccjJudgmentInterest(caseData))
                 .add(ccjJudgmentFixedCost(caseData));
         }
+        log.info("caseData.isPartAdmitClaimSpec() else  for caseId {}", caseId);
+        return ccjJudgmentClaimAmount(caseData)
+            .add(ccjJudgmentClaimFee(caseData))
+            .add(ccjJudgmentInterest(caseData))
+            .add(ccjJudgmentFixedCost(caseData));
     }
 
     public BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {

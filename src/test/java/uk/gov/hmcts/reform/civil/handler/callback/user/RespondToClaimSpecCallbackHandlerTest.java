@@ -1704,10 +1704,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             UserInfo userInfo = UserInfo.builder().uid("798").build();
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
-            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(
-                any(),
-                anyInt()
-            )).willReturn(whenWillPay);
+            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(LocalDateTime.class), anyInt())).willReturn(whenWillPay);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

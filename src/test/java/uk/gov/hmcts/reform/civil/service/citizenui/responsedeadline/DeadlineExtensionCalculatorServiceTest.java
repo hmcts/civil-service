@@ -8,6 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,6 +75,27 @@ public class DeadlineExtensionCalculatorServiceTest {
             proposedExtensionDeadline, 5);
 
         assertThat(calculatedDeadline).isEqualTo(expectedExtensionDeadline);
+    }
+
+    @Test
+    void shouldStartCountFromSameDay_WhenBefore4pm() {
+        LocalDateTime dateTime = LocalDateTime.of(2025, 6, 12, 15, 59); // before 4pm
+        LocalDate startDate = LocalDate.of(2025, 6, 12); // next calendar day
+        given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
+
+        LocalDate result = deadlineExtensionCalculatorService.calculateExtendedDeadline(dateTime, 5);
+        assertThat(result).isEqualTo(startDate.plusDays(5));
+    }
+
+    @Test
+    void shouldStartCountFromNextDayAndConsiderNonWorkingDays_WhenAfter4pm() {
+        LocalDateTime dateTime = LocalDateTime.of(2025, 6, 17, 15, 01); // before 4pm
+        given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
+        given(workingDayIndicator.isWorkingDay(LocalDate.of(2025, 6, 19))).willReturn(false);
+        LocalDate expectedExtensionDeadline = LocalDate.of(2025, 6, 23);
+
+        LocalDate result = deadlineExtensionCalculatorService.calculateExtendedDeadline(dateTime, 5);
+        assertThat(result).isEqualTo(expectedExtensionDeadline);
     }
 
 }
