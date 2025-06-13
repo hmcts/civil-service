@@ -120,7 +120,9 @@ public interface Claim {
 
     boolean defendantRespondedWithPreferredLanguageWelsh();
 
-    boolean isWaitingForClaimantIntentDocUpload();
+    boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline();
+
+    boolean isWaitingForClaimantIntentDocUploadPostDefendantNocOnline();
 
     boolean isClaimSubmittedNotPaidOrFailedNotHwF();
 

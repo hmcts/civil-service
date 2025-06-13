@@ -117,14 +117,10 @@ public class DashboardScenariosService {
                     .build();
 
                 log.info(
-                    "Task Notification details for scenario = {}, template = {}, titleEn = {},"
-                        + " descriptionEn = {}, titleEn = {}, descriptionCy = {}",
+                    "Task Notification details for scenario = {}, template = {}, caseId = {}",
                     scenario.getName(),
                     template.getName(),
-                    notification.getTitleEn(),
-                    notification.getDescriptionEn(),
-                    notification.getTitleCy(),
-                    notification.getDescriptionCy()
+                    uniqueCaseIdentifier
                 );
 
                 // insert new record in notifications table

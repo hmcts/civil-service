@@ -100,8 +100,11 @@ public enum DashboardClaimStatus {
     IN_MEDIATION(
         Claim::isMediationPending
     ),
-    WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD(
-        Claim::isWaitingForClaimantIntentDocUpload
+    WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD_PRE_DEF_NOC_ONLINE(
+        Claim::isWaitingForClaimantIntentDocUploadPreDefendantNocOnline
+    ),
+    WAITING_FOR_CLAIMANT_INTENT_DOC_UPLOAD_POST_DEF_NOC_ONLINE(
+        Claim::isWaitingForClaimantIntentDocUploadPostDefendantNocOnline
     ),
     CLAIM_ENDED(
         Claim::hasClaimEnded

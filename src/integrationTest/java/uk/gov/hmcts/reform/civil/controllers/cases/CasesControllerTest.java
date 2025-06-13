@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
@@ -271,6 +272,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldNotSubmitEventSuccessfullyForisUnauthorizedCaseWorker() {
+
+        when(userRequestAuthorizerMock.authorise(any())).thenThrow(BearerTokenMissingException.class);
+
         doPost(
             "invalid token",
             CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
@@ -279,7 +283,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             "jurisdictionId",
             "caseTypeId"
         )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isForbidden());
     }
 
     @Test

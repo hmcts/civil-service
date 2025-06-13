@@ -94,7 +94,6 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldNotRecordAnyScenarios_ifClaimantIsNotLip() {
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -114,7 +113,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenPreStateInMediation() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -136,7 +135,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenPreStateJudicialReferral() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -158,7 +157,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenPreStateCaseProgression() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -181,7 +180,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenPreStateHearingReadiness() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -206,7 +205,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenPreStatePfHcH_withFeePaid() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -231,7 +230,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenPreStatePfHcH_withFeeNotRequired() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -256,7 +255,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenEvidenceUploadedByClaimant() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
@@ -283,7 +282,7 @@ class StayLiftedClaimantNotificationHandlerTest extends BaseCallbackHandlerTest 
         @Test
         void shouldRecordExpectedScenarios_whenEvidenceUploadedByDefendant() {
             when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-            when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()

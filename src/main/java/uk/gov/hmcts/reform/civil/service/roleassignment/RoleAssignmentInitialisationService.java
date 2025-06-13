@@ -43,12 +43,11 @@ public class RoleAssignmentInitialisationService {
         } catch (Exception e) {
             log.error("Could not automatically create user role assignment", e);
         }
-        if (featureToggleService.isMintiEnabled()) {
-            try {
-                assignCaseAllocatorToSystemUser(getSystemUserToken());
-            } catch (Exception e) {
-                log.error("Could not automatically create case allocator role assignment", e);
-            }
+
+        try {
+            assignCaseAllocatorToSystemUser(getSystemUserToken());
+        } catch (Exception e) {
+            log.error("Could not automatically create case allocator role assignment", e);
         }
     }
 

@@ -9,6 +9,7 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Timeline;
@@ -24,6 +25,7 @@ import java.util.List;
 public class ClaimForm implements MappableObject {
 
     private final String claimNumber;
+    private final String ccdCaseReference;
     private final LipFormParty claimant;
     private final LipFormParty defendant;
     private final Address claimantCorrespondenceAddress;
@@ -55,4 +57,5 @@ public class ClaimForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMM yyyy")
     private final LocalDate claimIssuedDate;
     private final FlightDelayDetails flightDelayDetails;
+    private final StatementOfTruth uiStatementOfTruth;
 }

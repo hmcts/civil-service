@@ -10,11 +10,12 @@ import static uk.gov.hmcts.reform.civil.enums.DocumentContext.TITLE;
 @Getter
 @RequiredArgsConstructor
 public enum DocumentHearingType {
-    TRI("trial"),
-    DIS("disposal hearing"),
-    DRH("dispute resolution hearing");
+    TRI("trial", "dreial"),
+    DIS("disposal hearing", "wrandawiad gwaredu"),
+    DRH("dispute resolution hearing", "wrandawiad datrys anghydfod");
 
     private final String label;
+    private final String labelWelsh;
 
     /**
      * Gets the {@link DocumentHearingType} based on the provided hearing type string.
@@ -32,19 +33,38 @@ public enum DocumentHearingType {
         }
     }
 
-    private static String getTypeText(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack, DocumentContext context) {
-        if (documentHearingType.equals(TRI)) {
-            return allocatedTrack.equals(FAST_CLAIM) ? documentHearingType.getLabel() : "hearing";
+    private static String getTypeText(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack, DocumentContext context, boolean isWelsh) {
+        String labelText;
+        String hearingText;
+
+        if (documentHearingType.equals(TRI) && !isWelsh) {
+            labelText = documentHearingType.getLabel();
+            hearingText = "hearing";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else if (documentHearingType.equals(TRI) && context.equals(TITLE)) {
+            labelText = documentHearingType.getLabelWelsh();
+            hearingText = "wrandawiad";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else if (documentHearingType.equals(TRI)) {
+            labelText = "treial";
+            hearingText = "gwrandawiad";
+            return allocatedTrack.equals(FAST_CLAIM) ? labelText : hearingText;
+        } else {
+            labelText = isWelsh ? documentHearingType.getLabelWelsh() : documentHearingType.getLabel();
+            hearingText = isWelsh ? "gwrandawiad" : "hearing";
+            return context.equals(TITLE) ? labelText : hearingText;
         }
-        return context.equals(TITLE) ? documentHearingType.getLabel() : "hearing";
     }
 
-    public static String getTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack) {
-        return getTypeText(hearingType, allocatedTrack, TITLE);
+    public static String getTitleText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, boolean isWelsh) {
+        return getTypeText(hearingType, allocatedTrack, TITLE, isWelsh);
     }
 
-    public static String getContentText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack) {
-        return getTypeText(hearingType, allocatedTrack, CONTENT);
+    public static String getContentText(DocumentHearingType hearingType, AllocatedTrack allocatedTrack, boolean isWelsh) {
+        return getTypeText(hearingType, allocatedTrack, CONTENT, isWelsh);
     }
 
+    public static String getPluralTypeTextWelsh(DocumentHearingType documentHearingType, AllocatedTrack allocatedTrack) {
+        return documentHearingType.equals(DocumentHearingType.TRI) && allocatedTrack.equals(FAST_CLAIM) ? "dreialon" : "wrandawiadau";
+    }
 }

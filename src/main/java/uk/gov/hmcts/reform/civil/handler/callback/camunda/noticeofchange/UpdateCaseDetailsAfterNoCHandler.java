@@ -12,12 +12,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.RespondentSolicitorDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -31,9 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -42,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 
 @Slf4j
 @Service
@@ -132,11 +137,43 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             }
         }
 
+        updateDefendantQueryCollectionPartyName(caseDataBuilder);
+        resetLanguagePreference(caseDataBuilder, caseData, replacedSolicitorCaseRole);
         clearLRIndividuals(replacedSolicitorCaseRole, caseDataBuilder.build(), caseDataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateDefendantQueryCollectionPartyName(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        CaseData caseData = caseDataBuilder.build();
+        if (nonNull(caseData.getQmRespondentSolicitor1Queries())
+            && getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+            updateQueryCollectionPartyName(
+                List.of(RESPONDENTSOLICITORONE.getFormattedName()),
+                ONE_V_TWO_TWO_LEGAL_REP,
+                caseDataBuilder
+            );
+        }
+    }
+
+    private void resetLanguagePreference(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, CaseData caseData, String caseRole) {
+        if (featureToggleService.isGaForWelshEnabled()) {
+            if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isClaimantBilingual()) {
+                updatedCaseDataBuilder
+                        .claimantBilingualLanguagePreference(null)
+                        .claimantLanguagePreferenceDisplay(null);
+            } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isRespondentResponseBilingual()) {
+                CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+                updatedCaseDataBuilder
+                        .caseDataLiP(caseDataLiP.toBuilder()
+                                .respondent1LiPResponse(
+                                    caseDataLiP.getRespondent1LiPResponse().toBuilder().respondent1ResponseLanguage(null).build()
+                                ).build())
+                        .defendantLanguagePreferenceDisplay(null);
+            }
+        }
     }
 
     private Consumer<Organisation> setRespondentSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
@@ -228,9 +265,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent2Represented(YES)
             .defendant2LIPAtClaimIssued(NO);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            caseDataBuilder.anyRepresented(YES);
-        }
+        caseDataBuilder.anyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
@@ -260,9 +295,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             .respondent1Represented(YES)
             .defendant1LIPAtClaimIssued(NO);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            caseDataBuilder.anyRepresented(YES);
-        }
+        caseDataBuilder.anyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)
@@ -288,6 +321,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             try {
                 organisationService.findOrganisationById(organisationId)
                     .ifPresent(setRespondentSolicitorDetails(caseDataBuilder));
+                caseData.getSystemGeneratedCaseDocuments().removeIf(e -> e.getValue().getDocumentType().equals(
+                    DocumentType.CLAIMANT_CLAIM_FORM));
             } catch (FeignException e) {
                 log.error("Error recovering org id " + organisationId
                               + " for case id " + caseData.getLegacyCaseReference(), e);
@@ -302,9 +337,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         caseDataBuilder.applicantSolicitor1PbaAccounts(null)
             .applicantSolicitor1PbaAccountsIsEmpty(YES);
 
-        if (featureToggleService.isCaseEventsEnabled()) {
-            caseDataBuilder.anyRepresented(YES);
-        }
+        caseDataBuilder.anyRepresented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder

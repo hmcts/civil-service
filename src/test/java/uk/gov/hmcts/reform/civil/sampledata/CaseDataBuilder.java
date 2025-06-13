@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -321,7 +322,7 @@ public class CaseDataBuilder {
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final LocalDate PAST_DATE = now().minusDays(1);
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
-    public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
+    public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10001);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
     public static final String CUSTOMER_REFERENCE = "12345";
 
@@ -447,6 +448,8 @@ public class CaseDataBuilder {
     protected LocalDateTime claimNotificationDeadline;
     protected LocalDateTime claimNotificationDate;
     protected LocalDateTime claimDetailsNotificationDeadline;
+    protected LocalDateTime addLegalRepDeadlineDefendant1;
+    protected LocalDateTime addLegalRepDeadlineDefendant2;
     protected ServedDocumentFiles servedDocumentFiles;
     protected LocalDateTime claimDetailsNotificationDate;
     protected LocalDateTime respondent1ResponseDeadline;
@@ -690,11 +693,18 @@ public class CaseDataBuilder {
     private String claimantBilingualLanguagePreference;
     private JudgmentPaidInFull judgmentPaidInFull;
     private YesOrNo anyRepresented;
+    private FixedCosts fixedCosts;
 
     private String partialPaymentAmount;
+    private LocalDate nextDeadline;
 
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
+        return this;
+    }
+
+    public CaseDataBuilder fixedCosts(FixedCosts fixedCosts) {
+        this.fixedCosts = fixedCosts;
         return this;
     }
 
@@ -2506,6 +2516,23 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDraftMock() {
+        CaseDataBuilder caseDataBuilder = atStateClaimDraft();
+        caseDataBuilder.caseManagementLocation(CaseLocationCivil.builder().region("2").baseLocation("41112").build());
+        caseDataBuilder.applicant1DQ(Applicant1DQ.builder()
+            .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
+                                            .caseLocation(CaseLocationCivil.builder()
+                                                              .baseLocation("dummy base").region("dummy region")
+                                                              .build())
+                                            .responseCourtName("testCourt")
+                                            .responseCourtCode("0000")
+                                            .reasonForHearingAtSpecificCourt("reason")
+                                            .otherPartyPreferredSite("site")
+                                            .build())
+                .build());
+        return caseDataBuilder;
+    }
+
     public CaseDataBuilder atStateClaimDraft() {
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference("12345")
@@ -2856,12 +2883,6 @@ public class CaseDataBuilder {
         fastTrackHearingTime = FastTrackHearingTime.builder()
             .helpText1("If either party considers that the time estimate is insufficient, "
                 + "they must inform the court within 7 days of the date of this order.")
-            .helpText2("Not more than seven nor less than three clear days before the trial, "
-                + "the claimant must file at court and serve an indexed and paginated bundle of "
-                + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                + "the contents of the bundle before it is filed. The bundle will include a case "
-                + "summary and a chronology.")
             .hearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
             .dateFrom(LocalDate.parse("2022-01-01"))
             .dateTo(LocalDate.parse("2022-01-02"))
@@ -5101,6 +5122,22 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTakenOfflineDefendant1NocDeadlinePassed() {
+        atStateClaimIssued1v1UnrepresentedDefendant();
+
+        takenOfflineDate = LocalDateTime.now().plusDays(1);
+        addLegalRepDeadlineDefendant1 = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineDefendant2NocDeadlinePassed() {
+        atStateClaimIssued1v2UnrepresentedDefendant();
+
+        takenOfflineDate = LocalDateTime.now().plusDays(1);
+        addLegalRepDeadlineDefendant2 = LocalDateTime.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateHearingFeeDueUnpaid() {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = LocalDate.now().minusDays(1);
@@ -7086,6 +7123,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder specClaim1v1LrVsLip() {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
+        this.ccdCaseReference = CASE_ID;
         return this;
     }
 
@@ -7785,6 +7823,8 @@ public class CaseDataBuilder {
             .claimDismissedDate(claimDismissedDate)
             .caseDismissedHearingFeeDueDate(caseDismissedHearingFeeDueDate)
             .addLegalRepDeadline(addLegalRepDeadline)
+            .addLegalRepDeadlineRes1(addLegalRepDeadlineDefendant1)
+            .addLegalRepDeadlineRes2(addLegalRepDeadlineDefendant2)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)
@@ -7983,6 +8023,8 @@ public class CaseDataBuilder {
             .joJudgmentPaidInFull(judgmentPaidInFull)
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
+            .nextDeadline(nextDeadline)
+            .fixedCosts(fixedCosts)
             .build();
     }
 
@@ -7999,6 +8041,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder anyRepresented(YesOrNo anyRepresented) {
         this.anyRepresented = anyRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder nextDeadline(LocalDate nextDeadline) {
+        this.nextDeadline = nextDeadline;
         return this;
     }
 

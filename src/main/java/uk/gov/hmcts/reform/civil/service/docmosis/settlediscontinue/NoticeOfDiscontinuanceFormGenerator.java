@@ -9,10 +9,11 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.settlediscontinue.SettleDiscontinueYesOrNoList;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.settleanddiscontinue.NoticeOfDiscontinuanceForm;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -30,9 +31,10 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final FeatureToggleService featureToggleService;
 
-    public CaseDocument generateDocs(CaseData caseData, Party party, String authorisation) {
-        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, party);
+    public CaseDocument generateDocs(CaseData caseData, String partyName, Address address, String partyType, String authorisation) {
+        NoticeOfDiscontinuanceForm templateData = getNoticeOfDiscontinueData(caseData, partyName, address);
         DocmosisTemplates docmosisTemplate = isBilingual(caseData) ? NOTICE_OF_DISCONTINUANCE_BILINGUAL_PDF : NOTICE_OF_DISCONTINUANCE_PDF;
         DocmosisDocument docmosisDocument =
                 documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
@@ -40,28 +42,32 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
         return documentManagementService.uploadDocument(
                 authorisation,
                 new PDF(
-                        getFileName(caseData, docmosisTemplate),
+                        getFileName(caseData, docmosisTemplate, partyType),
                         docmosisDocument.getBytes(),
                         DocumentType.NOTICE_OF_DISCONTINUANCE
                 )
         );
     }
 
-    private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
-        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate, String partyType) {
+        String partyTypeAndCaseRef =
+            featureToggleService.isGaForWelshEnabled()
+                ? partyType + "_" + caseData.getLegacyCaseReference()
+                : caseData.getLegacyCaseReference();
+        return String.format(docmosisTemplate.getDocumentTitle(), partyTypeAndCaseRef);
     }
 
-    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, Party party) {
+    private NoticeOfDiscontinuanceForm getNoticeOfDiscontinueData(CaseData caseData, String partyName, Address address) {
         var noticeOfDiscontinueBuilder = NoticeOfDiscontinuanceForm.builder()
                 .caseNumber(caseData.getLegacyCaseReference())
                 .claimReferenceNumber(caseData.getLegacyCaseReference())
                 .letterIssueDate(LocalDate.now())
                 .dateOfEvent(LocalDate.now())
-                .coverLetterName(party.getPartyName())
-                .addressLine1(party.getPrimaryAddress().getAddressLine1())
-                .addressLine2(party.getPrimaryAddress().getAddressLine2())
-                .addressLine3(party.getPrimaryAddress().getAddressLine3())
-                .postCode(party.getPrimaryAddress().getPostCode())
+                .coverLetterName(partyName)
+                .addressLine1(address.getAddressLine1())
+                .addressLine2(address.getAddressLine2())
+                .addressLine3(address.getAddressLine3())
+                .postCode(address.getPostCode())
                 .claimant1Name(caseData.getApplicant1().getPartyName())
                 .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
                 .defendant1Name(caseData.getRespondent1().getPartyName())
@@ -82,14 +88,14 @@ public class NoticeOfDiscontinuanceFormGenerator implements TemplateDataGenerato
                 .judgementDate(isCourtPermissionGranted(caseData)
                         ? caseData.getPermissionGrantedComplex().getPermissionGrantedDate() : null)
                 .judgementDateWelsh(isCourtPermissionGranted(caseData)
-                        ? formatDateInWelsh(caseData.getPermissionGrantedComplex().getPermissionGrantedDate()) : null)
+                        ? formatDateInWelsh(caseData.getPermissionGrantedComplex().getPermissionGrantedDate(), false) : null)
                 .typeOfDiscontinuance(caseData.getTypeOfDiscontinuance().toString())
                 .typeOfDiscontinuanceTxt(caseData.getTypeOfDiscontinuance().getType())
                 .partOfDiscontinuanceTxt(caseData.getPartDiscontinuanceDetails())
                 .discontinuingAgainstOneDefendant(getDiscontinueAgainstOneDefendant(caseData))
                 .discontinuingAgainstBothDefendants(nonNull(caseData.getIsDiscontinuingAgainstBothDefendants())
                         ? caseData.getIsDiscontinuingAgainstBothDefendants().getDisplayedValue() : null)
-                .welshDate(formatDateInWelsh(LocalDate.now()));
+                .welshDate(formatDateInWelsh(LocalDate.now(), false));
         return noticeOfDiscontinueBuilder.build();
     }
 

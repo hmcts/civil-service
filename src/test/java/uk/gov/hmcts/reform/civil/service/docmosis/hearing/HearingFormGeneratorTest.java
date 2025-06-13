@@ -295,7 +295,6 @@ public class HearingFormGeneratorTest {
                                                             YesOrNo applicant1Represented, YesOrNo respondent1Represented,
                                                             PaymentDetails hearingFeePaymentDetails, FeePaymentOutcomeDetails feePaymentOutcomeDetails,
                                                             String expected) {
-        when(featureToggleService.isCaseEventsEnabled()).thenReturn(true);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")

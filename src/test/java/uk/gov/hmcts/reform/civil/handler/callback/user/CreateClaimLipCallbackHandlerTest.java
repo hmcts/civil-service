@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -126,6 +124,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CaseData caseData;
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
         private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
+        private static final String CLAIMANT_PARTY_NAME = "Clay Mint";
 
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
@@ -164,9 +163,17 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder()
+                                .type(Party.Type.INDIVIDUAL)
+                                .partyName(CLAIMANT_PARTY_NAME)
+                                .individualFirstName("Clay")
+                                .individualLastName("Mint")
+                                .build())
                 .respondent1(Party.builder()
                     .type(Party.Type.INDIVIDUAL)
                     .partyName(DEFENDANT_PARTY_NAME)
+                    .individualFirstName("Dave")
+                    .individualLastName("Indent")
                     .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .build();
 
@@ -182,6 +189,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getPartyName().equals(DEFENDANT_PARTY_NAME));
             assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getType().equals(Party.Type.INDIVIDUAL));
+            assertThat(updatedData.getAllPartyNames()).isEqualTo("Clay Mint V Dave Indent");
         }
 
         @Test
@@ -233,16 +241,47 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(ClaimType.FLIGHT_DELAY.name());
         }
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldSetAnyRepresented(boolean caseEventsEnabled) {
-            when(toggleService.isCaseEventsEnabled()).thenReturn(caseEventsEnabled);
+        @Test
+        void shouldSetAnyRepresented() {
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
 
-            assertThat(response.getData().get("anyRepresented")).isEqualTo(caseEventsEnabled ? "No" : null);
+            assertThat(response.getData().get("anyRepresented")).isEqualTo("No");
+        }
+
+        @Test
+        void shouldNotSetLanguageDisplayIfWelshDisabled() {
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isNull();
+        }
+
+        @Test
+        void shouldSetLanguageDisplayToEnglishIfNotSpecified() {
+            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isEqualTo("ENGLISH");
+        }
+
+        @Test
+        void shouldSetLanguageDisplayToEnglishAndWelshIfSpecified() {
+            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(localParams);
+
+            assertThat(response.getData().get("claimantLanguagePreferenceDisplay")).isEqualTo("ENGLISH_AND_WELSH");
         }
     }
 }

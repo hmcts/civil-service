@@ -189,21 +189,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (featureToggleService.isMintiEnabled()
-            && isJudicialReferral(callbackParams)
+        if (isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(NOT_ALLOWED_FOR_CITIZEN))
                 .build();
         }
 
-        if (featureToggleService.isMintiEnabled()) {
-            if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {
-                caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
-            } else {
-                caseDataBuilder.allowOrderTrackAllocation(NO);
-                populateTrackToggle(caseData, caseDataBuilder);
-            }
+        if (isJudicialReferral(callbackParams) || isMultiOrIntTrack(caseData)) {
+            caseDataBuilder.allowOrderTrackAllocation(YES).finalOrderTrackToggle(null);
+        } else {
+            caseDataBuilder.allowOrderTrackAllocation(NO);
+            populateTrackToggle(caseData, caseDataBuilder);
         }
         caseDataBuilder.finalOrderFurtherHearingToggle(null);
         return nullPreviousSelections(caseDataBuilder);
@@ -282,9 +279,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse assignTrackToggle(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        if (featureToggleService.isMintiEnabled()
-            && caseData.getFinalOrderAllocateToTrack().equals(NO)
+        if (NO.equals(caseData.getFinalOrderAllocateToTrack())
             && isJudicialReferral(callbackParams)
             && isSmallOrFastTrack(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -294,7 +289,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         caseDataBuilder = populateDownloadTemplateOptions(caseDataBuilder);
 
-        if (caseData.getFinalOrderAllocateToTrack().equals(YES)) {
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
             caseDataBuilder.finalOrderTrackToggle(caseData.getFinalOrderTrackAllocation().name());
         } else {
             populateTrackToggle(caseData, caseDataBuilder);
@@ -618,13 +613,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
-
-        if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
-            finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (featureToggleService.isGaForWelshEnabled()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
+                || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            preTranslationDocuments.addAll(finalCaseDocuments);
+            caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
+            // Do not trigger business process when document is hidden
+        } else {
+            if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
+                finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
+            }
+            caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
+            caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
         }
 
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,
         // we only use freeFormOrderDocument as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
@@ -633,17 +637,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder.finalOrderDownloadTemplateDocument(null);
         caseDataBuilder.allowOrderTrackAllocation(null);
 
-        if (featureToggleService.isMintiEnabled()) {
-            if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
-                if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                    caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().name());
-                } else {
-                    caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation());
-                }
+        if (YES.equals(caseData.getFinalOrderAllocateToTrack())) {
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                caseDataBuilder.responseClaimTrack(caseData.getFinalOrderTrackAllocation().name());
+            } else {
+                caseDataBuilder.allocatedTrack(caseData.getFinalOrderTrackAllocation());
             }
         }
-
-        caseDataBuilder.businessProcess(BusinessProcess.ready(GENERATE_ORDER_NOTIFICATION));
 
         if (nonNull(caseData.getFinalOrderSelection())) {
             // populate hearing notes in listing tab with hearing notes from either assisted or freeform order, if either exist.
@@ -671,8 +671,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
         nullPreviousSelections(caseDataBuilder);
 
-        if (featureToggleService.isCaseEventsEnabled()
-            && !JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
+        if (!JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
             && ((ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())
             && isNull(caseData.getFinalOrderFurtherHearingToggle()))
             || FREE_FORM_ORDER.equals(caseData.getFinalOrderSelection())
@@ -726,13 +725,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private boolean isJudicialReferral(CallbackParams callbackParams) {
-        return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState())
-            && featureToggleService.isMintiEnabled();
+        return JUDICIAL_REFERRAL.toString().equals(callbackParams.getRequest().getCaseDetails().getState());
     }
 
     private void populateTrackToggle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
-            caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+            if (caseData.getResponseClaimTrack() != null) {
+                caseDataBuilder.finalOrderTrackToggle(caseData.getResponseClaimTrack());
+            } else {
+                // track is null when DJ is completed, default to small/fast track journey
+                // in this scenario
+                caseDataBuilder.finalOrderTrackToggle(AllocatedTrack.SMALL_CLAIM.name());
+            }
 
         }
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -22,12 +22,16 @@ import static java.math.BigDecimal.valueOf;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.HUNDRED;
 
 @Component
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class InterestCalculator {
 
     public static final int TO_FULL_PENNIES = 2;
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
+
+    public BigDecimal calculateInterestForJO(CaseData caseData) {
+        return this.calculateInterest(caseData, getToDateForJO(caseData));
+    }
 
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
@@ -62,6 +66,16 @@ public class InterestCalculator {
                 caseData.getInterestFromSpecificDate(), interestToDate);
         }
         return ZERO;
+    }
+
+    private LocalDate getToDateForJO(CaseData caseData) {
+        if (Objects.isNull(caseData.getInterestClaimUntil())) {
+            return LocalDate.now();
+        } else if (caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+            return getSubmittedDate(caseData);
+        } else {
+            return LocalDate.now().minusDays(1);
+        }
     }
 
     private LocalDate getToDate(CaseData caseData) {

@@ -53,7 +53,9 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DE
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_CLAIMANT_ENDS_CLAIM_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.ClaimantResponseNotificationHandler.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,6 +91,13 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             }
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             caseData = caseData.toBuilder().ccdState(caseState).applicant1Represented(YesOrNo.NO).build();
+            if (caseState == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
+                caseData = caseData.toBuilder().caseDataLiP(
+                    CaseDataLiP.builder().applicant1LiPResponse(
+                        ClaimantLiPResponse.builder().claimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE).build())
+                        .build())
+                    .build();
+            }
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
@@ -114,8 +123,15 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
 
                 verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                     caseData.getCcdCaseReference().toString(),
-                    "CLAIMANT",
-                    null
+                    "CLAIMANT"
+                );
+            }
+            if (caseState.equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)) {
+                verify(dashboardScenariosService).recordScenarios(
+                    "BEARER_TOKEN",
+                    SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_CLAIMANT.getScenario(),
+                    caseData.getCcdCaseReference().toString(),
+                    ScenarioRequestParams.builder().params(scenarioParams).build()
                 );
             }
         }
@@ -143,7 +159,11 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
                     DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_GO_TO_HEARING
                 ),
                 Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA6_CLAIMANT_MEDIATION),
-                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM)
+                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_CLAIMANT_CARM),
+                Arguments.of(
+                    CaseState.PROCEEDS_IN_HERITAGE_SYSTEM,
+                    DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_REQUEST_JUDGE_PLAN_REQUESTED_CCJ_CLAIMANT
+                )
             );
         }
 
@@ -260,9 +280,13 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(callbackParams);
 
             // Then
+            String scenario = featureToggleService.isJudgmentOnlineLive()
+                ? SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()
+                : SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario();
+
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario(),
+                scenario,
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
@@ -298,9 +322,13 @@ class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandlerTest {
             handler.handle(callbackParams);
 
             // Then
+            String scenario = featureToggleService.isJudgmentOnlineLive()
+                ? SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT.getScenario()
+                : SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario();
+
             verify(dashboardScenariosService).recordScenarios(
                 "BEARER_TOKEN",
-                SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_CLAIMANT.getScenario(),
+                scenario,
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

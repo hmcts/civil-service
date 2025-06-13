@@ -44,7 +44,7 @@ public class GeneralApplicationPayAdditionalFeeScenarioTest extends BaseIntegrat
                         "<a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Pay the additional application fee</a></p>"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae'r llys angen i chi dalu ffi ychwanegol cyn y gall eich cais gael ei brosesu ymhellach. " +
-                        "<a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Talu ffi’r gwneud cais ychwanegol</a></p>")
+                        "<a href=\"{GA_VIEW_APPLICATION_URL}\" class=\"govuk-link\">Talu’r ffi ychwanegol i wneud cais</a></p>")
             );
     }
 

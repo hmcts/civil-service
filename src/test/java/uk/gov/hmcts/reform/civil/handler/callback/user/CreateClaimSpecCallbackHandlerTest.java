@@ -164,7 +164,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         + " Court Claims Centre.";
 
     public static final String SPEC_LIP_CONFIRMATION_SCREEN = "<br />When the payment is confirmed your claim will be issued "
-        + "and you'll be notified by email. The claim will then progress offline."
+        + "and youll be notified by email. The claim will then progress offline."
         + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
         + "defendant which must include a response pack"
         + "%n%nYou will need to send the following:<ul style=\"margin-bottom : 0px;\"> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
@@ -2023,22 +2023,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class FlightDelayDetailsMidCallbacks {
 
         @Test
-        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Disabled() {
-            // Given
-            CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
-            // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(false);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
-            assertThat(response.getData()).doesNotHaveToString("claimType");
-        }
-
-        @Test
         void shouldGetAirlineList_whenRequired() {
             // Given
             List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
@@ -2052,7 +2036,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
             // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -2074,7 +2057,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -2091,7 +2073,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -2219,7 +2200,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateCasenamePublic_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("'John Rambo' v 'Sole Trader'");
+            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("John Rambo v Sole Trader");
         }
 
         @Test
@@ -2268,7 +2249,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData())
-                .containsEntry("caseNameHmctsInternal", "'John Rambo' v 'Sole Trader', 'John Rambo'");
+                .containsEntry("caseNameHmctsInternal", "John Rambo v Sole Trader, John Rambo");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2284,7 +2265,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData())
-                .containsEntry("caseNameHmctsInternal", "'John Rambo', 'Jason Rambo' v 'Sole Trader'");
+                .containsEntry("caseNameHmctsInternal", "John Rambo, Jason Rambo v Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2300,7 +2281,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("'John Rambo' v 'Sole Trader'");
+                .isEqualTo("John Rambo v Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2535,8 +2516,6 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                     .willReturn(locations);
-
-                when(toggleService.isSdoR2Enabled()).thenReturn(true);
             }
 
             @Test

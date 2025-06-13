@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTran
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimSubmittedTransitionBuilder.takenOfflineByStaffBeforeClaimIssued;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimSubmittedTransitionBuilderTest {
+class ClaimSubmittedTransitionBuilderTest {
 
     @Mock
     private FeatureToggleService mockFeatureToggleService;
@@ -73,6 +73,21 @@ public class ClaimSubmittedTransitionBuilderTest {
             entry(FlowFlag.LIP_CASE.name(), true),
             entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
             entry(FlowFlag.PIP_ENABLED.name(), true)
+        );
+    }
+
+    @Test
+    void shouldSetBilingualFlag_whenDefendantNoCOnline() {
+        ClaimSubmittedTransitionBuilder claimSubmittedTransitionBuilder = new ClaimSubmittedTransitionBuilder(
+            mockFeatureToggleService);
+        result = claimSubmittedTransitionBuilder.buildTransitions();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+        assertThat(getCaseFlags(result.get(6), caseData)).hasSize(3).contains(
+            entry(FlowFlag.LIP_CASE.name(), true),
+            entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
+            entry(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true)
         );
     }
 
