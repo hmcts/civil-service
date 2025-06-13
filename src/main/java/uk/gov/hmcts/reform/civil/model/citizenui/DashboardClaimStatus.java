@@ -136,11 +136,11 @@ public enum DashboardClaimStatus {
     SETTLED(
         Claim::isSettled
     ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::pausedForTranslationAfterResponse
+    ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
-    ),
-    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
-        Claim::defendantRespondedWithPreferredLanguageWelsh
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid

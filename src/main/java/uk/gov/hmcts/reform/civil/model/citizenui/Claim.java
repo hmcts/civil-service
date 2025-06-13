@@ -118,7 +118,7 @@ public interface Claim {
 
     boolean isHwfPaymentOutcome();
 
-    boolean defendantRespondedWithPreferredLanguageWelsh();
+    boolean pausedForTranslationAfterResponse();
 
     boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline();
 
