@@ -12,7 +12,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @AllArgsConstructor
 public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
 
-    private final OrganisationService organisationService;
+    protected final OrganisationService organisationService;
 
     @Override
     protected String getEmailAddress(CaseData caseData) {
@@ -27,7 +27,7 @@ public abstract class RespSolTwoEmailDTOGenerator extends EmailDTOGenerator {
         return properties;
     }
 
-    protected Boolean getShouldNotify(CaseData caseData) {
+    public Boolean getShouldNotify(CaseData caseData) {
         return isOneVTwoTwoLegalRep(caseData) ? Boolean.TRUE : Boolean.FALSE;
     }
 }
