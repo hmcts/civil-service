@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +40,7 @@ public class JudgementService {
             .ccjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount())
             .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
             .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
-            .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails()
-                                            .getCcjJudgmentFixedCostOption())
+            .ccjJudgmentFixedCostOption(checkFixedCostOption(caseData))
             .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
             .ccjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())
             .ccjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest())
@@ -65,7 +65,6 @@ public class JudgementService {
                 claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
             }
         }
-
         return claimAmount;
     }
 
@@ -128,7 +127,7 @@ public class JudgementService {
             return JUDGEMENT_BY_COURT;
         } else {
             return String.format(
-                isLrFullAdmitRepaymentPlan(caseData)
+                isLrFullAdmitRepaymentPlan(caseData) || isLrPayImmediatelyPlan(caseData)
                     ? JUDGEMENT_ORDER_V2 : JUDGEMENT_ORDER, ccjJudgementSubTotal(caseData));
         }
     }
@@ -151,5 +150,21 @@ public class JudgementService {
 
     private boolean isLRvLR(CaseData caseData) {
         return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
+    }
+
+    public boolean isLrPayImmediatelyPlan(CaseData caseData) {
+        return caseData.isPayImmediately()
+            && isOneVOne(caseData)
+            && isLRvLR(caseData)
+            && featureToggleService.isLrAdmissionBulkEnabled();
+    }
+
+    private YesOrNo checkFixedCostOption(CaseData caseData) {
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            && (nonNull(caseData.getFixedCosts()) && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
+            || YesOrNo.YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+            return YesOrNo.YES;
+        }
+        return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }
 }
