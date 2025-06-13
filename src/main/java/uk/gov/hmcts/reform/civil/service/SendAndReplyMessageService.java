@@ -103,8 +103,12 @@ public class SendAndReplyMessageService {
 
     public Message createBaseMessageWithSenderDetails(String userAuth) {
         UserDetails details = userService.getUserDetails(userAuth);
+        log.info("USER DETAILS,  {}", details);
         RoleAssignmentResponse role = getFirstSupportedRole(userAuth, details.getId());
+        log.info("ROLE ASSIGNMENT ROLE,  {}", role);
         String senderName = String.format("%s, %s", details.getFullName(), role.getRoleLabel());
+        log.info("SENDER NAME,  {}", senderName);
+        log.info("SENDERROLETYPE,  {}", SUPPORTED_ROLES_MAP.get(role.getRoleName()));
 
         return Message.builder()
             .senderName(senderName)
