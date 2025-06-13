@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ChildrenByAgeGroupLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
@@ -80,21 +79,10 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<Element<UnavailableDate>> defendant1UnavailableDatesList;
     private final boolean checkCarmToggle;
     private final StatementOfTruth uiStatementOfTruth;
-    private final BigDecimal admittedAmount;
     private final String faContent;
 
-    public boolean isCurrentlyWorking() {
-        return (employerDetails != null && !employerDetails.isEmpty())
-            || selfEmployment != null && selfEmployment.getAnnualTurnover() != null;
-    }
-
-    public int getNumberOfChildren() {
-        return Optional.ofNullable(partnerAndDependent).map(PartnerAndDependentsLRspec::getHowManyChildrenByAgeGroup)
-            .map(ChildrenByAgeGroupLRspec::getTotalChildren).orElse(0);
-    }
-
     @JsonIgnore
-    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData, BigDecimal claimAmountPlusInterestToDate) {
+    public static SealedClaimLipResponseForm toTemplate(final CaseData caseData, BigDecimal admittedAmount) {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
             .ccdCaseReference(formatCcdCaseReference(caseData))
@@ -107,7 +95,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, claimAmountPlusInterestToDate, false))
+            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData, admittedAmount, false))
             .faContent(getAdditionContent(caseData))
             .uiStatementOfTruth(caseData.getRespondent1LiPStatementOfTruth());
         addSolicitorDetails(caseData, builder);
