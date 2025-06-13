@@ -102,7 +102,7 @@ public class ClaimantResponseUtils {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         BigDecimal fixedCosts = BigDecimal.ZERO;
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-            if (addFixedCosts && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            if (addFixedCosts && (caseData.getFixedCosts() != null && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))) {
                 fixedCosts = MonetaryConversions.penniesToPounds(
                     BigDecimal.valueOf(Integer.parseInt(
                         caseData.getFixedCosts().getFixedCostAmount())));
