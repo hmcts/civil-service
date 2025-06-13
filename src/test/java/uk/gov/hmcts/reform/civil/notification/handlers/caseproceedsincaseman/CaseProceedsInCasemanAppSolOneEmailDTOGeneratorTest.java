@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class CaseProceedsInCasemanAppSolOneEmailDTOGeneratorTest {
 
@@ -42,21 +40,5 @@ public class CaseProceedsInCasemanAppSolOneEmailDTOGeneratorTest {
         String referenceTemplate = emailDTOGenerator.getReferenceTemplate();
 
         assertThat(referenceTemplate).isEqualTo("case-proceeds-in-caseman-applicant-notification-%s");
-    }
-
-    @Test
-    void shouldNotNotifyWhenLipVLipOneVOne() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).respondent1Represented(NO).build();
-        boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
-
-        assertThat(shouldNotify).isFalse();
-    }
-
-    @Test
-    void shouldNotifyWhenNotLipVLipOneVOne() {
-        CaseData caseData = CaseData.builder().applicant1Represented(YES).respondent1Represented(YES).build();
-        boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
-
-        assertThat(shouldNotify).isTrue();
     }
 }

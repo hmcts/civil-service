@@ -11,8 +11,11 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGenerator extends RespSolOne
 
     private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-respondent-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected CaseProceedsInCasemanRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

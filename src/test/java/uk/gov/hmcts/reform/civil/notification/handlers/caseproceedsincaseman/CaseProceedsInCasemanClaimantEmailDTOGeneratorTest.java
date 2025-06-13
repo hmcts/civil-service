@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -19,9 +18,6 @@ public class CaseProceedsInCasemanClaimantEmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
-
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private CaseProceedsInCasemanClaimantEmailDTOGenerator emailDTOGenerator;
@@ -63,26 +59,16 @@ public class CaseProceedsInCasemanClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotNotifyWhenNotLipVLipOneVOne() {
-        CaseData caseData = CaseData.builder().applicant1Represented(YES).respondent1Represented(YES).build();
+    void shouldNotNotifyWhenNotLipvLROneVOne() {
+        CaseData caseData = CaseData.builder().applicant1Represented(NO).respondent1Represented(NO).build();
         boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isFalse();
     }
 
     @Test
-    void shouldNotNotifyWhenLipVLipNotEnabled() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).respondent1Represented(NO).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
-
-        assertThat(shouldNotify).isFalse();
-    }
-
-    @Test
-    void shouldNotifyWhenLipVLipOneVOneAndLipVLipEnabled() {
-        CaseData caseData = CaseData.builder().applicant1Represented(NO).respondent1Represented(NO).build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+    void shouldNotifyWhenLipvLROneVOne() {
+        CaseData caseData = CaseData.builder().applicant1Represented(NO).respondent1Represented(YES).build();
         boolean shouldNotify = emailDTOGenerator.getShouldNotify(caseData);
 
         assertThat(shouldNotify).isTrue();

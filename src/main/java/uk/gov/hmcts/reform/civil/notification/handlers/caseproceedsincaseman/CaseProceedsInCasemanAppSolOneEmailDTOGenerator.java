@@ -11,8 +11,11 @@ public class CaseProceedsInCasemanAppSolOneEmailDTOGenerator extends AppSolOneEm
 
     private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-applicant-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected CaseProceedsInCasemanAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override
@@ -23,10 +26,5 @@ public class CaseProceedsInCasemanAppSolOneEmailDTOGenerator extends AppSolOneEm
     @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
-    }
-
-    @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() ? Boolean.FALSE : Boolean.TRUE;
     }
 }

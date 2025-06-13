@@ -4,18 +4,16 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Component
 public class CaseProceedsInCasemanClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-applicant-notification-%s";
 
-    private final FeatureToggleService featureToggleService;
+    private final NotificationsProperties notificationsProperties;
 
-    protected CaseProceedsInCasemanClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties, FeatureToggleService featureToggleService) {
-        super(notificationsProperties);
-        this.featureToggleService = featureToggleService;
+    protected CaseProceedsInCasemanClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override
@@ -30,7 +28,7 @@ public class CaseProceedsInCasemanClaimantEmailDTOGenerator extends ClaimantEmai
     }
 
     @Override
-    protected Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled() ? Boolean.TRUE : Boolean.FALSE;
+    public Boolean getShouldNotify(CaseData caseData) {
+        return caseData.isLipvLROneVOne() ? Boolean.TRUE : Boolean.FALSE;
     }
 }

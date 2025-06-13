@@ -10,9 +10,11 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 public class CaseProceedsInCasemanRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-respondent-notification-%s";
+    private final NotificationsProperties notificationsProperties;
 
     protected CaseProceedsInCasemanRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override
