@@ -507,7 +507,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean pausedForTranslationAfterDefendantResponse() {
+    public boolean pausedForTranslationAfterResponse() {
         return false;
     }
 
