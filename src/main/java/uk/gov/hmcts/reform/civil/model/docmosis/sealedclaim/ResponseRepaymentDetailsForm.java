@@ -137,12 +137,12 @@ public class ResponseRepaymentDetailsForm {
                                               BigDecimal totalAmount,
                                               BigDecimal admittedAmount) {
         if (caseData.isPayImmediately()) {
-            addPayByDatePayImmediately(builder, totalAmount, caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
+            addPayByDatePayImmediately(builder, admittedAmount, caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
         } else if (caseData.isPayByInstallment()) {
             addRepaymentPlan(caseData, builder, totalAmount);
             builder.admittedAmount(admittedAmount);
         } else if (caseData.isPayBySetDate()) {
-            addPayBySetDate(caseData, builder, totalAmount);
+            addPayBySetDate(caseData, builder, admittedAmount);
         }
     }
 
