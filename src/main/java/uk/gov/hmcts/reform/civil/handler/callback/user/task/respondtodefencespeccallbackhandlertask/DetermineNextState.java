@@ -230,9 +230,7 @@ public class DetermineNextState extends CallbackHandler {
         if (!featureToggleService.isGaForWelshEnabled()) {
             return false;
         }
-        boolean bilingualRequested = caseData.isLRvLipOneVOne()
-            && (caseData.isRespondentResponseBilingual()
-            || caseData.isLipDefendantSpecifiedBilingualDocuments());
+        boolean bilingualRequested = caseData.isLRvLipOneVOne() && caseData.isRespondentResponseBilingual();
 
         log.info("PAUSE CLAIM TRANSLATION RESPONDENT WELSH");
         log.info("NEEDS TRANSLATION RESPONDENT WELSH, {}", bilingualRequested);
