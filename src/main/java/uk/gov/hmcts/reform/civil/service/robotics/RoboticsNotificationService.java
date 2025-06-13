@@ -86,7 +86,6 @@ public class RoboticsNotificationService {
                 triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
             } else {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseDataDTO.getEvents());
-                log.info(String.format("triggerEvent %s", triggerEvent));
             }
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))

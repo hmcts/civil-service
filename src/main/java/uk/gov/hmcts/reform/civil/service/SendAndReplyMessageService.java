@@ -38,6 +38,7 @@ public class SendAndReplyMessageService {
     // Order is important here as we only use the first matching role when mapping against a users role assignments.
     // Senior roles should always be before their non-senior counterpart.
     private static final Map<String, RolePool> SUPPORTED_ROLES_MAP = Map.ofEntries(
+        entry("wlu-admin", RolePool.WLU_ADMIN),
         entry("ctsc-team-leader", RolePool.ADMIN),
         entry("ctsc", RolePool.ADMIN),
         entry("hearing-centre-team-leader", RolePool.ADMIN),
