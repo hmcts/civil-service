@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.TakeCaseOfflineNotifier;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseTakenOfflineNotifierTest {
+class CaseTakenOfflineNotifierTest {
 
     @InjectMocks
     private CaseTakenOfflineNotifier notifier;
