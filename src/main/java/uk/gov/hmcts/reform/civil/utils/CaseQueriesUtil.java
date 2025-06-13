@@ -20,8 +20,12 @@ import java.util.stream.Stream;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_CITIZEN_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
+import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_CITIZEN_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -59,7 +63,9 @@ public class CaseQueriesUtil {
         return Stream.of(
                 caseData.getQmApplicantSolicitorQueries(),
                 caseData.getQmRespondentSolicitor1Queries(),
-                caseData.getQmRespondentSolicitor2Queries()
+                caseData.getQmRespondentSolicitor2Queries(),
+                caseData.getQmApplicantCitizenQueries(),
+                caseData.getQmRespondentCitizenQueries()
             )
             .filter(collection -> nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().stream()
                 .anyMatch(messageEl -> messageEl.getValue().getCreatedOn().equals(message.getCreatedOn())))
@@ -99,6 +105,12 @@ public class CaseQueriesUtil {
         if (queriesCollection.isSame(caseData.getQmRespondentSolicitor2Queries())) {
             return RESPONDENT_SOLICITOR_TWO_QUERIES;
         }
+        if (queriesCollection.isSame(caseData.getQmApplicantCitizenQueries())) {
+            return APPLICANT_CITIZEN_QUERIES;
+        }
+        if (queriesCollection.isSame(caseData.getQmRespondentCitizenQueries())) {
+            return RESPONDENT_CITIZEN_QUERIES;
+        }
 
         return null;
     }
@@ -107,6 +119,14 @@ public class CaseQueriesUtil {
         return switch(collectionType) {
             case APPLICANT_SOLICITOR_QUERIES -> CLAIMANT_QUERY_DOCUMENTS;
             case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES -> DEFENDANT_QUERY_DOCUMENTS;
+            default -> null;
+        };
+    }
+
+    public static DocCategory getQueryAttachmentsDocumentCategory(QueryCollectionType collectionType) {
+        return switch(collectionType) {
+            case APPLICANT_SOLICITOR_QUERIES, APPLICANT_CITIZEN_QUERIES -> CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
+            case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES, RESPONDENT_CITIZEN_QUERIES -> DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
             default -> null;
         };
     }
@@ -183,40 +203,35 @@ public class CaseQueriesUtil {
 
     public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
                                                      AssignCategoryId assignCategoryId,
-                                                     List<String> roles) {
-        String categoryId = getAttachmentsCategoryIdForRole(roles);
+                                                     String docCategoryId) {
         List<Element<Document>> attachments = latestCaseMessage.getAttachments();
         if (attachments != null && !attachments.isEmpty()) {
             for (Element<Document> attachment : attachments) {
-                assignCategoryId.assignCategoryIdToDocument(attachment.getValue(), categoryId);
+                assignCategoryId.assignCategoryIdToDocument(attachment.getValue(), docCategoryId);
             }
         }
     }
 
+    public static void assignCategoryIdToAttachments(CaseMessage latestCaseMessage,
+                                                     AssignCategoryId assignCategoryId,
+                                                     List<String> roles) {
+        String categoryId = getAttachmentsCategoryIdForRole(roles);
+        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, categoryId);
+    }
+
     public static void assignCategoryIdToCaseworkerAttachments(CaseData caseData,
                                                                CaseMessage latestCaseMessage,
-                                                               AssignCategoryId assignCategoryId,
-                                                               CoreCaseUserService coreCaseUserService,
-                                                               String parentQueryId) {
-        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
-        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
+                                                               AssignCategoryId assignCategoryId) {
+        CaseQueriesCollection workingCollection = getCollectionByMessage(caseData, latestCaseMessage);
+        DocCategory documentCategory = getQueryAttachmentsDocumentCategory(getCollectionType(workingCollection, caseData));
+        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, documentCategory.getValue());
     }
 
     private static String getAttachmentsCategoryIdForRole(List<String> roles) {
         if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
-            return DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
+            return CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
         } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles) || isLIPDefendant(roles)) {
-            return DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
-        } else {
-            throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
-        }
-    }
-
-    private static String getQueryDocumentCategoryIdForRole(List<String> roles) {
-        if (isApplicantSolicitor(roles)) {
-            return CLAIMANT_QUERY_DOCUMENTS.getValue();
-        } else if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
-            return DocCategory.DEFENDANT_QUERY_DOCUMENTS.getValue();
+            return DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue();
         } else {
             throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
         }
