@@ -1113,6 +1113,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public Optional<Element<CaseDocument>> getDecisionReconsiderationDocument() {
+        return getLatestDocumentOfType(DocumentType.DECISION_MADE_ON_APPLICATIONS);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getTranslatedDecisionReconsiderationDocument() {
+        return getLatestDocumentOfType(DocumentType.DECISION_MADE_ON_APPLICATIONS_TRANSLATED);
+    }
+
+    @JsonIgnore
     public Optional<Element<CaseDocument>> getLatestDocumentOfType(DocumentType documentType) {
         return ofNullable(systemGeneratedCaseDocuments)
             .flatMap(docs -> docs.stream()
