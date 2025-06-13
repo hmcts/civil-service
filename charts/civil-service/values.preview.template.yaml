@@ -1,7 +1,7 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
-  devcpuRequests: 500m
+  devcpuRequests: 1000m
   devmemoryRequests: 2048Mi
   devmemoryLimits: 4096Mi
   environment:
@@ -320,9 +320,9 @@ camunda-bpm:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}
-    devcpuRequests: 500m
+    devcpuRequests: 1000m
     devmemoryRequests: 1024Mi
-    devcpuLimits: 1
+    devcpuLimits: 2
     devmemoryLimits: 1Gi
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
