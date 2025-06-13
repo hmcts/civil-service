@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -44,12 +44,6 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
             List.of("reference"),
             startIndex
         );
-    }
-
-    @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
-        return null;
     }
 
     private QueryBuilder beState(CaseState caseState) {
