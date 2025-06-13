@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.model.wa;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.ZonedDateTime;
@@ -16,6 +19,8 @@ import static uk.gov.hmcts.reform.civil.model.wa.SystemDateProvider.DATE_TIME_FO
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyFields",
     "PMD.ExcessiveParameterList", "PMD.ShortClassName", "PMD.LinguisticNaming"})
 @Schema(allowableValues = "Task")
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Task {
 
     public static final String SAMPLE_ISO_DATE_TIME = "2020-09-05T14:47:01.250542+01:00";
