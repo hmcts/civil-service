@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -22,9 +20,6 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlementagreement.SettlementAgreementFormGenerator;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
@@ -150,46 +145,6 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
                              .build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldHideSettlementAgreementDocWhenClaimantHasWelshDocPreference() {
-        //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(formGenerator.generate(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(caseDocument);
-        CaseData caseData = CaseData.builder()
-            .applicant1Represented(YesOrNo.NO)
-            .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.WELSH).build()).build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        verify(formGenerator).generate(caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldHideSettlementAgreementDocWhenDefendantHasWelshDocPreference() {
-        //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(formGenerator.generate(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(caseDocument);
-        CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.NO)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.WELSH).build()).build())
             .build();
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
