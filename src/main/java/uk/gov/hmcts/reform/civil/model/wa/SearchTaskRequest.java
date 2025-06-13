@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.wa;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,11 +21,13 @@ public class SearchTaskRequest {
         requiredMode = REQUIRED,
         name = "search_parameters",
         description = "https://tools.hmcts.net/confluence/display/WA/WA+Task+Management+API+Guidelines")
+    @JsonProperty("search_parameters")
     @NotEmpty(message = "At least one search_parameter element is required.")
     private List<@Valid SearchParameter<?>> searchParameters;
     @Schema(name = "sorting_parameters")
     private List<SortingParameter> sortingParameters;
     @Schema(name = "request_context", allowableValues = "ALL_WORK, AVAILABLE_TASKS", example = "ALL_WORK")
+    @JsonProperty("request_context")
     private RequestContext requestContext;
 
     private SearchTaskRequest() {
