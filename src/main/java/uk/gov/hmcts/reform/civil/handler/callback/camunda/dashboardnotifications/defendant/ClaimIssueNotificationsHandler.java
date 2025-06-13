@@ -47,31 +47,33 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
     }
 
     @Override
-    public String getScenario(CaseData caseData) {
-        return SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario();
-    }
-
-    @Override
-    public String getExtraScenario() {
-        return SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario();
-    }
-
-    @Override
-    public boolean shouldRecordExtraScenario(CaseData caseData) {
-        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
-
-        return FAST_CLAIM.equals(allocatedTrack) && caseData.isRespondent1NotRepresented();
-    }
-
-    @Override
-    public boolean shouldRecordScenario(CaseData caseData) {
-        return caseData.isRespondent1NotRepresented();
+    protected String getScenario(CaseData caseData) {
+        return null;
     }
 
     @Override
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
+
+        if (caseData.isRespondent1NotRepresented()) {
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
+        if (FAST_CLAIM.equals(allocatedTrack) && caseData.isRespondent1NotRepresented()){
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
         if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
