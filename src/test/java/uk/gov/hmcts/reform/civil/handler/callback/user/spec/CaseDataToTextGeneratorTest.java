@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.PartialAdmitPayImmediatelyConfirmationText;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
 import java.time.LocalDate;
@@ -49,9 +48,6 @@ class CaseDataToTextGeneratorTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
-
-    @MockBean
-    private JudgementService judgementService;
 
     @SuppressWarnings("rawtypes")
     private final List<CaseDataToTextGeneratorIntentionConfig> intentionConfigs = List.of(

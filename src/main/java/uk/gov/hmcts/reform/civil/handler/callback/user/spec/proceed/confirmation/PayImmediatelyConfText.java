@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
 
     private final PaymentDateService paymentDateService;
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
-    private final JudgementService judgementService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
@@ -45,7 +46,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
             + "<p><h3>If you haven’t been paid.</h3></p>"
             + "<p>If the defendant has not paid you, you can request a County Court Judgment ";
 
-        if (judgementService.isLrPayImmediatelyPlan(caseData)) {
+        if (isLrPayImmediatelyPlan(caseData)) {
             return Optional.of(
                 String.format(genericText
                                   + "by selecting 'Request Judgment by Admission' from the 'Next Step' drop down list.</p>",
@@ -72,5 +73,11 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
             && null == caseData.getApplicant1ProceedWithClaim())
             || (caseData.isPartAdmitImmediatePaymentClaimSettled()
             && YES == caseData.getRespondForImmediateOption()));
+    }
+
+    public boolean isLrPayImmediatelyPlan(CaseData caseData) {
+        return caseData.isPayImmediately()
+            && isOneVOne(caseData)
+            && featureToggleService.isLrAdmissionBulkEnabled();
     }
 }
