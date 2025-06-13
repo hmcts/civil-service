@@ -12,10 +12,12 @@ public class DiscontinueClaimPartiesAllPartiesEmailGenerator extends AllPartiesE
 
     public DiscontinueClaimPartiesAllPartiesEmailGenerator(
         DiscontinueClaimPartiesAppSolOneEmailDTOGenerator discontinueClaimPartiesAppSolOneEmailDTOGenerator,
+        DiscontinueClaimPartiesDefendantEmailDTOGenerator discontinueClaimPartiesDefendantEmailDTOGenerator,
         DiscontinueClaimPartiesRespSolOneEmailDTOGenerator discontinueClaimPartiesRespSolOneEmailDTOGenerator,
         DiscontinueClaimPartiesRespSolTwoEmailDTOGenerator discontinueClaimPartiesRespSolTwoEmailDTOGenerator
     ) {
         super(List.of(discontinueClaimPartiesAppSolOneEmailDTOGenerator,
+                      discontinueClaimPartiesDefendantEmailDTOGenerator,
                       discontinueClaimPartiesRespSolOneEmailDTOGenerator,
                       discontinueClaimPartiesRespSolTwoEmailDTOGenerator));
     }
