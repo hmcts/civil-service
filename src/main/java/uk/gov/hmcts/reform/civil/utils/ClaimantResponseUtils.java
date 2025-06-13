@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 
@@ -16,7 +15,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 
 import static java.util.Objects.isNull;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.*;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Component
 @RequiredArgsConstructor
