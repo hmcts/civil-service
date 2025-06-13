@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,11 +22,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.wa.WaMapper;
+import uk.gov.hmcts.reform.civil.utils.WaMapperUtils;
 
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
+
+import static uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption.REPLY;
+import static uk.gov.hmcts.reform.civil.utils.WaMapperUtils.createClientContext;
 
 @Tag(name = "Callback Controller")
 @Slf4j
@@ -47,11 +57,12 @@ public class CallbackController {
         "/version/{version}/{callback-type}/{page-id}"
     })
     @Operation(summary = "Handles all callbacks from CCD")
-    public CallbackResponse callback(
+    public ResponseEntity<CallbackResponse> callback(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
         @PathVariable("version") Optional<CallbackVersion> version,
+        @RequestHeader(value = WorkAllocationConstants.CLIENT_CONTEXT_HEADER_PARAMETER, required = false) String clientContext,
         @PathVariable("page-id") Optional<String> pageId
     ) {
         final CaseDetails caseDetails = callback.getCaseDetails();
@@ -61,16 +72,31 @@ public class CallbackController {
             callback.getEventId(), callbackType, pageId, version
         );
 
+        log.info("client context " + clientContext);
+        WaMapper waMapper = WaMapperUtils.getWaMapper(clientContext);
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
             .params(java.util.Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
-            .caseData(caseDetailsConverter.toCaseData(caseDetails))
+            .caseData(caseData)
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
+            .waMapper(waMapper)
             .build();
 
-        return callbackHandlerFactory.dispatch(callbackParams);
+        log.info("event id " + callback.getEventId());
+
+        if (CaseEvent.valueOf(callback.getEventId()).equals(CaseEvent.SEND_AND_REPLY)
+            && REPLY.equals(caseData.getSendAndReplyOption())) {
+            log.info("updating client context callback controller");
+            return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
+                                        createClientContext(waMapper, caseData),
+                                        HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
+                                        HttpStatus.OK);
+        }
     }
 }

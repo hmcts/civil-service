@@ -79,6 +79,7 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
+import uk.gov.hmcts.reform.civil.model.sendandreply.MessageWaTaskDetails;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 
@@ -423,6 +424,7 @@ public class CaseDataCaseProgression extends CaseDataCaseSdo implements Mappable
     private Message lastMessage;
     private String lastMessageAllocatedTrack;
     private String lastMessageJudgeLabel;
+    private MessageWaTaskDetails messageWaTaskDetails;
 
     //QueryManagement
     private final CaseQueriesCollection qmApplicantSolicitorQueries;
