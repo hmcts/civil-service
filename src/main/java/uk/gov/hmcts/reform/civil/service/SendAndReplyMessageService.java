@@ -149,13 +149,12 @@ public class SendAndReplyMessageService {
         log.info("message for history id  add task info " + messageForHistory.getMessageID());
 
         try {
-            SearchTaskRequest request = SearchTaskRequest.builder()
-                .requestContext(RequestContext.AVAILABLE_TASKS)
-                .searchParameters(List.of(new SearchParameterList(
+            SearchTaskRequest request = new SearchTaskRequest(
+                RequestContext.AVAILABLE_TASKS,
+                List.of(new SearchParameterList(
                     SearchParameterKey.CASE_ID, SearchOperator.IN,
                     List.of(String.valueOf(caseData.getCcdCaseReference()))
-                )))
-                .build();
+                )));
             log.info("wa task search request " + request);
             ResponseEntity<GetTasksResponse<Task>> response = waTaskManagementApiClient.searchWithCriteria(
                 authTokenGenerator.generate(),

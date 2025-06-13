@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.wa;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -11,8 +11,8 @@ import java.util.List;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Builder(toBuilder = true)
+@EqualsAndHashCode
+@ToString
 @SuppressWarnings("java:S1452")
 public class SearchTaskRequest {
 
