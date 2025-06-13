@@ -994,7 +994,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
             assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
-            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
+            assertThat(response.getData()).containsKey("preTranslationDocuments");
         }
 
         @Test
@@ -1013,7 +1013,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).doesNotContainKey("sdoOrderDocument");
             assertThat(response.getData()).doesNotContainKey("systemGeneratedCaseDocuments");
-            assertThat(response.getData()).containsKey("preTranslationSdoOrderDocuments");
+            assertThat(response.getData()).containsKey("preTranslationDocuments");
         }
     }
 

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoCoverLetterAppendService;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
+import uk.gov.hmcts.reform.civil.utils.LanguageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,10 @@ public class SendSDOBulkPrintService {
 
     public void sendSDOOrderToLIP(String authorisation, CaseData caseData, String taskId) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
-            Language language = determineLanguageForBulkPrint(caseData, taskId);
+            Language language = LanguageUtils.determineLanguageForBulkPrint(
+                caseData,
+                TASK_ID_CLAIMANT.equals(taskId),
+                featureToggleService.isGaForWelshEnabled());
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {
                 case ENGLISH -> caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
@@ -53,18 +57,6 @@ public class SendSDOBulkPrintService {
                                              caseData.getLegacyCaseReference(), SDO_ORDER_PACK_LETTER_TYPE, recipients);
             }
         }
-    }
-
-    private Language determineLanguageForBulkPrint(CaseData caseData, String taskId) {
-        if (!featureToggleService.isGaForWelshEnabled()) {
-            return Language.ENGLISH;
-        }
-        String languageString = TASK_ID_CLAIMANT.equals(taskId) ? caseData.getClaimantBilingualLanguagePreference() : caseData.getDefendantBilingualLanguagePreference();
-        return switch (languageString) {
-            case "WELSH" -> Language.WELSH;
-            case "BOTH" -> Language.BOTH;
-            default -> Language.ENGLISH;
-        };
     }
 
     private List<String> getRecipientsList(CaseData caseData, String taskId) {
