@@ -176,8 +176,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationDecisionReconsideration =
                             preTranslationDocuments.stream()
-                                .filter(item -> item.getValue().getDocumentType() ==
-                                    DocumentType.DECISION_MADE_ON_APPLICATIONS)
+                                .filter(item -> item.getValue().getDocumentType()
+                                    == DocumentType.DECISION_MADE_ON_APPLICATIONS)
                                 .findFirst();
                         preTranslationDecisionReconsideration.ifPresent(preTranslationDocuments::remove);
                         preTranslationDecisionReconsideration.ifPresent(systemGeneratedDocuments::add);
