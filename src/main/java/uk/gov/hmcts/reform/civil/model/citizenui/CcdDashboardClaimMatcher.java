@@ -297,10 +297,10 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     private boolean generalOrderRaised() {
         return (caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().anyMatch(
-            element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
+                element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
         )) || (caseData.getFinalOrderDocumentCollection() != null
             && caseData.getFinalOrderDocumentCollection().stream().anyMatch(
-            element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
+                element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
         ));
     }
 }
