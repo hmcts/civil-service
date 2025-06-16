@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_CUI);
+    private static final int DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION_MONTHS = 24;
 
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -96,7 +98,11 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, builder);
-        CaseData updatedData = builder.build();
+        CaseData updatedData = builder.claimDismissedDeadline(
+            deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION_MONTHS,
+                LocalDate.now()
+            )).build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
@@ -127,7 +133,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             log.info(
                 "case id: {}, respondToAdmittedClaimOwingAmount: {}",
                 callbackParams.getRequest().getCaseDetails().getId(),
-                 respondToAdmittedClaimOwingAmount
+                respondToAdmittedClaimOwingAmount
             );
         }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
@@ -136,12 +142,18 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             responseDate
         );
 
-        CaseData.CaseDataBuilder<?, ?> builder =  caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
-            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
+            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(
+                caseData.getTotalClaimAmount(),
+                null,
+                null,
+                featureToggleService,
+                caseData
+            ).name())
             .applicant1ResponseDeadline(applicantDeadline)
             .nextDeadline(applicantDeadline.toLocalDate());
 
