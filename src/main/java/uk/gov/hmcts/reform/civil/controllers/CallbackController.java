@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +20,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandlerFactory;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.WorkAllocationConstants;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -32,9 +29,6 @@ import uk.gov.hmcts.reform.civil.utils.WaMapperUtils;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.constraints.NotNull;
-
-import static uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption.REPLY;
-import static uk.gov.hmcts.reform.civil.utils.WaMapperUtils.createClientContext;
 
 @Tag(name = "Callback Controller")
 @Slf4j
@@ -57,7 +51,7 @@ public class CallbackController {
         "/version/{version}/{callback-type}/{page-id}"
     })
     @Operation(summary = "Handles all callbacks from CCD")
-    public ResponseEntity<CallbackResponse> callback(
+    public CallbackResponse callback(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @PathVariable("callback-type") String callbackType,
         @NotNull @RequestBody CallbackRequest callback,
@@ -88,15 +82,15 @@ public class CallbackController {
 
         log.info("event id " + callback.getEventId());
 
-        if (CaseEvent.valueOf(callback.getEventId()).equals(CaseEvent.SEND_AND_REPLY)
-            && REPLY.equals(caseData.getSendAndReplyOption())) {
-            log.info("updating client context callback controller");
-            return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
-                                        createClientContext(waMapper, caseData),
-                                        HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(callbackHandlerFactory.dispatch(callbackParams),
-                                        HttpStatus.OK);
-        }
+        // if (CaseEvent.valueOf(callback.getEventId()).equals(CaseEvent.SEND_AND_REPLY)
+        //    && REPLY.equals(caseData.getSendAndReplyOption()) && callbackType.equals("submitted")) {
+        //    log.info("updating client context callback controller");
+        //    return new ResponseEntity<>(
+        //        callbackHandlerFactory.dispatch(callbackParams),
+        //        createClientContext(waMapper, caseData),
+        //        HttpStatus.OK
+        //    );
+        //}
+        return callbackHandlerFactory.dispatch(callbackParams);
     }
 }

@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.model.sendandreply.MessageReply;
 import uk.gov.hmcts.reform.civil.model.sendandreply.Message;
 import uk.gov.hmcts.reform.civil.model.sendandreply.MessageWaTaskDetails;
 import uk.gov.hmcts.reform.civil.model.sendandreply.SendMessageMetadata;
+import uk.gov.hmcts.reform.civil.model.wa.CompleteTaskRequest;
+import uk.gov.hmcts.reform.civil.model.wa.CompletionOptions;
 import uk.gov.hmcts.reform.civil.model.wa.GetTasksResponse;
 import uk.gov.hmcts.reform.civil.model.wa.RequestContext;
 import uk.gov.hmcts.reform.civil.model.wa.SearchOperator;
@@ -187,6 +189,16 @@ public class SendAndReplyMessageService {
         }
 
         return null;
+    }
+
+    public void completeJudicialTask(String userAuth, CaseData caseData) {
+        log.info("trying to complete task 0bcf956b-4527-11f0-b4be-4edf1b6429b1");
+        waTaskManagementApiClient.completeTask(userAuth,
+                                               authTokenGenerator.generate(),
+                                               "0bcf956b-4527-11f0-b4be-4edf1b6429b1",
+                                               new CompleteTaskRequest(new CompletionOptions(true))
+        );
+        log.info("task 0bcf956b-4527-11f0-b4be-4edf1b6429b1 completd");
     }
 
     public Element<Message> getMessageById(List<Element<Message>> messages, String code) {
