@@ -285,4 +285,22 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
         return caseData.isRespondentResponseFullDefence() && caseData.getApplicant1ResponseDate() != null
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION && caseData.isClaimantBilingual();
     }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslation() {
+        return caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().anyMatch(
+                element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
+        ) && !generalOrderRaised() && !isSettled();
+    }
+
+    private boolean generalOrderRaised() {
+        return (caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().anyMatch(
+            element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
+        )) || (caseData.getFinalOrderDocumentCollection() != null
+            && caseData.getFinalOrderDocumentCollection().stream().anyMatch(
+            element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
+        ));
+    }
 }

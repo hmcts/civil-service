@@ -632,4 +632,9 @@ public class CmcClaim implements Claim {
     public boolean isBundleCreatedStatusActive() {
         return false;
     }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslation() {
+        return false;
+    }
 }

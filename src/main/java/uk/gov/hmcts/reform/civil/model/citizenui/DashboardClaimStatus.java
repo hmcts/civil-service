@@ -25,6 +25,9 @@ public enum DashboardClaimStatus {
     MEDIATION_SUCCESSFUL(
         Claim::isMediationSuccessful
     ),
+    AWAITING_HEARING_NOTICE_TRANSLATION(
+        Claim::awaitingHearingNoticeTranslation
+    ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
     ),

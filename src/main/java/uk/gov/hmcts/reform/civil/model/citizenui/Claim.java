@@ -72,6 +72,8 @@ public interface Claim {
 
     boolean isMediationPending();
 
+    boolean awaitingHearingNoticeTranslation();
+
     boolean isCourtReviewing();
 
     boolean hasClaimEnded();
