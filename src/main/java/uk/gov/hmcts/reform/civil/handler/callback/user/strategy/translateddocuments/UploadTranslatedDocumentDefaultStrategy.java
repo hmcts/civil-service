@@ -29,16 +29,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DQ_DEF1;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.INTERLOCUTORY_JUDGMENT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.MANUAL_DETERMINATION;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.ORDER_NOTICE;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.STANDARD_DIRECTION_ORDER;
+import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.HEARING_NOTICE;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -51,6 +52,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private final ObjectMapper objectMapper;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
+
+    private static final String CATEGORY_ID = "caseManagementOrders";
 
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
@@ -75,6 +78,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
         if (Objects.nonNull(caseDataLip)) {
             caseDataLip.setTranslatedDocuments(null);
+        }
+
+        if (Objects.nonNull(caseData.getPreTranslationDocumentType())) {
+            caseDataBuilder = caseDataBuilder.preTranslationDocumentType(null);
         }
 
         caseDataBuilder.caseDataLiP(caseDataLip);
@@ -165,6 +172,16 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                         preTranslationCourtOfficerOrder.ifPresent(preTranslationDocuments::remove);
                         preTranslationCourtOfficerOrder.ifPresent(courtOfficerOrderDocuments::add);
                     }
+                } else if (document.getValue().getDocumentType().equals(DECISION_MADE_ON_APPLICATIONS)) {
+                    if (Objects.nonNull(preTranslationDocuments)) {
+                        Optional<Element<CaseDocument>> preTranslationDecisionReconsideration =
+                            preTranslationDocuments.stream()
+                                .filter(item -> item.getValue().getDocumentType() ==
+                                    DocumentType.DECISION_MADE_ON_APPLICATIONS)
+                                .findFirst();
+                        preTranslationDecisionReconsideration.ifPresent(preTranslationDocuments::remove);
+                        preTranslationDecisionReconsideration.ifPresent(systemGeneratedDocuments::add);
+                    }
                 } else if (document.getValue().getDocumentType().equals(HEARING_NOTICE)) {
                     if (Objects.nonNull(preTranslationDocuments)) {
                         Optional<Element<CaseDocument>> preTranslationHearingForm = preTranslationDocuments.stream()
@@ -185,7 +202,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                                 systemGeneratedDocuments.add(element);
                                 caseDataBuilder.respondent1OriginalDqDoc(null);
                             });
-                        caseDataBuilder.preTranslationDocumentType(null);
                         aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.toString());
                     });
                 } else if ((Objects.nonNull(preTranslationDocuments) && !preTranslationDocuments.isEmpty())) {
@@ -245,16 +261,16 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     document.getValue().getFile().setCategoryID("orders");
                     addToSystemGenerated.add(document);
                 } else if (document.getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
-                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    document.getValue().getFile().setCategoryID(CATEGORY_ID);
                     addToSystemGenerated.add(document);
                 } else if (document.getValue().getDocumentType().equals(HEARING_NOTICE)) {
                     document.getValue().getFile().setCategoryID("hearingNotices");
                     addToHearingDocuments.add(document);
                 } else if (document.getValue().getDocumentType().equals(FINAL_ORDER)) {
-                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    document.getValue().getFile().setCategoryID(CATEGORY_ID);
                     addToFinalOrders.add(document);
                 } else if (document.getValue().getDocumentType().equals(COURT_OFFICER_ORDER)) {
-                    document.getValue().getFile().setCategoryID("caseManagementOrders");
+                    document.getValue().getFile().setCategoryID(CATEGORY_ID);
                     addToCourtOfficerOrders.add(document);
                 } else if (isTranslationForLipVsLRDefendantSealedForm(document, caseData)) {
                     document.getValue().getFile().setCategoryID(DQ_DEF1.getValue());
@@ -302,7 +318,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(STANDARD_DIRECTION_ORDER)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_SDO;
             } else if (Objects.nonNull(translatedDocuments)
-                && (translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT)
+                && ((translatedDocuments.get(0).getValue().getDocumentType().equals(INTERLOCUTORY_JUDGMENT))
                 || (translatedDocuments.get(0).getValue().getDocumentType().equals(MANUAL_DETERMINATION)))) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
             } else if (Objects.nonNull(translatedDocuments)
@@ -318,6 +334,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(COURT_OFFICER_ORDER)) {
                 return CaseEvent.COURT_OFFICER_ORDER;
+            } else if (Objects.nonNull(translatedDocuments)
+                && translatedDocuments.get(0).getValue().getDocumentType().equals(DECISION_MADE_ON_APPLICATIONS)) {
+                return CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
             } else if (Objects.nonNull(translatedDocuments)
                 && translatedDocuments.get(0).getValue().getDocumentType().equals(HEARING_NOTICE)) {
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_HEARING_NOTICE;
