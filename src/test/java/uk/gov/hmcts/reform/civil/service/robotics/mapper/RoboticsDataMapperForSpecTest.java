@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -28,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForSpecTest {
@@ -227,6 +230,66 @@ class RoboticsDataMapperForSpecTest {
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertNull(roboticsCaseData.getNoticeOfChange());
+    }
+
+    @Test
+    void shouldBuildClaimDetailsWithoutInterestForPartAdmission() {
+        // Arrange
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                .type(Party.Type.COMPANY)
+                .companyName("company 1")
+                .build())
+            .respondent1(Party.builder()
+                .type(Party.Type.COMPANY)
+                .companyName("company 2")
+                .build())
+            .totalClaimAmount(BigDecimal.valueOf(15000))
+            .totalInterest(BigDecimal.valueOf(1000))
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .respondent1ClaimResponseTypeForSpec(uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION)
+            .submittedDate(LocalDateTime.now().minusDays(14))
+            .issueDate(LocalDate.now().minusDays(10))
+            .ccdState(CaseState.CASE_ISSUED)
+            .build();
+
+        // Act
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(15000), roboticsCaseData.getClaimDetails().getAmountClaimed());
+        assertEquals(caseData.getIssueDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseIssuedDate());
+        assertEquals(caseData.getSubmittedDate().toLocalDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseRequestReceivedDate());
+    }
+
+    @Test
+    void shouldBuildClaimDetailsWithInterestForNonPartAdmission() {
+        // Arrange
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                .type(Party.Type.COMPANY)
+                .companyName("company 1")
+                .build())
+            .respondent1(Party.builder()
+                .type(Party.Type.COMPANY)
+                .companyName("company 2")
+                .build())
+            .totalClaimAmount(BigDecimal.valueOf(15000))
+            .totalInterest(BigDecimal.valueOf(1000))
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .submittedDate(LocalDateTime.now().minusDays(14))
+            .issueDate(LocalDate.now().minusDays(10))
+            .ccdState(CaseState.CASE_ISSUED)
+            .build();
+
+        // Act
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(16000), roboticsCaseData.getClaimDetails().getAmountClaimed());
+        assertEquals(caseData.getIssueDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseIssuedDate());
+        assertEquals(caseData.getSubmittedDate().toLocalDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseRequestReceivedDate());
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime fromDate) {

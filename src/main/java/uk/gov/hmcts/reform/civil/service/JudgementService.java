@@ -78,9 +78,7 @@ public class JudgementService {
         if (caseData.getOutstandingFeeInPounds() != null) {
             return caseData.getOutstandingFeeInPounds();
         }
-        return caseData.isLipvLipOneVOne()
-            ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
-            : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        return MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
     public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
