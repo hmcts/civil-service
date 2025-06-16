@@ -162,10 +162,16 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("query-management");
     }
 
-    public boolean isPublicQueryManagementLRsEnabled(CaseData caseData) {
+    // if deleting this, also handle isQMPdfGeneratorEnabled() below
+    public boolean isPublicQueryManagementEnabled(CaseData caseData) {
         if (caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
         }
+        return featureToggleApi.isFeatureEnabled("public-query-management");
+    }
+
+    public boolean isQMPdfGeneratorDisabled() {
+        // only generate pdf if flag is off
         return featureToggleApi.isFeatureEnabled("public-query-management");
     }
 
