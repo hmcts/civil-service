@@ -975,7 +975,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             userId = UUID.randomUUID().toString();
 
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         }
 
         @Test

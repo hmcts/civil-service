@@ -133,11 +133,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         if (initiateGeneralApplicationService.caseContainsLiP(caseData)) {
             if (!featureToggleService.isGaForLipsEnabled()
-                || (caseData.isRespondentResponseBilingual() && !featureToggleService.isGaForWelshEnabled() && !caseData.isLipvLROneVOne()
+                || (caseData.isRespondentResponseBilingual() && !featureToggleService.isWelshEnabledForMainCase() && !caseData.isLipvLROneVOne()
                 && !(caseEvent == INITIATE_GENERAL_APPLICATION_COSC))) {
                 errors.add(LR_VS_LIP);
             } else if (featureToggleService.isDefendantNoCOnlineForCase(caseData) && caseData.isLipvLROneVOne()
-                && caseData.isClaimantBilingual() && !featureToggleService.isGaForWelshEnabled()) {
+                && caseData.isClaimantBilingual() && !featureToggleService.isWelshEnabledForMainCase()) {
                 errors.add(LR_VS_LIP);
             } else if (!(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(caseData
                                                               .getCaseManagementLocation().getBaseLocation()))) {

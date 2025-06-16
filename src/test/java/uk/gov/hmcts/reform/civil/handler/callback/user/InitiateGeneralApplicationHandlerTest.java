@@ -341,7 +341,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isWelshEnabledForMainCase()).willReturn(true);
         given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
         given(featureToggleService.isDefendantNoCOnlineForCase(any())).willReturn(true);
@@ -431,7 +431,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         params.getRequest().setEventId(INITIATE_GENERAL_APPLICATION.name());
         given(initiateGeneralAppService.caseContainsLiP(any())).willReturn(true);
         given(featureToggleService.isGaForLipsEnabled()).willReturn(true);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isWelshEnabledForMainCase()).willReturn(true);
         given(featureToggleService.isGaForLipsEnabledAndLocationWhiteListed(any())).willReturn(true);
         given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
 

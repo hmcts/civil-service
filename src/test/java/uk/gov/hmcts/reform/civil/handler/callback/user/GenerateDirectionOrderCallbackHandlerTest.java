@@ -1673,7 +1673,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                             .forename("Judge")
                                                                             .surname("Judy")
@@ -1704,7 +1704,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                             .forename("Judge")
                                                                             .surname("Judy")
@@ -1734,7 +1734,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                             .forename("Judge")
                                                                             .surname("Judy")

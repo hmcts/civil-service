@@ -24,7 +24,7 @@ class DefendantResponseDeadlineCheckSearchServiceTest extends ElasticSearchServi
     @BeforeEach
     void setup() {
         searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService, featureToggleService);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
     }
 
     @Override

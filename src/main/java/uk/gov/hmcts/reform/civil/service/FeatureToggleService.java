@@ -161,8 +161,8 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("query-management");
     }
 
-    public boolean isGaForWelshEnabled() {
-        return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
+    public boolean isWelshEnabledForMainCase() {
+        return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
     }
 
     public boolean isLipQueryManagementEnabled(CaseData caseData) {
