@@ -178,6 +178,31 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldExtendDeadline() {
+            when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
+            when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
+                .thenReturn(LocalDateTime.now().plusMonths(24));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .totalClaimAmount(BigDecimal.valueOf(150000))
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
+                    "ENGLISH").build()).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Object deadlineValue = response.getData().get("claimDismissedDeadline");
+            assertThat(deadlineValue).isNotNull();
+
+            LocalDate expectedDate = LocalDate.now().plusMonths(24);
+            LocalDate actualDate = LocalDateTime.parse(deadlineValue.toString()).toLocalDate();
+
+            assertThat(actualDate).isEqualTo(expectedDate);
+        }
+
+        @Test
         void shouldPopulateRespondentWithUnavailabilityDates() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
@@ -418,6 +443,23 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
 
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
+        }
+
+        @Test
+        void shouldUpdateLanguagePreferenceIfWelshDocsSpecified() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(Language.WELSH).build()).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("WELSH");
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
         }
     }
