@@ -2212,7 +2212,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @BeforeEach
             void setUp() {
-                PayImmediatelyConfText textGen = new PayImmediatelyConfText(paymentDateService, claimUrlsConfiguration, featureToggleService);
+                PayImmediatelyConfText textGen = new PayImmediatelyConfText(paymentDateService, claimUrlsConfiguration);
 
                 buildConfirmationTask = new BuildConfirmationTask(
                     List.of(),

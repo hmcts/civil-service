@@ -25,7 +25,6 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
 
     private final PaymentDateService paymentDateService;
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
@@ -46,7 +45,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
             + "<p><h3>If you haven’t been paid.</h3></p>"
             + "<p>If the defendant has not paid you, you can request a County Court Judgment ";
 
-        if (isLrPayImmediatelyPlan(caseData)) {
+        if (isLrPayImmediatelyPlan(caseData, featureToggleService)) {
             return Optional.of(
                 String.format(genericText
                                   + "by selecting 'Request Judgment by Admission' from the 'Next Step' drop down list.</p>",
@@ -75,7 +74,7 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
             && YES == caseData.getRespondForImmediateOption()));
     }
 
-    public boolean isLrPayImmediatelyPlan(CaseData caseData) {
+    public boolean isLrPayImmediatelyPlan(CaseData caseData, FeatureToggleService featureToggleService) {
         return caseData.isPayImmediately()
             && isOneVOne(caseData)
             && featureToggleService.isLrAdmissionBulkEnabled();
