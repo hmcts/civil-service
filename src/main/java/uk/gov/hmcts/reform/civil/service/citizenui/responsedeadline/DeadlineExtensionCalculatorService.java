@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 
