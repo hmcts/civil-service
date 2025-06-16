@@ -70,7 +70,7 @@ public class DefendantLipResponseRespondentNotificationHandler extends CallbackH
         CaseData caseData = callbackParams.getCaseData();
         if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
-                "civilmoneyclaimsdemo@gmail.com",
+                caseData.getRespondent1().getPartyEmail(),
                 addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
