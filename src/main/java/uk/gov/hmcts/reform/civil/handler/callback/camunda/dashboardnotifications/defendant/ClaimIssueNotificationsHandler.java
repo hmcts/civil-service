@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1;
@@ -58,19 +60,33 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
+        List<ScenarioCondition> scenarioConditions = getScenarioConditions(caseData, allocatedTrack);
+
+        scenarioConditions.forEach(condition -> {
+            if (condition.condition.get()) {
+                recordScenario(authToken, condition.scenario, caseData);
+            }
+        });
+
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    @NotNull
+    private List<ScenarioCondition> getScenarioConditions(CaseData caseData, AllocatedTrack allocatedTrack) {
         boolean isUnrepresented = caseData.isRespondent1NotRepresented();
 
-        if (isUnrepresented) {
-            recordScenario(authToken, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED, caseData);
-            if (FAST_CLAIM.equals(allocatedTrack)) {
-                recordScenario(authToken, SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT, caseData);
-            }
-        }
-
-        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
-            recordScenario(authToken, SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT, caseData);
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+        List<ScenarioCondition> scenarioConditions = List.of(
+            new ScenarioCondition(() -> isUnrepresented, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED),
+            new ScenarioCondition(
+                () -> isUnrepresented && FAST_CLAIM.equals(allocatedTrack),
+                SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT
+            ),
+            new ScenarioCondition(
+                () -> featureToggleService.isLipQueryManagementEnabled(caseData),
+                SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT
+            )
+        );
+        return scenarioConditions;
     }
 
     private void recordScenario(String authToken, DashboardScenarios dashboardScenarios, CaseData caseData) {
@@ -82,4 +98,15 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
                 .params(mapper.mapCaseDataToParams(caseData)).build()
         );
     }
+
+    private static class ScenarioCondition {
+        Supplier<Boolean> condition;
+        DashboardScenarios scenario;
+
+        ScenarioCondition(Supplier<Boolean> condition, DashboardScenarios scenario) {
+            this.condition = condition;
+            this.scenario = scenario;
+        }
+    }
+
 }
