@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -59,30 +60,24 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
         AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
 
         if (caseData.isRespondent1NotRepresented()) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-            );
+            recordScenario(authToken, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED, caseData);
         }
         if (FAST_CLAIM.equals(allocatedTrack) && caseData.isRespondent1NotRepresented()) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-            );
+            recordScenario(authToken, SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT, caseData);
         }
         if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
-            );
+            recordScenario(authToken, SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT, caseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private void recordScenario(String authToken, DashboardScenarios dashboardScenarios, CaseData caseData) {
+        dashboardScenariosService.recordScenarios(
+            authToken,
+            dashboardScenarios.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder()
+                .params(mapper.mapCaseDataToParams(caseData)).build()
+        );
     }
 }
