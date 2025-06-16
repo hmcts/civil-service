@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -23,7 +25,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT;
 
-public abstract class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
+@Service
+@Slf4j
+public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1);
     public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForDefendant1";
@@ -57,6 +61,11 @@ public abstract class ClaimIssueNotificationsHandler extends DashboardCallbackHa
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
+    @Override
+    public String getScenario(CaseData caseData) {
+        return null;
+    }
+
     private List<DashboardScenarios> getScenarioConditions(CaseData caseData, AllocatedTrack allocatedTrack) {
         boolean isUnrepresented = caseData.isRespondent1NotRepresented();
         List<DashboardScenarios> scenarios = new ArrayList<>();
@@ -84,8 +93,5 @@ public abstract class ClaimIssueNotificationsHandler extends DashboardCallbackHa
                 .params(mapper.mapCaseDataToParams(caseData)).build()
         );
     }
-
-    @Override
-    protected abstract String getScenario(CaseData caseData);
 
 }
