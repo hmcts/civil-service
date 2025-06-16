@@ -58,6 +58,13 @@ public class CaseQueriesCollection {
     }
 
     @JsonIgnore
+    public boolean hasAQueryAwaitingResponse() {
+        return caseMessages.stream()
+            .filter(message -> nonNull(message.getValue()) && message.getValue().getParentId() == null)
+            .anyMatch(parentMessage -> messageThread(parentMessage.getValue().getId().toString()).size() % 2 != 0);
+    }
+
+    @JsonIgnore
     public boolean isSame(CaseQueriesCollection caseQueriesCollection) {
         // purposely not overriding equals to avoid unexpected behaviour
         return nonNull(caseQueriesCollection) && caseQueriesCollection.equals(this);
