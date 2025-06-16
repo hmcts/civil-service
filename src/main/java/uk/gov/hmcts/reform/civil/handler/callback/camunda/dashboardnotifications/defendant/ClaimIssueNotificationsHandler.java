@@ -62,17 +62,14 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
         AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
         List<DashboardScenarios> scenarioConditions = getScenarioConditions(caseData, allocatedTrack);
 
-        scenarioConditions.forEach(scenario -> {
-            recordScenario(authToken, scenario, caseData);
-        });
+        scenarioConditions.forEach(scenario -> recordScenario(authToken, scenario, caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    @NotNull
     private List<DashboardScenarios> getScenarioConditions(CaseData caseData, AllocatedTrack allocatedTrack) {
         boolean isUnrepresented = caseData.isRespondent1NotRepresented();
-        List<DashboardScenarios> scenarios = new ArrayList<DashboardScenarios>();
+        List<DashboardScenarios> scenarios = new ArrayList<>();
         if (isUnrepresented) {
             scenarios.add(SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED);
 
