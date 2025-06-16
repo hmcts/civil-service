@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @Service
 @Slf4j
-public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
+public abstract class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1);
     public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForDefendant1";
@@ -46,11 +46,6 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    @Override
-    protected String getScenario(CaseData caseData) {
-        return null;
     }
 
     @Override
@@ -93,5 +88,8 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
                 .params(mapper.mapCaseDataToParams(caseData)).build()
         );
     }
+
+    @Override
+    protected abstract String getScenario(CaseData caseData);
 
 }
