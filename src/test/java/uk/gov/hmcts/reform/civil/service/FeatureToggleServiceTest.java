@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -332,5 +333,29 @@ class FeatureToggleServiceTest {
         givenToggle(lrAdmission, toggleStat);
 
         assertThat(featureToggleService.isLrAdmissionBulkEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenPublicQueryEnabledLr(Boolean toggleStat) {
+        var lrPublicQuery = "public-query-management";
+        givenToggle(lrPublicQuery, toggleStat);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .build();
+
+        assertThat(featureToggleService.isPublicQueryManagementLRsEnabled(caseData)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenPublicQueryEnabledLip(Boolean toggleStat) {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .applicant1Represented(YesOrNo.NO)
+            .build();
+
+        when(featureToggleService.isLipQueryManagementEnabled(caseData)).thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isPublicQueryManagementLRsEnabled(caseData)).isEqualTo(toggleStat);
     }
 }
