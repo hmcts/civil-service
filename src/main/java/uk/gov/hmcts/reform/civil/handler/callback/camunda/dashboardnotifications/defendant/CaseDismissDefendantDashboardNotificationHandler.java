@@ -13,6 +13,9 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.nonNull;
 
 @Service
 public class CaseDismissDefendantDashboardNotificationHandler extends DashboardCallbackHandler {
@@ -43,6 +46,12 @@ public class CaseDismissDefendantDashboardNotificationHandler extends DashboardC
     }
 
     @Override
+    public Map<String, Boolean> getScenarios(CaseData caseData) {
+        return Map.of(DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(),
+                      defendantQueryAwaitingAResponse(caseData));
+    }
+
+    @Override
     public boolean shouldRecordScenario(CaseData caseData) {
         return YesOrNo.NO.equals(caseData.getRespondent1Represented());
     }
@@ -60,5 +69,11 @@ public class CaseDismissDefendantDashboardNotificationHandler extends DashboardC
             caseId,
             role
         );
+    }
+
+    private boolean defendantQueryAwaitingAResponse(CaseData caseData) {
+        return featureToggleService.isLipQueryManagementEnabled(caseData)
+            && nonNull(caseData.getQmRespondentCitizenQueries())
+            ? caseData.getQmRespondentCitizenQueries().hasAQueryAwaitingResponse() : false;
     }
 }
