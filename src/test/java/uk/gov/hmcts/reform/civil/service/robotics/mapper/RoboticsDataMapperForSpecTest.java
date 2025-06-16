@@ -11,8 +11,6 @@ import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -22,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.math.BigDecimal;
@@ -56,31 +55,31 @@ class RoboticsDataMapperForSpecTest {
             .totalInterest(BigDecimal.ZERO)
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(Party.builder()
-                            .type(Party.Type.COMPANY)
-                            .companyName("company 1")
-                            .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 1")
+                .build())
             .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company 2")
-                             .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 2")
+                .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .type(BreathingSpaceType.STANDARD)
-                                      .build())
-                           .lift(BreathingSpaceLiftInfo.builder()
-                                     .expectedEnd(LocalDate.now())
-                                     .build())
-                           .build())
+                .enter(BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .build())
+                .lift(BreathingSpaceLiftInfo.builder()
+                    .expectedEnd(LocalDate.now())
+                    .build())
+                .build())
             .build();
 
         RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(mapped.getHeader().getCaseNumber(), caseData.getLegacyCaseReference());
         Assertions.assertTrue(mapped.getLitigiousParties().stream()
-                              .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
+            .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
         Assertions.assertTrue(mapped.getLitigiousParties().stream()
-                              .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
+            .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
     }
 
     @Test
@@ -96,22 +95,22 @@ class RoboticsDataMapperForSpecTest {
             .totalInterest(BigDecimal.ZERO)
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(Party.builder()
-                            .type(Party.Type.COMPANY)
-                            .companyName("company 1")
-                            .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 1")
+                .build())
             .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company 2")
-                             .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 2")
+                .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .type(BreathingSpaceType.STANDARD)
-                                      .build())
-                           .lift(BreathingSpaceLiftInfo.builder()
-                                     .expectedEnd(LocalDate.now())
-                                     .build())
-                           .build())
+                .enter(BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .build())
+                .lift(BreathingSpaceLiftInfo.builder()
+                    .expectedEnd(LocalDate.now())
+                    .build())
+                .build())
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
 
@@ -154,22 +153,22 @@ class RoboticsDataMapperForSpecTest {
             .totalInterest(BigDecimal.ZERO)
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(Party.builder()
-                            .type(Party.Type.COMPANY)
-                            .companyName("company 1")
-                            .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 1")
+                .build())
             .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company 2")
-                             .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 2")
+                .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .type(BreathingSpaceType.STANDARD)
-                                      .build())
-                           .lift(BreathingSpaceLiftInfo.builder()
-                                     .expectedEnd(LocalDate.now())
-                                     .build())
-                           .build())
+                .enter(BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .build())
+                .lift(BreathingSpaceLiftInfo.builder()
+                    .expectedEnd(LocalDate.now())
+                    .build())
+                .build())
             .ccdState(CaseState.CASE_DISMISSED)
             .build();
 
@@ -208,22 +207,22 @@ class RoboticsDataMapperForSpecTest {
             .totalInterest(BigDecimal.ZERO)
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(Party.builder()
-                            .type(Party.Type.COMPANY)
-                            .companyName("company 1")
-                            .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 1")
+                .build())
             .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company 2")
-                             .build())
+                .type(Party.Type.COMPANY)
+                .companyName("company 2")
+                .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
-                           .enter(BreathingSpaceEnterInfo.builder()
-                                      .type(BreathingSpaceType.STANDARD)
-                                      .build())
-                           .lift(BreathingSpaceLiftInfo.builder()
-                                     .expectedEnd(LocalDate.now())
-                                     .build())
-                           .build())
+                .enter(BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .build())
+                .lift(BreathingSpaceLiftInfo.builder()
+                    .expectedEnd(LocalDate.now())
+                    .build())
+                .build())
             .ccdState(CaseState.CASE_ISSUED)
             .build();
 
@@ -258,8 +257,10 @@ class RoboticsDataMapperForSpecTest {
 
         // Assert
         assertEquals(BigDecimal.valueOf(15000), roboticsCaseData.getClaimDetails().getAmountClaimed());
-        assertEquals(caseData.getIssueDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseIssuedDate());
-        assertEquals(caseData.getSubmittedDate().toLocalDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseRequestReceivedDate());
+        assertEquals(caseData.getIssueDate().format(java.time.format.DateTimeFormatter.ISO_DATE),
+            roboticsCaseData.getClaimDetails().getCaseIssuedDate());
+        assertEquals(caseData.getSubmittedDate().toLocalDate().format(java.time.format.DateTimeFormatter.ISO_DATE),
+            roboticsCaseData.getClaimDetails().getCaseRequestReceivedDate());
     }
 
     @Test
@@ -288,8 +289,10 @@ class RoboticsDataMapperForSpecTest {
 
         // Assert
         assertEquals(BigDecimal.valueOf(16000), roboticsCaseData.getClaimDetails().getAmountClaimed());
-        assertEquals(caseData.getIssueDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseIssuedDate());
-        assertEquals(caseData.getSubmittedDate().toLocalDate().format(java.time.format.DateTimeFormatter.ISO_DATE), roboticsCaseData.getClaimDetails().getCaseRequestReceivedDate());
+        assertEquals(caseData.getIssueDate().format(java.time.format.DateTimeFormatter.ISO_DATE),
+            roboticsCaseData.getClaimDetails().getCaseIssuedDate());
+        assertEquals(caseData.getSubmittedDate().toLocalDate().format(java.time.format.DateTimeFormatter.ISO_DATE),
+            roboticsCaseData.getClaimDetails().getCaseRequestReceivedDate());
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime fromDate) {
