@@ -254,12 +254,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
     @Autowired
     private InterestCalculator interestCalculator;
-    @MockBean
-    private ClaimUrlsConfiguration claimUrlsConfiguration;
-    @MockBean
-    private AboutToSubmitRespondToDefenceTask aboutToSubmitRespondToDefenceTask;
-    @MockBean
-    private PopulateCaseDataTask populateCaseDataTask;
 
     @Nested
     class AboutToStart {
@@ -2206,6 +2200,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class ConfTextLRBulkAdmission {
+
+            @MockBean
+            private ClaimUrlsConfiguration claimUrlsConfiguration;
+            @MockBean
+            private AboutToSubmitRespondToDefenceTask aboutToSubmitRespondToDefenceTask;
+            @MockBean
+            private PopulateCaseDataTask populateCaseDataTask;
 
             private BuildConfirmationTask buildConfirmationTask;
             private RespondToDefenceSpecCallbackHandler respondToDefenceSpecCallbackHandler;
