@@ -1,7 +1,7 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
-  devcpuRequests: 1000m
+  devcpuRequests: 750m
   devmemoryRequests: 2048Mi
   devmemoryLimits: 4096Mi
   environment:
@@ -254,7 +254,7 @@ ccd:
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 1000m
+      devcpuRequests: 750m
       devmemoryRequests: 4096Mi
       devmemoryLimits: 8192Mi
       autoscaling:
