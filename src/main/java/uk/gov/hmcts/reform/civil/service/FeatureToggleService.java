@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
 import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
@@ -159,6 +160,13 @@ public class FeatureToggleService {
 
     public boolean isQueryManagementLRsEnabled() {
         return featureToggleApi.isFeatureEnabled("query-management");
+    }
+
+    public boolean isPublicQueryManagementLRsEnabled(CaseData caseData) {
+        if (caseContainsLiP.test(caseData)) {
+            return isLipQueryManagementEnabled(caseData);
+        }
+        return featureToggleApi.isFeatureEnabled("public-query-management");
     }
 
     public boolean isGaForWelshEnabled() {
