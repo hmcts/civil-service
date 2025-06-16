@@ -634,7 +634,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean awaitingHearingNoticeTranslation() {
+    public boolean awaitingHearingNoticeTranslationNotGeneralOrderRaisedNotSettled() {
         return false;
     }
 }

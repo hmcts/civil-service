@@ -287,11 +287,15 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean awaitingHearingNoticeTranslation() {
+    public boolean awaitingHearingNoticeTranslationNotGeneralOrderRaisedNotSettled() {
+        return awaitingHearingNoticeTranslation() && !generalOrderRaised() && !isSettled();
+    }
+
+    private boolean awaitingHearingNoticeTranslation() {
         return caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().anyMatch(
-                element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
-        ) && !generalOrderRaised() && !isSettled();
+            element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
+        );
     }
 
     private boolean generalOrderRaised() {

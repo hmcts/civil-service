@@ -72,7 +72,7 @@ public interface Claim {
 
     boolean isMediationPending();
 
-    boolean awaitingHearingNoticeTranslation();
+    boolean awaitingHearingNoticeTranslationNotGeneralOrderRaisedNotSettled();
 
     boolean isCourtReviewing();
 
