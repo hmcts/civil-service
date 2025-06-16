@@ -66,7 +66,7 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
         }
-        if (FAST_CLAIM.equals(allocatedTrack) && caseData.isRespondent1NotRepresented()){
+        if (FAST_CLAIM.equals(allocatedTrack) && caseData.isRespondent1NotRepresented()) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT.getScenario(),
