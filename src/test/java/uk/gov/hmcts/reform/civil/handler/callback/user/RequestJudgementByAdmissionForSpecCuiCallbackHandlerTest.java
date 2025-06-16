@@ -757,7 +757,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldSetUpBusinessProcessAndCaseStateForLip() {
-            BigDecimal subToatal = BigDecimal.valueOf(1300);
+            BigDecimal subToatal = new BigDecimal("1300.00");
             BigDecimal stillOwed = new BigDecimal("1295.00");
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
@@ -772,7 +772,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .claimFee(Fee.builder()
-                    .calculatedAmountInPence(BigDecimal.valueOf(10000))
+                    .calculatedAmountInPence(BigDecimal.valueOf(0))
                     .build())
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
