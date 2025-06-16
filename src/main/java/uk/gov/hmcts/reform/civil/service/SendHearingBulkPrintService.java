@@ -113,42 +113,14 @@ public class SendHearingBulkPrintService {
             return BOTH;
         }
 
-        if (TASK_ID_CLAIMANT.equals(taskId)
-            || TASK_ID_CLAIMANT_HMC.equals(taskId)
-            || TASK_ID_CLAIMANT_DRO.equals(taskId)) {
-            return getClaimantLanguagePreference(caseData);
-        } else {
-            return getDefendantLanguagePreference(caseData);
-        }
-    }
-
-    public Language getClaimantLanguagePreference(CaseData caseData) {
-
-        if (caseData.getApplicant1DQ() != null
-            && caseData.getApplicant1DQ().getApplicant1DQLanguage() != null
-            && (caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments() != null)) {
-            return caseData.getApplicant1DQ().getApplicant1DQLanguage().getDocuments();
-        } else {
-            return switch (caseData.getClaimantBilingualLanguagePreference()) {
-                case "WELSH" -> WELSH;
-                case "BOTH" -> BOTH;
-                default -> ENGLISH;
-            };
-        }
-    }
-
-    public Language getDefendantLanguagePreference(CaseData caseData) {
-
-        if (caseData.getRespondent1DQ() != null
-            && caseData.getRespondent1DQ().getRespondent1DQLanguage() != null
-            && (caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments() != null)) {
-            return caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments();
-        } else {
-            return switch (caseData.getDefendantBilingualLanguagePreference()) {
-                case "WELSH" -> WELSH;
-                case "BOTH" -> BOTH;
-                default -> ENGLISH;
-            };
-        }
+        String languagePreference = (TASK_ID_CLAIMANT.equals(taskId) || TASK_ID_CLAIMANT_HMC.equals(taskId)
+                                    || TASK_ID_CLAIMANT_DRO.equals(taskId))
+            ? caseData.getClaimantBilingualLanguagePreference()
+            : caseData.getDefendantBilingualLanguagePreference();
+        return switch (languagePreference) {
+            case "WELSH" -> WELSH;
+            case "BOTH" -> BOTH;
+            default -> ENGLISH;
+        };
     }
 }
