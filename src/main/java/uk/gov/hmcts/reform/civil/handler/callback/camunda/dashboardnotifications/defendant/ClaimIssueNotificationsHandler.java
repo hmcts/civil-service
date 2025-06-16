@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1;
@@ -60,33 +60,32 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
-        List<ScenarioCondition> scenarioConditions = getScenarioConditions(caseData, allocatedTrack);
+        List<DashboardScenarios> scenarioConditions = getScenarioConditions(caseData, allocatedTrack);
 
-        scenarioConditions.forEach(condition -> {
-            if (condition.condition.get()) {
-                recordScenario(authToken, condition.scenario, caseData);
-            }
+        scenarioConditions.forEach(scenario -> {
+            recordScenario(authToken, scenario, caseData);
         });
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     @NotNull
-    private List<ScenarioCondition> getScenarioConditions(CaseData caseData, AllocatedTrack allocatedTrack) {
+    private List<DashboardScenarios> getScenarioConditions(CaseData caseData, AllocatedTrack allocatedTrack) {
         boolean isUnrepresented = caseData.isRespondent1NotRepresented();
+        List<DashboardScenarios> scenarios = new ArrayList<DashboardScenarios>();
+        if (isUnrepresented) {
+            scenarios.add(SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED);
 
-        List<ScenarioCondition> scenarioConditions = List.of(
-            new ScenarioCondition(() -> isUnrepresented, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED),
-            new ScenarioCondition(
-                () -> isUnrepresented && FAST_CLAIM.equals(allocatedTrack),
-                SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT
-            ),
-            new ScenarioCondition(
-                () -> featureToggleService.isLipQueryManagementEnabled(caseData),
-                SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT
-            )
-        );
-        return scenarioConditions;
+            if (FAST_CLAIM.equals(allocatedTrack)) {
+                scenarios.add(SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT);
+            }
+        }
+
+        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
+            scenarios.add(SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT);
+        }
+
+        return scenarios;
     }
 
     private void recordScenario(String authToken, DashboardScenarios dashboardScenarios, CaseData caseData) {
@@ -97,16 +96,6 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
             ScenarioRequestParams.builder()
                 .params(mapper.mapCaseDataToParams(caseData)).build()
         );
-    }
-
-    private static class ScenarioCondition {
-        Supplier<Boolean> condition;
-        DashboardScenarios scenario;
-
-        ScenarioCondition(Supplier<Boolean> condition, DashboardScenarios scenario) {
-            this.condition = condition;
-            this.scenario = scenario;
-        }
     }
 
 }
