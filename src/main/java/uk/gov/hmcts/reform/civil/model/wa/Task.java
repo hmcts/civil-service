@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.wa;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.model.wa.SystemDateProvider.DATE_TIME_FO
 @SuppressWarnings({"PMD.LawOfDemeter", "PMD.TooManyFields",
     "PMD.ExcessiveParameterList", "PMD.ShortClassName", "PMD.LinguisticNaming"})
 @Schema(allowableValues = "Task")
-@RequiredArgsConstructor
 @AllArgsConstructor
 public class Task {
 
@@ -237,40 +238,42 @@ public class Task {
     @Schema(name = "termination_process", description = "Termination Process")
     private String terminationProcess;
 
-    public Task(String id,
-                String name,
-                String type,
-                String taskState,
-                String taskSystem,
-                String securityClassification,
-                String taskTitle,
-                ZonedDateTime createdDate,
-                ZonedDateTime dueDate,
-                String assignee,
-                boolean autoAssigned,
-                String executionType,
-                String jurisdiction,
-                String region,
-                String location,
-                String locationName,
-                String caseTypeId,
-                String caseId,
-                String caseCategory,
-                String caseName,
-                Boolean warnings,
-                WarningValues warningList,
-                String caseManagementCategory,
-                String workTypeId,
-                String workTypeLabel,
-                TaskPermissions taskPermissions,
-                String roleCategory,
-                String description,
-                Map<String, String> additionalProperties,
-                String nextHearingId,
-                ZonedDateTime nextHearingDate,
-                Integer minorPriority,
-                Integer majorPriority,
-                ZonedDateTime priorityDate) {
+    @JsonCreator
+    public Task(
+        @JsonProperty("id") String id,
+        @JsonProperty("name") String name,
+        @JsonProperty("assignee") String assignee,
+        @JsonProperty("type") String type,
+        @JsonProperty("task_state") String taskState,
+        @JsonProperty("task_system") String taskSystem,
+        @JsonProperty("security_classification") String securityClassification,
+        @JsonProperty("task_title") String taskTitle,
+        @JsonProperty("created_date") ZonedDateTime createdDate,
+        @JsonProperty("due_date") ZonedDateTime dueDate,
+        @JsonProperty("location_name") String locationName,
+        @JsonProperty("location") String location,
+        @JsonProperty("execution_type") String executionType,
+        @JsonProperty("jurisdiction") String jurisdiction,
+        @JsonProperty("region") String region,
+        @JsonProperty("case_type_id") String caseTypeId,
+        @JsonProperty("case_id") String caseId,
+        @JsonProperty("case_category") String caseCategory,
+        @JsonProperty("case_name") String caseName,
+        @JsonProperty("auto_assigned") boolean autoAssigned,
+        @JsonProperty("warnings") Boolean warnings,
+        @JsonProperty("warning_list") WarningValues warningList,
+        @JsonProperty("case_management_category") String caseManagementCategory,
+        @JsonProperty("work_type_id") String workTypeId,
+        @JsonProperty("work_type_label") String workTypeLabel,
+        @JsonProperty("permissions") TaskPermissions taskPermissions,
+        @JsonProperty("role_category") String roleCategory,
+        @JsonProperty("description") String description,
+        @JsonProperty("additional_properties") Map<String, String> additionalProperties,
+        @JsonProperty("next_hearing_id") String nextHearingId,
+        @JsonProperty("next_hearing_date") ZonedDateTime nextHearingDate,
+        @JsonProperty("minor_priority") Integer minorPriority,
+        @JsonProperty("major_priority") Integer majorPriority,
+        @JsonProperty("priority_date") ZonedDateTime priorityDate) {
         Objects.requireNonNull(id, "taskId cannot be null");
         Objects.requireNonNull(name, "name cannot be null");
         this.id = id;
@@ -307,81 +310,6 @@ public class Task {
         this.minorPriority = minorPriority;
         this.majorPriority = majorPriority;
         this.priorityDate = priorityDate;
-    }
-
-    public Task(String id,
-                String name,
-                String type,
-                String taskState,
-                String taskSystem,
-                String securityClassification,
-                String taskTitle,
-                ZonedDateTime createdDate,
-                ZonedDateTime dueDate,
-                String assignee,
-                boolean autoAssigned,
-                String executionType,
-                String jurisdiction,
-                String region,
-                String location,
-                String locationName,
-                String caseTypeId,
-                String caseId,
-                String caseCategory,
-                String caseName,
-                Boolean warnings,
-                WarningValues warningList,
-                String caseManagementCategory,
-                String workTypeId,
-                String workTypeLabel,
-                TaskPermissions taskPermissions,
-                String roleCategory,
-                String description,
-                Map<String, String> additionalProperties,
-                String nextHearingId,
-                ZonedDateTime nextHearingDate,
-                Integer minorPriority,
-                Integer majorPriority,
-                ZonedDateTime priorityDate,
-                ZonedDateTime reconfigureRequestTime,
-                ZonedDateTime lastReconfigurationTime) {
-        this(id,
-             name,
-             type,
-             taskState,
-             taskSystem,
-             securityClassification,
-             taskTitle,
-             createdDate,
-             dueDate,
-             assignee,
-             autoAssigned,
-             executionType,
-             jurisdiction,
-             region,
-             location,
-             locationName,
-             caseTypeId,
-             caseId,
-             caseCategory,
-             caseName,
-             warnings,
-             warningList,
-             caseManagementCategory,
-             workTypeId,
-             workTypeLabel,
-             taskPermissions,
-             roleCategory,
-             description,
-             additionalProperties,
-             nextHearingId,
-             nextHearingDate,
-             minorPriority,
-             majorPriority,
-             priorityDate
-        );
-        this.reconfigureRequestTime = reconfigureRequestTime;
-        this.lastReconfigurationTime = lastReconfigurationTime;
     }
 
     public String getId() {
