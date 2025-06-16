@@ -37,11 +37,10 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
         log.info("Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-        BigDecimal claimAmountPlusInterestToDate = interestCalculator.claimAmountPlusInterestToDate(caseData)
+        BigDecimal admittedAmount = interestCalculator.claimAmountPlusInterestToDate(caseData)
             .setScale(2, RoundingMode.UNNECESSARY);
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
-            SealedClaimLipResponseForm.toTemplate(caseData, claimAmountPlusInterestToDate).toBuilder();
-        responseFormBuilder.admittedAmount(claimAmountPlusInterestToDate);
+            SealedClaimLipResponseForm.toTemplate(caseData, admittedAmount).toBuilder();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             log.info("If Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
             responseFormBuilder.checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
