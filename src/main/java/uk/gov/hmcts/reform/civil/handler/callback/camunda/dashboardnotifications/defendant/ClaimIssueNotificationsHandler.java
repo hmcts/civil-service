@@ -58,13 +58,15 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
+        boolean isUnrepresented = caseData.isRespondent1NotRepresented();
 
-        if (caseData.isRespondent1NotRepresented()) {
+        if (isUnrepresented) {
             recordScenario(authToken, SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED, caseData);
+            if (FAST_CLAIM.equals(allocatedTrack)) {
+                recordScenario(authToken, SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT, caseData);
+            }
         }
-        if (FAST_CLAIM.equals(allocatedTrack) && caseData.isRespondent1NotRepresented()) {
-            recordScenario(authToken, SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT, caseData);
-        }
+
         if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
             recordScenario(authToken, SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT, caseData);
         }
