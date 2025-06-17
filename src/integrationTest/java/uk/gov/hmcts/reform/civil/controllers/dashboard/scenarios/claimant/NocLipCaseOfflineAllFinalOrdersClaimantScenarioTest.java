@@ -33,6 +33,11 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
     void should_create_noc_lip_offline_scenario() throws Exception {
 
         String caseId = "72014544355416";
+
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+
         JudgmentDetails activeJudgment = JudgmentDetails.builder().judgmentId(123).build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
@@ -44,9 +49,6 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
             .activeJudgment(activeJudgment)
             .build();
 
-        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
-        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
         handler.handle(callbackParamsTest(caseData));
 
         //Verify Notification is created
