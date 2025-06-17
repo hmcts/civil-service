@@ -37,3 +37,7 @@ set notifications_to_delete = '{"Notice.AAA6.ClaimIssue.Response.Await", "Notice
                                 "Notice.AAA6.CP.HearingFee.Required", "Notice.AAA6.CP.HearingFee.HWF.AppliedFor", "Notice.AAA6.CP.HearingFee.HWF.Rejected", "Notice.AAA6.CP.HearingFee.HWF.PartRemission",
                                 "Notice.AAA6.CP.HearingFee.HWF.FullRemission", "Notice.AAA6.CP.HearingFee.HWF.InfoRequired", "Notice.AAA6.CP.HearingFee.HWF.InvalidRef", "Notice.AAA6.CP.HearingFee.HWF.ReviewUpdate"}'
 where name = 'Scenario.AAA6.ClaimantIntent.ClaimSettledEvent.Claimant';
+
+update dbs.scenario
+set notifications_to_delete = '{"Notice.AAA6.ClaimantIntent.SettlementAgreement.DefendantAccepted.Defendant", "Notice.AAA6.DefResponse.FullOrPartAdmit.PayByInstallments.Defendant"}'
+where name = 'Scenario.AAA6.ClaimantIntent.RequestCCJ.ClaimantAcceptOrRejectPlan.SettlementRequested.DefPaymentMissed.Defendant';
