@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
 class DQGeneratorFormBuilderTest {
@@ -89,7 +91,24 @@ class DQGeneratorFormBuilderTest {
             dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
 
         assertNotNull(result);
+        assertThat(result.build().getStatementOfTruthText()).startsWith("The defendant believes");
+    }
 
+    @Test
+    void shouldGetDirectionsQuestionnaireFormBuilderForPartAdmit() {
+        when(state.getName()).thenReturn(PART_ADMISSION.fullName());
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateRespondentPartAdmissionSpec()
+            .respondent1DQ()
+            .build().toBuilder()
+            .build();
+
+        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder result =
+            dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(caseData, DEFENDANT);
+
+        assertNotNull(result);
+        assertThat(result.build().getStatementOfTruthText()).startsWith("The defendant believes");
     }
 
     @Test
