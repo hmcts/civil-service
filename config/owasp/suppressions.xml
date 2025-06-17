@@ -1,6 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <suppress until="2025-07-04">
+    <notes>
+      These CVEs are present in transitive Spring Framework dependencies (e.g., spring-web 5.3.31),
+      which are managed by Spring Boot 2.7.18.
+      They are fixed in Spring Framework 5.3.33+ (Spring Boot 2.7.23+) or Spring Boot 3.x.
+      We plan to upgrade beyond 2.7.18 in due course.
+    </notes>
     <cve>CVE-2024-38820</cve>
     <cve>CVE-2024-22259</cve>
   </suppress>
