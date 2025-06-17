@@ -28,6 +28,7 @@ public class DiscontinueClaimPartiesDefendantEmailDTOGenerator extends Defendant
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(RESPONDENT_NAME, caseData.getRespondent1().getPartyName());
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService));
         properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
