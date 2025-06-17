@@ -68,17 +68,14 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String queryId = processVariables.getQueryId();
-        if (queryId == null) {
-            queryId = caseData.getQmLatestQuery().getQueryId();
-        }
+
         CaseMessage responseQuery = getQueryById(caseData, queryId);
         String parentQueryId = responseQuery.getParentId();
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        if (isLIPClaimant(roles) && caseData.getQmApplicantCitizenQueries() != null
-            && caseData.getQmApplicantCitizenQueries().getCaseMessages().size() > 0) {
+        if (isLIPClaimant(roles) && caseData.getQueries() != null) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
@@ -92,8 +89,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
                 notificationParams
             );
         }
-        if (isLIPDefendant(roles) && caseData.getQmRespondentCitizenQueries() != null
-            && caseData.getQmRespondentCitizenQueries().getCaseMessages().size() > 0) {
+        if (isLIPDefendant(roles) && caseData.getQueries() != null) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),

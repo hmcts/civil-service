@@ -72,8 +72,7 @@ public class CaseDismissDefendantDashboardNotificationHandler extends DashboardC
     }
 
     private boolean defendantQueryAwaitingAResponse(CaseData caseData) {
-        return featureToggleService.isLipQueryManagementEnabled(caseData)
-            && nonNull(caseData.getQmRespondentCitizenQueries())
-            ? caseData.getQmRespondentCitizenQueries().hasAQueryAwaitingResponse() : false;
+        // todo CIV-17287
+        return featureToggleService.isLipQueryManagementEnabled(caseData);
     }
 }

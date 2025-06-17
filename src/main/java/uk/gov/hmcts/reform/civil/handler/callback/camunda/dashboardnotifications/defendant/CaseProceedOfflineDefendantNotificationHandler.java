@@ -97,9 +97,8 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
     }
 
     private boolean defendantQueryAwaitingResponse(CaseData caseData) {
-        return featureToggleService.isLipQueryManagementEnabled(caseData)
-            && nonNull(caseData.getQmRespondentCitizenQueries())
-            ? caseData.getQmRespondentCitizenQueries().hasAQueryAwaitingResponse() : false;
+        // todo CIV-17287
+        return featureToggleService.isLipQueryManagementEnabled(caseData);
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData, boolean isLipvLipOrLRvLip) {
