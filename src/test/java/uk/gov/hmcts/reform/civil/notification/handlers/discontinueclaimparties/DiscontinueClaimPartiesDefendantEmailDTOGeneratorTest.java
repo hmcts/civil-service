@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
@@ -73,7 +74,11 @@ class DiscontinueClaimPartiesDefendantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Map<String, String> properties = new HashMap<>();
+        Party respondent1 = mock(Party.class);
+        when(respondent1.getPartyName()).thenReturn("Respondent1 Name");
         CaseData caseData = mock(CaseData.class);
+
+        when(caseData.getRespondent1()).thenReturn(respondent1);
 
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService))
             .thenReturn(APPLICANT_LEGAL_ORG_NAME);
