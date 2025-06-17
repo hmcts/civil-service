@@ -146,7 +146,6 @@ public class DefendantResponseAdmitPayInstalmentCompanyDefendantScenarioTest ext
                 )
             );
 
-
         //Verify task Item is created
         doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "DEFENDANT")
             .andExpectAll(
