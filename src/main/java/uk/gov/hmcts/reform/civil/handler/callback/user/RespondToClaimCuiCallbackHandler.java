@@ -14,10 +14,13 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -107,8 +110,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
         boolean needsTranslating = featureToggleService.isGaForWelshEnabled()
-            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual()
-            || caseData.isLipDefendantSpecifiedBilingualDocuments())
+            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())
             : caseData.isRespondentResponseBilingual();
 
         if (!needsTranslating) {
@@ -158,10 +160,22 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .nextDeadline(applicantDeadline.toLocalDate());
 
         if (featureToggleService.isGaForWelshEnabled()) {
-            String respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
-                .map(CaseDataLiP::getRespondent1LiPResponse)
-                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-                .orElse(null);
+            Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
+                .map(Respondent1DQ::getRespondent1DQLanguage).map(WelshLanguageRequirements::getDocuments);
+            String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
+            optionalLanguage.ifPresent(docLanguage -> {
+                CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+                builder.caseDataLiP(caseDataLiP.toBuilder()
+                                        .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
+                                                                    .respondent1ResponseLanguage(docLanguage.name()).build())
+                                        .build());
+            });
+            if (respondentLanguageString == null) {
+                respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
+                    .map(CaseDataLiP::getRespondent1LiPResponse)
+                    .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                    .orElse(null);
+            }
             builder.defendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
         }
         return builder.build();
