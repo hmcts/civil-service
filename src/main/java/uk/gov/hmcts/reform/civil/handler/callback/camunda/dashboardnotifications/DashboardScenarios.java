@@ -247,7 +247,8 @@ public enum DashboardScenarios {
     SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT("Scenario.AAA6.Applications.and.messages.to.the.court"),
     SCENARIO_AAA6_CLAIMANT_INTENT_REJECT_REPAYMENT_ORG_LTD_CO_JO_CLAIMANT("Scenario.AAA6.ClaimantIntent.Defendant.OrgLtdCo.JO.Claimant"),
     SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT("Scenario.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant"),
-    SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT("Scenario.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant");
+    SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT("Scenario.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant"),
+    SCENARIO_AAA6_DEFENDANT_NOTICE_OF_CHANGE_JBA_CLAIM_MOVES_OFFLINE_CLAIMANT("Scenario.AAA6.DefendantNoticeOfChange.JudgmentByAdmissionClaimMovesOffline.Claimant");
 
     private final String scenario;
 
