@@ -10,8 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -20,9 +18,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
@@ -170,62 +165,6 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
                                                         .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                         .build())
                              .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build())
-                             .build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT);
-        verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldHideInterlocutoryJudgementDocWhenClaimantHasWelshDocPreference() {
-        //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .applicant1Represented(YesOrNo.NO)
-            .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.WELSH).build()).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
-                             .build())
-            .build();
-
-        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(PreTranslationDocumentType.INTERLOCUTORY_JUDGMENT);
-        verify(interlocutoryJudgementDocGenerator).generateInterlocutoryJudgementDoc(caseData, BEARER_TOKEN);
-    }
-
-    @Test
-    void shouldHideInterlocutoryJudgementDocWhenDefendantHasWelshDocPreference() {
-        //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
-            any(CaseData.class),
-            anyString()
-        )).willReturn(FORM);
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
-            .respondent1Represented(YesOrNo.NO)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                Language.WELSH).build()).build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                                                        .build())
                              .build())
             .build();
 
