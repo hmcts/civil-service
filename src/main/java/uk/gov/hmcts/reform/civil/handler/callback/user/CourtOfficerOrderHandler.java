@@ -84,8 +84,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (featureToggleService.isGaForWelshEnabled()
-            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
-            || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(caseData.getPreviewCourtOfficerOrder()));
             caseDataBuilder.previewCourtOfficerOrder(null);
