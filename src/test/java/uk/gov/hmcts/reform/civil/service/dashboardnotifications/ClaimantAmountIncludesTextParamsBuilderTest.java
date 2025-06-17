@@ -32,10 +32,10 @@ class ClaimantAmountIncludesTextParamsBuilderTest {
         builder.addParams(caseData, params);
 
         // Assert
-        assertEquals("(this amount includes interest if it has been claimed which will continue to accrue to the date of Judgment, " +
+        assertEquals("(this amount includes interest if it has been claimed which may continue to accrue to the date of Judgment, " +
             "settlement agreement or earlier payment)", params.get("claimantAmountIncludesTextEn"));
-        assertEquals("(mae’r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo " +
-            "neu daliad cynharach)", params.get("claimantAmountIncludesTextCy"));
+        assertEquals("(mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall barhau i gronni hyd dyddiad y Dyfarniad, " +
+            "y cytundeb setlo neu daliad cynharach)", params.get("claimantAmountIncludesTextCy"));
     }
 
     @Test

@@ -35,10 +35,9 @@ class AmountIncludesTextParamsBuilderTest {
 
         // Assert
         assertThat(params).containsEntry("amountIncludesTextEn",
-            ". This amount includes interest if it has been claimed which will continue to accrue to the date of Judgment, settlement agreement or earlier payment");
+            ". This amount includes interest if it has been claimed which may continue to accrue to the date of Judgment, settlement agreement or earlier payment");
         assertThat(params).containsEntry("amountIncludesTextCy",
-            ". Mae’r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad,"
-                + " cytundeb setlo neu daliad cynharach");
+            ". Mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall barhau i gronni hyd dyddiad y Dyfarniad, y cytundeb setlo neu daliad cynharach");
     }
 
     @Test

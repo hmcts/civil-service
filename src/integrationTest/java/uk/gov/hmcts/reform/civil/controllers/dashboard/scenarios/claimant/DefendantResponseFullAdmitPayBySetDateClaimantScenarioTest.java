@@ -60,14 +60,14 @@ public class DefendantResponseFullAdmitPayBySetDateClaimantScenarioTest extends 
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">You have offered to pay £1001 (this amount includes interest if it has been claimed " +
-                        "which will continue to accrue to the date of Judgment, settlement agreement or earlier payment) by " +
+                        "which may continue to accrue to the date of Judgment, settlement agreement or earlier payment) by " +
                         DateUtils.formatDate(admitPaymentDeadline) + ". We will contact you when the claimant responds to your offer." +
                         "</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">View your response</a></p>"
                 ),
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
-                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 (mae’r swm hwn yn cynnwys llog os hawlir a fydd yn parhau" +
-                        " i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach) erbyn " +
+                    "<p class=\"govuk-body\">Rydych wedi cynnig talu £1001 (mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall " +
+                        "barhau i gronni hyd dyddiad y Dyfarniad, y cytundeb setlo neu daliad cynharach) erbyn " +
                         DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". Byddwn yn cysylltu â chi pan fydd yr hawlydd" +
                         " yn ymateb i’ch cynnig.</p><p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" class=\"govuk-link\">" +
                         "Gweld eich ymateb</a></p>"

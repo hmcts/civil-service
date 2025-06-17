@@ -113,13 +113,13 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">Mr. Sole Trader has offered to pay you £1001 (this amount includes interest if it has " +
-                        "been claimed which will continue to accrue to the date of Judgment, settlement agreement or earlier payment) by "
+                        "been claimed which may continue to accrue to the date of Judgment, settlement agreement or earlier payment) by "
                      +   DateUtils.formatDate(admitPaymentDeadline) + ".</p><p class=\"govuk-body\">"
                      +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">View and respond</a></p>"),
                jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                jsonPath("$[0].descriptionCy").value(
-                   "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi cynnig talu £1001 (mae’r swm hwn yn cynnwys llog os hawlir" +
-                       " a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach) i chi erbyn "
+                   "<p class=\"govuk-body\">Mae Mr. Sole Trader wedi cynnig talu £1001 (mae’r swm hwn yn cynnwys llog os yw wedi’i " +
+                       "hawlio a gall barhau i gronni hyd dyddiad y Dyfarniad, y cytundeb setlo neu daliad cynharach) i chi erbyn "
                     +   DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ".</p><p class=\"govuk-body\">"
                     +   "<a href=\"{CLAIMANT_RESPONSE_TASK_LIST}\" class=\"govuk-link\">Gweld ac ymateb</a></p>")
             );

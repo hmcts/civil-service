@@ -14,9 +14,10 @@ public class DefendantAmountIncludesTextParamsBuilder extends DashboardNotificat
         if (caseData.isPayBySetDate() || caseData.isPayByInstallment()) {
             if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
                 params.put("defendantAmountIncludesTextEn",
-                    "(this amount includes interest if it has been claimed which will continue to accrue to the date of Judgment, settlement agreement or earlier payment)");
+                    "(this amount includes interest if it has been claimed which may continue to accrue to the date of Judgment, settlement agreement or earlier payment)");
                 params.put("defendantAmountIncludesTextCy",
-                    "(mae’r swm hwn yn cynnwys llog os hawlir a fydd yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach)");
+                    "(mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a gall barhau i gronni hyd dyddiad y Dyfarniad, " +
+                        "y cytundeb setlo neu daliad cynharach)");
             } else if (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
                 {
                     params.put("defendantAmountIncludesTextEn",

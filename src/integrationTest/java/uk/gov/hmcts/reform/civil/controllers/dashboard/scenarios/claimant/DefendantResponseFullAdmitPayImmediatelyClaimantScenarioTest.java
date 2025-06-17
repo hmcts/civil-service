@@ -59,7 +59,7 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].titleEn").value("Response to the claim"),
                 jsonPath("$[0].descriptionEn").value(
                     "<p class=\"govuk-body\">James John has offered to pay £1001 by " +
-                        DateUtils.formatDate(admitPaymentDeadline) + ". This amount includes interest if it has been claimed which will continue" +
+                        DateUtils.formatDate(admitPaymentDeadline) + ". This amount includes interest if it has been claimed which may continue" +
                         " to accrue to the date of Judgment, settlement agreement or earlier payment.</p>" +
                         "<p class=\"govuk-body\">The payment must be received in your account by then, if not you can request a county court" +
                         " judgment.</p>" +
@@ -69,8 +69,8 @@ public class DefendantResponseFullAdmitPayImmediatelyClaimantScenarioTest extend
                 jsonPath("$[0].titleCy").value("Ymateb i’r hawliad"),
                 jsonPath("$[0].descriptionCy").value(
                     "<p class=\"govuk-body\">Mae James John wedi cynnig talu £1001 erbyn " +
-                        DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". Mae’r swm hwn yn cynnwys llog os hawlir a fydd" +
-                        " yn parhau i gronni hyd at ddyddiad y dyfarniad, cytundeb setlo neu daliad cynharach.</p>" +
+                        DateUtils.formatDateInWelsh(admitPaymentDeadline, false) + ". Mae’r swm hwn yn cynnwys llog os yw wedi’i hawlio a " +
+                        "gall barhau i gronni hyd dyddiad y Dyfarniad, y cytundeb setlo neu daliad cynharach.</p>" +
                         "<p class=\"govuk-body\">Rhaid i’r taliad fod yn eich cyfrif erbyn y dyddiad hwnnw. Os nad yw, yna gallwch wneud cais" +
                         " am ddyfarniad llys sirol.</p>" +
                         "<p class=\"govuk-body\"><a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">" +
