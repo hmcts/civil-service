@@ -12,7 +12,7 @@ WHERE name = 'Scenario.AAA6.ProofofDebtPayment.Application.Claimant';
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA6.ProofOfDebtPayment.Confirmation.Claimant',
-        '{"Notice.AAA6.ProofofDebtPayment.Application.Claimant"}',
+        '{"Notice.AAA6.ProofofDebtPayment.Application.Claimant", "Notice.AAA6.JudgmentsOnline.DefaultJudgmentIssued.Claimant"}',
         '{"": []}');
 
 /**
