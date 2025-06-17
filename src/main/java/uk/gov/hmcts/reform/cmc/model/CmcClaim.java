@@ -564,6 +564,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean decisionMadeDocumentsAreInTranslation() {
+        return false;
+    }
+
+    @Override
     public boolean isCaseStayed() {
         return false;
     }
@@ -625,6 +630,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isTrialScheduledPaymentPaidStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean sdoDocumentsAreInTranslation() {
         return false;
     }
 

@@ -134,6 +134,8 @@ public interface Claim {
 
     boolean isDefaultJudgementIssued();
 
+    boolean decisionMadeDocumentsAreInTranslation();
+
     default boolean isCaseDismissed() {
         return false;
     }
@@ -150,7 +152,7 @@ public interface Claim {
     /**
      * Some statuses consider how far is the hearing date.
      *
-     * @param i days
+     * @param  days
      * @return true if hearing date is defined and it is less or equal than i days away
      */
     boolean isHearingLessThanDaysAway(int days);
@@ -180,6 +182,8 @@ public interface Claim {
     boolean isTrialScheduledNoPaymentStatusActive();
 
     boolean isTrialScheduledPaymentPaidStatusActive();
+
+    boolean sdoDocumentsAreInTranslation();
 
     default boolean isHwfFullRemission() {
         return false;
