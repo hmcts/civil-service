@@ -47,7 +47,7 @@ class DefRespCaseOfflineHelperTest {
         Map<String, String> result = caseOfflineNotificationProperties(caseData);
 
         assertThat(result.get("reason")).contains("admits part of the claim")
-            .contains("Applicant One and FULL_ADMISSION against Applicant Two");
+            .contains("Applicant One and admits all of the claim against Applicant Two");
     }
 
     @Test

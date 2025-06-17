@@ -29,11 +29,10 @@ public class DefRespCaseOfflineHelper {
         }
 
         if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            String responseTypeToApplicant2 = String.valueOf(caseData.getRespondent1ClaimResponseTypeToApplicant2());
             return Map.of(
                 REASON, getReasonToBeDisplayed(caseData.getRespondent1ClaimResponseType())
                     .concat(" against " + caseData.getApplicant1().getPartyName())
-                    .concat(" and " + responseTypeToApplicant2)
+                    .concat(" and " + getReasonToBeDisplayed(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
                     .concat(" against " + caseData.getApplicant2().getPartyName())
             );
         }
