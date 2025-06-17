@@ -172,7 +172,6 @@ class ClaimDismissedRespondentNotificationHandlerTest {
 
             when(claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(any(), any())).thenReturn(TEMPLATE_ID_2);
 
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDismissedPastClaimNotificationDeadline()
                 .build();

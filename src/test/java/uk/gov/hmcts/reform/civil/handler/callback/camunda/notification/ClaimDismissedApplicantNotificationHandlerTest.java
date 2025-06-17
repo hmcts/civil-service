@@ -160,7 +160,6 @@ class ClaimDismissedApplicantNotificationHandlerTest {
             .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
         when(claimDismissedEmailTemplater.getSolicitorClaimDismissedProperty(any(), any())).thenReturn(TEMPLATE_ID_2);
 
-
         handler.handle(params);
 
         verify(notificationService).sendMail(

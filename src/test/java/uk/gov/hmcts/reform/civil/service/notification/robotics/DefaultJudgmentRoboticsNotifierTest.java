@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +44,6 @@ class DefaultJudgmentRoboticsNotifierTest {
             .build();
 
         when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
-
 
         defaultJudgmentRoboticsNotifier.sendNotifications(data, false, "auth");
 

@@ -4,9 +4,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
-import uk.gov.hmcts.reform.civil.stateflow.model.State;
-
-import java.util.Map;
 
 public interface IStateFlowEngine {
 

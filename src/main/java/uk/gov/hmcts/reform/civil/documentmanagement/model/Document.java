@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.documentmanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,17 +14,17 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Document {
 
-    @JsonProperty("document_url")
+    @JsonAlias("document_url")
     String documentUrl;
-    @JsonProperty("document_binary_url")
+    @JsonAlias("document_binary_url")
     String documentBinaryUrl;
-    @JsonProperty("document_filename")
+    @JsonAlias("document_filename")
     String documentFileName;
-    @JsonProperty("document_hash")
+    @JsonAlias("document_hash")
     String documentHash;
-    @JsonProperty("category_id")
+    @JsonAlias("category_id")
     String categoryID;
-    @JsonProperty("upload_timestamp")
+    @JsonAlias("upload_timestamp")
     String uploadTimestamp;
 
     @JsonCreator

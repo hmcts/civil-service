@@ -45,7 +45,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -97,7 +96,6 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
-
 
     @Nested
     class AboutToStartCallback {
@@ -161,16 +159,15 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            System.out.println(response.getData());
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("document_filename")
+                .extracting("documentFileName")
                 .isEqualTo(fileName);
             assertThat(response.getData())
                 .extracting("previewCourtOfficerOrder")
                 .extracting("documentLink")
-                .extracting("category_id")
+                .extracting("categoryID")
                 .isEqualTo("caseManagementOrders");
         }
 

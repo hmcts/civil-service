@@ -49,7 +49,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     @Nested
     class AboutToSubmitCallback {
 
-
         @Test
         void shouldNotifyApplicantSolicitorIn1v1Scenario_whenV1CallbackInvoked() {
             when(fullDefenceSolicitorNotifierFactory.getNotifier(eq(FullDefenceNotificationType.APPLICANT_SOLICITOR_ONE), any())).thenReturn(mockNotifier1);

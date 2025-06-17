@@ -27,7 +27,6 @@ class CaseHandledOffLineApplicantSolicitorNotifierFactoryTest {
 
         var notifier = caseHandledOffLineApplicantSolicitorNotifierFactory.getCaseHandledOfflineSolicitorNotifier(data);
 
-
         assertThat(notifier.getClass()).isEqualTo(CaseHandledOfflineApplicantSolicitorSpecNotifier.class);
     }
 
@@ -36,7 +35,6 @@ class CaseHandledOffLineApplicantSolicitorNotifierFactoryTest {
         CaseData data = CaseData.builder().caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
 
         var notifier = caseHandledOffLineApplicantSolicitorNotifierFactory.getCaseHandledOfflineSolicitorNotifier(data);
-
 
         assertThat(notifier.getClass()).isEqualTo(CaseHandledOfflineApplicantSolicitorUnspecNotifier.class);
     }

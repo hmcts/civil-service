@@ -257,7 +257,6 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getActivityId()).thenReturn("activityId");
             when(mockTask.getAllVariables()).thenReturn(variables);
 
-
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
@@ -317,7 +316,6 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getActivityId()).thenReturn("activityId");
             when(mockTask.getAllVariables()).thenReturn(variables);
 
-
             CaseData caseData = getCaseData(TAKEN_OFFLINE_BY_STAFF);
             caseData.getClaimProceedsInCaseman().setReason(reason);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");
@@ -362,7 +360,6 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getTopicName()).thenReturn("test");
             when(mockTask.getActivityId()).thenReturn("activityId");
             when(mockTask.getAllVariables()).thenReturn(variables);
-
 
             CaseData caseData = getCaseData(state);
             caseData.getBusinessProcess().setProcessInstanceId("processInstanceId");

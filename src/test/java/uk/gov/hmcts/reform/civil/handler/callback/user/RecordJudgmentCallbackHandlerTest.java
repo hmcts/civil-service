@@ -68,7 +68,6 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @InjectMocks
     private RecordJudgmentCallbackHandler handler;
 
-
     @BeforeEach
     void disableSerialisation() {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -358,7 +357,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             .issueDate(LocalDate.of(2022, 12, 12))
             .defendant1Name("Mr. Sole Trader")
             .defendant1Address(JudgmentAddress.builder().build())
-            .defendant1Dob(LocalDate.of(1950,12,12))
+            .defendant1Dob(LocalDate.of(1950, 12, 12))
             .build();
     }
 
