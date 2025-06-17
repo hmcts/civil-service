@@ -254,7 +254,7 @@ ccd:
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
-      devcpuRequests: 1000m
+      devcpuRequests: 750m
       devmemoryRequests: 4096Mi
       devmemoryLimits: 8192Mi
       autoscaling:
@@ -320,7 +320,7 @@ camunda-bpm:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: camunda-${SERVICE_FQDN}
-    devcpuRequests: 1000m
+    devcpuRequests: 750m
     devmemoryRequests: 1024Mi
     devcpuLimits: 2
     devmemoryLimits: 1Gi
