@@ -37,6 +37,9 @@ public enum DashboardClaimStatus {
     SDO_ORDER_CREATED_PRE_CP(
         Claim::isSDOOrderCreatedPreCP
     ),
+    DECISION_MADE_DOCUMENTS_BEING_TRANSLATED(
+        Claim::decisionMadeDocumentsAreInTranslation
+    ),
     SDO_ORDER_CREATED_CP(
         Claim::isSDOOrderCreatedCP
     ),
@@ -135,6 +138,9 @@ public enum DashboardClaimStatus {
     ),
     SETTLED(
         Claim::isSettled
+    ),
+    SDO_DOCUMENTS_BEING_TRANSLATED(
+        Claim::sdoDocumentsAreInTranslation
     ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement

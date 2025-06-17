@@ -55,6 +55,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
@@ -459,7 +461,7 @@ class CcdClaimStatusDashboardFactoryTest {
             UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
             CaseDocument.builder()
                 .createdDatetime(LocalDateTime.now())
-                .documentType(DocumentType.SDO_ORDER)
+                .documentType(SDO_ORDER)
                 .build()
         );
         DynamicListElement selectedCourt = DynamicListElement.builder()
@@ -844,5 +846,38 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.CASE_DISMISSED);
+    }
+
+    @Test
+    void given_sdoIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
+                                                                                .value(CaseDocument.builder()
+                                                                                           .documentType(SDO_ORDER)
+                                                                                           .build()).build()))
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.SDO_DOCUMENTS_BEING_TRANSLATED);
+    }
+
+    @Test
+    void given_decisionMadeIsDrawn_anyPartyBilingual_showStatusDocumentsTranslated() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData claim = CaseData.builder().preTranslationDocuments(List.of(Element.<CaseDocument>builder()
+                                                                                .value(CaseDocument.builder()
+                                                                                           .documentType(
+                                                                                               DECISION_MADE_ON_APPLICATIONS)
+                                                                                           .build()).build()))
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+                claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DECISION_MADE_DOCUMENTS_BEING_TRANSLATED);
     }
 }
