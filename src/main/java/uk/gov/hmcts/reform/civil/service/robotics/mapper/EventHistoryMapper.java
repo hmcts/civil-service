@@ -221,7 +221,7 @@ public class EventHistoryMapper {
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
                         buildClaimDismissedPastDeadline(builder, caseData,
-                            stateFlowEngine.evaluate(caseData).getStateHistory()
+                                                        stateFlowEngine.evaluate(caseData).getStateHistory()
                         );
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
@@ -278,7 +278,7 @@ public class EventHistoryMapper {
                     buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, ENTER);
                 } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData,
-                        MENTAL_HEALTH_BREATHING_SPACE_ENTERED, ENTER
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, ENTER
                     );
                 }
             } else if (null != caseData.getBreathing().getLift()) {
@@ -287,7 +287,7 @@ public class EventHistoryMapper {
                     buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_LIFTED, LIFTED);
                 } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData,
-                        MENTAL_HEALTH_BREATHING_SPACE_ENTERED, ENTER
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, ENTER
                     );
                     buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, LIFTED);
                 }
@@ -332,8 +332,8 @@ public class EventHistoryMapper {
                         .dateReceived(takenOfflineDate)
                         .eventDetailsText(miscText)
                         .eventDetails(EventDetails.builder()
-                            .miscText(miscText)
-                            .build())
+                                          .miscText(miscText)
+                                          .build())
                         .build());
             }
         }
@@ -364,7 +364,7 @@ public class EventHistoryMapper {
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText("")
-                .build())
+                              .build())
             .build());
     }
 
@@ -412,23 +412,23 @@ public class EventHistoryMapper {
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder()
-                .miscText("")
-                .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
-                    ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                    : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
-                .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
-                .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
-                .paymentInFullDate(paymentInFullDate)
-                .installmentAmount(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)
-                    ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
-                    : ZERO)
-                .installmentPeriod(getInstallmentPeriod(caseData))
-                .firstInstallmentDate(caseData.getRepaymentDate())
-                .dateOfJudgment(getDateOfDjCreated(caseData))
-                .jointJudgment(caseData.getRespondent2() != null)
-                .judgmentToBeRegistered(false)
-                .build())
+                              .miscText("")
+                              .amountOfJudgment(amountClaimedWithInterest.setScale(2))
+                              .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+                                                 ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+                                                 : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
+                              .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
+                              .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
+                              .paymentInFullDate(paymentInFullDate)
+                              .installmentAmount(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                                                     ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
+                                                     : ZERO)
+                              .installmentPeriod(getInstallmentPeriod(caseData))
+                              .firstInstallmentDate(caseData.getRepaymentDate())
+                              .dateOfJudgment(getDateOfDjCreated(caseData))
+                              .jointJudgment(caseData.getRespondent2() != null)
+                              .judgmentToBeRegistered(false)
+                              .build())
             .build();
     }
 
@@ -501,12 +501,12 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart() != null
-                        ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now())
-                        : LocalDateTime.now())
+                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .litigiousPartyID("001")
                     .eventDetailsText(eventDetails)
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
-                        .build())
+                                      .build())
                     .build()));
                 break;
             case BREATHING_SPACE_LIFTED:
@@ -514,12 +514,12 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getLift().getExpectedEnd() != null
-                        ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now())
-                        : LocalDateTime.now())
+                                      ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
-                        .build())
+                                      .build())
                     .build()));
                 break;
             case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
@@ -527,12 +527,12 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart() != null
-                        ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now())
-                        : LocalDateTime.now())
+                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
-                        .build())
+                                      .build())
                     .build()));
                 break;
             case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
@@ -540,12 +540,12 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getLift().getExpectedEnd() != null
-                        ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now())
-                        : LocalDateTime.now())
+                                      ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
-                        .build())
+                                      .build())
                     .build()));
                 break;
             default:
@@ -558,7 +558,7 @@ public class EventHistoryMapper {
 
         if (featureToggleService.isJOLiveFeedActive()
             && ((joMarkedPaidInFullDateExists && caseData.getJoDefendantMarkedPaidInFullIssueDate() == null)
-            || caseData.hasCoscCert())
+                || caseData.hasCoscCert())
         ) {
             // date received when mark paid in full by claimant is issued or when the scheduler runs at the cosc deadline at 4pm
             LocalDateTime dateReceived = joMarkedPaidInFullDateExists
@@ -570,12 +570,12 @@ public class EventHistoryMapper {
                 .eventCode(CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
                 .dateReceived(dateReceived)
                 .eventDetails(EventDetails.builder()
-                    .status(caseData.getJoCoscRpaStatus().toString())
-                    .datePaidInFull(getCoscDate(caseData))
-                    .notificationReceiptDate(joMarkedPaidInFullDateExists
-                        ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
-                        : caseData.getJoDefendantMarkedPaidInFullIssueDate().toLocalDate())
-                    .build())
+                                  .status(caseData.getJoCoscRpaStatus().toString())
+                                  .datePaidInFull(getCoscDate(caseData))
+                                  .notificationReceiptDate(joMarkedPaidInFullDateExists
+                                                               ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
+                                                               : caseData.getJoDefendantMarkedPaidInFullIssueDate().toLocalDate())
+                                  .build())
                 .eventDetailsText("")
                 .build()));
         }
@@ -598,8 +598,8 @@ public class EventHistoryMapper {
                 .dateReceived(getJbADate(caseData))
                 .eventDetailsText(detailsTextRequested)
                 .eventDetails(EventDetails.builder()
-                    .miscText(miscTextRequested)
-                    .build())
+                                  .miscText(miscTextRequested)
+                                  .build())
                 .build()));
         }
     }
@@ -656,16 +656,16 @@ public class EventHistoryMapper {
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
-                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
+                               .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
             .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
             .isJudgmentForthwith(caseData.isPayImmediately())
             .paymentInFullDate(caseData.isPayBySetDate()
-                ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
-                : null)
+                                   ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
+                                   : null)
             .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, repaymentPlan))
             .installmentPeriod(featureToggleService.isJOLiveFeedActive() ? getJBAInstallmentPeriod(caseData) : (isResponsePayByInstallment
-                ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
-                : null))
+                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
+                                   : null))
             .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
             .dateOfJudgment(getJbADate(caseData))
             .jointJudgment(false)
@@ -716,11 +716,11 @@ public class EventHistoryMapper {
                         : caseData.getRespondent1ClaimResponseTypeForSpec();
 
                 buildRespondentResponseEventForSpec(builder, caseData, respondent1SpecResponseType,
-                    respondent1ResponseDate, RESPONDENT_ID
+                                                    respondent1ResponseDate, RESPONDENT_ID
                 );
             } else {
                 buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                    respondent1ResponseDate, RESPONDENT_ID
+                                             respondent1ResponseDate, RESPONDENT_ID
                 );
             }
 
@@ -739,8 +739,8 @@ public class EventHistoryMapper {
                     .dateReceived(respondent1ResponseDate)
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
-                        .miscText(miscText)
-                        .build())
+                                      .miscText(miscText)
+                                      .build())
                     .build()));
             }
         }
@@ -748,12 +748,12 @@ public class EventHistoryMapper {
         if (defendant2DivergentResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 buildRespondentResponseEventForSpec(builder, caseData,
-                    caseData.getRespondent2ClaimResponseTypeForSpec(),
-                    respondent2ResponseDate, RESPONDENT2_ID
+                                                    caseData.getRespondent2ClaimResponseTypeForSpec(),
+                                                    respondent2ResponseDate, RESPONDENT2_ID
                 );
             } else {
                 buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
-                    respondent2ResponseDate, RESPONDENT2_ID
+                                             respondent2ResponseDate, RESPONDENT2_ID
                 );
             }
 
@@ -772,8 +772,8 @@ public class EventHistoryMapper {
                     .dateReceived(respondent2ResponseDate)
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
-                        .miscText(miscText)
-                        .build())
+                                      .miscText(miscText)
+                                      .build())
                     .build()));
             }
         }
@@ -963,23 +963,23 @@ public class EventHistoryMapper {
         List<Event> events = unwrapElements(caseData.getCaseNotes())
             .stream()
             .map(caseNote ->
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(caseNote.getCreatedOn())
-                    .eventDetailsText(left((format(
-                        "case note added: %s",
-                        caseNote.getNote() != null
-                            ? caseNote.getNote().replaceAll("\\s+", " ") : ""
-                    )), 250))
-                    .eventDetails(EventDetails.builder()
-                        .miscText(left((format(
-                            "case note added: %s",
-                            caseNote.getNote() != null
-                                ? caseNote.getNote().replaceAll("\\s+", " ") : ""
-                        )), 250))
-                        .build())
-                    .build())
+                     Event.builder()
+                         .eventSequence(prepareEventSequence(builder.build()))
+                         .eventCode(MISCELLANEOUS.getCode())
+                         .dateReceived(caseNote.getCreatedOn())
+                         .eventDetailsText(left((format(
+                             "case note added: %s",
+                             caseNote.getNote() != null
+                                 ? caseNote.getNote().replaceAll("\\s+", " ") : ""
+                         )), 250))
+                         .eventDetails(EventDetails.builder()
+                                           .miscText(left((format(
+                                               "case note added: %s",
+                                               caseNote.getNote() != null
+                                                   ? caseNote.getNote().replaceAll("\\s+", " ") : ""
+                                           )), 250))
+                                           .build())
+                         .build())
             .toList();
         builder.miscellaneous(events);
     }
@@ -1000,8 +1000,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getRespondent1LitigationFriendCreatedDate())
                 .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
+                                  .miscText(miscText)
+                                  .build())
                 .build());
     }
 
@@ -1021,8 +1021,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getRespondent2LitigationFriendCreatedDate())
                 .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
+                                  .miscText(miscText)
+                                  .build())
                 .build());
     }
 
@@ -1035,8 +1035,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getClaimDetailsNotificationDate())
                 .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
+                                  .miscText(miscText)
+                                  .build())
                 .build());
 
     }
@@ -1050,8 +1050,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getIssueDate().atStartOfDay())
                 .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
+                                  .miscText(miscText)
+                                  .build())
                 .build());
     }
 
@@ -1065,8 +1065,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getTakenOfflineDate())
                 .eventDetailsText(detailsText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(detailsText)
-                    .build())
+                                  .miscText(detailsText)
+                                  .build())
                 .build());
     }
 
@@ -1079,8 +1079,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getClaimDismissedDate())
                 .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
+                                  .miscText(miscText)
+                                  .build())
                 .build());
     }
 
@@ -1095,8 +1095,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getClaimDismissedDate())
                 .eventDetailsText(prepareClaimDismissedDetails(flowState))
                 .eventDetails(EventDetails.builder()
-                    .miscText(prepareClaimDismissedDetails(flowState))
-                    .build())
+                                  .miscText(prepareClaimDismissedDetails(flowState))
+                                  .build())
                 .build());
     }
 
@@ -1127,8 +1127,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getTakenOfflineByStaffDate())
                 .eventDetailsText(prepareTakenOfflineEventDetails(caseData))
                 .eventDetails(EventDetails.builder()
-                    .miscText(prepareTakenOfflineEventDetails(caseData))
-                    .build())
+                                  .miscText(prepareTakenOfflineEventDetails(caseData))
+                                  .build())
                 .build());
     }
 
@@ -1150,8 +1150,8 @@ public class EventHistoryMapper {
                 .dateReceived(dateReceived)
                 .eventDetailsText(QUERIES_ON_CASE)
                 .eventDetails(EventDetails.builder()
-                    .miscText(QUERIES_ON_CASE)
-                    .build())
+                                  .miscText(QUERIES_ON_CASE)
+                                  .build())
                 .build());
     }
 
@@ -1171,17 +1171,17 @@ public class EventHistoryMapper {
                                                                  CaseData caseData) {
         if (caseData.getGeneralApplications() != null) {
             var generalApplications = caseData
-                .getGeneralApplications()
-                .stream()
-                .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
-                    && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
-                    application.getValue()
-                        .getCaseLink()
-                        .getCaseReference(),
-                    caseData
-                )
-                    != null)
-                .toList();
+                    .getGeneralApplications()
+                    .stream()
+                    .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
+                            && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
+                            application.getValue()
+                                    .getCaseLink()
+                                    .getCaseReference(),
+                            caseData
+                    )
+                            != null)
+                    .toList();
 
             if (!generalApplications.isEmpty()) {
                 buildGeneralFormOfApplicationStrikeOut(builder, generalApplications);
@@ -1195,26 +1195,26 @@ public class EventHistoryMapper {
                                                         List<Element<GeneralApplication>> generalApplicationsStrikeOut) {
 
         List<Event> generalApplicationsEvents = IntStream.range(0, generalApplicationsStrikeOut.size())
-            .mapToObj(index -> {
-                String miscText = "APPLICATION TO Strike Out";
-                return Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
-                    .dateReceived(generalApplicationsStrikeOut
-                        .get(index)
-                        .getValue()
-                        .getGeneralAppSubmittedDateGAspec())
-                    .litigiousPartyID(generalApplicationsStrikeOut
-                        .get(index)
-                        .getValue()
-                        .getLitigiousPartyID())
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                        .miscText(miscText)
-                        .build())
-                    .build();
-            })
-            .toList();
+                .mapToObj(index -> {
+                    String miscText = "APPLICATION TO Strike Out";
+                    return Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
+                            .dateReceived(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getGeneralAppSubmittedDateGAspec())
+                            .litigiousPartyID(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getLitigiousPartyID())
+                            .eventDetailsText(miscText)
+                            .eventDetails(EventDetails.builder()
+                                    .miscText(miscText)
+                                    .build())
+                            .build();
+                })
+                .toList();
 
         builder.generalFormOfApplication(generalApplicationsEvents);
     }
@@ -1223,38 +1223,38 @@ public class EventHistoryMapper {
                                                     List<Element<GeneralApplication>> generalApplicationsStrikeOut) {
 
         List<Event> generalApplicationsEvents = IntStream.range(0, generalApplicationsStrikeOut.size())
-            .mapToObj(index -> {
-                return Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(DEFENCE_STRUCK_OUT.getCode())
-                    .dateReceived(generalApplicationsStrikeOut
-                        .get(index)
-                        .getValue()
-                        .getGeneralAppSubmittedDateGAspec())
-                    .litigiousPartyID(generalApplicationsStrikeOut
-                        .get(index)
-                        .getValue()
-                        .getLitigiousPartyID())
-                    .build();
-            })
-            .toList();
+                .mapToObj(index -> {
+                    return Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(DEFENCE_STRUCK_OUT.getCode())
+                            .dateReceived(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getGeneralAppSubmittedDateGAspec())
+                            .litigiousPartyID(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getLitigiousPartyID())
+                            .build();
+                })
+                .toList();
 
         builder.defenceStruckOut(generalApplicationsEvents);
     }
 
     private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
-        String caseLinkId, CaseData caseData) {
+            String caseLinkId, CaseData caseData) {
         return caseData.getGaDetailsMasterCollection().stream()
-            .filter(generalApplicationsDetailsElement ->
-                generalApplicationsDetailsElement
-                    .getValue()
-                    .getCaseLink()
-                    .getCaseReference()
-                    .equals(caseLinkId)
-                    && generalApplicationsDetailsElement.getValue().getCaseState()
-                    .equals(PROCEEDS_IN_HERITAGE.getDisplayedValue()))
-            .findFirst()
-            .orElse(null);
+                .filter(generalApplicationsDetailsElement ->
+                        generalApplicationsDetailsElement
+                                .getValue()
+                                .getCaseLink()
+                                .getCaseReference()
+                                .equals(caseLinkId)
+                                && generalApplicationsDetailsElement.getValue().getCaseState()
+                                .equals(PROCEEDS_IN_HERITAGE.getDisplayedValue()))
+                .findFirst()
+                .orElse(null);
     }
 
     private int prepareEventSequence(EventHistory history) {
@@ -1326,8 +1326,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getClaimNotificationDate())
                 .eventDetailsText("Claimant has notified defendant.")
                 .eventDetails(EventDetails.builder()
-                    .miscText("Claimant has notified defendant.")
-                    .build())
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
                 .build());
     }
 
@@ -1342,8 +1342,8 @@ public class EventHistoryMapper {
                     .dateReceived(caseData.getSubmittedDate())
                     .eventDetailsText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
                     .eventDetails(EventDetails.builder()
-                        .miscText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
-                        .build())
+                                      .miscText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
+                                      .build())
                     .build()
             ));
     }
@@ -1358,8 +1358,8 @@ public class EventHistoryMapper {
                     .dateReceived(caseData.getApplicant1ResponseDate())
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
-                        .miscText(miscText)
-                        .build())
+                                      .miscText(miscText)
+                                      .build())
                     .build());
         }
     }
@@ -1374,22 +1374,22 @@ public class EventHistoryMapper {
         if (SPEC_CLAIM.equals(claimType)) {
             List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                        .dateReceived(applicantDetails.get(index).getResponseDate())
-                        .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                        .eventDetails(EventDetails.builder()
-                            .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                            .preferredCourtCode(
-                                getPreferredCourtCode(caseData.getApplicant1DQ()))
-                            .preferredCourtName("")
-                            .build())
-                        .eventDetailsText(prepareEventDetailsText(
-                            applicantDetails.get(index).getDq(),
-                            getPreferredCourtCode(caseData.getApplicant1DQ())
-                        ))
-                        .build())
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                                  .dateReceived(applicantDetails.get(index).getResponseDate())
+                                  .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                                  .eventDetails(EventDetails.builder()
+                                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                                    .preferredCourtCode(
+                                                        getPreferredCourtCode(caseData.getApplicant1DQ()))
+                                                    .preferredCourtName("")
+                                                    .build())
+                                  .eventDetailsText(prepareEventDetailsText(
+                                      applicantDetails.get(index).getDq(),
+                                      getPreferredCourtCode(caseData.getApplicant1DQ())
+                                  ))
+                                  .build())
                 .toList();
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         } else {
@@ -1400,21 +1400,21 @@ public class EventHistoryMapper {
 
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                        .dateReceived(applicantDetails.get(index).getResponseDate())
-                        .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                        .eventDetails(EventDetails.builder()
-                            .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                            .preferredCourtCode(preferredCourtCode)
-                            .preferredCourtName("")
-                            .build())
-                        .eventDetailsText(prepareEventDetailsText(
-                            applicantDetails.get(index).getDq(),
-                            preferredCourtCode
-                        ))
-                        .build())
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                                  .dateReceived(applicantDetails.get(index).getResponseDate())
+                                  .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                                  .eventDetails(EventDetails.builder()
+                                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                                    .preferredCourtCode(preferredCourtCode)
+                                                    .preferredCourtName("")
+                                                    .build())
+                                  .eventDetailsText(prepareEventDetailsText(
+                                      applicantDetails.get(index).getDq(),
+                                      preferredCourtCode
+                                  ))
+                                  .build())
                 .toList();
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
         }
@@ -1485,7 +1485,7 @@ public class EventHistoryMapper {
                     && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                     && respondent1MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
-                )
+                    )
                 ) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
@@ -1512,7 +1512,7 @@ public class EventHistoryMapper {
                     && respondent1MediationRequired == YesOrNo.YES
                     && respondent2MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
-                )
+                    )
                 ) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
@@ -1536,7 +1536,7 @@ public class EventHistoryMapper {
                     && respondent1MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
                     && applicant2MediationRequired == YesOrNo.YES
-                )
+                    )
                 ) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
@@ -1558,28 +1558,28 @@ public class EventHistoryMapper {
             if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
                 || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
                 applicantsDetails.add(ClaimantResponseDetails.builder()
-                    .dq(caseData.getApplicant1DQ())
-                    .litigiousPartyID(APPLICANT_ID)
-                    .responseDate(caseData.getApplicant1ResponseDate())
-                    .build());
+                                          .dq(caseData.getApplicant1DQ())
+                                          .litigiousPartyID(APPLICANT_ID)
+                                          .responseDate(caseData.getApplicant1ResponseDate())
+                                          .build());
             }
             if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
                 || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
                 applicantsDetails.add(ClaimantResponseDetails.builder()
-                    .dq(caseData.getApplicant2DQ())
-                    .litigiousPartyID(APPLICANT2_ID)
-                    .responseDate(
-                        SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                            ? caseData.getApplicant1ResponseDate()
-                            : caseData.getApplicant2ResponseDate())
-                    .build());
+                                          .dq(caseData.getApplicant2DQ())
+                                          .litigiousPartyID(APPLICANT2_ID)
+                                          .responseDate(
+                                              SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                                  ? caseData.getApplicant1ResponseDate()
+                                                  : caseData.getApplicant2ResponseDate())
+                                          .build());
             }
         } else {
             applicantsDetails.add(ClaimantResponseDetails.builder()
-                .dq(caseData.getApplicant1DQ())
-                .litigiousPartyID(APPLICANT_ID)
-                .responseDate(caseData.getApplicant1ResponseDate())
-                .build());
+                                      .dq(caseData.getApplicant1DQ())
+                                      .litigiousPartyID(APPLICANT_ID)
+                                      .responseDate(caseData.getApplicant1ResponseDate())
+                                      .build());
         }
         return applicantsDetails;
     }
@@ -1659,17 +1659,17 @@ public class EventHistoryMapper {
                                             List<String> miscEventText, LocalDateTime... eventDate) {
         return IntStream.range(0, miscEventText.size())
             .mapToObj(index ->
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(eventDate.length > 0
-                        && eventDate[0] != null
-                        ? eventDate[0] : caseData.getApplicant1ResponseDate())
-                    .eventDetailsText(miscEventText.get(index))
-                    .eventDetails(EventDetails.builder()
-                        .miscText(miscEventText.get(index))
-                        .build())
-                    .build())
+                          Event.builder()
+                              .eventSequence(prepareEventSequence(builder.build()))
+                              .eventCode(MISCELLANEOUS.getCode())
+                              .dateReceived(eventDate.length > 0
+                                                && eventDate[0] != null
+                                                ? eventDate[0] : caseData.getApplicant1ResponseDate())
+                              .eventDetailsText(miscEventText.get(index))
+                              .eventDetails(EventDetails.builder()
+                                                .miscText(miscEventText.get(index))
+                                                .build())
+                              .build())
             .toList();
     }
 
@@ -1691,14 +1691,14 @@ public class EventHistoryMapper {
             : "RPA Reason: Claimant intends not to proceed.";
 
         builder.miscellaneous(Event.builder()
-            .eventSequence(prepareEventSequence(builder.build()))
-            .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(caseData.getApplicant1ResponseDate())
-            .eventDetailsText(miscText)
-            .eventDetails(EventDetails.builder()
-                .miscText(miscText)
-                .build())
-            .build());
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(MISCELLANEOUS.getCode())
+                                  .dateReceived(caseData.getApplicant1ResponseDate())
+                                  .eventDetailsText(miscText)
+                                  .eventDetails(EventDetails.builder()
+                                                    .miscText(miscText)
+                                                    .build())
+                                  .build());
     }
 
     private void buildRespondentFullDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
@@ -1734,11 +1734,11 @@ public class EventHistoryMapper {
             }
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID,
-                    respondent1DQ,
-                    respondent1,
-                    isRespondent1
+                                                       respondent1ResponseDate,
+                                                       RESPONDENT_ID,
+                                                       respondent1DQ,
+                                                       respondent1,
+                                                       isRespondent1
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 Party respondent2 = caseData.getRespondent2();
@@ -1763,11 +1763,11 @@ public class EventHistoryMapper {
                     ));
                 directionsQuestionnaireFiledEvents.add(
                     buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        respondent2DQ,
-                        respondent2,
-                        isRespondent1
+                                                           respondent2ResponseDate,
+                                                           RESPONDENT2_ID,
+                                                           respondent2DQ,
+                                                           respondent2,
+                                                           isRespondent1
                     ));
             }
         }
@@ -1796,11 +1796,11 @@ public class EventHistoryMapper {
             }
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                    respondent2ResponseDate,
-                    RESPONDENT2_ID,
-                    respondent2DQ,
-                    respondent2,
-                    isRespondent1
+                                                       respondent2ResponseDate,
+                                                       RESPONDENT2_ID,
+                                                       respondent2DQ,
+                                                       respondent2,
+                                                       isRespondent1
                 ));
         }
         builder.defenceFiled(defenceFiledEvents);
@@ -1827,10 +1827,10 @@ public class EventHistoryMapper {
                 respondent
             ))
             .eventDetails(EventDetails.builder()
-                .stayClaim(isStayClaim(respondentDQ))
-                .preferredCourtCode(getPreferredCourtCode(respondentDQ))
-                .preferredCourtName("")
-                .build())
+                              .stayClaim(isStayClaim(respondentDQ))
+                              .preferredCourtCode(getPreferredCourtCode(respondentDQ))
+                              .preferredCourtName("")
+                              .build())
             .build();
     }
 
@@ -1917,8 +1917,8 @@ public class EventHistoryMapper {
                     .dateReceived(caseData.getSubmittedDate())
                     .eventDetailsText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
                     .eventDetails(EventDetails.builder()
-                        .miscText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
-                        .build())
+                                      .miscText(RPA_REASON_ONLY_ONE_OF_THE_RESPONDENT_IS_NOTIFIED)
+                                      .build())
                     .build()
             ));
     }
@@ -2064,8 +2064,8 @@ public class EventHistoryMapper {
                                     .dateReceived(dateAcknowledge)
                                     .litigiousPartyID("002")
                                     .eventDetails(EventDetails.builder()
-                                        .acknowledgeService("Acknowledgement of Service")
-                                        .build())
+                                                      .acknowledgeService("Acknowledgement of Service")
+                                                      .build())
                                     .eventDetailsText("Defendant LR Acknowledgement of Service ")
                                     .build()
                                 :
@@ -2094,15 +2094,15 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED.getCode())
             .dateReceived(isRespondent1
-                ? caseData.getRespondent1AcknowledgeNotificationDate()
-                : caseData.getRespondent2AcknowledgeNotificationDate())
+                              ? caseData.getRespondent1AcknowledgeNotificationDate()
+                              : caseData.getRespondent2AcknowledgeNotificationDate())
             .litigiousPartyID(isRespondent1 ? "002" : "003")
             .eventDetails(EventDetails.builder()
-                .responseIntention(
-                    isRespondent1
-                        ? caseData.getRespondent1ClaimResponseIntentionType().getLabel()
-                        : evaluateRespondent2IntentionType(caseData))
-                .build())
+                              .responseIntention(
+                                  isRespondent1
+                                      ? caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                                      : evaluateRespondent2IntentionType(caseData))
+                              .build())
             .eventDetailsText(eventDetailsText)
             .build();
     }
@@ -2112,29 +2112,28 @@ public class EventHistoryMapper {
         builder
             .acknowledgementOfServiceReceived(
                 List.of(Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode("38")
-                    .dateReceived(dateAcknowledge)
-                    .litigiousPartyID("002")
-                    .eventDetails(EventDetails.builder()
-                        .acknowledgeService("Acknowledgement of Service")
-                        .build())
-                    .eventDetailsText("Defendant LR Acknowledgement of Service ")
-                    .build()));
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode("38")
+                            .dateReceived(dateAcknowledge)
+                            .litigiousPartyID("002")
+                            .eventDetails(EventDetails.builder()
+                                              .acknowledgeService("Acknowledgement of Service")
+                                              .build())
+                            .eventDetailsText("Defendant LR Acknowledgement of Service ")
+                            .build()));
     }
 
-    private void buildRespondentResponseText(EventHistory.EventHistoryBuilder builder, CaseData caseData, String miscText,
-                                             LocalDateTime respondentResponseDate) {
+    private void buildRespondentResponseText(EventHistory.EventHistoryBuilder builder, CaseData caseData, String miscText, LocalDateTime respondentResponseDate) {
         if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             builder.miscellaneous(Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(respondentResponseDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
-                .build());
+                                      .eventSequence(prepareEventSequence(builder.build()))
+                                      .eventCode(MISCELLANEOUS.getCode())
+                                      .dateReceived(respondentResponseDate)
+                                      .eventDetailsText(miscText)
+                                      .eventDetails(EventDetails.builder()
+                                                        .miscText(miscText)
+                                                        .build())
+                                      .build());
         }
 
     }
@@ -2144,11 +2143,11 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.receiptOfAdmission(Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                .dateReceived(caseData.getRespondent1ResponseDate())
-                .litigiousPartyID(RESPONDENT_ID)
-                .build()
+                                           .eventSequence(prepareEventSequence(builder.build()))
+                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                           .dateReceived(caseData.getRespondent1ResponseDate())
+                                           .litigiousPartyID(RESPONDENT_ID)
+                                           .build()
             );
             buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent1ResponseDate());
             buildMiscellaneousForRespondentResponseLipVSLr(builder, caseData);
@@ -2157,11 +2156,11 @@ public class EventHistoryMapper {
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.receiptOfAdmission(Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                    .dateReceived(respondent2ResponseDate)
-                    .litigiousPartyID(RESPONDENT2_ID)
-                    .build()
+                                               .eventSequence(prepareEventSequence(builder.build()))
+                                               .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                               .dateReceived(respondent2ResponseDate)
+                                               .litigiousPartyID(RESPONDENT2_ID)
+                                               .build()
                 );
                 buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
             }
@@ -2169,11 +2168,11 @@ public class EventHistoryMapper {
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.receiptOfAdmission(Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                .dateReceived(caseData.getRespondent2ResponseDate())
-                .litigiousPartyID(RESPONDENT2_ID)
-                .build()
+                                           .eventSequence(prepareEventSequence(builder.build()))
+                                           .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                           .dateReceived(caseData.getRespondent2ResponseDate())
+                                           .litigiousPartyID(RESPONDENT2_ID)
+                                           .build()
             );
             buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent2ResponseDate());
         }
@@ -2212,11 +2211,11 @@ public class EventHistoryMapper {
 
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                    respondent1ResponseDate,
-                    RESPONDENT_ID,
-                    respondent1DQ,
-                    respondent1,
-                    true
+                                                       respondent1ResponseDate,
+                                                       RESPONDENT_ID,
+                                                       respondent1DQ,
+                                                       respondent1,
+                                                       true
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 final Party respondent2 = caseData.getRespondent2();
@@ -2235,11 +2234,11 @@ public class EventHistoryMapper {
                 buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
                 directionsQuestionnaireFiledEvents.add(
                     buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                        respondent2ResponseDate,
-                        RESPONDENT2_ID,
-                        respondent2DQ,
-                        respondent2,
-                        true
+                                                           respondent2ResponseDate,
+                                                           RESPONDENT2_ID,
+                                                           respondent2DQ,
+                                                           respondent2,
+                                                           true
                     ));
             }
         }
@@ -2261,11 +2260,11 @@ public class EventHistoryMapper {
 
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
-                    respondent2ResponseDate,
-                    RESPONDENT2_ID,
-                    respondent2DQ,
-                    respondent2,
-                    false
+                                                       respondent2ResponseDate,
+                                                       RESPONDENT2_ID,
+                                                       respondent2DQ,
+                                                       respondent2,
+                                                       false
                 ));
         }
         builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
@@ -2276,40 +2275,40 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.miscellaneous(Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getRespondent1ResponseDate())
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
-                .build());
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent1ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.miscellaneous(Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(respondent2ResponseDate)
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                        .miscText(miscText)
-                        .build())
-                    .build());
+                                    .eventSequence(prepareEventSequence(builder.build()))
+                                    .eventCode(MISCELLANEOUS.getCode())
+                                    .dateReceived(respondent2ResponseDate)
+                                    .eventDetailsText(miscText)
+                                    .eventDetails(EventDetails.builder()
+                                                      .miscText(miscText)
+                                                      .build())
+                                    .build());
             }
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.miscellaneous(Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getRespondent2ResponseDate())
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
-                .build());
+                                .eventSequence(prepareEventSequence(builder.build()))
+                                .eventCode(MISCELLANEOUS.getCode())
+                                .dateReceived(caseData.getRespondent2ResponseDate())
+                                .eventDetailsText(miscText)
+                                .eventDetails(EventDetails.builder()
+                                                  .miscText(miscText)
+                                                  .build())
+                                .build());
         }
     }
 
@@ -2349,8 +2348,8 @@ public class EventHistoryMapper {
             .litigiousPartyID(party.getRole().equals(RESPONDENT_ONE) ? RESPONDENT_ID : RESPONDENT2_ID)
             .eventDetailsText(getExtensionEventText(scenario, party))
             .eventDetails(EventDetails.builder()
-                .agreedExtensionDate(party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE))
-                .build())
+                              .agreedExtensionDate(party.getSolicitorAgreedDeadlineExtension().format(ISO_DATE))
+                              .build())
             .build();
     }
 
@@ -2362,7 +2361,7 @@ public class EventHistoryMapper {
                 return format("Defendant(s) have agreed extension: %s", extensionDate);
             case ONE_V_TWO_TWO_LEGAL_REP:
                 return format("Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
-                    extensionDate
+                              extensionDate
                 );
             default:
                 return format("agreed extension date: %s", extensionDate);
@@ -2385,8 +2384,8 @@ public class EventHistoryMapper {
                 .dateReceived(eventDate)
                 .eventDetailsText(miscText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(miscText)
-                    .build())
+                                  .miscText(miscText)
+                                  .build())
                 .build());
     }
 
@@ -2400,8 +2399,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getTakenOfflineDate())
                 .eventDetailsText(detailsText)
                 .eventDetails(EventDetails.builder()
-                    .miscText(detailsText)
-                    .build())
+                                  .miscText(detailsText)
+                                  .build())
                 .build());
     }
 
@@ -2420,8 +2419,8 @@ public class EventHistoryMapper {
                     .dateReceived(LocalDateTime.now())
                     .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                     .eventDetails(EventDetails.builder()
-                        .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
-                        .build())
+                                      .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
+                                      .build())
                     .build());
         }
 
@@ -2432,7 +2431,7 @@ public class EventHistoryMapper {
             && caseData.getDefendantDetailsSpec() != null
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both");
-        String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
+        String miscTextRequested =  "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
 
         if (featureToggleService.isJOLiveFeedActive()) {
@@ -2447,8 +2446,8 @@ public class EventHistoryMapper {
                     .dateReceived(getDateOfDjCreated(caseData))
                     .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                     .eventDetails(EventDetails.builder()
-                        .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
-                        .build())
+                                      .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
+                                      .build())
                     .build());
         }
     }
@@ -2521,8 +2520,8 @@ public class EventHistoryMapper {
                     .dateReceived(setApplicant1ResponseDate(caseData))
                     .eventDetailsText(RPA_REASON_MANUAL_DETERMINATION)
                     .eventDetails(EventDetails.builder()
-                        .miscText(RPA_REASON_MANUAL_DETERMINATION)
-                        .build())
+                                      .miscText(RPA_REASON_MANUAL_DETERMINATION)
+                                      .build())
                     .build());
         }
     }
@@ -2541,14 +2540,14 @@ public class EventHistoryMapper {
                     .dateReceived(setApplicant1ResponseDate(caseData))
                     .eventDetailsText(RPA_IN_MEDIATION)
                     .eventDetails(EventDetails.builder()
-                        .miscText(RPA_IN_MEDIATION)
-                        .build())
+                                      .miscText(RPA_IN_MEDIATION)
+                                      .build())
                     .build());
         }
     }
 
     private void buildClaimantDirectionQuestionnaireForSpec(EventHistory.EventHistoryBuilder builder,
-                                                            CaseData caseData) {
+                                               CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
 
         CaseCategory claimType = caseData.getCaseAccessCategory();
@@ -2556,22 +2555,22 @@ public class EventHistoryMapper {
         if (SPEC_CLAIM.equals(claimType)) {
             List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-                        .dateReceived(applicantDetails.get(index).getResponseDate())
-                        .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                        .eventDetails(EventDetails.builder()
-                            .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                            .preferredCourtCode(
-                                getPreferredCourtCode(caseData.getApplicant1DQ()))
-                            .preferredCourtName("")
-                            .build())
-                        .eventDetailsText(prepareEventDetailsText(
-                            applicantDetails.get(index).getDq(),
-                            getPreferredCourtCode(caseData.getApplicant1DQ())
-                        ))
-                        .build())
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
+                                  .dateReceived(applicantDetails.get(index).getResponseDate())
+                                  .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                                  .eventDetails(EventDetails.builder()
+                                                    .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
+                                                    .preferredCourtCode(
+                                                        getPreferredCourtCode(caseData.getApplicant1DQ()))
+                                                    .preferredCourtName("")
+                                                    .build())
+                                  .eventDetailsText(prepareEventDetailsText(
+                                      applicantDetails.get(index).getDq(),
+                                      getPreferredCourtCode(caseData.getApplicant1DQ())
+                                  ))
+                                  .build())
                 .toList();
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         }
@@ -2607,8 +2606,8 @@ public class EventHistoryMapper {
                 .dateReceived(caseData.getTakenOfflineDate())
                 .eventDetailsText("RPA Reason : Notice of Change filed.")
                 .eventDetails(EventDetails.builder()
-                    .miscText("RPA Reason : Notice of Change filed.")
-                    .build())
+                                  .miscText("RPA Reason : Notice of Change filed.")
+                                  .build())
                 .build());
     }
 
@@ -2630,8 +2629,8 @@ public class EventHistoryMapper {
                     .dateReceived(LocalDateTime.now())
                     .eventDetailsText("RPA Reason: LiP vs LR - full/part admission received.")
                     .eventDetails(EventDetails.builder()
-                        .miscText("RPA Reason: LiP vs LR - full/part admission received.")
-                        .build())
+                                      .miscText("RPA Reason: LiP vs LR - full/part admission received.")
+                                      .build())
                     .build());
         }
     }
