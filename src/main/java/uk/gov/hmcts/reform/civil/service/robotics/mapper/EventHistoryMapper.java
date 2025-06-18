@@ -410,25 +410,33 @@ public class EventHistoryMapper {
             .dateReceived(getDateOfDjCreated(caseData))
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
-            .eventDetails(EventDetails.builder()
-                              .miscText("")
-                              .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
-                                                 ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                                                 : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
-                              .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
-                              .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
-                              .paymentInFullDate(paymentInFullDate)
-                              .installmentAmount(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)
-                                                     ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
-                                                     : ZERO)
-                              .installmentPeriod(getInstallmentPeriod(caseData))
-                              .firstInstallmentDate(caseData.getRepaymentDate())
-                              .dateOfJudgment(getDateOfDjCreated(caseData))
-                              .jointJudgment(caseData.getRespondent2() != null)
-                              .judgmentToBeRegistered(false)
-                              .build())
+            .eventDetails(getDefaultJudgmentEventDetails(caseData, amountClaimedWithInterest, partialPaymentPounds, paymentInFullDate))
             .build();
+    }
+
+    private EventDetails getDefaultJudgmentEventDetails(CaseData caseData, BigDecimal amountClaimedWithInterest, BigDecimal partialPaymentPounds, LocalDateTime paymentInFullDate) {
+        var builder = EventDetails.builder()
+            .miscText("")
+            .amountOfJudgment(amountClaimedWithInterest.setScale(2))
+            .amountOfCosts((caseData.isApplicantLipOneVOne() && featureToggleService.isLipVLipEnabled())
+                               ? MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+                               : JudgmentsOnlineHelper.getCostOfJudgmentForDJ(caseData))
+            .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES) ? partialPaymentPounds : ZERO)
+            .isJudgmentForthwith(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY))
+            .paymentInFullDate(paymentInFullDate)
+            .installmentAmount(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                                   ? getInstallmentAmount(caseData.getRepaymentSuggestion()).setScale(2)
+                                   : ZERO)
+            .installmentPeriod(getInstallmentPeriod(caseData))
+            .firstInstallmentDate(caseData.getRepaymentDate())
+            .jointJudgment(caseData.getRespondent2() != null)
+            .judgmentToBeRegistered(false);
+
+        if (!isEitherDefendantLip(caseData)) {
+            builder.dateOfJudgment(getDateOfDjCreated(caseData));
+        }
+
+        return builder.build();
     }
 
     private LocalDateTime getDateOfDjCreated(CaseData caseData) {
@@ -2637,5 +2645,9 @@ public class EventHistoryMapper {
         return featureToggleService.isJOLiveFeedActive()
             ? caseData.getJoJudgementByAdmissionIssueDate()
             : setApplicant1ResponseDate(caseData);
+    }
+
+    private boolean isEitherDefendantLip(CaseData caseData) {
+        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP();
     }
 }

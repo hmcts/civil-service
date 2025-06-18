@@ -97,7 +97,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", true);
+            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", false);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -122,6 +122,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             now = LocalDateTime.now();
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any())).willReturn(respondToDeadline);
+            ReflectionTestUtils.setField(handler, "caseFlagsLoggingEnabled", false);
+
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         }
 
