@@ -14,15 +14,10 @@ import static java.util.Objects.requireNonNull;
 public class DeadlineExtensionCalculatorService {
 
     private final WorkingDayIndicator workingDayIndicator;
+    private final DeadlineExtensionDateTimeHelper deadlineExtensionDateTimeHelper;
 
     public LocalDate calculateExtendedDeadline(LocalDate responseDate, int plusDays) {
-        int workingDaysCounter = 0;
-        requireNonNull(responseDate);
-
-        if (plusDays == 0) {
-            return workingDayIndicator.getNextWorkingDay(responseDate);
-        }
-        return calculateWorkingDays(responseDate.plusDays(1), plusDays, workingDaysCounter);
+        return calculateExtendedDeadline(deadlineExtensionDateTimeHelper.createDateTimeWithNowTime(responseDate), plusDays);
     }
 
     public LocalDate calculateExtendedDeadline(LocalDateTime responseDate, int plusDays) {
