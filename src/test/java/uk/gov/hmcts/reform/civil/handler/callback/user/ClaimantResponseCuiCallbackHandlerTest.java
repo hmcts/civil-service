@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
@@ -643,6 +645,26 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedCaseData.getActiveJudgment()).isNotNull();
             assertThat(updatedCaseData.getJoIsLiveJudgmentExists()).isEqualTo(YES);
             assertThat(updatedCaseData.getJoJudgementByAdmissionIssueDate()).isEqualTo(now);
+        }
+
+        @Test
+        void shouldUpdateLanguagePreferenceWhenWelshDocsSelected() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1ResponseDate(LocalDateTime.now())
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(NO)
+                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
+                    Language.WELSH).build()).build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+            assertThat(updatedCaseData.getClaimantBilingualLanguagePreference()).isEqualTo("WELSH");
         }
     }
 
