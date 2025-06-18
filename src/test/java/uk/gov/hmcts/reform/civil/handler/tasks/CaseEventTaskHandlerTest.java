@@ -665,7 +665,8 @@ class CaseEventTaskHandlerTest {
                              Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
-                             Map.entry(FlowFlag.WELSH_ENABLED.name(), false)
+                             Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                             Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)) {
@@ -678,7 +679,8 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
-                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false)
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(FULL_ADMISSION)
                 || state.equals(PART_ADMISSION)
@@ -693,7 +695,8 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
-                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false)
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(CLAIM_DETAILS_NOTIFIED)
                 || state.equals(NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION)) {
@@ -706,7 +709,8 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
-                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false)
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
 
             } else if (state.equals(FULL_DEFENCE_PROCEED)) {
@@ -720,7 +724,8 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
-                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false)
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             }
             return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
