@@ -478,8 +478,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
             BigDecimal expectedSubTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                .add(caseData.getTotalInterest())
-                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+                    .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
             assertThat(subTotal).isEqualTo(expectedSubTotal);
 
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
