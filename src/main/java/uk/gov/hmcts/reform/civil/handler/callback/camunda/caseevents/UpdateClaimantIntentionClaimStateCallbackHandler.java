@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
     private final ObjectMapper objectMapper;
     private final UpdateClaimStateService updateClaimStateService;
     private final ToggleConfiguration toggleConfiguration;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
