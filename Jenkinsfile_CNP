@@ -142,6 +142,7 @@ withPipeline(type, product, component) {
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
         ./bin/wait-for.sh definition-store
         ./bin/add-roles.sh
+        chmod +x ./bin/load-wiremock-mappings.sh
         ./bin/load-wiremock-mappings.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
