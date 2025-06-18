@@ -85,11 +85,13 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         CaseQueriesCollection claimantQueries = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")
+                                                   .createdBy("claimant")
                                                    .build(),
                     CaseMessage.builder()
-                            .id("queryId")
-                            .parentId("123457")
-                            .build())))
+                        .id("queryId")
+                        .createdBy("claimant")
+                        .parentId("123457")
+                        .build())))
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
@@ -134,12 +136,14 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                 .build());
         CaseQueriesCollection defendantQueries = CaseQueriesCollection.builder()
                 .caseMessages(wrapElements(List.of(CaseMessage.builder()
-                                .id("123457")
-                                .build(),
-                        CaseMessage.builder()
-                                .id("queryId")
-                                .parentId("123457")
-                                .build())))
+                                                       .id("123457")
+                                                       .createdBy("defendant")
+                                                       .build(),
+                                                   CaseMessage.builder()
+                                                       .id("queryId")
+                                                       .createdBy("defendant")
+                                                       .parentId("123457")
+                                                       .build())))
                 .build();
         CaseData caseData = CaseData.builder()
                 .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())

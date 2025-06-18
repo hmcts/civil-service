@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
+import uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesCreatedByUser;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
@@ -75,7 +77,8 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
         ScenarioRequestParams
             notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        if (isLIPClaimant(roles) && caseData.getQueries() != null) {
+        if (isLIPClaimant(roles) && caseData.getQueries() != null
+            && hasQueryRaisedByLipUser(caseData, queryId)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE.getScenario(),
@@ -89,7 +92,8 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
                 notificationParams
             );
         }
-        if (isLIPDefendant(roles) && caseData.getQueries() != null) {
+        if (isLIPDefendant(roles) && caseData.getQueries() != null
+            && hasQueryRaisedByLipUser(caseData, queryId)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT_DELETE.getScenario(),
@@ -104,5 +108,12 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private boolean hasQueryRaisedByLipUser(CaseData caseData, String queryId) {
+        CaseMessage query = CaseQueriesUtil.getQueryById(caseData, queryId);
+        String createdBy = query.getCreatedBy();
+        List<CaseMessage> queriesCreatedByUser = getUserQueriesCreatedByUser(caseData, createdBy);
+        return queriesCreatedByUser.size() > 0;
     }
 }
