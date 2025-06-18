@@ -124,6 +124,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CaseData caseData;
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
         private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
+        private static final String CLAIMANT_PARTY_NAME = "Clay Mint";
 
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
@@ -162,9 +163,17 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder()
+                                .type(Party.Type.INDIVIDUAL)
+                                .partyName(CLAIMANT_PARTY_NAME)
+                                .individualFirstName("Clay")
+                                .individualLastName("Mint")
+                                .build())
                 .respondent1(Party.builder()
                     .type(Party.Type.INDIVIDUAL)
                     .partyName(DEFENDANT_PARTY_NAME)
+                    .individualFirstName("Dave")
+                    .individualLastName("Indent")
                     .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
                 .build();
 
@@ -180,6 +189,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getPartyName().equals(DEFENDANT_PARTY_NAME));
             assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getType().equals(Party.Type.INDIVIDUAL));
+            assertThat(updatedData.getAllPartyNames()).isEqualTo("Clay Mint V Dave Indent");
         }
 
         @Test

@@ -35,6 +35,8 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -1652,7 +1654,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             finalCaseDocuments.add(element(finalOrder));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocumentCollection(new ArrayList<>())
                 .finalOrderDocument(finalOrder)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
                 .build();
@@ -1666,6 +1668,100 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .build();
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection()).hasSize(1);
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .build();
+            caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+        }
+
+        @Test
+        void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(theUserService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                            .forename("Judge")
+                                                                            .surname("Judy")
+                                                                            .roles(Collections.emptyList()).build());
+            // Given
+            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
+            finalCaseDocuments.add(element(finalOrder));
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                .build();
+            caseData = caseData.toBuilder().caseDataLiP(CaseDataLiP.builder()
+                                            .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                        .respondent1ResponseLanguage("WELSH").build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
+            assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
+            assertThat(updatedData.getFinalOrderDocumentCollection()).hasSize(1);
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getPreTranslationDocuments().get(0)
                            .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
         }
 

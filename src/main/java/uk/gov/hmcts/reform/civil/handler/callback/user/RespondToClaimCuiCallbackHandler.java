@@ -14,19 +14,24 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_CUI);
+    private static final int DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION_MONTHS = 24;
 
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -56,6 +62,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     @Value("${case-flags.logging.enabled:false}")
     private boolean caseFlagsLoggingEnabled;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -93,11 +100,20 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(
             caseData, builder, updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams));
 
-        CaseData updatedData = builder.build();
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, builder);
+        CaseData updatedData = builder.claimDismissedDeadline(
+            deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION_MONTHS,
+                LocalDate.now()
+            )).build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        if (!caseData.isRespondentResponseBilingual()) {
+        boolean needsTranslating = featureToggleService.isGaForWelshEnabled()
+            ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())
+            : caseData.isRespondentResponseBilingual();
+
+        if (!needsTranslating) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
 
@@ -119,25 +135,47 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             log.info(
                 "case id: {}, respondToAdmittedClaimOwingAmount: {}",
                 callbackParams.getRequest().getCaseDetails().getId(),
-                 respondToAdmittedClaimOwingAmount
+                respondToAdmittedClaimOwingAmount
             );
         }
         CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
-        CaseData.CaseDataBuilder<?, ?> builder =  caseData.toBuilder()
+        LocalDateTime applicantDeadline = deadlinesCalculator.calculateApplicantResponseDeadline(
+            responseDate
+        );
+
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
             .respondent1ClaimResponseDocumentSpec(dummyDocument)
-            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null, featureToggleService, caseData).name())
-            .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
-                responseDate
-            ));
+            .responseClaimTrack(AllocatedTrack.getAllocatedTrack(
+                caseData.getTotalClaimAmount(),
+                null,
+                null,
+                featureToggleService,
+                caseData
+            ).name())
+            .applicant1ResponseDeadline(applicantDeadline)
+            .nextDeadline(applicantDeadline.toLocalDate());
+
         if (featureToggleService.isGaForWelshEnabled()) {
-            String respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
-                .map(CaseDataLiP::getRespondent1LiPResponse)
-                .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
-                .orElse(null);
+            Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
+                .map(Respondent1DQ::getRespondent1DQLanguage).map(WelshLanguageRequirements::getDocuments);
+            String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
+            optionalLanguage.ifPresent(docLanguage -> {
+                CaseDataLiP caseDataLiP = caseData.getCaseDataLiP();
+                builder.caseDataLiP(caseDataLiP.toBuilder()
+                                        .respondent1LiPResponse(caseDataLiP.getRespondent1LiPResponse().toBuilder()
+                                                                    .respondent1ResponseLanguage(docLanguage.name()).build())
+                                        .build());
+            });
+            if (respondentLanguageString == null) {
+                respondentLanguageString = Optional.ofNullable(caseData.getCaseDataLiP())
+                    .map(CaseDataLiP::getRespondent1LiPResponse)
+                    .map(RespondentLiPResponse::getRespondent1ResponseLanguage)
+                    .orElse(null);
+            }
             builder.defendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
         }
         return builder.build();

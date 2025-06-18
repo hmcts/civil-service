@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnli
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -447,6 +448,67 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenNoFixedCosts() {
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(1500))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1Represented(YES)
+                .specRespondent1Represented(YES)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(new BigDecimal(1000))
+                .claimFee(fee)
+                .fixedCosts(FixedCosts.builder().claimFixedCosts(NO).build())
+                .totalInterest(BigDecimal.valueOf(100))
+                .build();
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            BigDecimal claimFee = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimFee();
+            assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
+
+            BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
+            BigDecimal expectedSubTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
+                .add(caseData.getTotalInterest())
+                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+            assertThat(subTotal).isEqualTo(expectedSubTotal);
+
+            BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
+            assertThat(finalTotal).isEqualTo(subTotal);
+        }
+
+        @Test
+        void shouldCheckValidateAmountPaid_withCcJPaymentDetailsWhenYesFixedCosts() {
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(1500))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1Represented(YES)
+                .specRespondent1Represented(YES)
+                .applicant1Represented(YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .totalClaimAmount(new BigDecimal(1000))
+                .fixedCosts(FixedCosts.builder().claimFixedCosts(YES).build())
+                .build();
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
     }
 
     @Nested
@@ -760,6 +822,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
 
             AboutToStartOrSubmitCallbackResponse response;
             try (MockedStatic<LocalDateTime> mock = mockStatic(LocalDateTime.class, CALLS_REAL_METHODS)) {

@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -22,10 +24,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
-import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -62,6 +65,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final JudgmentByAdmissionOnlineMapper judgmentByAdmissionOnlineMapper;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -103,7 +107,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .respondent1RespondToSettlementAgreementDeadline(caseData.isClaimantBilingual() ? null : getRespondToSettlementAgreementDeadline(
                 caseData,
                 applicant1ResponseDate
-            ));
+            ))
+            .nextDeadline(null);
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
@@ -115,6 +120,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
+        updateLanguagePreference(builder, caseData);
         populateDQPartyIds(builder);
         addEventAndDateAddedToApplicantExperts(builder);
         addEventAndDateAddedToApplicantWitnesses(builder);
@@ -130,6 +136,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 .joIsLiveJudgmentExists(YES)
                 .joJudgementByAdmissionIssueDate(LocalDateTime.now());
         }
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, builder);
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
@@ -152,6 +159,14 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
             builder.ccjPaymentDetails(ccjPaymentDetails).build();
+        }
+    }
+
+    private void updateLanguagePreference(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
+        if (featureToggleService.isGaForWelshEnabled()) {
+            Optional.ofNullable(caseData.getApplicant1DQ())
+                .map(Applicant1DQ::getApplicant1DQLanguage).map(WelshLanguageRequirements::getDocuments)
+                .ifPresent(documentLanguage -> builder.claimantBilingualLanguagePreference(documentLanguage.name()));
         }
     }
 
