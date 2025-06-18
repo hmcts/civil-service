@@ -115,10 +115,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = judgementService.validateAmountPaid(caseData);
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        if (judgementService.isLrPayImmediatelyPlan(caseData)) {
-            if (Objects.nonNull(caseData.getFixedCosts()) && YesOrNo.NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
-                updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
-            }
+        if (judgementService.isLrPayImmediatelyPlan(caseData)
+            && Objects.nonNull(caseData.getFixedCosts())
+            && YesOrNo.NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
