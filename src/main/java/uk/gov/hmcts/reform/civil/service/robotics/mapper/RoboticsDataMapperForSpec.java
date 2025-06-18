@@ -78,15 +78,11 @@ public class RoboticsDataMapperForSpec {
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
-        BigDecimal amountClaimed = caseData.getTotalClaimAmount() != null
-            ? caseData.getTotalClaimAmount() : BigDecimal.ZERO;
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !caseData.isPartAdmitClaimSpec()) {
-            BigDecimal claimInterest = caseData.getTotalInterest() != null
-                ? caseData.getTotalInterest() : BigDecimal.ZERO;
-            amountClaimed = caseData.getTotalClaimAmount().add(claimInterest);
-        }
+        BigDecimal claimInterest = caseData.getTotalInterest() != null
+            ? caseData.getTotalInterest() : BigDecimal.ZERO;
+        BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
         return ClaimDetails.builder()
-            .amountClaimed(amountClaimed)
+            .amountClaimed(amountClaimedWithInterest)
             .courtFee(ofNullable(caseData.getClaimFee())
                 .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
                 .orElse(null))
