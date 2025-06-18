@@ -8142,8 +8142,6 @@ public class CaseDataBuilder {
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
             .nextDeadline(nextDeadline)
-            .qmApplicantCitizenQueries(qmApplicantCitizenQueries)
-            .qmRespondentCitizenQueries(qmRespondentCitizenQueries)
             .fixedCosts(fixedCosts)
             .build();
     }

@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
-
 @Service
 public class CaseDismissClaimantDashboardNotificationHandler extends DashboardCallbackHandler {
 

@@ -97,7 +97,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                 ).build()
             )
             .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
-            .qmApplicantCitizenQueries(claimantQueries)
+            .queries(claimantQueries)
             .legacyCaseReference("reference")
             .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
             .ccdCaseReference(1234L)
@@ -143,7 +143,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                 .build();
         CaseData caseData = CaseData.builder()
                 .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
-                .qmRespondentCitizenQueries(defendantQueries)
+                .queries(defendantQueries)
                 .legacyCaseReference("reference")
                 .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
                 .ccdCaseReference(1234L)

@@ -47,7 +47,6 @@ public class CaseQueriesUtil {
         throw new IllegalArgumentException("Unsupported action for no queries on case");
     }
 
-
     //ToDo: Remove this and all its usages after public queries release.
     public static CaseQueriesCollection getUserQueriesByRole(CaseData caseData, List<String> roles) {
         if (isApplicantSolicitor(roles)) {

@@ -54,6 +54,7 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
+    public static final String PUBLIC_QUERIES_PARTY_NAME = "All queries";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -96,7 +97,9 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
             buildLatestQuery(latestCaseMessage));
 
-        if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build());
+        } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
             updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
         }
 
