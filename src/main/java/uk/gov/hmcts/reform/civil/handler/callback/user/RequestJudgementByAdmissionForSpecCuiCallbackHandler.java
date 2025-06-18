@@ -101,6 +101,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+        if (judgementService.isLrPayImmediatelyPlan(caseData)) {
+            updatedCaseData.ccjJudgmentAmountShowInterest(YesOrNo.NO);
+        }
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -113,7 +116,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         List<String> errors = judgementService.validateAmountPaid(caseData);
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         if (judgementService.isLrPayImmediatelyPlan(caseData)) {
-            updatedCaseData.ccjJudgmentAmountShowInterest(YesOrNo.NO);
             if (Objects.nonNull(caseData.getFixedCosts()) && YesOrNo.NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
             }
