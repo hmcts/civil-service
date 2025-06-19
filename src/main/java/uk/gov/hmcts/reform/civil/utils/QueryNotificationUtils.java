@@ -86,13 +86,6 @@ public class QueryNotificationUtils {
         return getOtherPartyRecipientList(caseData, roles, organisationService);
     }
 
-    public static List<Map<String, String>> getOtherPartyRecipientList(
-        CaseData caseData, OrganisationService organisationService,
-        CoreCaseUserService coreCaseUserService, String queryId) {
-        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
-        return getOtherPartyRecipientList(caseData, roles, organisationService);
-    }
-
     private static List<Map<String, String>> getOtherPartyRecipientList(CaseData caseData, List<String> roles,
                                                                         OrganisationService organisationService) {
         List<Map<String, String>> emailDetailsList = new ArrayList<>();

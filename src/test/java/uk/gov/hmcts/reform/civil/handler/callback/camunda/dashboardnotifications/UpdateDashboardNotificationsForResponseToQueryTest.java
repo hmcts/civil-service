@@ -82,6 +82,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("queryId")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection claimantQueries = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")
@@ -134,6 +135,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("queryId")
                 .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantQueries = CaseQueriesCollection.builder()
                 .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                        .id("123457")

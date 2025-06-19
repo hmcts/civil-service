@@ -80,6 +80,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123456")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
                                            .id("123456")
@@ -121,6 +122,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
                                            .id("123457")
@@ -162,6 +164,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")
@@ -207,6 +210,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")

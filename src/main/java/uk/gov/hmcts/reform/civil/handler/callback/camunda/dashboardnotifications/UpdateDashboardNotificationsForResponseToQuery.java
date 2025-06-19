@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 import uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil;
@@ -47,6 +48,7 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
     private final DashboardNotificationsParamsMapper mapper;
     private final CoreCaseUserService coreCaseUserService;
     private final QueryManagementCamundaService runtimeService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,6 +69,9 @@ public class UpdateDashboardNotificationsForResponseToQuery extends CallbackHand
 
     private CallbackResponse createDashboardNotification(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
         QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
         String queryId = processVariables.getQueryId();
