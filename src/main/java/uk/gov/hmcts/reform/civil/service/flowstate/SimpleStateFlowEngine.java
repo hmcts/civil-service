@@ -31,12 +31,10 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     }
 
-    @Deprecated
     public StateFlow evaluate(CaseDetails caseDetails) {
         return evaluate(caseDetailsConverter.toCaseData(caseDetails));
     }
 
-    @Deprecated
     public StateFlow evaluate(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
@@ -44,12 +42,10 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
         return stateFlowBuilder.build(FlowState.Main.DRAFT).evaluate(caseData);
     }
 
-    @Deprecated
     public StateFlow evaluateSpec(CaseDetails caseDetails) {
         return evaluateSpec(caseDetailsConverter.toCaseData(caseDetails));
     }
 
-    @Deprecated
     public StateFlow evaluateSpec(CaseData caseData) {
         return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
     }

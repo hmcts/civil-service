@@ -5403,6 +5403,37 @@ class SimpleStateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnStateFlowDto_whenEvaluatingCaseDetailsSpec() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
+                .ccdState(CaseState.CASE_ISSUED)
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            StateFlowDTO stateFlowDTO = stateFlowEngine.getStateFlow(caseData);
+
+            // Then
+            assertThat(stateFlowDTO.getState()).isNotNull();
+            assertThat(stateFlowDTO.getState().getName()).isEqualTo(CLAIM_ISSUED.fullName());
+        }
+
+        @Test
         void shouldReturnStateFlowDto_whenEvaluatingCaseDetailsWithSpec() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
