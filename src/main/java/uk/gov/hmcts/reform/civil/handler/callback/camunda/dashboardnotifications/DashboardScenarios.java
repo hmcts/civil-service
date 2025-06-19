@@ -144,6 +144,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION("Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Claimant"),
     SCENARIO_AAA6_DEFENDANT_SDO_DRAWN_PRE_CASE_PROGRESSION("Scenario.AAA6.ClaimantIntent.SDODrawn.PreCaseProgression.Defendant"),
     SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant"),
+    SCENARIO_AAA6_ENGLISH_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT("Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT("Scenario.AAA6.CaseProceedsInCaseman.Claimant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT("Scenario.AAA6.CaseProceedsInCaseman.Defendant"),
     SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES("Scenario.AAA6.CaseProceedsInCaseman.Claimant.FastTrack"),
