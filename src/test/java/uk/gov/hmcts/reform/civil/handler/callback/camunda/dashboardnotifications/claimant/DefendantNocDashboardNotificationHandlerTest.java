@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_NOC;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_NOC_CLAIMANT_HEARING_FEE_TASK_LIST;
@@ -345,7 +346,8 @@ class DefendantNocDashboardNotificationHandlerTest extends BaseCallbackHandlerTe
 
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(123455L)
-                .ccdState(All_FINAL_ORDERS_ISSUED)
+                .previousCCDState(All_FINAL_ORDERS_ISSUED)
+                .ccdState(PROCEEDS_IN_HERITAGE_SYSTEM)
                 .applicant1Represented(YesOrNo.NO)
                 .activeJudgment(activeJudgment)
                 .build();
