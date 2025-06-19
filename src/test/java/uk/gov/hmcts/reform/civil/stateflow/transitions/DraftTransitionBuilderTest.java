@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
@@ -250,6 +253,7 @@ public class DraftTransitionBuilderTest {
         when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
         when(mockFeatureToggleService.isGaForLipsEnabled()).thenReturn(true);
         when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+        when(mockFeatureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
             .defendant1LIPAtClaimIssued(YES).build();
 
@@ -260,7 +264,7 @@ public class DraftTransitionBuilderTest {
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), true),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
             entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
-            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
+            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
             entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
@@ -311,6 +315,37 @@ public class DraftTransitionBuilderTest {
 
         assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
         assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+    }
+
+    @Test
+    void shouldResolve_whenUnrepresentedDefendantWithJudgmentByAdmissionForNoc() {
+        when(mockFeatureToggleService.isDashboardEnabledForCase(any())).thenReturn(true);
+        when(mockFeatureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(mockFeatureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(NO)
+            .specRespondent1Represented(NO)
+            .applicant1Represented(NO)
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .activeJudgment(JudgmentDetails.builder()
+                                .type(JudgmentType.JUDGMENT_BY_ADMISSION)
+                                .build())
+            .build();
+
+        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(12).contains(
+            entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
+            entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
+            entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), true),
+            entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
+            entry("UNREPRESENTED_DEFENDANT_ONE", true),
+            entry("UNREPRESENTED_DEFENDANT_TWO", false),
+            entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
+            entry(FlowFlag.WELSH_ENABLED.name(), false),
+            entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), true)
+        );
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
