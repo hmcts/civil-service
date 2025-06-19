@@ -2343,7 +2343,7 @@ class SimpleStateFlowEngineTest {
         }
 
         @Test
-            //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
+        //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
         void shouldAwaitResponse_1v2DiffSol_whenBothRespondFullDefenceAndTimeExtension() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -3555,7 +3555,7 @@ class SimpleStateFlowEngineTest {
         class DefendantResponseMultiparty {
 
             @Test
-                //1v2 Different solicitor scenario-first response FullDefence received
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3598,7 +3598,7 @@ class SimpleStateFlowEngineTest {
             }
 
             @Test
-                //1v2 Different solicitor scenario-first response FullDefence received
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsNotFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3640,7 +3640,7 @@ class SimpleStateFlowEngineTest {
             }
 
             @Test
-                //1v2 Different solicitor scenario-first response FullDefence received
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3683,8 +3683,8 @@ class SimpleStateFlowEngineTest {
             }
 
             @Test
-                //1v2 Different solicitor scenario-first party acknowledges, not responds
-                //second party submits response FullDefence
+            //1v2 Different solicitor scenario-first party acknowledges, not responds
+            //second party submits response FullDefence
             void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3811,7 +3811,7 @@ class SimpleStateFlowEngineTest {
             }
 
             @Test
-                //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
+            //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenRep1AcknowledgedAndBothSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3856,7 +3856,7 @@ class SimpleStateFlowEngineTest {
             }
 
             @Test
-                //Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
+            //Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
             void shouldReturnFullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponses() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3901,7 +3901,7 @@ class SimpleStateFlowEngineTest {
             }
 
             @Test
-                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3944,7 +3944,7 @@ class SimpleStateFlowEngineTest {
             }
 
             @Test
-                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder()
@@ -5057,8 +5057,8 @@ class SimpleStateFlowEngineTest {
                 // part admit
                 .respondent1ResponseDate(LocalDateTime.now())
                 .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                                 .build())
+                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                    .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .claimNotificationDate(LocalDateTime.now())
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -5137,8 +5137,8 @@ class SimpleStateFlowEngineTest {
                 // part admit
                 .respondent1ResponseDate(LocalDateTime.now())
                 .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
-                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
-                                 .build())
+                    .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                    .build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .claimNotificationDate(LocalDateTime.now())
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -5216,17 +5216,17 @@ class SimpleStateFlowEngineTest {
                 .paymentSuccessfulDate(null)
                 .claimIssuedPaymentDetails(null)
                 .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
-                                            .timestamp(LocalDateTime.now())
-                                            .organisationToAddID("HA160")
-                                            .build())
+                    .timestamp(LocalDateTime.now())
+                    .organisationToAddID("HA160")
+                    .build())
                 .caseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFeesReferenceNumber("Test")
-                                                   .build())
-                                 .build())
+                    .helpWithFees(HelpWithFees.builder()
+                        .helpWithFeesReferenceNumber("Test")
+                        .build())
+                    .build())
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForClaimIssue(YES)
-                                              .build())
+                    .hwfFullRemissionGrantedForClaimIssue(YES)
+                    .build())
                 .ccdState(CaseState.CASE_PROGRESSION)
                 .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
                 .caseAccessCategory(SPEC_CLAIM).build();
@@ -5260,17 +5260,17 @@ class SimpleStateFlowEngineTest {
                 .paymentSuccessfulDate(null)
                 .claimIssuedPaymentDetails(null)
                 .changeOfRepresentation(ChangeOfRepresentation.builder().caseRole("RESPONDENTSOLICITORONE")
-                                            .timestamp(LocalDateTime.now())
-                                            .organisationToAddID("HA160")
-                                            .build())
+                    .timestamp(LocalDateTime.now())
+                    .organisationToAddID("HA160")
+                    .build())
                 .caseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFeesReferenceNumber("Test")
-                                                   .build())
-                                 .build())
+                    .helpWithFees(HelpWithFees.builder()
+                        .helpWithFeesReferenceNumber("Test")
+                        .build())
+                    .build())
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForClaimIssue(YES)
-                                              .build())
+                    .hwfFullRemissionGrantedForClaimIssue(YES)
+                    .build())
                 .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
                 .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
                 .caseAccessCategory(SPEC_CLAIM).build();
@@ -5336,13 +5336,13 @@ class SimpleStateFlowEngineTest {
                 .paymentSuccessfulDate(null)
                 .claimIssuedPaymentDetails(null)
                 .caseDataLiP(CaseDataLiP.builder()
-                                 .helpWithFees(HelpWithFees.builder()
-                                                   .helpWithFeesReferenceNumber("Test")
-                                                   .build())
-                                 .build())
+                    .helpWithFees(HelpWithFees.builder()
+                        .helpWithFeesReferenceNumber("Test")
+                        .build())
+                    .build())
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForClaimIssue(YES)
-                                              .build())
+                    .hwfFullRemissionGrantedForClaimIssue(YES)
+                    .build())
                 .ccdState(CaseState.CASE_PROGRESSION)
                 .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
                 .caseAccessCategory(SPEC_CLAIM).build();
