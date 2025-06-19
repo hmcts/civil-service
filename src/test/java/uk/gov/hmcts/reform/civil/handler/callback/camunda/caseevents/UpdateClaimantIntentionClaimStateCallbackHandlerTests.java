@@ -81,7 +81,6 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
     @Test
     void shouldUpdateCaseStateForFullDefenceNotProcessIfClaimantBilingual() {
         // given
-        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder().claimantBilingualLanguagePreference("BOTH")
             .applicant1ProceedWithClaim(YesOrNo.NO).build();
 

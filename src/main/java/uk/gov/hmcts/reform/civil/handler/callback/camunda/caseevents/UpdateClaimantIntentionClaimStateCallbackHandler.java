@@ -72,8 +72,6 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
     }
 
     private boolean isClaimantNotBilingualAndNotSignedSettlementAgreement(CaseData caseData) {
-        return ((!caseData.isClaimantBilingual() && !caseData.hasApplicant1SignedSettlementAgreement())
-            || (featureToggleService.isDefendantNoCOnlineForCase(caseData)
-            && caseData.hasApplicantNotProceededWithClaim()));
+        return (!caseData.hasApplicant1SignedSettlementAgreement());
     }
 }
