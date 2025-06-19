@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -653,11 +654,7 @@ public class EventHistoryMapper {
         boolean isResponsePayByInstallment = caseData.isPayByInstallment();
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
-            .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                                  .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                                           ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
-                                  .setScale(2))
+            .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
             .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
@@ -684,6 +681,20 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
+    }
+
+    @NotNull
+    BigDecimal getAmountOfJudgmentForAdmission(CaseData caseData) {
+        BigDecimal claimAmount = caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount();
+        BigDecimal interest = ZERO;
+        if (caseData.isLipvLipOneVOne()) {
+            if (!caseData.isPartAdmitClaimSpec()) {
+                interest = caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest();
+            }
+        } else {
+            interest = Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
+        }
+        return claimAmount.add(interest).setScale(2);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,

@@ -51,7 +51,8 @@ public class RetriggerCasesEventHandler extends BaseExternalTaskHandler {
                 break;
             }
             try {
-                log.info("Retrigger CaseId: {} started", caseId);
+                log.info("" +
+                    "Retrigger CaseId: {} started", caseId);
                 externalTask.getAllVariables().put("caseId", caseId);
                 coreCaseDataService.triggerEvent(
                     parseLong(caseId.trim()),
