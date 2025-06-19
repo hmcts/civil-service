@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DirectionsQuestionnairePreparer {
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
@@ -138,6 +140,14 @@ public class DirectionsQuestionnairePreparer {
 
     private void singleResponseFile(String bearerToken, CaseData caseData,
                                     CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isLRvLipOneVOne() && caseData.isRespondentResponseBilingual()) {
+            log.info("ADDING PRE TRANSLATED DQ TO preTranslationDocuments");
+            CaseDocument directionsQuestionnairePretranslation = directionsQuestionnaireGenerator.generate(caseData, bearerToken);
+            assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnairePretranslation, DocCategory.APP1_DQ.getValue());
+            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+            preTranslationDocuments.add(element(directionsQuestionnairePretranslation));
+        } else {
         CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
             caseData,
             bearerToken
@@ -179,6 +189,9 @@ public class DirectionsQuestionnairePreparer {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DQ_DEF1.getValue());
             }
         }
+        }
+    }
+
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {

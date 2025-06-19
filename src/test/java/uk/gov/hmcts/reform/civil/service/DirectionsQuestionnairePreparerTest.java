@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator;
@@ -68,6 +70,34 @@ class DirectionsQuestionnairePreparerTest {
         verify(directionsQuestionnaireGenerator).generate(any(CaseData.class), eq(userToken));
         verify(assignCategoryId).copyCaseDocumentWithCategoryId(any(CaseDocument.class), eq(""));
         assertEquals(1, result.getSystemGeneratedCaseDocuments().size());
+    }
+
+    @Test
+    void shouldPrepareDirectionsQuestionnaire_singleResponse_preTranslation() {
+        // Given
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData caseData = CaseData.builder()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant1Represented(YES)
+            .respondent1Represented(NO)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1ResponseLanguage("WELSH")
+                                                         .build())
+                             .build())
+            .build();
+        String userToken = "userToken";
+
+        CaseDocument caseDocument = CaseDocument.builder().documentName("directionsQuestionnaire").build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), eq(userToken)))
+            .thenReturn(caseDocument);
+
+        // When
+        CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
+
+        // Then
+        System.out.println("test" + result.getSystemGeneratedCaseDocuments());
+        assertEquals(1, result.getPreTranslationDocuments().size());
     }
 
     @Test
