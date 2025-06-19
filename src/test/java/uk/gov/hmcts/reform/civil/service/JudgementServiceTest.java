@@ -6,8 +6,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,18 +29,20 @@ class JudgementServiceTest {
     private FeatureToggleService featureToggleService;
 
     @ParameterizedTest
-    @EnumSource(DJPaymentTypeSelection.class)
-    void ccjJudgementSubTotal(DJPaymentTypeSelection selection) {
+    @EnumSource(RespondentResponsePartAdmissionPaymentTimeLRspec.class)
+    void ccjJudgementSubTotal(RespondentResponsePartAdmissionPaymentTimeLRspec selection) {
         CaseData mockData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal(1000))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .paymentTypeSelection(selection)
+            .defenceAdmitPartPaymentTimeRouteRequired(selection)
             .hwfFeeType(FeeType.HEARING)
             .hearingHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(new BigDecimal(255)).build())
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(550))
             .ccjPaymentDetails(CCJPaymentDetails.builder().ccjJudgmentFixedCostOption(YesOrNo.NO).build())
             .build();
-
-        assertEquals(new BigDecimal(805), judgementService.ccjJudgementSubTotal(mockData));
+        BigDecimal expected = new BigDecimal(805).setScale(2, RoundingMode.UNNECESSARY);
+        assertEquals(expected, judgementService.ccjJudgementSubTotal(mockData));
     }
 }

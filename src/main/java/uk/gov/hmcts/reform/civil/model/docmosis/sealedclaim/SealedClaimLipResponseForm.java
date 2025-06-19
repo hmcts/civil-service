@@ -120,7 +120,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
                     return "The final payment date may be later to reflect any additional interest, " +
                         "any fixed costs and claim fee added to the judgment, settlement agreement or earlier payment amount";
                 }
-            } else if (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            } else if (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && caseData.isPayImmediately() || caseData.isPayBySetDate()) {
                 return "The claim fee and any fixed costs claimed are not included in this figure but are payable in addition and if judgment," +
                     " settlement agreement or earlier payment is entered on an admission will be included in the total amount.";
             }

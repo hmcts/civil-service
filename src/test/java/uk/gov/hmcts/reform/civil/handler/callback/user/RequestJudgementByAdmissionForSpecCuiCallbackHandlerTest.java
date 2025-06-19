@@ -762,7 +762,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(500.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300.00))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
             CaseData caseData = CaseData.builder()
