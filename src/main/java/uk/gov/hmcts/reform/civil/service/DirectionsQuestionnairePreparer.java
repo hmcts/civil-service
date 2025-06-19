@@ -143,55 +143,74 @@ public class DirectionsQuestionnairePreparer {
 
         if (featureToggleService.isGaForWelshEnabled() && caseData.isLRvLipOneVOne() && caseData.isRespondentResponseBilingual()) {
             log.info("ADDING PRE TRANSLATED DQ TO preTranslationDocuments");
-            CaseDocument directionsQuestionnairePretranslation = directionsQuestionnaireGenerator.generate(caseData, bearerToken);
-            assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnairePretranslation, DocCategory.APP1_DQ.getValue());
+            CaseDocument directionsQuestionnairePretranslation = directionsQuestionnaireGenerator.generate(
+                caseData,
+                bearerToken
+            );
+            assignCategoryId.assignCategoryIdToCaseDocument(
+                directionsQuestionnairePretranslation,
+                DocCategory.APP1_DQ.getValue()
+            );
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(directionsQuestionnairePretranslation));
         } else {
-        CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
-            caseData,
-            bearerToken
-        );
-        List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = caseData.getDuplicateSystemGeneratedCaseDocs();
-        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(directionsQuestionnaire, "");
-        String claimant = "claimant";
-        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (directionsQuestionnaire.getDocumentName().contains(claimant)) {
-                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());
-                assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP1.getValue());
-                duplicateSystemGeneratedCaseDocs.add(element(copy));
+            CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
+                caseData,
+                bearerToken
+            );
+            List<Element<CaseDocument>> duplicateSystemGeneratedCaseDocs = caseData.getDuplicateSystemGeneratedCaseDocs();
+            CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(directionsQuestionnaire, "");
+            String claimant = "claimant";
+            if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                if (directionsQuestionnaire.getDocumentName().contains(claimant)) {
+                    assignCategoryId.assignCategoryIdToCaseDocument(
+                        directionsQuestionnaire,
+                        DocCategory.APP1_DQ.getValue()
+                    );
+                    assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP1.getValue());
+                    duplicateSystemGeneratedCaseDocs.add(element(copy));
+                }
+                if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
+                    assignCategoryId.assignCategoryIdToCaseDocument(
+                        directionsQuestionnaire,
+                        DocCategory.DQ_DEF1.getValue()
+                    );
+                }
+                if (nonNull(caseData.getRespondent2DocumentGeneration())
+                    && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")
+                    && !directionsQuestionnaire.getDocumentName().contains(claimant)) {
+                    assignCategoryId.assignCategoryIdToCaseDocument(
+                        directionsQuestionnaire,
+                        DocCategory.DQ_DEF2.getValue()
+                    );
+                }
             }
-            if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
-                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DQ_DEF1.getValue());
+            if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+                && caseData.isClaimantBilingual()
+                && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
+                caseDataBuilder.respondent1OriginalDqDoc(directionsQuestionnaire);
+            } else {
+                List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
+                systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+                caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
             }
-            if (nonNull(caseData.getRespondent2DocumentGeneration())
-                && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")
-                && !directionsQuestionnaire.getDocumentName().contains(claimant)) {
-                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DQ_DEF2.getValue());
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+                if (directionsQuestionnaire.getDocumentName().contains(claimant)) {
+                    assignCategoryId.assignCategoryIdToCaseDocument(
+                        directionsQuestionnaire,
+                        DocCategory.APP1_DQ.getValue()
+                    );
+                    assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP1.getValue());
+                    duplicateSystemGeneratedCaseDocs.add(element(copy));
+                }
+                if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
+                    assignCategoryId.assignCategoryIdToCaseDocument(
+                        directionsQuestionnaire,
+                        DocCategory.DQ_DEF1.getValue()
+                    );
+                }
             }
         }
-        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
-            && caseData.isClaimantBilingual()
-            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
-            caseDataBuilder.respondent1OriginalDqDoc(directionsQuestionnaire);
-        } else {
-            List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
-            systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        }
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            if (directionsQuestionnaire.getDocumentName().contains(claimant)) {
-                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());
-                assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP1.getValue());
-                duplicateSystemGeneratedCaseDocs.add(element(copy));
-            }
-            if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
-                assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DQ_DEF1.getValue());
-            }
-        }
-        }
-    }
-
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {

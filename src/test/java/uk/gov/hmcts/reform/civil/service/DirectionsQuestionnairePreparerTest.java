@@ -73,7 +73,7 @@ class DirectionsQuestionnairePreparerTest {
     }
 
     @Test
-    void shouldPrepareDirectionsQuestionnaire_singleResponse_preTranslation() {
+    void shouldPrepareDirectionsQuestionnaire_singleResponse_ClaimantDqPreTranslation() {
         // Given
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
@@ -96,7 +96,7 @@ class DirectionsQuestionnairePreparerTest {
         CaseData result = preparer.prepareDirectionsQuestionnaire(caseData, userToken);
 
         // Then
-        System.out.println("test" + result.getSystemGeneratedCaseDocuments());
+        verify(directionsQuestionnaireGenerator).generate(any(CaseData.class), eq(userToken));
         assertEquals(1, result.getPreTranslationDocuments().size());
     }
 
