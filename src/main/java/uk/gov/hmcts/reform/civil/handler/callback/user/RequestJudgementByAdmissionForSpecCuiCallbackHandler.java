@@ -92,6 +92,10 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             }
         }
 
+        if (judgementService.isLrPayImmediatelyPlan(caseData)) {
+            caseDataBuilder.ccjJudgmentAmountShowInterest(YesOrNo.NO);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
@@ -101,9 +105,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        if (judgementService.isLrPayImmediatelyPlan(caseData)) {
-            updatedCaseData.ccjJudgmentAmountShowInterest(YesOrNo.NO);
-        }
+
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
