@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,11 +40,18 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
     private ObjectMapper objectMapper;
     @Mock
     private ToggleConfiguration toggleConfiguration;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
-        handler = new UpdateClaimantIntentionClaimStateCallbackHandler(objectMapper, updateClaimStateService, toggleConfiguration);
+        handler = new UpdateClaimantIntentionClaimStateCallbackHandler(
+            objectMapper,
+            updateClaimStateService,
+            toggleConfiguration,
+            featureToggleService
+        );
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
 
@@ -64,6 +72,23 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
 
         // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        verify(updateClaimStateService, times(1)).setUpCaseState(caseData);
+    }
+
+    @Test
+    void shouldUpdateCaseStateForFullDefenceNotProcessIfClaimantBilingual() {
+        // given
+        when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder().claimantBilingualLanguagePreference("BOTH")
+            .applicant1ProceedWithClaim(YesOrNo.NO).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // then
         assertThat(response.getErrors()).isNull();
