@@ -25,7 +25,6 @@ class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private FeatureToggleService toggleService;
 
-
     @BeforeEach
     public void setUp() {
         handler = new ProceedOfflineCallbackHandler(new ObjectMapper().registerModule(new JavaTimeModule()), toggleService);
