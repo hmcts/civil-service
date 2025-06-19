@@ -15,12 +15,5 @@ resource "azurerm_servicebus_subscription_rule" "civil_ccd_jurisdiction_rule" {
   name            = "civil-ccd-event-rule-${var.env}"
   subscription_id = module.servicebus-subscription-ccd-events.id
   filter_type     = "SqlFilter"
-  sql_filter      = "jurisdiction_id IN ('CIVIL','civil')"
-}
-
-resource "azurerm_servicebus_subscription_rule" "topic_filter_impossible_rule_civil" {
-  name            = "civil-ccd-event-rule-${var.env}"
-  subscription_id = module.servicebus-subscription.id
-  filter_type     = "SqlFilter"
   sql_filter      = var.ccd_service_bus_filter_rule
 }
