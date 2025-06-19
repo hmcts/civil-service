@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,8 +39,6 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
     private ObjectMapper objectMapper;
     @Mock
     private ToggleConfiguration toggleConfiguration;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     void setup() {
@@ -49,8 +46,7 @@ class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseCallback
         handler = new UpdateClaimantIntentionClaimStateCallbackHandler(
             objectMapper,
             updateClaimStateService,
-            toggleConfiguration,
-            featureToggleService
+            toggleConfiguration
         );
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
     }
