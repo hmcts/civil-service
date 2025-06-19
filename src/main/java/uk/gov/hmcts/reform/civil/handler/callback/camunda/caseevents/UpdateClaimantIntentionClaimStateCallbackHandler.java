@@ -34,7 +34,6 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
     private final ObjectMapper objectMapper;
     private final UpdateClaimStateService updateClaimStateService;
     private final ToggleConfiguration toggleConfiguration;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
