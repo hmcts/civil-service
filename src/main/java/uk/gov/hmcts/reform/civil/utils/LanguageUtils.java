@@ -31,7 +31,13 @@ public class LanguageUtils {
                 && (caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments() != null)) {
                 return caseData.getRespondent1DQ().getRespondent1DQLanguage().getDocuments();
             } else {
-                return switch (caseData.getDefendantBilingualLanguagePreference()) {
+                String preference = caseData.getDefendantBilingualLanguagePreference();
+
+                if (preference == null) {
+                    return Language.ENGLISH;
+                }
+
+                return switch (preference) {
                     case "WELSH" -> Language.WELSH;
                     case "BOTH" -> Language.BOTH;
                     default -> Language.ENGLISH;
