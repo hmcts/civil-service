@@ -35,6 +35,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -402,7 +403,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                                  .build())
                 .build();
             caseData = caseData.toBuilder()
-                .respondent1Represented(NO)
                 .applicant1ProceedWithClaim(NO)
                 .applicant1Represented(NO)
                 .respondent1Represented(YES)
@@ -419,6 +419,42 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 RESPONDENT_LR_EMAIL_TEMPLATE,
                 getNotificationDataMapLipLr(caseData),
                 REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyLRRespondent_whenApplicantSettlesClaimForWelsh() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
+            when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(
+                RESPONDENT_LR_EMAIL_TEMPLATE);
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
+                                                                                             .name("org name")
+                                                                                             .build()));
+
+            when(configuration.getCnbcContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk");
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData = caseData.toBuilder()
+                .respondent1Represented(NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+                .applicant1Represented(NO)
+                .specRespondent1Represented(NO)
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService, times(1)).sendMail(
+                eq("sole.trader@email.com"),
+                eq(RESPONDENT_LR_EMAIL_TEMPLATE),
+                any(),
+                eq(REFERENCE_NUMBER)
             );
         }
 

@@ -92,7 +92,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             && ((!caseData.isClaimantBilingual()
             || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId))
             || (featureToggleService.isDefendantNoCOnlineForCase(caseData)
-            && NO.equals(caseData.getApplicant1ProceedWithClaim())));
+            && (NO.equals(caseData.getApplicant1ProceedWithClaim()) || caseData.isClaimantIntentionSettlePartAdmit())));
     }
 
     private String getRespondent1LipEmailTemplate(CaseData caseData) {
