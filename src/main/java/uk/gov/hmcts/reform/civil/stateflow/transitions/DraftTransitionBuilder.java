@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BILINGUAL_DOCS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.BULK_CLAIM_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CASE_PROGRESSION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.CLAIM_STATE_DURING_NOC;
@@ -49,8 +48,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
-                    Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -70,8 +68,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
-                    Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
                 )), transitions)
             // Only one unrepresented defendant
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -87,8 +84,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
-                    Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
                 )), transitions)
             // Unrepresented defendant 1
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -107,8 +103,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
-                    Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
                 )), transitions)
             // Unrepresented defendant 2
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -126,8 +121,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
-                    Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
                 )), transitions)
             // Unrepresented defendants
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -145,8 +139,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
-                    Map.entry(BILINGUAL_DOCS.name(), lipPartySpecifiedBilingualDocs(c))
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
                 )), transitions);
     }
 
@@ -202,10 +195,6 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
             && caseData.getRespondent2OrgRegistered() == NO
             && (caseData.getRespondent2SameLegalRepresentative() == NO
             || caseData.getRespondent2SameLegalRepresentative() == null);
-
-    public boolean lipPartySpecifiedBilingualDocs(CaseData caseData) {
-        return (caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments());
-    }
 
     public boolean isDashBoardEnabledForCase(CaseData caseData) {
         return featureToggleService.isDashboardEnabledForCase(caseData) && caseContainsLiP.test(caseData);
