@@ -142,17 +142,7 @@ public class DirectionsQuestionnairePreparer {
                                     CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
 
         if (featureToggleService.isGaForWelshEnabled() && caseData.isLRvLipOneVOne() && caseData.isRespondentResponseBilingual()) {
-            log.info("ADDING PRE TRANSLATED DQ TO preTranslationDocuments");
-            CaseDocument directionsQuestionnairePretranslation = directionsQuestionnaireGenerator.generate(
-                caseData,
-                bearerToken
-            );
-            assignCategoryId.assignCategoryIdToCaseDocument(
-                directionsQuestionnairePretranslation,
-                DocCategory.APP1_DQ.getValue()
-            );
-            List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
-            preTranslationDocuments.add(element(directionsQuestionnairePretranslation));
+            isClaimantDqPreTranslation(bearerToken, caseData);
         } else {
             CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
                 caseData,
@@ -211,6 +201,20 @@ public class DirectionsQuestionnairePreparer {
                 }
             }
         }
+    }
+
+    private void isClaimantDqPreTranslation(String bearerToken, CaseData caseData) {
+        log.info("ADDING PRE TRANSLATED DQ TO preTranslationDocuments");
+        CaseDocument directionsQuestionnairePretranslation = directionsQuestionnaireGenerator.generate(
+            caseData,
+            bearerToken
+        );
+        assignCategoryId.assignCategoryIdToCaseDocument(
+            directionsQuestionnairePretranslation,
+            DocCategory.APP1_DQ.getValue()
+        );
+        List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
+        preTranslationDocuments.add(element(directionsQuestionnairePretranslation));
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
