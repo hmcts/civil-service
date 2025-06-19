@@ -666,7 +666,6 @@ class CaseEventTaskHandlerTest {
                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
                              Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                             Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false),
                              Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
@@ -681,7 +680,6 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false),
                                      Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
                 );
             } else if (state.equals(FULL_ADMISSION)
@@ -698,7 +696,6 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false),
                                      Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
                 );
             } else if (state.equals(CLAIM_DETAILS_NOTIFIED)
@@ -713,7 +710,6 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false),
                                      Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
                 );
 
@@ -729,7 +725,6 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
-                                     Map.entry(FlowFlag.BILINGUAL_DOCS.name(), false),
                                      Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
                 );
             }
