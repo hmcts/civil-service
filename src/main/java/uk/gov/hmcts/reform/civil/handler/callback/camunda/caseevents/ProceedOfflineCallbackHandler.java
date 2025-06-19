@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ public class ProceedOfflineCallbackHandler extends CallbackHandler {
                       "ProceedOfflineForUnRepresentedSolicitor", "ProceedOfflineForNonDefenceResponse");
 
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<String> camundaActivityIds(CallbackParams callbackParams) {
@@ -42,12 +44,15 @@ public class ProceedOfflineCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse captureTakenOfflineDate(CallbackParams callbackParams) {
-        CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .takenOfflineDate(LocalDateTime.now())
-            .build();
+        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = callbackParams.getCaseData().toBuilder()
+            .takenOfflineDate(LocalDateTime.now());
+
+        if (featureToggleService.isLrAdmissionBulkEnabled() && featureToggleService.isJudgmentOnlineLive()) {
+            caseDataUpdated.previousCCDState(callbackParams.getCaseData().getCcdState());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
+            .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
     }
 

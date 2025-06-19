@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -10,16 +13,22 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     ProceedOfflineCallbackHandler handler;
+    @Mock
+    private FeatureToggleService toggleService;
+
 
     @BeforeEach
     public void setUp() {
-        handler = new ProceedOfflineCallbackHandler(new ObjectMapper().registerModule(new JavaTimeModule()));
+        handler = new ProceedOfflineCallbackHandler(new ObjectMapper().registerModule(new JavaTimeModule()), toggleService);
     }
 
     @Test
@@ -30,5 +39,17 @@ class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getData()).extracting("takenOfflineDate").isNotNull();
+    }
+
+    @Test
+    void shouldCaptureCCDPreState_whenProceedInHeritageSystemRequested() {
+        when(toggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        when(toggleService.isJudgmentOnlineLive()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getData()).extracting("previousCCDState").isNotNull();
     }
 }
