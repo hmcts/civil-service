@@ -1,11 +1,12 @@
 pluginManagement {
   repositories {
-    maven { url 'https://repo.spring.io/release' }
+    mavenLocal()
     mavenCentral()
     gradlePluginPortal()
     maven {
       url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1"
     }
+    maven { url 'https://repo.spring.io/release' }
   }
 }
 rootProject.name = 'civil-service'
