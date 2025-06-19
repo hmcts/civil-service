@@ -1179,6 +1179,40 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         }
 
+        @Test
+        void shouldPauseLipVsLrCaseIfClaimantLipIsWelsh() {
+            // Given
+            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+            LocalDate date = dateTime.toLocalDate();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(time.now()).thenReturn(dateTime);
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(false);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent1v1FullDefenceSpec()
+                .ccdCaseReference(123456789)
+                .claimantBilingualLanguagePreference("BOTH")
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .addRespondent2(NO)
+                .respondent1DQ()
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(dateTime)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any()))
+                .thenReturn(dateTime);
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            // Then
+            assertThat(response.getState()).isNull();
+        }
+
         @Nested
         class UpdateExperts {
             @Test
