@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -197,8 +198,8 @@ public class DQGeneratorFormBuilder {
             ? caseData.getAllocatedTrack().name() : caseData.getResponseClaimTrack();
     }
 
-    private String createStatementOfTruthText(Boolean respondentState) {
-        String role = Boolean.TRUE.equals(respondentState) ? DEFENDANT : "claimant";
+    private String createStatementOfTruthText(boolean respondentState) {
+        String role = respondentState ? DEFENDANT : "claimant";
         String statementOfTruth = role.equals(DEFENDANT)
             ? "The defendant believes that the facts stated in the response are true."
             : "The claimant believes that the facts in this claim are true.";
@@ -211,7 +212,7 @@ public class DQGeneratorFormBuilder {
         return statementOfTruth;
     }
 
-    public Boolean isRespondentState(CaseData caseData) {
+    public boolean isRespondentState(CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             return false;
         }
@@ -224,6 +225,7 @@ public class DQGeneratorFormBuilder {
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             || state.equals(FULL_DEFENCE.fullName())
+            || state.equals(PART_ADMISSION.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
             || state.equals(ALL_RESPONSES_RECEIVED.fullName())
             || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
