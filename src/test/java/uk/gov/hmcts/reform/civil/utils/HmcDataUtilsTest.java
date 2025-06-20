@@ -236,10 +236,10 @@ class HmcDataUtilsTest {
 
         assertEquals(result, isWelsh ? "23 Rhagfyr 2023 am 10:00 am 3 awr\n" +
             "24 Rhagfyr 2023 am 14:00 am 2 awr\n" +
-            "25 Rhagfyr 2023 am 10:00 am 5 awr"
+            "25 Rhagfyr 2023 am 10:00 am 6 awr"
             : "23 December 2023 at 10:00 for 3 hours\n" +
             "24 December 2023 at 14:00 for 2 hours\n" +
-            "25 December 2023 at 10:00 for 5 hours");
+            "25 December 2023 at 10:00 for 6 hours");
     }
 
     @Test
@@ -357,7 +357,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(isWelsh ? "23 Mai 2023 am 11:00 am 5 awr" : "23 May 2023 at 11:00 for 5 hours"));
+        assertEquals(result, List.of(isWelsh ? "23 Mai 2023 am 11:00 am 6 awr" : "23 May 2023 at 11:00 for 6 hours"));
     }
 
     @ParameterizedTest
@@ -374,7 +374,7 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysTextList(hearing, isWelsh);
 
-        assertEquals(result, List.of(isWelsh ? "23 Rhagfyr 2023 am 10:00 am 5 awr" : "23 December 2023 at 10:00 for 5 hours"));
+        assertEquals(result, List.of(isWelsh ? "23 Rhagfyr 2023 am 10:00 am 6 awr" : "23 December 2023 at 10:00 for 6 hours"));
     }
 
     @ParameterizedTest
@@ -495,10 +495,10 @@ class HmcDataUtilsTest {
 
         List<String> expectedResult = isWelsh
             ? List.of(
-            "23 Rhagfyr 2023 am 10:00 am 5 awr",
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
             "24 Rhagfyr 2023 am 14:00 am 2 awr")
             : List.of(
-            "23 December 2023 at 10:00 for 5 hours",
+            "23 December 2023 at 10:00 for 6 hours",
             "24 December 2023 at 14:00 for 2 hours");
 
         assertEquals(result, expectedResult);
@@ -526,10 +526,10 @@ class HmcDataUtilsTest {
 
         List<String> expectedResult = isWelsh
             ? List.of(
-            "23 Rhagfyr 2023 am 10:00 am 5 awr",
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
             "24 Rhagfyr 2023 am 10:00 am 3 awr")
             : List.of(
-            "23 December 2023 at 10:00 for 5 hours",
+            "23 December 2023 at 10:00 for 6 hours",
             "24 December 2023 at 10:00 for 3 hours");
 
         assertEquals(result, expectedResult);
@@ -624,13 +624,13 @@ class HmcDataUtilsTest {
 
         List<String> expectedResult = isWelsh
             ? List.of(
-            "23 Rhagfyr 2023 am 10:00 am 5 awr",
-            "24 Rhagfyr 2023 am 10:00 am 5 awr",
-            "25 Rhagfyr 2023 am 10:00 am 5 awr")
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
+            "24 Rhagfyr 2023 am 10:00 am 6 awr",
+            "25 Rhagfyr 2023 am 10:00 am 6 awr")
             : List.of(
-            "23 December 2023 at 10:00 for 5 hours",
-            "24 December 2023 at 10:00 for 5 hours",
-            "25 December 2023 at 10:00 for 5 hours");
+            "23 December 2023 at 10:00 for 6 hours",
+            "24 December 2023 at 10:00 for 6 hours",
+            "25 December 2023 at 10:00 for 6 hours");
 
         assertEquals(result, expectedResult);
     }
@@ -662,11 +662,11 @@ class HmcDataUtilsTest {
 
         List<String> expectedResult = isWelsh
             ? List.of(
-            "23 Rhagfyr 2023 am 10:00 am 5 awr",
+            "23 Rhagfyr 2023 am 10:00 am 6 awr",
             "24 Rhagfyr 2023 am 10:00 am 3 awr",
             "25 Rhagfyr 2023 am 14:00 am 2 awr")
             : List.of(
-            "23 December 2023 at 10:00 for 5 hours",
+            "23 December 2023 at 10:00 for 6 hours",
             "24 December 2023 at 10:00 for 3 hours",
             "25 December 2023 at 14:00 for 2 hours");
 
