@@ -24,9 +24,7 @@ import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMEN
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
-import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_CITIZEN_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.APPLICANT_SOLICITOR_QUERIES;
-import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_CITIZEN_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_ONE_QUERIES;
 import static uk.gov.hmcts.reform.civil.enums.QueryCollectionType.RESPONDENT_SOLICITOR_TWO_QUERIES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -70,9 +68,7 @@ public class CaseQueriesUtil {
         return Stream.of(
                 caseData.getQmApplicantSolicitorQueries(),
                 caseData.getQmRespondentSolicitor1Queries(),
-                caseData.getQmRespondentSolicitor2Queries(),
-                caseData.getQmApplicantCitizenQueries(),
-                caseData.getQmRespondentCitizenQueries()
+                caseData.getQmRespondentSolicitor2Queries()
             )
             .filter(collection -> nonNull(collection) && nonNull(collection.getCaseMessages()) && collection.getCaseMessages().stream()
                 .anyMatch(messageEl -> messageEl.getValue().getCreatedOn().equals(message.getCreatedOn())))
@@ -111,12 +107,6 @@ public class CaseQueriesUtil {
         if (queriesCollection.isSame(caseData.getQmRespondentSolicitor2Queries())) {
             return RESPONDENT_SOLICITOR_TWO_QUERIES;
         }
-        if (queriesCollection.isSame(caseData.getQmApplicantCitizenQueries())) {
-            return APPLICANT_CITIZEN_QUERIES;
-        }
-        if (queriesCollection.isSame(caseData.getQmRespondentCitizenQueries())) {
-            return RESPONDENT_CITIZEN_QUERIES;
-        }
 
         return null;
     }
@@ -131,9 +121,10 @@ public class CaseQueriesUtil {
     }
 
     public static DocCategory getQueryAttachmentsDocumentCategory(QueryCollectionType collectionType) {
-        return switch(collectionType) {
-            case APPLICANT_SOLICITOR_QUERIES, APPLICANT_CITIZEN_QUERIES -> CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
-            case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES, RESPONDENT_CITIZEN_QUERIES -> DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
+        return switch (collectionType) {
+            case APPLICANT_SOLICITOR_QUERIES -> CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
+            case RESPONDENT_SOLICITOR_ONE_QUERIES, RESPONDENT_SOLICITOR_TWO_QUERIES ->
+                DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
             default -> null;
         };
     }

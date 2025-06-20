@@ -51,7 +51,11 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
-        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId);
+
+        // ToDo: Remove condition and assign to new caseworker category in CIV-17308
+        if (!caseData.isLipCase()) {
+            assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId);
+        }
 
         caseData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
