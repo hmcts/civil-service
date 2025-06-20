@@ -55,15 +55,17 @@ class AppSolOneEmailGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         CaseData caseData = CaseData.builder().build();
-        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
-            .thenReturn(APPLICANT_LEGAL_ORG_NAME);
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
+            notificationUtilsMockedStatic.when(() ->
+                                                   NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+                .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
-        Map<String, String> properties = new HashMap<>();
-        Map<String, String> updatedProperties = emailGenerator.addCustomProperties(properties, caseData);
+            Map<String, String> properties = new HashMap<>();
+            Map<String, String> updatedProperties = emailGenerator.addCustomProperties(properties, caseData);
 
-        assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, APPLICANT_LEGAL_ORG_NAME);
-        notificationUtilsMockedStatic.close();
+            assertThat(updatedProperties)
+                .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, APPLICANT_LEGAL_ORG_NAME);
+        }
     }
 
     @Test
