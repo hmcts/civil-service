@@ -77,6 +77,7 @@ class DirectionsQuestionnairePreparerTest {
         // Given
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant1Represented(YES)
             .respondent1Represented(NO)
