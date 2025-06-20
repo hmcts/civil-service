@@ -19,8 +19,7 @@ public class CaseProceedsInCasemanRespSolTwoEmailDTOGenerator extends RespSolTwo
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.isLipvLROneVOne() ? notificationsProperties.getSolicitorCaseTakenOfflineForSpec() :
-            notificationsProperties.getSolicitorCaseTakenOffline();
+        return notificationsProperties.getSolicitorCaseTakenOffline();
     }
 
     @Override

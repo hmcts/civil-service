@@ -26,25 +26,11 @@ public class CaseProceedsInCasemanRespSolTwoEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldReturnCorrectEmailTemplateIdWhenIsNotLipvLROneVOne() {
+    void shouldReturnCorrectEmailTemplateId() {
         CaseData caseData = CaseData.builder().build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn(expectedTemplateId);
-
-        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
-
-        assertThat(actualTemplateId).isEqualTo(expectedTemplateId);
-    }
-
-    @Test
-    void shouldReturnCorrectEmailTemplateIdWhenIsLipvLROneVOne() {
-        CaseData caseData = CaseData.builder()
-            .applicant1Represented(NO)
-            .build();
-        String expectedTemplateId = "template-id";
-
-        when(notificationsProperties.getSolicitorCaseTakenOfflineForSpec()).thenReturn(expectedTemplateId);
 
         String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
 
