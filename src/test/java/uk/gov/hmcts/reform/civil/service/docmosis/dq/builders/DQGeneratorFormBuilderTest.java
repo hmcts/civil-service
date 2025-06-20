@@ -7,6 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.Witnesses;
@@ -21,6 +23,8 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -67,8 +71,6 @@ class DQGeneratorFormBuilderTest {
     @BeforeEach
     void setUp() {
 
-        Witnesses mockWitnesses = mock(Witnesses.class);
-        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
         when(stateFlow.getState()).thenReturn(state);
         when(state.getName()).thenReturn(FULL_DEFENCE.fullName());
@@ -76,7 +78,8 @@ class DQGeneratorFormBuilderTest {
 
     @Test
     void shouldGetDirectionsQuestionnaireFormBuilder() {
-
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
@@ -113,7 +116,8 @@ class DQGeneratorFormBuilderTest {
 
     @Test
     void shouldBuildFormForClaimantResponseWithSpecClaim() {
-
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
@@ -139,7 +143,8 @@ class DQGeneratorFormBuilderTest {
 
     @Test
     void shouldCountWitnessesIncludingDefendantsForSpecClaimFullAdmission() {
-
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
@@ -159,7 +164,8 @@ class DQGeneratorFormBuilderTest {
 
     @Test
     void shouldSetApplicantsForNonClaimantResponse() {
-
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondent2DQWithFixedRecoverableCosts()
@@ -176,5 +182,28 @@ class DQGeneratorFormBuilderTest {
         assertNotNull(result);
         assertEquals(2, result.build().getWitnessesIncludingDefendants());
 
+    }
+
+    @Test
+    void shouldReturnForTrueForLipClaimantBilingual() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData caseData =
+            CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
+                    CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
+        boolean result = dqGeneratorFormBuilder.isRespondentState(caseData);
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnForFalseForLipClaimantBilingual_ForOtherStates() {
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(state.getName()).thenReturn(FULL_ADMISSION.fullName());
+        CaseData caseData =
+            CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
+                    CaseState.CASE_DISMISSED).build();
+        boolean result = dqGeneratorFormBuilder.isRespondentState(caseData);
+        assertFalse(result);
     }
 }
