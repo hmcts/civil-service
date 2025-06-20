@@ -215,6 +215,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateSdoDisposal()
                 .build().toBuilder()
@@ -261,6 +262,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -281,6 +283,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData().get("allowOrderTrackAllocation")).isEqualTo("Yes");
@@ -301,6 +304,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -320,6 +324,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -340,6 +345,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -359,6 +365,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -378,6 +385,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                        .value(DynamicListElement.builder()
                                                                   .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                                   .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
@@ -398,6 +406,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                      .value(DynamicListElement.builder()
                                                 .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
                                                 .build()).build()).build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
@@ -416,6 +425,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
             assertThat(response.getData().get("freeFormRecordedTextArea")).isNull();
@@ -440,6 +450,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("text").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("finalOrderSelection")).isNull();
             assertThat(response.getData().get("finalOrderMadeSelection")).isNull();
@@ -460,6 +471,99 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData().get("finalOrderAppealComplex")).isNull();
             assertThat(response.getData().get("orderMadeOnDetailsList")).isNull();
             assertThat(response.getData().get("finalOrderGiveReasonsComplex")).isNull();
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenNoLipsAndFlagEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("BOTH")
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndRespondentLangExists() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLiP(CaseDataLiP.builder()
+                            .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                        .respondent1ResponseLanguage("BOTH").build()).build())
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndClaimantRespondentLangExists() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("BOTH")
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build()).build())
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvokedWhenLipsAndFlagEnabledAndClaimantRespondentLangNotExists() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderTrackAllocation(AllocatedTrack.SMALL_CLAIM)
+                .finalOrderAllocateToTrack(YES)
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("ENGLISH").build()).build())
+                .finalOrderIntermediateTrackComplexityBand(FinalOrdersComplexityBand.builder()
+                                                               .assignComplexityBand(YES)
+                                                               .band(ComplexityBand.BAND_1)
+                                                               .build())
+                .finalOrderDownloadTemplateOptions(DynamicList.builder()
+                                                       .value(DynamicListElement.builder()
+                                                                  .label(BLANK_TEMPLATE_AFTER_HEARING.getLabel())
+                                                                  .build()).build()).build();
+            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("bilingualHint")).isNull();
         }
     }
 

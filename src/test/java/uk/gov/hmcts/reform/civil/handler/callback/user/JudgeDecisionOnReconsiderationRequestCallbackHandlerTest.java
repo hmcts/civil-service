@@ -130,6 +130,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -139,6 +140,94 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
                 .extracting("reasonForReconsiderationTxtYes")
                 .isEqualTo(reason);
+        }
+
+        @Test
+        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithClaimant() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH").atStateClaimDetailsNotified()
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            //Then: upholding reason should be set correctly
+            assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
+                .extracting("reasonForReconsiderationTxtYes")
+                .isEqualTo(reason);
+            assertThat(response.getData()).extracting("bilingualHint").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithRespondentLang() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build())
+                                 .build()).atStateClaimDetailsNotified()
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            //Then: upholding reason should be set correctly
+            assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
+                .extracting("reasonForReconsiderationTxtYes")
+                .isEqualTo(reason);
+            assertThat(response.getData()).extracting("bilingualHint").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithRespondentLangAndClaimant() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("BOTH")
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build())
+                                 .build()).atStateClaimDetailsNotified()
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            //Then: upholding reason should be set correctly
+            assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
+                .extracting("reasonForReconsiderationTxtYes")
+                .isEqualTo(reason);
+            assertThat(response.getData()).extracting("bilingualHint").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldPopulateUpholdingPreviousOrderReasonWithWelshFlagEnabledWithNoRespondentLangAndClaimant() {
+            //Given : Casedata
+            CaseData caseData = CaseDataBuilder.builder().claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("ENGLISH").build())
+                                 .build()).atStateClaimDetailsNotified()
+                .build().toBuilder().systemGeneratedCaseDocuments(sdoDocList).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
+            //Then: upholding reason should be set correctly
+            assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
+                .extracting("reasonForReconsiderationTxtYes")
+                .isEqualTo(reason);
+            assertThat(response.getData()).extracting("bilingualHint").isNull();
         }
     }
 
