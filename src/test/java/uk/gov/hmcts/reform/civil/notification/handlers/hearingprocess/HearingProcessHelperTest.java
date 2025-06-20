@@ -76,20 +76,22 @@ public class HearingProcessHelperTest {
         LocalDate dueDate = LocalDate.of(2025, 7, 10);
         Fee fee = Fee.builder().calculatedAmountInPence(new BigDecimal("1000")).build();
 
-        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getFormattedHearingDate(dueDate)).thenReturn(
-            "10 July 2025");
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
+            notificationUtilsMockedStatic
+                .when(() -> NotificationUtils.getFormattedHearingDate(dueDate))
+                .thenReturn("10 July 2025");
 
-        CaseData caseData = CaseData.builder()
-            .hearingDueDate(dueDate)
-            .hearingFee(fee)
-            .hearingFeePaymentDetails(null)
-            .build();
+            CaseData caseData = CaseData.builder()
+                .hearingDueDate(dueDate)
+                .hearingFee(fee)
+                .hearingFeePaymentDetails(null)
+                .build();
 
-        Map<String, String> props = getHearingFeePropertiesIfNotPaid(caseData);
+            Map<String, String> props = getHearingFeePropertiesIfNotPaid(caseData);
 
-        assertEquals("£10.00", props.get(HEARING_FEE));
-        assertEquals("10 July 2025", props.get(HEARING_DUE_DATE));
+            assertEquals("£10.00", props.get(HEARING_FEE));
+            assertEquals("10 July 2025", props.get(HEARING_DUE_DATE));
+        }
     }
 
     @Test
