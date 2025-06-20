@@ -297,7 +297,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
         assertThat(documentsList)
             .extracting("value")
-            .extracting("documentName");
+            .extracting("documentName")
+            .isNotNull();
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")

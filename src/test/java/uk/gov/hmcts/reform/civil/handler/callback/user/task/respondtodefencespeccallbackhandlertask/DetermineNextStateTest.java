@@ -111,11 +111,6 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
             .responseClaimTrack(SMALL_CLAIM)
             .build();
 
-        CallbackParams params = callbackParams(caseData)
-            .builder()
-            .version(CallbackVersion.V_1)
-            .build();
-
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(true);
 
         String resultState;
