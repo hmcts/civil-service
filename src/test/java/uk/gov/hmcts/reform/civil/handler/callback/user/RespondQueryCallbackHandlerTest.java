@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
@@ -49,6 +50,9 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
     @InjectMocks
     private ObjectMapper objectMapper;
 
+    @InjectMocks
+    private FeatureToggleService featureToggleService;
+
     @Test
     public void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(queryManagementRespondQuery);
@@ -61,7 +65,7 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setupTest() {
             objectMapper.registerModule(new JavaTimeModule());
             handler = new RespondQueryCallbackHandler(
-                objectMapper, assignCategoryId
+                objectMapper, assignCategoryId, featureToggleService
             );
         }
 
