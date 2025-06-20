@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.hearingprocess;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -7,6 +8,7 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.Map;
 
+@Component
 public class HearingProcessClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
     private static final String REFERENCE_CLAIMANT_TEMPLATE = "notification-of-hearing-lip-%s";

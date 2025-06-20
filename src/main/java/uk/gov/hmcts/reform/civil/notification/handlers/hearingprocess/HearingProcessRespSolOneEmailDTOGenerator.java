@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.hearingprocess;
 
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -12,6 +13,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getFormattedHear
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getFormattedHearingTime;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 
+@Component
 public class HearingProcessRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
     protected static final String REFERENCE_RESP_SOL_ONE_TEMPLATE = "notification-of-hearing-%s";
