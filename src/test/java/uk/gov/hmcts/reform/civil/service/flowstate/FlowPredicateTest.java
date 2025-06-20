@@ -6,10 +6,14 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.ChangeLanguagePreference;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDateTime;
@@ -25,6 +29,8 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage.ENGLISH_AND_WELSH;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.UserType.DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
@@ -51,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isOneVOneResponseFlagSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.onlyInitialRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
@@ -1547,6 +1554,35 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
 
             assertFalse(caseContainsLiP.test(caseData));
+        }
+
+        @Test
+        void onlyInitialRespondentResponseLangIsBilingual() {
+            CaseData caseData = CaseData.builder()
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.WELSH.toString())
+                                                             .build())
+                                 .build())
+                .build();
+
+            assertTrue(onlyInitialRespondentResponseLangIsBilingual.test(caseData));
+        }
+
+        @Test
+        void onlyInitialRespondentResponseLangIsBilingual_false() {
+            CaseData caseData = CaseData.builder()
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage(Language.WELSH.toString())
+                                                             .build())
+                                 .build())
+                .changeLanguagePreference(ChangeLanguagePreference.builder()
+                                              .userType(DEFENDANT)
+                                              .preferredLanguage(ENGLISH_AND_WELSH).build())
+                .build();
+
+            assertFalse(onlyInitialRespondentResponseLangIsBilingual.test(caseData));
         }
     }
 }
