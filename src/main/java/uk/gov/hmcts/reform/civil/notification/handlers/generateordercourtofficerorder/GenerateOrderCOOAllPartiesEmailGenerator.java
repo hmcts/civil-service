@@ -18,9 +18,9 @@ public class GenerateOrderCOOAllPartiesEmailGenerator extends AllPartiesEmailGen
         GenerateOrderCOODefendantEmailDTOGenerator defendantEmailDTOGenerator
     ) {
         super(List.of(appSolEmailDTOGenerator,
-              resp1EmailDTOGenerator,
-              resp2EmailDTOGenerator,
-              claimantEmailDTOGenerator,
-              defendantEmailDTOGenerator));
+                      resp1EmailDTOGenerator,
+                      resp2EmailDTOGenerator,
+                      claimantEmailDTOGenerator,
+                      defendantEmailDTOGenerator));
     }
 }
