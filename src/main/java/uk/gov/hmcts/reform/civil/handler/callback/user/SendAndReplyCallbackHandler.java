@@ -112,7 +112,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessages(),
                 caseData.getSendMessageMetadata(),
                 caseData.getSendMessageContent(),
-                userAuth
+                userAuth, caseData
             );
 
             builder.messages(messagesNew)
@@ -123,7 +123,7 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
                 caseData.getMessages(),
                 caseData.getMessagesToReplyTo().getValue().getCode(),
                 caseData.getMessageReplyMetadata(),
-                userAuth
+                userAuth, caseData
             );
             builder.messages(messagesNew)
                 .messagesToReplyTo(null)
