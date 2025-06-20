@@ -150,36 +150,37 @@ public class HearingProcessAppSolEmailDTOGeneratorTest {
             .solicitorReferences(solicitorReferences)
             .build();
 
-        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> getFormattedHearingDate(LocalDate.parse("2025-07-01")))
-            .thenReturn("1 July 2025");
-        notificationUtilsMockedStatic.when(() -> getFormattedHearingTime("10:30"))
-            .thenReturn("10:30 AM");
-        notificationUtilsMockedStatic.when(() -> getApplicantLegalOrganizationName(caseData, organisationService))
-            .thenReturn("Organization Name");
+        try (
+            MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
+            MockedStatic<HearingProcessHelper> hearingProcessHelperMockedStatic = Mockito.mockStatic(HearingProcessHelper.class)
+        ) {
+            notificationUtilsMockedStatic.when(() -> getFormattedHearingDate(LocalDate.parse("2025-07-01")))
+                .thenReturn("1 July 2025");
+            notificationUtilsMockedStatic.when(() -> getFormattedHearingTime("10:30"))
+                .thenReturn("10:30 AM");
+            notificationUtilsMockedStatic.when(() -> getApplicantLegalOrganizationName(caseData, organisationService))
+                .thenReturn("Organization Name");
 
-        MockedStatic<HearingProcessHelper> hearingProcessHelperMockedStatic = Mockito.mockStatic(HearingProcessHelper.class);
-        Map<String, String> hearingFeeProperties = new HashMap<>();
-        hearingFeeProperties.put(HEARING_FEE, "£200");
-        hearingFeeProperties.put(HEARING_DUE_DATE, "1 June 2025");
-        hearingProcessHelperMockedStatic.when(() -> getHearingFeePropertiesIfNotPaid(caseData))
-            .thenReturn(hearingFeeProperties);
-        hearingProcessHelperMockedStatic.when(() -> getAppSolReference(caseData))
-            .thenReturn("REF123");
+            Map<String, String> hearingFeeProperties = new HashMap<>();
+            hearingFeeProperties.put(HEARING_FEE, "£200");
+            hearingFeeProperties.put(HEARING_DUE_DATE, "1 June 2025");
 
-        Map<String, String> properties = new java.util.HashMap<>();
-        Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
+            hearingProcessHelperMockedStatic.when(() -> getHearingFeePropertiesIfNotPaid(caseData))
+                .thenReturn(hearingFeeProperties);
+            hearingProcessHelperMockedStatic.when(() -> getAppSolReference(caseData))
+                .thenReturn("REF123");
 
-        notificationUtilsMockedStatic.close();
-        hearingProcessHelperMockedStatic.close();
+            Map<String, String> properties = new HashMap<>();
+            Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
-        assertThat(updatedProperties)
-            .containsEntry(HEARING_DATE, "1 July 2025")
-            .containsEntry(HEARING_TIME, "10:30 AM")
-            .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Organization Name")
-            .containsEntry(CLAIMANT_REFERENCE_NUMBER, "REF123")
-            .containsEntry(HEARING_FEE, "£200")
-            .containsEntry(HEARING_DUE_DATE, "1 June 2025")
-            .hasSize(6);
+            assertThat(updatedProperties)
+                .containsEntry(HEARING_DATE, "1 July 2025")
+                .containsEntry(HEARING_TIME, "10:30 AM")
+                .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Organization Name")
+                .containsEntry(CLAIMANT_REFERENCE_NUMBER, "REF123")
+                .containsEntry(HEARING_FEE, "£200")
+                .containsEntry(HEARING_DUE_DATE, "1 June 2025")
+                .hasSize(6);
+        }
     }
 }

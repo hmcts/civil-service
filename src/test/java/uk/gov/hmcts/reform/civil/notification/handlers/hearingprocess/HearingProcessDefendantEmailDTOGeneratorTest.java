@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,22 +82,20 @@ public class HearingProcessDefendantEmailDTOGeneratorTest {
             .respondent1(party)
             .build();
 
-        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getFormattedHearingDate(LocalDate.parse(
-                "2025-07-01")))
-            .thenReturn("1 July 2025");
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getFormattedHearingTime("10:30"))
-            .thenReturn("10:30 AM");
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
+            notificationUtilsMockedStatic.when(() -> NotificationUtils.getFormattedHearingDate(LocalDate.parse("2025-07-01")))
+                .thenReturn("1 July 2025");
+            notificationUtilsMockedStatic.when(() -> NotificationUtils.getFormattedHearingTime("10:30"))
+                .thenReturn("10:30 AM");
 
-        Map<String, String> properties = new java.util.HashMap<>();
-        Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
+            Map<String, String> properties = new HashMap<>();
+            Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
-        notificationUtilsMockedStatic.close();
-
-        assertThat(updatedProperties)
-            .containsEntry(HEARING_DATE, "1 July 2025")
-            .containsEntry(HEARING_TIME, "10:30 AM")
-            .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Party Name")
-            .size().isEqualTo(3);
+            assertThat(updatedProperties)
+                .containsEntry(HEARING_DATE, "1 July 2025")
+                .containsEntry(HEARING_TIME, "10:30 AM")
+                .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Party Name")
+                .size().isEqualTo(3);
+        }
     }
 }

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,29 +70,29 @@ public class HearingProcessRespSolTwoEmailDTOGeneratorTest {
             .respondent2OrganisationPolicy(organisationPolicy)
             .build();
 
-        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> getFormattedHearingDate(LocalDate.parse("2025-07-01")))
-            .thenReturn("1 July 2025");
-        notificationUtilsMockedStatic.when(() -> getFormattedHearingTime("10:30"))
-            .thenReturn("10:30 AM");
-        notificationUtilsMockedStatic.when(() -> getRespondentLegalOrganizationName(organisationPolicy, organisationService))
-            .thenReturn("Organization Name");
+        try (
+            MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
+            MockedStatic<HearingProcessHelper> hearingProcessHelperMockedStatic = Mockito.mockStatic(HearingProcessHelper.class)
+        ) {
+            notificationUtilsMockedStatic.when(() -> getFormattedHearingDate(LocalDate.parse("2025-07-01")))
+                .thenReturn("1 July 2025");
+            notificationUtilsMockedStatic.when(() -> getFormattedHearingTime("10:30"))
+                .thenReturn("10:30 AM");
+            notificationUtilsMockedStatic.when(() -> getRespondentLegalOrganizationName(organisationPolicy, organisationService))
+                .thenReturn("Organization Name");
 
-        MockedStatic<HearingProcessHelper> hearingProcessHelperMockedStatic = Mockito.mockStatic(HearingProcessHelper.class);
-        hearingProcessHelperMockedStatic.when(() -> getRespSolTwoReference(caseData))
-            .thenReturn("REF123");
+            hearingProcessHelperMockedStatic.when(() -> getRespSolTwoReference(caseData))
+                .thenReturn("REF123");
 
-        Map<String, String> properties = new java.util.HashMap<>();
-        Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
+            Map<String, String> properties = new HashMap<>();
+            Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
 
-        notificationUtilsMockedStatic.close();
-        hearingProcessHelperMockedStatic.close();
-
-        assertThat(updatedProperties)
-            .containsEntry(HEARING_DATE, "1 July 2025")
-            .containsEntry(HEARING_TIME, "10:30 AM")
-            .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Organization Name")
-            .containsEntry(DEFENDANT_REFERENCE_NUMBER, "REF123")
-            .size().isEqualTo(4);
+            assertThat(updatedProperties)
+                .containsEntry(HEARING_DATE, "1 July 2025")
+                .containsEntry(HEARING_TIME, "10:30 AM")
+                .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Organization Name")
+                .containsEntry(DEFENDANT_REFERENCE_NUMBER, "REF123")
+                .hasSize(4);
+        }
     }
 }
