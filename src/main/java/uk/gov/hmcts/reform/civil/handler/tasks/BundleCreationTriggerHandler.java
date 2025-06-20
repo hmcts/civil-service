@@ -59,10 +59,8 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
                     log.info("Bundle is already created for {}", caseDetails.getId());
                 }
             } catch (InterruptedException e) {
-                log.error("Error processing caseRef {} and error is {}", caseDetails.getId(), e.getMessage());
-                e.printStackTrace();
-            }
-            catch (Exception e) {
+                log.error("Error processing caseRef {} and error is {}", caseDetails.getId(), e.getMessage(), e);
+            } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
