@@ -249,11 +249,7 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
-
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
-                                                                coreCaseUserService,
-                                                                "id");
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
@@ -271,11 +267,7 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
-
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
-                                                                coreCaseUserService,
-                                                                "id");
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
@@ -293,37 +285,12 @@ class CaseQueriesUtilTest {
                                                .build())
             .build();
 
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
-
-        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
-                                                      coreCaseUserService,
-                                                      "id");
+        CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId);
 
         List<Document> documents = unwrapElements(queries.get(1).getValue().getAttachments());
 
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
-    }
-
-    @Test
-    void shouldThrowError_whenParentUserHasUnsupportedRole() {
-        List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
-        CaseData caseData = CaseData.builder()
-            .ccdCaseReference(1L)
-            .qmRespondentSolicitor2Queries(CaseQueriesCollection.builder()
-                                               .caseMessages(queries)
-                                               .build())
-            .build();
-
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("new role"));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-            CaseQueriesUtil.assignCategoryIdToCaseworkerAttachments(caseData, queries.get(1).getValue(), assignCategoryId,
-                                                          coreCaseUserService,
-                                                          "id")
-        );
-
-        assertEquals("Unsupported case role for query management.", exception.getMessage());
     }
 
     @Test
