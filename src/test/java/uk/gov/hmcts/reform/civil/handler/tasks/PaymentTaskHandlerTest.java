@@ -97,7 +97,8 @@ class PaymentTaskHandlerTest {
                                                          Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                                          Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                                          Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
-                                                         Map.entry(FlowFlag.WELSH_ENABLED.name(), false))
+                                                         Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                                         Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false))
             );
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
