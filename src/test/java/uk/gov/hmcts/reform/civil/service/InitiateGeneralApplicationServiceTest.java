@@ -1265,6 +1265,21 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getCertOfSC()).isNotNull();
     }
 
+    @Test
+    void shouldExtendDeadline_buildCaseData() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataCollectionOfApps(CaseData.builder().build());
+        when(calc.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getClaimDismissedDeadline().toLocalDate())
+            .isEqualTo(LocalDateTime.now().plusMonths(24).toLocalDate());
+    }
+
     private void assertCaseDateEntries(CaseData caseData) {
         assertThat(caseData.getGeneralAppType().getTypes()).isNull();
         assertThat(caseData.getGeneralAppRespondentAgreement().getHasAgreed()).isNull();

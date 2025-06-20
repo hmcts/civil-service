@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -113,6 +114,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         if (judgementService.isLrPayImmediatelyPlan(caseData)) {
             updatedCaseData.ccjJudgmentAmountShowInterest(YesOrNo.NO);
+            if (Objects.nonNull(caseData.getFixedCosts()) && YesOrNo.NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

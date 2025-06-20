@@ -24,7 +24,6 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.isWelshHearingTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +73,8 @@ public class GenerateHearingFormHandler extends CallbackHandler {
         if (!isEmpty(caseData.getHearingDocuments())) {
             systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
         }
-        if (featureToggleService.isGaForWelshEnabled() && isWelshHearingTemplate(caseData)) {
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData().getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocuments.get(0)));
             caseDataBuilder.preTranslationDocuments(translatedDocuments);

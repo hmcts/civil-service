@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -118,6 +120,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
+        updateLanguagePreference(builder, caseData);
         populateDQPartyIds(builder);
         addEventAndDateAddedToApplicantExperts(builder);
         addEventAndDateAddedToApplicantWitnesses(builder);
@@ -156,6 +159,14 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
             builder.ccjPaymentDetails(ccjPaymentDetails).build();
+        }
+    }
+
+    private void updateLanguagePreference(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
+        if (featureToggleService.isGaForWelshEnabled()) {
+            Optional.ofNullable(caseData.getApplicant1DQ())
+                .map(Applicant1DQ::getApplicant1DQLanguage).map(WelshLanguageRequirements::getDocuments)
+                .ifPresent(documentLanguage -> builder.claimantBilingualLanguagePreference(documentLanguage.name()));
         }
     }
 

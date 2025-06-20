@@ -124,4 +124,75 @@ class CaseQueriesCollectionTest {
         assertFalse(result);
     }
 
+    @Test
+    void shouldReturnFalse_collectionHasNoQueriesAwaitingAResponse() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .caseMessages(
+                List.of(
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("query-id")
+                                .isHearingRelated(YES)
+                                .createdOn(now)
+                                .build()).build(),
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("response-id")
+                                .isHearingRelated(NO)
+                                .createdOn(now.plusHours(3))
+                                .parentId("query-id")
+                                .build()).build()
+                ))
+            .build();
+
+        assertFalse(caseQueries.hasAQueryAwaitingResponse());
+    }
+
+    @Test
+    void shouldReturnTrue_whenCollectionHasQueryAwaitingResponse() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .caseMessages(
+                List.of(
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("query-id")
+                                .isHearingRelated(YES)
+                                .createdOn(now)
+                                .build()).build(),
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("response-id")
+                                .isHearingRelated(NO)
+                                .createdOn(now.plusHours(3))
+                                .parentId("query-id")
+                                .build()).build(),
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("followup-id")
+                                .isHearingRelated(NO)
+                                .createdOn(now.plusHours(5))
+                                .parentId("query-id")
+                                .build()).build()
+                ))
+            .build();
+
+        assertTrue(caseQueries.hasAQueryAwaitingResponse());
+    }
+
 }

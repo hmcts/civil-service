@@ -14,9 +14,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -28,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -46,6 +51,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private final CivilStitchService civilStitchService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
@@ -79,7 +85,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF2_DEFENSE_DQ.getValue());
             assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
         }
-
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
         if (stitchEnabled) {
             List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
             log.info("Calling civil stitch service for generate response sealed form for caseId {}", caseId);
@@ -97,21 +103,33 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF2_DEFENSE_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, DocCategory.DQ_DEF2.getValue());
             }
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
-            if (Objects.nonNull(stitchedDocumentCopy)) {
-                caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(stitchedDocumentCopy));
-            }
+            isLipWelshApplicant(caseData, builder, stitchedDocument, stitchedDocumentCopy);
+        } else {
+            isLipWelshApplicant(caseData, builder, sealedForm, copy);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void isLipWelshApplicant(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
+                                     CaseDocument sealedForm,
+                                     CaseDocument copy) {
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual()
+            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
+            List<Element<CaseDocument>> preTranslationDocs =
+                Optional.ofNullable(caseData.getPreTranslationDocuments()).orElseGet(ArrayList::new);
+            preTranslationDocs.add(ElementUtils.element(sealedForm));
+            builder.preTranslationDocuments(preTranslationDocs);
+            builder.preTranslationDocumentType(PreTranslationDocumentType.DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR);
         } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
             if (Objects.nonNull(copy)) {
                 caseData.getDuplicateSystemGeneratedCaseDocs().add(ElementUtils.element(copy));
             }
         }
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
     }
 
     /**
@@ -144,16 +162,28 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 LocalDate.now().toString()
             ));
         }
-        ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
-            .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
-            .map(cd ->
-                     new DocumentMetaData(
-                         cd.getDocumentLink(),
-                         "Directions Questionnaire",
-                         LocalDate.now().toString()
-                     )
-            ).forEach(documents::add);
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual() && caseData.getRespondent1OriginalDqDoc() != null
+            && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState())) {
+            documents.add(
+                new DocumentMetaData(
+                    caseData.getRespondent1OriginalDqDoc().getDocumentLink(),
+                    "Directions Questionnaire",
+                    LocalDate.now().toString()
+                )
+            );
 
+        } else {
+            ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
+                .filter(cd -> DocumentType.DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
+                .map(cd ->
+                         new DocumentMetaData(
+                             cd.getDocumentLink(),
+                             "Directions Questionnaire",
+                             LocalDate.now().toString()
+                         )
+                ).forEach(documents::add);
+        }
         return documents;
     }
 }

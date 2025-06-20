@@ -217,6 +217,10 @@ public class DQGeneratorFormBuilder {
         }
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
 
+        if (isLipClaimantBilingualRequiresTranslation(caseData)) {
+            return true;
+        }
+
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             || state.equals(FULL_DEFENCE.fullName())
@@ -363,5 +367,11 @@ public class DQGeneratorFormBuilder {
     private static boolean isSmallClaim(CaseData caseData) {
         return AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
             || SMALL_CLAIM.equals(caseData.getResponseClaimTrack());
+    }
+
+    private boolean isLipClaimantBilingualRequiresTranslation(CaseData caseData) {
+        return featureToggleService.isGaForWelshEnabled()
+            && caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual();
     }
 }

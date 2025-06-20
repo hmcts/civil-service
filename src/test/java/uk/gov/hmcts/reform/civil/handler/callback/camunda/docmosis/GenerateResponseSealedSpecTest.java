@@ -14,11 +14,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -39,7 +41,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType.DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -59,11 +63,15 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
     @Mock
     private CivilStitchService civilStitchService;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
         handler = new GenerateResponseSealedSpec(mapper, sealedClaimResponseFormGeneratorForSpec, civilStitchService,
-                                                 new AssignCategoryId());
+                                                 new AssignCategoryId(), featureToggleService
+        );
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
@@ -295,6 +303,33 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldAssignCategoryId_whenInvokedForLip_Vs_Lr_Welsh() {
+        // Given
+        ReflectionTestUtils.setField(handler, "stitchEnabled", false);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(
+            any(CaseData.class),
+            anyString()
+        )).thenReturn(SEALED_FORM);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData localCaseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .respondent1OriginalDqDoc(CaseDocument.builder().documentType(SEALED_CLAIM).build())
+            .claimantBilingualLanguagePreference("BOTH")
+            .respondent1Represented(YES)
+            .applicant1Represented(NO)
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .build();
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getPreTranslationDocuments().get(0).getValue().getDocumentLink()
+                       .getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
+        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR);
+    }
+
+    @Test
     void shouldAssignCategoryId_whenInvokedStitchedEnabled() {
         // Given
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
@@ -313,6 +348,36 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
         assertThat(updatedData.getDuplicateSystemGeneratedCaseDocs().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondent");
+    }
+
+    @Test
+    void shouldAssignCategoryId_whenInvokedStitchedEnabledForLipVSLR_Welsh() {
+        // Given
+        ReflectionTestUtils.setField(handler, "stitchEnabled", true);
+        when(sealedClaimResponseFormGeneratorForSpec.generate(
+            any(CaseData.class),
+            anyString()
+        )).thenReturn(SEALED_FORM);
+        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        CaseData localCaseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued().build().toBuilder()
+            .respondent1OriginalDqDoc(CaseDocument.builder().documentType(SEALED_CLAIM).build())
+            .claimantBilingualLanguagePreference("BOTH")
+            .respondent1Represented(YES)
+            .applicant1Represented(NO)
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .build();
+        CallbackParams params = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
+        when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFENDANT_DEFENCE),
+                                                             anyString()
+        )).thenReturn(STITCHED_DOC);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getPreTranslationDocuments().get(0).getValue().getDocumentLink()
+                       .getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
+        assertThat(updatedData.getPreTranslationDocumentType()).isEqualTo(DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR);
     }
 
     @Test
