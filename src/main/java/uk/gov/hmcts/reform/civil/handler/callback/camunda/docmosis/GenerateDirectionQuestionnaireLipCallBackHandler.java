@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_DQ_LIP_SEALED;
@@ -54,7 +56,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isFullAdmitClaimSpec()
+        if ( caseData.isFullAdmitClaimSpec()
             || caseData.isClaimantAcceptedClaimAmount()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
@@ -71,6 +73,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(sealedDQForm));
             caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.LIP_CLAIMANT_DQ);
         } else {
             caseDataBuilder
                 .systemGeneratedCaseDocuments(systemGeneratedDocumentService
