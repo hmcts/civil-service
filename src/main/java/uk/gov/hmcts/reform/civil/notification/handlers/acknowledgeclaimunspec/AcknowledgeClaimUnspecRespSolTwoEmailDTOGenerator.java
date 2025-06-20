@@ -41,6 +41,7 @@ public class AcknowledgeClaimUnspecRespSolTwoEmailDTOGenerator extends RespSolTw
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return !(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData));
+        return !(acknowledgeClaimUnspecHelper.isRespondentOneAcknowledged(caseData))
+            && !caseData.isRespondent2LiP();
     }
 }
