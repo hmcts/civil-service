@@ -632,6 +632,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
 
     private final PreTranslationDocumentType preTranslationDocumentType;
+    private final CaseDocument respondent1OriginalDqDoc;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1111,6 +1112,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public Optional<Element<CaseDocument>> getTranslatedSDODocument() {
         return getLatestDocumentOfType(DocumentType.SDO_TRANSLATED_DOCUMENT);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getDecisionReconsiderationDocument() {
+        return getLatestDocumentOfType(DocumentType.DECISION_MADE_ON_APPLICATIONS);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getTranslatedDecisionReconsiderationDocument() {
+        return getLatestDocumentOfType(DocumentType.DECISION_MADE_ON_APPLICATIONS_TRANSLATED);
     }
 
     @JsonIgnore
