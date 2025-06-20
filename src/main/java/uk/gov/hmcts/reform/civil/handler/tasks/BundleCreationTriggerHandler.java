@@ -34,6 +34,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     @Value("${stitch-bundle.wait-time-mins:10}")
     private int waitTime;
 
+    @SuppressWarnings("java:S2142")
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
         Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
