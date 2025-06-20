@@ -159,7 +159,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     }
 
     private void resetLanguagePreference(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, CaseData caseData, String caseRole) {
-        if (featureToggleService.isGaForWelshEnabled()) {
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(caseRole) && caseData.isClaimantBilingual()) {
                 updatedCaseDataBuilder
                         .claimantBilingualLanguagePreference(null)

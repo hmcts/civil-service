@@ -1518,7 +1518,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
-            if (featureToggleService.isGaForWelshEnabled()
+            if (featureToggleService.isWelshEnabledForMainCase()
                 && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
                 List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
                     .getPreTranslationDocuments();

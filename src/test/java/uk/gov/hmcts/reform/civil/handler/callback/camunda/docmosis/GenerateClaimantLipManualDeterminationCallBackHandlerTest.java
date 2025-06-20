@@ -119,7 +119,7 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
     @Test
     void shouldNotHideTheDocumentWhenFTisOff() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -138,7 +138,7 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
     @Test
     void shouldHideTheDocumentWhenFTisONAndWelshClaimant() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -157,7 +157,7 @@ class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCall
     @Test
     void shouldHideInterlocutoryJudgementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()

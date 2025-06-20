@@ -105,7 +105,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldGenerateDefendantClaimForm() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(claimFormGenerator.generate(
             any(CaseData.class),
             anyString(),
@@ -127,7 +127,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAddDefendantClaimFormInTempCollection_whenWelshFlagIsOn() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(claimFormGenerator.generate(
             any(CaseData.class),
             anyString(),

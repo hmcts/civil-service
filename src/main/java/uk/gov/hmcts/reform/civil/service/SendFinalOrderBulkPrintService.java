@@ -37,7 +37,7 @@ public class SendFinalOrderBulkPrintService {
         Language language = LanguageUtils.determineLanguageForBulkPrint(
             caseData,
             TASK_ID_CLAIMANT.equals(task),
-            featureToggleService.isGaForWelshEnabled());
+            featureToggleService.isWelshEnabledForMainCase());
         if (checkFinalOrderDocumentAvailable(caseData, language)) {
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {

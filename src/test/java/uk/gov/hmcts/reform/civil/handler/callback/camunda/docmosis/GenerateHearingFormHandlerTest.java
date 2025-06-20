@@ -96,7 +96,7 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGenerateForm_when1v1ButHideIt_IfClaimantIsWelsh() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
             .documentName("document name")

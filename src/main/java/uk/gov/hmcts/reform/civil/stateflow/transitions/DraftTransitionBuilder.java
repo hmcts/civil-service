@@ -48,7 +48,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
             .onlyWhen(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -68,7 +68,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
                 )), transitions)
             // Only one unrepresented defendant
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -84,7 +84,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
                 )), transitions)
             // Unrepresented defendant 1
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -103,7 +103,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
                 )), transitions)
             // Unrepresented defendant 2
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -121,7 +121,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
                 )), transitions)
             // Unrepresented defendants
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -139,7 +139,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
                 )), transitions);
     }
 

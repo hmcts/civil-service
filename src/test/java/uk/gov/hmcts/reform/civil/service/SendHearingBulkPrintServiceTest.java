@@ -237,7 +237,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenWelsh() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, "WELSH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
@@ -253,7 +253,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToClaimantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, null, "BOTH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
@@ -269,7 +269,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToDefendantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, "BOTH", null, null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
@@ -285,7 +285,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintWelshHearingNoticeLetterToDefendantLiPSuccessfullyWhenEnglish() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, HEARING_FORM, true, "ENGLISH", null, null, Language.WELSH);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
