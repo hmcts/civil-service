@@ -535,6 +535,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String caseNameHmctsInternal;
     private final String caseNamePublic;
     private final YesOrNo ccjJudgmentAmountShowInterest;
+    private final YesOrNo claimFixedCostsExist;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();

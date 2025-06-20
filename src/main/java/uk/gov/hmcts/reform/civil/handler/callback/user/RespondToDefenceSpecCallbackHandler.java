@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespeccallbackhandlertask.AboutToSubmitRespondToDefenceTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespeccallbackhandlertask.BuildConfirmationTask;
@@ -337,8 +338,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
                 .build();
-        } else if (featureToggleService.isLrAdmissionBulkEnabled() 
-                   && caseData.getFixedCosts() != null 
+        } else if (featureToggleService.isLrAdmissionBulkEnabled()
+                   && caseData.getFixedCosts() != null
                    && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
             updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
@@ -359,6 +360,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
             updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+            if (caseData.getFixedCosts() != null
+                && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                updatedCaseData.claimFixedCostsExist(YES);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
