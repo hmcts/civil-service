@@ -99,6 +99,8 @@ class DQGeneratorFormBuilderTest {
 
     @Test
     void shouldGetDirectionsQuestionnaireFormBuilderForPartAdmit() {
+        Witnesses mockWitnesses = mock(Witnesses.class);
+        when(respondentTemplateForDQGenerator.getWitnesses(any())).thenReturn(mockWitnesses);
         when(state.getName()).thenReturn(PART_ADMISSION.fullName());
 
         CaseData caseData = CaseDataBuilder.builder()
