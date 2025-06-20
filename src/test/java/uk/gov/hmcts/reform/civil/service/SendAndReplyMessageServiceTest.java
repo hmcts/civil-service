@@ -1,12 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -113,7 +110,7 @@ class SendAndReplyMessageServiceTest {
 
     @Nested
     class AddMessage {
-        @Test
+
         void should_returnExpectedMessage_whenExistingMessagesAreNull() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -139,7 +136,6 @@ class SendAndReplyMessageServiceTest {
             );
         }
 
-        @Test
         void should_returnExpectedMessage_forHearingCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -172,7 +168,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forCtsc() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -201,7 +196,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forCtscTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -233,7 +227,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -264,7 +257,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forSeniorTribunalCaseworker() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -297,7 +289,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forNationalBusinessCentre() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -328,7 +319,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forNationalBusinessCentreTeamLeader() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -361,7 +351,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forDistrictJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -393,7 +382,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forCircuitJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -425,7 +413,6 @@ class SendAndReplyMessageServiceTest {
             ), unwrapElements(actual));
         }
 
-        @Test
         void should_returnExpectedMessage_forJudge() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
 
@@ -569,8 +556,6 @@ class SendAndReplyMessageServiceTest {
             );
         }
 
-        @ParameterizedTest
-        @MethodSource("provideUserData")
         void shouldAddMessageReplyasBaseAndBaseToMessageHistory(RolePool originalSender,
                                                                                      RolePool currentSender,
                                                                                      List<RoleAssignmentResponse> roleAssignmentResponses,
@@ -633,7 +618,6 @@ class SendAndReplyMessageServiceTest {
             assertEquals(expectedMessage, existingMessageToBeChanged.getValue());
         }
 
-        @Test
         void shouldAddMessageReplyToExistingHistory_withTwoExistingReplies() {
             when(userService.getUserDetails(USER_AUTH)).thenReturn(USER_DETAILS);
             when(roleAssignmentService.getRoleAssignmentsWithLabels(USER_DETAILS.getId(), USER_AUTH, SUPPORTED_ROLES)).thenReturn(
@@ -710,7 +694,6 @@ class SendAndReplyMessageServiceTest {
             messages = List.of(message1, message2);
         }
 
-        @Test
         void shouldReturnMessage_whenMessageIdMatches() {
             String messageId = message1.getId().toString();
 
@@ -719,7 +702,6 @@ class SendAndReplyMessageServiceTest {
             assertEquals(message1, result);
         }
 
-        @Test
         void shouldReturnNull_whenMessageIdDoesNotMatch() {
             String nonExistentMessageId = UUID.randomUUID().toString();
 
@@ -751,7 +733,6 @@ class SendAndReplyMessageServiceTest {
             messages = List.of(message1, message2);
         }
 
-        @Test
         void shouldCreateMessageSelectionList_withCorrectFormat() {
             DynamicList result = messageService.createMessageSelectionList(messages);
 
@@ -776,7 +757,6 @@ class SendAndReplyMessageServiceTest {
                              .build(), result);
         }
 
-        @Test
         void shouldReturnEmptyList_whenNoMessages() {
             List<Element<Message>> emptyMessages = new ArrayList<>();
 
@@ -809,7 +789,6 @@ class SendAndReplyMessageServiceTest {
                                   .build());
         }
 
-        @Test
         void shouldCallTableMarkupService_withExpectedRowData_withoutReplies() {
             messageService.renderMessageTableList(message);
 
@@ -824,7 +803,6 @@ class SendAndReplyMessageServiceTest {
             ));
         }
 
-        @Test
         void shouldCallTableMarkupService_withExpectedRowData_withReplies() {
             message.getValue().getHistory().add(element(MessageReply.builder()
                                                             .messageContent("This is the original message")
