@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +29,10 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+    @Value("${stitch-bundle.batchsize:500}")
+    private int batchSize;
+    @Value("${stitch-bundle.wait-time-mins:10}")
+    private int waitTime;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -36,13 +42,27 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
+                int count = 0;
+                int batchCount = 1;
                 boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
                 if (!isBundleCreated) {
+                    count++;
                     applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));
+                    if (count == batchSize) {
+                        log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, batchSize, waitTime);
+                        TimeUnit.MINUTES.sleep(waitTime);
+                        count = 0;
+                        batchCount++;
+                    }
+                    log.info("Process case reference {}, batch {}, count {}", caseDetails.getId(), batchCount, count);
                 } else {
                     log.info("Bundle is already created for {}", caseDetails.getId());
                 }
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
+                log.error("Error processing caseRef {} and error is {}", caseDetails.getId(), e.getMessage());
+                e.printStackTrace();
+            }
+            catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
