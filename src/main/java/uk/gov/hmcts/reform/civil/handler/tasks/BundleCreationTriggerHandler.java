@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,21 +44,20 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
         List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
         log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
         log.info("batchEnabled {}", batchEnabled);
+        AtomicInteger count = new AtomicInteger();
+        AtomicInteger batchCount = new AtomicInteger(1);
         cases.forEach(caseDetails -> {
             try {
-                int count = 0;
-                int batchCount = 1;
                 boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
                 if (!isBundleCreated) {
-                    count++;
+                    count.getAndIncrement();
                     applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));
-                    if (Boolean.TRUE.equals(batchEnabled) && (count == batchSize)) {
+                    if (Boolean.TRUE.equals(batchEnabled) && (count.get() == batchSize)) {
                         log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, batchSize, waitTime);
                         TimeUnit.MINUTES.sleep(waitTime);
-                        count = 0;
-                        batchCount++;
+                        count.set(0);
+                        batchCount.getAndIncrement();
                     }
-                    log.info("Process case reference {}, batch {}, count {}", caseDetails.getId(), batchCount, count);
                 } else {
                     log.info("Bundle is already created for {}", caseDetails.getId());
                 }
