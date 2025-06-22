@@ -788,10 +788,6 @@ docmosis:
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:some-gov-uk-notify-api-key}
 
-testing:
-  support:
-    enabled: true
-
 rd_professional:
   api:
     url: ${RD_PROFESSIONAL_API_URL:http://fake-prd-api}
@@ -831,5 +827,6 @@ court_location_dmn:
   enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
 
 stitch-bundle:
-  batchsize: ${BATCH_SIZE:50}
+  batch-size: ${BATCH_SIZE:50}
   wait-time-mins: ${WAIT_TIME_MINS:10}
+  batch-enabled: ${BATCH_ENABLED:false}

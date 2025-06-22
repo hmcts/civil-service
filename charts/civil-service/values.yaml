@@ -93,6 +93,7 @@ java:
     CCD_EVENTS_TOPIC_NAME: "ccd-case-events-{{ .Values.global.environment }}"
     BATCH_SIZE: 50
     WAIT_TIME_MINS: 10
+    BATCH_ENABLED: false
 
   keyVaults:
     civil:

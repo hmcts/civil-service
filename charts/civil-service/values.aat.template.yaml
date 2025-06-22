@@ -30,6 +30,9 @@ java:
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
+    BATCH_SIZE: 50
+    WAIT_TIME_MINS: 10
+    BATCH_ENABLED: false
   postgresql:
     enabled: true
     image:
