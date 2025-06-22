@@ -43,7 +43,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
         Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
         List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
         log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
-        log.info("batchEnabled {}", batchEnabled);
+        log.info("Initial batchSize {}, waitTime {}, batchEnabled {}", batchSize, waitTime, batchEnabled);
         AtomicInteger count = new AtomicInteger();
         AtomicInteger batchCount = new AtomicInteger(1);
         cases.forEach(caseDetails -> {
