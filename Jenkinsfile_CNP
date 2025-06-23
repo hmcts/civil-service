@@ -12,7 +12,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def ccdBranch = "master"
-def camundaBranch = "master"
+def camundaBranch = "fix/CIV-16870"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
@@ -105,9 +105,9 @@ def checkForRunFailedTestFiles(branch_name) {
 def getCivilCcdDefinitionBranch() {
   def githubApi = new GithubAPI(this)
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
-    return label.minus("civilDefinitionBranch:").trim()
+    return "fix/CIV-16870"
   }
-  return "master"
+  return "fix/CIV-16870"
 }
 
 withPipeline(type, product, component) {
