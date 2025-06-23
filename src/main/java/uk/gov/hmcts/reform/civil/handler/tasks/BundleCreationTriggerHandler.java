@@ -31,9 +31,9 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     @Value("${stitch-bundle.batch-size}")
-    private int batchSize;
+    private Integer batchSize;
     @Value("${stitch-bundle.wait-time-mins}")
-    private int waitTime;
+    private Integer waitTime;
 
     @SuppressWarnings("java:S2142")
     @Override

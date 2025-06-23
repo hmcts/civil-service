@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -69,6 +70,8 @@ class BundleCreationTriggerHandlerTest {
 
     @BeforeEach
     void init() {
+        ReflectionTestUtils.setField(handler, "batchSize", 1);
+        ReflectionTestUtils.setField(handler, "waitTime", 0);
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
 
