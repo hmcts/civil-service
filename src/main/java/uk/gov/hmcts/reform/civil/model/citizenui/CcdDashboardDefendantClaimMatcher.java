@@ -118,7 +118,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
-        if(isCasedDiscontinued()) {
+        if (isCasedDiscontinued()) {
             return false;
         }
         return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
@@ -481,6 +481,6 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isCasedDiscontinued() {
-      return CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
+        return CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
     }
 }
