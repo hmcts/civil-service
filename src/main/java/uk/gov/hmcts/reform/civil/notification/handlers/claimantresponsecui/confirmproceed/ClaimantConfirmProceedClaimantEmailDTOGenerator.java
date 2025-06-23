@@ -7,6 +7,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+
 @RequiredArgsConstructor
 @Slf4j
 @Component
@@ -31,5 +35,12 @@ public class ClaimantConfirmProceedClaimantEmailDTOGenerator extends ClaimantEma
 
     private boolean isBilingualForLipApplicant(CaseData caseData) {
         return caseData.isApplicantNotRepresented() && caseData.isClaimantBilingual();
+    }
+
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        return properties;
     }
 }
