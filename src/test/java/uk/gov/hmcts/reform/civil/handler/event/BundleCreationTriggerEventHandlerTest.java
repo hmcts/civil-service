@@ -69,7 +69,7 @@ class BundleCreationTriggerEventHandlerTest {
     private Bundle bundle;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         bundle = Bundle.builder().value(BundleDetails.builder().title("Trial Bundle").id("1")
                                             .stitchStatus("new")
                                             .stitchedDocument(null)

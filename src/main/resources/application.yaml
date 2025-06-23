@@ -827,6 +827,5 @@ court_location_dmn:
   enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
 
 stitch-bundle:
-  batch-size: ${BATCH_SIZE:50}
+  batch-size: ${BATCH_SIZE:25}
   wait-time-mins: ${WAIT_TIME_MINS:10}
-  batch-enabled: ${BATCH_ENABLED:false}

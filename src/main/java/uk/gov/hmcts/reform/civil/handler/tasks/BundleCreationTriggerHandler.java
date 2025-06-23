@@ -34,8 +34,6 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     private int batchSize;
     @Value("${stitch-bundle.wait-time-mins}")
     private int waitTime;
-    @Value("${stitch-bundle.batch-enabled}")
-    private Boolean batchEnabled;
 
     @SuppressWarnings("java:S2142")
     @Override
@@ -43,7 +41,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
         Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
         List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
         log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
-        log.info("Initial batchSize {}, waitTime {}, batchEnabled {}", batchSize, waitTime, batchEnabled);
+        log.info("Initial batchSize {}, waitTime {}", batchSize, waitTime);
         AtomicInteger count = new AtomicInteger();
         AtomicInteger batchCount = new AtomicInteger(1);
         cases.forEach(caseDetails -> {
@@ -52,7 +50,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
                 if (!isBundleCreated) {
                     count.getAndIncrement();
                     applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));
-                    if (Boolean.TRUE.equals(batchEnabled) && (count.get() == batchSize)) {
+                    if (count.get() == batchSize) {
                         log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, batchSize, waitTime);
                         TimeUnit.MINUTES.sleep(waitTime);
                         count.set(0);
