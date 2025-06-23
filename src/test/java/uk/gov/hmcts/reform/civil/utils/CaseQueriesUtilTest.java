@@ -292,6 +292,7 @@ class CaseQueriesUtilTest {
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(0).getCategoryID());
         assertEquals(DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS.getValue(), documents.get(1).getCategoryID());
     }
+
     @Test
     void shouldAssignCategoryIDToAttachments_whenCaseworker_QmLip_isOn() {
         List<Element<CaseMessage>> queries = buildCaseMessageWithFollowUpQuery();
