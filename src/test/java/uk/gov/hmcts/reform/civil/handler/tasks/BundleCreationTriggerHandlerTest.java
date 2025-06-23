@@ -84,28 +84,6 @@ class BundleCreationTriggerHandlerTest {
     @Test
     void shouldEmitBundleCreationEvent_whenCasesFound() {
         long caseId = 1L;
-        ReflectionTestUtils.setField(handler, "batchSize", 1);
-        ReflectionTestUtils.setField(handler, "waitTime", 0);
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
-        Map<String, Object> data = Map.of("data", caseData);
-        Set<CaseDetails> caseDetails = Set.of(CaseDetails.builder().id(caseId).data(data).build());
-
-        when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.iterator().next());
-        when(caseDetailsConverter.toCaseData(caseDetails.iterator().next())).thenReturn(caseData);
-        when(coreCaseDataService.getCase(anyLong())).thenReturn(caseDetails.iterator().next());
-        when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId));
-        verify(externalTaskService).complete(mockTask, null);
-    }
-
-    @Test
-    void shouldEmitBundleCreationEvent_whenCasesFound_1() {
-        long caseId = 1L;
-        ReflectionTestUtils.setField(handler, "batchSize", 0);
         ReflectionTestUtils.setField(handler, "waitTime", 0);
         CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
         Map<String, Object> data = Map.of("data", caseData);

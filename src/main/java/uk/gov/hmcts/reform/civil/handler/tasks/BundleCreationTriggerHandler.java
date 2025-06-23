@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,9 +29,7 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    @Value("${stitch-bundle.batch-size}")
-    private Integer batchSize;
-    @Value("${stitch-bundle.wait-time-mins}")
+    @Value("${stitch-bundle.wait-time-in-milliseconds}")
     private Integer waitTime;
 
     @SuppressWarnings("java:S2142")
@@ -41,21 +38,13 @@ public class BundleCreationTriggerHandler extends BaseExternalTaskHandler {
         Set<CaseDetails> cases = bundleCreationTriggerService.getCases();
         List<Long> ids = cases.stream().map(CaseDetails::getId).sorted().toList();
         log.info("Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), cases.size(), ids);
-        log.info("Initial batchSize {}, waitTime {}", batchSize, waitTime);
-        AtomicInteger count = new AtomicInteger();
-        AtomicInteger batchCount = new AtomicInteger(1);
+        log.info("Initial  waitTime in milliseconds is {}", waitTime);
         cases.forEach(caseDetails -> {
             try {
                 boolean isBundleCreated = getIsBundleCreatedForHearingDate(caseDetails.getId());
                 if (!isBundleCreated) {
-                    count.getAndIncrement();
                     applicationEventPublisher.publishEvent(new BundleCreationTriggerEvent(caseDetails.getId()));
-                    if (count.get() == batchSize) {
-                        log.info("Batch {} limit reached {}, pausing for {} minutes", batchCount, batchSize, waitTime);
-                        TimeUnit.MINUTES.sleep(waitTime);
-                        count.set(0);
-                        batchCount.getAndIncrement();
-                    }
+                    TimeUnit.MILLISECONDS.sleep(waitTime);
                 } else {
                     log.info("Bundle is already created for {}", caseDetails.getId());
                 }
