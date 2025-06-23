@@ -108,6 +108,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
@@ -631,6 +632,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
 
     private final PreTranslationDocumentType preTranslationDocumentType;
+    private final YesOrNo bilingualHint;
     private final CaseDocument respondent1OriginalDqDoc;
 
     /**
@@ -910,6 +912,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isUnSpecClaim() {
+        return UNSPEC_CLAIM.equals(getCaseAccessCategory());
+    }
+
+    @JsonIgnore
+    public boolean isSpecClaim() {
+        return SPEC_CLAIM.equals(getCaseAccessCategory());
+    }
+
+    @JsonIgnore
     public boolean isLRvLipOneVOne() {
         return isRespondent1LiP()
             && !isApplicant1NotRepresented()
@@ -1111,6 +1123,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public Optional<Element<CaseDocument>> getTranslatedSDODocument() {
         return getLatestDocumentOfType(DocumentType.SDO_TRANSLATED_DOCUMENT);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getDecisionReconsiderationDocument() {
+        return getLatestDocumentOfType(DocumentType.DECISION_MADE_ON_APPLICATIONS);
+    }
+
+    @JsonIgnore
+    public Optional<Element<CaseDocument>> getTranslatedDecisionReconsiderationDocument() {
+        return getLatestDocumentOfType(DocumentType.DECISION_MADE_ON_APPLICATIONS_TRANSLATED);
     }
 
     @JsonIgnore
