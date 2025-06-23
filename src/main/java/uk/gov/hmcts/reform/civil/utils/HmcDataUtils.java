@@ -130,17 +130,6 @@ public class HmcDataUtils {
     }
 
     /**
-     * If a hearing is listed for 6 hours which is classed as a full day hearing,
-     *      one hour is removed from the hearingDuration to account for lunch break.
-     * hearingDayHours is the amount of hours the hearing is listed for on a single day
-     * @return hearingDayHours
-     */
-    private static int actualHours(int hearingDayHours) {
-
-        return hearingDayHours == HOURS_PER_DAY ? 5 : hearingDayHours;
-    }
-
-    /**
      * Returns and formats information for each individual day of the hearing.
      * Returns the date of hearing, time of hearing and total duration of hearing.
      * @return e.g. "30 June 2023 at 10:00 for 3 hours"
@@ -154,7 +143,7 @@ public class HmcDataUtils {
         int hours = (int)Math.floor((double)hearingDayDurationInMinutes / MINUTES_PER_HOUR);
         int minutes = hearingDayDurationInMinutes - (hours * MINUTES_PER_HOUR);
 
-        return String.format("%s at %s for %s", dateString, timeString, hoursMinutesFormat(actualHours(hours), minutes));
+        return String.format("%s at %s for %s", dateString, timeString, hoursMinutesFormat(hours, minutes));
     }
 
     /**
@@ -171,7 +160,7 @@ public class HmcDataUtils {
         int hours = (int)Math.floor((double)hearingDayDurationInMinutes / MINUTES_PER_HOUR);
         int minutes = hearingDayDurationInMinutes - (hours * MINUTES_PER_HOUR);
 
-        return String.format("%s am %s am %s", dateString, timeString, hoursMinutesFormatWelsh(actualHours(hours), minutes));
+        return String.format("%s am %s am %s", dateString, timeString, hoursMinutesFormatWelsh(hours, minutes));
     }
 
     /**
