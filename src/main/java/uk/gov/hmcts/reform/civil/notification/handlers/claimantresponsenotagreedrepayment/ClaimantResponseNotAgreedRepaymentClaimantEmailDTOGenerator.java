@@ -31,6 +31,7 @@ public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGenerator extends
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         return properties;
     }
 }
