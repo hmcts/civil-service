@@ -632,6 +632,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
 
     private final PreTranslationDocumentType preTranslationDocumentType;
+    private final YesOrNo bilingualHint;
     private final CaseDocument respondent1OriginalDqDoc;
 
     /**
