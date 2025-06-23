@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.SendAndReplyOption;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -89,6 +90,11 @@ public class SendAndReplyCallbackHandler extends CallbackHandler {
 
         if (nonNull(caseData.getMessages()) && !caseData.getMessages().isEmpty()) {
             builder.messagesToReplyTo(messageService.createMessageSelectionList(caseData.getMessages()));
+        }
+
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            builder.bilingualHint(YesOrNo.YES);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

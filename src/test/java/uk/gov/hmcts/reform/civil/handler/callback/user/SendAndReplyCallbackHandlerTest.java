@@ -13,9 +13,12 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sendandreply.RolePool;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -76,6 +79,7 @@ class SendAndReplyCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .sendAndReplyOption(SEND)
                 .build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
@@ -88,13 +92,52 @@ class SendAndReplyCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetTheNotificationSendAndReplyOption_WhenAboutToStartIsInvokedFlagEnabled() {
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getBilingualHint()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
+        void shouldSetTheNotificationSendAndReplyOptionRespondentBiligual_WhenAboutToStartIsInvokedFlagEnabled() {
+            CaseData caseData = CaseData.builder()
+                .sendAndReplyOption(SEND)
+                .claimantBilingualLanguagePreference("ENGLISH")
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("BOTH").build()).build())
+                .build();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = new ObjectMapper().convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getBilingualHint()).isEqualTo(YesOrNo.YES);
+        }
+
+        @Test
         void shouldPopulateMessagesToReplyTo_whenMessagesExist() {
             List<Element<Message>> messages = List.of(element(Message.builder().build()));
             CaseData caseData = CaseData.builder()
                 .messages(messages)
                 .build();
             DynamicList expectedMessages = DynamicList.fromList(List.of("mock"));
-
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             when(messageService.createMessageSelectionList(messages)).thenReturn(expectedMessages);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
@@ -112,7 +155,7 @@ class SendAndReplyCallbackHandlerTest {
         void shouldNotInteractWithMessagesService_whenNoMessagesExist() {
             CaseData caseData = CaseData.builder().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             handler.handle(params);
 
             verifyNoInteractions(messageService);
