@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -33,12 +32,5 @@ class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
         Query expectedQuery = buildQuery(0);
         String queryString = expectedQuery.toString();
         assertFalse(queryString.contains("data.hearingDueDate"));
-    }
-
-    @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
-                                          boolean initialSearch,
-                                          String searchAfterValue) {
-        return null;
     }
 }
