@@ -118,6 +118,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
             return false;
         }
+        if(isCasedDiscontinued()) {
+            return false;
+        }
         return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
             && !hasSdoBeenDrawn())
             || (null != caseData.getCcjPaymentDetails()
@@ -474,5 +477,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isCasedDiscontinued() {
+      return CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
     }
 }
