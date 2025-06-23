@@ -6,6 +6,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+
 @Component
 @RequiredArgsConstructor
 public class ClaimantResponseCuiRejectPayClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
@@ -17,6 +21,14 @@ public class ClaimantResponseCuiRejectPayClaimantEmailDTOGenerator extends Claim
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getNotifyClaimantLipTemplateManualDetermination();
+    }
+
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
+        return properties;
     }
 
     @Override

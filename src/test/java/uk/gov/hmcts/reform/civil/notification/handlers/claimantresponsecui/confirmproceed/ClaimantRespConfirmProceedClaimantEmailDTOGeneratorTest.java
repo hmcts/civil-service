@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -23,9 +22,6 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
-    @Mock
-    private FeatureToggleService featureToggleService;
-
     @InjectMocks
     private ClaimantConfirmProceedClaimantEmailDTOGenerator emailGenerator;
 
@@ -35,7 +31,6 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
             .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
 
@@ -48,7 +43,6 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
             .claimantBilingualLanguagePreference(Language.ENGLISH.getDisplayedValue()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         String actualTemplateId = emailGenerator.getEmailTemplateId(caseData);
 

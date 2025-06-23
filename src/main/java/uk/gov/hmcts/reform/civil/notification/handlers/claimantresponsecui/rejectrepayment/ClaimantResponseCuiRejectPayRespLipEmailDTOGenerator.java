@@ -6,7 +6,10 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
+import java.util.Map;
+
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @Component
 @RequiredArgsConstructor
@@ -16,7 +19,6 @@ public class ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator extends Defend
     private static final String REFERENCE_TEMPLATE = "claimant-reject-repayment-respondent-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
@@ -31,8 +33,15 @@ public class ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator extends Defend
         return REFERENCE_TEMPLATE;
     }
 
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
+        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
+        return properties;
+    }
+
     private boolean isBilingualForLipApplicant(CaseData caseData) {
-        return caseData.isApplicantNotRepresented() && featureToggleService.isLipVLipEnabled()
-            && caseData.isClaimantBilingual();
+        return caseData.isApplicantNotRepresented() && caseData.isClaimantBilingual();
     }
 }

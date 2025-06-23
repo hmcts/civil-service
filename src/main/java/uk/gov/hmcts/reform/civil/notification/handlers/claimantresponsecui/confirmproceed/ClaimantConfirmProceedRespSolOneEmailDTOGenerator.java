@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
@@ -53,7 +54,10 @@ public class ClaimantConfirmProceedRespSolOneEmailDTOGenerator extends RespSolOn
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        boolean isRespondent1 = true;
         properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
+        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                                                                                        isRespondent1, organisationService));
         return properties;
     }
 
