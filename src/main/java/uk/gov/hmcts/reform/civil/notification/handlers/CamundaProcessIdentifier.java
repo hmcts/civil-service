@@ -22,5 +22,5 @@ public enum CamundaProcessIdentifier {
     ClaimantResponseAgreedRepaymentNotify,
     ClaimantResponseAgreedSettledPartAdmitNotify,
     ClaimantResponseConfirmsNotToProceedLipNotify,
-    AmendRestitchBundleNotify
+    AmendRestitchBundleNotify,
 }
