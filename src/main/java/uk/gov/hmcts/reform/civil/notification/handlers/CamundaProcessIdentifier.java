@@ -24,5 +24,5 @@ public enum CamundaProcessIdentifier {
     ClaimantResponseConfirmsNotToProceedLipNotify,
     ApplicantNotifyOthersTrialReady,
     Respondent1NotifyOthersTrialReady,
-    Respondent2NotifyOthersTrialReady
+    Respondent2NotifyOthersTrialReady,
 }
