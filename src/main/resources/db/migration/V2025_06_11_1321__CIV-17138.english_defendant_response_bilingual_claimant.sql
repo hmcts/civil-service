@@ -18,3 +18,11 @@ values ('<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response t
         'The response',
         '<a href={VIEW_RESPONSE_TO_CLAIM} class="govuk-link">View the response to the claim</a>',
         'The response', 'Response.View', 'Scenario.AAA6.EnglishDefResponse.BilingualFlagSet.Claimant', '{3, 3}', 'CLAIMANT', 3);
+
+
+-- UPDATE dbs.task_item_template
+-- SET task_status_sequence = '{2, 2}',
+--     task_name_en         = '<a>View the response to the claim</a>',
+--     task_name_cy         = '<a>View the response to the claim</a>'
+-- WHERE scenario_name = 'Scenario.AAA6.DefResponse.BilingualFlagSet.Claimant';
+
