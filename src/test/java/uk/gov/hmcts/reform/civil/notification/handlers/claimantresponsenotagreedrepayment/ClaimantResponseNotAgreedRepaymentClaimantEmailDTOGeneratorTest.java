@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGeneratorTest {
@@ -53,7 +54,8 @@ public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        CaseData caseData = CaseData.builder().build();
+        String legacyCaseReference = "case reference";
+        CaseData caseData = CaseData.builder().legacyCaseReference(legacyCaseReference).build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 
         String partyName = "party name";
@@ -64,7 +66,8 @@ public class ClaimantResponseNotAgreedRepaymentClaimantEmailDTOGeneratorTest {
 
         partyUtilsMockedStatic.close();
 
-        assertThat(updatedProperties.size()).isEqualTo(1);
-        updatedProperties.put(CLAIMANT_NAME, partyName);
+        assertThat(updatedProperties.size()).isEqualTo(2);
+        assertThat(updatedProperties).containsEntry(CLAIMANT_NAME, partyName);
+        assertThat(updatedProperties).containsEntry(CLAIM_REFERENCE_NUMBER, legacyCaseReference);
     }
 }

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 public class CaseProceedsInCasemanRespSolTwoEmailDTOGeneratorTest {
 
