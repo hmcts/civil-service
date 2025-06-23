@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_RESPONSE_DQ_LIP_SEALED;
