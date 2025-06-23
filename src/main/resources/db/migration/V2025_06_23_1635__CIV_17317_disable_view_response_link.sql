@@ -3,14 +3,14 @@ VALUES ('Scenario.AAA6.Disable.View.Response.Link', '{"Notice.AAA6.ClaimIssue.Re
           "Notice.AAA6.DefResponse.MoretimeRequested.Claimant",
           "Notice.AAA6.DefResponse.ResponseTimeElapsed.Claimant",
           "Notice.AAA6.ClaimIssue.HWF.PhonePayment"}',
-        '{"Notice.AAA6.DefResponse.BilingualFlagSet.Claimant": []}');
+        '{"Notice.AAA6.DefResponse.BilingualFlagSet.Disable.Claimant": []}');
 
 /**
  * Add notification template for claimant
  */
 INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, title_Cy, description_En, description_Cy
                                                   , notification_role)
-VALUES ('Notice.AAA6.DefResponse.BilingualFlagSet.Claimant',
+VALUES ('Notice.AAA6.DefResponse.BilingualFlagSet.Disable.Claimant',
         'The defendant''s response is being translated',
         'Mae ymateb y diffynnydd yn cael ei gyfieithu',
         '<p class="govuk-body">The defendant has chosen to respond to the claim in Welsh. Their response is paused for translation into English. We will send it to you when it has been translated.</p>',
