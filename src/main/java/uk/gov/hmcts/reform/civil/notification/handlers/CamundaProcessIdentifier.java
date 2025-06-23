@@ -15,5 +15,12 @@ public enum CamundaProcessIdentifier {
     JudgmentVariedDeterminationOfMeansNotifyParties,
     ClaimSubmittedApplicantNotifier,
     ClaimantLipHelpWithFeesNotifier,
-    HearingProcessNotifier
+    HearingProcessNotifier,
+    ClaimantResponseConfirmsNotToProceedNotify,
+    ClaimantConfirmsToProceedNotify,
+    ClaimantDefendantAgreedMediationNotify,
+    ClaimantResponseNotAgreedRepaymentNotify,
+    ClaimantResponseAgreedRepaymentNotify,
+    ClaimantResponseAgreedSettledPartAdmitNotify,
+    ClaimantResponseConfirmsNotToProceedLipNotify
 }
