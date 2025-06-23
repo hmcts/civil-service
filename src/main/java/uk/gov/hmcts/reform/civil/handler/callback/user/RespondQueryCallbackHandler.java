@@ -54,9 +54,8 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
 
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
 
-        // CIV-17308
-        boolean isLipQmEnabled = featureToggleService.isLipQueryManagementEnabled(caseData);
-        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId, isLipQmEnabled);
+        boolean isPublicQmEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
+        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId, isPublicQmEnabled);
 
         caseData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
