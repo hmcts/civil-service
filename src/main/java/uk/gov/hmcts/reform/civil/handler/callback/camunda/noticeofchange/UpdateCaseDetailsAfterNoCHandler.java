@@ -137,6 +137,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             }
         }
 
+        if (featureToggleService.isLrAdmissionBulkEnabled() && featureToggleService.isJudgmentOnlineLive()) {
+            caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
+        }
+
         updateDefendantQueryCollectionPartyName(caseDataBuilder);
         resetLanguagePreference(caseDataBuilder, caseData, replacedSolicitorCaseRole);
         clearLRIndividuals(replacedSolicitorCaseRole, caseDataBuilder.build(), caseDataBuilder, caseData);
