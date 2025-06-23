@@ -160,11 +160,6 @@ public class JudgementService {
     }
 
     private YesOrNo checkFixedCostOption(CaseData caseData) {
-        if (isLrFullAdmitRepaymentPlan(caseData)
-            && (nonNull(caseData.getFixedCosts()) && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts()))
-            || YesOrNo.YES.equals(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
-            return YesOrNo.YES;
-        }
         return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }
 }
