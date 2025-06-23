@@ -283,7 +283,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                 .upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                   .reasonForReconsiderationTxtYes("Reason1").build())
                 .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.YES).build();
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -309,7 +309,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageNotSelected(String claimantLang, String respondentLang,
             Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -350,7 +350,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedClaimantLang(String claimantLang, String respondentLang,
                                                                                                  Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
@@ -390,7 +390,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         void shouldGenerateDocAndCallBusinessProcessIfDecisionUpheldWhenWelshlanguageSelectedRespondentLang(String claimantLang, String respondentLang,
                                                                                                           Language claimantDocLang, Language respondentDocLang) {
 
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             //Given : Casedata
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()

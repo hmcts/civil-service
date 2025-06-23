@@ -101,7 +101,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldNotHideInterlocutoryJudgementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             any(CaseData.class),
             anyString()
@@ -126,7 +126,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldHideInterlocutoryJudgementDocWhenClaimantHasWelshPreference() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             any(CaseData.class),
             anyString()
@@ -152,7 +152,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Test
     void shouldHideInterlocutoryJudgementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             any(CaseData.class),
             anyString()

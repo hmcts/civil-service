@@ -23,7 +23,7 @@ class DefendantResponseDeadlineCheckSearchServiceWithWelshFlagOnTest extends Ela
     @BeforeEach
     void setup() {
         searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService, featureToggleService);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
     }
 
     @Override
@@ -44,7 +44,7 @@ class DefendantResponseDeadlineCheckSearchServiceWithWelshFlagOnTest extends Ela
 
         return new Query(query, List.of("reference"), fromValue);
     }
-    
+
     @Override
     protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
                                           boolean initialSearch,

@@ -263,7 +263,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetLanguageDisplayToEnglishIfNotSpecified() {
-            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
@@ -274,7 +274,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldSetLanguageDisplayToEnglishAndWelshIfSpecified() {
-            when(toggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(toggleService.isWelshEnabledForMainCase()).thenReturn(true);
             caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
             CallbackParams localParams = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())

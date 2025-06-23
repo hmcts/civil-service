@@ -63,7 +63,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
         CaseDocument sealedDQForm = directionQuestionnaireLipGeneratorFactory
             .getDirectionQuestionnaire()
             .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && sealedDQForm.getDocumentName().contains("claimant")
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_APP1.getValue());

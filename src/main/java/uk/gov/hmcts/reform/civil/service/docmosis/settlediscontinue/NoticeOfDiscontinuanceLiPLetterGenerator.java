@@ -29,7 +29,7 @@ public class NoticeOfDiscontinuanceLiPLetterGenerator {
     public void printNoticeOfDiscontinuanceLetter(CaseData caseData, String authorisation) {
         CaseDocument discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyViewDoc();
         if (Objects.nonNull(discontinuanceCaseDocument)) {
-            Language language = LanguageUtils.determineLanguageForBulkPrint(caseData, false, featureToggleService.isGaForWelshEnabled());
+            Language language = LanguageUtils.determineLanguageForBulkPrint(caseData, false, featureToggleService.isWelshEnabledForMainCase());
             if (language.equals(Language.WELSH) || language.equals(Language.BOTH)) {
                 if (Objects.nonNull(caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc())) {
                     discontinuanceCaseDocument = caseData.getRespondent1NoticeOfDiscontinueAllPartyTranslatedDoc();

@@ -28,7 +28,7 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
     }
 
     public Query query(int startIndex) {
-        if (featureToggleService.isGaForWelshEnabled()) {
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             return new Query(
                 boolQuery()
                     .minimumShouldMatch(1)

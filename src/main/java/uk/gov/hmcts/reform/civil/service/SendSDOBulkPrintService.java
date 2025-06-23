@@ -33,7 +33,7 @@ public class SendSDOBulkPrintService {
             Language language = LanguageUtils.determineLanguageForBulkPrint(
                 caseData,
                 TASK_ID_CLAIMANT.equals(taskId),
-                featureToggleService.isGaForWelshEnabled());
+                featureToggleService.isWelshEnabledForMainCase());
             List<CaseDocument> caseDocuments = new ArrayList<>();
             switch (language) {
                 case ENGLISH -> caseData.getSDODocument().map(Element::getValue).ifPresent(caseDocuments::add);
