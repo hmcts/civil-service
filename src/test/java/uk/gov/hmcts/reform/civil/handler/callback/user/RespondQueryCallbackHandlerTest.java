@@ -70,7 +70,6 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new RespondQueryCallbackHandler(
                 objectMapper, assignCategoryId, featuretoggleService
             );
-            when(featuretoggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(false);
         }
 
         @Test
@@ -86,7 +85,7 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            List<Document> documents = unwrapElements(updatedData.getQmApplicantSolicitorQueries()
+            List<Document> documents = unwrapElements(updatedData.getQueries()
                                                           .getCaseMessages().get(0).getValue()
                                                           .getAttachments());
 
