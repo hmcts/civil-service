@@ -230,8 +230,8 @@ public class CaseQueriesUtil {
     public static void assignCategoryIdToCaseworkerAttachments(CaseData caseData,
                                                                CaseMessage latestCaseMessage,
                                                                AssignCategoryId assignCategoryId,
-                                                               boolean isLipQmEnabled) {
-        if (!isLipQmEnabled) {
+                                                               boolean isPublicQmEnabled) {
+        if (!isPublicQmEnabled) {
             CaseQueriesCollection workingCollection = getCollectionByMessage(caseData, latestCaseMessage);
             DocCategory documentCategory = getQueryAttachmentsDocumentCategory(getCollectionType(workingCollection, caseData));
             assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, documentCategory.getValue());
