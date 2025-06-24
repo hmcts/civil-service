@@ -23,10 +23,10 @@ for file in "$MAPPINGS_DIR"/*.json; do
         # Check if the file is a PDF
         if [[ "$BODY_FILE_PATH" == *.pdf ]]; then
           # Base64 encode the PDF content
-          BASE64_CONTENT=$(base64 "$BODY_FILE_PATH")
+          BASE64_CONTENT=$(base64 -w 0 "$BODY_FILE_PATH")
           INLINE_MAPPING=$(jq --arg base64_content "$BASE64_CONTENT" '
             del(.response.bodyFileName) |
-            .response.body = $base64_content
+            .response.base64Body = $base64_content
           ' "$file")
         else
           # Read mapping and replace bodyFileName with body content
