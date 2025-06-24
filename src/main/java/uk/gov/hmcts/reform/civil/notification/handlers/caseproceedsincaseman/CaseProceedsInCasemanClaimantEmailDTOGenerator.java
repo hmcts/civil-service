@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.Map;
+
 @Component
 public class CaseProceedsInCasemanClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
@@ -25,6 +27,12 @@ public class CaseProceedsInCasemanClaimantEmailDTOGenerator extends ClaimantEmai
     @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
+    }
+
+    @Override
+    protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
+        return properties;
     }
 
     @Override
