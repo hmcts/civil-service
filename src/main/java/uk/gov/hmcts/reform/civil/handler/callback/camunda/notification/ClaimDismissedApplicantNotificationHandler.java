@@ -98,7 +98,6 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler 
                 .getStateHistory()
                 .stream()
                 .map(State::getName)
-                .peek(System.out::println)
                 .toList(),
             notificationsProperties
         );
