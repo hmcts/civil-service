@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.createsdo;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -15,15 +17,22 @@ public class CreateSDOAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenera
 
     private final NotificationsProperties notificationsProperties;
 
-    protected CreateSDOAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
+    private final FeatureToggleService featureToggleService;
+
+    protected CreateSDOAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService, FeatureToggleService featureToggleService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
+        this.featureToggleService = featureToggleService;
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? notificationsProperties.getSdoOrderedSpec() :
-            notificationsProperties.getSdoOrdered();
+        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+            return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
+                ? notificationsProperties.getSdoOrderedSpecEa() : notificationsProperties.getSdoOrderedSpec();
+        }
+
+        return notificationsProperties.getSdoOrdered();
     }
 
     @Override
