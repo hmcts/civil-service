@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -31,12 +30,6 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
             startIndex
         );
 
-    }
-
-    @Override
-    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate, boolean carmEnabled, boolean initialSearch,
-                                String searchAfterValue) {
-        return null;
     }
 
     private QueryBuilder beState(CaseState caseState) {
