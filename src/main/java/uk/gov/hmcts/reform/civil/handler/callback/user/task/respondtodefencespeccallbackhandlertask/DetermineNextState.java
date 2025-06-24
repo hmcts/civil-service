@@ -127,7 +127,7 @@ public class DetermineNextState extends CallbackHandler {
             && isOneVOne(caseData)) {
 
             log.debug("Pin in Post enabled for Case : {}", caseData.getCcdCaseReference());
-            if (caseData.hasClaimantAgreedToFreeMediation()) {
+            if (!caseData.isFullAdmitClaimSpec() && caseData.hasClaimantAgreedToFreeMediation()) {
                 nextState = CaseState.IN_MEDIATION.name();
             } else if (caseData.hasApplicantAcceptedRepaymentPlan()) {
                 Pair<String, BusinessProcess> result = handleAcceptedRepaymentPlan(caseData, builder, businessProcess);
@@ -146,8 +146,7 @@ public class DetermineNextState extends CallbackHandler {
             }
         }
 
-        if (shouldMoveToInMediationState(
-            caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
+        if (shouldMoveToInMediationState(caseData, featureToggleService)) {
             nextState = CaseState.IN_MEDIATION.name();
             businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         }
