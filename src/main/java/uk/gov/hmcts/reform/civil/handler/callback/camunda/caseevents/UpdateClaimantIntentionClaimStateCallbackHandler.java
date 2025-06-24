@@ -58,7 +58,7 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
         CaseData updatedData = caseDataBuilder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder();
-        if (isClaimantNotBilingualAndNotSignedSettlementAgreement(updatedData)) {
+        if (hasClaimantSignedSettlementAgreement(updatedData)) {
             String newState = updateClaimStateService.setUpCaseState(updatedData);
             response.state(newState);
             if (PROCEEDS_IN_HERITAGE_SYSTEM.name().equals(newState)) {
@@ -69,7 +69,7 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
         return response.build();
     }
 
-    private boolean isClaimantNotBilingualAndNotSignedSettlementAgreement(CaseData caseData) {
+    private boolean hasClaimantSignedSettlementAgreement(CaseData caseData) {
         return !caseData.hasApplicant1SignedSettlementAgreement();
     }
 }
