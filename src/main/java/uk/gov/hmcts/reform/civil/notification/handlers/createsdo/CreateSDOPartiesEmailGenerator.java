@@ -25,8 +25,6 @@ public class CreateSDOPartiesEmailGenerator implements PartiesEmailGenerator {
 
     protected final CreateSDODefendantEmailDTOGenerator defendantEmailDTOGenerator;
 
-    protected final CreateSDODefendantTwoEmailDTOGenerator defendantTwoEmailDTOGenerator;
-
     @Override
     public Set<EmailDTO> getPartiesToNotify(CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
