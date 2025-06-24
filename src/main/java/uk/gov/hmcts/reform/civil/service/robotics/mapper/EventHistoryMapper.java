@@ -432,7 +432,7 @@ public class EventHistoryMapper {
             .jointJudgment(caseData.getRespondent2() != null)
             .judgmentToBeRegistered(false);
 
-        if (!isEitherDefendantLip(caseData)) {
+        if (!isEitherDefendantLip(caseData) || featureToggleService.isJudgmentOnlineLive()) {
             builder.dateOfJudgment(getDateOfDjCreated(caseData));
         }
 
