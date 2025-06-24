@@ -12,7 +12,7 @@ import java.util.Map;
 @Component
 public class GenerateHearingNoticeRespSolTwoEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
+    private static final String REFERENCE_TEMPLATE_HEARING_RESP_SOL_TWO = "notification-of-hearing-%s";
     private final NotificationsProperties notificationsProperties;
 
     public GenerateHearingNoticeRespSolTwoEmailDTOGenerator(NotificationsProperties notificationsProperties,
@@ -28,7 +28,7 @@ public class GenerateHearingNoticeRespSolTwoEmailDTOGenerator extends RespSolOne
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE_HEARING;
+        return REFERENCE_TEMPLATE_HEARING_RESP_SOL_TWO;
     }
 
     @Override

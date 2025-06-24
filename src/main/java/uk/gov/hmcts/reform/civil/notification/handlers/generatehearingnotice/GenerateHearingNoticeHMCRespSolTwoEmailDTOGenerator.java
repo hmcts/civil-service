@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 public class GenerateHearingNoticeHMCRespSolTwoEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE_HEARING = "notification-of-hearing-%s";
+    private static final String REFERENCE_TEMPLATE_HEARING_HMC_RESP_SOL_TWO = "notification-of-hearing-%s";
     private final NotificationsProperties notificationsProperties;
     private final HearingNoticeCamundaService camundaService;
 
@@ -33,7 +33,7 @@ public class GenerateHearingNoticeHMCRespSolTwoEmailDTOGenerator extends RespSol
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE_HEARING;
+        return REFERENCE_TEMPLATE_HEARING_HMC_RESP_SOL_TWO;
     }
 
     @Override
