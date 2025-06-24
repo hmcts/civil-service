@@ -29,5 +29,8 @@ public enum CamundaProcessIdentifier {
     ClaimantResponseAgreedSettledPartAdmitNotify,
     ClaimantResponseConfirmsNotToProceedLipNotify,
     HearingNoticeGeneratorNotifier,
-    HearingNoticeGeneratorHMCNotifier
+    HearingNoticeGeneratorHMCNotifier,
+    ApplicantNotifyOthersTrialReady,
+    Respondent1NotifyOthersTrialReady,
+    Respondent2NotifyOthersTrialReady,
 }
