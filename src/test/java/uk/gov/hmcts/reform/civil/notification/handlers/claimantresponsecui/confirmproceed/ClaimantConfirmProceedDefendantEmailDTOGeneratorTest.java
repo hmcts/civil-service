@@ -6,14 +6,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.ENGLISH;
 import static uk.gov.hmcts.reform.civil.enums.dq.Language.WELSH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
@@ -57,4 +63,28 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
         assertThat(referenceTemplate).isEqualTo(REFERENCE_TEMPLATE);
     }
 
+    @Test
+    void shouldAddCustomProperties() {
+        String legacyCaseReference = "000MC001";
+
+        Party respondent = Party.builder()
+            .individualTitle("Ms")
+            .individualFirstName("Jane")
+            .individualLastName("Smith")
+            .type(Party.Type.INDIVIDUAL)
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference(legacyCaseReference)
+            .respondent1(respondent)
+            .build();
+
+        Map<String, String> properties = new HashMap<>();
+
+        Map<String, String> result = emailDTOGenerator.addCustomProperties(properties, caseData);
+
+        assertThat(result)
+            .containsEntry(RESPONDENT_NAME, "Ms Jane Smith")
+            .containsEntry(CLAIM_REFERENCE_NUMBER, legacyCaseReference);
+    }
 }

@@ -11,8 +11,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
@@ -56,4 +61,28 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
         assertThat(referenceTemplate).isEqualTo(REFERENCE_TEMPLATE);
     }
 
+    @Test
+    void shouldAddCustomProperties() {
+        String legacyCaseReference = "000LR001";
+
+        Party applicant = Party.builder()
+            .individualTitle("Mr")
+            .individualFirstName("John")
+            .individualLastName("Doe")
+            .type(Party.Type.INDIVIDUAL)
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference(legacyCaseReference)
+            .applicant1(applicant)
+            .build();
+
+        Map<String, String> existingProperties = new HashMap<>();
+
+        Map<String, String> result = emailGenerator.addCustomProperties(existingProperties, caseData);
+
+        assertThat(result)
+            .containsEntry(APPLICANT_ONE_NAME, "Mr John Doe")
+            .containsEntry(CLAIM_REFERENCE_NUMBER, legacyCaseReference);
+    }
 }
