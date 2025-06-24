@@ -138,7 +138,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isLrAdmissionBulkEnabled() && featureToggleService.isJudgmentOnlineLive()) {
-            log.info("Update previous CCD State with {}", callbackParams.getCaseData().getCcdState());
             caseDataBuilder.previousCCDState(callbackParams.getCaseData().getCcdState());
         }
 
