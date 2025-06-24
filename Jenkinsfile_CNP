@@ -12,7 +12,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def ccdBranch = "master"
-def camundaBranch = "CIV-17131-Pause-in-Claimant-Response-Journey-LRvLiP"
+def camundaBranch = "CIV-17131-Pause-in-Claimant-Response-Journey-LRvLiP-v2"
 def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
