@@ -347,6 +347,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
             updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+            if (caseData.getFixedCosts() != null
+                && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                updatedCaseData.claimFixedCostsExist(YES);
+            }
         }
 
         List<String> errors = judgementService.validateAmountPaid(caseData);
@@ -362,15 +366,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
-        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
-            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
-            updatedCaseData.ccjJudgmentAmountShowInterest(NO);
-            if (caseData.getFixedCosts() != null
-                && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
-                updatedCaseData.claimFixedCostsExist(YES);
-            }
-        }
-        
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
