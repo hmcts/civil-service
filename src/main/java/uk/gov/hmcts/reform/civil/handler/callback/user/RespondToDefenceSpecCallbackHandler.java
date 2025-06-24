@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespeccallbackhandlertask.AboutToSubmitRespondToDefenceTask;
 import uk.gov.hmcts.reform.civil.handler.callback.user.task.respondtodefencespeccallbackhandlertask.BuildConfirmationTask;
@@ -348,7 +347,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
             updatedCaseData.ccjJudgmentAmountShowInterest(NO);
             if (caseData.getFixedCosts() != null
-                && YesOrNo.YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                && YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
                 updatedCaseData.claimFixedCostsExist(YES);
             }
         }
