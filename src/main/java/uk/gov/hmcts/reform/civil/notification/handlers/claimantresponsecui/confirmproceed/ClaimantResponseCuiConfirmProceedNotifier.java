@@ -12,8 +12,8 @@ public class ClaimantResponseCuiConfirmProceedNotifier extends Notifier {
 
     public ClaimantResponseCuiConfirmProceedNotifier(NotificationService notificationService,
                                                      CaseTaskTrackingService caseTaskTrackingService,
-                                                     ClaimantConfirmProceedAllPartiesEmailGenerator claimantEmailGenerator) {
-        super(notificationService, caseTaskTrackingService, claimantEmailGenerator);
+                                                     ClaimantConfirmProceedAllPartiesEmailGenerator allPartiesEmailGenerator) {
+        super(notificationService, caseTaskTrackingService, allPartiesEmailGenerator);
     }
 
     @Override

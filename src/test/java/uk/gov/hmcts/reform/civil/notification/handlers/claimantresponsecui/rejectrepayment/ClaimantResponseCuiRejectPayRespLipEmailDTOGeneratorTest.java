@@ -9,14 +9,17 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.dq.Language.BOTH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class ClaimantResponseCuiRejectPayRespLipEmailDTOGeneratorTest {
@@ -31,8 +34,14 @@ class ClaimantResponseCuiRejectPayRespLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().applicant1(Party.builder().build()).applicant1Represented(YesOrNo.NO)
-            .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue()).build();
+        CaseData caseData = CaseData.builder().caseDataLiP(
+                                                    CaseDataLiP.builder()
+                                                        .respondent1LiPResponse(
+                                                            RespondentLiPResponse.builder()
+                                                                .respondent1ResponseLanguage(BOTH.toString())
+                                                                .build()
+                                                        ).build())
+                                                .build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyDefendantLipWelshTemplate()).thenReturn(expectedTemplateId);
 
@@ -63,8 +72,7 @@ class ClaimantResponseCuiRejectPayRespLipEmailDTOGeneratorTest {
 
         var properties = emailGenerator.addCustomProperties(new HashMap<>(), caseData);
 
-        assertThat(properties).containsEntry("name", "Defendant Name");
-        assertThat(properties).containsEntry(CLAIMANT_V_DEFENDANT, "Claimant Name V Defendant Name");
+        assertThat(properties).containsEntry(DEFENDANT_NAME, "Defendant Name");
         assertThat(properties).containsEntry(CLAIM_REFERENCE_NUMBER, "12345");
     }
 

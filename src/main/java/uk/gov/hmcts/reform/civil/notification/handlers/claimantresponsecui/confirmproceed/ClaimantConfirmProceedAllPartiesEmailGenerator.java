@@ -9,8 +9,10 @@ import java.util.List;
 public class ClaimantConfirmProceedAllPartiesEmailGenerator extends AllPartiesEmailGenerator {
 
     public ClaimantConfirmProceedAllPartiesEmailGenerator(ClaimantConfirmProceedClaimantEmailDTOGenerator claimantEmailDTOGenerator,
-                                                          ClaimantConfirmProceedDefendantEmailDTOGenerator defendantEmailDTOGenerator) {
+                                                          ClaimantConfirmProceedDefendantEmailDTOGenerator defendantEmailDTOGenerator,
+                                                          ClaimantConfirmProceedRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator) {
         super(List.of(claimantEmailDTOGenerator,
-                      defendantEmailDTOGenerator));
+                      defendantEmailDTOGenerator,
+                      respSolOneEmailDTOGenerator));
     }
 }

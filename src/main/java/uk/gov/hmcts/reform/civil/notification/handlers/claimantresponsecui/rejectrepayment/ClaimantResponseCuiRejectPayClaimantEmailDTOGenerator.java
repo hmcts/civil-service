@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 @RequiredArgsConstructor
@@ -25,9 +25,8 @@ public class ClaimantResponseCuiRejectPayClaimantEmailDTOGenerator extends Claim
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
-        properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
+        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         return properties;
     }
 

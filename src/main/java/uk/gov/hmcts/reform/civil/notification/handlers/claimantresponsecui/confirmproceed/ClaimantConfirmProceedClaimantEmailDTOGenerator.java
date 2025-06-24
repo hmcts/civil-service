@@ -22,7 +22,7 @@ public class ClaimantConfirmProceedClaimantEmailDTOGenerator extends ClaimantEma
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        if (isBilingualForLipApplicant(caseData)) {
+        if (caseData.isClaimantBilingual()) {
             return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
         }
         return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
@@ -31,10 +31,6 @@ public class ClaimantConfirmProceedClaimantEmailDTOGenerator extends ClaimantEma
     @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
-    }
-
-    private boolean isBilingualForLipApplicant(CaseData caseData) {
-        return caseData.isApplicantNotRepresented() && caseData.isClaimantBilingual();
     }
 
     @Override

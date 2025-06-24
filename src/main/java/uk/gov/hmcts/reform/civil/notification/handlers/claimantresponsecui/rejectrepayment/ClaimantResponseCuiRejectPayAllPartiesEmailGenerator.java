@@ -10,11 +10,13 @@ public class ClaimantResponseCuiRejectPayAllPartiesEmailGenerator extends AllPar
 
     public ClaimantResponseCuiRejectPayAllPartiesEmailGenerator(ClaimantResponseCuiRejectPayClaimantEmailDTOGenerator claimantEmailDTOGenerator,
                                                                 ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator defendantEmailDTOGenerator,
-                                                                ClaimantResponseCuiRejectPayRespSol1EmailDTOGenerator appSolOneEmailDTOGenerator) {
+                                                                ClaimantResponseCuiRejectPayRespSol1EmailDTOGenerator respSol1EmailDTOGenerator,
+                                                                ClaimantResponseCuiRejectPayAppSolOneEmailDTOGenerator appSolOneEmailDTOGenerator) {
         super(List.of(
             claimantEmailDTOGenerator,
             defendantEmailDTOGenerator,
-            appSolOneEmailDTOGenerator
+            appSolOneEmailDTOGenerator,
+            respSol1EmailDTOGenerator
         ));
     }
 }

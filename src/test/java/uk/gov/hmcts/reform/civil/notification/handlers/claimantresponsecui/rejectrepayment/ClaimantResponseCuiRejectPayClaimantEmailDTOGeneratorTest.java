@@ -15,7 +15,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +49,6 @@ class ClaimantResponseCuiRejectPayClaimantEmailDTOGeneratorTest {
 
         Map<String, String> properties = emailGenerator.addCustomProperties(new HashMap<>(), caseData);
 
-        assertThat(properties).containsEntry(CLAIMANT_V_DEFENDANT, "Claimant Name V Defendant Name");
         assertThat(properties).containsEntry(CLAIM_REFERENCE_NUMBER, "12345");
         assertThat(properties).containsEntry(CLAIMANT_NAME, "Claimant Name");
     }

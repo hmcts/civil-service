@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator extends Defend
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        if (isBilingualForLipApplicant(caseData)) {
+        if (caseData.isRespondentResponseBilingual()) {
             return notificationsProperties.getNotifyDefendantLipWelshTemplate();
         }
         return notificationsProperties.getNotifyDefendantLipTemplate();
@@ -35,13 +35,8 @@ public class ClaimantResponseCuiRejectPayRespLipEmailDTOGenerator extends Defend
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
-        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+        properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         return properties;
-    }
-
-    private boolean isBilingualForLipApplicant(CaseData caseData) {
-        return caseData.isApplicantNotRepresented() && caseData.isClaimantBilingual();
     }
 }
