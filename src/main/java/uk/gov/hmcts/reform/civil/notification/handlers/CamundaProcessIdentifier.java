@@ -10,6 +10,12 @@ public enum CamundaProcessIdentifier {
     AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
+    DefendantResponseUnspecFullDefenceNotifyParties,
+    DefendantResponseUnspecCaseHandedOfflineNotifyParties,
+    DefendantResponseSpecCaseHandedOfflineNotifyParties,
+    DefendantResponseSpecFullDefenceFullPartAdmitNotifyParties,
+    DefendantResponseSpecOneRespRespondedNotifyParties,
+    DefendantResponseSpecLipvLRFullOrPartAdmit,
     CreateClaimAfterPaymentContinuingOfflineNotifier,
     CreateClaimAfterPaymentContinuingOnlineNotifier,
     JudgmentVariedDeterminationOfMeansNotifyParties,
@@ -22,5 +28,8 @@ public enum CamundaProcessIdentifier {
     ClaimantResponseAgreedRepaymentNotify,
     ClaimantResponseAgreedSettledPartAdmitNotify,
     ClaimantResponseConfirmsNotToProceedLipNotify,
-    CaseProceedsInCasemanNotify
+    CaseProceedsInCasemanNotify,
+    ApplicantNotifyOthersTrialReady,
+    Respondent1NotifyOthersTrialReady,
+    Respondent2NotifyOthersTrialReady,
 }
