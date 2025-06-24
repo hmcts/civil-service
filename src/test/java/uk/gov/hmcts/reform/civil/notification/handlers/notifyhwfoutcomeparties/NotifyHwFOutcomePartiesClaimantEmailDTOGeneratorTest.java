@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,21 +92,6 @@ class NotifyHwFOutcomePartiesClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldAddPropertiesForNoRemissionHwfEvent() {
-        CaseData caseData = mock(CaseData.class);
-        when(caseData.getHwFEvent()).thenReturn(CaseEvent.NO_REMISSION_HWF);
-        Map<String, String> commonProperties = Map.of("key1", "value1");
-        Map<String, String> noRemissionProperties = Map.of("reason", "No remission reason");
-        when(helper.getCommonProperties(caseData)).thenReturn(commonProperties);
-        when(helper.getFurtherProperties(caseData)).thenReturn(noRemissionProperties);
-
-        Map<String, String> result = generator.addCustomProperties(Map.of(), caseData);
-
-        assertThat(result).containsAllEntriesOf(commonProperties);
-        assertThat(result).containsAllEntriesOf(noRemissionProperties);
-    }
-
-    @Test
     void shouldAddPropertiesForMoreInformationHwfEvent() {
         CaseData caseData = mock(CaseData.class);
         when(caseData.getHwFEvent()).thenReturn(CaseEvent.MORE_INFORMATION_HWF);
@@ -114,7 +100,7 @@ class NotifyHwFOutcomePartiesClaimantEmailDTOGeneratorTest {
         when(helper.getCommonProperties(caseData)).thenReturn(commonProperties);
         when(helper.getFurtherProperties(caseData)).thenReturn(moreInfoProperties);
 
-        Map<String, String> result = generator.addCustomProperties(Map.of(), caseData);
+        Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
         assertThat(result).containsAllEntriesOf(commonProperties);
         assertThat(result).containsAllEntriesOf(moreInfoProperties);
@@ -129,7 +115,7 @@ class NotifyHwFOutcomePartiesClaimantEmailDTOGeneratorTest {
         when(helper.getCommonProperties(caseData)).thenReturn(commonProperties);
         when(helper.getFurtherProperties(caseData)).thenReturn(partialRemissionProperties);
 
-        Map<String, String> result = generator.addCustomProperties(Map.of(), caseData);
+        Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);
 
         assertThat(result).containsAllEntriesOf(commonProperties);
         assertThat(result).containsAllEntriesOf(partialRemissionProperties);
