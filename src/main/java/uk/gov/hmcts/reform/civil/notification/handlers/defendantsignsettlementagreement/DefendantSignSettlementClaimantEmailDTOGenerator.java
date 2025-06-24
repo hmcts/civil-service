@@ -13,7 +13,7 @@ import java.util.Optional;
 @Component
 public class DefendantSignSettlementClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "notify-signed-settlement-%s";
+    private static final String REFERENCE_TEMPLATE_CLAIMANT = "notify-signed-settlement-%s";
 
     private final PinInPostConfiguration pipInPostConfiguration;
 
@@ -40,7 +40,7 @@ public class DefendantSignSettlementClaimantEmailDTOGenerator extends ClaimantEm
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_TEMPLATE_CLAIMANT;
     }
 
     @Override

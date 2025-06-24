@@ -126,4 +126,27 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
         assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, partyName);
         assertThat(updatedProperties).containsEntry(FRONTEND_URL, url);
     }
+
+    @Test
+    void shouldNotifyIfRespondentLipAndDefendantSignedSettlementNotAgreed() {
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(NO).build();
+        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
+
+        assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotifyIfRespondentLipAndDefendantSignedSettlementAgreement() {
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder().respondentSignSettlementAgreement(YES).build();
+        CaseData caseData = CaseData.builder().caseDataLiP(caseDataLiP).respondent1Represented(NO).build();
+
+        assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotifyIfRespondentIsRepresented() {
+        CaseData caseData = CaseData.builder().respondent1Represented(YES).build();
+
+        assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
+    }
 }
