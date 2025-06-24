@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -74,6 +75,7 @@ public class DetermineNextState extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String nextState = determineNextStatePostTranslation(caseData, callbackParams);
+        log.info("NEXT STATE IS {}", nextState);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
@@ -82,7 +84,7 @@ public class DetermineNextState extends CallbackHandler {
 
     public String determineNextStatePostTranslation(CaseData caseData, CallbackParams callbackParams) {
 
-        String nextState = "";
+        String nextState = putCaseStateInJudicialReferral(caseData);
         log.info("Determining next state (post translation) for Case: {}", caseData.getCcdCaseReference());
 
         if (V_2.equals(callbackParams.getVersion())
@@ -112,6 +114,14 @@ public class DetermineNextState extends CallbackHandler {
         }
 
         return nextState;
+    }
+
+    private String putCaseStateInJudicialReferral(CaseData caseData) {
+        if (caseData.isRespondentResponseFullDefence()
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData, featureToggleService.isMultiOrIntermediateTrackEnabled(caseData))) {
+            return CaseState.JUDICIAL_REFERRAL.name();
+        }
+        return null;
     }
 
     public String determineNextState(CaseData caseData,
