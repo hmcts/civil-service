@@ -94,8 +94,11 @@ public class InterestCalculator {
     }
 
     private static long getNumberOfDays(LocalDate interestFromSpecificDate, LocalDate interestToSpecificDate) {
-        long numberOfDays
-            = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
+        long numberOfDays = 0;
+        //Do not count number of days if they're negative, i.e. if the 'To' date is before the 'From' date
+        if (interestToSpecificDate.isAfter(interestFromSpecificDate)) {
+            numberOfDays = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
+        }
         return numberOfDays;
     }
 

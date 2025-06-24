@@ -344,6 +344,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
 
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
+            updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+        }
+
         List<String> errors = judgementService.validateAmountPaid(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -365,7 +370,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 updatedCaseData.claimFixedCostsExist(YES);
             }
         }
-
+        
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
