@@ -91,6 +91,7 @@ java:
     CCD_EVENTS_SERVICE_BUS_CONCURRENT_SESSIONS: 3
     CCD_EVENTS_SUBSCRIPTION_NAME: "civil-ccd-case-events-sub-{{ .Values.global.environment }}"
     CCD_EVENTS_TOPIC_NAME: "ccd-case-events-{{ .Values.global.environment }}"
+    WAIT_TIME_IN_MILLISECONDS: 3000
 
   keyVaults:
     civil:
