@@ -14,7 +14,6 @@ for file in "$MAPPINGS_DIR"/*.json; do
   if [ -f "$file" ]; then
     echo "Posting: $file"
 
-    # Extract bodyFileName if it exists
     BODY_FILE_NAME=$(jq -r '.response.bodyFileName // empty' "$file")
     if [[ -n "$BODY_FILE_NAME" ]]; then
       BODY_FILE_PATH="$FILES_DIR/$BODY_FILE_NAME"
@@ -23,31 +22,37 @@ for file in "$MAPPINGS_DIR"/*.json; do
 
         if [[ "$BODY_FILE_PATH" == *.pdf ]]; then
           echo "Inlining PDF as base64"
-          BASE64_CONTENT=$(base64 -w 0 "$BODY_FILE_PATH")
-          INLINE_MAPPING=$(jq --arg base64_content "$BASE64_CONTENT" '
+          TMP_BASE64=$(mktemp)
+          base64 -w 0 "$BODY_FILE_PATH" > "$TMP_BASE64"
+          TMP_JSON=$(mktemp)
+          jq --rawfile base64_content "$TMP_BASE64" '
             del(.response.bodyFileName) |
             .response.base64Body = $base64_content
-          ' "$file")
+          ' "$file" > "$TMP_JSON"
+          rm "$TMP_BASE64"
         else
           echo "Inlining JSON/text body"
           BODY_CONTENT=$(<"$BODY_FILE_PATH")
-          INLINE_MAPPING=$(jq --arg body "$BODY_CONTENT" '
+          TMP_JSON=$(mktemp)
+          jq --arg body "$BODY_CONTENT" '
             del(.response.bodyFileName) |
             .response.body = $body
-          ' "$file")
+          ' "$file" > "$TMP_JSON"
         fi
       else
         echo "Missing body file: $BODY_FILE_PATH"
         continue
       fi
     else
-      # No bodyFileName: just load the file directly
-      INLINE_MAPPING=$(cat "$file")
+      TMP_JSON=$(mktemp)
+      cat "$file" > "$TMP_JSON"
     fi
 
     RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$WIREMOCK_URL/__admin/mappings" \
       -H "Content-Type: application/json" \
-      --data "$INLINE_MAPPING")
+      --data-binary "@$TMP_JSON")
+
+    rm "$TMP_JSON"
 
     if [ "$RESPONSE" == "201" ]; then
       echo "Mapping loaded: $file"
