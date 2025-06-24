@@ -20,19 +20,20 @@ for file in "$MAPPINGS_DIR"/*.json; do
       BODY_FILE_PATH="$FILES_DIR/$BODY_FILE_NAME"
       if [[ -f "$BODY_FILE_PATH" ]]; then
         echo "Inlining body from: $BODY_FILE_PATH"
-        # Check if the file is a PDF
+
         if [[ "$BODY_FILE_PATH" == *.pdf ]]; then
-          # Base64 encode the PDF content
+          echo "Inlining PDF as base64"
           BASE64_CONTENT=$(base64 -w 0 "$BODY_FILE_PATH")
           INLINE_MAPPING=$(jq --arg base64_content "$BASE64_CONTENT" '
             del(.response.bodyFileName) |
             .response.base64Body = $base64_content
           ' "$file")
         else
-          # Read mapping and replace bodyFileName with body content
-          INLINE_MAPPING=$(jq --slurpfile body "$BODY_FILE_PATH" '
+          echo "Inlining JSON/text body"
+          BODY_CONTENT=$(<"$BODY_FILE_PATH")
+          INLINE_MAPPING=$(jq --arg body "$BODY_CONTENT" '
             del(.response.bodyFileName) |
-            .response.body = ($body[0] | tojson)
+            .response.body = $body
           ' "$file")
         fi
       else
