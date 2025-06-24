@@ -104,8 +104,7 @@ public class DetermineNextState extends CallbackHandler {
             }
         }
 
-        if (shouldMoveToInMediationState(
-            caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
+        if (shouldMoveToInMediationState(caseData, featureToggleService)) {
             nextState = CaseState.IN_MEDIATION.name();
         }
         if (shouldNotChangeStateMinti(caseData)) {
