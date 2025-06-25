@@ -75,7 +75,6 @@ public class DetermineNextState extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String nextState = determineNextStatePostTranslation(caseData, callbackParams);
-        log.info("NEXT STATE IS {}", nextState);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(nextState)
@@ -239,10 +238,6 @@ public class DetermineNextState extends CallbackHandler {
             return false;
         }
         boolean bilingualRequested = caseData.isLRvLipOneVOne() && caseData.isRespondentResponseBilingual();
-
-        log.info("PAUSE CLAIM TRANSLATION RESPONDENT WELSH");
-        log.info("NEEDS TRANSLATION RESPONDENT WELSH, {}", bilingualRequested);
-        log.info("TRANSLATION REQUIRED IN FLOW STATE, {}", translationRequiredInFlowState(caseData));
         return bilingualRequested && translationRequiredInFlowState(caseData);
     }
 

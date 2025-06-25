@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocum
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -47,7 +46,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
 
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
@@ -278,7 +276,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     document.getValue().getFile().setCategoryID(DQ_DEF1.getValue());
                     addToSystemGenerated.add(document);
                 } else if (isTranslationForLrVsLipApplicantDq(document, caseData)) {
-                    log.info("ADD DOCUMENT TO COLLEECTION AND ASSIGN CATEGORY ID");
                     document.getValue().getFile().setCategoryID(DocCategory.APP1_DQ.getValue());
                     addToSystemGenerated.add(document);
                 } else {
@@ -364,9 +361,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         }
 
         if (caseData.isLRvLipOneVOne() && featureToggleService.isGaForWelshEnabled()) {
-            log.info("UNPAUSE CLAIMANT INTENTION PROCESS");
             if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
-                log.info("UNPAUSE CLAIMANT INTENTION PROCESS");
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_LR_INTENTION;
             }
         }

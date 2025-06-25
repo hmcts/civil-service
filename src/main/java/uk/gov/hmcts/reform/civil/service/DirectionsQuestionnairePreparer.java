@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class DirectionsQuestionnairePreparer {
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
@@ -205,7 +204,6 @@ public class DirectionsQuestionnairePreparer {
     }
 
     private void isClaimantDqPreTranslation(String bearerToken, CaseData caseData) {
-        log.info("ADDING PRE TRANSLATED DQ TO preTranslationDocuments");
         CaseDocument directionsQuestionnairePretranslation = directionsQuestionnaireGenerator.generate(
             caseData,
             bearerToken
