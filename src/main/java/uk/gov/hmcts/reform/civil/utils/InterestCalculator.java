@@ -29,6 +29,10 @@ public class InterestCalculator {
     protected static final BigDecimal EIGHT_PERCENT_INTEREST_RATE = valueOf(8);
     public static final BigDecimal NUMBER_OF_DAYS_IN_YEAR = new BigDecimal(365L);
 
+    public BigDecimal calculateInterestForJO(CaseData caseData) {
+        return this.calculateInterest(caseData, getToDateForJO(caseData));
+    }
+
     public BigDecimal calculateInterest(CaseData caseData) {
         return this.calculateInterest(caseData, getToDate(caseData));
     }
@@ -64,6 +68,16 @@ public class InterestCalculator {
         return ZERO;
     }
 
+    private LocalDate getToDateForJO(CaseData caseData) {
+        if (Objects.isNull(caseData.getInterestClaimUntil())) {
+            return LocalDate.now();
+        } else if (caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+            return getSubmittedDate(caseData);
+        } else {
+            return LocalDate.now().minusDays(1);
+        }
+    }
+
     private LocalDate getToDate(CaseData caseData) {
         if (Objects.nonNull(caseData.getInterestClaimUntil())
             && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
@@ -80,8 +94,11 @@ public class InterestCalculator {
     }
 
     private static long getNumberOfDays(LocalDate interestFromSpecificDate, LocalDate interestToSpecificDate) {
-        long numberOfDays
-            = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
+        long numberOfDays = 0;
+        //Do not count number of days if they're negative, i.e. if the 'To' date is before the 'From' date
+        if (interestToSpecificDate.isAfter(interestFromSpecificDate)) {
+            numberOfDays = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
+        }
         return numberOfDays;
     }
 

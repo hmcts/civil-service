@@ -14,9 +14,13 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.enums.settlediscontinue.DiscontinuanceTypeList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.settlediscontinue.NoticeOfDiscontinuanceFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -29,7 +33,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_NOTICE_OF_DISCONTINUANCE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.NOTICE_OF_DISCONTINUANCE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +51,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
     private final NoticeOfDiscontinuanceFormGenerator formGenerator;
     private final RuntimeService runTimeService;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -78,7 +85,9 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         Optional<Organisation> applicantLegalOrganisation = getLegalOrganization(caseData.getApplicant1OrganisationPolicy()
                                                                                      .getOrganisation().getOrganisationID());
         String appSolOrgName = getLegalName(applicantLegalOrganisation,
-                                            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
+                                            caseData.getApplicantSolicitor1ClaimStatementOfTruth() != null
+                                                ? caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName()
+                                                : null);
         Address applicant1SolicitorAddress = getLegalAddress(applicantLegalOrganisation,
                                                              caseData.getApplicantSolicitor1ServiceAddress(),
                                                              caseData.getSpecApplicantCorrespondenceAddressdetails(),
@@ -104,12 +113,15 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
 
         CaseDocument applicant1DiscontinueDoc = generateForm(appSolOrgName,
                                                              applicant1SolicitorAddress,
+                                                             "claimant",
                                                              callbackParams);
-        CaseDocument respondent1DiscontinueDoc = generateForm(respondent1Name, respondent1Address, callbackParams);
+        boolean generateRespondent2Form = (YES.equals(caseData.getAddRespondent2())
+            && !YES.equals(caseData.getRespondent2SameLegalRepresentative()));
+        CaseDocument respondent1DiscontinueDoc = generateForm(respondent1Name, respondent1Address,
+                                                              generateRespondent2Form ? "defendant1" : "defendant", callbackParams);
         CaseDocument respondent2DiscontinueDoc = null;
 
-        if (YES.equals(caseData.getAddRespondent2())
-            && !YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
+        if (generateRespondent2Form) {
             String respondent2Name;
             Address respondent2Address;
             if (!caseData.isRespondent2LiP()) {
@@ -127,10 +139,23 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
                 respondent2Name = caseData.getRespondent2().getPartyName();
                 respondent2Address = caseData.getRespondent2().getPrimaryAddress();
             }
-            respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, callbackParams);
+            respondent2DiscontinueDoc = generateForm(respondent2Name, respondent2Address, "defendant2", callbackParams);
         }
-
-        if (caseData.isJudgeOrderVerificationRequired()) {
+        if (featureToggleService.isGaForWelshEnabled()
+            && caseData.isRespondent1LiP()
+            && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+            && caseData.isRespondentResponseBilingual()) {
+            respondent1DiscontinueDoc.setDocumentType(NOTICE_OF_DISCONTINUANCE_DEFENDANT);
+            List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
+                .getPreTranslationDocuments();
+            assignDiscontinuanceCategoryId(applicant1DiscontinueDoc);
+            assignDiscontinuanceCategoryId(respondent1DiscontinueDoc);
+            translatedDocuments.add(element(respondent1DiscontinueDoc));
+            caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.NOTICE_OF_DISCONTINUANCE);
+            caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
+            caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
+        } else if (caseData.isJudgeOrderVerificationRequired()) {
             caseDataBuilder.applicant1NoticeOfDiscontinueCWViewDoc(applicant1DiscontinueDoc);
             caseDataBuilder.respondent1NoticeOfDiscontinueCWViewDoc(respondent1DiscontinueDoc);
             assignDiscontinuanceCategoryId(caseDataBuilder.build().getApplicant1NoticeOfDiscontinueCWViewDoc());
@@ -153,9 +178,9 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseDocument generateForm(String partyName, Address address, CallbackParams callbackParams) {
+    private CaseDocument generateForm(String partyName, Address address, String partyType, CallbackParams callbackParams) {
         return formGenerator.generateDocs(
-            callbackParams.getCaseData(), partyName, address, callbackParams.getParams().get(BEARER_TOKEN).toString());
+            callbackParams.getCaseData(), partyName, address, partyType, callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
     private void assignDiscontinuanceCategoryId(CaseDocument caseDocument) {
@@ -167,6 +192,14 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             caseData.getBusinessProcess().getProcessInstanceId(),
             "JUDGE_ORDER_VERIFICATION_REQUIRED",
             caseData.isJudgeOrderVerificationRequired()
+        );
+        runTimeService.setVariable(
+            caseData.getBusinessProcess().getProcessInstanceId(),
+            "WELSH_ENABLED",
+            featureToggleService.isGaForWelshEnabled()
+                && caseData.isRespondent1LiP()
+                && caseData.getTypeOfDiscontinuance().equals(DiscontinuanceTypeList.PART_DISCONTINUANCE)
+                && caseData.isRespondentResponseBilingual()
         );
     }
 
