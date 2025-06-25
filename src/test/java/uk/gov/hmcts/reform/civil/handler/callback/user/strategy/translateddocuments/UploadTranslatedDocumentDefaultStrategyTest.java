@@ -402,7 +402,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             Document.builder().documentFileName("interlocutory_judgment.pdf").build(),
             DocumentType.INTERLOCUTORY_JUDGEMENT
         )));
-      
+
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
             .build().toBuilder()
@@ -512,7 +512,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         assertThat(response.getData())
             .extracting("businessProcess")
             .extracting("camundaEvent")
-            .isEqualTo(CaseEvent.GENERATE_ORDER_NOTIFICATION.name());
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER.name());
     }
 
     @Test
