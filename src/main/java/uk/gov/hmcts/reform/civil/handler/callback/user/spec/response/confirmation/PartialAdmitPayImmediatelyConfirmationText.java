@@ -28,7 +28,6 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData, FeatureToggleService featureToggleService) {
-        Boolean isLipVLr  = caseData.isLipvLROneVOne();
 
         if (!RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
             caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
@@ -45,8 +44,9 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         boolean isPartAdmitLRAdmissionBulk = checkLrAdmissionBulk(caseData, featureToggleService);
         BigDecimal claimOwingAmount = getClaimOwingAmount(caseData, isPartAdmitLRAdmissionBulk);
         String applicantName = caseData.getApplicant1().getPartyName();
+        Boolean isLipVLr  = caseData.isLipvLROneVOne();
 
-        if(isPartAdmitLRAdmissionBulk) {
+        if (isPartAdmitLRAdmissionBulk) {
             return Optional.of(getPartAdmitLrAdmissionBulkConfirmationText(caseData, claimOwingAmount));
         }
 
@@ -79,8 +79,6 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         } else {
             sb.append(" if you need details on how to pay.</p>");
         }
-
-
 
         boolean isFullAdmission = RespondentResponseTypeSpec.FULL_ADMISSION.equals(
             caseData.getRespondentClaimResponseTypeForSpecGeneric()
