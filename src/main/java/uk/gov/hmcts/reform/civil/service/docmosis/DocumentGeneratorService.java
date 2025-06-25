@@ -47,6 +47,7 @@ public class DocumentGeneratorService {
         byte[] response;
 
         try {
+            log.info("Generating docmosis document for template: {}", template.getTemplate());
             response = docmosisApiClient.createDocument(requestBody);
         } catch (HttpClientErrorException ex) {
             log.error("Docmosis document generation failed for " + ex.getMessage());
