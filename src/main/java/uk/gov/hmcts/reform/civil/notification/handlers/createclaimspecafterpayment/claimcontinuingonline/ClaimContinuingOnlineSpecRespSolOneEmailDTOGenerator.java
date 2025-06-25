@@ -41,7 +41,6 @@ public class ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator extends RespSo
         properties.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                 formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
         );
-
         return properties;
     }
 }
