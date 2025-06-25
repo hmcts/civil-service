@@ -40,7 +40,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGenerator extends Defenda
     protected Map<String, String> addCustomProperties(Map<String, String> properties,
                                                       CaseData caseData) {
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
-        properties.put(CLAIMANT_NAME,   getPartyNameBasedOnType(caseData.getApplicant1()));
+        properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         properties.put(ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE));
         properties.put(RESPOND_URL, pinInPostConfiguration.getRespondToClaimUrl());
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
