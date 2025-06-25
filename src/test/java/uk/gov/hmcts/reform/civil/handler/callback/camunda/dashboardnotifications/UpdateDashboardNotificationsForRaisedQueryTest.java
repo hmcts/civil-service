@@ -36,8 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,7 +106,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
+            SCENARIO_AA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -149,7 +148,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
+            SCENARIO_AA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -195,7 +194,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService, times(0)).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
+            SCENARIO_AA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -241,7 +240,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService, times(0)).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
+            SCENARIO_AA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );

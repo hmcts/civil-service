@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.DashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -16,15 +15,17 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_MESSAGES_TASK_CATEGORIES;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_APPLICATIONS_TO_THE_COURT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_MESSAGES_TO_THE_COURT;
 
 @Service
-public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandler {
+public class MessageTaskCategoryCallbackHandler extends DashboardCallbackHandler {
 
     public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForApplicant1";
-    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1);
+    private static final List<CaseEvent> EVENTS = List.of(CREATE_MESSAGES_TASK_CATEGORIES);
 
-    public CreateClaimIssueNotificationsHandler(DashboardScenariosService dashboardScenariosService,
+    public MessageTaskCategoryCallbackHandler(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
                                                 FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper, featureToggleService);
@@ -50,16 +51,17 @@ public class CreateClaimIssueNotificationsHandler extends DashboardCallbackHandl
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        dashboardScenariosService.recordScenarios(
-            authToken,
-            DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
-            ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-        );
-        if (caseData.isHWFTypeClaimIssued() && caseData.claimIssueFullRemissionNotGrantedHWF()) {
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
             dashboardScenariosService.recordScenarios(
                 authToken,
-                DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_HWF_PHONE_PAYMENT.getScenario(),
+                SCENARIO_AA6_APPLICATIONS_TO_THE_COURT.getScenario(),
+                caseData.getCcdCaseReference().toString(),
+                ScenarioRequestParams.builder()
+                    .params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+            dashboardScenariosService.recordScenarios(
+                authToken,
+                SCENARIO_AA6_MESSAGES_TO_THE_COURT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder()
                     .params(mapper.mapCaseDataToParams(caseData)).build()
