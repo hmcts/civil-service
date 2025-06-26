@@ -7245,6 +7245,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specClaim1v1LrVsLipBilingual() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = NO;
+        this.ccdCaseReference = CASE_ID;
+        this.caseDataLiP = CaseDataLiP.builder()
+            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        setClaimTypeToSpecClaim();
+        return this;
+    }
+
     public CaseDataBuilder specClaim1v1LipvLr() {
         atStateClaimDraft();
         legacyCaseReference(LEGACY_CASE_REFERENCE);

@@ -346,6 +346,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
             || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
             updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+            if (caseData.getFixedCosts() != null
+                && YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                updatedCaseData.claimFixedCostsExist(YES);
+            }
         }
 
         List<String> errors = judgementService.validateAmountPaid(caseData);
