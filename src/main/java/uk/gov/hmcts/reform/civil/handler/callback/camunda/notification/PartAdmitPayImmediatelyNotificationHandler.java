@@ -41,16 +41,16 @@ public class PartAdmitPayImmediatelyNotificationHandler extends CallbackHandler 
     private static final String REFERENCE_TEMPLATE_RESPONDENT = "part-admit-immediately-agreed-respondent-notification-%s";
     private static final String REFERENCE_TEMPLATE_APPLICANT = "part-admit-immediately-agreed-applicant-notification-%s";
 
+    private final NotificationsSignatureConfiguration configuration;
+    private final FeatureToggleService featureToggleService;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
-    private final NotificationsSignatureConfiguration configuration;
-    private final FeatureToggleService featureToggleService;
-
+    
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyRespondentSolicitorForCaseTakenOffline
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyPartAdmitPayImmediately
         );
     }
 
@@ -65,7 +65,7 @@ public class PartAdmitPayImmediatelyNotificationHandler extends CallbackHandler 
         return EVENTS;
     }
 
-    private CallbackResponse notifyRespondentSolicitorForCaseTakenOffline(CallbackParams callbackParams) {
+    private CallbackResponse notifyPartAdmitPayImmediately(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String emailAddress = isRespondent(callbackParams)
             ? caseData.getRespondentSolicitor1EmailAddress()
