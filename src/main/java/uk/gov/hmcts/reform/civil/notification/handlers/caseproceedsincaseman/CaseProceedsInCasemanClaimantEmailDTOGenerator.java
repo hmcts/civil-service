@@ -10,7 +10,7 @@ import java.util.Map;
 @Component
 public class CaseProceedsInCasemanClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_CLAIMANT = "case-proceeds-in-caseman-applicant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -26,7 +26,7 @@ public class CaseProceedsInCasemanClaimantEmailDTOGenerator extends ClaimantEmai
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_TEMPLATE_CLAIMANT;
     }
 
     @Override
