@@ -91,6 +91,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123456").build())
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
@@ -133,6 +134,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
@@ -179,6 +181,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
@@ -225,6 +228,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
