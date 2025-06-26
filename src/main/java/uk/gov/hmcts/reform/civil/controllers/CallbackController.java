@@ -57,9 +57,10 @@ public class CallbackController {
         final CaseDetails caseDetails = callback.getCaseDetails();
         final CaseDetails caseDetailsBefore = callback.getCaseDetailsBefore();
         final Long caseId = caseDetails.getId();
+        final Long caseIdBefore = caseDetailsBefore == null ? null : caseDetailsBefore.getId();
         MDC.put("caseId", Objects.toString(caseId, ""));
-        log.info("Received callback from CCD, caseId: {}, eventId: {}, callback type: {}, page id: {}, version: {}",
-                 caseId, callback.getEventId(), callbackType, pageId, version
+        log.info("Received callback from CCD, caseId: {}, caseIdBefore: {}, eventId: {}, callback type: {}, page id: {}, version: {}",
+                 caseId, caseIdBefore, callback.getEventId(), callbackType, pageId, version
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
