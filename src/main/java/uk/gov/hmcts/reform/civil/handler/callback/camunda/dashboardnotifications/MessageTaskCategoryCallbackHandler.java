@@ -50,23 +50,20 @@ public class MessageTaskCategoryCallbackHandler extends DashboardCallbackHandler
     public CallbackResponse configureDashboardScenario(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AA6_APPLICATIONS_TO_THE_COURT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
-            );
-            dashboardScenariosService.recordScenarios(
-                authToken,
-                SCENARIO_AA6_MESSAGES_TO_THE_COURT.getScenario(),
-                caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder()
-                    .params(mapper.mapCaseDataToParams(caseData)).build()
-            );
-        }
+        dashboardScenariosService.recordScenarios(
+            authToken,
+            SCENARIO_AA6_APPLICATIONS_TO_THE_COURT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder()
+                .params(mapper.mapCaseDataToParams(caseData)).build()
+        );
+        dashboardScenariosService.recordScenarios(
+            authToken,
+            SCENARIO_AA6_MESSAGES_TO_THE_COURT.getScenario(),
+            caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder()
+                .params(mapper.mapCaseDataToParams(caseData)).build()
+        );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }

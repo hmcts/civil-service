@@ -57,7 +57,6 @@ class MessageTaskCategoryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
-        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         handler.handle(params);
@@ -73,17 +72,5 @@ class MessageTaskCategoryCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-    }
-
-    @Test
-    void shouldNotRecordScenario_ForAddingApplicationsAndMessagesToTheCourtTaskWhenPublicQueriesNotEnabled() {
-        CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-            CallbackRequest.builder().eventId(CREATE_MESSAGES_TASK_CATEGORIES.name())
-                .build()
-        ).build();
-
-        handler.handle(params);
-        verifyNoInteractions(dashboardScenariosService);
     }
 }
