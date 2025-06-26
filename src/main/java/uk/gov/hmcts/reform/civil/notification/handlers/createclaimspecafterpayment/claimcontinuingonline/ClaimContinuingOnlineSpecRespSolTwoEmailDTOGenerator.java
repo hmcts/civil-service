@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.createclaimspecafterpayment.claimcontinuingonline;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -8,8 +9,10 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
@@ -27,6 +30,22 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
     }
 
     @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+            return true;
+        }
+        return isOneVTwoTwoLegalRep(caseData) && !caseData.isRespondent2LiP();
+    }
+
+    @Override
+    protected String getEmailAddress(CaseData caseData) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        }
+        return caseData.getRespondentSolicitor2EmailAddress();
+    }
+
+    @Override
     protected String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec();
     }
@@ -38,6 +57,13 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGenerator extends RespSo
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+            properties.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                    true, organisationService));
+        } else {
+            properties.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                    false, organisationService));
+        }
         properties.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                 formatLocalDate(caseData.getRespondent2ResponseDeadline().toLocalDate(), DATE)
         );

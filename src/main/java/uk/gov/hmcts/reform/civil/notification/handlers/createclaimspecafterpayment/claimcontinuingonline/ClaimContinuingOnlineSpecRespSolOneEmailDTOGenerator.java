@@ -10,6 +10,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -38,6 +39,8 @@ public class ClaimContinuingOnlineSpecRespSolOneEmailDTOGenerator extends RespSo
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData,
+                true, organisationService));
         properties.put(CLAIM_DETAILS_NOTIFICATION_DEADLINE,
                 formatLocalDate(caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
         );
