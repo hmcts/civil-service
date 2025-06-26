@@ -16,11 +16,8 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
-import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -53,10 +50,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
-    @Mock
-    private CoreCaseUserService coreCaseUserService;
-    @Mock
-    private QueryManagementCamundaService runtimeService;
+
     public static final String TASK_ID = "UpdateDashboardNotificationsRaisedQm";
 
     @Test
@@ -76,9 +70,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123456")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
@@ -119,9 +110,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
@@ -162,9 +150,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
@@ -209,9 +194,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
