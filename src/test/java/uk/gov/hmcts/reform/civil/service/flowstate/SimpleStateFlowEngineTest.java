@@ -2258,7 +2258,8 @@ class SimpleStateFlowEngineTest {
                     entry(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.SDO_ENABLED.name(), true),
-                    entry(FlowFlag.MINTI_ENABLED.name(), false)
+                    entry(FlowFlag.MINTI_ENABLED.name(), false),
+                    entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
                 );
             }
         }
@@ -2610,7 +2611,8 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.SDO_ENABLED.name(), true)
+                entry(FlowFlag.SDO_ENABLED.name(), true),
+                entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
             );
         }
 
@@ -2790,7 +2792,8 @@ class SimpleStateFlowEngineTest {
                 entry(FlowFlag.MINTI_ENABLED.name(), false),
                 entry(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false),
                 entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
-                entry(FlowFlag.SDO_ENABLED.name(), false)
+                entry(FlowFlag.SDO_ENABLED.name(), false),
+                entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
             );
         }
     }

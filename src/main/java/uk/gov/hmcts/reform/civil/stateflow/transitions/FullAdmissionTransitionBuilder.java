@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeNotBeingTakenOffline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isDefendantNoCOnlineForCaseAfterJBA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
@@ -48,6 +49,9 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(FULL_ADMIT_PAY_IMMEDIATELY, transitions).onlyWhen(fullAdmitPayImmediately, transitions)
             .moveTo(FULL_ADMIT_PROCEED, transitions).onlyWhen(fullDefenceProceed, transitions)
+            .set((c, flags) -> {
+                flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), isRespondentResponseLangIsBilingual.test(c));
+            }, transitions)
             .moveTo(FULL_ADMIT_NOT_PROCEED, transitions).onlyWhen(fullDefenceNotProceed, transitions)
             .moveTo(FULL_ADMIT_AGREE_REPAYMENT, transitions).onlyWhen(acceptRepaymentPlan, transitions)
             .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)

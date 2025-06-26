@@ -481,6 +481,10 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
         CaseDataParent::isRespondentResponseBilingual;
 
+    public static final Predicate<CaseData> onlyInitialRespondentResponseLangIsBilingual = caseData ->
+        // dependent lip selected bilingual during response
+        caseData.getChangeLanguagePreference() == null && caseData.isRespondentResponseBilingual();
+
     // This field is used in LR ITP, prevent going another path in preview
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
         caseData.getShowResponseOneVOneFlag() != null;
