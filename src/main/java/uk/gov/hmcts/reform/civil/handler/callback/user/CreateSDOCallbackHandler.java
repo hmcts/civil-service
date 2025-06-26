@@ -1512,7 +1512,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
             }
         }
-
+        updatedData.ccdCaseReference(caseData.getCcdCaseReference());
         return updatedData.build();
     }
 
