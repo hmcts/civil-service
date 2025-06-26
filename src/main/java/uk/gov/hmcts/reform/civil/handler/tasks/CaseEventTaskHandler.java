@@ -153,6 +153,8 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                     yield null;
                 }
             };
+        } else if (Objects.equals(eventId, CaseEvent.NOTIFY_EVENT.name())){
+            return caseData.getBusinessProcess().getActivityId();
         }
         return null;
     }
