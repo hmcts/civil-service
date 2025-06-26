@@ -78,14 +78,18 @@ public class QueryNotificationUtils {
         return properties;
     }
 
+    //ToDo: Remove this and all its usages after public queries release.
     public static List<Map<String, String>> getOtherPartyEmailDetails(
         CaseData caseData, OrganisationService organisationService,
         CoreCaseUserService coreCaseUserService, String queryId) {
-
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
-        List<Map<String, String>> emailDetailsList = new ArrayList<>();
+        return getOtherPartyRecipientList(caseData, roles, organisationService);
+    }
 
+    private static List<Map<String, String>> getOtherPartyRecipientList(CaseData caseData, List<String> roles,
+                                                                        OrganisationService organisationService) {
+        List<Map<String, String>> emailDetailsList = new ArrayList<>();
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         switch (multiPartyScenario) {
             case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP -> {
                 // When 1v1, 2v1,  or 1v2 same solicitor, "other party" will either be applicant 1, or respondent 1

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -34,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.assignCategoryIdToAttachments;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
+import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserQueriesByRole;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.updateQueryCollectionPartyName;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -49,8 +51,10 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     protected final UserService userService;
     protected final CoreCaseUserService coreCaseUserService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
+    public static final String PUBLIC_QUERIES_PARTY_NAME = "All queries";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -86,13 +90,16 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        CaseMessage latestCaseMessage = getUserQueriesByRole(caseData, roles).latest();
+        CaseMessage latestCaseMessage = featureToggleService.isPublicQueryManagementEnabled(caseData)
+            ? getLatestQuery(caseData) : getUserQueriesByRole(caseData, roles).latest();
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
             buildLatestQuery(latestCaseMessage));
 
-        if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
+        if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
+            caseDataBuilder.queries(caseData.getQueries().toBuilder().partyName(PUBLIC_QUERIES_PARTY_NAME).build());
+        } else if (!isLIPClaimant(roles) && !isLIPDefendant(roles)) {
             updateQueryCollectionPartyName(roles, MultiPartyScenario.getMultiPartyScenario(caseData), caseDataBuilder);
         }
 

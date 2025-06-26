@@ -5729,13 +5729,13 @@ class EventHistoryMapperTest {
 
         @ParameterizedTest
         @CsvSource({
-            "LR_QUERY",
-            "LIP_QUERY",
+            "PROD_LR_QUERY",
+            "PUBLIC_QUERY"
         })
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists(String queryType) {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
             CaseData caseData;
-            if (queryType.equals("LR_QUERY")) {
+            if (queryType.equals("PROD_LR_QUERY")) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
@@ -5745,11 +5745,12 @@ class EventHistoryMapperTest {
                                                      .build())
                     .build();
             } else {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
                     .build().toBuilder()
-                    .qmApplicantCitizenQueries(CaseQueriesCollection.builder()
+                    .queries(CaseQueriesCollection.builder()
                                                    .roleOnCase("APPLICANT")
                                                    .build())
                     .build();
@@ -5807,11 +5808,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes1QueryEnabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant1NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
@@ -5858,11 +5859,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryEnabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();
@@ -5909,11 +5910,11 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterNocDeadlinePassedRes2QueryDisabled() {
-            when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(false);
+            when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build().toBuilder()
-                .qmApplicantSolicitorQueries(CaseQueriesCollection.builder()
+                .queries(CaseQueriesCollection.builder()
                                                  .roleOnCase("APPLICANT")
                                                  .build())
                 .build();

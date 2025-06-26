@@ -82,14 +82,17 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("queryId")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection claimantQueries = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")
+                                                   .createdBy("claimant")
                                                    .build(),
                     CaseMessage.builder()
-                            .id("queryId")
-                            .parentId("123457")
-                            .build())))
+                        .id("queryId")
+                        .createdBy("claimant")
+                        .parentId("123457")
+                        .build())))
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
@@ -97,7 +100,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                 ).build()
             )
             .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
-            .qmApplicantCitizenQueries(claimantQueries)
+            .queries(claimantQueries)
             .legacyCaseReference("reference")
             .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
             .ccdCaseReference(1234L)
@@ -132,18 +135,21 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
         when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("queryId")
                 .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantQueries = CaseQueriesCollection.builder()
                 .caseMessages(wrapElements(List.of(CaseMessage.builder()
-                                .id("123457")
-                                .build(),
-                        CaseMessage.builder()
-                                .id("queryId")
-                                .parentId("123457")
-                                .build())))
+                                                       .id("123457")
+                                                       .createdBy("defendant")
+                                                       .build(),
+                                                   CaseMessage.builder()
+                                                       .id("queryId")
+                                                       .createdBy("defendant")
+                                                       .parentId("123457")
+                                                       .build())))
                 .build();
         CaseData caseData = CaseData.builder()
                 .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
-                .qmRespondentCitizenQueries(defendantQueries)
+                .queries(defendantQueries)
                 .legacyCaseReference("reference")
                 .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
                 .ccdCaseReference(1234L)
