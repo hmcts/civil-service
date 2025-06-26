@@ -150,7 +150,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         final String headingThreeText = "<h3 class=\"govuk-heading-m\">If ";
         StringBuilder sb = new StringBuilder();
         sb.append("<br>You believe you owe &#163;").append(claimOwingAmount).append(
-                ". We've emailed ").append(applicantName)
+                ". <br>We've emailed ").append(applicantName)
             .append(" to say you will pay immediately ");
 
         sb.append("<br><br>").append("The claimant has until 4pm on ")
@@ -176,7 +176,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
             .append("If you do not pay within 5 days of the response, the claimant can request a County Court Judgment against you.")
             .append("<br><br>").append("Contact ")
             .append(applicantName)
-            .append("'s legal representative if you need details on how to pay");
+            .append("'s legal representative if you need details on how to pay.");
 
         return sb.toString();
     }
