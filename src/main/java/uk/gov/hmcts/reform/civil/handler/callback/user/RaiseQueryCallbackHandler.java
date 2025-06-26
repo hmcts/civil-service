@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -54,6 +55,8 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
 
     public static final String INVALID_CASE_STATE_ERROR = "If your case is offline, you cannot raise a query.";
+    public static final String CONCURRENCY_ERROR = "The step you were trying to complete could not be actioned. " +
+        "Please review the case and try again.";
     public static final String PUBLIC_QUERIES_PARTY_NAME = "All queries";
 
     @Override
@@ -92,6 +95,10 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
 
         CaseMessage latestCaseMessage = featureToggleService.isPublicQueryManagementEnabled(caseData)
             ? getLatestQuery(caseData) : getUserQueriesByRole(caseData, roles).latest();
+
+        if (nonNull(caseData.getQueries()) && caseData.getQueries().messageThread(latestCaseMessage.getId()).size() % 2 == 0) {
+            return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(CONCURRENCY_ERROR)).build();
+        }
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().qmLatestQuery(
