@@ -260,7 +260,7 @@ public class EventHistoryMapper {
                     case IN_MEDIATION:
                         buildClaimInMediation(builder, caseData);
                         break;
-                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC:
+                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA:
                         buildTakenOfflineDueToDefendantNoc(builder, caseData);
                         break;
                     default:

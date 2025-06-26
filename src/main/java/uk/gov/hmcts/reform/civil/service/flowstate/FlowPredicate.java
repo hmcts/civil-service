@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentType;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -496,4 +497,11 @@ public class FlowPredicate {
         caseData.isRespondent1LiP()
             || caseData.isRespondent2LiP()
             || caseData.isApplicantNotRepresented();
+
+    public static final Predicate<CaseData> isDefendantNoCOnlineForCaseAfterJBA = caseData ->
+        caseData.isLipCase()
+            && caseData.getActiveJudgment() != null
+            && JudgmentType.JUDGMENT_BY_ADMISSION.equals(caseData.getActiveJudgment().getType())
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getChangeOfRepresentation() != null;
 }
