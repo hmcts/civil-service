@@ -1388,6 +1388,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
+        log.info("generateSdoOrder ccdCaseReference: {}", callbackParams.getCaseData().getCcdCaseReference());
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
