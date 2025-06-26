@@ -8,7 +8,6 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -67,25 +66,19 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyWhenTakenOfflineAfterClaimNotifiedAndLipvLROneVOne() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
-            .applicant1Represented(NO)
-            .defendantSolicitorNotifyClaimOptions("")
-            .build();
-
-        assertThat(ClaimIssuedTransitionBuilder.takenOfflineAfterClaimNotified.test(caseData)).isTrue();
-
+    void shouldNotifyWhenTakenOfflineByStaffAfterClaimIssueAndLipvLROneVOne() {
+        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().applicant1Represented(NO).build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
-    void shouldNotNotifyWhenTakenOfflineAfterClaimNotifiedAndNotLipvLROneVOne() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor().build();
+    void shouldNotNotifyWhenTakenOfflineByStaffAfterClaimIssueAndNotLipvLROneVOne() {
+        CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 
     @Test
-    void shouldNotNotifyWhenNotTakenOfflineAfterClaimNotifiedAndNotClaimNotified() {
+    void shouldNotNotifyWhenNotTakenOfflineByStaffAfterClaimIssueAndNotClaimNotified() {
         CaseData caseData = CaseData.builder().build();
         assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }

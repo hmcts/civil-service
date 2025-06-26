@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.claimNotified;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.takenOfflineAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.takenOfflineByStaffAfterClaimIssue;
 
 @Component
 public class CaseProceedsInCasemanRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -33,6 +33,6 @@ public class CaseProceedsInCasemanRespSolOneEmailDTOGenerator extends RespSolOne
     }
 
     public Boolean getShouldNotify(CaseData caseData) {
-        return claimNotified.test(caseData) || (takenOfflineAfterClaimNotified.test(caseData) && caseData.isLipvLROneVOne()) ? Boolean.TRUE : Boolean.FALSE;
+        return claimNotified.test(caseData) || (takenOfflineByStaffAfterClaimIssue.test(caseData) && caseData.isLipvLROneVOne()) ? Boolean.TRUE : Boolean.FALSE;
     }
 }
