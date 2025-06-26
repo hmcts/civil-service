@@ -2236,7 +2236,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             void summary_when_all_finals_order_issued_on_LR_bulk_admission() {
                 given(featureToggleService.isPinInPostEnabled()).willReturn(true);
                 given(featureToggleService.isJudgmentOnlineLive()).willReturn(true);
-                given(featureToggleService.isLrAdmissionBulkEnabled()).willReturn(true);
                 CaseData caseData = CaseData.builder()
                     .respondent1Represented(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.YES)

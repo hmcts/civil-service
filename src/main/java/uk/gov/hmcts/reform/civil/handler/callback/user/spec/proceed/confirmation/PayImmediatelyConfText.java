@@ -77,6 +77,6 @@ public class PayImmediatelyConfText implements RespondToResponseConfirmationText
     public boolean isLrPayImmediatelyPlan(CaseData caseData, FeatureToggleService featureToggleService) {
         return caseData.isPayImmediately()
             && isOneVOne(caseData)
-            && featureToggleService.isLrAdmissionBulkEnabled();
+            && featureToggleService.isJudgmentOnlineLive();
     }
 }
