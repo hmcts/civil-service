@@ -6,6 +6,9 @@ import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerat
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
+import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.claimNotified;
+
 @Component
 public class CaseProceedsInCasemanRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
@@ -25,5 +28,10 @@ public class CaseProceedsInCasemanRespSolTwoEmailDTOGenerator extends RespSolTwo
     @Override
     protected String getReferenceTemplate() {
         return REFERENCE_TEMPLATE;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return claimNotified.test(caseData) && isOneVTwoTwoLegalRep(caseData) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

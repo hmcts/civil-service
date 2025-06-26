@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -41,5 +42,17 @@ public class CaseProceedsInCasemanRespSolTwoEmailDTOGeneratorTest {
         String referenceTemplate = emailDTOGenerator.getReferenceTemplate();
 
         assertThat(referenceTemplate).isEqualTo("case-proceeds-in-caseman-respondent-notification-%s");
+    }
+
+    @Test
+    void shouldNotifyWhenClaimNotified() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
+        assertThat(emailDTOGenerator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotClaimNotified() {
+        CaseData caseData = CaseData.builder().build();
+        assertThat(emailDTOGenerator.getShouldNotify(caseData)).isFalse();
     }
 }
