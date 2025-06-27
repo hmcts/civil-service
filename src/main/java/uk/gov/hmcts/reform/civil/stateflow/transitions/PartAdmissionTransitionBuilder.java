@@ -28,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isRespondentResponseLangIsBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isDefendantNoCOnlineForCaseAfterJBA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
@@ -39,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA;
 import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceTransitionBuilder.takenOfflineByStaffAfterDefendantResponse;
 
 @Component
@@ -83,9 +81,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .set((c, flags) -> flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c)), transitions)
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterDefendantResponse, transitions)
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions)
-            .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
-            .onlyWhen(isDefendantNoCOnlineForCase.and(partAdmitLipPayImmediately).and(isDefendantNoCOnlineForCaseAfterJBA), transitions);;
+            .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions);
     }
 
     public static final Predicate<CaseData> agreePartAdmitSettle = CaseData::isPartAdmitClaimSettled;
@@ -93,10 +89,6 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     public static final Predicate<CaseData> partAdmitPayImmediately = CaseData::isPartAdmitPayImmediatelyAccepted;
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim = CaseData::isClaimantNotSettlePartAdmitClaim;
-
-    public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
-
-    public static final Predicate<CaseData> partAdmitLipPayImmediately = CaseData::isPayImmediately;
 
     public static final Predicate<CaseData> isCarmApplicableCase = caseData ->
         Optional.ofNullable(caseData)
