@@ -85,7 +85,7 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions)
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
-            .onlyWhen(isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA), transitions);
+            .onlyWhen(isDefendantNoCOnlineForCase.and(partAdmitLipPayImmediately).and(isDefendantNoCOnlineForCaseAfterJBA), transitions);;
     }
 
     public static final Predicate<CaseData> agreePartAdmitSettle = CaseData::isPartAdmitClaimSettled;
@@ -95,6 +95,8 @@ public class PartAdmissionTransitionBuilder extends MidTransitionBuilder {
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim = CaseData::isClaimantNotSettlePartAdmitClaim;
 
     public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
+
+    public static final Predicate<CaseData> partAdmitLipPayImmediately = CaseData::isPayImmediately;
 
     public static final Predicate<CaseData> isCarmApplicableCase = caseData ->
         Optional.ofNullable(caseData)
