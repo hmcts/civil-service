@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LIP_CONTACT_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.OPENING_HOURS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PHONE_CONTACT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.SPEC_UNSPEC_CONTACT;
@@ -111,6 +112,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         when(organisationService.findOrganisationById(any()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         when(notificationsProperties.getNotifyOtherPartyQueryRaised()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyOtherPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID);
         Map<String, String> expectedProperties = new HashMap<>();
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -127,71 +130,28 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
     @Nested
     class AboutToSubmitCallback {
 
-        @ParameterizedTest
-        @CsvSource({
-            "APPLICANTSOLICITORONE, respondent1@email.com",
-            "RESPONDENTSOLICITORONE, applicant@email.com"
-        })
-        void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative(String caseRole, String email) {
-            when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("1")
-                                .build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
-            CaseData caseData = createCaseDataWithQueries1v1();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        @Nested
+        class LrEmails {
 
-            handler.handle(params);
+            @ParameterizedTest
+            @CsvSource({
+                "APPLICANTSOLICITORONE, respondent1@email.com, false",
+                "RESPONDENTSOLICITORONE, applicant@email.com, false",
+                "APPLICANTSOLICITORONE, respondent1@email.com, true",
+                "RESPONDENTSOLICITORONE, applicant@email.com, true"
+            })
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative(String caseRole, String email, String toggle) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+                when(runtimeService.getProcessVariables(any()))
+                    .thenReturn(QueryManagementVariables.builder()
+                                    .queryId("1")
+                                    .build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
+                CaseData caseData = createCaseDataWithQueries1v1();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            verify(notificationService).sendMail(
-                email,
-                TEMPLATE_ID,
-                getNotificationDataMap(caseData),
-                "a-query-has-been-raised-notification-000DC001"
-            );
-        }
+                handler.handle(params);
 
-        @ParameterizedTest
-        @CsvSource({
-            "RESPONDENTSOLICITORTWO, applicant@email.com",
-            "RESPONDENTSOLICITORONE, applicant@email.com",
-        })
-        void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative_applicantIsOtherParty(String caseRole, String email) {
-            when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("2")
-                                .build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
-            CaseData caseData = createCaseDataWithQueries1v2SameSol();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                email,
-                TEMPLATE_ID,
-                getNotificationDataMap(caseData),
-                "a-query-has-been-raised-notification-000DC001"
-            );
-        }
-
-        @ParameterizedTest
-        @CsvSource({
-            "RESPONDENTSOLICITORTWO, applicant@email.com,",
-            "RESPONDENTSOLICITORONE, applicant@email.com,",
-            "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com",
-        })
-        void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2) {
-            when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("3")
-                                .build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
-            CaseData caseData = createCaseData1v2DifferentSolCaseWithQueries();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            handler.handle(params);
-
-            if (emailDef2 == null) {
                 verify(notificationService).sendMail(
                     email,
                     TEMPLATE_ID,
@@ -200,7 +160,244 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 );
             }
 
-            if (nonNull(emailDef2)) {
+            @ParameterizedTest
+            @CsvSource({
+                "RESPONDENTSOLICITORTWO, applicant@email.com, false",
+                "RESPONDENTSOLICITORONE, applicant@email.com, false",
+                "RESPONDENTSOLICITORTWO, applicant@email.com, true",
+                "RESPONDENTSOLICITORONE, applicant@email.com, true",
+            })
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative_applicantIsOtherParty(String caseRole, String email, String toggle) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+                when(runtimeService.getProcessVariables(any()))
+                    .thenReturn(QueryManagementVariables.builder()
+                                    .queryId("2")
+                                    .build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
+                CaseData caseData = createCaseDataWithQueries1v2SameSol();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    email,
+                    TEMPLATE_ID,
+                    getNotificationDataMap(caseData),
+                    "a-query-has-been-raised-notification-000DC001"
+                );
+            }
+
+            @ParameterizedTest
+            @CsvSource({
+                "RESPONDENTSOLICITORTWO, applicant@email.com, , false",
+                "RESPONDENTSOLICITORONE, applicant@email.com, , false",
+                "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com, false",
+                "RESPONDENTSOLICITORTWO, applicant@email.com, , true",
+                "RESPONDENTSOLICITORONE, applicant@email.com, , true",
+                "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com, true"
+            })
+            void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2, String toggle) {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
+                when(runtimeService.getProcessVariables(any()))
+                    .thenReturn(QueryManagementVariables.builder()
+                                    .queryId("3")
+                                    .build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
+                CaseData caseData = createCaseData1v2DifferentSolCaseWithQueries();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                handler.handle(params);
+
+                if (emailDef2 == null) {
+                    verify(notificationService).sendMail(
+                        email,
+                        TEMPLATE_ID,
+                        getNotificationDataMap(caseData),
+                        "a-query-has-been-raised-notification-000DC001"
+                    );
+                }
+
+                if (nonNull(emailDef2)) {
+                    verify(notificationService, times(2)).sendMail(
+                        targetEmail.capture(),
+                        emailTemplate.capture(),
+                        notificationDataMap.capture(),
+                        reference.capture()
+                    );
+
+                    assertThat(targetEmail.getAllValues().get(0)).isEqualTo(email);
+                    assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(TEMPLATE_ID);
+                    assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
+                    assertThat(reference.getAllValues().get(0)).isEqualTo("a-query-has-been-raised-notification-000DC001");
+
+                    assertThat(targetEmail.getAllValues().get(1)).isEqualTo(emailDef2);
+                    assertThat(emailTemplate.getAllValues().get(1)).isEqualTo(TEMPLATE_ID);
+                    assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap(caseData));
+                    assertThat(reference.getAllValues().get(1)).isEqualTo("a-query-has-been-raised-notification-000DC001");
+                }
+            }
+
+        }
+
+        @Nested
+        class lipOnCase {
+
+            @Test
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipApplicant() {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                CaseQueriesCollection query = CaseQueriesCollection.builder()
+                    .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
+                    .caseMessages(wrapElements(CaseMessage.builder()
+                                                   .id("1")
+                                                   .build()))
+                    .build();
+
+                when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .applicant1Represented(YesOrNo.NO)
+                    .respondentSolicitor1EmailAddress("respondent1@email.com")
+                    .queries(query)
+                    .businessProcess(BusinessProcess.builder()
+                                         .processInstanceId("123")
+                                         .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    TEMPLATE_ID,
+                    getNotificationDataMapLip(true),
+                    "a-query-has-been-raised-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipRespondent() {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                CaseQueriesCollection query = CaseQueriesCollection.builder()
+                    .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
+                    .caseMessages(wrapElements(CaseMessage.builder()
+                                                   .id("1")
+                                                   .build()))
+                    .build();
+
+                when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .respondent1Represented(YesOrNo.NO)
+                    .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                    .queries(query)
+                    .businessProcess(BusinessProcess.builder()
+                                         .processInstanceId("123")
+                                         .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "sole.trader@email.com",
+                    TEMPLATE_ID,
+                    getNotificationDataMapLip(false),
+                    "a-query-has-been-raised-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLrApplicant() {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                CaseQueriesCollection query = CaseQueriesCollection.builder()
+                    .roleOnCase(CaseRole.DEFENDANT.toString())
+                    .caseMessages(wrapElements(CaseMessage.builder()
+                                                   .id("1")
+                                                   .build()))
+                    .build();
+
+                when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .respondent1Represented(YesOrNo.NO)
+                    .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                    .queries(query)
+                    .businessProcess(BusinessProcess.builder()
+                                         .processInstanceId("123")
+                                         .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "applicantsolicitor@example.com",
+                    TEMPLATE_ID,
+                    getNotificationDataMap(caseData),
+                    "a-query-has-been-raised-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLrRespondent() {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                CaseQueriesCollection query = CaseQueriesCollection.builder()
+                    .roleOnCase(CaseRole.CLAIMANT.toString())
+                    .caseMessages(wrapElements(CaseMessage.builder()
+                                                   .id("1")
+                                                   .build()))
+                    .build();
+
+                when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .applicant1Represented(YesOrNo.NO)
+                    .queries(query)
+                    .businessProcess(BusinessProcess.builder()
+                                         .processInstanceId("123")
+                                         .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    TEMPLATE_ID,
+                    getNotificationDataMap(caseData),
+                    "a-query-has-been-raised-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_TwoRespondentRepresentative() {
+                when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
+                CaseQueriesCollection query = CaseQueriesCollection.builder()
+                    .roleOnCase(CaseRole.CLAIMANT.toString())
+                    .caseMessages(wrapElements(CaseMessage.builder()
+                                                   .id("1")
+                                                   .build()))
+                    .build();
+
+                when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
+                when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                    .respondent1(PartyBuilder.builder().build())
+                    .respondent2(PartyBuilder.builder().build())
+                    .addRespondent2(YesOrNo.YES)
+                    .applicant1Represented(YesOrNo.NO)
+                    .queries(query)
+                    .businessProcess(BusinessProcess.builder()
+                                         .processInstanceId("123")
+                                         .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                handler.handle(params);
+
                 verify(notificationService, times(2)).sendMail(
                     targetEmail.capture(),
                     emailTemplate.capture(),
@@ -208,12 +405,12 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     reference.capture()
                 );
 
-                assertThat(targetEmail.getAllValues().get(0)).isEqualTo(email);
+                assertThat(targetEmail.getAllValues().get(0)).isEqualTo("respondentsolicitor@example.com");
                 assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(TEMPLATE_ID);
                 assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
                 assertThat(reference.getAllValues().get(0)).isEqualTo("a-query-has-been-raised-notification-000DC001");
 
-                assertThat(targetEmail.getAllValues().get(1)).isEqualTo(emailDef2);
+                assertThat(targetEmail.getAllValues().get(1)).isEqualTo("respondentsolicitor2@example.com");
                 assertThat(emailTemplate.getAllValues().get(1)).isEqualTo(TEMPLATE_ID);
                 assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap(caseData));
                 assertThat(reference.getAllValues().get(1)).isEqualTo("a-query-has-been-raised-notification-000DC001");
@@ -339,6 +536,16 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 CASEMAN_REF, "000DC001",
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData)
+            ));
+            return properties;
+        }
+
+        @NotNull
+        private Map<String, String> getNotificationDataMapLip(boolean applicant) {
+            Map<String, String> properties = new HashMap<>(addCommonProperties());
+            properties.putAll(Map.of(
+                CLAIM_REFERENCE_NUMBER, "1594901956117591",
+                PARTY_NAME, applicant ? "Mr. John Rambo" : "Mr. Sole Trader"
             ));
             return properties;
         }

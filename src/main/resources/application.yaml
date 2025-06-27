@@ -493,6 +493,8 @@ notifications:
   queryRaisedLipBilingual: "53f14739-c463-4ac2-b5da-137bc9599c06"
   queryResponseReceived: "9ca248ee-f34a-44e9-b20f-f5c41b69c068"
   notifyOtherPartyQueryRaised: "0162e149-3bb7-461c-a3ff-b5c631245014"
+  notifyOtherPartyPublicQueryRaised: "0d2c9b47-a84f-4ea2-a4b6-52c1db909076"
+  notifyOtherLipPartyPublicQueryRaised: "5bced03b-b3ce-49bc-8efb-b5ab35ef21eb"
   notifyOtherPartyQueryResponseReceived: "bbb1c567-b5a1-4910-bf00-871163e7f318"
   queryLipResponseReceivedEnglish: "29d4ca19-460c-4133-a9ae-6e470e6cc443"
   queryLipResponseReceivedWelsh: "1464b8a5-3ec6-484d-9e61-527326045633"

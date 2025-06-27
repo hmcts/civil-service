@@ -683,6 +683,12 @@ public class NotificationsProperties {
     private String notifyOtherPartyQueryRaised;
 
     @NotEmpty
+    private String notifyOtherPartyPublicQueryRaised;
+
+    @NotEmpty
+    private String notifyOtherLipPartyPublicQueryRaised;
+
+    @NotEmpty
     private String notifyOtherPartyQueryResponseReceived;
 
     @NotEmpty

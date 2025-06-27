@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
@@ -27,6 +28,8 @@ public class QueryNotificationUtils {
     public static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
     public static final String EMAIL = "EMAIL";
     public static final String LEGAL_ORG = "LEGAL_ORG";
+    public static final String LIP_NAME = "LIP_NAME";
+    public static final String IS_LIP_OTHER_PARTY = "IS_LIP_OTHER_PARTY";
 
     private QueryNotificationUtils() {
         //NO-OP
@@ -78,12 +81,76 @@ public class QueryNotificationUtils {
         return properties;
     }
 
-    //ToDo: Remove this and all its usages after public queries release.
     public static List<Map<String, String>> getOtherPartyEmailDetails(
         CaseData caseData, OrganisationService organisationService,
         CoreCaseUserService coreCaseUserService, String queryId) {
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
-        return getOtherPartyRecipientList(caseData, roles, organisationService);
+        if (caseData.isLipCase()) {
+            if (isApplicantSolicitor(roles)) {
+                return getOtherPartyLipOnCaseRecipientList(caseData, "lipRespondent", organisationService);
+            }
+
+            if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
+                return getOtherPartyLipOnCaseRecipientList(caseData, "lipApplicant", organisationService);
+            }
+
+            if (isLIPClaimant(roles)) {
+                return getOtherPartyLipOnCaseRecipientList(caseData, "lrDefendant", organisationService);
+            }
+
+            if (isLIPDefendant(roles)) {
+                return getOtherPartyLipOnCaseRecipientList(caseData, "lrApplicant", organisationService);
+            }
+        } else {
+            return getOtherPartyRecipientList(caseData, roles, organisationService);
+        }
+        return null;
+    }
+
+    private static List<Map<String, String>> getOtherPartyLipOnCaseRecipientList(CaseData caseData, String otherParty, OrganisationService organisationService) {
+        List<Map<String, String>> emailDetailsList = new ArrayList<>();
+
+        String email;
+        String lipName;
+        String legalOrgName;
+
+        switch (otherParty) {
+            case "lipApplicant":
+                email = caseData.getApplicant1Email();
+                lipName = caseData.getApplicant1().getPartyName();
+                emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName));
+                break;
+            case "lipRespondent":
+                email = caseData.getDefendantUserDetails().getEmail();
+                lipName = caseData.getRespondent1().getPartyName();
+                emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName));
+                break;
+            case "lrApplicant":
+                email = caseData.getApplicantSolicitor1UserDetails().getEmail();
+                legalOrgName = getApplicantLegalOrganizationName(caseData, organisationService);
+                emailDetailsList.add(createEmailDetails(email, legalOrgName));
+                break;
+            case "lrDefendant":
+                if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                    emailDetailsList.add(createEmailDetails(
+                        caseData.getRespondentSolicitor1EmailAddress(),
+                        getLegalOrganizationNameForRespondent(caseData, true, organisationService)
+                    ));
+                    emailDetailsList.add(createEmailDetails(
+                        caseData.getRespondentSolicitor2EmailAddress(),
+                        getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+                    ));
+                } else {
+                    email = caseData.getRespondentSolicitor1EmailAddress();
+                    legalOrgName = getLegalOrganizationNameForRespondent(caseData, true, organisationService);
+                    emailDetailsList.add(createEmailDetails(email, legalOrgName));
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown party type: " + otherParty);
+        }
+
+        return emailDetailsList;
     }
 
     private static List<Map<String, String>> getOtherPartyRecipientList(CaseData caseData, List<String> roles,
@@ -131,6 +198,15 @@ public class QueryNotificationUtils {
         Map<String, String> details = new HashMap<>();
         details.put(EMAIL, email);
         details.put(LEGAL_ORG, legalOrg);
+        details.put(IS_LIP_OTHER_PARTY, "FALSE");
+        return details;
+    }
+
+    private static  Map<String, String> createLipOnCaseEmailDetails(String email, String lipName) {
+        Map<String, String> details = new HashMap<>();
+        details.put(EMAIL, email);
+        details.put(LIP_NAME, lipName);
+        details.put(IS_LIP_OTHER_PARTY, "TRUE");
         return details;
     }
 
