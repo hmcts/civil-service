@@ -26,8 +26,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_MESSAGES_TASK_CATEGORIES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_APPLICATIONS_TO_THE_COURT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_MESSAGES_TO_THE_COURT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_MESSAGES_TO_THE_COURT;
 
 @ExtendWith(MockitoExtension.class)
 class MessageTaskCategoryCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -62,13 +62,13 @@ class MessageTaskCategoryCallbackHandlerTest extends BaseCallbackHandlerTest {
         handler.handle(params);
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AA6_APPLICATIONS_TO_THE_COURT.getScenario(),
+            SCENARIO_AAA6_APPLICATIONS_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AA6_MESSAGES_TO_THE_COURT.getScenario(),
+            SCENARIO_AAA6_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );

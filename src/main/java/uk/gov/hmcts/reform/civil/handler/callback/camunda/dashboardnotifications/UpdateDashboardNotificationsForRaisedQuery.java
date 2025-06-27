@@ -21,7 +21,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_NOTIFICATIONS_RAISED_QUERY;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +64,7 @@ public class UpdateDashboardNotificationsForRaisedQuery extends CallbackHandler 
         if (caseData.isLipCase() && firstQueryRaisedOnClaim) {
             dashboardScenariosService.recordScenarios(
                 authToken,
-                SCENARIO_AA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
+                SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
                 notificationParams
             );
