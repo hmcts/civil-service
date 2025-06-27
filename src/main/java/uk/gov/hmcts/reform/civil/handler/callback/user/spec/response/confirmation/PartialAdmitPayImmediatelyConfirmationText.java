@@ -151,7 +151,7 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
         StringBuilder sb = new StringBuilder();
         sb.append("<br>You believe you owe &#163;").append(claimOwingAmount).append(
                 ". <br>We've emailed ").append(applicantName)
-            .append(" to say you will pay immediately ");
+            .append(" to say you will pay immediately. ");
 
         sb.append("<br><br>").append("The claimant has until 4pm on ")
             .append(formatLocalDateTime(caseData.getApplicant1ResponseDeadline(), DATE))
