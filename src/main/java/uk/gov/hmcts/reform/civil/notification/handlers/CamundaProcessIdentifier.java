@@ -16,6 +16,7 @@ public enum CamundaProcessIdentifier {
     RaisingClaimAgainstSpecLitigantInPersonForNotifier,
     ClaimSubmissionNotifyParties,
     ContinuingClaimOnlineSpecClaimNotifier,
+    HwFOutcomeNotifyParties,
     DefendantResponseUnspecFullDefenceNotifyParties,
     DefendantResponseUnspecCaseHandedOfflineNotifyParties,
     DefendantResponseSpecCaseHandedOfflineNotifyParties,
