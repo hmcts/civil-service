@@ -44,17 +44,17 @@ public class InterestCalculator {
     private BigDecimal calculateInterest(CaseData caseData, LocalDate interestToDate) {
         BigDecimal interestAmount = ZERO;
         if (caseData.getClaimInterest() == YesOrNo.YES) {
-            if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
-                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                    .equals(SameRateInterestType.SAME_RATE_INTEREST_8_PC)) {
+            if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
+                if (SameRateInterestType.SAME_RATE_INTEREST_8_PC
+                    .equals(caseData.getSameRateInterestSelection().getSameRateInterestType())) {
                     interestAmount = calculateInterestAmount(caseData, EIGHT_PERCENT_INTEREST_RATE, interestToDate);
                 }
-                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                    .equals(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)) {
+                if (SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE
+                    .equals(caseData.getSameRateInterestSelection().getSameRateInterestType())) {
                     interestAmount = calculateInterestAmount(caseData,
                         caseData.getSameRateInterestSelection().getDifferentRate(), interestToDate);
                 }
-            } else if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
+            } else if (InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())) {
                 interestAmount = caseData.getBreakDownInterestTotal();
             }
         }
@@ -62,10 +62,10 @@ public class InterestCalculator {
     }
 
     private BigDecimal calculateInterestAmount(CaseData caseData, BigDecimal interestRate, LocalDate interestToDate) {
-        if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)) {
+        if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
             LocalDate interestFromDate = getSubmittedDate(caseData);
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate, interestFromDate, interestToDate);
-        } else if (caseData.getInterestClaimFrom().equals(InterestClaimFromType.FROM_A_SPECIFIC_DATE)) {
+        } else if (InterestClaimFromType.FROM_A_SPECIFIC_DATE.equals(caseData.getInterestClaimFrom())) {
             return calculateInterestByDate(caseData.getTotalClaimAmount(), interestRate,
                 caseData.getInterestFromSpecificDate(), interestToDate);
         }
@@ -75,7 +75,7 @@ public class InterestCalculator {
     private LocalDate getToDateForJO(CaseData caseData) {
         if (Objects.isNull(caseData.getInterestClaimUntil())) {
             return LocalDate.now();
-        } else if (caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+        } else if (InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimUntil())) {
             return getSubmittedDate(caseData);
         } else {
             return LocalDate.now().minusDays(1);
@@ -84,7 +84,7 @@ public class InterestCalculator {
 
     private LocalDate getToDate(CaseData caseData) {
         if (Objects.nonNull(caseData.getInterestClaimUntil())
-            && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+            && InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimUntil())) {
             return getSubmittedDate(caseData);
         }
         return LocalDate.now();
@@ -98,8 +98,11 @@ public class InterestCalculator {
     }
 
     private static long getNumberOfDays(LocalDate interestFromSpecificDate, LocalDate interestToSpecificDate) {
-        long numberOfDays
-            = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
+        long numberOfDays = 0;
+        //Do not count number of days if they're negative, i.e. if the 'To' date is before the 'From' date
+        if (interestToSpecificDate.isAfter(interestFromSpecificDate)) {
+            numberOfDays = Math.abs(ChronoUnit.DAYS.between(interestToSpecificDate, interestFromSpecificDate));
+        }
         return numberOfDays;
     }
 
@@ -107,9 +110,8 @@ public class InterestCalculator {
     private static BigDecimal getInterestPerDay(BigDecimal claimAmount, BigDecimal interestRate) {
         BigDecimal interestForAYear
             = claimAmount.multiply(interestRate.divide(HUNDRED));
-        BigDecimal interestPerDay = interestForAYear.divide(NUMBER_OF_DAYS_IN_YEAR, TO_FULL_PENNIES,
+        return interestForAYear.divide(NUMBER_OF_DAYS_IN_YEAR, TO_FULL_PENNIES,
             RoundingMode.HALF_UP);
-        return interestPerDay;
     }
 
     public BigDecimal calculateBulkInterest(CaseData caseData) {
@@ -124,22 +126,22 @@ public class InterestCalculator {
 
     public String getInterestPerDayBreakdown(CaseData caseData) {
 
-        if (caseData.getInterestClaimUntil() != null && caseData.getInterestClaimUntil().equals(InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE)) {
+        if (InterestClaimUntilType.UNTIL_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimUntil())) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
             return caseData.getSubmittedDate().toLocalDate().format(formatter);
         } else if (caseData.getInterestClaimOptions() == null
-            || caseData.getInterestClaimOptions().equals(InterestClaimOptions.BREAK_DOWN_INTEREST)) {
+            || InterestClaimOptions.BREAK_DOWN_INTEREST.equals(caseData.getInterestClaimOptions())) {
             return null;
         } else {
             StringBuilder description = new StringBuilder("Interest will accrue at the daily rate of £");
             BigDecimal interestPerDay = ZERO;
-            if (caseData.getInterestClaimOptions().equals(InterestClaimOptions.SAME_RATE_INTEREST)) {
-                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                    .equals(SameRateInterestType.SAME_RATE_INTEREST_8_PC)) {
+            if (InterestClaimOptions.SAME_RATE_INTEREST.equals(caseData.getInterestClaimOptions())) {
+                if (SameRateInterestType.SAME_RATE_INTEREST_8_PC
+                    .equals(caseData.getSameRateInterestSelection().getSameRateInterestType())) {
                     interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), EIGHT_PERCENT_INTEREST_RATE);
                 }
-                if (caseData.getSameRateInterestSelection().getSameRateInterestType()
-                    .equals(SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE)) {
+                if (SameRateInterestType.SAME_RATE_INTEREST_DIFFERENT_RATE
+                    .equals(caseData.getSameRateInterestSelection().getSameRateInterestType())) {
                     interestPerDay = getInterestPerDay(caseData.getTotalClaimAmount(), caseData.getSameRateInterestSelection().getDifferentRate());
                 }
             }

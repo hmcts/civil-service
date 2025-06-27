@@ -22,10 +22,11 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnlineMapper;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.FixedCosts;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -49,6 +50,7 @@ import java.time.LocalDateTime;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -164,6 +166,76 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldSetCcjJudgmentAmountShowInterestToNoWhenPayImmediatelyAndLrAdmissionBulkEnabled() {
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(getCaseData(response).getCcjJudgmentAmountShowInterest()).isEqualTo(YesOrNo.NO);
+        }
+
+        @Test
+        void shouldNotSetCcjJudgmentAmountShowInterestToNoWhenPayImmediatelyAndLrAdmissionBulkEnabled_1v2() {
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualFirstName("John")
+                                 .individualLastName("Doe")
+                                 .build())
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(getCaseData(response).getCcjJudgmentAmountShowInterest()).isNull();
+        }
+
+        @Test
+        void shouldNotSetCcjJudgmentAmountShowInterestToNoWhenPayBySetDateAndLrAdmissionBulkEnabled() {
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            when(interestCalculator.calculateInterestForJO(any())).thenReturn(BigDecimal.valueOf(0));
+            LocalDate whenWillPay = LocalDate.of(2024, 11, 11);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .ccdState(AWAITING_APPLICANT_INTENTION)
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualFirstName("John")
+                                 .individualLastName("Doe")
+                                 .build())
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(whenWillPay).build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(getCaseData(response).getCcjJudgmentAmountShowInterest()).isNull();
         }
     }
 
@@ -478,8 +550,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             BigDecimal subTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentSummarySubtotalAmount();
             BigDecimal expectedSubTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                .add(caseData.getTotalInterest())
-                .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
+                    .add(caseData.getClaimFee().toFeeDto().getCalculatedAmount());
             assertThat(subTotal).isEqualTo(expectedSubTotal);
 
             BigDecimal finalTotal = getCaseData(response).getCcjPaymentDetails().getCcjJudgmentTotalStillOwed();
