@@ -63,7 +63,7 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
             .onlyWhen(applicantOutOfTimeNotBeingTakenOffline, transitions)
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
-            .onlyWhen(isDefendantNoCOnlineForCase.and(isDefendantNoCOnlineForCaseAfterJBA), transitions);
+            .onlyWhen(isDefendantNoCOnlineForCase.and(isPayImmediately).and(isDefendantNoCOnlineForCaseAfterJBA), transitions);
     }
 
     public static final Predicate<CaseData> fullAdmitPayImmediately = FullAdmissionTransitionBuilder::getPredicateForPayImmediately;
