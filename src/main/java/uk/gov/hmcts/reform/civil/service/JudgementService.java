@@ -159,6 +159,11 @@ public class JudgementService {
             && featureToggleService.isLrAdmissionBulkEnabled();
     }
 
+    public boolean isLrPartAdmitPayImmediately(CaseData caseData) {
+        return isLrPayImmediatelyPlan(caseData)
+            && caseData.isPartAdmitClaimSpec();
+    }
+
     private YesOrNo checkFixedCostOption(CaseData caseData) {
         return caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption();
     }

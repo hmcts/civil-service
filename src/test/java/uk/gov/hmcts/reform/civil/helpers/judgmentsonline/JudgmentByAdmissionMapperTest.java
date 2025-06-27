@@ -44,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -131,6 +132,60 @@ class JudgmentByAdmissionMapperTest {
         assertNotNull(activeJudgment);
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
         assertEquals("14000", activeJudgment.getOrderedAmount());
+
+    }
+
+    @Test
+    void testIfJudgmentByPartAdmissionLrPayImmediatelyNotAddInterest() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
+
+    }
+
+    @Test
+    void testIfJudgmentByFullAdmissionLrPayImmeidatelyNotAddInterest() {
+        when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YES)
+            .specRespondent1Represented(YES)
+            .applicant1Represented(YES)
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .totalInterest(BigDecimal.valueOf(10))
+            .respondent1(PartyBuilder.builder().individual().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment);
+        assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
+        assertEquals("15000", activeJudgment.getOrderedAmount());
 
     }
 
