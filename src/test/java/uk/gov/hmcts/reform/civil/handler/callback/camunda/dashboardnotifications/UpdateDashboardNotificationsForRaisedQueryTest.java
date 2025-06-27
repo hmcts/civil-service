@@ -16,11 +16,8 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
-import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -34,10 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,10 +48,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
-    @Mock
-    private CoreCaseUserService coreCaseUserService;
-    @Mock
-    private QueryManagementCamundaService runtimeService;
+
     public static final String TASK_ID = "UpdateDashboardNotificationsRaisedQm";
 
     @Test
@@ -77,9 +68,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123456")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
@@ -92,6 +80,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123456").build())
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
@@ -107,7 +96,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -119,9 +108,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
@@ -134,6 +120,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
@@ -149,7 +136,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -161,9 +148,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
@@ -180,6 +164,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
@@ -195,7 +180,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService, times(0)).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
@@ -207,9 +192,6 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
@@ -226,6 +208,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
@@ -241,7 +224,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         verify(dashboardScenariosService, times(0)).recordScenarios(
             "BEARER_TOKEN",
-            SCENARIO_AAA6_VIEW_MESSAGES_AVAILABLE_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_VIEW_AVAILABLE_MESSAGES_TO_THE_COURT.getScenario(),
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(params).build()
         );
