@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENTS;
@@ -228,10 +229,16 @@ public class CaseQueriesUtil {
 
     public static void assignCategoryIdToCaseworkerAttachments(CaseData caseData,
                                                                CaseMessage latestCaseMessage,
-                                                               AssignCategoryId assignCategoryId) {
-        CaseQueriesCollection workingCollection = getCollectionByMessage(caseData, latestCaseMessage);
-        DocCategory documentCategory = getQueryAttachmentsDocumentCategory(getCollectionType(workingCollection, caseData));
-        assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, documentCategory.getValue());
+                                                               AssignCategoryId assignCategoryId,
+                                                               boolean isPublicQmEnabled) {
+        if (!isPublicQmEnabled) {
+            CaseQueriesCollection workingCollection = getCollectionByMessage(caseData, latestCaseMessage);
+            DocCategory documentCategory = getQueryAttachmentsDocumentCategory(getCollectionType(workingCollection, caseData));
+            assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, documentCategory.getValue());
+        } else {
+            assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue());
+        }
+
     }
 
     private static String getAttachmentsCategoryIdForRole(List<String> roles) {

@@ -70,7 +70,29 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new RespondQueryCallbackHandler(
                 objectMapper, assignCategoryId, featuretoggleService
             );
-            when(featuretoggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(false);
+        }
+
+        @Test
+        public void shouldAssignClaimantQueryCategoryId_forCaseWorker() {
+            CaseData caseData = CaseData.builder()
+                .ccdCaseReference(CASE_ID)
+                .queries(mockQueriesCollection(QUERY_ID, NOW))
+                .build();
+            when(featuretoggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            List<Document> documents = unwrapElements(updatedData.getQueries()
+                                                          .getCaseMessages().get(0).getValue()
+                                                          .getAttachments());
+
+            assertThat(response.getErrors()).isNull();
+            for (Document document : documents) {
+                assertThat(document.getCategoryID()).isEqualTo(DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS.getValue());
+            }
         }
 
         @Test

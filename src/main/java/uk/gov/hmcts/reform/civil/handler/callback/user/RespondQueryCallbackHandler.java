@@ -54,10 +54,8 @@ public class RespondQueryCallbackHandler extends CallbackHandler {
 
         CaseMessage latestCaseMessage = getLatestQuery(caseData);
 
-        // ToDo: Remove condition and assign to new caseworker category in CIV-17308 (behind feature toggle)
-        if (!featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId);
-        }
+        boolean isPublicQmEnabled = featureToggleService.isPublicQueryManagementEnabled(caseData);
+        assignCategoryIdToCaseworkerAttachments(caseData, latestCaseMessage, assignCategoryId, isPublicQmEnabled);
 
         caseData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(queryManagementRespondQuery))
