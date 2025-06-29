@@ -27,7 +27,7 @@ def copyPrevFailedAndNotExecutedTestFilesJson() {
       copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
       buildFound = true
     } catch (Exception error) {
-      echo "artifact not found: " + error.toString()
+      echo "artifact not foundd: " + error.toString()
       buildNumber--
     }
   }
