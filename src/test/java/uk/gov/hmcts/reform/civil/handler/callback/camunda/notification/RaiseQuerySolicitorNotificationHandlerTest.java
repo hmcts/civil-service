@@ -306,16 +306,20 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                                            .build()))
             .build();
 
-        CaseQueriesCollection claimantLipQuery = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.CLAIMANT.toString())
+        CaseQueriesCollection publicQueries = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
+                                           .id("1")
+                                           .build(),
+                                       CaseMessage.builder()
+                                           .id("3")
+                                           .build(),
+                                       CaseMessage.builder()
+                                           .id("2")
+                                           .build(),
+                                       CaseMessage.builder()
                                            .id("4")
-                                           .build()))
-            .build();
-
-        CaseQueriesCollection defendantLipQuery = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.DEFENDANT.toString())
-            .caseMessages(wrapElements(CaseMessage.builder()
+                                           .build(),
+                                       CaseMessage.builder()
                                            .id("5")
                                            .build()))
             .build();
@@ -328,8 +332,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .qmApplicantSolicitorQueries(applicantQuery)
-            .qmApplicantCitizenQueries(claimantLipQuery)
-            .qmRespondentCitizenQueries(defendantLipQuery)
+            .queries(publicQueries)
             .qmRespondentSolicitor1Queries(respondent1Query)
             .qmRespondentSolicitor2Queries(respondent2Query)
             .businessProcess(BusinessProcess.builder()
