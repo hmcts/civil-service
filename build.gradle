@@ -230,16 +230,9 @@ task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
 }
 
-task runProdApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
+task runApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
   onlyIf {
-    return System.env.ENVIRONMENT == 'aat' && System.env.NIGHTLY_RUN != 'true'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
-}
-
-task runNonProdApiTestsByGroups(type: Exec, description: 'Runs Non Prod features in functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview' && System.env.NIGHTLY_RUN != 'true'
+    System.env.NIGHTLY_RUN != 'true'
   }
   commandLine './bin/run-api-tests.sh'
 }
@@ -264,7 +257,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runNightlyApiTests, runProdApiTests, runNonProdApiTestsByGroups))
+    runNightlyApiTests, runApiTests))
 }
 
 project.tasks['sonarqube'].dependsOn test, jacocoTestReport
