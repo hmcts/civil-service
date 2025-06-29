@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -47,6 +48,26 @@ public class SimpleStateFlowEngine implements IStateFlowEngine {
 
     public StateFlow evaluateSpec(CaseData caseData) {
         return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData);
+    }
+
+    public StateFlowDTO getStateFlow(CaseDetails caseDetails) {
+        return evaluate(caseDetailsConverter.toCaseData(caseDetails)).toStateFlowDTO();
+    }
+
+    public StateFlowDTO getStateFlow(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData).toStateFlowDTO();
+        }
+        return stateFlowBuilder.build(FlowState.Main.DRAFT).evaluate(caseData).toStateFlowDTO();
+    }
+
+    public StateFlowDTO getStateFlowSpec(CaseDetails caseDetails) {
+        StateFlow stateFlow = evaluateSpec(caseDetailsConverter.toCaseData(caseDetails));
+        return stateFlow.toStateFlowDTO();
+    }
+
+    public StateFlowDTO getStateFlowSpec(CaseData caseData) {
+        return stateFlowBuilder.build(FlowState.Main.SPEC_DRAFT).evaluate(caseData).toStateFlowDTO();
     }
 
     public boolean hasTransitionedTo(CaseDetails caseDetails, FlowState.Main state) {
