@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
@@ -30,6 +32,9 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;
+
+    @Mock
+    private OrganisationService organisationService;
 
     @InjectMocks
     private ExtendResponseDeadlineAppSolOneEmailDTOGenerator emailDTOGenerator;
@@ -55,7 +60,9 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = Party.builder().build();
+        String APPLICANT_LEGAL_ORG_NAME = "applicant-legal-org-name";
         LocalDate agreedExtensionDate = LocalDate.of(2025, 6, 20);
+
         CaseData caseData = CaseData.builder()
             .respondent1(party)
             .respondentSolicitor1AgreedDeadlineExtension(agreedExtensionDate)
@@ -64,19 +71,28 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
         String respondentName = "Respondent Name";
         String formattedDate = "20 June 2025";
 
-        MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
-        MockedStatic<DateFormatHelper> dateFormatHelperMockedStatic = Mockito.mockStatic(DateFormatHelper.class);
-        partyUtilsMockedStatic.when(() -> getPartyNameBasedOnType(party)).thenReturn(respondentName);
-        dateFormatHelperMockedStatic.when(() -> formatLocalDate(agreedExtensionDate, DATE)).thenReturn(formattedDate);
+        try (
+            MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
+            MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
+            MockedStatic<DateFormatHelper> dateFormatHelperMockedStatic = Mockito.mockStatic(DateFormatHelper.class)
+        ) {
+            notificationUtilsMockedStatic.when(() ->
+                                                   NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
+                .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
-        Map<String, String> properties = new HashMap<>();
-        Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
+            partyUtilsMockedStatic.when(() ->
+                                            getPartyNameBasedOnType(party)).thenReturn(respondentName);
 
-        partyUtilsMockedStatic.close();
-        dateFormatHelperMockedStatic.close();
+            dateFormatHelperMockedStatic.when(() ->
+                                                  formatLocalDate(agreedExtensionDate, DATE)).thenReturn(formattedDate);
 
-        assertThat(updatedProperties.size()).isEqualTo(2);
-        assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, respondentName);
-        assertThat(updatedProperties).containsEntry(AGREED_EXTENSION_DATE, formattedDate);
+            Map<String, String> properties = new HashMap<>();
+            Map<String, String> updatedProperties = emailDTOGenerator.addCustomProperties(properties, caseData);
+
+            assertThat(updatedProperties.size()).isEqualTo(3);
+            assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, respondentName);
+            assertThat(updatedProperties).containsEntry(AGREED_EXTENSION_DATE, formattedDate);
+            assertThat(updatedProperties).containsEntry(APPLICANT_LEGAL_ORG_NAME, APPLICANT_LEGAL_ORG_NAME);
+        }
     }
 }
