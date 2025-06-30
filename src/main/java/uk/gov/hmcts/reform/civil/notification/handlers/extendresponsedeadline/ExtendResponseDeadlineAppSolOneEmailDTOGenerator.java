@@ -36,6 +36,7 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGenerator extends AppSolOneE
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        super.addCustomProperties(properties, caseData);
         properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         properties.put(AGREED_EXTENSION_DATE, formatLocalDate(
                 caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE));

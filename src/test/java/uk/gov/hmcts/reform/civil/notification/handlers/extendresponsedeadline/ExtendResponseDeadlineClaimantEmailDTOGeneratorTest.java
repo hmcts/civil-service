@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
@@ -38,12 +39,17 @@ public class ExtendResponseDeadlineClaimantEmailDTOGeneratorTest {
     @Mock
     private PinInPostConfiguration pipInPostConfiguration;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @InjectMocks
     private ExtendResponseDeadlineClaimantEmailDTOGenerator emailDTOGenerator;
 
     @Test
     void shouldReturnCorrectEmailTemplateIdWhenBilingual() {
         CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+
+        when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(true);
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getClaimantLipDeadlineExtensionWelsh()).thenReturn(expectedTemplateId);
@@ -99,5 +105,18 @@ public class ExtendResponseDeadlineClaimantEmailDTOGeneratorTest {
         assertThat(updatedProperties).containsEntry(DEFENDANT_NAME, defendantName);
         assertThat(updatedProperties).containsEntry(FRONTEND_URL, frontEndUrl);
         assertThat(updatedProperties).containsEntry(RESPONSE_DEADLINE, formattedDate);
+    }
+
+    @Test
+    void shouldReturnDefaultTemplateIdWhenBilingualButToggleIsOff() {
+        CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference(BOTH.toString()).build();
+        String defaultTemplateId = "default-template";
+
+        when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(false);
+        when(notificationsProperties.getClaimantLipDeadlineExtension()).thenReturn(defaultTemplateId);
+
+        String actualTemplateId = emailDTOGenerator.getEmailTemplateId(caseData);
+
+        assertThat(actualTemplateId).isEqualTo(defaultTemplateId);
     }
 }

@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -21,14 +22,20 @@ public class ExtendResponseDeadlineClaimantEmailDTOGenerator extends ClaimantEma
 
     private final PinInPostConfiguration pipInPostConfiguration;
 
-    protected ExtendResponseDeadlineClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties, PinInPostConfiguration pipInPostConfiguration) {
+    private final FeatureToggleService featureToggleService;
+
+    protected ExtendResponseDeadlineClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties,
+                                                              PinInPostConfiguration pipInPostConfiguration,
+                                                              FeatureToggleService featureToggleService) {
         this.notificationsProperties = notificationsProperties;
+        this.featureToggleService = featureToggleService;
         this.pipInPostConfiguration = pipInPostConfiguration;
     }
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.isClaimantBilingual() ? notificationsProperties.getClaimantLipDeadlineExtensionWelsh()
+        return caseData.isClaimantBilingual() && featureToggleService.isDefendantNoCOnlineForCase(caseData)
+            ? notificationsProperties.getClaimantLipDeadlineExtensionWelsh()
             : notificationsProperties.getClaimantLipDeadlineExtension();
     }
 
