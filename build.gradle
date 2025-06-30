@@ -124,7 +124,7 @@ allprojects {
         entry 'snakeyaml'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.40') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.41') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -379,7 +379,7 @@ dependencies {
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
   implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
 
-  implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.0'
+  implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.1'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
   implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.4.1'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
@@ -413,8 +413,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.104'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.40'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.105'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.41'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
 
