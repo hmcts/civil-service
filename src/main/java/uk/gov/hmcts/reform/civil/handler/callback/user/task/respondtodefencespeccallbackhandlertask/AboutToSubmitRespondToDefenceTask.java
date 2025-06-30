@@ -105,7 +105,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
 
         is1v1RespondImmediately(caseData, builder);
-        persistFixedCosts(oldCaseData, caseData, builder);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
@@ -344,13 +343,6 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             builder.respondForImmediateOption(YesOrNo.YES);
-        }
-    }
-
-    private void persistFixedCosts(CaseData oldCaseData, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        if (featureToggleService.isLrAdmissionBulkEnabled() && nonNull(oldCaseData.getFixedCosts())
-            && (caseData.isFullAdmitClaimSpec() || caseData.isPartAdmitClaimSpec())) {
-            builder.fixedCosts(oldCaseData.getFixedCosts());
         }
     }
 
