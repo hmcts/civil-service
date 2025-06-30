@@ -224,6 +224,9 @@ public enum DashboardClaimStatus {
     NO_STATUS(c -> false),
     ORDER_MADE(
         Claim::isOrderMade
+    ),
+    CASE_DISCONTINUED(
+        Claim::isCasedDiscontinued
     );
 
     @Getter
