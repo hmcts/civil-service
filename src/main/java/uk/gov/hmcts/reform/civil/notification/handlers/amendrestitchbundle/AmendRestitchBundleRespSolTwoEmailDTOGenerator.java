@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 @Component
 public class AmendRestitchBundleRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "amend-restitch-bundle-defendant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_RESPONDENT_2 = "amend-restitch-bundle-defendant-notification-%s";
 
     private static final String DATE_FORMAT = "dd-MM-yyyy";
 
@@ -34,7 +34,7 @@ public class AmendRestitchBundleRespSolTwoEmailDTOGenerator extends RespSolTwoEm
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_TEMPLATE_RESPONDENT_2;
     }
 
     @Override
