@@ -12,16 +12,14 @@ public enum CamundaProcessIdentifier {
     AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
-<<<<<<< DTSCCI-2256
     DismissCaseNotifier,
-=======
+    HwFOutcomeNotifyParties,
     DefendantResponseUnspecFullDefenceNotifyParties,
     DefendantResponseUnspecCaseHandedOfflineNotifyParties,
     DefendantResponseSpecCaseHandedOfflineNotifyParties,
     DefendantResponseSpecFullDefenceFullPartAdmitNotifyParties,
     DefendantResponseSpecOneRespRespondedNotifyParties,
     DefendantResponseSpecLipvLRFullOrPartAdmit,
->>>>>>> master
     CreateClaimAfterPaymentContinuingOfflineNotifier,
     CreateClaimAfterPaymentContinuingOnlineNotifier,
     JudgmentVariedDeterminationOfMeansNotifyParties,
