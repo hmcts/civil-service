@@ -38,7 +38,6 @@ public class GeneratePipLetter extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_PIP_LETTER);
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
