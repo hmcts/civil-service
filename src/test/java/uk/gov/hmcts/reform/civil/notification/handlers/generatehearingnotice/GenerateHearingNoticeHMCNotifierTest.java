@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.HearingNoticeGeneratorHMCNotifier;
 
 @ExtendWith(MockitoExtension.class)
-public class GenerateHearingNoticeHMCNotifierTest {
+class GenerateHearingNoticeHMCNotifierTest {
 
     @InjectMocks
     private GenerateHearingNoticeHMCNotifier notifier;

@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-public class GenerateHearingNoticeAllPartiesEmailGeneratorTest {
+class GenerateHearingNoticeAllPartiesEmailGeneratorTest {
 
     @InjectMocks
     private GenerateHearingNoticeAllPartiesEmailGenerator emailGenerator;
