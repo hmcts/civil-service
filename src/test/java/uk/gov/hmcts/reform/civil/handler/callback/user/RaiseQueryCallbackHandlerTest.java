@@ -197,8 +197,7 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors()).containsOnly("The step you were trying to complete could not be actioned. " +
-                                                              "Please review the case and try again.");
+            assertThat(response.getErrors()).containsOnly("Consecutive follow up messages are not allowed for query management.");
             assertThat(response.getData()).isNull();
         }
 
