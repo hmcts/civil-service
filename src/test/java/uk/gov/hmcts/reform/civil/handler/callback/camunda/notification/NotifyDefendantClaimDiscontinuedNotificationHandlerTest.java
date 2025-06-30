@@ -27,10 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DISCONTINUANCE_DEFENDANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
@@ -153,6 +150,29 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
                 getNotificationLipDataMap(caseData),
                 "defendant-claim-discontinued-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotifyRespondentLipWithOutEmail_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            caseData = caseData.toBuilder()
+                .applicant1(Party.builder()
+                                .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
+                                .type(Party.Type.INDIVIDUAL).partyEmail("applicantLip@example.com").build())
+                .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
+                                 .type(Party.Type.INDIVIDUAL).build())
+                .respondent1Represented(YesOrNo.NO)
+                .legacyCaseReference("000DC001")
+                .specRespondent1Represented(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_DISCONTINUANCE_DEFENDANT1.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
         }
     }
 

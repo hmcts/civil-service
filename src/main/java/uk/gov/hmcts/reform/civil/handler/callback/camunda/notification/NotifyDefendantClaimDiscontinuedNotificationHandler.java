@@ -70,12 +70,14 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
                 getReferenceTemplate(caseData)
             );
         } else {
-            notificationService.sendMail(
-                caseData.getRespondent1().getPartyEmail(),
-                getLIPTemplate(),
-                addPropertiesLip(caseData),
-                getReferenceTemplate(caseData)
-            );
+            if (caseData.getRespondent1().getPartyEmail() != null) {
+                notificationService.sendMail(
+                    caseData.getRespondent1().getPartyEmail(),
+                    getLIPTemplate(),
+                    addPropertiesLip(caseData),
+                    getReferenceTemplate(caseData)
+                );
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
