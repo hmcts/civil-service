@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
@@ -35,10 +34,7 @@ public class DiscontinueClaimPartiesAppSolOneEmailDTOGenerator extends AppSolOne
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(LEGAL_ORG_NAME, getApplicantLegalOrganizationName(caseData, organisationService));
-        properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
-        properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         return properties;
     }
 

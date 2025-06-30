@@ -19,15 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 
 class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
 
     private static final String TEMPLATE_ID = "template-id";
-    private static final String REFERENCE_NUMBER = "8372942374";
     protected static final String APPLICANT_LEGAL_ORG_NAME = "Test Legal Org";
 
     @Mock
@@ -79,15 +75,9 @@ class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService))
             .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
-        when(caseData.getLegacyCaseReference()).thenReturn(REFERENCE_NUMBER);
-        when(caseData.getCcdCaseReference()).thenReturn(12345L);
-
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
 
         assertThat(result.get(LEGAL_ORG_NAME)).isEqualTo(APPLICANT_LEGAL_ORG_NAME);
-        assertThat(result.get(CLAIM_REFERENCE_NUMBER)).isEqualTo("12345");
-        assertThat(result.get(PARTY_REFERENCES)).isEqualTo(NotificationUtils.buildPartiesReferencesEmailSubject(caseData));
-        assertThat(result.get(CASEMAN_REF)).isEqualTo(REFERENCE_NUMBER);
     }
 
     @Test
