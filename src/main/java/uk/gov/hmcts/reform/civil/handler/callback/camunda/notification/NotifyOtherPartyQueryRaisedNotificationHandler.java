@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItem
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.EMAIL;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.IS_LIP_OTHER_PARTY;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.IS_LIP_OTHER_PARTY_WELSH;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LEGAL_ORG;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LIP_NAME;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetails;
@@ -69,7 +70,6 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
 
     private CallbackResponse notifyOtherPartyQueryHasBeenRaised(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        // to avoid null pointer exception for lip bypassing the notification
         if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
             String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
             QueryManagementVariables processVariables = runtimeService.getProcessVariables(processInstanceId);
@@ -79,9 +79,14 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
 
             if (isLipOtherParty) {
                 emailDetailsList.forEach(otherPartyEmailDetails -> {
+                    boolean isWelsh = "WELSH".equalsIgnoreCase(otherPartyEmailDetails.get(IS_LIP_OTHER_PARTY_WELSH));
+                    String templateId = isWelsh
+                        ? notificationsProperties.getNotifyOtherLipPartyWelshPublicQueryRaised()
+                        : notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised();
+
                     notificationService.sendMail(
                         otherPartyEmailDetails.get(EMAIL),
-                        notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised(),
+                        templateId,
                         addProperties(caseData, otherPartyEmailDetails.get(LIP_NAME), isLipOtherParty),
                         String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                     );

@@ -30,6 +30,7 @@ public class QueryNotificationUtils {
     public static final String LEGAL_ORG = "LEGAL_ORG";
     public static final String LIP_NAME = "LIP_NAME";
     public static final String IS_LIP_OTHER_PARTY = "IS_LIP_OTHER_PARTY";
+    public static final String IS_LIP_OTHER_PARTY_WELSH = "IS_LIP_OTHER_PARTY_WELSH";
 
     private QueryNotificationUtils() {
         //NO-OP
@@ -113,17 +114,20 @@ public class QueryNotificationUtils {
         String email;
         String lipName;
         String legalOrgName;
+        String lipOtherPartyWelsh;
 
         switch (otherParty) {
             case "lipApplicant":
                 email = caseData.getApplicant1Email();
                 lipName = caseData.getApplicant1().getPartyName();
-                emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName));
+                lipOtherPartyWelsh = caseData.isClaimantBilingual() ? "WELSH" : "NON_WELSH";
+                emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
                 break;
             case "lipRespondent":
                 email = caseData.getDefendantUserDetails().getEmail();
                 lipName = caseData.getRespondent1().getPartyName();
-                emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName));
+                lipOtherPartyWelsh = caseData.isRespondentResponseBilingual() ? "WELSH" : "NON_WELSH";
+                emailDetailsList.add(createLipOnCaseEmailDetails(email, lipName, lipOtherPartyWelsh));
                 break;
             case "lrApplicant":
                 email = caseData.getApplicantSolicitor1UserDetails().getEmail();
@@ -202,11 +206,12 @@ public class QueryNotificationUtils {
         return details;
     }
 
-    private static  Map<String, String> createLipOnCaseEmailDetails(String email, String lipName) {
+    private static  Map<String, String> createLipOnCaseEmailDetails(String email, String lipName, String lipOtherPartyWelsh) {
         Map<String, String> details = new HashMap<>();
         details.put(EMAIL, email);
         details.put(LIP_NAME, lipName);
         details.put(IS_LIP_OTHER_PARTY, "TRUE");
+        details.put(IS_LIP_OTHER_PARTY_WELSH, lipOtherPartyWelsh);
         return details;
     }
 

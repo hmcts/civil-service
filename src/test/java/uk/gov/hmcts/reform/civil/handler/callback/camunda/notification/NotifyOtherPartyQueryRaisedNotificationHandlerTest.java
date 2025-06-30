@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -21,6 +22,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -106,6 +109,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
     private NotifyOtherPartyQueryRaisedNotificationHandler handler;
 
     private static final String TEMPLATE_ID = "template-id";
+    private static final String TEMPLATE_ID_LIP = "lip-template-id";
+    private static final String TEMPLATE_ID_LIP_WELSH = "lip-welsh-template-id";
 
     @BeforeEach
     void setUp() {
@@ -113,7 +118,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         when(notificationsProperties.getNotifyOtherPartyQueryRaised()).thenReturn(TEMPLATE_ID);
         when(notificationsProperties.getNotifyOtherPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID);
-        when(notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID);
+        when(notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID_LIP);
+        when(notificationsProperties.getNotifyOtherLipPartyWelshPublicQueryRaised()).thenReturn(TEMPLATE_ID_LIP_WELSH);
         Map<String, String> expectedProperties = new HashMap<>();
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -241,8 +247,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         @Nested
         class lipOnCase {
 
-            @Test
-            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipApplicant() {
+            @ParameterizedTest
+            @ValueSource(booleans = {true, false})
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipApplicant(boolean isWelsh) {
                 when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
@@ -254,28 +261,44 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
                 when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                    .applicant1Represented(YesOrNo.NO)
-                    .respondentSolicitor1EmailAddress("respondent1@email.com")
-                    .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
-                                         .build())
-                    .build();
+                CaseData caseData;
+                if (isWelsh) {
+                    caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                        .applicant1Represented(YesOrNo.NO)
+                        .claimantBilingualLanguagePreference("WELSH")
+                        .respondentSolicitor1EmailAddress("respondent1@email.com")
+                        .queries(query)
+                        .businessProcess(BusinessProcess.builder()
+                                             .processInstanceId("123")
+                                             .build())
+                        .build();
+                } else {
+                    caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                        .applicant1Represented(YesOrNo.NO)
+                        .claimantBilingualLanguagePreference("ENGLISH")
+                        .respondentSolicitor1EmailAddress("respondent1@email.com")
+                        .queries(query)
+                        .businessProcess(BusinessProcess.builder()
+                                             .processInstanceId("123")
+                                             .build())
+                        .build();
+                }
+
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
                     "rambo@email.com",
-                    TEMPLATE_ID,
+                    isWelsh ? TEMPLATE_ID_LIP_WELSH :TEMPLATE_ID_LIP,
                     getNotificationDataMapLip(true),
                     "a-query-has-been-raised-notification-000DC001"
                 );
             }
 
-            @Test
-            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipRespondent() {
+            @ParameterizedTest
+            @ValueSource(booleans = {true, false})
+            void shouldNotifyOtherParty_whenQueryRaisedOnLipCase_OtherPartyLipRespondent(boolean isWelsh) {
                 when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 CaseQueriesCollection query = CaseQueriesCollection.builder()
                     .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
@@ -287,21 +310,38 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("1").build());
                 when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                    .respondent1Represented(YesOrNo.NO)
-                    .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
-                    .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
+                CaseData caseData;
+                if (isWelsh) {
+                    caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                        .caseDataLiP(CaseDataLiP.builder()
+                                         .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                     .respondent1ResponseLanguage("WELSH").build())
                                          .build())
-                    .build();
+                        .respondent1Represented(YesOrNo.NO)
+                        .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                        .queries(query)
+                        .businessProcess(BusinessProcess.builder().processInstanceId("123").build())
+                        .build();
+                } else {
+                    caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
+                        .caseDataLiP(CaseDataLiP.builder()
+                                         .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                     .respondent1ResponseLanguage("ENGLSH").build())
+                                         .build())
+                        .respondent1Represented(YesOrNo.NO)
+                        .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                        .queries(query)
+                        .businessProcess(BusinessProcess.builder().processInstanceId("123").build())
+                        .build();
+                }
+
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
                     "sole.trader@email.com",
-                    TEMPLATE_ID,
+                    isWelsh ? TEMPLATE_ID_LIP_WELSH :TEMPLATE_ID_LIP,
                     getNotificationDataMapLip(false),
                     "a-query-has-been-raised-notification-000DC001"
                 );

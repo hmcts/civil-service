@@ -689,6 +689,9 @@ public class NotificationsProperties {
     private String notifyOtherLipPartyPublicQueryRaised;
 
     @NotEmpty
+    private String notifyOtherLipPartyWelshPublicQueryRaised;
+
+    @NotEmpty
     private String notifyOtherPartyQueryResponseReceived;
 
     @NotEmpty
