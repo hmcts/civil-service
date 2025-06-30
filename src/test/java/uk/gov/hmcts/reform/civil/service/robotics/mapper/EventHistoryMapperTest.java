@@ -5730,14 +5730,11 @@ class EventHistoryMapperTest {
 
         @ParameterizedTest
         @CsvSource({
-            "LR_QUERY",
-            "LIP_QUERY",
+            "LR_QUERY"
         })
         void shouldPrepareExpectedEvents_whenClaimTakenOfflineAfterClaimIssuedQueryExists(String queryType) {
             when(featureToggleService.isQueryManagementLRsEnabled()).thenReturn(true);
-            CaseData caseData;
-            if (queryType.equals("LR_QUERY")) {
-                caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
                     .build().toBuilder()
@@ -5745,16 +5742,6 @@ class EventHistoryMapperTest {
                                                      .roleOnCase("APPLICANT")
                                                      .build())
                     .build();
-            } else {
-                caseData = CaseDataBuilder.builder()
-                    .atStateTakenOfflineByStaff()
-                    .takenOfflineDate(time.now())
-                    .build().toBuilder()
-                    .qmApplicantCitizenQueries(CaseQueriesCollection.builder()
-                                                   .roleOnCase("APPLICANT")
-                                                   .build())
-                    .build();
-            }
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()

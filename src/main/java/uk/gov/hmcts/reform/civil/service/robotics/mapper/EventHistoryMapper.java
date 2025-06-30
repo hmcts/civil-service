@@ -1158,9 +1158,7 @@ public class EventHistoryMapper {
     private boolean hasActiveQueries(CaseData caseData) {
         return caseData.getQmApplicantSolicitorQueries() != null
             || caseData.getQmRespondentSolicitor1Queries() != null
-            || caseData.getQmRespondentSolicitor2Queries() != null
-            || caseData.getQmApplicantCitizenQueries() != null
-            || caseData.getQmRespondentCitizenQueries() != null;
+            || caseData.getQmRespondentSolicitor2Queries() != null;
     }
 
     private boolean isCaseOffline(CaseData caseData) {
