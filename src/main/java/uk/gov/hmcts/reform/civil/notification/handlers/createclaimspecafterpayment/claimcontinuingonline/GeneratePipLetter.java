@@ -61,9 +61,7 @@ public class GeneratePipLetter extends CallbackHandler {
         final CaseData.CaseDataBuilder caseDataBuilder
                 = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
 
-        if (caseData.getRespondent1() == null || caseData.getRespondent1().getPartyEmail() == null) {
-            generatePIPLetter(callbackParams);
-        }
+        generatePIPLetter(callbackParams);
 
         String updateCaseState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
