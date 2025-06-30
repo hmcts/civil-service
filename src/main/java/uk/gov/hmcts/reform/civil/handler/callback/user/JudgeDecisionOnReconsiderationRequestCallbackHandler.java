@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
@@ -90,6 +91,11 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                     caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
             Comparator.reverseOrder()
         )).findFirst();
+
+        if (featureToggleService.isGaForWelshEnabled()
+            && (callbackParams.getCaseData().isClaimantBilingual() || callbackParams.getCaseData().isRespondentResponseBilingual())) {
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+        }
 
         if (sdoDocLatest.isPresent()) {
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);

@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -43,12 +42,5 @@ class DefendantResponseDeadlineCheckSearchServiceWithWelshFlagOnTest extends Ela
             );
 
         return new Query(query, List.of("reference"), fromValue);
-    }
-
-    @Override
-    protected Query buildQueryInMediation(int fromValue, LocalDate date, boolean carmEnabled,
-                                          boolean initialSearch,
-                                          String searchAfterValue) {
-        return null;
     }
 }
