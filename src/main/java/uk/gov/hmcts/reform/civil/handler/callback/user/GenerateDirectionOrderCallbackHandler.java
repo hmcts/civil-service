@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -202,6 +203,12 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             caseDataBuilder.allowOrderTrackAllocation(NO);
             populateTrackToggle(caseData, caseDataBuilder);
         }
+
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+        }
+
         caseDataBuilder.finalOrderFurtherHearingToggle(null);
         return nullPreviousSelections(caseDataBuilder);
     }
@@ -615,8 +622,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         finalCaseDocuments.add(element(finalDocument));
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (featureToggleService.isGaForWelshEnabled()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
-                || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.addAll(finalCaseDocuments);
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);

@@ -275,6 +275,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.showCarmFields(NO);
         }
 
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            updatedData.bilingualHint(YesOrNo.YES);
+        }
+
         /**
          * Update case management location to preferred logic and return preferred location when legal advisor SDO,
          * otherwise return preferred location only.
@@ -1519,8 +1524,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
             if (featureToggleService.isGaForWelshEnabled()
-                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual()
-                || caseData.isLipClaimantSpecifiedBilingualDocuments() || caseData.isLipDefendantSpecifiedBilingualDocuments())) {
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
                 List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
                     .getPreTranslationDocuments();
                 sdoDocuments.add(element(document));

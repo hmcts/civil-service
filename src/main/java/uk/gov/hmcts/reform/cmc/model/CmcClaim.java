@@ -507,7 +507,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean defendantRespondedWithPreferredLanguageWelsh() {
+    public boolean pausedForTranslationAfterResponse() {
         return false;
     }
 
@@ -630,6 +630,11 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isBundleCreatedStatusActive() {
+        return false;
+    }
+
+    @Override
+    public boolean isCasedDiscontinued() {
         return false;
     }
 }
