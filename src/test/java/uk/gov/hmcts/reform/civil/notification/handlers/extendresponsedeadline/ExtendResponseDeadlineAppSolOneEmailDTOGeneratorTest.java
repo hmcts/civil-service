@@ -61,7 +61,7 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         Party party = Party.builder().build();
-        String APPLICANT_LEGAL_ORG_NAME = "applicant-legal-org-name";
+        String appLegalOrgName = "applicant-legal-org-name";
         LocalDate agreedExtensionDate = LocalDate.of(2025, 6, 20);
 
         CaseData caseData = CaseData.builder()
@@ -79,7 +79,7 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
         ) {
             notificationUtilsMockedStatic.when(() ->
                                                    NotificationUtils.getApplicantLegalOrganizationName(caseData, organisationService))
-                .thenReturn(APPLICANT_LEGAL_ORG_NAME);
+                .thenReturn(appLegalOrgName);
 
             partyUtilsMockedStatic.when(() ->
                                             getPartyNameBasedOnType(party)).thenReturn(respondentName);
@@ -93,7 +93,7 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
             assertThat(updatedProperties.size()).isEqualTo(3);
             assertThat(updatedProperties).containsEntry(RESPONDENT_NAME, respondentName);
             assertThat(updatedProperties).containsEntry(AGREED_EXTENSION_DATE, formattedDate);
-            assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, APPLICANT_LEGAL_ORG_NAME);
+            assertThat(updatedProperties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, appLegalOrgName);
         }
     }
 }
