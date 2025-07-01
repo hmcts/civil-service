@@ -294,7 +294,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     private boolean awaitingHearingNoticeTranslation() {
         return caseData.getPreTranslationDocuments() != null
             && caseData.getPreTranslationDocuments().stream().anyMatch(
-            element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
+                element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
         );
     }
 }
