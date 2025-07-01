@@ -148,21 +148,21 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean decisionMadeDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null &&
-            caseData.getPreTranslationDocuments().stream().map(
+        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
                 .map(CaseDocument::getDocumentType)
-                .anyMatch(type -> DocumentType.DECISION_MADE_ON_APPLICATIONS.equals(type))) && !isSettled() &&
-            !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
+            .anyMatch(type -> DocumentType.DECISION_MADE_ON_APPLICATIONS.equals(type))) && !isSettled()
+            && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
     }
 
     @Override
     public boolean sdoDocumentsAreInTranslation() {
-        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null &&
-            caseData.getPreTranslationDocuments().stream().map(
+        return (featureToggleService.isGaForWelshEnabled() && caseData.getPreTranslationDocuments() != null
+            && caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
-                .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type)) &&
-            !isSettled() && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState()));
+            .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type))
+            && !isSettled() && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState()));
     }
 
     @Override
