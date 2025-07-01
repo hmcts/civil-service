@@ -49,7 +49,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
                     Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled())
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -70,7 +70,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
                     Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled())
                 )), transitions)
             // Only one unrepresented defendant
@@ -87,7 +87,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
                     Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled())
                 )), transitions)
             // Unrepresented defendant 1
@@ -107,7 +107,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
                     Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled())
                 )), transitions)
             // Unrepresented defendant 2
@@ -126,7 +126,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
                     Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled())
                 )), transitions)
             // Unrepresented defendants
@@ -145,7 +145,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(IS_JO_LIVE_FEED_ACTIVE.name(), featureToggleService.isJOLiveFeedActive()),
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
-                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase())
+                    Map.entry(WELSH_ENABLED.name(), featureToggleService.isWelshEnabledForMainCase()),
                     Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled())
                 )), transitions);
     }
