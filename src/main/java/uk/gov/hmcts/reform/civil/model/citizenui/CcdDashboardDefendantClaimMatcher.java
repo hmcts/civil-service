@@ -41,6 +41,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean hasResponsePending() {
+        if (isCasedDiscontinued()) {
+            return false;
+        }
         return caseData.getRespondent1ResponseDate() == null && !isPaperResponse()
             && caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(FOUR_PM));
@@ -48,6 +51,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean hasResponsePendingOverdue() {
+        if (isCasedDiscontinued()) {
+            return false;
+        }
         return caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.hasBreathingSpace();
@@ -68,7 +74,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately() {
-        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+        if ((featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -77,7 +83,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate() {
-        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+        if ((featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -87,7 +93,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments() {
-        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+        if ((featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
             return false;
         }
         return hasResponseFullAdmit()
@@ -97,6 +103,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isEligibleForCCJ() {
+        if (isCasedDiscontinued()) {
+            return false;
+        }
         return (caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() == null
@@ -115,7 +124,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+        if ((featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
             return false;
         }
         return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
@@ -126,7 +135,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isWaitingForClaimantToRespond() {
-        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+        if ((featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
             return false;
         }
         return RespondentResponseTypeSpec.FULL_DEFENCE == caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -185,6 +194,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean hasDefendantStatedTheyPaid() {
+        if (isCasedDiscontinued()) {
+            return false;
+        }
         return defendantRespondedWithPartAdmit()
             && isPayImmediately() && !caseData.getApplicant1ResponseDeadlinePassed()
             && !(caseData.hasApplicantRejectedRepaymentPlan() || caseData.isPartAdmitClaimNotSettled());
@@ -196,7 +208,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        if (featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) {
+        if ((featureToggleService.isLipVLipEnabled() && isClaimProceedInCaseMan()) || isCasedDiscontinued()) {
             return false;
         }
         return RespondentResponseTypeSpec.PART_ADMISSION == caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -474,5 +486,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isCasedDiscontinued() {
+        return CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
     }
 }

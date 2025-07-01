@@ -83,8 +83,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     private QueryResponseSolicitorNotificationHandler handler;
 
     private CaseData createCaseDataWithMultipleFollowUpQueries(OffsetDateTime now) {
-        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
+        CaseQueriesCollection caseQueriesCollection = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(
                 CaseMessage.builder()
                     .id("1")
@@ -119,13 +118,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .createdBy("LR")
                     .parentId("80")
                     .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
-
-        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
-            .caseMessages(wrapElements(
+                    .build(),
                 CaseMessage.builder()
                     .id("2")
                     .createdBy("LR")
@@ -153,13 +146,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .createdBy("LR")
                     .parentId("80")
                     .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
-
-        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.RESPONDENTSOLICITORTWO.toString())
-            .caseMessages(wrapElements(
+                    .build(),
                 CaseMessage.builder()
                     .id("3")
                     .createdBy("LR")
@@ -187,12 +174,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .createdBy("LR")
                     .parentId("80")
                     .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
-        CaseQueriesCollection applicantLipQuery = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.CLAIMANT.toString())
-            .caseMessages(wrapElements(
+                    .build(),
                 CaseMessage.builder()
                     .id("5")
                     .createdBy("Lip")
@@ -223,6 +205,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .build()
             ))
             .build();
+
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -230,10 +213,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                                                 .build())
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
-            .qmApplicantSolicitorQueries(applicantQuery)
-            .qmRespondentSolicitor1Queries(respondent1Query)
-            .qmRespondentSolicitor2Queries(respondent2Query)
-            .qmApplicantCitizenQueries(applicantLipQuery)
+            .queries(caseQueriesCollection)
             .businessProcess(BusinessProcess.builder()
                                  .processInstanceId("123")
                                  .build())
@@ -241,8 +221,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     }
 
     private CaseData createCaseDataWithQueries(OffsetDateTime now) {
-        CaseQueriesCollection applicantQuery = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.APPLICANTSOLICITORONE.toString())
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(
                 CaseMessage.builder()
                     .id("1")
@@ -260,13 +239,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .createdBy("LR")
                     .parentId("80")
                     .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
-
-        CaseQueriesCollection respondent1Query = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.RESPONDENTSOLICITORONE.toString())
-            .caseMessages(wrapElements(
+                    .build(),
                 CaseMessage.builder()
                     .id("2")
                     .createdBy("LR")
@@ -283,13 +256,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .createdBy("LR")
                     .parentId("80")
                     .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
-
-        CaseQueriesCollection respondent2Query = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.RESPONDENTSOLICITORTWO.toString())
-            .caseMessages(wrapElements(
+                    .build(),
                 CaseMessage.builder()
                     .id("3")
                     .createdBy("LR")
@@ -306,12 +273,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .createdBy("LR")
                     .parentId("80")
                     .createdOn(now.plusDays(1))
-                    .build()
-            ))
-            .build();
-        CaseQueriesCollection defendantLipQuery = CaseQueriesCollection.builder()
-            .roleOnCase(CaseRole.DEFENDANT.toString())
-            .caseMessages(wrapElements(
+                    .build(),
                 CaseMessage.builder()
                     .id("144")
                     .createdBy("Lip")
@@ -342,6 +304,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                     .build()
             ))
             .build();
+
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -349,10 +312,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                                                 .build())
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
-            .qmApplicantSolicitorQueries(applicantQuery)
-            .qmRespondentSolicitor1Queries(respondent1Query)
-            .qmRespondentSolicitor2Queries(respondent2Query)
-            .qmRespondentCitizenQueries(defendantLipQuery)
+            .queries(caseQueries)
             .businessProcess(BusinessProcess.builder()
                                  .processInstanceId("123")
                                  .build())
@@ -360,7 +320,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataForLip() {
+    private Map<String, String> getNotificationDataForLip(LocalDateTime now) {
         Map<String, String> expectedProperties = new HashMap<>(Map.of(
             "partyReferences",
             "Claimant reference: 12345 - Defendant reference: 6789",
@@ -369,7 +329,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             "claimReferenceNumber",
             "1594901956117591",
             "casemanRef",
-            "000DC001"
+            "000DC001",
+            QUERY_DATE,
+            formatLocalDate(now.toLocalDate(), DATE)
         ));
         expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
         expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -586,7 +548,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         }
 
         @NotNull
-        private Map<String, String> getNotificationDataMapLipRes() {
+        private Map<String, String> getNotificationDataMapLipRes(LocalDateTime now) {
             Map<String, String> expectedProperties = new HashMap<>(Map.of(
                 "partyReferences",
                 "Claimant reference: 12345 - Defendant reference: 6789",
@@ -595,7 +557,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
                 "claimReferenceNumber",
                 "1594901956117591",
                 "casemanRef",
-                "000DC001"
+                "000DC001",
+                QUERY_DATE,
+                formatLocalDate(now.toLocalDate(), DATE)
             ));
             expectedProperties.put(PHONE_CONTACT, configuration.getPhoneContact());
             expectedProperties.put(OPENING_HOURS, configuration.getOpeningHours());
@@ -629,7 +593,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 TEMPLATE_ID,
-                getNotificationDataForLip(),
+                getNotificationDataForLip(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -656,7 +620,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 TEMPLATE_ID,
-                getNotificationDataForLip(),
+                getNotificationDataForLip(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -684,7 +648,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMapLipRes(),
+                getNotificationDataMapLipRes(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }
@@ -714,7 +678,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 TEMPLATE_ID,
-                getNotificationDataMapLipRes(),
+                getNotificationDataMapLipRes(now.toLocalDateTime()),
                 "response-to-query-notification-000DC001"
             );
         }

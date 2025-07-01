@@ -502,4 +502,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             return false;
         }
     }
+
+    @Override
+    public boolean isCasedDiscontinued() {
+        return false;
+    }
 }

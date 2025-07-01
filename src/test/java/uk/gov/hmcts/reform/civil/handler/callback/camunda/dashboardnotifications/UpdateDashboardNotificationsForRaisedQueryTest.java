@@ -78,11 +78,13 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId(null)
+        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123456")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
                                            .id("123456")
+                                           .createdBy("applicant")
                                            .build()))
             .build();
         CaseData caseData = CaseData.builder()
@@ -91,7 +93,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 ).build()
             )
             .qmLatestQuery(LatestQuery.builder().queryId("123456").build())
-            .qmApplicantCitizenQueries(applicantCitizenQuery)
+            .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
             .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
             .ccdCaseReference(1234L)
@@ -118,11 +120,13 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId(null)
+        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
                                            .id("123457")
+                                           .createdBy("defendant")
                                            .build()))
             .build();
         CaseData caseData = CaseData.builder()
@@ -131,7 +135,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 ).build()
             )
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
-            .qmRespondentCitizenQueries(defendantCitizenQuery)
+            .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
             .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
             .ccdCaseReference(1234L)
@@ -158,13 +162,17 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId(null)
+        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")
-                                                   .build(), CaseMessage.builder()
+                                                   .createdBy("defendant")
+                                                   .build(),
+                                               CaseMessage.builder()
                                                    .id("123458")
+                                                   .createdBy("defendant")
                                                    .build())))
             .build();
         CaseData caseData = CaseData.builder()
@@ -173,7 +181,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 ).build()
             )
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
-            .qmRespondentCitizenQueries(defendantCitizenQuery)
+            .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
             .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
             .ccdCaseReference(1234L)
@@ -200,13 +208,17 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId(null)
+        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
                                                                        .build());
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
                                                    .id("123457")
-                                                   .build(), CaseMessage.builder()
+                                                   .createdBy("claimant")
+                                                   .build(),
+                                               CaseMessage.builder()
                                                    .id("123458")
+                                                   .createdBy("claimant")
                                                    .build())))
             .build();
         CaseData caseData = CaseData.builder()
@@ -215,7 +227,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
                 ).build()
             )
             .qmLatestQuery(LatestQuery.builder().queryId("123457").build())
-            .qmApplicantCitizenQueries(applicantCitizenQuery)
+            .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
             .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
             .ccdCaseReference(1234L)

@@ -184,4 +184,6 @@ public interface Claim {
     default boolean isHwfFullRemission() {
         return false;
     }
+
+    boolean isCasedDiscontinued();
 }
