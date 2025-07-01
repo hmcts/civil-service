@@ -3633,7 +3633,7 @@ class SimpleStateFlowEngineTest {
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(12).contains(
+                assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
@@ -3803,7 +3803,7 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(12).contains(
+                assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
@@ -3980,7 +3980,7 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(11).contains(
+                assertThat(stateFlow.getFlags()).hasSize(12).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
@@ -4021,7 +4021,7 @@ class SimpleStateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(12).contains(
+                assertThat(stateFlow.getFlags()).hasSize(13).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
