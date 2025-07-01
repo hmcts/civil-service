@@ -157,7 +157,7 @@ class NotifyDefendantClaimDiscontinuedNotificationHandlerTest extends BaseCallba
         }
 
         @Test
-        void shouldNotifyRespondentLipWithOutEmail_whenInvoked() {
+        void shouldNotNotifyRespondentLipWithOutEmail_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(Party.builder()

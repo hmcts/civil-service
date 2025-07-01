@@ -70,9 +70,10 @@ public class NotifyDefendantClaimDiscontinuedNotificationHandler extends Callbac
                 getReferenceTemplate(caseData)
             );
         } else {
-            if (caseData.getRespondent1().getPartyEmail() != null) {
+            String emailId = caseData.getRespondent1().getPartyEmail();
+            if (emailId != null) {
                 notificationService.sendMail(
-                    caseData.getRespondent1().getPartyEmail(),
+                    emailId,
                     getLIPTemplate(),
                     addPropertiesLip(caseData),
                     getReferenceTemplate(caseData)
