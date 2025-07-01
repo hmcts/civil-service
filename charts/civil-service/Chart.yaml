@@ -35,7 +35,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wiremock.enabled
   - name: civil-general-applications
-    version: 0.0.73
+    version: 0.0.65
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: civil-general-applications.enabled
   - name: ccd-case-document-am-api
