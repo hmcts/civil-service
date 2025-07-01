@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
+
 @Slf4j
 public abstract class Notifier extends BaseNotifier {
 
@@ -26,6 +28,12 @@ public abstract class Notifier extends BaseNotifier {
     public void notifyParties(CaseData caseData, String eventId, String taskId) {
         log.info("Notifying parties for case ID: {} and eventId: {} and taskId: {} ", caseData.getCcdCaseReference(), eventId, taskId);
         final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData, taskId);
+        for (EmailDTO emailDTO : partiesToEmail) {
+            if (NO_EMAIL_OPERATION.equals(emailDTO.getEmailTemplate())) {
+                log.info("Skipping notification for case ID: {} due to no op request", caseData.getCcdCaseReference());
+                partiesToEmail.remove(emailDTO);
+            }
+        }
         final List<String> errors = sendNotification(partiesToEmail);
         if (!errors.isEmpty()) {
             final HashMap<String, String> additionalProperties = new HashMap<>();
