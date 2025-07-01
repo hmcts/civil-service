@@ -82,6 +82,7 @@ public class DraftTransitionBuilderTest {
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
+            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }
@@ -102,6 +103,7 @@ public class DraftTransitionBuilderTest {
             entry("ONE_RESPONDENT_REPRESENTATIVE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
+            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }
@@ -180,6 +182,7 @@ public class DraftTransitionBuilderTest {
             entry("TWO_RESPONDENT_REPRESENTATIVES", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
+            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }
@@ -219,6 +222,7 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_TWO", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
+            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }
@@ -269,6 +273,7 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_ONE", true),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), true),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
+            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }
@@ -302,6 +307,7 @@ public class DraftTransitionBuilderTest {
             entry("UNREPRESENTED_DEFENDANT_TWO", false),
             entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
             entry(FlowFlag.WELSH_ENABLED.name(), false),
+            entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
             entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
         );
     }

@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.DEFENDANT_NOC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.IS_JO_LIVE_FEED_ACTIVE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JO_ONLINE_LIVE_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.PUBLIC_QUERIES_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.WELSH_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.JBA_ISSUED_BEFORE_NOC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
@@ -51,6 +52,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c))
                 )), transitions)
             .moveTo(CLAIM_SUBMITTED, transitions)
@@ -72,6 +74,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c))
                 )), transitions)
             // Only one unrepresented defendant
@@ -89,6 +92,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c))
                 )), transitions)
             // Unrepresented defendant 1
@@ -109,6 +113,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c))
                 )), transitions)
             // Unrepresented defendant 2
@@ -128,6 +133,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c))
                 )), transitions)
             // Unrepresented defendants
@@ -147,6 +153,7 @@ public abstract class DraftTransitionBuilder extends TransitionBuilder {
                     Map.entry(DEFENDANT_NOC_ONLINE.name(), featureToggleService.isDefendantNoCOnlineForCase(c)),
                     Map.entry(CLAIM_STATE_DURING_NOC.name(), getMainClaimCcdState(c)),
                     Map.entry(WELSH_ENABLED.name(), featureToggleService.isGaForWelshEnabled()),
+                    Map.entry(PUBLIC_QUERIES_ENABLED.name(), featureToggleService.isQMPdfGeneratorDisabled()),
                     Map.entry(JBA_ISSUED_BEFORE_NOC.name(), isJudgmentByAdmissionIssuedForCase(c))
                 )), transitions);
     }
