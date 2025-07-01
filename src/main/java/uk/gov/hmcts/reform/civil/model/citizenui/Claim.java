@@ -152,7 +152,7 @@ public interface Claim {
     /**
      * Some statuses consider how far is the hearing date.
      *
-     * @param  days
+     * @param i days
      * @return true if hearing date is defined and it is less or equal than i days away
      */
     boolean isHearingLessThanDaysAway(int days);
