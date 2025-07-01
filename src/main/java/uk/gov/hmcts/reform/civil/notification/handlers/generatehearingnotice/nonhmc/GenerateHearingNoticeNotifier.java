@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice;
+package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice.nonhmc;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;

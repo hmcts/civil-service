@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice;
+package uk.gov.hmcts.reform.civil.notification.handlers.generatehearingnotice.nonhmc;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
@@ -27,10 +27,7 @@ public class GenerateHearingNoticeAppSolOneEmailDTOGenerator extends AppSolOneEm
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        if (caseData.getHearingFeePaymentDetails() != null
-                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())
-                || caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)
-                || caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
+        if (shouldSendNoFeeHearingNotice(caseData)) {
             return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
         } else {
             return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
@@ -56,5 +53,12 @@ public class GenerateHearingNoticeAppSolOneEmailDTOGenerator extends AppSolOneEm
         }
 
         return properties;
+    }
+
+    private static boolean shouldSendNoFeeHearingNotice(CaseData caseData) {
+        return (caseData.getHearingFeePaymentDetails() != null
+                && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus()))
+                || caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)
+                || caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING);
     }
 }
