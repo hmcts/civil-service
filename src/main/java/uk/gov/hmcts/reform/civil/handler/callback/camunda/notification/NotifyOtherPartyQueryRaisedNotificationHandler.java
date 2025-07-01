@@ -96,7 +96,7 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
                     notificationService.sendMail(
                         otherPartyEmailDetails.get(EMAIL),
                         notificationsProperties.getNotifyOtherPartyPublicQueryRaised(),
-                        addProperties(caseData, otherPartyEmailDetails.get(LEGAL_ORG), isLipOtherParty),
+                        addProperties(caseData, otherPartyEmailDetails.get(LEGAL_ORG), false),
                         String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                     );
                 });

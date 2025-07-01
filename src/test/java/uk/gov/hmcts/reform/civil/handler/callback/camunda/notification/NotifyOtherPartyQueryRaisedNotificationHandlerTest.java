@@ -245,7 +245,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         }
 
         @Nested
-        class lipOnCase {
+        class LipOnCase {
 
             @ParameterizedTest
             @ValueSource(booleans = {true, false})
@@ -290,7 +290,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
                 verify(notificationService).sendMail(
                     "rambo@email.com",
-                    isWelsh ? TEMPLATE_ID_LIP_WELSH :TEMPLATE_ID_LIP,
+                    isWelsh ? TEMPLATE_ID_LIP_WELSH : TEMPLATE_ID_LIP,
                     getNotificationDataMapLip(true),
                     "a-query-has-been-raised-notification-000DC001"
                 );
@@ -341,7 +341,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
                 verify(notificationService).sendMail(
                     "sole.trader@email.com",
-                    isWelsh ? TEMPLATE_ID_LIP_WELSH :TEMPLATE_ID_LIP,
+                    isWelsh ? TEMPLATE_ID_LIP_WELSH : TEMPLATE_ID_LIP,
                     getNotificationDataMapLip(false),
                     "a-query-has-been-raised-notification-000DC001"
                 );

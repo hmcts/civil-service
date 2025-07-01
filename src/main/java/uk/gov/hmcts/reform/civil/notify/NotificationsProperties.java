@@ -683,6 +683,15 @@ public class NotificationsProperties {
     private String notifyOtherPartyQueryRaised;
 
     @NotEmpty
+    private String notifyOtherPartyQueryResponseReceived;
+
+    @NotEmpty
+    private String queryLipResponseReceivedEnglish;
+
+    @NotEmpty
+    private String queryLipResponseReceivedWelsh;
+
+    @NotEmpty
     private String notifyOtherPartyPublicQueryRaised;
 
     @NotEmpty
@@ -692,12 +701,12 @@ public class NotificationsProperties {
     private String notifyOtherLipPartyWelshPublicQueryRaised;
 
     @NotEmpty
-    private String notifyOtherPartyQueryResponseReceived;
+    private String queryLrPublicResponseReceived;
 
     @NotEmpty
-    private String queryLipResponseReceivedEnglish;
+    private String queryLipPublicResponseReceived;
 
     @NotEmpty
-    private String queryLipResponseReceivedWelsh;
+    private String queryLipWelshPublicResponseReceived;
 
 }
