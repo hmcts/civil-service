@@ -666,6 +666,8 @@ class CaseEventTaskHandlerTest {
                              Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                              Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
                              Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                             Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
+                             Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
                              Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
@@ -679,6 +681,8 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
@@ -696,6 +700,8 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             } else if (state.equals(CLAIM_DETAILS_NOTIFIED)
@@ -709,6 +715,8 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false),
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), false),
+                                     Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false)
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
@@ -725,18 +733,22 @@ class CaseEventTaskHandlerTest {
                                      Map.entry(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false),
                                      Map.entry(FlowFlag.CLAIM_STATE_DURING_NOC.name(), true),
                                      Map.entry(FlowFlag.WELSH_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false),
+                                     Map.entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false)
                                      Map.entry(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), false),
                                      Map.entry(FlowFlag.JBA_ISSUED_BEFORE_NOC.name(), false)
                 );
             }
-            return Map.of(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                          FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false,
-                          FlowFlag.CASE_PROGRESSION_ENABLED.name(), false,
-                          FlowFlag.BULK_CLAIM_ENABLED.name(), false,
-                          FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false,
-                          FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false,
-                          FlowFlag.DEFENDANT_NOC_ONLINE.name(), false
-                    );
+            Map<String, Boolean> expectedFlags = new HashMap<>();
+            expectedFlags.put(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false);
+            expectedFlags.put(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), false);
+            expectedFlags.put(FlowFlag.CASE_PROGRESSION_ENABLED.name(), false);
+            expectedFlags.put(FlowFlag.BULK_CLAIM_ENABLED.name(), false);
+            expectedFlags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), false);
+            expectedFlags.put(FlowFlag.IS_JO_LIVE_FEED_ACTIVE.name(), false);
+            expectedFlags.put(FlowFlag.DEFENDANT_NOC_ONLINE.name(), false);
+            expectedFlags.put(FlowFlag.PUBLIC_QUERIES_ENABLED.name(), false);
+            return expectedFlags;
         }
 
         private CaseData getCaseData(FlowState.Main state) {
