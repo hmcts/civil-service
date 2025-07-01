@@ -152,7 +152,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
                 .map(CaseDocument::getDocumentType)
-                .anyMatch(type -> DocumentType.DECISION_MADE_ON_APPLICATIONS.equals(type))) && !isSettled();
+                .anyMatch(type -> DocumentType.DECISION_MADE_ON_APPLICATIONS.equals(type))) && !isSettled() &&
+            !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState());
     }
 
     @Override
@@ -161,7 +162,7 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             caseData.getPreTranslationDocuments().stream().map(
                     Element::getValue)
                 .map(CaseDocument::getDocumentType).anyMatch(type -> DocumentType.SDO_ORDER.equals(type)) &&
-            !isSettled());
+            !isSettled() && !CaseState.CASE_DISCONTINUED.equals(caseData.getCcdState()));
     }
 
     @Override

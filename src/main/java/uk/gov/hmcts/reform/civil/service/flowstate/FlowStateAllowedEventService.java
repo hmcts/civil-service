@@ -2041,6 +2041,7 @@ public class FlowStateAllowedEventService {
         entry(
             RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.fullName(),
             List.of(
+                CREATE_SDO,
                 CHANGE_SOLICITOR_EMAIL,
                 EXTEND_RESPONSE_DEADLINE,
                 LIP_CLAIM_SETTLED,
@@ -2048,6 +2049,7 @@ public class FlowStateAllowedEventService {
                 SETTLE_CLAIM,
                 SETTLE_CLAIM_MARK_PAID_FULL,
                 DISCONTINUE_CLAIM_CLAIMANT,
+                DECISION_ON_RECONSIDERATION_REQUEST,
                 VALIDATE_DISCONTINUE_CLAIM_CLAIMANT,
                 STAY_CASE,
                 DISMISS_CASE,
