@@ -142,11 +142,11 @@ public enum DashboardClaimStatus {
     SDO_DOCUMENTS_BEING_TRANSLATED(
         Claim::sdoDocumentsAreInTranslation
     ),
+    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
+        Claim::pausedForTranslationAfterResponse
+    ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
-    ),
-    CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
-        Claim::defendantRespondedWithPreferredLanguageWelsh
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
@@ -230,6 +230,9 @@ public enum DashboardClaimStatus {
     NO_STATUS(c -> false),
     ORDER_MADE(
         Claim::isOrderMade
+    ),
+    CASE_DISCONTINUED(
+        Claim::isCasedDiscontinued
     );
 
     @Getter

@@ -880,4 +880,15 @@ class CcdClaimStatusDashboardFactoryTest {
                 claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.DECISION_MADE_DOCUMENTS_BEING_TRANSLATED);
     }
+  
+    @Test
+    void given_caseDiscontinued_whenGetStatus_thenReturnCaseDiscontinued() {
+        CaseData claim = CaseData.builder()
+            .ccdState(CaseState.CASE_DISCONTINUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
+            claim, featureToggleService, Collections.emptyList()));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CASE_DISCONTINUED);
+    }
 }
