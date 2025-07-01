@@ -639,7 +639,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean awaitingHearingNoticeTranslationNotGeneralOrderRaisedNotSettled() {
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
         return false;
     }
 }

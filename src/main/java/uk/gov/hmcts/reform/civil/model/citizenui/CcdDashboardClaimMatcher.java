@@ -287,8 +287,8 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean awaitingHearingNoticeTranslationNotGeneralOrderRaisedNotSettled() {
-        return awaitingHearingNoticeTranslation() && !generalOrderRaised() && !isSettled();
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
+        return awaitingHearingNoticeTranslation() && !isSettled() && !isCasedDiscontinued();
     }
 
     private boolean awaitingHearingNoticeTranslation() {
@@ -296,15 +296,5 @@ public abstract class CcdDashboardClaimMatcher implements Claim {
             && caseData.getPreTranslationDocuments().stream().anyMatch(
             element -> element.getValue().getDocumentType() == DocumentType.HEARING_FORM
         );
-    }
-
-    private boolean generalOrderRaised() {
-        return (caseData.getPreTranslationDocuments() != null
-            && caseData.getPreTranslationDocuments().stream().anyMatch(
-                element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
-        )) || (caseData.getFinalOrderDocumentCollection() != null
-            && caseData.getFinalOrderDocumentCollection().stream().anyMatch(
-                element -> element.getValue().getDocumentType() == DocumentType.JUDGE_FINAL_ORDER
-        ));
     }
 }
