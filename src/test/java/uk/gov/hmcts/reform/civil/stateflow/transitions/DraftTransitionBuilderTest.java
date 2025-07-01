@@ -339,7 +339,7 @@ public class DraftTransitionBuilderTest {
                                 .build())
             .build();
 
-        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(12).contains(
+        assertThat(getCaseFlags(result.get(3), caseData)).hasSize(13).contains(
             entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.DASHBOARD_SERVICE_ENABLED.name(), true),
