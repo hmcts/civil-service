@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,9 +36,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 
 @ExtendWith(MockitoExtension.class)
 class DQGeneratorFormBuilderTest {
+
+    public static final String ERROR_FLOW_STATE_PAST_DEADLINE =
+        "Error evaluating state flow when checking which DQ file name to be used";
 
     @Mock
     private IStateFlowEngine stateFlowEngine;
@@ -207,5 +212,22 @@ class DQGeneratorFormBuilderTest {
                     CaseState.CASE_DISMISSED).build();
         boolean result = dqGeneratorFormBuilder.isRespondentState(caseData);
         assertFalse(result);
+    }
+
+    @Test
+    void shouldThrowAndExceptionWhenStatePastDeadline() {
+        when(state.getName()).thenReturn(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName());
+        CaseData caseData =
+            CaseDataBuilder.builder().respondent1Represented(YesOrNo.YES).applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH").build().toBuilder().ccdState(
+                    CaseState.CASE_DISMISSED).build();
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            dqGeneratorFormBuilder.isRespondentState(caseData);
+        });
+
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(ERROR_FLOW_STATE_PAST_DEADLINE));
     }
 }
