@@ -124,13 +124,13 @@ public class NotifyOtherPartyQueryRaisedNotificationHandler extends CallbackHand
         HashMap<String, String> properties = new HashMap<>();
 
         if (isLipOtherParty) {
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
             properties.put(PARTY_NAME, legalOrgNameOrPartyName);
-            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         } else {
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrgNameOrPartyName);
-            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
             properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
             properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrgNameOrPartyName);
+            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         }
         addAllFooterItems(caseData, properties, configuration,
                           featureToggleService.isQueryManagementLRsEnabled(),
