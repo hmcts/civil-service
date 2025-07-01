@@ -30,12 +30,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_DASHBOARD_NOTIFICATIONS_RESPONSE_TO_QUERY;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_CLAIMANT_DELETE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_QUERY_RESPONDED_DEFENDANT;
@@ -56,10 +55,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
-    @Mock
-    private CoreCaseUserService coreCaseUserService;
-    @Mock
-    private QueryManagementCamundaService runtimeService;
+
     public static final String TASK_ID = "UpdateDashboardNotificationsResponseToQuery";
 
     @Test
@@ -79,9 +75,6 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("queryId")
-                                                                       .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection claimantQueries = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
@@ -99,6 +92,8 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                 CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO
                 ).build()
             )
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.YES)
             .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
             .queries(claimantQueries)
             .legacyCaseReference("reference")
@@ -124,6 +119,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
         );
+        verifyNoMoreInteractions(dashboardScenariosService);
     }
 
     @Test
@@ -132,9 +128,6 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
         HashMap<String, Object> params = new HashMap<>();
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("queryId")
-                .build());
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantQueries = CaseQueriesCollection.builder()
                 .caseMessages(wrapElements(List.of(CaseMessage.builder()
@@ -148,12 +141,13 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                                                        .build())))
                 .build();
         CaseData caseData = CaseData.builder()
-                .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
-                .queries(defendantQueries)
-                .legacyCaseReference("reference")
-                .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
-                .ccdCaseReference(1234L)
-                .build();
+            .qmLatestQuery(LatestQuery.builder().queryId("queryId").build())
+            .queries(defendantQueries)
+            .legacyCaseReference("reference")
+            .respondent1Represented(YesOrNo.NO)
+            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .ccdCaseReference(1234L)
+            .build();
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -173,5 +167,6 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
                 caseData.getCcdCaseReference().toString(),
                 ScenarioRequestParams.builder().params(params).build()
         );
+        verifyNoMoreInteractions(dashboardScenariosService);
     }
 }
