@@ -465,7 +465,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToClaimantLiPSuccessfullyWhenWelsh() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS_TRANSLATED, false,  null, "WELSH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
@@ -481,7 +481,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToClaimantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS_TRANSLATED, false, null, "BOTH", null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
@@ -497,7 +497,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToDefendantLiPSuccessfullyWhenBilingual() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS, false, "BOTH", null, null, null);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
@@ -513,7 +513,7 @@ class SendHearingBulkPrintServiceTest {
     @Test
     void shouldDownloadDecisionDocumentAndPrintWelshDecisionReconsiderationLetterToDefendantLiPSuccessfullyWhenEnglish() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, DECISION_MADE_ON_APPLICATIONS, false,  "ENGLISH", null, null, Language.ENGLISH);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
