@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.lang.String.format;
+
 @Slf4j
 public abstract class Notifier extends BaseNotifier {
 
@@ -23,7 +25,7 @@ public abstract class Notifier extends BaseNotifier {
         this.partiesNotifier = partiesNotifier;
     }
 
-    public void notifyParties(CaseData caseData, String eventId, String taskId) {
+    public String notifyParties(CaseData caseData, String eventId, String taskId) {
         log.info("Notifying parties for case ID: {} and eventId: {} and taskId: {} ", caseData.getCcdCaseReference(), eventId, taskId);
         final Set<EmailDTO> partiesToEmail = partiesNotifier.getPartiesToNotify(caseData, taskId);
         final List<String> errors = sendNotification(partiesToEmail);
@@ -32,6 +34,9 @@ public abstract class Notifier extends BaseNotifier {
             additionalProperties.put("Errors", errors.toString());
             trackErrors(caseData.getCcdCaseReference(), eventId, taskId, additionalProperties);
         }
+
+        final String attempted = partiesToEmail.stream().map(p -> p.getTargetEmail() + " : " + p.getReference() + " : " + p.getEmailTemplate()).toList().toString();
+        return format("Attempted: %s, Errors: %s", attempted, errors);
     }
 
     private void trackErrors(final Long caseId,
