@@ -13,6 +13,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_DEFENDANT_RESPONSE_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DISABLE_VIEW_RESPONSE_LINK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_ENGLISH_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT;
 
 @Service
@@ -40,6 +41,10 @@ public class DefendantResponseWelshClaimantDashboardNotificationHandler extends 
 
     @Override
     public String getScenario(CaseData caseData) {
+        if (featureToggleService.isGaForWelshEnabled() &&
+            (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())) {
+            return SCENARIO_AAA6_DISABLE_VIEW_RESPONSE_LINK.getScenario();
+        }
         if (caseData.isRespondentResponseBilingual()) {
             return SCENARIO_AAA6_DEFENDANT_RESPONSE_BILINGUAL_CLAIMANT.getScenario();
         } else {
