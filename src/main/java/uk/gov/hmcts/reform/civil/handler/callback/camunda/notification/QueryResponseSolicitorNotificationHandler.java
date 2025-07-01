@@ -109,6 +109,11 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
     private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
                                                   CaseMessage parentQuery) {
+        if (caseData.getQueries() != null) {
+            return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQueries(),
+                                                            parentQuery, responseQuery
+            );
+        }
         if (isApplicantSolicitor(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmApplicantSolicitorQueries(),
                                                             parentQuery, responseQuery
