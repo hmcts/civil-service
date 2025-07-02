@@ -266,7 +266,6 @@ public class DQGeneratorFormBuilder {
             || CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName().equals(state)
             || PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state)
             || CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName().equals(state)
-            || CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName().equals(state)
             || PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state)
             || CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName().equals(state)
             || PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state);
