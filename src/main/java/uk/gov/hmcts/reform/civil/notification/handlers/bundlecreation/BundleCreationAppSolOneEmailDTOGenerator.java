@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLega
 @Component
 public class BundleCreationAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "bundle-created-applicant-notification-%s";
+    private static final String REFERENCE_TEMPLATE_APPLICANT = "bundle-created-applicant-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -30,7 +30,7 @@ public class BundleCreationAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOG
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_TEMPLATE_APPLICANT;
     }
 
     @Override

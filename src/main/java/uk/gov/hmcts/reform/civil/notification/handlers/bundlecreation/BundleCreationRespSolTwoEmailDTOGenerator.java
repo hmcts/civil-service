@@ -14,7 +14,7 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganiza
 @Component
 public class BundleCreationRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
 
-    private static final String REFERENCE_TEMPLATE = "bundle-created-respondent-notification-%s";
+    private static final String REFERENCE_TEMPLATE_RESPONDENT_2 = "bundle-created-respondent-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -30,7 +30,7 @@ public class BundleCreationRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_TEMPLATE_RESPONDENT_2;
     }
 
     @Override
