@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -52,6 +53,8 @@ public class GeneratePipLetterTest {
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference("12345")
                 .respondent1(Party.builder().partyName("Test Respondent").type(Party.Type.COMPANY).build())
+                .respondent1Represented(YesOrNo.NO)
+                .addRespondent2(YesOrNo.YES)
                 .build();
         CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -69,5 +72,26 @@ public class GeneratePipLetterTest {
                 Collections.singletonList(caseData.getRespondent1().getPartyName())
         );
         assertThat(response.getState()).isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+    }
+
+    @Test
+    void shouldGenerateAndPrintLetterSuccessfully1() {
+        when(time.now()).thenReturn(LocalDateTime.now());
+        when(pipLetterGenerator.downloadLetter(any(CaseData.class), any(String.class)))
+                .thenReturn(new byte[]{1, 2, 3, 4});
+
+        CaseData caseData = CaseData.builder()
+                .legacyCaseReference("12345")
+                .respondent1(Party.builder().partyName("Test Respondent").type(Party.Type.COMPANY).build())
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+        verify(bulkPrintService).printLetter(
+                new byte[]{1, 2, 3, 4},
+                "12345",
+                "12345",
+                "first-contact-pack",
+                Collections.singletonList(caseData.getRespondent1().getPartyName())
+        );
     }
 }
