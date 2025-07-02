@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -24,6 +24,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_PIP_LETTER;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -61,9 +62,21 @@ public class GeneratePipLetter extends CallbackHandler {
         final CaseData.CaseDataBuilder caseDataBuilder
                 = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
 
-        generatePIPLetter(callbackParams);
+        if (caseData.getRespondent1() == null || caseData.getRespondent1().getPartyEmail() == null) {
+            generatePIPLetter(callbackParams);
+        }
 
         String updateCaseState = setClaimState(caseData);
+        if (!YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(caseDataBuilder.build().toMap(objectMapper))
+                    .build();
+        } else if (YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(caseDataBuilder.build().toMap(objectMapper))
+                    .state(AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name())
+                    .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .state(updateCaseState)
@@ -81,7 +94,7 @@ public class GeneratePipLetter extends CallbackHandler {
 
     private String setClaimState(CaseData caseData) {
         if (!isBilingualForLipvsLip(caseData)) {
-            return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
+            return AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
         }
         return caseData.getCcdState().name();
     }
