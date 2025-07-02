@@ -72,7 +72,8 @@ class DiscontinueClaimPartiesRespSolTwoEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         CaseData caseData = mock(CaseData.class);
 
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService))
+        notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData,
+                                                                                                      false, organisationService))
             .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
         Map<String, String> result = generator.addCustomProperties(properties, caseData);

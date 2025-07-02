@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
 public class DiscontinueClaimPartiesRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
@@ -30,7 +30,9 @@ public class DiscontinueClaimPartiesRespSolOneEmailDTOGenerator extends RespSolO
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(LEGAL_ORG_NAME, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService));
+        boolean isRespondent1 = true;
+        properties.put(LEGAL_ORG_NAME, getLegalOrganizationNameForRespondent(caseData,
+                                                                             isRespondent1, organisationService));
         return properties;
     }
 
