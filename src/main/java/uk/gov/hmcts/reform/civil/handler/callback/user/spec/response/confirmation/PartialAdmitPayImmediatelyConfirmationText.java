@@ -173,10 +173,10 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
 
         sb.append(headingThreeText)
             .append("you do not pay:</h3>")
-            .append("If you do not pay within 5 days of the response, the claimant can request a County Court Judgment against you.")
+            .append("<p>If you do not pay within 5 days of the response, the claimant can request a County Court Judgment against you.")
             .append("<br><br>").append("Contact ")
             .append(applicantName)
-            .append("'s legal representative if you need details on how to pay.");
+            .append("'s legal representative if you need details on how to pay.</p>");
 
         return sb.toString();
     }
