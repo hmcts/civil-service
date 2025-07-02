@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.IS_LIP_OTHE
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LEGAL_ORG;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.LIP_NAME;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetails;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetailsPublicQuery;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +85,7 @@ public class NotifyOtherPartyQueryHasResponseNotificationHandler extends Callbac
         String parentQueryId = responseQuery.getParentId();
 
         if (featureToggleService.isPublicQueryManagementEnabled(caseData)) {
-            List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetails(caseData, organisationService, coreCaseUserService, parentQueryId);
+            List<Map<String, String>> emailDetailsList = getOtherPartyEmailDetailsPublicQuery(caseData, organisationService, coreCaseUserService, parentQueryId);
             boolean isLipOtherParty = emailDetailsList.stream().anyMatch(map -> "TRUE".equalsIgnoreCase(map.get(IS_LIP_OTHER_PARTY)));
 
             if (isLipOtherParty) {

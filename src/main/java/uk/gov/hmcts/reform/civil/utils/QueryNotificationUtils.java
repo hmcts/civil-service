@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -23,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
+@Slf4j
 public class QueryNotificationUtils {
 
     public static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
@@ -82,30 +85,45 @@ public class QueryNotificationUtils {
         return properties;
     }
 
+    //ToDo: Remove this and all its usages after public queries release.
     public static List<Map<String, String>> getOtherPartyEmailDetails(
         CaseData caseData, OrganisationService organisationService,
         CoreCaseUserService coreCaseUserService, String queryId) {
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
+        return getOtherPartyRecipientList(caseData, roles, organisationService);
+    }
+
+    public static List<Map<String, String>> getOtherPartyEmailDetailsPublicQuery(
+        CaseData caseData, OrganisationService organisationService,
+        CoreCaseUserService coreCaseUserService, String queryId) {
+        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         if (caseData.isLipCase()) {
-            if (isApplicantSolicitor(roles)) {
-                return getOtherPartyLipOnCaseRecipientList(caseData, "lipRespondent", organisationService);
-            }
-
-            if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
-                return getOtherPartyLipOnCaseRecipientList(caseData, "lipApplicant", organisationService);
-            }
-
-            if (isLIPClaimant(roles)) {
-                return getOtherPartyLipOnCaseRecipientList(caseData, "lrDefendant", organisationService);
-            }
-
-            if (isLIPDefendant(roles)) {
-                return getOtherPartyLipOnCaseRecipientList(caseData, "lrApplicant", organisationService);
-            }
+            String otherParty = getOtherParty(caseData, roles);
+            log.info("other party: {}", otherParty);
+            return getOtherPartyLipOnCaseRecipientList(caseData, otherParty, organisationService);
         } else {
             return getOtherPartyRecipientList(caseData, roles, organisationService);
         }
-        return null;
+    }
+
+    private static String getOtherParty(CaseData caseData, List<String> roles) {
+        if (isApplicantSolicitor(roles)) {
+            log.info("Applicant solicitor found");
+            return caseData.getRespondent1Represented() == YesOrNo.YES ? "lrDefendant" : "lipRespondent";
+        }
+        if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
+            log.info("Respondent solicitor found");
+            return caseData.getApplicant1Represented() == YesOrNo.YES ? "lrApplicant" : "lipApplicant";
+        }
+        if (isLIPClaimant(roles)) {
+            log.info("LIP claimant found");
+            return caseData.getRespondent1Represented() == YesOrNo.YES ? "lrDefendant" : "lipRespondent";
+        }
+        if (isLIPDefendant(roles)) {
+            log.info("LIP defendant found");
+            return caseData.getApplicant1Represented() == YesOrNo.YES ? "lrApplicant" : "lipApplicant";
+        }
+        throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
     }
 
     private static List<Map<String, String>> getOtherPartyLipOnCaseRecipientList(CaseData caseData, String otherParty, OrganisationService organisationService) {

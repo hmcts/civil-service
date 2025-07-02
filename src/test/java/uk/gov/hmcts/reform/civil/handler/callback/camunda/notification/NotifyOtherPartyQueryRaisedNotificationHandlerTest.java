@@ -362,6 +362,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                     .respondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.YES)
                     .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                     .queries(query)
                     .businessProcess(BusinessProcess.builder()
