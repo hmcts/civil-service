@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -62,6 +63,9 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private AssignCategoryId assignCategoryId;
@@ -160,7 +164,8 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             objectMapper.registerModule(new JavaTimeModule());
             when(userService.getUserInfo(any())).thenReturn(UserInfo.builder().uid(USER_ID).build());
             handler = new RaiseQueryCallbackHandler(
-                objectMapper, userService, coreCaseUserService, assignCategoryId
+                objectMapper, userService, coreCaseUserService, assignCategoryId,
+                featureToggleService
             );
         }
 
