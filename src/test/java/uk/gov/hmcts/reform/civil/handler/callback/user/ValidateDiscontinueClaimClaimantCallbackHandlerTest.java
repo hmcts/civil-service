@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -29,17 +32,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_DISCONTINUE_CLAIM_CLAIMANT;
 
-@SpringBootTest(classes = {
-    ValidateDiscontinueClaimClaimantCallbackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @Autowired
-    private ValidateDiscontinueClaimClaimantCallbackHandler handler;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @InjectMocks
+    private ValidateDiscontinueClaimClaimantCallbackHandler handler;
 
     private static final String UNABLE_TO_VALIDATE = "# Unable to validate information";
     private static final String INFORMATION_SUCCESSFULLY_VALIDATED = "# Information successfully validated";
@@ -69,6 +69,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
 
         @Test
         void shouldPopulateJudgeAndDateCopies_WhenAboutToStartIsInvoked() {
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             caseData.setPermissionGrantedComplex(PermissionGranted.builder()
@@ -79,6 +80,7 @@ public class ValidateDiscontinueClaimClaimantCallbackHandlerTest extends BaseCal
             //When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
+
             //Then
             assertThat(response.getData()).extracting("permissionGrantedJudgeCopy")
                 .isEqualTo("Judge Name");

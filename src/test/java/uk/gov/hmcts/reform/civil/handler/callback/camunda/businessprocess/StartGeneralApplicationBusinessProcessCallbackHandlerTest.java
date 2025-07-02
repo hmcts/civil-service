@@ -2,17 +2,16 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.businessprocess;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -27,9 +26,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
-import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -39,14 +35,7 @@ import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    StartGeneralApplicationBusinessProcessCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    SimpleStateFlowEngine.class,
-    SimpleStateFlowBuilder.class,
-    TransitionsTestConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
@@ -55,15 +44,19 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
     private ExternalTask mockTask;
     @Mock
     private ExternalTaskService externalTaskService;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @Autowired
-    private StartGeneralApplicationBusinessProcessCallbackHandler handler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @InjectMocks
+    private StartGeneralApplicationBusinessProcessCallbackHandler handler;
 
     private CaseData getTestCaseDataWithNullBusinessProcessGA(CaseData caseData) {
         GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();

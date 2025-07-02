@@ -40,7 +40,8 @@ public abstract class CaseHandledOfflineApplicantSolicitorNotifier implements No
         return NotificationUtils.caseOfflineNotificationAddProperties(caseData,
                                                                       caseData.getApplicant1OrganisationPolicy(), organisationService,
                                                                       featureToggleService.isQueryManagementLRsEnabled(),
-                                                                      featureToggleService.isLipQueryManagementEnabled(caseData), configuration);
+                                                                      featureToggleService.isLipQueryManagementEnabled(caseData),
+                                                                      configuration);
     }
 
     public abstract void notifyApplicantSolicitorForCaseHandedOffline(CaseData caseData);
