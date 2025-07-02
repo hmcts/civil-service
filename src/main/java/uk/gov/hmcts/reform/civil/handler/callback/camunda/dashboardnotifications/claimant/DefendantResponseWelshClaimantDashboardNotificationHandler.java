@@ -41,8 +41,8 @@ public class DefendantResponseWelshClaimantDashboardNotificationHandler extends 
 
     @Override
     public String getScenario(CaseData caseData) {
-        if (featureToggleService.isGaForWelshEnabled() &&
-            (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())) {
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())) {
             return SCENARIO_AAA6_DISABLE_VIEW_RESPONSE_LINK.getScenario();
         }
         if (caseData.isRespondentResponseBilingual()) {
