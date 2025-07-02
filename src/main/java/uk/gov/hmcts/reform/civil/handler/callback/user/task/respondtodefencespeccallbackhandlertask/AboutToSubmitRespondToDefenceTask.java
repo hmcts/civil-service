@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.DQResponseDocumentUtils;
 import uk.gov.hmcts.reform.civil.utils.FrcDocumentsUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
+import uk.gov.hmcts.reform.civil.utils.RequestedCourtForClaimDetailsTab;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
 import java.time.LocalDate;
@@ -73,6 +74,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
     private final DQResponseDocumentUtils dqResponseDocumentUtils;
     private final DetermineNextState determineNextState;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    private final RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
     @Value("${court-location.specified-claim.region-id}") String cnbcRegionId;
 
@@ -102,7 +104,7 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         BusinessProcess businessProcess = BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC);
         nextState = determineNextState.determineNextState(caseData, callbackParams, builder, nextState, businessProcess);
 
-        is1v1RespondImmediately(caseData, builder);
+        is1v1RespondImmediately(oldCaseData, caseData, builder);
 
         frcDocumentsUtils.assembleClaimantsFRCDocuments(caseData);
 
@@ -118,6 +120,8 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
             ));
         }
 
+        requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, builder);
+        builder.nextDeadline(null);
         builder.previousCCDState(caseData.getCcdState());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -332,13 +336,17 @@ public class AboutToSubmitRespondToDefenceTask implements CaseTask {
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
-    private void is1v1RespondImmediately(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+    private void is1v1RespondImmediately(CaseData oldCaseData, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         if (featureToggleService.isJudgmentOnlineLive()
             && isOneVOne(caseData)
             && caseData.isPayImmediately()
             && ((caseData.isFullAdmitClaimSpec() && caseData.getApplicant1ProceedWithClaim() == null)
             || caseData.isPartAdmitImmediatePaymentClaimSettled())) {
             builder.respondForImmediateOption(YesOrNo.YES);
+            //persist fixedCost
+            if (featureToggleService.isLrAdmissionBulkEnabled() && nonNull(oldCaseData.getFixedCosts())) {
+                builder.fixedCosts(oldCaseData.getFixedCosts());
+            }
         }
     }
 

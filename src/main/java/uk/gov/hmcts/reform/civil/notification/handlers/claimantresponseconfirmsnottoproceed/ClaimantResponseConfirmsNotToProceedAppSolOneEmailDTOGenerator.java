@@ -17,8 +17,11 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Component
 public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
+    private final NotificationsProperties notificationsProperties;
+
     protected ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

@@ -16,8 +16,11 @@ public class BundleCreationAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOG
 
     private static final String REFERENCE_TEMPLATE = "bundle-created-applicant-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected BundleCreationAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

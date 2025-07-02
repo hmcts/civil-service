@@ -13,27 +13,27 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLeg
 @Slf4j
 public class AllLegalRepsEmailGenerator implements PartiesEmailGenerator {
 
-    protected final AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
-    protected final RespSolOneEmailDTOGenerator respSolOneEmailGenerator;
-    protected final RespSolTwoEmailDTOGenerator respSolTwoEmailGenerator;
+    private final AppSolOneEmailDTOGenerator appSolOneEmailGenerator;
+    private final RespSolOneEmailDTOGenerator respSolOneEmailGenerator;
+    private final RespSolTwoEmailDTOGenerator respSolTwoEmailGenerator;
 
     @Override
-    public Set<EmailDTO> getPartiesToNotify(final CaseData caseData) {
+    public Set<EmailDTO> getPartiesToNotify(final CaseData caseData, String taskId) {
         Set<EmailDTO> partiesToEmail = new HashSet<>();
         log.info("Generating email for case ID: {}", caseData.getCcdCaseReference());
-        partiesToEmail.add(appSolOneEmailGenerator.buildEmailDTO(caseData));
+        partiesToEmail.add(appSolOneEmailGenerator.buildEmailDTO(caseData, taskId));
         if (shouldNotifyRespondents(caseData)) {
             log.info("Generating email for respondents for case ID: {}", caseData.getCcdCaseReference());
-            partiesToEmail.addAll(getRespondents(caseData));
+            partiesToEmail.addAll(getRespondents(caseData, taskId));
         }
         return partiesToEmail;
     }
 
-    protected Set<EmailDTO> getRespondents(CaseData caseData) {
+    private Set<EmailDTO> getRespondents(CaseData caseData, String taskId) {
         Set<EmailDTO> recipients = new HashSet<>();
-        recipients.add(respSolOneEmailGenerator.buildEmailDTO(caseData));
+        recipients.add(respSolOneEmailGenerator.buildEmailDTO(caseData, taskId));
         if (isOneVTwoTwoLegalRep(caseData)) {
-            recipients.add(respSolTwoEmailGenerator.buildEmailDTO(caseData));
+            recipients.add(respSolTwoEmailGenerator.buildEmailDTO(caseData, taskId));
         }
         return recipients;
     }

@@ -15,7 +15,7 @@ public class ClaimDismissedAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOG
     public ClaimDismissedAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
                                                     OrganisationService organisationService,
                                                     ClaimDismissedEmailTemplater claimDismissedEmailTemplater) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
         this.claimDismissedEmailTemplater = claimDismissedEmailTemplater;
     }
 

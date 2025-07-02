@@ -16,8 +16,11 @@ public class BundleCreationRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
 
     private static final String REFERENCE_TEMPLATE = "bundle-created-respondent-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected BundleCreationRespSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

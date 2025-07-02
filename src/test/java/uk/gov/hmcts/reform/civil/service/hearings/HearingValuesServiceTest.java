@@ -186,7 +186,7 @@ public class HearingValuesServiceTest {
         ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
             .hmctsServiceID("AAA7")
             .hmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader")
-            .publicCaseName("'John Rambo' v 'Sole Trader'")
+            .publicCaseName("John Rambo v Sole Trader")
             .caseAdditionalSecurityFlag(false)
             .caseCategories(expectedCaseCategories)
             .caseDeepLink("http://localhost:3333/cases/case-details/1")

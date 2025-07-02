@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.RequestReconsiderationGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -89,6 +92,11 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
             Comparator.reverseOrder()
         )).findFirst();
 
+        if (featureToggleService.isGaForWelshEnabled()
+            && (callbackParams.getCaseData().isClaimantBilingual() || callbackParams.getCaseData().isRespondentResponseBilingual())) {
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
+        }
+
         if (sdoDocLatest.isPresent()) {
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
             caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
@@ -126,12 +134,19 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                     callbackParams.getCaseData().getDecisionOnReconsiderationDocument();
                 List<Element<CaseDocument>> systemGeneratedCaseDocuments =
                     callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
-                systemGeneratedCaseDocuments.add(element(requestForReconsiderationDocument));
-                caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+                if (featureToggleService.isGaForWelshEnabled() && (callbackParams.getCaseData().isClaimantBilingual()
+                    || callbackParams.getCaseData().isRespondentResponseBilingual()
+                    || callbackParams.getCaseData().isLipDefendantSpecifiedBilingualDocuments())) {
+                    caseDataBuilder.preTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
+                    caseDataBuilder.preTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);
+                } else {
+                    systemGeneratedCaseDocuments.add(element(requestForReconsiderationDocument));
+                    caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
+                    caseDataBuilder.businessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
+                }
                 //delete temp so it will not show up twice in case file view
                 caseDataBuilder.decisionOnReconsiderationDocument(null);
             }
-            caseDataBuilder.businessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

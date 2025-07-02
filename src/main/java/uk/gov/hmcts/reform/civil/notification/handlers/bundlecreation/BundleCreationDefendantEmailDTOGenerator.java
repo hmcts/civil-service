@@ -10,8 +10,10 @@ public class BundleCreationDefendantEmailDTOGenerator extends DefendantEmailDTOG
 
     private static final String REFERENCE_TEMPLATE = "bundle-created-respondent-notification-%s";
 
+    private final NotificationsProperties notificationsProperties;
+
     protected BundleCreationDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties) {
-        super(notificationsProperties);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

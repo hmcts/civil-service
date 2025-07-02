@@ -275,6 +275,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.showCarmFields(NO);
         }
 
+        if (featureToggleService.isGaForWelshEnabled()
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            updatedData.bilingualHint(YesOrNo.YES);
+        }
+
         /**
          * Update case management location to preferred logic and return preferred location when legal advisor SDO,
          * otherwise return preferred location only.
@@ -1518,10 +1523,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
-            List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
-                .getSystemGeneratedCaseDocuments();
-            generatedDocuments.add(element(document));
-            dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+            if (featureToggleService.isGaForWelshEnabled()
+                && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+                List<Element<CaseDocument>> sdoDocuments = callbackParams.getCaseData()
+                    .getPreTranslationDocuments();
+                sdoDocuments.add(element(document));
+                dataBuilder.preTranslationDocuments(sdoDocuments);
+            } else {
+                List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
+                    .getSystemGeneratedCaseDocuments();
+                generatedDocuments.add(element(document));
+                dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+            }
         }
         // null/remove preview SDO document, otherwise it will show as duplicate within case file view
         dataBuilder.sdoOrderDocument(null);

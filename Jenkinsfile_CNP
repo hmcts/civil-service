@@ -1,4 +1,7 @@
 #!groovy
+properties([
+  copyArtifactPermission('/HMCTS_a_to_c/civil-service/*'),
+]);
 
 @Library("Infrastructure")
 import uk.gov.hmcts.contino.AppPipelineConfig
@@ -14,6 +17,21 @@ def dmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 AppPipelineConfig pipelineConf
+
+def copyPrevFailedAndNotExecutedTestFilesJson() {
+  def buildFound = false
+  def buildNumber = currentBuild.previousBuild ? currentBuild.previousBuild.number : 0
+  def minBuildNumber = ((buildNumber - 8) > 0) ? buildNumber - 8 : 0
+  while (!buildFound && buildNumber > minBuildNumber) {
+    try {
+      copyArtifacts projectName: env.JOB_NAME, selector: specific("${buildNumber}"), filter: "test-results/functional/testFilesReport.json"
+      buildFound = true
+    } catch (Exception error) {
+      echo "artifact not found: " + error.toString()
+      buildNumber--
+    }
+  }
+}
 
 def getFunctionalTestsGroups() {
   def githubApi = new GithubAPI(this)
@@ -80,6 +98,10 @@ def checkForEnableHelmLabel(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
 
+def checkForRunFailedTestFiles(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "runFailedTestFiles").contains("runFailedTestFiles")
+}
+
 def getCivilCcdDefinitionBranch() {
   def githubApi = new GithubAPI(this)
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
@@ -114,12 +136,14 @@ withPipeline(type, product, component) {
   before('smoketest:preview') {
     env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
 
     retry(3) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
         ./bin/wait-for.sh definition-store
         ./bin/add-roles.sh
+        ./bin/load-wiremock-mappings.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
         ./bin/pull-latest-ccd-files.sh ${getCivilCcdDefinitionBranch()}
@@ -135,7 +159,6 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.AAC_API_URL = "https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.PR_FT_GROUPS = getFunctionalTestsGroups()
   }
 
@@ -143,6 +166,14 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
     if (checkForEnableHelmLabel(env.BRANCH_NAME)) {
       error "The 'pr-values: enableHelm' label is active on the PR. The build will be interrupted to avoid wasting build time needlessly."
+    }
+  }
+
+  before('functionalTest:preview') {
+    if(checkForRunFailedTestFiles(env.BRANCH_NAME)) {
+      echo "GitHub label: 'runFailedTestFiles' currently on PR"
+      copyPrevFailedAndNotExecutedTestFilesJson();
+      env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES = true
     }
   }
 

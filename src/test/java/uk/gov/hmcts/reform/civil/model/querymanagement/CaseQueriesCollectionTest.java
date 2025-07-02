@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +21,7 @@ class CaseQueriesCollectionTest {
 
     @Test
     void shouldReturnLatestCaseMessage() {
-        LocalDateTime now = LocalDateTime.of(2025, 3, 1, 7, 0, 0);
+        OffsetDateTime now = OffsetDateTime.of(LocalDateTime.of(2025, 3, 1, 7, 0, 0), ZoneOffset.UTC);
         CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
             .partyName("John Doe")
             .roleOnCase("applicant-solicitor")
@@ -120,6 +122,77 @@ class CaseQueriesCollectionTest {
         boolean result = caseQueries.isSame(differentCaseQueries);
 
         assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnFalse_collectionHasNoQueriesAwaitingAResponse() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .caseMessages(
+                List.of(
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("query-id")
+                                .isHearingRelated(YES)
+                                .createdOn(now)
+                                .build()).build(),
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("response-id")
+                                .isHearingRelated(NO)
+                                .createdOn(now.plusHours(3))
+                                .parentId("query-id")
+                                .build()).build()
+                ))
+            .build();
+
+        assertFalse(caseQueries.hasAQueryAwaitingResponse());
+    }
+
+    @Test
+    void shouldReturnTrue_whenCollectionHasQueryAwaitingResponse() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseQueriesCollection caseQueries = CaseQueriesCollection.builder()
+            .partyName("John Doe")
+            .roleOnCase("applicant-solicitor")
+            .caseMessages(
+                List.of(
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("query-id")
+                                .isHearingRelated(YES)
+                                .createdOn(now)
+                                .build()).build(),
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("response-id")
+                                .isHearingRelated(NO)
+                                .createdOn(now.plusHours(3))
+                                .parentId("query-id")
+                                .build()).build(),
+                    Element.<CaseMessage>builder()
+                        .id(UUID.randomUUID())
+                        .value(
+                            CaseMessage.builder()
+                                .id("followup-id")
+                                .isHearingRelated(NO)
+                                .createdOn(now.plusHours(5))
+                                .parentId("query-id")
+                                .build()).build()
+                ))
+            .build();
+
+        assertTrue(caseQueries.hasAQueryAwaitingResponse());
     }
 
 }

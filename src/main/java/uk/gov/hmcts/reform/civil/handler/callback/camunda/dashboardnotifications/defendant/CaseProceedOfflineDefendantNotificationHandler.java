@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CASE_PROCEED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_DEFENDANT;
@@ -77,7 +78,8 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
             SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),
             featureToggleService.isGaForLipsEnabled(),
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
-            featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0
+            featureToggleService.isGaForLipsEnabled() && caseData.getGeneralApplications().size() > 0,
+            SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT.getScenario(), defendantQueryAwaitingResponse(caseData)
         );
     }
 
@@ -91,6 +93,11 @@ public class CaseProceedOfflineDefendantNotificationHandler extends DashboardCal
         boolean isLipvLipOrLRvLip = caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne();
         return (caseData.getPreviousCCDState() != null && caseProceedInCaseManStates.contains(caseData.getPreviousCCDState()) && isLipvLipOrLRvLip)
             || (shouldRecordScenarioInCaseProgression(caseData, isLipvLipOrLRvLip));
+    }
+
+    private boolean defendantQueryAwaitingResponse(CaseData caseData) {
+        // todo CIV-17287
+        return featureToggleService.isLipQueryManagementEnabled(caseData);
     }
 
     public boolean shouldRecordScenarioInCaseProgression(CaseData caseData, boolean isLipvLipOrLRvLip) {

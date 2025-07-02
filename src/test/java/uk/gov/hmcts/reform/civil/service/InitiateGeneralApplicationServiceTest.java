@@ -641,6 +641,20 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
+    void shoulAddSubmittedDate() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataSPEC(SPEC_CLAIM);
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getMainCaseSubmittedDate()).isEqualTo(LocalDateTime.of(2025, 5, 5, 0, 0, 0));
+    }
+
+    @Test
     void shoulAddSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataSPEC(SPEC_CLAIM);
@@ -1249,6 +1263,21 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
             .isNotNull();
         assertThat(result.getGeneralApplications().get(0).getValue().getCertOfSC()).isNotNull();
+    }
+
+    @Test
+    void shouldExtendDeadline_buildCaseData() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataCollectionOfApps(CaseData.builder().build());
+        when(calc.addMonthsToDateToNextWorkingDayAtMidnight(24, LocalDate.now()))
+            .thenReturn(LocalDateTime.now().plusMonths(24));
+        when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getClaimDismissedDeadline().toLocalDate())
+            .isEqualTo(LocalDateTime.now().plusMonths(24).toLocalDate());
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

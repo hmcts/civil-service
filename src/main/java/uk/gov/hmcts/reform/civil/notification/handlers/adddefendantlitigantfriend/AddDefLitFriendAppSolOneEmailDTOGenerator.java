@@ -9,8 +9,12 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 @Component
 public class AddDefLitFriendAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
-    public AddDefLitFriendAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService) {
-        super(notificationsProperties, organisationService);
+    NotificationsProperties notificationsProperties;
+
+    public AddDefLitFriendAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties,
+                                                     OrganisationService organisationService) {
+        super(organisationService);
+        this.notificationsProperties = notificationsProperties;
     }
 
     @Override

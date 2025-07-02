@@ -78,6 +78,7 @@ public class SdoGeneratorService {
             docmosisTemplate =  DocmosisTemplates.SDO_R2_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
         }
+        log.info("SDO docmosisTemplate: {} for caseId {}", docmosisTemplate.getTemplate(), caseData.getCcdCaseReference());
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate
@@ -498,6 +499,7 @@ public class SdoGeneratorService {
             .smallClaimsMediationSectionToggle(
                 SdoHelper.showCarmMediationSection(caseData, carmEnabled)
             )
+            .caseAccessCategory(caseData.getCaseAccessCategory().toString())
             .carmEnabled(carmEnabled);
 
         sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
