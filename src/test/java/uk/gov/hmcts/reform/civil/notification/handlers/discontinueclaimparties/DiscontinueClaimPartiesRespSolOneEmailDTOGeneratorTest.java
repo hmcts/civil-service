@@ -73,7 +73,7 @@ class DiscontinueClaimPartiesRespSolOneEmailDTOGeneratorTest {
         CaseData caseData = mock(CaseData.class);
 
         notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData,
-                                                                                                         true , organisationService))
+                                                                                                         true, organisationService))
             .thenReturn(APPLICANT_LEGAL_ORG_NAME);
 
         Map<String, String> result = generator.addCustomProperties(properties, caseData);
