@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.notification.handlers;
 
+import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
+@AllArgsConstructor
 public abstract class ClaimantEmailDTOGenerator extends EmailDTOGenerator {
 
     @Override
