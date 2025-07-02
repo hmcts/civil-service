@@ -250,6 +250,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_CLAIMANT("Scenario.AAA6.LiPQM.CaseOffline.OpenQueries.Claimant"),
     SCENARIO_AAA6_LIP_QM_CASE_OFFLINE_OPEN_QUERIES_DEFENDANT("Scenario.AAA6.LiPQM.CaseOffline.OpenQueries.Defendant"),
     SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_CLAIMANT("Scenario.AAA6.ProofOfDebtPayment.Confirmation.Claimant"),
+    SCENARIO_AAA6_DISABLE_VIEW_RESPONSE_LINK("Scenario.AAA6.Disable.View.Response.Link"),
     SCENARIO_AAA6_CLAIMANT_CONFIRMATION_JUDGMENT_PAID_IN_FULL_DEFENDANT("Scenario.AAA6.ProofOfDebtPayment.Confirmation.Defendant");
 
     private final String scenario;
