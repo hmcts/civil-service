@@ -85,6 +85,13 @@ public class GeneratePipLetterTest {
                 .respondent1(Party.builder().partyName("Test Respondent").type(Party.Type.COMPANY).build())
                 .respondent1Represented(YesOrNo.NO)
                 .build();
+        CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .params(Map.of(CallbackParams.Params.valueOf("BEARER_TOKEN"), "test-token"))
+                .build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) generatePipLetter
+                .handle(params);
 
         verify(bulkPrintService).printLetter(
                 new byte[]{1, 2, 3, 4},
