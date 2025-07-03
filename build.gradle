@@ -93,7 +93,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.4.6-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.4.8-jre') {
         entry 'guava'
       }
 

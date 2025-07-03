@@ -30,7 +30,7 @@ public class FullAdmissionTransitionBuilderTest {
 
     @Test
     void shouldSetUpTransitions_withExpectedSizeAndStates() {
-        assertThat(result).hasSize(8);
+        assertThat(result).hasSize(9);
 
         assertTransition(result.get(0), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_PAY_IMMEDIATELY");
         assertTransition(result.get(1), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_PROCEED");
@@ -40,6 +40,7 @@ public class FullAdmissionTransitionBuilderTest {
         assertTransition(result.get(5), "MAIN.FULL_ADMISSION", "MAIN.FULL_ADMIT_JUDGMENT_ADMISSION");
         assertTransition(result.get(6), "MAIN.FULL_ADMISSION", "MAIN.TAKEN_OFFLINE_BY_STAFF");
         assertTransition(result.get(7), "MAIN.FULL_ADMISSION", "MAIN.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA");
+        assertTransition(result.get(8), "MAIN.FULL_ADMISSION", "MAIN.TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA");
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {
