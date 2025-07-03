@@ -108,6 +108,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
@@ -535,6 +536,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String caseNameHmctsInternal;
     private final String caseNamePublic;
     private final YesOrNo ccjJudgmentAmountShowInterest;
+    private final YesOrNo claimFixedCostsExist;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -631,6 +633,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> queryDocuments = new ArrayList<>();
 
     private final PreTranslationDocumentType preTranslationDocumentType;
+    private final YesOrNo bilingualHint;
     private final CaseDocument respondent1OriginalDqDoc;
 
     /**
@@ -907,6 +910,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isApplicant1NotRepresented() {
         return NO.equals(getApplicant1Represented());
+    }
+
+    @JsonIgnore
+    public boolean isUnSpecClaim() {
+        return UNSPEC_CLAIM.equals(getCaseAccessCategory());
+    }
+
+    @JsonIgnore
+    public boolean isSpecClaim() {
+        return SPEC_CLAIM.equals(getCaseAccessCategory());
     }
 
     @JsonIgnore

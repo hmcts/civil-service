@@ -276,6 +276,7 @@ notifications:
   claimantSolicitorDefendantResponse1v2DSForSpec: "684d7f7d-7520-4161-8e0a-32afda832125"
   claimantSolicitorDefendantResponseForSpec: "2df7c3e2-de71-437e-9787-538922ebc293"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "0935f427-063f-4c06-8a1c-da2e05a6871f"
+  claimantSolicitorImmediatelyDefendantResponseForSpecJBA: "f05e1e4d-726e-49cf-8a31-bce9fc36fb4b"
   respondentSolicitorDefendantResponseForSpec: "99ffd73f-dbb0-47bb-86c8-28298cf564db"
   respondentSolicitorDefResponseSpecWithClaimantAction: "0daaf9e7-fa2c-4662-9391-9d64b535e233"
   respondentDefendantResponseForSpec: "2c4435ae-af57-4988-9e79-cb28db4bba49"
@@ -788,10 +789,6 @@ docmosis:
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:some-gov-uk-notify-api-key}
 
-testing:
-  support:
-    enabled: true
-
 rd_professional:
   api:
     url: ${RD_PROFESSIONAL_API_URL:http://fake-prd-api}
@@ -829,3 +826,6 @@ caseFlags:
 
 court_location_dmn:
   enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
+
+stitch-bundle:
+  wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}
