@@ -923,7 +923,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldResetLanguageFlag_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -948,7 +948,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldResetLanguageFlag_afterNocSubmittedByDefendantSolicitorForDefendantLip() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -977,7 +977,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotResetLanguageFlagIfWelshDisabled_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
