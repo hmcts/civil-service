@@ -260,7 +260,7 @@ public class EventHistoryMapper {
                     case IN_MEDIATION:
                         buildClaimInMediation(builder, caseData);
                         break;
-                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC:
+                    case TAKEN_OFFLINE_SPEC_DEFENDANT_NOC, TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA:
                         buildTakenOfflineDueToDefendantNoc(builder, caseData);
                         break;
                     default:
@@ -1147,9 +1147,7 @@ public class EventHistoryMapper {
     private boolean hasActiveQueries(CaseData caseData) {
         return caseData.getQmApplicantSolicitorQueries() != null
             || caseData.getQmRespondentSolicitor1Queries() != null
-            || caseData.getQmRespondentSolicitor2Queries() != null
-            || caseData.getQmApplicantCitizenQueries() != null
-            || caseData.getQmRespondentCitizenQueries() != null;
+            || caseData.getQmRespondentSolicitor2Queries() != null;
     }
 
     private boolean isCaseOffline(CaseData caseData) {
