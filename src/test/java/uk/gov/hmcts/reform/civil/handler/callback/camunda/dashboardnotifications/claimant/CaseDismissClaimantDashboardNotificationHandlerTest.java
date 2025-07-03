@@ -61,7 +61,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(false);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(false);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When
@@ -101,7 +101,7 @@ class CaseDismissClaimantDashboardNotificationHandlerTest extends BaseCallbackHa
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        when(featureToggleService.isLipQueryManagementEnabled(any())).thenReturn(true);
+        when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
         // When
