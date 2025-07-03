@@ -81,7 +81,7 @@ class BaseNotifierTest {
 
         Set<EmailDTO> recipients = Set.of(email1, email2);
 
-        doThrow(new NotificationException(new Exception("Failed to send email to recipient2@example.com")))
+        doThrow(new NotificationException(new uk.gov.service.notify.NotificationClientException("Error message")))
             .when(notificationService).sendMail(
                 eq(email2.getTargetEmail()), eq(email2.getEmailTemplate()), eq(email2.getParameters()), eq(email2.getReference())
             );
@@ -90,7 +90,7 @@ class BaseNotifierTest {
         var errors = notifier.sendNotification(recipients);
 
         // Assert
-        assertThat(errors).containsExactly("java.lang.Exception: Failed to send email to recipient2@example.com");
+        assertThat(errors).containsExactly("Failed to send email to recipient2@example.com : uk.gov.service.notify.NotificationClientException: Error message");
         verify(notificationService, times(1)).sendMail(
             eq(email1.getTargetEmail()), eq(email1.getEmailTemplate()), eq(email1.getParameters()), eq(email1.getReference())
         );
