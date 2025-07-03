@@ -138,6 +138,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
                     || callbackParams.getCaseData().isRespondentResponseBilingual()
                     || callbackParams.getCaseData().isLipDefendantSpecifiedBilingualDocuments())) {
                     caseDataBuilder.preTranslationDocuments(List.of(ElementUtils.element(requestForReconsiderationDocument)));
+                    caseDataBuilder.bilingualHint(YesOrNo.YES);
                     caseDataBuilder.preTranslationDocumentType(DECISION_MADE_ON_APPLICATIONS);
                 } else {
                     systemGeneratedCaseDocuments.add(element(requestForReconsiderationDocument));
