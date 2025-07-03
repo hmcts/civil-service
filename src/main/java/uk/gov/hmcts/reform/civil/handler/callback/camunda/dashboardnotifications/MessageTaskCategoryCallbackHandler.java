@@ -32,18 +32,13 @@ public class MessageTaskCategoryCallbackHandler extends DashboardCallbackHandler
     }
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+    protected String getScenario(CaseData caseData) {
+        return null;
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    @Override
-    protected String getScenario(CaseData caseData) {
-        return null;
     }
 
     @Override
@@ -65,5 +60,10 @@ public class MessageTaskCategoryCallbackHandler extends DashboardCallbackHandler
                 .params(mapper.mapCaseDataToParams(caseData)).build()
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
     }
 }
