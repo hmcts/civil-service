@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -29,7 +28,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipG
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -246,9 +244,9 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference("BOTH").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
         verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
         verifyNoMoreInteractions(assignCategoryId);
-        assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
     }
 }
