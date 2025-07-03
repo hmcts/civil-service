@@ -159,12 +159,9 @@ public class PartialAdmitPayImmediatelyConfirmationText implements RespondToClai
 
         sb.append("<h2 class=\"govuk-heading-m\">What happens next</h2>")
             .append(headingThreeText)
-            .append(applicantName);
-        if (caseData.getApplicant2() != null) {
-            sb.append(" accept your offer</h3>");
-        } else {
-            sb.append(" accepts your offer</h3>");
-        }
+            .append(applicantName)
+            .append(" accepts your offer</h3>");
+
         sb.append("<ul>")
             .append("<li><p class=\"govuk-!-margin-0\">pay ").append(applicantName).append(" within 5 days of the response").append("</p></li>")
             .append("<li><p class=\"govuk-!-margin-0\">make sure any cheques or bank transfers are clear in their account by the deadline</p></li>")
