@@ -118,7 +118,7 @@ public interface Claim {
 
     boolean isHwfPaymentOutcome();
 
-    boolean defendantRespondedWithPreferredLanguageWelsh();
+    boolean pausedForTranslationAfterResponse();
 
     boolean isWaitingForClaimantIntentDocUploadPreDefendantNocOnline();
 
@@ -184,4 +184,6 @@ public interface Claim {
     default boolean isHwfFullRemission() {
         return false;
     }
+
+    boolean isCasedDiscontinued();
 }
