@@ -43,6 +43,6 @@ public class DefendantChangeOfAddressAppSolOneEmailDTOGenerator extends AppSolOn
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isApplicantRepresented() && NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired()) ? Boolean.TRUE : Boolean.FALSE;
+        return !caseData.isApplicantLiP() && NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired()) ? Boolean.TRUE : Boolean.FALSE;
     }
 }
