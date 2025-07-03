@@ -434,7 +434,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.4'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.55.5'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.12'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
