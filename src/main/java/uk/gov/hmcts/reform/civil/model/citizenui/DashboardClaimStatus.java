@@ -19,6 +19,12 @@ public enum DashboardClaimStatus {
     HEARING_FEE_UNPAID(
         Claim::isCaseStruckOut
     ),
+    DECISION_MADE_DOCUMENTS_BEING_TRANSLATED(
+        Claim::decisionMadeDocumentsAreInTranslation
+    ),
+    SDO_DOCUMENTS_BEING_TRANSLATED(
+        Claim::sdoDocumentsAreInTranslation
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),
@@ -36,9 +42,6 @@ public enum DashboardClaimStatus {
     ),
     SDO_ORDER_CREATED_PRE_CP(
         Claim::isSDOOrderCreatedPreCP
-    ),
-    DECISION_MADE_DOCUMENTS_BEING_TRANSLATED(
-        Claim::decisionMadeDocumentsAreInTranslation
     ),
     SDO_ORDER_CREATED_CP(
         Claim::isSDOOrderCreatedCP
@@ -138,9 +141,6 @@ public enum DashboardClaimStatus {
     ),
     SETTLED(
         Claim::isSettled
-    ),
-    SDO_DOCUMENTS_BEING_TRANSLATED(
-        Claim::sdoDocumentsAreInTranslation
     ),
     CLAIMANT_DOCUMENTS_BEING_TRANSLATED(
         Claim::pausedForTranslationAfterResponse
