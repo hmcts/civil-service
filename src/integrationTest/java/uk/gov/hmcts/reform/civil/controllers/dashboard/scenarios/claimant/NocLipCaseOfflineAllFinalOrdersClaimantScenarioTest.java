@@ -45,7 +45,7 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
             .toBuilder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .ccdState(All_FINAL_ORDERS_ISSUED)
+            .previousCCDState(All_FINAL_ORDERS_ISSUED)
             .applicant1Represented(YesOrNo.NO)
             .activeJudgment(activeJudgment)
             .build();
