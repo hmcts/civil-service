@@ -28,9 +28,8 @@ import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.HAS_
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;
@@ -90,8 +89,10 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private boolean shouldSendNotification(CaseData caseData, String eventId) {
         return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
-            && (!caseData.isClaimantBilingual()
-            || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId));
+            && ((!caseData.isClaimantBilingual()
+            || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId))
+            || (featureToggleService.isDefendantNoCOnlineForCase(caseData)
+            && (NO.equals(caseData.getApplicant1ProceedWithClaim()) || caseData.isClaimantIntentionSettlePartAdmit())));
     }
 
     private String getRespondent1LipEmailTemplate(CaseData caseData) {
@@ -128,11 +129,11 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             addCnbcContact(caseData, properties, configuration,
                            featureToggleService.isQueryManagementLRsEnabled());
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
             return properties;
         }
         if (shouldSendMediationNotificationDefendant1LRCarm(
@@ -147,17 +148,21 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 CASEMAN_REF, caseData.getLegacyCaseReference(),
                 APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ));
-            addCommonFooterSignature(properties, configuration);
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             addCnbcContact(caseData, properties, configuration,
                            featureToggleService.isQueryManagementLRsEnabled());
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
             return properties;
         }
-        return Map.of(
+        HashMap<String, String> lipProperties = new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
+        ));
+        addAllFooterItems(caseData, lipProperties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+        return lipProperties;
     }
 
     private boolean isFullDefenceStatesPaid(CaseData caseData) {

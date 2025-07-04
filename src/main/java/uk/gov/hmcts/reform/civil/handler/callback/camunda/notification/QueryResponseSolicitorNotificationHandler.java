@@ -34,8 +34,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getEmail;
 import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getProperties;
@@ -110,6 +109,11 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
 
     private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
                                                   CaseMessage parentQuery) {
+        if (caseData.getQueries() != null) {
+            return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQueries(),
+                                                            parentQuery, responseQuery
+            );
+        }
         if (isApplicantSolicitor(roles)) {
             return getLastRelatedQueryRaisedBySolicitorDate(caseData.getQmApplicantSolicitorQueries(),
                                                             parentQuery, responseQuery
@@ -158,9 +162,10 @@ public class QueryResponseSolicitorNotificationHandler extends CallbackHandler i
             PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
-        addCommonFooterSignature(properties, configuration);
-        addSpecAndUnspecContact(caseData, properties, configuration,
-                                featureToggleService.isQueryManagementLRsEnabled());
+        addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
+
         return properties;
     }
 

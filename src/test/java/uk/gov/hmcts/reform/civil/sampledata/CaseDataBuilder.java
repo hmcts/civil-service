@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FixedCosts;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -165,6 +166,8 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -189,9 +192,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
@@ -692,12 +698,21 @@ public class CaseDataBuilder {
     private String claimantBilingualLanguagePreference;
     private JudgmentPaidInFull judgmentPaidInFull;
     private YesOrNo anyRepresented;
+    private FixedCosts fixedCosts;
 
     private String partialPaymentAmount;
     private LocalDate nextDeadline;
 
+    private CaseQueriesCollection qmApplicantCitizenQueries;
+    private CaseQueriesCollection qmRespondentCitizenQueries;
+
     public CaseDataBuilder claimantBilingualLanguagePreference(String claimantBilingualLanguagePreference) {
         this.claimantBilingualLanguagePreference = claimantBilingualLanguagePreference;
+        return this;
+    }
+
+    public CaseDataBuilder fixedCosts(FixedCosts fixedCosts) {
+        this.fixedCosts = fixedCosts;
         return this;
     }
 
@@ -4245,6 +4260,116 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder includesApplicantCitizenQuery(OffsetDateTime queryCreationDatetime) {
+        List<Element<CaseMessage>> caseMessages = new ArrayList<>();
+        caseMessages.add(Element.<CaseMessage>builder()
+                                .id(UUID.randomUUID())
+                                .value(
+                                    CaseMessage.builder()
+                                        .id("app-query-id")
+                                        .isHearingRelated(YES)
+                                        .createdOn(queryCreationDatetime)
+                                        .build())
+                                .build());
+        this.qmApplicantCitizenQueries = CaseQueriesCollection.builder()
+            .partyName("Claimant")
+            .roleOnCase("applicant-citizen")
+            .caseMessages(caseMessages).build();
+        return this;
+    }
+
+    public CaseDataBuilder includesApplicantCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
+        includesApplicantCitizenQuery(queryCreationDatetime);
+        this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
+            Stream.concat(
+                this.qmApplicantCitizenQueries.getCaseMessages().stream(),
+                List.of(Element.<CaseMessage>builder()
+                            .id(UUID.randomUUID())
+                            .value(
+                                CaseMessage.builder()
+                                    .id("app-response-id")
+                                    .isHearingRelated(NO)
+                                    .createdOn(queryCreationDatetime.plusHours(3))
+                                    .parentId("app-query-id")
+                                    .build()).build()).stream()
+            ).toList()).build();
+        return this;
+    }
+
+    public CaseDataBuilder includesApplicantCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
+        includesApplicantCitizenQueryResponse(queryCreationDatetime);
+        this.qmApplicantCitizenQueries = this.qmApplicantCitizenQueries.toBuilder().caseMessages(
+                Stream.concat(
+                    this.qmApplicantCitizenQueries.getCaseMessages().stream(),
+                    List.of(Element.<CaseMessage>builder()
+                                .id(UUID.randomUUID())
+                                .value(
+                                    CaseMessage.builder()
+                                        .id("app-followup-id")
+                                        .isHearingRelated(NO)
+                                        .createdOn(queryCreationDatetime.plusHours(5))
+                                        .parentId("app-query-id")
+                                        .build()).build()).stream()
+                ).toList())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder includesRespondentCitizenQuery(OffsetDateTime queryCreationDatetime) {
+        List<Element<CaseMessage>> caseMessages = new ArrayList<>();
+        caseMessages.add(Element.<CaseMessage>builder()
+                             .id(UUID.randomUUID())
+                             .value(
+                                 CaseMessage.builder()
+                                     .id("res-query-id")
+                                     .isHearingRelated(YES)
+                                     .createdOn(queryCreationDatetime)
+                                     .build())
+                             .build());
+        this.qmRespondentCitizenQueries = CaseQueriesCollection.builder()
+            .partyName("Defendant")
+            .roleOnCase("respondent-citizen")
+            .caseMessages(caseMessages).build();
+        return this;
+    }
+
+    public CaseDataBuilder includesRespondentCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
+        includesRespondentCitizenQuery(queryCreationDatetime);
+        this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
+            Stream.concat(
+                this.qmRespondentCitizenQueries.getCaseMessages().stream(),
+                List.of(Element.<CaseMessage>builder()
+                            .id(UUID.randomUUID())
+                            .value(
+                                CaseMessage.builder()
+                                    .id("res-response-id")
+                                    .isHearingRelated(NO)
+                                    .createdOn(queryCreationDatetime.plusHours(3))
+                                    .parentId("res-query-id")
+                                    .build()).build()).stream()
+            ).toList()).build();
+        return this;
+    }
+
+    public CaseDataBuilder includesRespondentCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
+        includesRespondentCitizenQueryResponse(queryCreationDatetime);
+        this.qmRespondentCitizenQueries = this.qmRespondentCitizenQueries.toBuilder().caseMessages(
+                Stream.concat(
+                    this.qmRespondentCitizenQueries.getCaseMessages().stream(),
+                    List.of(Element.<CaseMessage>builder()
+                                .id(UUID.randomUUID())
+                                .value(
+                                    CaseMessage.builder()
+                                        .id("res-followup-id")
+                                        .isHearingRelated(NO)
+                                        .createdOn(queryCreationDatetime.plusHours(5))
+                                        .parentId("res-query-id")
+                                        .build()).build()).stream()
+                ).toList())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
                                                                     RespondentResponseType respondent2Response) {
         atStateClaimDetailsNotified();
@@ -7120,6 +7245,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder specClaim1v1LrVsLipBilingual() {
+        this.caseAccessCategory = SPEC_CLAIM;
+        this.respondent1Represented = NO;
+        this.ccdCaseReference = CASE_ID;
+        this.caseDataLiP = CaseDataLiP.builder()
+            .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build();
+        setClaimTypeToSpecClaim();
+        return this;
+    }
+
     public CaseDataBuilder specClaim1v1LipvLr() {
         atStateClaimDraft();
         legacyCaseReference(LEGACY_CASE_REFERENCE);
@@ -8017,6 +8152,7 @@ public class CaseDataBuilder {
             .anyRepresented(anyRepresented)
             .partialPaymentAmount(partialPaymentAmount)
             .nextDeadline(nextDeadline)
+            .fixedCosts(fixedCosts)
             .build();
     }
 

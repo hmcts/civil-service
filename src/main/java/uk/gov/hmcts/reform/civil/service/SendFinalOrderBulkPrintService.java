@@ -4,16 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.CoverLetterAppendService;
+import uk.gov.hmcts.reform.civil.utils.LanguageUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.FINAL_ORDER_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ORDER_NOTICE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendFinalOrderToLiPCallbackHandler.TASK_ID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendFinalOrderToLiPCallbackHandler.TASK_ID_DEFENDANT;
 
 @Service
@@ -28,37 +34,72 @@ public class SendFinalOrderBulkPrintService {
     private static final String TRANSLATED_ORDER_PACK_LETTER_TYPE = "translated-order-document-pack";
 
     public void sendFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
-        if (checkFinalOrderDocumentAvailable(caseData)) {
-            CaseDocument document = caseData.getFinalOrderDocumentCollection().get(0).getValue();
-            sendBulkPrint(authorisation, caseData, task, document, FINAL_ORDER_PACK_LETTER_TYPE);
+        Language language = LanguageUtils.determineLanguageForBulkPrint(
+            caseData,
+            TASK_ID_CLAIMANT.equals(task),
+            featureToggleService.isWelshEnabledForMainCase());
+        if (checkFinalOrderDocumentAvailable(caseData, language)) {
+            List<CaseDocument> caseDocuments = new ArrayList<>();
+            switch (language) {
+                case ENGLISH -> caseDocuments.add(getFinalOrderDocumentOfType(caseData, JUDGE_FINAL_ORDER));
+                case WELSH -> caseDocuments.add(getFinalOrderDocumentOfType(caseData, FINAL_ORDER_TRANSLATED_DOCUMENT));
+                case BOTH -> {
+                    caseDocuments.add(getFinalOrderDocumentOfType(caseData, JUDGE_FINAL_ORDER));
+                    caseDocuments.add(getFinalOrderDocumentOfType(caseData, FINAL_ORDER_TRANSLATED_DOCUMENT));
+                }
+                default -> { }
+            }
+            sendBulkPrint(authorisation, caseData, task, caseDocuments, FINAL_ORDER_PACK_LETTER_TYPE);
         }
+    }
+
+    private CaseDocument getFinalOrderDocumentOfType(CaseData caseData, DocumentType documentType) {
+        List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
+        return finalOrderDocuments.stream()
+            .map(Element::getValue)
+            .filter(caseDocument -> caseDocument.getDocumentType() == documentType)
+            .findFirst()
+            .orElse(null);
     }
 
     public void sendTranslatedFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         if (checkTranslatedFinalOrderDocumentAvailable(caseData, task)) {
             CaseDocument document = caseData.getSystemGeneratedCaseDocuments()
                 .get(caseData.getSystemGeneratedCaseDocuments().size() - 1).getValue();
-            sendBulkPrint(authorisation, caseData, task, document, TRANSLATED_ORDER_PACK_LETTER_TYPE);
+            sendBulkPrint(authorisation, caseData, task, List.of(document), TRANSLATED_ORDER_PACK_LETTER_TYPE);
         }
     }
 
-    private void sendBulkPrint(String authorisation, CaseData caseData, String task, CaseDocument caseDocument,
+    private void sendBulkPrint(String authorisation, CaseData caseData, String task, List<CaseDocument> caseDocuments,
                                String letterType) {
         byte[] letterContent;
         Party recipient = isDefendantPrint(task) ? caseData.getRespondent1() : caseData.getApplicant1();
 
-        letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, JUDGE_FINAL_ORDER, caseDocument);
+        letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, JUDGE_FINAL_ORDER,
+                                                                      caseDocuments.toArray(new CaseDocument[0]));
 
         List<String> recipients = List.of(recipient.getPartyName());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                      caseData.getLegacyCaseReference(), letterType, recipients);
     }
 
-    private boolean checkFinalOrderDocumentAvailable(CaseData caseData) {
-        return nonNull(caseData.getSystemGeneratedCaseDocuments())
+    private boolean checkFinalOrderDocumentAvailable(CaseData caseData, Language language) {
+        if (nonNull(caseData.getSystemGeneratedCaseDocuments())
             && !caseData.getSystemGeneratedCaseDocuments().isEmpty()
-            && nonNull(caseData.getFinalOrderDocumentCollection())
-            && !caseData.getFinalOrderDocumentCollection().isEmpty();
+            && nonNull(caseData.getFinalOrderDocumentCollection())) {
+            List<Element<CaseDocument>> finalOrderDocuments = caseData.getFinalOrderDocumentCollection();
+            boolean containsEnglish = finalOrderDocuments.stream()
+                .anyMatch(elemment -> elemment.getValue().getDocumentType() == JUDGE_FINAL_ORDER);
+            boolean containsWelsh = finalOrderDocuments.stream()
+                .anyMatch(elemment -> elemment.getValue().getDocumentType() == FINAL_ORDER_TRANSLATED_DOCUMENT);
+            return switch (language) {
+                case ENGLISH -> containsEnglish;
+                case WELSH -> containsWelsh;
+                case BOTH -> containsEnglish && containsWelsh;
+            };
+        } else {
+            return false;
+        }
     }
 
     private boolean checkTranslatedFinalOrderDocumentAvailable(CaseData caseData, String task) {
@@ -83,4 +124,5 @@ public class SendFinalOrderBulkPrintService {
             return caseData.isApplicant1NotRepresented() && caseData.isClaimantBilingual();
         }
     }
+
 }

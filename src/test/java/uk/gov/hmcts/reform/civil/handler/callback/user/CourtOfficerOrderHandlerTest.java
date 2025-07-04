@@ -17,14 +17,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -52,7 +48,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.COURT_OFFICER_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CourtOfficerOrderHandler.HEADER;
 
 @ExtendWith(SpringExtension.class)
@@ -249,7 +244,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
@@ -268,7 +263,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
@@ -287,7 +282,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
@@ -295,48 +290,6 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                 .caseDataLiP(CaseDataLiP.builder()
                                  .respondent1LiPResponse(RespondentLiPResponse.builder()
                                                              .respondent1ResponseLanguage("WELSH").build()).build())
-                .build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            // Then
-            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
-            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
-        }
-
-        @Test
-        void shouldHideDocumentIfClaimantWelshDocs_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            // Given
-            caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .preTranslationDocuments(new ArrayList<>())
-                .applicant1Represented(NO)
-                .applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    Language.WELSH).build()).build())
-                .build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            // Then
-            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
-            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
-            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
-        }
-
-        @Test
-        void shouldHideDocumentIfDefendantWelshDocs_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-            // Given
-            caseData = caseData.toBuilder()
-                .previewCourtOfficerOrder(courtOfficerOrder)
-                .preTranslationDocuments(new ArrayList<>())
-                .respondent1Represented(NO)
-                .respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(WelshLanguageRequirements.builder().documents(
-                    Language.WELSH).build()).build())
                 .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When

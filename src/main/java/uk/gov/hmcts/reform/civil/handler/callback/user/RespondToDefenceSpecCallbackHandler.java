@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -71,6 +72,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final AboutToSubmitRespondToDefenceTask aboutToSubmitRespondToDefenceTask;
     private final PopulateCaseDataTask populateCaseDataTask;
     private final BuildConfirmationTask buildConfirmationTask;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${court-location.specified-claim.epimms-id}") String cnbcEpimsId;
 
@@ -262,7 +264,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        return buildConfirmationTask.execute(callbackParams);
+        return buildConfirmationTask.execute(callbackParams, featureToggleService);
     }
 
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
@@ -328,16 +330,32 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+
         if (caseData.getCcjPaymentDetails() != null
             && YES.equals(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(PARTIAL_PAYMENT_OFFLINE))
                 .build();
+        } else if (featureToggleService.isLrAdmissionBulkEnabled()
+                   && caseData.getFixedCosts() != null
+                   && NO.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+            updatedCaseData.ccjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
         }
+
+        if (judgementService.isLrFullAdmitRepaymentPlan(caseData)
+            || judgementService.isLRPartAdmitRepaymentPlan(caseData)) {
+            updatedCaseData.ccjJudgmentAmountShowInterest(NO);
+            if (caseData.getFixedCosts() != null
+                && YES.equals(caseData.getFixedCosts().getClaimFixedCosts())) {
+                updatedCaseData.claimFixedCostsExist(YES);
+            }
+        }
+
         List<String> errors = judgementService.validateAmountPaid(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.isEmpty() ? caseData.toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? updatedCaseData.build().toMap(objectMapper) : null)
             .build();
     }
 
