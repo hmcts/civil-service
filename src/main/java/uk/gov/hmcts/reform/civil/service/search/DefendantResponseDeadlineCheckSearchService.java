@@ -26,12 +26,14 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
     }
 
     public Query query(int startIndex) {
+        String now = getSchedulerStartTime();
+
         if (featureToggleService.isWelshEnabledForMainCase()) {
             return new Query(
                 boolQuery()
                     .minimumShouldMatch(1)
                     .should(boolQuery()
-                                .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
+                                .must(rangeQuery("data.respondent1ResponseDeadline").lt(now))
                                 .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
                                 .mustNot(existsQuery("data.respondent1ResponseDate"))
                                 .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
@@ -45,7 +47,7 @@ public class DefendantResponseDeadlineCheckSearchService extends ElasticSearchSe
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.respondent1ResponseDeadline").lt("now"))
+                            .must(rangeQuery("data.respondent1ResponseDeadline").lt(now))
                             .mustNot(matchQuery("data.respondent1ResponseDeadlineChecked", "Yes"))
                             .must(beState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT))
                             .must(haveNoOngoingBusinessProcess())

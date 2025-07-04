@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -76,6 +77,27 @@ abstract class ElasticSearchServiceTest {
         List<Query> capturedQueries = queryCaptor.getAllValues();
         assertThat(capturedQueries.get(0)).usingRecursiveComparison().isEqualTo(buildQuery(0));
         assertThat(capturedQueries.get(1)).usingRecursiveComparison().isEqualTo(buildQuery(10));
+    }
+
+    @Test
+    void shouldSetFixedNowDuringGetCases() throws Exception {
+        SearchResult searchResult = buildSearchResultWithTotalCases(1);
+        when(coreCaseDataService.searchCases(any())).thenAnswer(invocation -> {
+            assertThat(getSchedulerStartTimeFromThreadLocal()).isNotNull();
+            return searchResult;
+        });
+
+        searchService.getCases();
+
+        // After getCases completes, fixedNow should be cleared
+        assertThat(getSchedulerStartTimeFromThreadLocal()).isNull();
+    }
+
+    private String getSchedulerStartTimeFromThreadLocal() throws Exception {
+        Field fixedNowField = ElasticSearchService.class.getDeclaredField("schedulerStartTime");
+        fixedNowField.setAccessible(true);
+        ThreadLocal<String> fixedNow = (ThreadLocal<String>) fixedNowField.get(searchService);
+        return fixedNow.get();
     }
 
     private SearchResult buildSearchResultWithTotalCases(int i) {
