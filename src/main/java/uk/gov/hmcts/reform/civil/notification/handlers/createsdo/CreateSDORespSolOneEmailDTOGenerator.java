@@ -13,7 +13,7 @@ public class CreateSDORespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGene
 
     private final FeatureToggleService featureToggleService;
 
-    private static final String REFERENCE_TEMPLATE = "create-sdo-respondent-1-notification-%s";
+    private static final String REFERENCE_TEMPLATE_RESPONDENT_1 = "create-sdo-respondent-1-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -39,6 +39,6 @@ public class CreateSDORespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGene
 
     @Override
     protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE;
+        return REFERENCE_TEMPLATE_RESPONDENT_1;
     }
 }
