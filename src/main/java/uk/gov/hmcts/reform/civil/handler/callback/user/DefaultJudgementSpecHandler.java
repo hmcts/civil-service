@@ -528,6 +528,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_NON_DIVERGENT_SPEC));
         } else {
             nextState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+            caseDataBuilder.takenOfflineDate(LocalDateTime.now());
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
         }
 
