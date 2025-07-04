@@ -87,6 +87,7 @@ public class CourtOfficerOrderHandler extends CallbackHandler {
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(caseData.getPreviewCourtOfficerOrder()));
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
             caseDataBuilder.previewCourtOfficerOrder(null);
             caseDataBuilder.preTranslationDocuments(preTranslationDocuments);
         } else {

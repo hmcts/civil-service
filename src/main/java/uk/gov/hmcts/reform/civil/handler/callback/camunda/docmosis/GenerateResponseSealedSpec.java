@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -123,6 +124,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 Optional.ofNullable(caseData.getPreTranslationDocuments()).orElseGet(ArrayList::new);
             preTranslationDocs.add(ElementUtils.element(sealedForm));
             builder.preTranslationDocuments(preTranslationDocs);
+            builder.bilingualHint(YesOrNo.YES);
             builder.preTranslationDocumentType(PreTranslationDocumentType.DEFENDANT_SEALED_CLAIM_FORM_FOR_LIP_VS_LR);
         } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));

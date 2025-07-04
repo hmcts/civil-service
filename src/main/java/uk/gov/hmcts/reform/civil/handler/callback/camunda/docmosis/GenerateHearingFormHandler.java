@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -78,6 +79,7 @@ public class GenerateHearingFormHandler extends CallbackHandler {
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData().getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocuments.get(0)));
             caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
             caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.HEARING_NOTICE);
         } else {
             systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
