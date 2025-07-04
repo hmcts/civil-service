@@ -44,7 +44,7 @@ public abstract class ElasticSearchService {
 
             return caseDetails;
         } finally {
-            // Always clean up ThreadLocal to avoid memory leaks
+            //Clean up ThreadLocal to avoid memory leaks
             schedulerStartTime.remove();
         }
     }
