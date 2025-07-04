@@ -93,7 +93,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.4.6-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.4.8-jre') {
         entry 'guava'
       }
 
@@ -124,7 +124,7 @@ allprojects {
         entry 'snakeyaml'
       }
 
-      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.41') {
+      dependencySet(group: 'org.apache.tomcat.embed', version: '10.1.42') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -381,7 +381,7 @@ dependencies {
 
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.1.1'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
-  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.4.1'
+  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23.1'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
   implementation('com.github.hmcts:fees-java-client:0.0.6') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
@@ -413,10 +413,10 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.105'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.41'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.106'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.42'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
@@ -434,7 +434,7 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.55.4'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.55.5'
   implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.12'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
