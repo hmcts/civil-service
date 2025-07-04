@@ -155,10 +155,6 @@ public class JudgementService {
             && isOneVOne(caseData);
     }
 
-    private boolean isLRvLR(CaseData caseData) {
-        return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
-    }
-
     public boolean isLrPayImmediatelyPlan(CaseData caseData) {
         return isLrvLrOneVOneBulkAdmissionsEnabled(caseData)
             && caseData.isPayImmediately();
