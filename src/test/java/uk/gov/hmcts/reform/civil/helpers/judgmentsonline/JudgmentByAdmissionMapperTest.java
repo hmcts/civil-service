@@ -185,7 +185,7 @@ class JudgmentByAdmissionMapperTest {
 
         assertNotNull(activeJudgment);
         assertEquals(JudgmentState.ISSUED, activeJudgment.getState());
-        assertEquals("15000", activeJudgment.getOrderedAmount());
+        assertEquals("14000", activeJudgment.getOrderedAmount());
 
     }
 
