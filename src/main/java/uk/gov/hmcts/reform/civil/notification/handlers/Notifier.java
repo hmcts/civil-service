@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.lang.String.*;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 public abstract class Notifier extends BaseNotifier {
@@ -35,8 +37,11 @@ public abstract class Notifier extends BaseNotifier {
             trackErrors(caseData.getCcdCaseReference(), eventId, taskId, additionalProperties);
         }
 
-        final String attempted = partiesToEmail.stream().map(p -> p.getTargetEmail() + " : " + p.getReference() + " : " + p.getEmailTemplate()).toList().toString();
-        return format("Attempted: %s, Errors: %s", attempted, errors);
+        String attempted = partiesToEmail.stream()
+            .map(p -> p.getTargetEmail() + " : " + p.getReference() + " : " + p.getEmailTemplate())
+            .collect(joining(" | "));
+
+        return format("Attempted: %s || Errors: %s", attempted, join(" | ", errors));
     }
 
     private void trackErrors(final Long caseId,
