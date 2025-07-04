@@ -93,6 +93,7 @@ abstract class ElasticSearchServiceTest {
         assertThat(getSchedulerStartTimeFromThreadLocal()).isNull();
     }
 
+    @SuppressWarnings("unchecked")
     private String getSchedulerStartTimeFromThreadLocal() throws Exception {
         Field fixedNowField = ElasticSearchService.class.getDeclaredField("schedulerStartTime");
         fixedNowField.setAccessible(true);
