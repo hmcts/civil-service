@@ -176,7 +176,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             "RESPONDENTSOLICITORTWO, applicant@email.com",
             "RESPONDENTSOLICITORONE, applicant@email.com",
         })
-        void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative_applicantIsOtherParty(String caseRole, String email) {
+        void shouldNotifyOtherParty_whenQueryRaisedOnCase_OneRespondentRepresentative_applicantIsOtherParty(String caseRole, String email) {
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
                                 .queryId("11")
@@ -197,8 +197,8 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
         @ParameterizedTest
         @CsvSource({
-            "RESPONDENTSOLICITORTWO, applicant@email.com,",
-            "RESPONDENTSOLICITORONE, applicant@email.com,",
+            "RESPONDENTSOLICITORTWO, applicant@email.com, respondent1@email.com",
+            "RESPONDENTSOLICITORONE, applicant@email.com, respondent2@email.com",
             "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com",
         })
         void shouldNotifyOtherParty_whenQueryRaisedOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2) {
