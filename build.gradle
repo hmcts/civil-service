@@ -416,7 +416,7 @@ dependencies {
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.106'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.42'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.6'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
