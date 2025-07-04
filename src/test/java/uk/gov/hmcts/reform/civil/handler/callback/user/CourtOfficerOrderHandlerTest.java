@@ -244,7 +244,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
@@ -263,7 +263,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
@@ -282,7 +282,7 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             // Given
             caseData = caseData.toBuilder()
                 .previewCourtOfficerOrder(courtOfficerOrder)
