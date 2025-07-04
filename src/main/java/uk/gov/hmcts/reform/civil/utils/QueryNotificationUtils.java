@@ -192,14 +192,7 @@ public class QueryNotificationUtils {
                 emailDetailsList.add(createEmailDetails(email, legalOrgName));
             }
             case ONE_V_TWO_TWO_LEGAL_REP -> {
-                if (isOtherPartyApplicant(roles)) {
-                    // 1v2 different solicitor, and when "other party" is applicant 1.
-                    emailDetailsList.add(createEmailDetails(
-                        caseData.getApplicantSolicitor1UserDetails().getEmail(),
-                        getApplicantLegalOrganizationName(caseData, organisationService)
-                    ));
-                } else {
-                    // 1v2 different solicitor, and when "other party" is respondent 1 AND respondent 2.
+                if (isApplicantSolicitor(roles)) {
                     emailDetailsList.add(createEmailDetails(
                         caseData.getRespondentSolicitor1EmailAddress(),
                         getLegalOrganizationNameForRespondent(caseData, true, organisationService)
@@ -207,6 +200,24 @@ public class QueryNotificationUtils {
                     emailDetailsList.add(createEmailDetails(
                         caseData.getRespondentSolicitor2EmailAddress(),
                         getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+                    ));
+                } else if (isRespondentSolicitorOne(roles)) {
+                    emailDetailsList.add(createEmailDetails(
+                        caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                        getApplicantLegalOrganizationName(caseData, organisationService)
+                    ));
+                    emailDetailsList.add(createEmailDetails(
+                        caseData.getRespondentSolicitor2EmailAddress(),
+                        getLegalOrganizationNameForRespondent(caseData, false, organisationService)
+                    ));
+                } else if (isRespondentSolicitorTwo(roles)) {
+                    emailDetailsList.add(createEmailDetails(
+                        caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                        getApplicantLegalOrganizationName(caseData, organisationService)
+                    ));
+                    emailDetailsList.add(createEmailDetails(
+                        caseData.getRespondentSolicitor1EmailAddress(),
+                        getLegalOrganizationNameForRespondent(caseData, true, organisationService)
                     ));
                 }
             }

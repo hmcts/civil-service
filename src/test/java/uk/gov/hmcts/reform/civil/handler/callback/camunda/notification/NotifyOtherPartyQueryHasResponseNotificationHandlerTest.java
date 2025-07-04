@@ -171,7 +171,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             "RESPONDENTSOLICITORTWO, applicant@email.com, true",
             "RESPONDENTSOLICITORONE, applicant@email.com, true",
         })
-        void shouldNotifyOtherParty_whenQueryResponseOnCase_TwoRespondentRepresentative_applicantIsOtherParty(String caseRole, String email, String toggle) {
+        void shouldNotifyOtherParty_whenQueryResponseOnCase_OneRespondentRepresentative_applicantIsOtherParty(String caseRole, String email, String toggle) {
             when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(Boolean.valueOf(toggle));
             when(runtimeService.getProcessVariables(any()))
                 .thenReturn(QueryManagementVariables.builder()
@@ -193,11 +193,11 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
 
         @ParameterizedTest
         @CsvSource({
-            "RESPONDENTSOLICITORTWO, applicant@email.com, , false",
-            "RESPONDENTSOLICITORONE, applicant@email.com, , false",
+            "RESPONDENTSOLICITORTWO, applicant@email.com, respondent1@email.com, false",
+            "RESPONDENTSOLICITORONE, applicant@email.com, respondent2@email.com, false",
             "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com, false",
-            "RESPONDENTSOLICITORTWO, applicant@email.com, , true",
-            "RESPONDENTSOLICITORONE, applicant@email.com, , true",
+            "RESPONDENTSOLICITORTWO, applicant@email.com, respondent1@email.com, true",
+            "RESPONDENTSOLICITORONE, applicant@email.com, respondent2@email.com, true",
             "APPLICANTSOLICITORONE, respondent1@email.com, respondent2@email.com, true",
         })
         void shouldNotifyOtherParty_whenQueryResponseOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2, String toggle) {
