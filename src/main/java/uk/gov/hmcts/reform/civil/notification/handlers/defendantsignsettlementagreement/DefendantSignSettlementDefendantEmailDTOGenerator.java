@@ -34,17 +34,17 @@ public class DefendantSignSettlementDefendantEmailDTOGenerator extends Defendant
     }
 
     @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE_DEFENDANT;
-    }
-
-    @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference());
         properties.put(CLAIMANT_NAME, caseData.getApplicant1().getPartyName());
         properties.put(RESPONDENT_NAME, caseData.getRespondent1().getPartyName());
         properties.put(FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl());
         return properties;
+    }
+
+    @Override
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE_DEFENDANT;
     }
 
     @Override
