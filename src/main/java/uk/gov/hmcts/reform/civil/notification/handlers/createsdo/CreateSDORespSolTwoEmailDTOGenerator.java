@@ -25,6 +25,11 @@ public class CreateSDORespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGene
     }
 
     @Override
+    protected String getReferenceTemplate() {
+        return REFERENCE_TEMPLATE_RESPONDENT_2;
+    }
+
+    @Override
     protected String getEmailTemplateId(CaseData caseData) {
         if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
             if (caseData.isRespondentResponseBilingual()) {
@@ -35,10 +40,5 @@ public class CreateSDORespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGene
             return notificationsProperties.getSdoOrderedSpec();
         }
         return notificationsProperties.getSdoOrdered();
-    }
-
-    @Override
-    protected String getReferenceTemplate() {
-        return REFERENCE_TEMPLATE_RESPONDENT_2;
     }
 }
