@@ -229,7 +229,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldCalculateDeadlineSuccessfully() {
         LocalDate extensionDate = LocalDate.of(2022, 6, 6);
-        when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).thenReturn(extensionDate);
+        when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).thenReturn(extensionDate);
         doPost(
             BEARER_TOKEN,
             ExtendedDeadlineDto.builder().responseDate(extensionDate).plusDays(5).build(),

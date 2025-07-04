@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CertOfSC;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentState;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,6 +31,7 @@ public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenar
             .respondent1Represented(NO)
             .certOfSC(CertOfSC.builder().defendantFinalPaymentDate(LocalDate.now().plusDays(10)).build())
             .activeJudgment(JudgmentDetails.builder()
+                .state(JudgmentState.ISSUED)
                                 .fullyPaymentMadeDate(LocalDate.now())
                                 .build())
             .build();
