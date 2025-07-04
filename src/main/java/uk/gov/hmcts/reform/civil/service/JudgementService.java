@@ -121,8 +121,13 @@ public class JudgementService {
     private String ccjJudgmentStatement(CaseData caseData) {
         if (caseData.isLRvLipOneVOne()
             && featureToggleService.isPinInPostEnabled()) {
+            boolean hasPaymentOption = caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate();
+            if (featureToggleService.isLrAdmissionBulkEnabled()
+                && hasPaymentOption) {
+                return String.format(JUDGEMENT_ORDER_V2, ccjJudgementSubTotal(caseData));
+            }
             if (featureToggleService.isJudgmentOnlineLive()
-                && (caseData.isPayImmediately() || caseData.isPayByInstallment() || caseData.isPayBySetDate())) {
+                && hasPaymentOption) {
                 return JUDGEMENT_BY_COURT_NOT_OFFLINE;
             }
             return JUDGEMENT_BY_COURT;
@@ -135,7 +140,7 @@ public class JudgementService {
 
     public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
         return featureToggleService.isLrAdmissionBulkEnabled()
-            && isLRvLR(caseData)
+            && !caseData.isApplicantLiP()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
     }
 
@@ -151,12 +156,8 @@ public class JudgementService {
 
     public boolean isLrvLrOneVOneBulkAdmissionsEnabled(CaseData caseData) {
         return featureToggleService.isLrAdmissionBulkEnabled()
-            && isLRvLR(caseData)
+            && !caseData.isApplicantLiP()
             && isOneVOne(caseData);
-    }
-
-    private boolean isLRvLR(CaseData caseData) {
-        return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
     }
 
     public boolean isLrPayImmediatelyPlan(CaseData caseData) {
