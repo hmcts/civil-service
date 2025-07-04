@@ -66,7 +66,7 @@ public class SendHearingToLiPCallbackHandler extends CallbackHandler {
 
         CaseData caseData = callbackParams.getCaseData();
         String task = camundaActivityId(callbackParams);
-        if (featureToggleService.isGaForWelshEnabled()) {
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             sendHearingBulkPrintService.sendHearingToLIP(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData, task,
                 false);

@@ -100,7 +100,7 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldNotHideSettlementAgreementDocWhenClaimantHasWelshPreferenceAndWelshToggleDisabled() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -118,7 +118,7 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldHideSettlementAgreementDocWhenClaimantHasWelshPreference() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
@@ -136,7 +136,7 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldHideSettlementAgreementDocWhenDefendantHasWelshPreference() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(formGenerator.generate(
             any(CaseData.class),
             anyString()
