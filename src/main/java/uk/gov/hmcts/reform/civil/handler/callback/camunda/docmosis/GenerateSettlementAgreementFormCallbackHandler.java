@@ -46,7 +46,7 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             List<Element<CaseDocument>> preTranslationDocuments = caseData.getPreTranslationDocuments();
             preTranslationDocuments.add(element(claimantResponseForm));

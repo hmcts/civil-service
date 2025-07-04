@@ -97,7 +97,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     }
 
     private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
-        if (featureToggleService.isGaForWelshEnabled() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
                 .bilingualHint(YesOrNo.YES)
                 .preTranslationDocuments(List.of(ElementUtils.element(document)));
