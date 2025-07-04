@@ -22,7 +22,7 @@ class DefendantResponseDeadlineCheckSearchServiceWithWelshFlagOnTest extends Ela
     @BeforeEach
     void setup() {
         searchService = new DefendantResponseDeadlineCheckSearchService(coreCaseDataService, featureToggleService);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
     }
 
     @Override
