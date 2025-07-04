@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.createsdo;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -19,7 +18,8 @@ public class CreateSDOAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenera
 
     private final FeatureToggleService featureToggleService;
 
-    protected CreateSDOAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService, FeatureToggleService featureToggleService) {
+    protected CreateSDOAppSolOneEmailDTOGenerator(NotificationsProperties notificationsProperties, OrganisationService organisationService,
+                                                  FeatureToggleService featureToggleService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
         this.featureToggleService = featureToggleService;
@@ -27,7 +27,7 @@ public class CreateSDOAppSolOneEmailDTOGenerator extends AppSolOneEmailDTOGenera
 
     @Override
     protected String getEmailTemplateId(CaseData caseData) {
-        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+        if (caseData.getCaseAccessCategory() == SPEC_CLAIM) {
             return featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
                 ? notificationsProperties.getSdoOrderedSpecEa() : notificationsProperties.getSdoOrderedSpec();
         }
