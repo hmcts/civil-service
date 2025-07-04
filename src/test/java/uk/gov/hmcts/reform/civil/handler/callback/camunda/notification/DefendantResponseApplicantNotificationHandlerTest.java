@@ -115,6 +115,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id-jo");
         when(notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction()).thenReturn("spec-respondent-template-id-action");
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -481,6 +482,40 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("respondentsolicitor2@example.com"),
                     ArgumentMatchers.eq("spec-respondent-template-id"),
+                    ArgumentMatchers.argThat(map -> {
+                        Map<String, String> expected = getNotificationDataMapSpec();
+                        return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                            && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+                    }),
+                    ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked_judgmentOnlineFlagEnabled() {
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                    .respondToClaimAdmitPartLRspec(
+                        RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                    )
+                    .build();
+                when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+                verify(notificationService).sendMail(
+                    ArgumentMatchers.eq("applicantsolicitor@example.com"),
+                    ArgumentMatchers.eq("templateImm-id-jo"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec();
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))

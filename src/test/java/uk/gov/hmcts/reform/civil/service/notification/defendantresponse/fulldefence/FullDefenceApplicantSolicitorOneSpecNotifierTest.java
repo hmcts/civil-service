@@ -269,6 +269,40 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
         );
     }
 
+    @Test
+    void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked_JudgmentOnlineFlagEnabled() {
+
+        LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .build().toBuilder()
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA()).thenReturn("templateImm-id-jo");
+
+        notifier.notifySolicitorForDefendantResponse(caseData);
+
+        verify(notificationService).sendMail(
+            ArgumentMatchers.eq("applicantsolicitor@example.com"),
+            ArgumentMatchers.eq("templateImm-id-jo"),
+            ArgumentMatchers.argThat(map -> {
+                Map<String, String> expected = getNotificationDataMapSpec();
+                return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                    && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+            }),
+            ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+        );
+    }
+
     @NotNull
     public Map<String, String> getNotificationDataMapSpec() {
         Map<String, String> expectedProperties = new HashMap<>();

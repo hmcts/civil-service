@@ -90,7 +90,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
             systemGeneratedCaseDocuments = systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
                 .toList();
-        } else if (featureToggleService.isGaForWelshEnabled() && caseData.isClaimantBilingual()
+        } else if (featureToggleService.isWelshEnabledForMainCase() && caseData.isClaimantBilingual()
             && event == GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC) {
             translatedDocuments = caseData.getPreTranslationDocuments();
             translatedDocuments.add(element(caseDocument));

@@ -179,6 +179,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("generalApplicationsForWelshParty");
     }
 
+    public boolean isWelshEnabledForMainCase() {
+        return featureToggleApi.isFeatureEnabled("enableWelshForMainCase");
+    }
+
     public boolean isLipQueryManagementEnabled(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
