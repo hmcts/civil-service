@@ -696,4 +696,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String partAdmitPayImmediatelyAgreedDefendant;
+
+    @NotEmpty
+    private String claimantSolicitorImmediatelyDefendantResponseForSpecJBA;
+
 }

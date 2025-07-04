@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
@@ -20,6 +21,7 @@ public class SpecDefRespEmailHelper {
 
     public static final String REFERENCE_TEMPLATE = "defendant-response-spec-notification-%s";
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
 
     public String getAppSolTemplate(CaseData caseData) {
         RespondentResponsePartAdmissionPaymentTimeLRspec paymentRoute =
@@ -33,6 +35,9 @@ public class SpecDefRespEmailHelper {
                 || FULL_ADMISSION.equals(respondent2Response));
 
         if (isFullAdmitImmediatePayment) {
+            if (featureToggleService.isJudgmentOnlineLive()) {
+                return notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
+            }
             return notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
         }
 
