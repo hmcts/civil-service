@@ -24,6 +24,7 @@ public enum CamundaProcessIdentifier {
     JudgmentVariedDeterminationOfMeansNotifyParties,
     ClaimSubmittedApplicantNotifier,
     ClaimantLipHelpWithFeesNotifier,
+    DiscontinuanceClaimNotifyParties,
     TakeCaseOfflineNotifier,
     UnpaidHearingFeeNotifier,
     ClaimantResponseConfirmsNotToProceedNotify,
