@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -35,8 +36,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 class DashboardClaimStatusFactoryTest {
 
@@ -881,5 +884,21 @@ class DashboardClaimStatusFactoryTest {
             Arguments.arguments(caseData1, true, true),
             Arguments.arguments(caseData2, false, true)
         );
+    }
+
+    @Test
+    void shouldOverrideStatus_fromOverrideList() {
+        List<CaseEventDetail> eventHistory = new ArrayList<>();
+        eventHistory.add(CaseEventDetail.builder().id("GENERATE_DIRECTIONS_ORDER").createdDate(LocalDateTime.now()).build());
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .preTranslationDocuments(List.of(element(CaseDocument.builder().documentType(DocumentType.HEARING_FORM).build())))
+
+            .build();
+
+        DashboardClaimStatus claimantStatus = claimStatusFactory.getDashboardClaimStatus(
+            new CcdDashboardClaimantClaimMatcher(caseData, toggleService, eventHistory)
+        );
+        assertThat(claimantStatus).isEqualTo(DashboardClaimStatus.ORDER_MADE);
     }
 }

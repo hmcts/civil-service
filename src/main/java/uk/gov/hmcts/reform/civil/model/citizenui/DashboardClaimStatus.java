@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.Getter;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -30,6 +32,9 @@ public enum DashboardClaimStatus {
     ),
     MEDIATION_SUCCESSFUL(
         Claim::isMediationSuccessful
+    ),
+    AWAITING_HEARING_NOTICE_TRANSLATION(
+        Claim::awaitingHearingNoticeTranslationNotSettledOrDiscontinued
     ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
@@ -241,4 +246,10 @@ public enum DashboardClaimStatus {
     DashboardClaimStatus(Predicate<Claim> claimMatcher) {
         this.claimMatcher = claimMatcher;
     }
+
+    // Can be used to ensure that a status lower down the list takes precedence over a previous one
+    public static final Map<DashboardClaimStatus, List<DashboardClaimStatus>> STATUS_OVERRIDES =
+        Map.of(
+            AWAITING_HEARING_NOTICE_TRANSLATION, List.of(ORDER_MADE)
+        );
 }
