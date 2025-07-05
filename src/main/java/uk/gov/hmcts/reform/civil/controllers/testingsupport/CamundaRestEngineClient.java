@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.community.rest.client.api.ExternalTaskApiClient;
-import org.camunda.community.rest.client.api.HistoricProcessInstanceApiClient;
+import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.IncidentApiClient;
 import org.camunda.community.rest.client.api.ProcessDefinitionApiClient;
 import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
@@ -32,7 +32,7 @@ public class CamundaRestEngineClient {
     private final ExternalTaskApiClient externalTaskApiClient;
     private final IncidentApiClient incidentApiClient;
     private final ProcessDefinitionApiClient processDefinitionApiClient;
-    private final HistoricProcessInstanceApiClient historicInstancesClient;
+    private final HistoryApiClient historyApiClient;
 
     public Optional<String> findIncidentByProcessInstanceId(String processInstanceId) {
         return Optional.ofNullable(
@@ -64,7 +64,7 @@ public class CamundaRestEngineClient {
     }
 
     public ResponseEntity<List<HistoricProcessInstanceDto>> getProcessInstances(String processInstanceId, String definitionKey, String variables) {
-        return historicInstancesClient.getHistoricProcessInstances(
+        return historyApiClient.getHistoricProcessInstances(
                 null,
                 null,
                 null,
@@ -73,6 +73,10 @@ public class CamundaRestEngineClient {
                 null,
                 null,
                 definitionKey,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import camundajar.impl.scala.collection.mutable.StringBuilder;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 
@@ -12,17 +11,17 @@ public class AddressUtils {
         //no op
     }
 
-    public static  String formatAddress(Address address) {
-        String formattedLine = new StringBuilder()
-            .addAll(formatAddressLine(address.getAddressLine1()))
-            .addAll(formatAddressLine(address.getAddressLine2()))
-            .addAll(formatAddressLine(address.getAddressLine3()))
-            .addAll(formatAddressLine(address.getCounty()))
-            .addAll(formatAddressLine(address.getPostTown()))
-            .addAll(formatAddressLine(address.getPostCode()))
-            .addAll(formatAddressLine(address.getCountry()))
-            .result().trim();
-        return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
+    public static String formatAddress(Address address) {
+        StringBuilder formattedLine = new StringBuilder();
+        formattedLine.append(formatAddressLine(address.getAddressLine1()))
+            .append(formatAddressLine(address.getAddressLine2()))
+            .append(formatAddressLine(address.getAddressLine3()))
+            .append(formatAddressLine(address.getCounty()))
+            .append(formatAddressLine(address.getPostTown()))
+            .append(formatAddressLine(address.getPostCode()))
+            .append(formatAddressLine(address.getCountry()));
+        String result = formattedLine.toString().trim();
+        return result.length() > 0 ? result.substring(0, result.length() - 1) : "";
     }
 
     private static String formatAddressLine(String line) {
