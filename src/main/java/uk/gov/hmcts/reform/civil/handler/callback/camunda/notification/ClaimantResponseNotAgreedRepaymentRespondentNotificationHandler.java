@@ -63,9 +63,16 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
     private String addTemplate(CaseData caseData) {
         return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
-            ? notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()
+            ? getTemplateForLip(caseData)
             : notificationsProperties.getNotifyClaimantLrTemplate();
 
+    }
+
+    private String getTemplateForLip(CaseData caseData) {
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isClaimantBilingual()) {
+            return notificationsProperties.getNotifyClaimantLipTemplateManualDeterminationForWelsh();
+        }
+        return notificationsProperties.getNotifyClaimantLipTemplateManualDetermination();
     }
 
     @Override

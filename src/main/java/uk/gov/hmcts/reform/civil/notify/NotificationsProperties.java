@@ -700,4 +700,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String claimantSolicitorImmediatelyDefendantResponseForSpecJBA;
 
+    @NotEmpty
+    private String notifyClaimantLipTemplateManualDeterminationForWelsh;
+
 }
