@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -196,12 +195,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     defendantSealedForm.ifPresent(sealedForm -> {
                         preTranslationDocuments.remove(sealedForm);
                         systemGeneratedDocuments.add(sealedForm);
-                        Optional.ofNullable(caseData.getRespondent1OriginalDqDoc())
-                            .map(ElementUtils::element)
-                            .ifPresent(element -> {
-                                systemGeneratedDocuments.add(element);
-                                caseDataBuilder.respondent1OriginalDqDoc(null);
-                            });
                         aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.toString());
                     });
                 } else if ((Objects.nonNull(preTranslationDocuments) && !preTranslationDocuments.isEmpty())) {
@@ -227,6 +220,12 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (!courtOfficerOrderDocuments.isEmpty()) {
             caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
         }
+
+        if (featureToggleService.isGaForWelshEnabled() && caseData.getRespondent1OriginalDqDoc() != null) {
+            systemGeneratedDocuments.add(element(caseData.getRespondent1OriginalDqDoc()));
+            caseDataBuilder.respondent1OriginalDqDoc(null);
+        }
+
     }
 
     private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams,

@@ -208,7 +208,8 @@ class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandl
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.WELSH.toString())
-            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build();
+            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments).build().toBuilder()
+            .respondent1OriginalDqDoc(CaseDocument.builder().documentName("defendant-dq-form").build()).build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
 
