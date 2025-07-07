@@ -134,6 +134,8 @@ public interface Claim {
 
     boolean isDefaultJudgementIssued();
 
+    boolean decisionMadeDocumentsAreInTranslation();
+
     default boolean isCaseDismissed() {
         return false;
     }
@@ -181,7 +183,11 @@ public interface Claim {
 
     boolean isTrialScheduledPaymentPaidStatusActive();
 
+    boolean sdoDocumentsAreInTranslation();
+
     default boolean isHwfFullRemission() {
         return false;
     }
+
+    boolean isCasedDiscontinued();
 }
