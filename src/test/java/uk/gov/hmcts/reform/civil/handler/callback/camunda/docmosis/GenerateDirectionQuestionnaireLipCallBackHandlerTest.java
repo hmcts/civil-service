@@ -122,7 +122,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     void shouldGenerateFormAndStoreItIntoPreTranslationCollection_whenAboutToSubmitCalledAndClaimantBilingual() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .claimantBilingualLanguagePreference("BOTH").build();
 
@@ -135,7 +135,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     void shouldGenerateFormAndStoreItIntoPreTranslationCollection_whenAboutToSubmitCalledAndClaimHasEnglishParty() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .claimantBilingualLanguagePreference("ENGLISH").build();
 
@@ -147,7 +147,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     void shouldGenerateFormAndStoreItIntoPreTranslationCollection_whenAboutToSubmitCalledAndDefendantBilingual() {
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(directionsQuestionnaireLipGenerator);
         given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP.builder()
                              .respondent1LiPResponse(RespondentLiPResponse.builder()
@@ -163,7 +163,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
             directionQuestionnaireLipResponseGenerator);
         given(directionQuestionnaireLipResponseGenerator.generate(any(CaseData.class), anyString())).willReturn(FORM);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         CaseData caseData = CaseData.builder().build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
