@@ -298,7 +298,7 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInWelshSuccessfully() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
@@ -319,7 +319,7 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInBothLanguagesSuccessfully() {
         // given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
