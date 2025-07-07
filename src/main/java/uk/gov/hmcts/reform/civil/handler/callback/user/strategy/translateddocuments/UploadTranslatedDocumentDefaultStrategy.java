@@ -218,8 +218,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             DocCategory.APP1_DQ.getValue()
                         );
                     } else if ((originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM)
-                        || (featureToggleService.isWelshEnabledForMainCase() &&
-                        originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
+                        || (featureToggleService.isWelshEnabledForMainCase()
+                        && originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
                         systemGeneratedDocuments.add(originalDocument);
                     }
                 }
