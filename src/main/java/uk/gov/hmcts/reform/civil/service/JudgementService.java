@@ -135,7 +135,7 @@ public class JudgementService {
 
     public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
         return featureToggleService.isLrAdmissionBulkEnabled()
-            && isLRvLR(caseData)
+            && !caseData.isApplicantLiP()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
     }
 
@@ -151,12 +151,8 @@ public class JudgementService {
 
     public boolean isLrvLrOneVOneBulkAdmissionsEnabled(CaseData caseData) {
         return featureToggleService.isLrAdmissionBulkEnabled()
-            && isLRvLR(caseData)
+            && !caseData.isApplicantLiP()
             && isOneVOne(caseData);
-    }
-
-    private boolean isLRvLR(CaseData caseData) {
-        return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
     }
 
     public boolean isLrPayImmediatelyPlan(CaseData caseData) {
