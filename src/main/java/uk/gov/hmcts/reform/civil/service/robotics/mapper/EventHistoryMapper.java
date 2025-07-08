@@ -654,7 +654,11 @@ public class EventHistoryMapper {
         boolean isResponsePayByInstallment = caseData.isPayByInstallment();
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
-            .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
+            .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
+                                  .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+                                           ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
+                                           totalInterestForLrClaim(caseData))
+                                  .setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
             .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
@@ -683,18 +687,9 @@ public class EventHistoryMapper {
             .build()));
     }
 
-    @NotNull
-    BigDecimal getAmountOfJudgmentForAdmission(CaseData caseData) {
-        BigDecimal claimAmount = caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount();
-        BigDecimal interest = ZERO;
-        if (caseData.isLipvLipOneVOne()) {
-            if (!caseData.isPartAdmitClaimSpec()) {
-                interest = caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest();
-            }
-        } else {
-            interest = Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
-        }
-        return claimAmount.add(interest).setScale(2);
+    private BigDecimal totalInterestForLrClaim(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled() ? ZERO : Optional.ofNullable(caseData.getTotalInterest()).orElse(
+            ZERO);
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
