@@ -210,7 +210,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                             claimantSealedCopy,
                             DocCategory.APP1_DQ.getValue()
                         );
-                    } else if (originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM) {
+                    } else if ((originalDocument.getValue().getDocumentType() != DocumentType.SEALED_CLAIM)
+                        || (featureToggleService.isWelshEnabledForMainCase()
+                        && originalDocument.getValue().getDocumentType() == DocumentType.SEALED_CLAIM)) {
                         systemGeneratedDocuments.add(originalDocument);
                     }
                 }
