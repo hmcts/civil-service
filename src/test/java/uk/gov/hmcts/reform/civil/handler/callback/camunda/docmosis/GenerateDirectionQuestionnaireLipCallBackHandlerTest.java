@@ -249,4 +249,26 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
         verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
         verifyNoMoreInteractions(assignCategoryId);
     }
+
+    @Test
+    void shouldGenerateForm_whenAboutToSubmitCalled_defendantDocHideFromWelshPartyForRespondent() {
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
+            directionsQuestionnaireLipGenerator);
+        given(directionsQuestionnaireLipGenerator.generate(
+            any(CaseData.class),
+            anyString()
+        )).willReturn(FORM_DEFENDANT);
+        given(featureToggleService.isWelshEnabledForMainCase()).willReturn(true);
+        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder()
+                                                               .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                                                           .respondent1ResponseLanguage(
+                                                                                               "BOTH")
+                                                                                           .build()).build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getData().get("respondent1OriginalDqDoc")).isNotNull();
+        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
+        verify(assignCategoryId).assignCategoryIdToCaseDocument(any(), eq(DocCategory.DQ_DEF1.getValue()));
+        verifyNoMoreInteractions(assignCategoryId);
+    }
 }
