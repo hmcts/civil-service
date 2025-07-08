@@ -10,14 +10,10 @@ import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoCoverLetterAppendService;
@@ -89,7 +85,7 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
         caseData = caseData.toBuilder().caseDataLiP(
             CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build()).build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -107,7 +103,7 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
         caseData = caseData.toBuilder().caseDataLiP(
             CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("WELSH").build()).build()).build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -125,43 +121,7 @@ class SendSDOBulkPrintServiceTest {
         CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
         caseData = caseData.toBuilder().caseDataLiP(
             CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build()).build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
-            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-
-        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
-
-        verifyPrintLetter(caseData, applicant1);
-        ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
-        verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
-        assertThat(captor.getValue()).hasSize(2);
-    }
-
-    @Test
-    void shouldPrintLetterSuccessfullyForDefendantLIPInWelshIfDocPreferenceIsWelsh() {
-        Party applicant1 = createSoleTraderParty();
-        CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().documents(Language.WELSH).build()).build()).build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
-            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-
-        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
-
-        verifyPrintLetter(caseData, applicant1);
-        ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
-        verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
-        assertThat(captor.getValue()).hasSize(1);
-    }
-
-    @Test
-    void shouldPrintLetterSuccessfullyForRespondentLIPInBothLanguagesIfDocPreferenceIsBoth() {
-        Party applicant1 = createSoleTraderParty();
-        CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().respondent1DQ(Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().documents(Language.BOTH).build()).build()).build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -178,7 +138,7 @@ class SendSDOBulkPrintServiceTest {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithSDOOrder(applicant1);
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -195,7 +155,7 @@ class SendSDOBulkPrintServiceTest {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("WELSH").build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 
@@ -212,43 +172,7 @@ class SendSDOBulkPrintServiceTest {
         Party applicant1 = createSoleTraderParty();
         CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
-            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-
-        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
-
-        verifyPrintLetter(caseData, applicant1);
-        ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
-        verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
-        assertThat(captor.getValue()).hasSize(2);
-    }
-
-    @Test
-    void shouldPrintLetterSuccessfullyForClaimantLIPInWelshIfDocPreferenceIsWelsh() {
-        Party applicant1 = createSoleTraderParty();
-        CaseData caseData = createCaseDataWithTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().documents(Language.WELSH).build()).build()).build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
-            .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
-
-        sendSDOBulkPrintService.sendSDOOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
-
-        verifyPrintLetter(caseData, applicant1);
-        ArgumentCaptor<CaseDocument[]> captor = ArgumentCaptor.forClass(CaseDocument[].class);
-        verify(sdoCoverLetterAppendService).makeSdoDocumentMailable(any(), any(), any(), any(), captor.capture());
-        assertThat(captor.getValue()).hasSize(1);
-    }
-
-    @Test
-    void shouldPrintLetterSuccessfullyForClaimantLIPInBothLanguagesIfDocPreferenceIsBoth() {
-        Party applicant1 = createSoleTraderParty();
-        CaseData caseData = createCaseDataWithEnglishAndTranslatedSDOOrder(applicant1);
-        caseData = caseData.toBuilder().applicant1DQ(Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().documents(Language.BOTH).build()).build()).build();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         given(sdoCoverLetterAppendService.makeSdoDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
 

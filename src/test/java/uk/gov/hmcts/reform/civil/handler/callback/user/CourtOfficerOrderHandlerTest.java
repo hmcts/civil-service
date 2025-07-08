@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -228,6 +230,8 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
+            objectMapper = new ObjectMapper();
+            objectMapper.findAndRegisterModules();
         }
 
         @Test
@@ -238,6 +242,64 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
                 .containsOnly(COURT_OFFICER_ORDER.name(), "READY");
         }
 
+        @Test
+        void shouldHideDocumentIfClaimantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .preTranslationDocuments(new ArrayList<>())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
+        }
+
+        @Test
+        void shouldNotHideDocumentIfWelshDisabled_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .preTranslationDocuments(new ArrayList<>())
+                .claimantBilingualLanguagePreference("BOTH")
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getPreTranslationDocuments()).hasSize(0);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNotNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNotNull();
+        }
+
+        @Test
+        void shouldHideDocumentIfDefendantWelsh_onAboutToSubmit() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            // Given
+            caseData = caseData.toBuilder()
+                .previewCourtOfficerOrder(courtOfficerOrder)
+                .preTranslationDocuments(new ArrayList<>())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                             .respondent1ResponseLanguage("WELSH").build()).build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getPreTranslationDocuments()).hasSize(1);
+            assertThat(updatedData.getPreviewCourtOfficerOrder()).isNull();
+            assertThat(updatedData.getCurrentCamundaBusinessProcessName()).isNull();
+        }
     }
 
     @Test

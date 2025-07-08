@@ -157,6 +157,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
     private static final String DEF2 = "Defendant 2";
     public static final String ERROR_DEFENDANT_RESPONSE_SPEC_SUBMITTED = "There is a problem \n You have already submitted the defendant's response";
+    private static final int RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS = 24;
     public static final String ERROR_RESPONSE_TO_CLAIM_OWING_AMOUNT = "This amount equals or exceeds the claim amount plus interest.";
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -1423,7 +1424,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDate = time.now();
         Party updatedRespondent1;
 
         if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
@@ -1443,7 +1443,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
+        updatedData.claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+            RESPONSE_CLAIM_SPEC_DEADLINE_EXTENSION_MONTHS,
+            LocalDate.now()
+        ));
 
+        LocalDateTime responseDate = time.now();
         if (respondent2HasSameLegalRep(caseData)
             && caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
             updatedData.respondent2ClaimResponseTypeForSpec(caseData.getRespondent1ClaimResponseTypeForSpec());
@@ -1669,7 +1674,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
-
+        if (featureToggleService.isGaForWelshEnabled() && caseData.isLipvLROneVOne()
+            && caseData.isClaimantBilingual()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.build().toMap(objectMapper))
+                .build();
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
@@ -1911,13 +1921,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         String body = CaseDataToTextGenerator.getTextFor(
             confirmationTextSpecGenerators.stream(),
             () -> getDefaultConfirmationBody(caseData),
-            caseData
+            caseData,
+            featureToggleService
         );
 
         String header = CaseDataToTextGenerator.getTextFor(
             confirmationHeaderGenerators.stream(),
             () -> format("# You have submitted your response%n## Claim number: %s", claimNumber),
-            caseData
+            caseData,
+            featureToggleService
         );
 
         return SubmittedCallbackResponse.builder()

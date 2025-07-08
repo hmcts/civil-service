@@ -20,8 +20,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCommonFooterSignature;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addSpecAndUnspecContact;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -50,7 +49,11 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
             || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
         ) {
-            emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+            if (featureToggleService.isJudgmentOnlineLive()) {
+                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpecJBA();
+            } else {
+                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+            }
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
@@ -93,9 +96,9 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             return properties;
         } else {
             HashMap<String, String> properties = new HashMap<>(Map.of(
@@ -106,9 +109,9 @@ public class FullDefenceApplicantSolicitorOneSpecNotifier extends FullDefenceSol
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
                 CASEMAN_REF, caseData.getLegacyCaseReference()
             ));
-            addCommonFooterSignature(properties, configuration);
-            addSpecAndUnspecContact(caseData, properties, configuration,
-                                    featureToggleService.isQueryManagementLRsEnabled());
+            addAllFooterItems(caseData, properties, configuration,
+                          featureToggleService.isQueryManagementLRsEnabled(),
+                          featureToggleService.isLipQueryManagementEnabled(caseData));
             return properties;
         }
     }
