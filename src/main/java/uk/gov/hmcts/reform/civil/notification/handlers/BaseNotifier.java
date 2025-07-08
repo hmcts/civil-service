@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.notification.handlers.claimantresponsecui.confirmproceed.ClaimantConfirmProceedDefendantEmailDTOGenerator.NO_EMAIL_OPERATION;
 
 @AllArgsConstructor
@@ -30,7 +31,8 @@ public abstract class BaseNotifier {
                     recipient.getReference()
                 );
             } catch (NotificationException e) {
-                errorMessages.add(e.getMessage());
+                final String message = format("Failed to send email to %s : %s", recipient.getTargetEmail(), e.getMessage());
+                errorMessages.add(message);
             }
         }
         return errorMessages;

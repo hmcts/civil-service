@@ -57,7 +57,8 @@ public class JudgementService {
 
     public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
-        if (isLrFullAdmitRepaymentPlan(caseData)) {
+        if (isLrFullAdmitRepaymentPlan(caseData)
+            || isLrFullAdmitPayImmediately(caseData)) {
             BigDecimal interest = interestCalculator.calculateInterestForJO(caseData);
             claimAmount = claimAmount.add(interest);
         } else {
@@ -134,7 +135,7 @@ public class JudgementService {
 
     public boolean isLRAdmissionRepaymentPlan(CaseData caseData) {
         return featureToggleService.isLrAdmissionBulkEnabled()
-            && isLRvLR(caseData)
+            && !caseData.isApplicantLiP()
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment());
     }
 
@@ -148,15 +149,20 @@ public class JudgementService {
             && caseData.isPartAdmitClaimSpec();
     }
 
-    private boolean isLRvLR(CaseData caseData) {
-        return !caseData.isApplicantLiP() && !caseData.isRespondent1LiP() && !caseData.isRespondent2LiP();
+    public boolean isLrvLrOneVOneBulkAdmissionsEnabled(CaseData caseData) {
+        return featureToggleService.isLrAdmissionBulkEnabled()
+            && !caseData.isApplicantLiP()
+            && isOneVOne(caseData);
     }
 
     public boolean isLrPayImmediatelyPlan(CaseData caseData) {
-        return caseData.isPayImmediately()
-            && isOneVOne(caseData)
-            && isLRvLR(caseData)
-            && featureToggleService.isLrAdmissionBulkEnabled();
+        return isLrvLrOneVOneBulkAdmissionsEnabled(caseData)
+            && caseData.isPayImmediately();
+    }
+
+    public boolean isLrFullAdmitPayImmediately(CaseData caseData) {
+        return isLrPayImmediatelyPlan(caseData)
+            && caseData.isFullAdmitClaimSpec();
     }
 
     private YesOrNo checkFixedCostOption(CaseData caseData) {

@@ -133,7 +133,7 @@ class NotifierTest {
                 CASE_ID.toString(),
                 "eventId",
                 "taskId",
-                Map.of("Errors", "[java.lang.Exception: Notification Service error null]")
+                Map.of("Errors", "[Failed to send email to respondentsolicitor@example.com : java.lang.Exception: Notification Service error null]")
             );
         verify(emailGenerator, times(1)).getPartiesToNotify(caseData, taskId);
         verify(notificationService, times(3)).sendMail(anyString(), anyString(), anyMap(), anyString());

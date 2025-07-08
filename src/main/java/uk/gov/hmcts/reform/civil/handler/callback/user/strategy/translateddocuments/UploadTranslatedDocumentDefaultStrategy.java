@@ -326,7 +326,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                 return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_REJECTS_REPAYMENT_PLAN;
             } else if (Objects.nonNull(translatedDocuments)
                 && (translatedDocuments.get(0).getValue().getDocumentType().equals(FINAL_ORDER))) {
-                return CaseEvent.GENERATE_ORDER_NOTIFICATION;
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_ORDER;
             } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, NOTICE_OF_DISCONTINUANCE_DEFENDANT)) {
                 return caseData.isJudgeOrderVerificationRequired() ? null :
