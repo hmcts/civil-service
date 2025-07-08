@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.notification.handlers;
 
 public enum CamundaProcessIdentifier {
     ClaimDismissedNotifyParties,
+    ClaimantConfirmProceedNotifyParties,
+    RejectRepaymentPlanNotifyParties,
     LitigationFriendAddedNotifier,
     GenerateDJFormNotifyParties,
     ClaimProceedsOfflineUnspecNotifyApplicantSolicitor,
@@ -10,6 +12,8 @@ public enum CamundaProcessIdentifier {
     AcknowledgeClaimUnspecNotifyParties,
     GenerateOrderNotifyPartiesCourtOfficerOrder,
     GenerateOrderNotifyParties,
+    DismissCaseNotifier,
+    HwFOutcomeNotifyParties,
     DefendantResponseUnspecFullDefenceNotifyParties,
     DefendantResponseUnspecCaseHandedOfflineNotifyParties,
     DefendantResponseSpecCaseHandedOfflineNotifyParties,
@@ -22,11 +26,18 @@ public enum CamundaProcessIdentifier {
     ClaimSubmittedApplicantNotifier,
     ClaimantLipHelpWithFeesNotifier,
     HearingProcessNotifier,
+    TakeCaseOfflineNotifier,
+    UnpaidHearingFeeNotifier,
     ClaimantResponseConfirmsNotToProceedNotify,
     ClaimantConfirmsToProceedNotify,
     ClaimantDefendantAgreedMediationNotify,
     ClaimantResponseNotAgreedRepaymentNotify,
     ClaimantResponseAgreedRepaymentNotify,
     ClaimantResponseAgreedSettledPartAdmitNotify,
-    ClaimantResponseConfirmsNotToProceedLipNotify
+    ClaimantResponseConfirmsNotToProceedLipNotify,
+    CaseProceedsInCasemanNotify,
+    ApplicantNotifyOthersTrialReady,
+    Respondent1NotifyOthersTrialReady,
+    Respondent2NotifyOthersTrialReady,
+    AmendRestitchBundleNotify,
 }

@@ -19,6 +19,12 @@ public enum DashboardClaimStatus {
     HEARING_FEE_UNPAID(
         Claim::isCaseStruckOut
     ),
+    DECISION_MADE_DOCUMENTS_BEING_TRANSLATED(
+        Claim::decisionMadeDocumentsAreInTranslation
+    ),
+    SDO_DOCUMENTS_BEING_TRANSLATED(
+        Claim::sdoDocumentsAreInTranslation
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),
@@ -224,6 +230,9 @@ public enum DashboardClaimStatus {
     NO_STATUS(c -> false),
     ORDER_MADE(
         Claim::isOrderMade
+    ),
+    CASE_DISCONTINUED(
+        Claim::isCasedDiscontinued
     );
 
     @Getter
