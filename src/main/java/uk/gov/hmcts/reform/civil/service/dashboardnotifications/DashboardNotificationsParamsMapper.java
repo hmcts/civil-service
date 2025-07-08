@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsBuilder;
 
 import java.util.HashMap;
@@ -22,6 +23,7 @@ public class DashboardNotificationsParamsMapper {
     public static final String ORDER_DOCUMENT = "orderDocument";
 
     private final List<DashboardNotificationsParamsBuilder> dashboardNotificationsParamsBuilders;
+    private final FeatureToggleService featureToggleService;
 
     public HashMap<String, Object> mapCaseDataToParams(CaseData caseData) {
 
@@ -44,8 +46,15 @@ public class DashboardNotificationsParamsMapper {
 
         if (nonNull(caseEvent)) {
             switch (caseEvent) {
-                case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
-                    UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT, UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT -> {
+                case CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_DEFENDANT, CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT -> {
+                    if (featureToggleService.isGaForWelshEnabled() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+                        return null;
+                    } else {
+                        return caseData.getFinalOrderDocumentCollection()
+                            .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
+                    }
+                }
+                case UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_CLAIMANT, UPDATE_TASK_LIST_CONFIRM_ORDER_REVIEW_DEFENDANT -> {
                     return caseData.getFinalOrderDocumentCollection()
                         .get(0).getValue().getDocumentLink().getDocumentBinaryUrl();
                 }
