@@ -363,7 +363,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -415,7 +415,7 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.107'
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.43'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.28'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: versions.jackson
