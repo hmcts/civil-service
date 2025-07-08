@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_EVENT); //Change back to generic NOTIFY_EVENT
@@ -44,6 +46,7 @@ public class NotificationHandler extends CallbackHandler {
 
     private CallbackResponse sendNotifications(CallbackParams callbackParams) {
         final String taskId = callbackParams.getCaseData().getBusinessProcess().getActivityId();
+        log.info("Sending notifications for taskId: {}", taskId);
         final Notifier notifier = notifierFactory.getNotifier(taskId);
         notifier.notifyParties(callbackParams.getCaseData(), NOTIFY_EVENT.toString(), taskId);
         return AboutToStartOrSubmitCallbackResponse.builder().build();
