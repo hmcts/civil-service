@@ -654,11 +654,7 @@ public class EventHistoryMapper {
         boolean isResponsePayByInstallment = caseData.isPayByInstallment();
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
-            .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                                  .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                                           ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           totalInterestForLrClaim(caseData))
-                                  .setScale(2))
+            .amountOfJudgment(getAmountOfJudgmentForAdmission(caseData))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
             .amountPaidBeforeJudgment(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmountInPounds().setScale(2))
@@ -685,6 +681,12 @@ public class EventHistoryMapper {
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
+    }
+
+    @NotNull
+    protected BigDecimal getAmountOfJudgmentForAdmission(CaseData caseData) {
+        return caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
+            .add(caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() : totalInterestForLrClaim(caseData)).setScale(2);
     }
 
     private BigDecimal totalInterestForLrClaim(CaseData caseData) {
