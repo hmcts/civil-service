@@ -240,7 +240,7 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
             any(CaseData.class),
             anyString()
         )).willReturn(FORM_DEFENDANT);
-        given(featureToggleService.isGaForWelshEnabled()).willReturn(true);
+        given(featureToggleService.isWelshEnabledForMainCase()).willReturn(true);
         CaseData caseData = CaseData.builder().claimantBilingualLanguagePreference("BOTH").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

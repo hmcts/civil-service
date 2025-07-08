@@ -117,7 +117,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 "Sealed Claim form",
                 LocalDate.now().toString()
         ));
-        if (featureToggleService.isGaForWelshEnabled() && caseData.getRespondent1OriginalDqDoc() != null) {
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
             documents.add(
                 new DocumentMetaData(
                     caseData.getRespondent1OriginalDqDoc().getDocumentLink(),
