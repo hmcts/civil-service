@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -922,7 +923,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldResetLanguageFlag_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -947,7 +948,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldResetLanguageFlag_afterNocSubmittedByDefendantSolicitorForDefendantLip() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -976,7 +977,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldNotResetLanguageFlagIfWelshDisabled_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
-            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -1052,6 +1053,28 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                         .isNull();
                 }
             }
+        }
+
+        @Test
+        void shouldCaptureCCDPreState_whenProceedInHeritageSystemRequested() {
+            when(featureToggleService.isLrAdmissionBulkEnabled()).thenReturn(true);
+            when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
+                .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
+                .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
+                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .applicant1Represented(NO)
+                .anyRepresented(NO)
+                .claimantBilingualLanguagePreference("WELSH")
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("previousCCDState").isNotNull();
         }
     }
 }
