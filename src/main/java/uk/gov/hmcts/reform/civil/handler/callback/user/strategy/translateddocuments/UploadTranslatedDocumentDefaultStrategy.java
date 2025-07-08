@@ -345,7 +345,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)
                 && caseData.isLipvLROneVOne()
-                && featureToggleService.isGaForWelshEnabled()) {
+                && featureToggleService.isWelshEnabledForMainCase()) {
                 return CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM;
             }
         }
@@ -391,14 +391,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private boolean isTranslationForLipVsLRDefendantSealedForm(Element<TranslatedDocument> document,
                                                                CaseData caseData) {
         return DEFENDANT_RESPONSE.equals(document.getValue().getDocumentType())
-            && caseData.isLipvLROneVOne() && featureToggleService.isGaForWelshEnabled()
+            && caseData.isLipvLROneVOne() && featureToggleService.isWelshEnabledForMainCase()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState());
     }
 
     private boolean isTranslationForLrVsLipApplicantDq(Element<TranslatedDocument> document,
                                                                CaseData caseData) {
         return CLAIMANT_INTENTION.equals(document.getValue().getDocumentType())
-            && caseData.isLRvLipOneVOne() && featureToggleService.isGaForWelshEnabled()
+            && caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()
             && CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState());
     }
 }

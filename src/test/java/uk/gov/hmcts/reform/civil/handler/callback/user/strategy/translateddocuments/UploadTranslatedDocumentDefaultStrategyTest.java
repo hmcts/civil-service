@@ -965,7 +965,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLr() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(DEFENDANT_RESPONSE)
