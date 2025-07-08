@@ -107,9 +107,9 @@ public class SendHearingBulkPrintService {
 
     private Language determineLanguageForBulkPrint(CaseData caseData, String taskId, boolean welshDocument) {
         //TODO: refactor this method when Welsh feature goes live
-        if (!featureToggleService.isGaForWelshEnabled() && !welshDocument) {
+        if (!featureToggleService.isWelshEnabledForMainCase() && !welshDocument) {
             return ENGLISH;
-        } else if (!featureToggleService.isGaForWelshEnabled() && welshDocument) {
+        } else if (!featureToggleService.isWelshEnabledForMainCase() && welshDocument) {
             return BOTH;
         }
 

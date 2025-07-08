@@ -397,7 +397,7 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Test
     void shouldSetTheValuesInPreTranslationCollectionForWelshTranslation() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         when(formGenerator.generateDocs(
             any(CaseData.class),
             anyString(), any(Address.class), anyString(), anyString()
