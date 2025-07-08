@@ -16,9 +16,8 @@ import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.model.querymanagement.LatestQuery;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -57,8 +56,8 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE.name())
-                             .build())
+                    .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE.name())
+                    .build())
                 .build()))
             .isEqualTo(TASK_ID);
     }
@@ -72,9 +71,9 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("123456")
-                                           .createdBy("applicant")
-                                           .build()))
+                .id("123456")
+                .createdBy("applicant")
+                .build()))
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
@@ -112,9 +111,9 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(CaseMessage.builder()
-                                           .id("123457")
-                                           .createdBy("defendant")
-                                           .build()))
+                .id("123457")
+                .createdBy("defendant")
+                .build()))
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
@@ -152,13 +151,13 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection defendantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
-                                                   .id("123457")
-                                                   .createdBy("defendant")
-                                                   .build(),
-                                               CaseMessage.builder()
-                                                   .id("123458")
-                                                   .createdBy("defendant")
-                                                   .build())))
+                    .id("123457")
+                    .createdBy("defendant")
+                    .build(),
+                CaseMessage.builder()
+                    .id("123458")
+                    .createdBy("defendant")
+                    .build())))
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
@@ -196,13 +195,13 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
         when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
         CaseQueriesCollection applicantCitizenQuery = CaseQueriesCollection.builder()
             .caseMessages(wrapElements(List.of(CaseMessage.builder()
-                                                   .id("123457")
-                                                   .createdBy("claimant")
-                                                   .build(),
-                                               CaseMessage.builder()
-                                                   .id("123458")
-                                                   .createdBy("claimant")
-                                                   .build())))
+                    .id("123457")
+                    .createdBy("claimant")
+                    .build(),
+                CaseMessage.builder()
+                    .id("123458")
+                    .createdBy("claimant")
+                    .build())))
             .build();
         CaseData caseData = CaseData.builder()
             .caseDataLiP(
