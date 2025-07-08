@@ -503,6 +503,8 @@ notifications:
   queryLrPublicResponseReceived: "cd51bd5e-f4e7-47d3-9f8f-7a59d8612526"
   queryLipPublicResponseReceived: "b097eb54-3e00-4272-9b77-426b23a71ce1"
   queryLipWelshPublicResponseReceived: "d1ff72f3-db0e-44c9-83e9-5c6a43681d69"
+  partAdmitPayImmediatelyAgreedClaimant: "c8f80d91-5f4f-4396-9955-6c5da13a818b"
+  partAdmitPayImmediatelyAgreedDefendant: "d653484b-2e1d-4e65-bea5-b58f23a3f242"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

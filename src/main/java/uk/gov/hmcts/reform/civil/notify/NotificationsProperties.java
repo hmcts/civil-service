@@ -692,6 +692,12 @@ public class NotificationsProperties {
     private String queryLipResponseReceivedWelsh;
 
     @NotEmpty
+    private String partAdmitPayImmediatelyAgreedClaimant;
+
+    @NotEmpty
+    private String partAdmitPayImmediatelyAgreedDefendant;
+
+    @NotEmpty
     private String claimantSolicitorImmediatelyDefendantResponseForSpecJBA;
   
     @NotEmpty
