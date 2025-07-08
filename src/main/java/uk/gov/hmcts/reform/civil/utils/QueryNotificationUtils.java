@@ -99,7 +99,6 @@ public class QueryNotificationUtils {
         List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, queryId);
         if (caseData.isLipCase()) {
             String otherParty = getOtherParty(caseData, roles);
-            log.info("other party: {}", otherParty);
             return getOtherPartyLipOnCaseRecipientList(caseData, otherParty, organisationService);
         } else {
             return getOtherPartyRecipientList(caseData, roles, organisationService);
