@@ -21,7 +21,6 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT;
 
@@ -75,10 +74,6 @@ public class ClaimIssueNotificationsHandler extends DashboardCallbackHandler {
             if (FAST_CLAIM.equals(allocatedTrack)) {
                 scenarios.add(SCENARIO_AAA6_CP_CLAIM_ISSUE_FAST_TRACK_DEFENDANT);
             }
-        }
-
-        if (featureToggleService.isLipQueryManagementEnabled(caseData)) {
-            scenarios.add(SCENARIO_AA6_APPLICATIONS_AND_MESSAGES_TO_THE_COURT);
         }
 
         return scenarios;
