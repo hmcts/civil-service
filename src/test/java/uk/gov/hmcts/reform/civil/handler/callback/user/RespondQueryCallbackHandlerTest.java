@@ -70,7 +70,6 @@ class RespondQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             handler = new RespondQueryCallbackHandler(
                 objectMapper, assignCategoryId, featuretoggleService
             );
-            when(featuretoggleService.isPublicQueryManagementEnabled(any(CaseData.class))).thenReturn(false);
         }
 
         @Test
