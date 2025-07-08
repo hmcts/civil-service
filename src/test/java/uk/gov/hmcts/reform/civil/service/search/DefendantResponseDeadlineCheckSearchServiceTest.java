@@ -92,4 +92,60 @@ class DefendantResponseDeadlineCheckSearchServiceTest {
         assertThat(query.toString()).contains("data.businessProcess.status");
         assertThat(query.toString()).contains("FINISHED");
     }
+
+    @Test
+    void shouldReturnQuery_whenCallingQueryWithSingleParameter() {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
+
+        Query query = searchService.query(0);
+
+        assertThat(query).isNotNull();
+        assertThat(query.toString()).contains("\"from\": 0");
+        assertThat(query.toString()).contains("\"_source\": [\"reference\"]");
+        assertThat(query.toString()).contains("\"query\"");
+    }
+
+    @Test
+    void shouldReturnCasesFromMultiplePages_whenTotalExceedsDefaultLimit() {
+        List<CaseDetails> firstPageCases = List.of(
+            CaseDetails.builder().id(1L).build(),
+            CaseDetails.builder().id(2L).build(),
+            CaseDetails.builder().id(3L).build(),
+            CaseDetails.builder().id(4L).build(),
+            CaseDetails.builder().id(5L).build(),
+            CaseDetails.builder().id(6L).build(),
+            CaseDetails.builder().id(7L).build(),
+            CaseDetails.builder().id(8L).build(),
+            CaseDetails.builder().id(9L).build(),
+            CaseDetails.builder().id(10L).build()
+        );
+
+        List<CaseDetails> secondPageCases = List.of(
+            CaseDetails.builder().id(11L).build(),
+            CaseDetails.builder().id(12L).build(),
+            CaseDetails.builder().id(13L).build(),
+            CaseDetails.builder().id(14L).build(),
+            CaseDetails.builder().id(15L).build()
+        );
+
+        SearchResult firstPage = SearchResult.builder()
+            .total(15)
+            .cases(firstPageCases)
+            .build();
+
+        SearchResult secondPage = SearchResult.builder()
+            .total(15)
+            .cases(secondPageCases)
+            .build();
+
+        when(coreCaseDataService.searchCases(any(Query.class)))
+            .thenReturn(firstPage)  // First page
+            .thenReturn(secondPage); // Second page
+
+        Set<CaseDetails> results = searchService.getCases();
+
+        assertThat(results).hasSize(15);
+        assertThat(results).extracting(CaseDetails::getId)
+            .containsExactlyInAnyOrder(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 13L, 14L, 15L);
+    }
 }
