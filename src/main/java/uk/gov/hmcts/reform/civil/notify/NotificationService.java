@@ -22,7 +22,7 @@ public class NotificationService {
         String reference
     ) {
         try {
-            log.info("NotificationService::sendMail::templateID: {}", emailTemplate);
+            log.info("NotificationService::sendMail::templateID: {}, address: {}", emailTemplate, targetEmail);
             notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
         } catch (NotificationClientException e) {
             log.error("Notification Service error {}", e.getMessage());
