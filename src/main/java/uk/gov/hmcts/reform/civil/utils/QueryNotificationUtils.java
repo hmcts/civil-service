@@ -109,19 +109,19 @@ public class QueryNotificationUtils {
     private static String getOtherParty(CaseData caseData, List<String> roles) {
         if (isApplicantSolicitor(roles)) {
             log.info("Applicant solicitor found");
-            return caseData.getRespondent1Represented() == YesOrNo.YES ? "lrDefendant" : "lipRespondent";
+            return caseData.getRespondent1Represented() != YesOrNo.NO ? "lrDefendant" : "lipRespondent";
         }
         if (isRespondentSolicitorOne(roles) || isRespondentSolicitorTwo(roles)) {
             log.info("Respondent solicitor found");
-            return caseData.getApplicant1Represented() == YesOrNo.YES ? "lrApplicant" : "lipApplicant";
+            return caseData.getApplicant1Represented() != YesOrNo.NO ? "lrApplicant" : "lipApplicant";
         }
         if (isLIPClaimant(roles)) {
             log.info("LIP claimant found");
-            return caseData.getRespondent1Represented() == YesOrNo.YES ? "lrDefendant" : "lipRespondent";
+            return caseData.getRespondent1Represented() != YesOrNo.NO ? "lrDefendant" : "lipRespondent";
         }
         if (isLIPDefendant(roles)) {
             log.info("LIP defendant found");
-            return caseData.getApplicant1Represented() == YesOrNo.YES ? "lrApplicant" : "lipApplicant";
+            return caseData.getApplicant1Represented() != YesOrNo.NO ? "lrApplicant" : "lipApplicant";
         }
         throw new IllegalArgumentException(UNSUPPORTED_ROLE_ERROR);
     }
