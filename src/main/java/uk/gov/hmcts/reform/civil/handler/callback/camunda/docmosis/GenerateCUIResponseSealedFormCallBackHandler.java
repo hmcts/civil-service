@@ -96,7 +96,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     }
 
     private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
-        if (featureToggleService.isGaForWelshEnabled() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+        if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
                 .preTranslationDocuments(List.of(ElementUtils.element(document)));
         } else {
@@ -117,16 +117,25 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 "Sealed Claim form",
                 LocalDate.now().toString()
         ));
-        ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+            documents.add(
+                new DocumentMetaData(
+                    caseData.getRespondent1OriginalDqDoc().getDocumentLink(),
+                    "Directions Questionnaire",
+                    LocalDate.now().toString()
+                )
+            );
+        } else {
+            ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
                 .filter(cd -> DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
                 .map(cd ->
-                        new DocumentMetaData(
-                                cd.getDocumentLink(),
-                                "Directions Questionnaire",
-                                LocalDate.now().toString()
-                        )
+                         new DocumentMetaData(
+                             cd.getDocumentLink(),
+                             "Directions Questionnaire",
+                             LocalDate.now().toString()
+                         )
                 ).forEach(documents::add);
-
+        }
         return documents;
     }
 }
