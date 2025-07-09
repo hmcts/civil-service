@@ -647,4 +647,9 @@ public class CmcClaim implements Claim {
     public boolean isCasedDiscontinued() {
         return false;
     }
+
+    @Override
+    public boolean awaitingHearingNoticeTranslationNotSettledOrDiscontinued() {
+        return false;
+    }
 }
