@@ -64,7 +64,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
         CaseDocument sealedDQForm = directionQuestionnaireLipGeneratorFactory
             .getDirectionQuestionnaire()
             .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (featureToggleService.isGaForWelshEnabled()
+        if (featureToggleService.isWelshEnabledForMainCase()
             && sealedDQForm.getDocumentName().contains("claimant")
             && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_APP1.getValue());
@@ -73,6 +73,11 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             translatedDocuments.add(element(sealedDQForm));
             caseDataBuilder.preTranslationDocuments(translatedDocuments);
             caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.LIP_CLAIMANT_DQ);
+        } else if (featureToggleService.isWelshEnabledForMainCase()
+            && sealedDQForm.getDocumentName().contains("defendant")
+            && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DQ_DEF1.getValue());
+            caseDataBuilder.respondent1OriginalDqDoc(sealedDQForm);
         } else {
             caseDataBuilder
                 .systemGeneratedCaseDocuments(systemGeneratedDocumentService

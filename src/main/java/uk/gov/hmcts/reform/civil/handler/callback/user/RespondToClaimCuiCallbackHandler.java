@@ -109,7 +109,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
 
-        boolean needsTranslating = featureToggleService.isGaForWelshEnabled()
+        boolean needsTranslating = featureToggleService.isWelshEnabledForMainCase()
             ? (caseData.isRespondentResponseBilingual() || caseData.isClaimantBilingual())
             : caseData.isRespondentResponseBilingual();
 
@@ -159,7 +159,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .applicant1ResponseDeadline(applicantDeadline)
             .nextDeadline(applicantDeadline.toLocalDate());
 
-        if (featureToggleService.isGaForWelshEnabled()) {
+        if (featureToggleService.isWelshEnabledForMainCase()) {
             Optional<Language> optionalLanguage = Optional.ofNullable(caseData.getRespondent1DQ())
                 .map(Respondent1DQ::getRespondent1DQLanguage).map(WelshLanguageRequirements::getDocuments);
             String respondentLanguageString = optionalLanguage.map(Language::name).orElse(null);
