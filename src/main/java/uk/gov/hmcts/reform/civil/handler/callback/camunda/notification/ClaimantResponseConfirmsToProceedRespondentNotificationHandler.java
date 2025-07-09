@@ -220,10 +220,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       featureToggleService.isQueryManagementLRsEnabled());
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -238,11 +235,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       featureToggleService.isQueryManagementLRsEnabled());
-
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -254,10 +247,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isQueryManagementLRsEnabled(),
-                          featureToggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       featureToggleService.isQueryManagementLRsEnabled());
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 

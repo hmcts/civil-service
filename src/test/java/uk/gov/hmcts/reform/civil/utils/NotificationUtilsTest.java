@@ -490,16 +490,7 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
                 when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, false);
-                assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
-            }
-
-            @Test
-            void shouldAddLipEmailWhenLrQmNotEnabled() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().respondent1Represented(NO).build();
-                when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false, true);
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, false);
                 assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
             }
 
@@ -510,7 +501,7 @@ class NotificationUtilsTest {
                     .respondent1Represented(NO)
                     .ccdState(Enum.valueOf(CaseState.class, caseState)).build();
                 when(configuration.getLipContactEmail()).thenReturn("contactocmc@justice.gov.uk");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true);
                 assertThat(actual.get(LIP_CONTACT)).isEqualTo("contactocmc@justice.gov.uk");
             }
 
@@ -519,7 +510,7 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
                 when(configuration.getRaiseQueryLip()).thenReturn("To contact the court, select contact or apply to the court on your dashboard.");
-                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true, true);
+                Map<String, String> actual = addLipContact(caseData, new HashMap<>(), configuration, true);
                 assertThat(actual.get(LIP_CONTACT)).isEqualTo("To contact the court, select contact or apply to the court on your dashboard.");
             }
 
@@ -533,16 +524,7 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
                 when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, false, false);
-                assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
-            }
-
-            @Test
-            void shouldAddWelshLipEmailWhenLrQmNotEnabled() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
-                    .toBuilder().respondent1Represented(NO).build();
-                when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, false, true);
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, false);
                 assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
             }
 
@@ -553,7 +535,7 @@ class NotificationUtilsTest {
                     .respondent1Represented(NO)
                     .ccdState(Enum.valueOf(CaseState.class, caseState)).build();
                 when(configuration.getLipContactEmailWelsh()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true, true);
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true);
                 assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("E-bost: ymholiadaucymraeg@justice.gov.uk");
             }
 
@@ -562,7 +544,7 @@ class NotificationUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
                     .toBuilder().respondent1Represented(NO).build();
                 when(configuration.getRaiseQueryLipWelsh()).thenReturn("I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd.");
-                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true, true);
+                Map<String, String> actual = addLipContactWelsh(caseData, new HashMap<>(), configuration, true);
                 assertThat(actual.get(LIP_CONTACT_WELSH)).isEqualTo("I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd.");
             }
 

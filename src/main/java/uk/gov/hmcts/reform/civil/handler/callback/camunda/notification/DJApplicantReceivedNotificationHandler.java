@@ -154,10 +154,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          toggleService.isQueryManagementLRsEnabled(),
-                          toggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       toggleService.isQueryManagementLRsEnabled());
+                          toggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -168,8 +165,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          toggleService.isQueryManagementLRsEnabled(),
-                          toggleService.isLipQueryManagementEnabled(caseData));
+                          toggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -184,10 +180,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          toggleService.isQueryManagementLRsEnabled(),
-                          toggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       toggleService.isQueryManagementLRsEnabled());
+                          toggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -202,10 +195,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          toggleService.isQueryManagementLRsEnabled(),
-                          toggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       toggleService.isQueryManagementLRsEnabled());
+                          toggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
@@ -220,10 +210,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          toggleService.isQueryManagementLRsEnabled(),
-                          toggleService.isLipQueryManagementEnabled(caseData));
-        addCnbcContact(caseData, properties, configuration,
-                       toggleService.isQueryManagementLRsEnabled());
+                          toggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
