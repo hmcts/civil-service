@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -81,6 +82,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
         if (Objects.nonNull(caseData.getPreTranslationDocumentType())) {
             caseDataBuilder = caseDataBuilder.preTranslationDocumentType(null);
+        }
+
+        if (Objects.nonNull(caseData.getBilingualHint())) {
+            caseDataBuilder = caseDataBuilder.bilingualHint(YesOrNo.NO);
         }
 
         caseDataBuilder.caseDataLiP(caseDataLip);
