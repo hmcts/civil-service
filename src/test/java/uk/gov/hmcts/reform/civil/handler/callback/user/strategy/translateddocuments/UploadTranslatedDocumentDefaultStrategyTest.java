@@ -791,6 +791,65 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     }
 
     @Test
+    void shouldCopySealedClaimForm() {
+        //Given
+        @SuppressWarnings("unchecked")
+        List<Element<TranslatedDocument>> expectedTranslatedDocs = (List<Element<TranslatedDocument>>) any(List.class);
+        List<Element<CaseDocument>> documents = List.of(
+            element(CaseDocument.builder().documentName("000MC001-sealed-claim-form.pdf")
+                        .documentType(DocumentType.SEALED_CLAIM).build()));
+        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+            expectedTranslatedDocs,
+            any(CaseData.class)
+        )).willReturn(documents);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(CLAIM_ISSUE)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1)
+        );
+
+        List<Element<CaseDocument>> preTranslationDocuments = new ArrayList<>();
+        preTranslationDocuments.add(element(CaseDocument.toCaseDocument(
+            Document.builder().build(),
+            DocumentType.SEALED_CLAIM
+        )));
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .build().toBuilder()
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocuments(translatedDocument)
+                             .build())
+            .preTranslationDocuments(preTranslationDocuments)
+            .systemGeneratedCaseDocuments(new ArrayList<>())
+            .ccdCaseReference(123L)
+            .build();
+
+        when(featureToggleService.isCaseProgressionEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+            callbackParams);
+        List<?> documentsList = (List<?>) response.getData().get("systemGeneratedCaseDocuments");
+        //Then
+        assertThat(documentsList.size()).isEqualTo(1);
+        assertThat(response.getData())
+            .extracting("businessProcess")
+            .extracting("camundaEvent")
+            .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE.name());
+    }
+
+    @Test
     void shouldUpdateBusinessProcess_WhenDocumentTypeIsCourtOfficerOrder() {
         //Given
         TranslatedDocument translatedDocument1 = TranslatedDocument
@@ -965,7 +1024,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldUpdateBusinessProcess_WhenLipIsBilingual_documentTypeDefendantResponseOfLr() {
         //Given
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(DEFENDANT_RESPONSE)
