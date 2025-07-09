@@ -686,7 +686,8 @@ public class EventHistoryMapper {
     @NotNull
     protected BigDecimal getAmountOfJudgmentForAdmission(CaseData caseData) {
         return caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-            .add(caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() : totalInterestForLrClaim(caseData)).setScale(2);
+            .add(caseData.isLipvLipOneVOne() && !caseData.isPartAdmitClaimSpec()
+                ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() : totalInterestForLrClaim(caseData)).setScale(2);
     }
 
     private BigDecimal totalInterestForLrClaim(CaseData caseData) {
