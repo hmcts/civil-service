@@ -95,7 +95,7 @@ java:
         enabled: false
       resources:
         requests:
-          cpu: 25m
+          cpu: 50m
       initdb:
         scripts:
           init.sql: |
@@ -266,6 +266,7 @@ ccd:
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
         DATA_STORE_DB_PASSWORD: ${POSTGRES_PASSWORD}
+        DATA_STORE_DB_CONNECTION_TIMEOUT: 60000
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,civil_service,ccd_case_document_am_api,aac_manage_case_assignment
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
