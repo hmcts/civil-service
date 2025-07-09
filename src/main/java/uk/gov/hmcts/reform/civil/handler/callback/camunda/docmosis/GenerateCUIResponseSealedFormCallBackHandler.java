@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -98,6 +99,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     private void addToSystemGeneratedDocuments(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseDocument document, CaseData caseData) {
         if (featureToggleService.isWelshEnabledForMainCase() && (caseData.isClaimantBilingual() || caseData.isRespondentResponseBilingual())) {
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
+                .bilingualHint(YesOrNo.YES)
                 .preTranslationDocuments(List.of(ElementUtils.element(document)));
         } else {
             caseDataBuilder.respondent1ClaimResponseDocumentSpec(document)
@@ -117,16 +119,25 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 "Sealed Claim form",
                 LocalDate.now().toString()
         ));
-        ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+            documents.add(
+                new DocumentMetaData(
+                    caseData.getRespondent1OriginalDqDoc().getDocumentLink(),
+                    "Directions Questionnaire",
+                    LocalDate.now().toString()
+                )
+            );
+        } else {
+            ElementUtils.unwrapElements(caseData.getSystemGeneratedCaseDocuments()).stream()
                 .filter(cd -> DIRECTIONS_QUESTIONNAIRE.equals(cd.getDocumentType()))
                 .map(cd ->
-                        new DocumentMetaData(
-                                cd.getDocumentLink(),
-                                "Directions Questionnaire",
-                                LocalDate.now().toString()
-                        )
+                         new DocumentMetaData(
+                             cd.getDocumentLink(),
+                             "Directions Questionnaire",
+                             LocalDate.now().toString()
+                         )
                 ).forEach(documents::add);
-
+        }
         return documents;
     }
 }
