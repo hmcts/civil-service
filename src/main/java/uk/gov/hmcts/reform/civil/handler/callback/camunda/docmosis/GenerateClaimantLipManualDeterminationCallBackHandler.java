@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
@@ -70,6 +71,7 @@ public class GenerateClaimantLipManualDeterminationCallBackHandler extends Callb
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(claimantResponseForm));
             caseDataBuilder.preTranslationDocuments(translatedDocuments);
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
             caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.MANUAL_DETERMINATION_DOCUMENT);
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService
