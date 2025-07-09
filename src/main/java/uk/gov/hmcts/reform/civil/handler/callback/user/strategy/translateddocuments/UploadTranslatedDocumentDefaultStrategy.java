@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -82,6 +82,10 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
         if (Objects.nonNull(caseData.getPreTranslationDocumentType())) {
             caseDataBuilder = caseDataBuilder.preTranslationDocumentType(null);
+        }
+
+        if (Objects.nonNull(caseData.getBilingualHint())) {
+            caseDataBuilder = caseDataBuilder.bilingualHint(YesOrNo.NO);
         }
 
         caseDataBuilder.caseDataLiP(caseDataLip);
@@ -196,12 +200,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
                     defendantSealedForm.ifPresent(sealedForm -> {
                         preTranslationDocuments.remove(sealedForm);
                         systemGeneratedDocuments.add(sealedForm);
-                        Optional.ofNullable(caseData.getRespondent1OriginalDqDoc())
-                            .map(ElementUtils::element)
-                            .ifPresent(element -> {
-                                systemGeneratedDocuments.add(element);
-                                caseDataBuilder.respondent1OriginalDqDoc(null);
-                            });
                         aboutToStartOrSubmitCallbackResponseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.toString());
                     });
                 } else if ((Objects.nonNull(preTranslationDocuments) && !preTranslationDocuments.isEmpty())) {
@@ -229,6 +227,12 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (!courtOfficerOrderDocuments.isEmpty()) {
             caseDataBuilder.previewCourtOfficerOrder(courtOfficerOrderDocuments.get(0).getValue());
         }
+
+        if (featureToggleService.isWelshEnabledForMainCase() && caseData.getRespondent1OriginalDqDoc() != null) {
+            systemGeneratedDocuments.add(element(caseData.getRespondent1OriginalDqDoc()));
+            caseDataBuilder.respondent1OriginalDqDoc(null);
+        }
+
     }
 
     private void updateNoticeOfDiscontinuanceTranslatedDoc(CallbackParams callbackParams,
@@ -348,7 +352,7 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             } else if (Objects.nonNull(translatedDocuments)
                 && isContainsSpecifiedDocType(translatedDocuments, DEFENDANT_RESPONSE)
                 && caseData.isLipvLROneVOne()
-                && featureToggleService.isGaForWelshEnabled()) {
+                && featureToggleService.isWelshEnabledForMainCase()) {
                 return CaseEvent.UPLOAD_TRANSLATED_DEFENDANT_SEALED_FORM;
             }
         }
@@ -394,14 +398,14 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     private boolean isTranslationForLipVsLRDefendantSealedForm(Element<TranslatedDocument> document,
                                                                CaseData caseData) {
         return DEFENDANT_RESPONSE.equals(document.getValue().getDocumentType())
-            && caseData.isLipvLROneVOne() && featureToggleService.isGaForWelshEnabled()
+            && caseData.isLipvLROneVOne() && featureToggleService.isWelshEnabledForMainCase()
             && CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.equals(caseData.getCcdState());
     }
 
     private boolean isTranslationForLrVsLipApplicantDq(Element<TranslatedDocument> document,
                                                                CaseData caseData) {
         return CLAIMANT_INTENTION.equals(document.getValue().getDocumentType())
-            && caseData.isLRvLipOneVOne() && featureToggleService.isGaForWelshEnabled()
+            && caseData.isLRvLipOneVOne() && featureToggleService.isWelshEnabledForMainCase()
             && CaseState.AWAITING_APPLICANT_INTENTION.equals(caseData.getCcdState());
     }
 }
