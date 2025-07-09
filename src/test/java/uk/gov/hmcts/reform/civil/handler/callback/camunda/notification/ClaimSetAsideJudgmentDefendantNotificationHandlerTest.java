@@ -99,10 +99,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
             when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
             when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
-            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
         @Test
@@ -110,7 +108,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
             when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
@@ -137,7 +136,8 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
             when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
-
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
@@ -163,6 +163,9 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
         @Test
         void shouldNotifyDefendantLipSolicitor_whenInvoked() {
             when(notificationsProperties.getNotifyUpdateTemplate()).thenReturn(TEMPLATE_ID_LIP);
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().toBuilder()
                 .applicant1(Party.builder()
