@@ -38,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 

@@ -26,7 +26,6 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 

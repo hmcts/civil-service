@@ -29,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DE
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getRespondentLegalOrganizationName;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.shouldSendMediationNotificationDefendant1LRCarm;

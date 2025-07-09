@@ -26,7 +26,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addAllFooterItems;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.addCnbcContact;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 

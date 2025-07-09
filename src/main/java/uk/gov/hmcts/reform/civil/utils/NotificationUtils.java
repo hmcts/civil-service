@@ -365,8 +365,8 @@ public class NotificationUtils {
     public static Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isPublicQMEnabled) {
-        if (!queryNotAllowedCaseStates(caseData) &&
-            (!caseData.isLipCase() || (caseData.isLipCase() && isPublicQMEnabled))) {
+        if (!queryNotAllowedCaseStates(caseData)
+            && (!caseData.isLipCase() || (caseData.isLipCase() && isPublicQMEnabled))) {
             properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         } else {
             properties.put(CNBC_CONTACT, configuration.getCnbcContact());
