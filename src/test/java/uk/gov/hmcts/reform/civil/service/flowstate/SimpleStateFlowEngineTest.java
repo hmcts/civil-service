@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
+import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
@@ -49,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -5371,5 +5373,100 @@ class SimpleStateFlowEngineTest {
             );
         }
 
+    }
+
+    @Nested
+    class DtoTests {
+        @Test
+        void shouldReturnStateFlowDto_whenEvaluatingCaseDetails() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendant()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseDataLiP(CaseDataLiP.builder()
+                    .helpWithFees(HelpWithFees.builder()
+                        .helpWithFeesReferenceNumber("Test")
+                        .build())
+                    .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                    .hwfFullRemissionGrantedForClaimIssue(YES)
+                    .build())
+                .ccdState(CaseState.CASE_ISSUED)
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
+                .caseAccessCategory(UNSPEC_CLAIM).build();
+
+            // When
+            StateFlowDTO stateFlowDTO = stateFlowEngine.getStateFlow(caseData);
+
+            // Then
+            assertThat(stateFlowDTO.getState()).isNotNull();
+            assertThat(stateFlowDTO.getState().getName()).isEqualTo(CLAIM_ISSUED.fullName());
+        }
+
+        @Test
+        void shouldReturnStateFlowDto_whenEvaluatingCaseDetailsSpec() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
+                .ccdState(CaseState.CASE_ISSUED)
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(2))
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            StateFlowDTO stateFlowDTO = stateFlowEngine.getStateFlow(caseData);
+
+            // Then
+            assertThat(stateFlowDTO.getState()).isNotNull();
+            assertThat(stateFlowDTO.getState().getName()).isEqualTo(CLAIM_ISSUED.fullName());
+        }
+
+        @Test
+        void shouldReturnStateFlowDto_whenEvaluatingCaseDetailsWithSpec() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendantSpec()
+                .applicant1Represented(NO)
+                .respondent1Represented(YES)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("Temp").build())
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseDataLiP(CaseDataLiP.builder()
+                    .helpWithFees(HelpWithFees.builder()
+                        .helpWithFeesReferenceNumber("Test")
+                        .build())
+                    .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                    .hwfFullRemissionGrantedForClaimIssue(YES)
+                    .build())
+                .ccdState(CaseState.CASE_ISSUED)
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            StateFlowDTO stateFlowDTO = stateFlowEngine.getStateFlowSpec(caseData);
+
+            // Then
+            assertThat(stateFlowDTO.getState()).isNotNull();
+            assertThat(stateFlowDTO.getState().getName()).isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
+        }
     }
 }
