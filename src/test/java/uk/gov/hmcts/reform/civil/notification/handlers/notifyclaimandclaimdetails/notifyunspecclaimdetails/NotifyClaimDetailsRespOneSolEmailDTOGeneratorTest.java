@@ -69,16 +69,17 @@ class NotifyClaimDetailsRespOneSolEmailDTOGeneratorTest {
         when(notifyClaimDetailsHelper.getCustomProperties(caseData)).thenReturn(customProps);
 
         String respOrgName = "respondent-legal-org-name";
-        MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class);
-        notificationUtilsMockedStatic.when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.TRUE, organisationService))
-            .thenReturn(respOrgName);
+        try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
+            notificationUtilsMockedStatic
+                .when(() -> NotificationUtils.getLegalOrganizationNameForRespondent(caseData, Boolean.TRUE, organisationService))
+                .thenReturn(respOrgName);
 
-        Map<String, String> result = generator.addCustomProperties(baseProps, caseData);
+            Map<String, String> result = generator.addCustomProperties(baseProps, caseData);
 
-        assertEquals(2, result.size());
-        assertThat(result).containsEntry("key", "value");
-        assertThat(result).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, respOrgName);
-        notificationUtilsMockedStatic.close();
+            assertEquals(2, result.size());
+            assertThat(result).containsEntry("key", "value");
+            assertThat(result).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, respOrgName);
+        }
     }
 
     @Test
