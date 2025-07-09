@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreTranslationDocumentType;
@@ -71,6 +72,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
             List<Element<CaseDocument>> translatedDocuments = callbackParams.getCaseData()
                 .getPreTranslationDocuments();
             translatedDocuments.add(element(sealedDQForm));
+            caseDataBuilder.bilingualHint(YesOrNo.YES);
             caseDataBuilder.preTranslationDocuments(translatedDocuments);
             caseDataBuilder.preTranslationDocumentType(PreTranslationDocumentType.LIP_CLAIMANT_DQ);
         } else if (featureToggleService.isWelshEnabledForMainCase()
