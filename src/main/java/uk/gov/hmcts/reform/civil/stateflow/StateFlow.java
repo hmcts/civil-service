@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.stateflow;
 
 import org.springframework.statemachine.StateMachine;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StateFlowDTO;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -56,5 +57,13 @@ public class StateFlow {
 
     public boolean isFlagSet(FlowFlag flowFlag) {
         return Optional.ofNullable(getFlags().get(flowFlag.name())).orElse(false);
+    }
+
+    public StateFlowDTO toStateFlowDTO() {
+        return StateFlowDTO.builder()
+            .stateHistory(getStateHistory())
+            .state(getState())
+            .flags(getFlags())
+            .build();
     }
 }
